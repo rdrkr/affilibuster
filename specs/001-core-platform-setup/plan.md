@@ -1,15 +1,15 @@
 
 # Implementation Plan: Core Platform Setup & Multi-Language Infrastructure
 
-**Branch**: `002-core-platform-setup` | **Date**: 2025-10-04 | **Spec**: [spec.md](spec.md)
-**Input**: Feature specification from `/specs/002-core-platform-setup/spec.md`
+**Branch**: `001-core-platform-setup` | **Date**: 2025-10-04 | **Spec**: [spec.md](spec.md)
+**Input**: Feature specification from `/specs/001-core-platform-setup/spec.md`
 
 ## Execution Flow (/plan command scope)
 ```
 1. Load feature spec from Input path
-   → ✅ Loaded from /specs/002-core-platform-setup/spec.md
+   → ✅ Loaded from /specs/001-core-platform-setup/spec.md
 2. Fill Technical Context (scan for NEEDS CLARIFICATION)
-   → ✅ Project Type: Web application (Next.js + Django/FastAPI)
+   → ✅ Project Type: Web application (Next.js + FastAPI)
    → ✅ All technical decisions made (see Technical Context)
 3. Fill the Constitution Check section
    → ✅ Completed based on constitution v1.0.0
@@ -33,10 +33,10 @@
 
 ## Summary
 
-This feature establishes the foundational platform infrastructure for a multi-language eco-friendly affiliate website. The platform will support three languages (English, Italian, Hebrew) with separate URL paths per language, dynamic currency selection, and comprehensive SEO optimization. The architecture uses Next.js for the frontend (SSG/ISR for performance), Django/FastAPI for the backend API, PostgreSQL for data persistence, and Strapi as a headless CMS for non-technical content management.
+This feature establishes the foundational platform infrastructure for a multi-language eco-friendly affiliate website. The platform will support three languages (English, Italian, Hebrew) with separate URL paths per language, dynamic currency selection, and comprehensive SEO optimization. The architecture uses Next.js for the frontend (SSG/ISR for performance), FastAPI for the backend API, PostgreSQL for data persistence, and Strapi as a headless CMS for non-technical content management.
 
 Key capabilities:
-- Language-specific URL routing (/en, /it, /il) with RTL support for Hebrew
+- Language-specific URL routing (root for English, /it for Italian, /il for Hebrew) with RTL support for Hebrew
 - Browser/location detection with opt-in language switching prompts
 - Multi-currency support with user preferences persistence
 - SEO-optimized URLs with custom slugs per language
@@ -53,7 +53,7 @@ Key capabilities:
 
 **Primary Dependencies**:
 - Frontend: Next.js 14, React 18, next-intl (i18n), tailwindcss, next-seo
-- Backend: FastAPI 0.104+ or Django 5.0+ with Django REST Framework
+- Backend: FastAPI 0.104+
 - Database: PostgreSQL 15+
 - CMS: Strapi 4.x with PostgreSQL adapter
 - Caching: Redis (for session/currency preferences)
@@ -109,7 +109,7 @@ Key capabilities:
   - Entities: Language, Content, URLRoute, Currency, UserPreferences
   - Use Cases: GetLocalizedContent, SwitchLanguage, SetCurrency, DetectUserLanguage
   - Adapters: REST API controllers, Next.js pages, Strapi plugins
-  - Frameworks: Next.js, FastAPI/Django, Strapi
+  - Frameworks: Next.js, FastAPI, Strapi
 - Violations: None
 
 **II. SOLID Principles Compliance**
@@ -300,7 +300,7 @@ All technical decisions have been provided through clarifications. The following
    - Focus: SSG/ISR support, URL routing patterns, performance
 
 2. **Python backend framework selection**
-   - Decision: FastAPI vs Django comparison
+   - Decision: FastAPI selected
    - Research: Clean Architecture support, type safety, async capabilities
    - Focus: Which better supports domain-driven design patterns
 
@@ -826,7 +826,7 @@ Run the agent context update script:
 
 This will update `CLAUDE.md` with:
 - Project structure overview
-- Technology stack (Next.js 14, FastAPI/Django, Strapi, PostgreSQL)
+- Technology stack (Next.js 14, FastAPI, Strapi, PostgreSQL)
 - Key architectural decisions
 - Multi-language routing patterns
 - Currency handling approach

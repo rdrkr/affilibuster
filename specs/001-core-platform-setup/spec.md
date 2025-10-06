@@ -1,6 +1,6 @@
 # Feature Specification: Core Platform Setup & Multi-Language Infrastructure
 
-**Feature Branch**: `002-core-platform-setup`
+**Feature Branch**: `001-core-platform-setup`
 **Created**: 2025-10-04
 **Status**: Draft
 **Input**: User description: "Core Platform Setup & Multi-Language Infrastructure"
@@ -72,7 +72,7 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 #### Multi-Language Support
 - **FR-001**: System MUST support content delivery in three languages: English (primary at e.g. affilibuster.com), Italian (at e.g. affilibuster.com/it), and Hebrew (at e.g. affilibuster.com/il)
 - **FR-002**: System MUST detect user's browser language or location preference when they access the root domain (e.g. affilibuster.com)
-- **FR-003**: System MUST display a non-intrusive prompt asking if the user wants to switch to their detected language version when it differs from English, in case the user lands on a page whose language is different than the detected language. The prompt should be triggered only upon interaction with the page and only once per session.
+- **FR-003**: System MUST display a non-intrusive prompt asking if the user wants to switch to their detected language version when it differs from English, in case the user lands on a page whose language is different than the detected language. The prompt should be triggered only upon user interaction with the page (e.g., scroll, mouse movement, click) and only once per session.
 - **FR-004**: Users MUST be able to manually switch between language versions via a language selector visible on all pages, which redirects to the appropriate language URL path
 - **FR-005**: System MUST remember prompt dismissal preference for the current session and not re-prompt the user
 - **FR-006**: System MUST maintain language preference by serving the appropriate URL path (e.g. affilibuster.com, e.g. affilibuster.com/it, or e.g. affilibuster.com/il)
@@ -83,7 +83,7 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 - **FR-009**: System MUST format dates according to the selected language's locale conventions (DD/MM/YYYY for Italian/Hebrew, MM/DD/YYYY for English)
 - **FR-010**: System MUST format numbers with appropriate thousands separators and decimal points per locale
 - **FR-011**: System MUST provide a currency selector allowing users to choose their preferred currency for price display
-- **FR-012**: System MUST display default currency based on the detected location currency (USD for United States, EUR for Italian, ILS for Hebrew) until user selects a different currency
+- **FR-012**: System MUST display default currency based on the detected location (USD for United States, EUR for Italy/Europe, ILS for Israel) until user selects a different currency
 - **FR-013**: System MUST persist user's currency selection across sessions and language switches
 - **FR-014**: System MUST format currency values with proper symbols, decimal places, and positioning according to the selected currency's conventions
 - **FR-015**: System MUST handle timezone display appropriately for international audiences
@@ -91,7 +91,7 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 #### SEO & Discoverability
 - **FR-016**: System MUST generate hreflang meta tags for all pages indicating available language versions (x-default for e.g. affilibuster.com, it for e.g. affilibuster.com/it, he for e.g. affilibuster.com/il)
 - **FR-017**: System MUST create SEO-friendly, human-readable URLs with language path prefixes: root domain for English (e.g. affilibuster.com/products/), /it/ for Italian (e.g. affilibuster.com/it/prodotti/), /il/ for Hebrew (e.g. affilibuster.com/il/products/). The URLs slugs are always customizable by the admin
-- **FR-018**: System MUST allow customization of URL slugs per language for optimal SEO. In case a slug gets changed, the system MUST implement 301 redirects from the old URL to the new one. If a page/language version is removed, the system MUST implement a 410 status code for that URL.
+- **FR-018**: System MUST allow customization of URL slugs per language for optimal SEO. In case a slug gets changed, the system MUST automatically create 301 redirects from the old URL to the new one at the time of slug update. If a page/language version is removed, the system MUST automatically create a 410 status code response for that URL at the time of deletion.
 - **FR-019**: System MUST maintain equivalent page mapping across language versions for proper canonical and alternate URL references
 - **FR-020**: System MUST generate language-specific sitemaps for search engine crawlers (sitemap.xml, sitemap-it.xml, sitemap-il.xml)
 - **FR-021**: System MUST include language-specific schema markup for rich snippets in the appropriate language
@@ -99,12 +99,12 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 #### Content Management
 - **FR-022**: Content editors MUST be able to create and manage content in all three languages through a single interface
 - **FR-023**: System MUST clearly indicate which language versions of content exist and which are missing
-- **FR-024**: System MUST allow partial translations (some pages in all languages, others English-only)
+- **FR-024**: System MUST allow partial translations at both page level (some pages in all languages, others English-only) and field level (within a single page, some fields translated while others fall back to English)
 - **FR-025**: System MUST support batch content translation workflows for editors
 - **FR-026**: System MUST preserve content relationships (e.g., product-to-category) across language versions and their respective URL structures
 
 #### Platform Foundation
-- **FR-027**: System MUST deliver pages with load time under 3 seconds on 3G connections across all language versions
+- **FR-027**: System MUST deliver pages with Largest Contentful Paint (LCP) under 2.5 seconds and total page load (window.onload) under 3 seconds on 3G connections across all language versions
 - **FR-028**: System MUST achieve Lighthouse performance score above 90 for all language versions
 - **FR-029**: System MUST support static HTML generation where feasible for optimal performance
 - **FR-030**: System MUST implement proper caching strategies that respect language-specific content and URL paths
@@ -127,7 +127,7 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 - **TranslatableContent**: Abstract representation of content that can exist in multiple language versions, including status tracking for each translation and equivalent page mappings across language paths
 - **Locale**: Cultural and regional settings including date formats, number formats, default currency per language, and timezone preferences
 - **Currency**: Represents a currency option with code (USD, EUR, ILS, etc.), symbol, display format, and decimal precision
-- **LanguageVersion**: Specific versions of content tied to a language, including SEO metadata (title, description, keywords, custom URL slug) and the corresponding URL path. All customizable by the admin and independent one from another (while linked via hreflang)
+- **ContentVersion**: Specific versions of content tied to a language, including SEO metadata (title, description, keywords, custom URL slug) and the corresponding URL path. All customizable by the admin and independent one from another (while linked via hreflang)
 - **URLRoute**: SEO-friendly URL structure with language-specific path prefixes (e.g. affilibuster.com/*, e.g. affilibuster.com/it/*, e.g. affilibuster.com/il/*), custom slugs per language, redirects (301/410), and canonical/alternate URL references for hreflang
 - **UserPreferences**: Stores user choices including dismissed language prompts, selected currency, and session data for personalization
 
