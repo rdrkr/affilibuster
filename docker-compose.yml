@@ -1,0 +1,89 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: affilibuster-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: affilibuster
+      POSTGRES_PASSWORD: affilibuster
+      POSTGRES_DB: affilibuster
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U affilibuster"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: affilibuster-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: affilibuster-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://affilibuster:affilibuster@postgres:5432/affilibuster
+      REDIS_URL: redis://redis:6379
+      CORS_ORIGINS: http://localhost:3000,http://localhost:1337
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+
+  strapi:
+    image: node:18-alpine
+    container_name: affilibuster-strapi
+    restart: unless-stopped
+    working_dir: /app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: affilibuster_cms
+      DATABASE_USERNAME: affilibuster
+      DATABASE_PASSWORD: affilibuster
+      DATABASE_SSL: "false"
+      JWT_SECRET: changeme-jwt-secret-key-for-development
+      ADMIN_JWT_SECRET: changeme-admin-jwt-secret-key-for-development
+      APP_KEYS: changeme-app-key1,changeme-app-key2
+      API_TOKEN_SALT: changeme-api-token-salt
+      BACKEND_URL: http://backend:8000
+      WEBHOOK_SECRET: changeme-webhook-secret
+    ports:
+      - "1337:1337"
+    volumes:
+      - ./cms:/app
+      - strapi_uploads:/app/public/uploads
+    command: sh -c "npm install && npm run develop"
+
+volumes:
+  postgres_data:
+  redis_data:
+  strapi_uploads:

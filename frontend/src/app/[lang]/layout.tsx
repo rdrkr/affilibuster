@@ -1,0 +1,63 @@
+// Copyright (c) 2025 Affilibuster by Ronen Druker.
+
+/**
+ * Language-specific Layout
+ * Reference: T125 (Create [lang] dynamic segment layout)
+ */
+
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages, setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { ReactNode } from 'react';
+import { Navigation } from '@/components/Navigation';
+import { Footer } from '@/components/Footer';
+import { LocaleProvider } from '@/components/LocaleProvider';
+import '../globals.css';
+
+const locales = ['en', 'it', 'he'];
+
+type Props = {
+  children: ReactNode;
+  params: Promise<{ lang: string }>;
+};
+
+export function generateStaticParams() {
+  return locales.map((lang) => ({ lang }));
+}
+
+export default async function LocaleLayout({
+  children,
+  params,
+}: Props) {
+  const { lang } = await params;
+
+  // Validate locale
+  if (!locales.includes(lang)) {
+    notFound();
+  }
+
+  // Enable static rendering
+  setRequestLocale(lang);
+
+  // Get messages for this locale
+  const messages = await getMessages();
+
+  // Determine text direction
+  const direction = lang === 'he' ? 'rtl' : 'ltr';
+
+  return (
+    <html lang={lang} dir={direction}>
+      <body>
+        <NextIntlClientProvider messages={messages}>
+          <LocaleProvider>
+            <div className="min-h-screen flex flex-col">
+              <Navigation />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+          </LocaleProvider>
+        </NextIntlClientProvider>
+      </body>
+    </html>
+  );
+}

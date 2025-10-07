@@ -1,0 +1,104 @@
+# Copyright (c) 2025 Affilibuster by Ronen Druker.
+
+"""
+UserPreferences domain entity.
+
+Reference: data-model.md:320-362
+"""
+
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from typing import Optional
+from uuid import UUID, uuid4
+
+
+@dataclass
+class UserPreferences:
+    """
+    Stores user preferences for language prompts and currency selection.
+
+    Business Rules:
+    - expiresAt must be > updatedAt
+    - sessionId is required (generated on first visit)
+    - userId takes precedence over sessionId if both exist (logged-in user)
+    - When currency changed, updatedAt and expiresAt refresh (extend TTL)
+    - When language prompt dismissed, dismissedLanguagePrompt = true for session only
+    """
+
+    session_id: str
+    selected_currency: str  # CurrencyCode
+    dismissed_language_prompt: bool = False
+    detected_language: Optional[str] = None  # LanguageCode
+    user_id: Optional[str] = None
+    id: UUID = None  # type: ignore
+    created_at: datetime = None  # type: ignore
+    updated_at: datetime = None  # type: ignore
+    expires_at: datetime = None  # type: ignore
+
+    def __post_init__(self):
+        """Initialize defaults and run validation."""
+        if self.id is None:
+            self.id = uuid4()
+        if self.created_at is None:
+            self.created_at = datetime.utcnow()
+        if self.updated_at is None:
+            self.updated_at = datetime.utcnow()
+        if self.expires_at is None:
+            # Default TTL: 30 days from creation
+            self.expires_at = self.updated_at + timedelta(days=30)
+
+        self.validate()
+
+    def validate(self) -> None:
+        """
+        Validate business rules.
+
+        Raises:
+            ValueError: If any business rule is violated
+        """
+        # Rule: expiresAt must be > updatedAt
+        if self.expires_at <= self.updated_at:
+            raise ValueError("expiresAt must be greater than updatedAt")
+
+        # Rule: sessionId is required
+        if not self.session_id:
+            raise ValueError("sessionId is required")
+
+    def update_currency(self, currency_code: str) -> None:
+        """
+        Update selected currency and refresh TTL.
+
+        Args:
+            currency_code: New currency code to set
+        """
+        self.selected_currency = currency_code
+        self.updated_at = datetime.utcnow()
+        # Extend TTL by 30 days from now
+        self.expires_at = self.updated_at + timedelta(days=30)
+
+    def dismiss_language_prompt(self) -> None:
+        """
+        Mark language prompt as dismissed for this session.
+        """
+        self.dismissed_language_prompt = True
+        self.updated_at = datetime.utcnow()
+        # Extend TTL by 30 days from now
+        self.expires_at = self.updated_at + timedelta(days=30)
+
+    def is_expired(self) -> bool:
+        """
+        Check if preferences have expired.
+
+        Returns:
+            bool: True if current time is past expiresAt
+        """
+        return datetime.utcnow() > self.expires_at
+
+    def get_effective_identifier(self) -> str:
+        """
+        Get the effective identifier (userId if logged in, otherwise sessionId).
+
+        Returns:
+            str: userId if present, otherwise sessionId
+        """
+        return self.user_id if self.user_id else self.session_id
