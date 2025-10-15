@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     container_name: affilibuster-postgres
     restart: unless-stopped
     environment:
@@ -54,7 +54,7 @@ services:
     command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
   strapi:
-    image: node:18-alpine
+    image: node:22-alpine
     container_name: affilibuster-strapi
     restart: unless-stopped
     working_dir: /app
@@ -81,7 +81,7 @@ services:
     volumes:
       - ./cms:/app
       - strapi_uploads:/app/public/uploads
-    command: sh -c "npm install && npm run develop"
+    command: sh -c "npm install --legacy-peer-deps && npm run develop"
 
 volumes:
   postgres_data:

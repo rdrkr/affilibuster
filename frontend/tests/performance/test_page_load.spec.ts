@@ -33,6 +33,8 @@ const SLOW_3G = {
   uploadThroughput: (500 * 1024) / 8,
   // Latency: 400ms
   latency: 400,
+  // Network is online (not offline)
+  offline: false,
 };
 
 /**
@@ -172,6 +174,7 @@ test.describe('Page Load Performance (Comparison)', () => {
       downloadThroughput: (4 * 1024 * 1024) / 8,
       uploadThroughput: (3 * 1024 * 1024) / 8,
       latency: 20,
+      offline: false,
     });
 
     const fast4gStart = Date.now();

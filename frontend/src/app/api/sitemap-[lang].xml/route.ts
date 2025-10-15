@@ -87,10 +87,12 @@ function escapeXml(unsafe: string): string {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { lang: string } }
+  context: any
 ) {
   try {
-    const lang = params.lang.replace('.xml', ''); // Extract lang from filename
+    // Next.js 15: params is now a Promise
+    const { lang: langParam } = await context.params as { lang: string };
+    const lang = langParam.replace('.xml', ''); // Extract lang from filename
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://affilibuster.com';
 
     // Validate language

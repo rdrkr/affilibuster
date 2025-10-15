@@ -32,7 +32,7 @@ test.describe('Accessibility - WCAG 2.1 AA Compliance', () => {
 
     if (accessibilityScanResults.violations.length > 0) {
       console.log('\nViolations:');
-      accessibilityScanResults.violations.forEach((violation) => {
+      accessibilityScanResults.violations.forEach((violation: any) => {
         console.log(`  - ${violation.id}: ${violation.description}`);
         console.log(`    Impact: ${violation.impact}`);
         console.log(`    Nodes: ${violation.nodes.length}`);
@@ -312,7 +312,7 @@ test.describe('Accessibility - Color Contrast', () => {
 
     // Check for color contrast violations specifically
     const colorContrastViolations = contrastResults.violations.filter(
-      v => v.id === 'color-contrast'
+      (v: any) => v.id === 'color-contrast'
     );
 
     console.log(`\nColor Contrast Violations: ${colorContrastViolations.length}`);

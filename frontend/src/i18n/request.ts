@@ -12,12 +12,15 @@ export default getRequestConfig(async ({ locale }) => {
   // Validate that the incoming locale parameter matches supported locales
   const supportedLocales = ['en', 'it', 'he'];
 
-  if (!supportedLocales.includes(locale)) {
-    console.warn(`Invalid locale requested: ${locale}, falling back to 'en'`);
-    locale = 'en';
+  let validatedLocale = locale || 'en';
+
+  if (!supportedLocales.includes(validatedLocale)) {
+    console.warn(`Invalid locale requested: ${validatedLocale}, falling back to 'en'`);
+    validatedLocale = 'en';
   }
 
   return {
-    messages: (await import(`../../messages/${locale}.json`)).default,
+    locale: validatedLocale,
+    messages: (await import(`../../messages/${validatedLocale}.json`)).default,
   };
 });

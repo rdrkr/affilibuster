@@ -7,6 +7,7 @@ const withNextIntl = require('next-intl/plugin')(
 
 const nextConfig = {
   reactStrictMode: true,
+  allowedDevOrigins: ['10.100.102.35'],
   images: {
     remotePatterns: [
       {

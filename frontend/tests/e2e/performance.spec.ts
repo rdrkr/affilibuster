@@ -110,7 +110,7 @@ test.describe('Performance', () => {
           const rules = Array.from(sheet.cssRules || []);
           for (const rule of rules) {
             if (rule instanceof CSSFontFaceRule) {
-              fontRules.push(rule.style.fontDisplay);
+              fontRules.push(rule.style.getPropertyValue('font-display'));
             }
           }
         } catch (e) {

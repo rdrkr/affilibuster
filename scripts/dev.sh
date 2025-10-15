@@ -35,6 +35,21 @@ cleanup() {
 # Register cleanup function for Ctrl+C and script exit
 trap cleanup SIGINT SIGTERM EXIT
 
+# Kill any processes using our ports
+kill_port() {
+    local port=$1
+    local pids=$(lsof -ti :$port 2>/dev/null)
+    if [ ! -z "$pids" ]; then
+        echo "🔧 Killing existing process on port $port..."
+        echo "$pids" | xargs kill 2>/dev/null || true
+        sleep 1
+    fi
+}
+
+# Kill existing instances on our ports
+echo "🔍 Checking for existing instances..."
+kill_port 3000  # Frontend
+
 # Check if Docker is running
 if ! docker info > /dev/null 2>&1; then
     echo "❌ Docker is not running. Please start Docker and try again."
