@@ -7,7 +7,7 @@ Reference: T075 (IUserPreferencesRepository interface), T070 (UserPreferences mo
 """
 
 from typing import Optional
-from datetime import datetime
+from datetime import UTC, datetime
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
@@ -29,7 +29,7 @@ class UserPreferencesRepository(IUserPreferencesRepository):
         """Get user preferences by session ID."""
         stmt = select(UserPreferencesModel).where(
             UserPreferencesModel.session_id == session_id,
-            UserPreferencesModel.expires_at > datetime.utcnow(),
+            UserPreferencesModel.expires_at > datetime.now(UTC).replace(tzinfo=None),
         )
         result = await self.session.execute(stmt)
         model = result.scalar_one_or_none()
@@ -39,7 +39,7 @@ class UserPreferencesRepository(IUserPreferencesRepository):
         """Get user preferences by user ID."""
         stmt = select(UserPreferencesModel).where(
             UserPreferencesModel.user_id == user_id,
-            UserPreferencesModel.expires_at > datetime.utcnow(),
+            UserPreferencesModel.expires_at > datetime.now(UTC).replace(tzinfo=None),
         )
         result = await self.session.execute(stmt)
         model = result.scalar_one_or_none()
@@ -81,7 +81,7 @@ class UserPreferencesRepository(IUserPreferencesRepository):
     async def delete_expired(self) -> int:
         """Delete all expired preferences."""
         stmt = delete(UserPreferencesModel).where(
-            UserPreferencesModel.expires_at <= datetime.utcnow()
+            UserPreferencesModel.expires_at <= datetime.now(UTC).replace(tzinfo=None)
         )
         result = await self.session.execute(stmt)
         await self.session.flush()

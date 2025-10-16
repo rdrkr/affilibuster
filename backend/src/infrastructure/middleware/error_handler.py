@@ -7,7 +7,7 @@ Catches all unhandled exceptions and returns standardized error responses
 """
 
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -43,7 +43,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
                 "error": "Internal Server Error",
                 "message": "An unexpected error occurred. Please try again later.",
                 "code": "INTERNAL_SERVER_ERROR",
-                "timestamp": datetime.utcnow().isoformat() + "Z",
+                "timestamp": datetime.now(UTC).isoformat() + "Z",
                 "path": str(request.url.path),
             }
 

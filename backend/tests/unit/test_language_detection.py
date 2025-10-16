@@ -43,7 +43,7 @@ def supported_languages():
             display_name="Hebrew",
             native_name="עברית",
             direction="rtl",
-            url_prefix="/il",
+            url_prefix="/he",
             default_currency="ILS",
             locale_code="he-IL",
             is_default=False,

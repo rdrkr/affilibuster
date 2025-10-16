@@ -39,7 +39,7 @@ test.describe('404 Page Localization', () => {
   });
 
   test('should show Hebrew 404 page for non-existent Hebrew URL', async ({ page }) => {
-    const response = await page.goto('/il/non-existent-page');
+    const response = await page.goto('/he/non-existent-page');
 
     // Should return 404
     expect(response?.status()).toBe(404);

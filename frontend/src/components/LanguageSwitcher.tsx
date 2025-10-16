@@ -22,9 +22,13 @@ export function LanguageSwitcher() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Extract current language from pathname (e.g., /it/products -> it)
+    // Extract current language from pathname (e.g., /it/products -> it, /he/products -> he)
     const pathParts = pathname.split('/').filter(Boolean);
-    const lang = pathParts[0] === 'it' || pathParts[0] === 'he' ? pathParts[0] : 'en';
+    const firstSegment = pathParts[0];
+    // Map URL prefixes to language codes
+    let lang = 'en';
+    if (firstSegment === 'it') lang = 'it';
+    else if (firstSegment === 'he') lang = 'he';
     setCurrentLang(lang);
 
     // Fetch available languages
@@ -38,24 +42,46 @@ export function LanguageSwitcher() {
   const handleLanguageChange = (newLang: string) => {
     // Get the path without the language prefix
     const pathParts = pathname.split('/').filter(Boolean);
-    const isCurrentPathLangPrefixed = pathParts[0] === 'it' || pathParts[0] === 'he';
+
+    // Check if first segment is a language prefix (it, he, or en)
+    const knownPrefixes = ['it', 'he', 'en'];
+    const isCurrentPathLangPrefixed = knownPrefixes.includes(pathParts[0]);
     const pathWithoutLang = isCurrentPathLangPrefixed
       ? '/' + pathParts.slice(1).join('/')
       : pathname;
 
-    // Construct new path with new language
+    // Get the new language configuration
     const language = languages.find((l) => l.code === newLang);
-    const newPath = language?.urlPrefix
-      ? `${language.urlPrefix}${pathWithoutLang}`
-      : pathWithoutLang;
+    if (!language) {
+      console.error(`Language ${newLang} not found`);
+      return;
+    }
 
-    router.push(newPath || '/');
+    // Construct new path with language prefix
+    // All languages now have explicit prefixes: /en /it /he
+    let newPath: string;
+    if (language.urlPrefix) {
+      const basePath = pathWithoutLang === '/' ? '' : pathWithoutLang;
+      newPath = `${language.urlPrefix}${basePath}`;
+    } else {
+      // Fallback for languages without urlPrefix (shouldn't happen)
+      newPath = pathWithoutLang;
+    }
+
+    // Ensure we have at least '/' for root paths
+    if (!newPath || newPath === '') {
+      newPath = '/';
+    }
+
+    // Use router.push for language switching
+    router.push(newPath);
+    router.refresh(); // Refresh to ensure content is reloaded
     setIsOpen(false);
   };
 
   if (loading) {
     return (
-      <div className="w-32 h-10 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-md" />
+      <div className="w-32 h-10 bg-primary-700 animate-pulse rounded-lg" />
     );
   }
 
@@ -65,7 +91,7 @@ export function LanguageSwitcher() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        className="flex items-center space-x-2 px-4 py-2 bg-primary-700 hover:bg-primary-600 text-white rounded-lg transition-colors shadow-sm"
         aria-label="Select language"
         aria-expanded={isOpen}
       >
@@ -97,15 +123,15 @@ export function LanguageSwitcher() {
           />
 
           {/* Dropdown */}
-          <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg z-20">
+          <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-neutral-800 border border-primary-200 dark:border-primary-700 rounded-lg shadow-xl z-20 overflow-hidden">
             {languages.map((language) => (
               <button
                 key={language.code}
                 onClick={() => handleLanguageChange(language.code)}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-50 dark:hover:bg-primary-900 transition-colors ${
                   language.code === currentLang
-                    ? 'bg-gray-50 dark:bg-gray-700 font-medium'
-                    : ''
+                    ? 'bg-primary-50 dark:bg-primary-900 font-medium text-primary-700 dark:text-primary-300'
+                    : 'text-neutral-700 dark:text-neutral-200'
                 }`}
                 dir={language.direction}
               >
@@ -113,7 +139,7 @@ export function LanguageSwitcher() {
                   <span>{language.nativeName}</span>
                   {language.code === currentLang && (
                     <svg
-                      className="w-4 h-4 text-blue-600"
+                      className="w-4 h-4 text-secondary-500"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >

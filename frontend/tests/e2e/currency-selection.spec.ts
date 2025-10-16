@@ -19,7 +19,7 @@ test.describe('Currency Selection', () => {
     await expect(currencySelector).toContainText('EUR');
 
     // Hebrew -> ILS
-    await page.goto('/il');
+    await page.goto('/he');
     await expect(currencySelector).toContainText('ILS');
   });
 

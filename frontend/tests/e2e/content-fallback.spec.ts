@@ -50,7 +50,7 @@ test.describe('Content Fallback to English', () => {
   test('should show English content when Hebrew translation is missing', async ({ page }) => {
     // Test same scenario for Hebrew (RTL layout)
 
-    await page.goto(`${BASE_URL}/il/products/new-gadget`, {
+    await page.goto(`${BASE_URL}/he/products/new-gadget`, {
       waitUntil: 'networkidle',
     });
 

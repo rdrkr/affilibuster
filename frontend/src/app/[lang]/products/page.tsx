@@ -45,7 +45,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-4xl font-bold mb-4">Products</h1>
-        <p className="text-red-600 dark:text-red-400">
+        <p className="text-error-600 dark:text-error-400">
           Unable to load products. Please try again later.
         </p>
       </div>
@@ -60,7 +60,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">Products</h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400">
+        <p className="text-xl text-neutral-600 dark:text-neutral-400">
           Browse our collection of products
         </p>
       </div>
@@ -73,12 +73,12 @@ export default async function ProductsPage({ params, searchParams }: Props) {
               <Link
                 key={item.id}
                 href={`/${lang}/${item.slug}`}
-                className="group border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300"
+                className="group border-2 border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-tertiary-400 bg-white dark:bg-neutral-800"
               >
                 {/* Placeholder Image */}
-                <div className="bg-gray-200 dark:bg-gray-700 h-48 flex items-center justify-center">
+                <div className="bg-neutral-200 dark:bg-neutral-700 h-48 flex items-center justify-center">
                   <svg
-                    className="w-16 h-16 text-gray-400"
+                    className="w-16 h-16 text-neutral-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -94,11 +94,11 @@ export default async function ProductsPage({ params, searchParams }: Props) {
 
                 {/* Content */}
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-xl font-semibold mb-2 group-hover:text-secondary-600 transition-colors">
                     {item.title}
                   </h3>
                   {item.excerpt && (
-                    <p className="text-gray-600 dark:text-gray-400 line-clamp-3">
+                    <p className="text-neutral-600 dark:text-neutral-400 line-clamp-3">
                       {item.excerpt}
                     </p>
                   )}
@@ -114,7 +114,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
               {content.pagination.hasPrevious && (
                 <Link
                   href={`/${lang}/products?page=${currentPage - 1}`}
-                  className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
                 >
                   ← Previous
                 </Link>
@@ -135,15 +135,15 @@ export default async function ProductsPage({ params, searchParams }: Props) {
                     <div key={page} className="flex items-center gap-2">
                       {/* Show ellipsis if there's a gap */}
                       {index > 0 && page - array[index - 1] > 1 && (
-                        <span className="text-gray-400">...</span>
+                        <span className="text-neutral-400">...</span>
                       )}
 
                       <Link
                         href={`/${lang}/products?page=${page}`}
                         className={`px-4 py-2 border rounded-md transition-colors ${
                           page === currentPage
-                            ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                            ? 'bg-secondary-600 text-white border-secondary-600'
+                            : 'bg-white dark:bg-neutral-800 border-neutral-300 dark:border-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-700'
                         }`}
                       >
                         {page}
@@ -156,7 +156,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
               {content.pagination.hasNext && (
                 <Link
                   href={`/${lang}/products?page=${currentPage + 1}`}
-                  className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
                 >
                   Next →
                 </Link>
@@ -165,7 +165,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
           )}
 
           {/* Pagination Info */}
-          <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+          <div className="mt-8 text-center text-sm text-neutral-600 dark:text-neutral-400">
             Showing {products.length} of {content.pagination.totalItems} products
             {content.pagination.totalPages > 1 && (
               <> · Page {currentPage} of {content.pagination.totalPages}</>
@@ -174,7 +174,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
         </>
       ) : (
         <div className="text-center py-16">
-          <p className="text-xl text-gray-600 dark:text-gray-400">
+          <p className="text-xl text-neutral-600 dark:text-neutral-400">
             No products found.
           </p>
         </div>

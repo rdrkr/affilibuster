@@ -207,4 +207,4 @@ async def test_webhook_multilanguage_revalidation():
                 paths = data["revalidation"].get("paths", [])
                 assert any("/en/" in p for p in paths)
                 assert any("/it/" in p for p in paths)
-                assert any("/il/" in p for p in paths)
+                assert any("/he/" in p for p in paths)

@@ -7,7 +7,7 @@ Reference: data-model.md:320-362
 """
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Optional
 from uuid import UUID, uuid4
 
@@ -40,9 +40,9 @@ class UserPreferences:
         if self.id is None:
             self.id = uuid4()
         if self.created_at is None:
-            self.created_at = datetime.utcnow()
+            self.created_at = datetime.now(UTC).replace(tzinfo=None)
         if self.updated_at is None:
-            self.updated_at = datetime.utcnow()
+            self.updated_at = datetime.now(UTC).replace(tzinfo=None).replace(tzinfo=None)
         if self.expires_at is None:
             # Default TTL: 30 days from creation
             self.expires_at = self.updated_at + timedelta(days=30)
@@ -72,7 +72,7 @@ class UserPreferences:
             currency_code: New currency code to set
         """
         self.selected_currency = currency_code
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC).replace(tzinfo=None)
         # Extend TTL by 30 days from now
         self.expires_at = self.updated_at + timedelta(days=30)
 
@@ -81,7 +81,7 @@ class UserPreferences:
         Mark language prompt as dismissed for this session.
         """
         self.dismissed_language_prompt = True
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC).replace(tzinfo=None)
         # Extend TTL by 30 days from now
         self.expires_at = self.updated_at + timedelta(days=30)
 
@@ -92,7 +92,7 @@ class UserPreferences:
         Returns:
             bool: True if current time is past expiresAt
         """
-        return datetime.utcnow() > self.expires_at
+        return datetime.now(UTC).replace(tzinfo=None) > self.expires_at
 
     def get_effective_identifier(self) -> str:
         """

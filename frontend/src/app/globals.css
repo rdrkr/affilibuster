@@ -1,32 +1,51 @@
 /* Copyright (c) 2025 Affilibuster by Ronen Druker. */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Import RTL utility classes (T150A) */
+@import "tailwindcss";
+@import '../styles/theme.css';
 @import '../styles/rtl.css';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --foreground: var(--color-neutral-900);
+  --background-start: var(--color-primary-50);
+  --background-end: var(--color-neutral-50);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.light {
+  --foreground: var(--color-neutral-900);
+  --background-start: var(--color-primary-50);
+  --background-end: var(--color-neutral-50);
+}
+
+.dark {
+  --foreground: var(--color-neutral-50);
+  --background-start: var(--color-neutral-900);
+  --background-end: var(--color-neutral-900);
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
+  color: var(--foreground);
   background: linear-gradient(
       to bottom,
       transparent,
-      rgb(var(--background-end-rgb))
+      var(--background-end)
     )
-    rgb(var(--background-start-rgb));
+    var(--background-start);
+}
+
+/* System theme preference support - CSS-only fallback */
+@media (prefers-color-scheme: dark) {
+  :where(html):not(.light):not(.dark) {
+    color-scheme: dark;
+  }
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

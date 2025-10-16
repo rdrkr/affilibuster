@@ -7,7 +7,7 @@ Reference: data-model.md:81-104
 """
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Optional
 from uuid import UUID, uuid4
@@ -53,9 +53,9 @@ class Content:
         if self.id is None:
             self.id = uuid4()
         if self.created_at is None:
-            self.created_at = datetime.utcnow()
+            self.created_at = datetime.now(UTC)
         if self.updated_at is None:
-            self.updated_at = datetime.utcnow()
+            self.updated_at = datetime.now(UTC)
 
     def can_delete(self) -> bool:
         """
@@ -81,7 +81,7 @@ class Content:
 
         self.status = ContentStatus.ARCHIVED
         self.updated_by = archived_by
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
     def publish(self, published_by: str) -> None:
         """
@@ -100,4 +100,4 @@ class Content:
 
         self.status = ContentStatus.PUBLISHED
         self.updated_by = published_by
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)

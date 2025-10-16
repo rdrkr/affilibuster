@@ -22,7 +22,7 @@ class Language:
     Business Rules:
     - Exactly one language must have isDefault = true
     - English (code: 'en') must be the default language
-    - urlPrefix must be empty string for default language
+    - All languages have explicit URL prefixes (/en, /it, /he)
     - Hebrew must have direction = 'rtl', all others 'ltr'
     """
 
@@ -47,10 +47,6 @@ class Language:
         # Rule: English must be default
         if self.code == 'en' and not self.is_default:
             raise ValueError("English (code: 'en') must be the default language")
-
-        # Rule: urlPrefix must be empty for default language
-        if self.is_default and self.url_prefix != '':
-            raise ValueError("Default language must have empty urlPrefix")
 
         # Rule: Hebrew must be RTL
         if self.code == 'he' and self.direction != 'rtl':

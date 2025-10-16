@@ -39,7 +39,7 @@ describe('LanguageSwitcher Component', () => {
       displayName: 'English',
       nativeName: 'English',
       direction: 'ltr' as const,
-      urlPrefix: '',
+      urlPrefix: '/en',
       defaultCurrency: 'USD',
       localeCode: 'en-US',
       isDefault: true,
@@ -63,7 +63,7 @@ describe('LanguageSwitcher Component', () => {
       displayName: 'Hebrew',
       nativeName: 'עברית',
       direction: 'rtl' as const,
-      urlPrefix: '/il',
+      urlPrefix: '/he',
       defaultCurrency: 'ILS',
       localeCode: 'he-IL',
       isDefault: false,
@@ -82,13 +82,13 @@ describe('LanguageSwitcher Component', () => {
   it('should render language switcher button', async () => {
     render(<LanguageSwitcher />);
 
-    // Should show loading state initially
-    expect(screen.getByRole('button', { name: /select language/i })).toBeInTheDocument();
-
-    // Wait for languages to load
+    // Wait for languages to load and button to appear
     await waitFor(() => {
-      expect(screen.getByText('English')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /select language/i })).toBeInTheDocument();
     });
+
+    // Verify English is displayed
+    expect(screen.getByText('English')).toBeInTheDocument();
   });
 
   it('should display current language in button', async () => {
@@ -112,8 +112,8 @@ describe('LanguageSwitcher Component', () => {
     const button = screen.getByRole('button', { name: /select language/i });
     fireEvent.click(button);
 
-    // Should show all 3 languages
-    expect(screen.getByText('English')).toBeInTheDocument();
+    // Should show all 3 languages (use getAllByText for English since it appears in button and dropdown)
+    expect(screen.getAllByText('English').length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText('Italiano')).toBeInTheDocument();
     expect(screen.getByText('עברית')).toBeInTheDocument();
   });
@@ -140,7 +140,7 @@ describe('LanguageSwitcher Component', () => {
   });
 
   it('should navigate to Italian version when Italian is selected', async () => {
-    (usePathname as jest.Mock).mockReturnValue('/products/eco-bottle');
+    (usePathname as jest.Mock).mockReturnValue('/en/products/eco-bottle');
 
     render(<LanguageSwitcher />);
 
@@ -159,11 +159,12 @@ describe('LanguageSwitcher Component', () => {
     // Should navigate to Italian version
     await waitFor(() => {
       expect(mockRouter.push).toHaveBeenCalledWith('/it/products/eco-bottle');
+      expect(mockRouter.refresh).toHaveBeenCalled();
     });
   });
 
   it('should navigate to Hebrew (RTL) version when Hebrew is selected', async () => {
-    (usePathname as jest.Mock).mockReturnValue('/products/eco-bottle');
+    (usePathname as jest.Mock).mockReturnValue('/en/products/eco-bottle');
 
     render(<LanguageSwitcher />);
 
@@ -181,7 +182,8 @@ describe('LanguageSwitcher Component', () => {
 
     // Should navigate to Hebrew version
     await waitFor(() => {
-      expect(mockRouter.push).toHaveBeenCalledWith('/il/products/eco-bottle');
+      expect(mockRouter.push).toHaveBeenCalledWith('/he/products/eco-bottle');
+      expect(mockRouter.refresh).toHaveBeenCalled();
     });
   });
 
@@ -202,9 +204,10 @@ describe('LanguageSwitcher Component', () => {
     const englishButtons = screen.getAllByText('English');
     fireEvent.click(englishButtons[englishButtons.length - 1]);
 
-    // Should navigate to English version (remove /it prefix)
+    // Should navigate to English version (change /it to /en)
     await waitFor(() => {
-      expect(mockRouter.push).toHaveBeenCalledWith('/prodotti/bottiglia');
+      expect(mockRouter.push).toHaveBeenCalledWith('/en/prodotti/bottiglia');
+      expect(mockRouter.refresh).toHaveBeenCalled();
     });
   });
 
@@ -219,8 +222,8 @@ describe('LanguageSwitcher Component', () => {
     const button = screen.getByRole('button', { name: /select language/i });
     fireEvent.click(button);
 
-    // Dropdown should be visible
-    expect(screen.getAllByText('Italiano').length).toBeGreaterThan(1);
+    // Dropdown should be visible (English appears in button + dropdown = 2 times)
+    expect(screen.getAllByText('English').length).toBeGreaterThan(1);
 
     // Click backdrop (div with aria-hidden="true")
     const backdrop = document.querySelector('[aria-hidden="true"]');
@@ -228,9 +231,9 @@ describe('LanguageSwitcher Component', () => {
       fireEvent.click(backdrop);
     }
 
-    // Dropdown should close
+    // Dropdown should close (English only in button = 1 time)
     await waitFor(() => {
-      expect(screen.getAllByText('Italiano').length).toBe(1);
+      expect(screen.getAllByText('English').length).toBe(1);
     });
   });
 

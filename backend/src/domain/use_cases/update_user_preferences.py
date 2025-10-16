@@ -7,7 +7,7 @@ Reference: research.md:274-282
 """
 
 import json
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from src.domain.entities.user_preferences import UserPreferences
 from src.domain.repositories.preferences_repository import IUserPreferencesRepository
 from src.domain.repositories.cache_service import ICacheService
@@ -46,7 +46,7 @@ class UpdateUserPreferences:
             UserPreferences: Updated preferences
         """
         # Refresh timestamps and TTL
-        now = datetime.utcnow()
+        now = datetime.now(UTC).replace(tzinfo=None)
         preferences.updated_at = now
         preferences.expires_at = now + timedelta(days=30)
 

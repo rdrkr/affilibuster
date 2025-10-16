@@ -6,7 +6,7 @@ PublishContent use case.
 Reference: data-model.md:515-538 (Content Publishing Flow)
 """
 
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import UUID
 from src.domain.entities.content import Content, ContentStatus
 from src.domain.entities.content_version import ContentVersion
@@ -64,8 +64,8 @@ class PublishContent:
 
         # Update version
         version.is_published = True
-        version.published_at = datetime.utcnow()
-        version.updated_at = datetime.utcnow()
+        version.published_at = datetime.now(UTC)
+        version.updated_at = datetime.now(UTC)
 
         updated = await self.content_repository.update_version(version)
 

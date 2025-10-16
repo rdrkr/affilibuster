@@ -19,7 +19,7 @@ export function RTLWrapper({ children }: RTLWrapperProps) {
   const pathname = usePathname();
 
   // Check if current path is Hebrew
-  const isRTL = pathname.startsWith('/il') || pathname.startsWith('/he');
+  const isRTL = pathname.startsWith('/he');
 
   useEffect(() => {
     // Update document direction

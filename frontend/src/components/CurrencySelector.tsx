@@ -50,7 +50,7 @@ export function CurrencySelector() {
 
   if (loading) {
     return (
-      <div className="w-24 h-10 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-md" />
+      <div className="w-24 h-10 bg-primary-700 animate-pulse rounded-lg" />
     );
   }
 
@@ -60,7 +60,7 @@ export function CurrencySelector() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        className="flex items-center space-x-2 px-3 py-2 bg-primary-700 hover:bg-primary-600 text-white rounded-lg transition-colors shadow-sm"
         aria-label="Select currency"
         aria-expanded={isOpen}
       >
@@ -92,22 +92,22 @@ export function CurrencySelector() {
           />
 
           {/* Dropdown */}
-          <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg z-20 max-h-96 overflow-y-auto">
+          <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-neutral-800 border border-primary-200 dark:border-primary-700 rounded-lg shadow-xl z-20 max-h-96 overflow-y-auto">
             {currencies.map((currency) => (
               <button
                 key={currency.code}
                 onClick={() => handleCurrencyChange(currency.code)}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-50 dark:hover:bg-primary-900 transition-colors ${
                   currency.code === selectedCurrency
-                    ? 'bg-gray-50 dark:bg-gray-700 font-medium'
-                    : ''
+                    ? 'bg-primary-50 dark:bg-primary-900 font-medium text-primary-700 dark:text-primary-300'
+                    : 'text-neutral-700 dark:text-neutral-200'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <span>
                     {currency.symbol} {currency.code}
                   </span>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400">
                     {currency.displayName}
                   </span>
                 </div>

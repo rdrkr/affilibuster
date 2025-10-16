@@ -9,6 +9,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { ReactNode } from 'react';
+import Script from 'next/script';
 import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 import { LocaleProvider } from '@/components/LocaleProvider';
@@ -46,7 +47,28 @@ export default async function LocaleLayout({
   const direction = lang === 'he' ? 'rtl' : 'ltr';
 
   return (
-    <html lang={lang} dir={direction}>
+    <html lang={lang} dir={direction} suppressHydrationWarning>
+      <head>
+        <Script
+          id="theme-script"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var root = document.documentElement;
+                  var isDark = localStorage.theme === 'dark' ||
+                    (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+                  // Explicitly set the theme class
+                  root.classList.remove('light', 'dark');
+                  root.classList.add(isDark ? 'dark' : 'light');
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
         <NextIntlClientProvider messages={messages}>
           <LocaleProvider>

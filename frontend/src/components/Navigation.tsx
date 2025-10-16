@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { CurrencySelector } from './CurrencySelector';
+import { ThemeSelector } from './ThemeSelector';
 
 interface NavLink {
   href: string;
@@ -22,6 +23,7 @@ const navLinks: NavLink[] = [
   { href: '/', label: 'Home' },
   { href: '/products', label: 'Products' },
   { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 export function Navigation() {
@@ -30,22 +32,26 @@ export function Navigation() {
   // Extract current language prefix
   const pathParts = pathname.split('/').filter(Boolean);
   const langPrefix =
-    pathParts[0] === 'it' || pathParts[0] === 'he' ? `/${pathParts[0]}` : '';
+    pathParts[0] === 'it' || pathParts[0] === 'he' || pathParts[0] === 'en' ? `/${pathParts[0]}` : '';
 
   return (
-    <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+    <nav className="bg-primary-800 text-white shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link
             href={langPrefix || '/'}
-            className="text-2xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="text-2xl font-bold text-white hover:text-secondary-400 transition-colors flex items-center gap-2"
           >
+            <svg className="w-8 h-8" viewBox="0 0 100 100" fill="none">
+              <rect width="100" height="100" rx="20" fill="currentColor"/>
+              <text x="50" y="72" fontFamily="Arial, sans-serif" fontSize="60" fontWeight="bold" fill="#5B21B6" textAnchor="middle">A</text>
+            </svg>
             Affilibuster
           </Link>
 
           {/* Main Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-1">
             {navLinks.map((link) => {
               const fullHref = `${langPrefix}${link.href}`;
               const isActive = pathname === fullHref;
@@ -54,10 +60,10 @@ export function Navigation() {
                 <Link
                   key={link.href}
                   href={fullHref}
-                  className={`text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border-b-2 ${
                     isActive
-                      ? 'text-blue-600 dark:text-blue-400'
-                      : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                      ? 'bg-primary-700 text-white border-tertiary-400'
+                      : 'text-neutral-200 hover:bg-primary-700 hover:text-white border-b-2 border-transparent hover:border-tertiary-400'
                   }`}
                 >
                   {link.label}
@@ -66,14 +72,15 @@ export function Navigation() {
             })}
           </div>
 
-          {/* Language & Currency Selectors */}
-          <div className="flex items-center space-x-4">
+          {/* Language, Currency & Theme Selectors */}
+          <div className="flex items-center space-x-3">
             <LanguageSwitcher />
             <CurrencySelector />
+            <ThemeSelector />
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="md:hidden p-2 rounded-md text-white hover:bg-primary-700"
               aria-label="Open menu"
             >
               <svg

@@ -89,13 +89,13 @@ describe('CurrencySelector Component', () => {
   it('should render currency selector button', async () => {
     render(<CurrencySelector />);
 
-    // Should show loading state initially
-    expect(screen.getByRole('button', { name: /select currency/i })).toBeInTheDocument();
-
-    // Wait for currencies to load
+    // Wait for currencies to load and button to appear
     await waitFor(() => {
-      expect(screen.getByText(/€ EUR/)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /select currency/i })).toBeInTheDocument();
     });
+
+    // Verify EUR is displayed (from mockPreferences)
+    expect(screen.getByText(/€ EUR/)).toBeInTheDocument();
   });
 
   it('should display user preferred currency from API', async () => {

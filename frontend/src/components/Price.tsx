@@ -53,7 +53,7 @@ export function Price({
   if (loading) {
     return (
       <span
-        className={`inline-block h-6 w-16 bg-gray-200 dark:bg-gray-700 animate-pulse rounded ${className}`}
+        className={`inline-block h-6 w-16 bg-neutral-200 dark:bg-neutral-700 animate-pulse rounded ${className}`}
       />
     );
   }
@@ -85,7 +85,7 @@ export function Price({
     <span className={`font-medium ${className}`}>
       {display}
       {showCurrencyCode && (
-        <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
+        <span className="text-xs text-neutral-500 dark:text-neutral-400 ml-1">
           {currency.code}
         </span>
       )}

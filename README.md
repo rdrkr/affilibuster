@@ -29,6 +29,7 @@ affilibuster/
 ### Tech Stack
 
 #### Frontend
+
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript 5.3+
 - **Styling**: Tailwind CSS with RTL support
@@ -36,6 +37,7 @@ affilibuster/
 - **Testing**: Jest, React Testing Library, Playwright
 
 #### Backend
+
 - **Framework**: FastAPI 0.104+
 - **Language**: Python 3.11+
 - **Database**: PostgreSQL 15+ (via SQLAlchemy)
@@ -43,6 +45,7 @@ affilibuster/
 - **Testing**: pytest, httpx
 
 #### CMS
+
 - **Platform**: Strapi 4.x
 - **Database**: PostgreSQL
 - **Plugins**: i18n for multi-language content
@@ -52,6 +55,7 @@ affilibuster/
 ### Prerequisites
 
 #### macOS
+
 ```bash
 # Install Docker Desktop (Option 1)
 # Download from: https://www.docker.com/products/docker-desktop
@@ -62,6 +66,7 @@ colima start
 ```
 
 #### Linux
+
 ```bash
 # Install Docker and Docker Compose
 curl -fsSL https://get.docker.com -o get-docker.sh
@@ -70,6 +75,7 @@ sudo apt-get install docker-compose-plugin
 ```
 
 #### Windows
+
 ```bash
 # Install Docker Desktop
 # Download from: https://www.docker.com/products/docker-desktop
@@ -84,6 +90,7 @@ make dev
 ```
 
 This single command:
+
 - ✅ Checks Docker is running
 - ✅ Starts PostgreSQL + Redis + Backend + Strapi (Docker)
 - ✅ Auto-installs frontend dependencies (if needed)
@@ -95,12 +102,12 @@ This single command:
 
 ### Access Your Applications
 
-| Service | URL |
-|---------|-----|
-| **Frontend** | http://localhost:3000 |
-| **Backend API** | http://localhost:8000 |
-| **API Docs** | http://localhost:8000/docs |
-| **CMS Admin** | http://localhost:1337/admin (takes ~60s first time) |
+| Service         | URL                                                 |
+|-----------------|-----------------------------------------------------|
+| **Frontend**    | http://localhost:3000                               |
+| **Backend API** | http://localhost:8000                               |
+| **API Docs**    | http://localhost:8000/docs                          |
+| **CMS Admin**   | http://localhost:1337/admin (takes ~60s first time) |
 
 ### Stopping Services
 
@@ -159,21 +166,25 @@ Press **Ctrl+C** in the terminal or run `make stop`
 The frontend and CMS are not included in Docker Compose and run separately:
 
 #### Frontend
+
 ```bash
 cd frontend
 npm install
 cp .env.example .env.local
 npm run dev
 ```
+
 Access at: http://localhost:3000
 
 #### CMS
+
 ```bash
 cd cms
 npm install
 cp .env.example .env
 npm run develop
 ```
+
 Access at: http://localhost:1337/admin
 
 ### Local Development (without Docker)
@@ -181,6 +192,7 @@ Access at: http://localhost:1337/admin
 If you prefer to run services locally without Docker:
 
 #### Backend
+
 ```bash
 cd backend
 
@@ -199,6 +211,7 @@ uvicorn src.main:app --reload --port 8000
 ```
 
 #### Frontend
+
 ```bash
 cd frontend
 npm install
@@ -207,6 +220,7 @@ npm run dev
 ```
 
 #### CMS
+
 ```bash
 cd cms
 npm install
@@ -217,11 +231,13 @@ npm run develop
 ## 📚 Documentation
 
 ### Component Documentation
+
 - [Backend Documentation](./backend/README.md) - FastAPI backend API
 - [Frontend Documentation](./frontend/README.md) - Next.js frontend
 - [CMS Documentation](./cms/README.md) - Strapi headless CMS
 
 ### Feature Specifications
+
 - [Feature Specification](./specs/001-core-platform-setup/spec.md)
 - [Implementation Plan](./specs/001-core-platform-setup/plan.md)
 - [Data Model](./specs/001-core-platform-setup/data-model.md)
@@ -269,44 +285,94 @@ make clean             # Clean up everything
 
 ## 🧪 Testing
 
-### Backend Tests
+Comprehensive testing infrastructure with 80% coverage requirements across all modules.
+
+### Quick Commands
 
 ```bash
-# Quick: Run all tests with coverage
+# Run all tests (sequential)
 make test
 
-# Detailed: Run tests with Docker
-docker-compose exec backend pytest -v
-docker-compose exec backend pytest --cov=src --cov-report=term-missing
+# Run all tests in parallel (faster)
+make test-parallel
 
-# Run specific test file
-docker-compose exec backend pytest tests/contract/test_languages_api.py -v
+# Run tests + merge coverage
+make test-all
+
+# Individual modules
+make test-backend          # Backend (pytest)
+make test-backend-fast     # Backend unit tests only
+make test-frontend         # Frontend (Jest)
+make test-shared           # Type tests (tsd)
+make test-cms              # CMS (when custom code added)
+
+# Coverage
+make coverage-merge        # Merge all module reports
+make coverage-view         # Open merged HTML report
+make clean-coverage        # Clean all coverage files
 ```
 
-**Status:** 79/80 passing (98.75%) ✅
-**Coverage:** HTML report at `backend/htmlcov/index.html`
-
-### Frontend Tests
+### Test Categories (Backend)
 
 ```bash
-cd frontend
-
-# Unit tests with Jest
-npm test
-npm test -- --coverage
-
-# E2E tests with Playwright
-npm run test:e2e
-npx playwright test --headed  # View browser
+# Filter by category using pytest markers
+docker-compose exec backend pytest -m "unit"           # Unit tests only
+docker-compose exec backend pytest -m "integration"    # Integration tests
+docker-compose exec backend pytest -m "contract"       # API contract tests
+docker-compose exec backend pytest -m "not slow"       # Skip slow tests
 ```
 
-See component READMEs for detailed testing instructions:
+### Coverage Requirements
+
+- **Backend**: 80% (pytest + coverage.py)
+- **Frontend**: 80% (Jest)
+- **Shared**: 95% type coverage (tsd + type-coverage)
+- **CMS**: 60% (lower due to Strapi framework boilerplate)
+
+### Error Handling
+
+⚠️ **Important**: `make test` will **FAIL** (exit code ≠ 0) if:
+
+- Any test fails
+- Coverage falls below the required thresholds
+- Any module encounters errors
+
+The test suite runs **all modules** even when failures occur, allowing you to see all errors at once. The final exit
+code indicates whether all tests passed.
+
+```bash
+# Example: Tests fail due to low coverage
+make test
+# Output: ❌ Tests failed with errors or coverage below threshold
+# Exit code: 2 (non-zero = failure)
+
+# Use in CI/CD pipelines
+make test && echo "Deploy" || echo "Build failed"
+```
+
+### Documentation
+
+📖 **Full Testing Guide
+**: [specs/003-comprehensive-testing-strategy/quickstart.md](specs/003-comprehensive-testing-strategy/quickstart.md)
+
+Covers:
+
+- Test infrastructure setup
+- Running tests locally and in CI
+- Writing new tests
+- Coverage reporting and merging
+- Troubleshooting
+
+### Component-Specific Guides
+
 - [Backend Testing](./backend/README.md#testing)
 - [Frontend Testing](./frontend/README.md#testing)
+- [CMS Testing](./cms/README.md#testing-strategy)
 
 ## 📦 Building for Production
 
 ### Frontend
+
 ```bash
 cd frontend
 npm run build
@@ -314,6 +380,7 @@ npm start
 ```
 
 ### Backend
+
 ```bash
 cd backend
 # Production deployment typically uses Docker or serverless platforms
@@ -338,6 +405,7 @@ cd backend
 ### macOS Specific (Colima)
 
 **Issue**: Colima not starting
+
 ```bash
 # Check status
 colima status
@@ -351,6 +419,7 @@ docker ps
 ```
 
 **Issue**: Volume mounting issues with Colima
+
 ```bash
 # Ensure your project is in your home directory or add volume mount
 colima start --mount /path/to/project:w
@@ -359,6 +428,7 @@ colima start --mount /path/to/project:w
 ### Port Conflicts
 
 **Issue**: Port already in use (5432, 6379, 8000, 3000, 1337)
+
 ```bash
 # Find process using port
 lsof -i :5432  # or any other port
@@ -372,6 +442,7 @@ kill -9 <PID>
 ### Database Connection Issues
 
 **Issue**: Backend can't connect to PostgreSQL
+
 - **Solution**: Ensure PostgreSQL container is healthy:
   ```bash
   docker compose ps
@@ -381,6 +452,7 @@ kill -9 <PID>
 ### Permission Issues
 
 **Issue**: Permission denied on scripts
+
 ```bash
 chmod +x scripts/init-db.sh
 ```

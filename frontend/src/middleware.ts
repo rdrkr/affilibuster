@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 const intlMiddleware = createIntlMiddleware({
   locales: ['en', 'it', 'he'],
   defaultLocale: 'en',
-  localePrefix: 'as-needed',
+  localePrefix: 'always',
   alternateLinks: true,
   localeDetection: true,
 });

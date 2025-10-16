@@ -142,16 +142,16 @@ async def test_hreflang_rtl_languages():
         )
 
         # Get Hebrew content
-        response = await client.get("/il/test-rtl")
+        response = await client.get("/he/test-rtl")
 
         if response.status_code == 200:
             data = response.json()
             hreflang = data.get("seo", {}).get("hreflang", [])
 
-            # Should include Hebrew with /il prefix (not /he)
+            # Should include Hebrew with /he prefix
             he_hreflang = next((h for h in hreflang if h["lang"] == "he"), None)
             assert he_hreflang is not None
-            assert "/il/" in he_hreflang["url"]
+            assert "/he/" in he_hreflang["url"]
 
 
 @pytest.mark.integration

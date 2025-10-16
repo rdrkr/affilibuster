@@ -6,7 +6,7 @@ HandleSlugChange use case.
 Reference: data-model.md:540-563
 """
 
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import UUID
 from src.domain.entities.url_route import URLRoute, URLRedirect
 from src.domain.repositories.url_route_repository import IURLRouteRepository
@@ -87,7 +87,7 @@ class HandleSlugChange:
         # Mark old route as inactive and non-primary
         old_route.is_active = False
         old_route.is_primary = False
-        old_route.updated_at = datetime.utcnow()
+        old_route.updated_at = datetime.now(UTC)
         await self.url_route_repository.update(old_route)
 
         # Create 301 redirect from old path to new route
@@ -95,7 +95,7 @@ class HandleSlugChange:
             from_path=old_route.path,
             to_primary_url_id=str(new_route.id),
             status_code=301,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
             created_by=created_by,
             reason="slug_changed",
         )

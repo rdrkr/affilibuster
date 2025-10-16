@@ -6,7 +6,7 @@ CreateURLRedirect use case.
 Reference: data-model.md:199-206
 """
 
-from datetime import datetime
+from datetime import UTC, datetime
 from src.domain.entities.url_route import URLRedirect
 from src.domain.repositories.url_route_repository import IURLRouteRepository
 
@@ -55,7 +55,7 @@ class CreateURLRedirect:
             from_path=from_path,
             to_primary_url_id=to_primary_url_id,
             status_code=status_code,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
             created_by=created_by,
             reason=reason,
         )

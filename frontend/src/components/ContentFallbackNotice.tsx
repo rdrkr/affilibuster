@@ -23,13 +23,13 @@ export function ContentFallbackNotice({
 
   return (
     <div
-      className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 mb-6"
+      className="bg-warning-50 dark:bg-warning-900/20 border-l-4 border-warning-400 dark:border-warning-600 p-4 mb-6"
       role="alert"
     >
       <div className="flex">
         <div className="flex-shrink-0">
           <svg
-            className="h-5 w-5 text-yellow-400"
+            className="h-5 w-5 text-warning-400"
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -41,7 +41,7 @@ export function ContentFallbackNotice({
           </svg>
         </div>
         <div className="ml-3">
-          <p className="text-sm text-yellow-800 dark:text-yellow-200">
+          <p className="text-sm text-warning-800 dark:text-warning-200">
             <span className="font-medium">Translation not available.</span> This
             content is not yet available in {requestedLanguage}. Showing{' '}
             {fallbackLanguage} version.

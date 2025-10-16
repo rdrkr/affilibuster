@@ -278,6 +278,67 @@ docker-compose exec postgres psql -U postgres -d affilibuster_cms
 SELECT id, title, locale FROM products;
 ```
 
+## Testing Strategy
+
+The CMS module uses Strapi as a headless CMS. Most of the codebase is Strapi framework boilerplate, which is already tested by the Strapi team. **Tests should only be added when custom code is introduced.**
+
+### When to Add Tests
+
+Add tests ONLY when you add:
+- ✅ **Custom Controllers** - Business logic beyond CRUD
+- ✅ **Custom Services** - Complex data transformations
+- ✅ **Custom Middlewares** - Request/response processing
+- ✅ **Custom Policies** - Authorization logic
+- ✅ **Custom Lifecycle Hooks** - Content type event handlers
+- ✅ **Custom Webhooks** - External integrations
+
+Do NOT test:
+- ❌ Strapi boilerplate code
+- ❌ Content type schemas
+- ❌ Route configurations
+- ❌ Generated API endpoints
+
+### Coverage Requirements
+
+**Target: 60%** (lower than standard 80%)
+
+Rationale:
+1. Most CMS code is Strapi framework boilerplate
+2. Framework code is already tested by Strapi
+3. Only custom business logic needs testing
+
+### Running Tests
+
+```bash
+# From project root
+make test-cms
+
+# From CMS directory
+npm test
+npm test -- --coverage
+npm test -- --watch
+```
+
+### Test Structure
+
+```
+cms/tests/
+├── helpers/      # Test utilities, mocks, fixtures
+├── api/          # API endpoint tests
+└── integration/  # Integration tests
+```
+
+### Current Status
+
+✅ Infrastructure ready
+ℹ️  No tests yet (no custom code to test)
+ℹ️  Add tests when custom Strapi code is introduced
+
+### Resources
+
+- [Strapi Testing Guide](https://docs.strapi.io/dev-docs/testing)
+- [Project Testing Strategy](../specs/003-comprehensive-testing-strategy/quickstart.md)
+
 ---
 
 **Status:** ✅ Fully configured and production-ready

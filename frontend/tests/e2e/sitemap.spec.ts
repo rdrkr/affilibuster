@@ -28,7 +28,7 @@ test.describe('Sitemap', () => {
     expect(content).toContain('<loc>');
     expect(content).toContain('/en/');
     expect(content).toContain('/it/');
-    expect(content).toContain('/il/'); // Hebrew
+    expect(content).toContain('/he/'); // Hebrew
   });
 
   test('should include xhtml:link for alternate languages', async ({ page }) => {

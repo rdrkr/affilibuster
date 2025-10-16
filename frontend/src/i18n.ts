@@ -5,19 +5,19 @@
  * Reference: T124A (Configure next-intl message loading)
  */
 
-import { getRequestConfig } from 'next-intl/server';
-import { notFound } from 'next/navigation';
+import { getRequestConfig } from 'next-intl/server'
+import { notFound } from 'next/navigation'
 
 // List of supported locales
-const locales = ['en', 'it', 'he'];
+const locales = ['en', 'it', 'he']
 
 export default getRequestConfig(async ({ requestLocale }) => {
   // Get the locale from the request
-  const locale = await requestLocale;
+  const locale = await requestLocale
 
   // Validate that the incoming locale is valid
   if (!locale || !locales.includes(locale)) {
-    notFound();
+    notFound()
   }
 
   return {
@@ -25,5 +25,5 @@ export default getRequestConfig(async ({ requestLocale }) => {
     messages: (await import(`../messages/${locale}.json`)).default,
     timeZone: 'UTC',
     now: new Date(),
-  };
-});
+  }
+})

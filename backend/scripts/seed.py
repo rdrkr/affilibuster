@@ -20,7 +20,7 @@ from src.infrastructure.database.models.content import ContentModel
 from src.infrastructure.database.models.content_version import ContentVersionModel
 from sqlalchemy import select
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 
 
 async def seed_languages():
@@ -42,7 +42,7 @@ async def seed_languages():
                 display_name='English',
                 native_name='English',
                 direction='ltr',
-                url_prefix='',
+                url_prefix='/en',
                 default_currency='USD',
                 locale_code='en-US',
                 is_default=True,
@@ -66,7 +66,7 @@ async def seed_languages():
                 display_name='Hebrew',
                 native_name='עברית',
                 direction='rtl',
-                url_prefix='/il',
+                url_prefix='/he',
                 default_currency='ILS',
                 locale_code='he-IL',
                 is_default=False,
@@ -185,7 +185,7 @@ async def seed_content():
             meta_title='Test Product | Affilibuster',
             meta_description='Test product description for SEO',
             is_published=True,
-            published_at=datetime.utcnow(),
+            published_at=datetime.now(UTC).replace(tzinfo=None),
         )
 
         # Content 2: Eco Bottle (EN and IT)
@@ -208,7 +208,7 @@ async def seed_content():
             meta_title='Eco Bottle | Affilibuster',
             meta_description='Buy sustainable reusable bottles',
             is_published=True,
-            published_at=datetime.utcnow(),
+            published_at=datetime.now(UTC).replace(tzinfo=None),
         )
         version2_it = ContentVersionModel(
             id=uuid.uuid4(),
@@ -221,7 +221,7 @@ async def seed_content():
             meta_title='Bottiglia Eco | Affilibuster',
             meta_description='Acquista bottiglie riutilizzabili sostenibili',
             is_published=True,
-            published_at=datetime.utcnow(),
+            published_at=datetime.now(UTC).replace(tzinfo=None),
         )
 
         # Content 3: New Product (EN only - for fallback testing)
@@ -244,7 +244,7 @@ async def seed_content():
             meta_title='New Product | Affilibuster',
             meta_description='New product description',
             is_published=True,
-            published_at=datetime.utcnow(),
+            published_at=datetime.now(UTC).replace(tzinfo=None),
         )
 
         session.add_all([content1, version1, content2, version2_en, version2_it, content3, version3_en])

@@ -7,7 +7,7 @@ Reference: data-model.md:108-167
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Optional, Dict, List
 from uuid import UUID, uuid4
 
@@ -46,9 +46,9 @@ class ContentVersion:
         if self.id is None:
             self.id = uuid4()
         if self.created_at is None:
-            self.created_at = datetime.utcnow()
+            self.created_at = datetime.now(UTC)
         if self.updated_at is None:
-            self.updated_at = datetime.utcnow()
+            self.updated_at = datetime.now(UTC)
         if self.meta_keywords is None:
             self.meta_keywords = []
         if self.custom_schema is None:
@@ -83,13 +83,13 @@ class ContentVersion:
             raise ValueError("Content version is already published")
 
         self.is_published = True
-        self.published_at = datetime.utcnow()
-        self.updated_at = datetime.utcnow()
+        self.published_at = datetime.now(UTC)
+        self.updated_at = datetime.now(UTC)
 
     def unpublish(self) -> None:
         """Unpublish this content version (when content is archived)."""
         self.is_published = False
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
     def add_translation(self, language_code: str, content_version_id: str) -> None:
         """
@@ -108,4 +108,4 @@ class ContentVersion:
             )
 
         self.translations[language_code] = content_version_id
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)

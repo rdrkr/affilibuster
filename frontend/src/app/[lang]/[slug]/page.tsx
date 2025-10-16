@@ -91,13 +91,13 @@ export default async function ContentPage({ params }: ContentPageProps) {
           </h1>
 
           {content.excerpt && (
-            <p className="text-xl text-gray-600 dark:text-gray-400">
+            <p className="text-xl text-neutral-600 dark:text-neutral-400">
               {content.excerpt}
             </p>
           )}
 
           {/* Metadata */}
-          <div className="flex items-center gap-4 mt-6 text-sm text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-4 mt-6 text-sm text-neutral-500 dark:text-neutral-400">
             <time dateTime={content.publishedAt}>
               {content.publishedAt &&
                 new Date(content.publishedAt).toLocaleDateString(lang, {
@@ -111,7 +111,7 @@ export default async function ContentPage({ params }: ContentPageProps) {
             {content.fallbackUsed && (
               <>
                 <span>•</span>
-                <span className="text-yellow-600 dark:text-yellow-400">
+                <span className="text-warning-600 dark:text-warning-400">
                   Fallback Content
                 </span>
               </>
@@ -121,13 +121,13 @@ export default async function ContentPage({ params }: ContentPageProps) {
 
         {/* Content */}
         <div
-          className="prose dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline"
+          className="prose dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-secondary-600 prose-a:no-underline hover:prose-a:underline"
           dangerouslySetInnerHTML={{ __html: content.content }}
         />
 
         {/* Language Alternates */}
         {Object.keys(content.translations).length > 0 && (
-          <aside className="mt-12 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <aside className="mt-12 p-6 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
             <h2 className="text-lg font-semibold mb-4">
               Available in other languages:
             </h2>
@@ -136,7 +136,7 @@ export default async function ContentPage({ params }: ContentPageProps) {
                 <a
                   key={lang}
                   href={url}
-                  className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                  className="px-4 py-2 bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors"
                 >
                   {lang.toUpperCase()}
                 </a>

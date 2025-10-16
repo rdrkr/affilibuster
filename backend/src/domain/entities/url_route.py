@@ -7,7 +7,7 @@ Reference: data-model.md:170-246
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Optional, Dict, List, Literal
 from uuid import UUID, uuid4
 
@@ -66,9 +66,9 @@ class URLRoute:
         if self.id is None:
             self.id = uuid4()
         if self.created_at is None:
-            self.created_at = datetime.utcnow()
+            self.created_at = datetime.now(UTC)
         if self.updated_at is None:
-            self.updated_at = datetime.utcnow()
+            self.updated_at = datetime.now(UTC)
         if self.redirects is None:
             self.redirects = []
         if self.alternate_urls is None:
@@ -103,14 +103,14 @@ class URLRoute:
 
         self.is_active = False
         self.is_primary = False
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
         # Create 410 Gone redirect
         redirect = URLRedirect(
             from_path=self.path,
             to_primary_url_id=str(self.id),
             status_code=410,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
             created_by=deactivated_by,
             reason=reason
         )
@@ -140,12 +140,12 @@ class URLRoute:
             from_path=from_path,
             to_primary_url_id=str(self.id),
             status_code=301,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
             created_by=created_by,
             reason=reason
         )
         self.redirects.append(redirect)
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
     def make_primary(self) -> None:
         """Make this URL route the primary route for its content version."""
@@ -154,4 +154,4 @@ class URLRoute:
 
         self.is_primary = True
         self.is_active = True
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)

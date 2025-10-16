@@ -9,9 +9,6 @@
 *.env
 *.env.local
 *.env.*.local
-.env.development.local
-.env.test.local
-.env.production.local
 .DS_Store
 *.pem
 *.key
@@ -158,9 +155,6 @@ public
 .strapi/
 .strapi-updater.json
 .tmp/
-.cache/
-build/
-dist/
 .env
 license.txt
 exports
@@ -177,7 +171,6 @@ cms/public/uploads/*
 .tailwindcss-*
 
 # TypeScript
-*.tsbuildinfo
 tsconfig.tsbuildinfo
 
 ###################
@@ -186,6 +179,26 @@ tsconfig.tsbuildinfo
 # Jest
 coverage/
 .nyc_output
+
+# Backend Coverage (pytest)
+backend/htmlcov/
+backend/.coverage
+backend/.coverage.*
+backend/coverage.xml
+backend/coverage.lcov
+backend/.pytest_cache/
+
+# Frontend Coverage (Jest)
+frontend/coverage/
+frontend/.nyc_output/
+
+# Shared Coverage (tsd, type-coverage)
+shared/coverage/
+shared/.nyc_output/
+shared/dist/
+
+# Merged Coverage Reports
+coverage-merged/
 
 # Playwright
 test-results/
@@ -207,7 +220,6 @@ playwright-mcp-output/
 *.vsix
 
 # IntelliJ IDEA / PyCharm / WebStorm
-.idea/
 *.iml
 *.ipr
 *.iws
@@ -231,7 +243,6 @@ playwright-mcp-output/
 .*.sw[a-z]
 
 # Emacs
-*~
 \#*\#
 /.emacs.desktop
 /.emacs.desktop.lock
@@ -244,13 +255,11 @@ tramp
 # Docker
 ###################
 docker-compose.override.yml
-.dockerignore
 
 ###################
 # OS
 ###################
 # macOS
-.DS_Store
 .AppleDouble
 .LSOverride
 Icon
@@ -264,8 +273,6 @@ Icon
 .com.apple.timemachine.donotpresent
 .AppleDB
 .AppleDesktop
-Network Trash Folder
-Temporary Items
 .apdisk
 
 # Windows
@@ -279,7 +286,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # Linux
-*~
 .directory
 .Trash-*
 
@@ -289,11 +295,7 @@ $RECYCLE.BIN/
 *.log
 logs/
 *.log.*
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
 ###################
 # Temporary Files
@@ -301,16 +303,10 @@ lerna-debug.log*
 *.tmp
 *.temp
 *.bak
-*.swp
-*.swo
-*~
 
 ###################
 # Database
 ###################
-*.db
-*.sqlite
-*.sqlite3
 *.db-journal
 *.db-shm
 *.db-wal
@@ -326,16 +322,11 @@ lerna-debug.log*
 !.env.example
 !**/.env.example
 
-# Strapi generated files
-.strapi-updater.json
-
 # Generated documentation
 docs/_build/
+.playwright-mcp/
 
 # Certificates (keep .example versions)
-*.pem
-*.key
-*.crt
 !*.example.pem
 !*.example.key
 !*.example.crt

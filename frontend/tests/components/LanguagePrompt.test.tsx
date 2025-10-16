@@ -56,7 +56,7 @@ describe('LanguagePrompt Component', () => {
       displayName: 'English',
       nativeName: 'English',
       direction: 'ltr' as const,
-      urlPrefix: '',
+      urlPrefix: '/en',
       defaultCurrency: 'USD',
       localeCode: 'en-US',
       isDefault: true,

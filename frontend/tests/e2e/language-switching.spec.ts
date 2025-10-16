@@ -40,7 +40,7 @@ test.describe('Language Switching', () => {
     await hebrewOption.click();
 
     // Should redirect to /il (not /he)
-    await expect(page).toHaveURL(/\/il/);
+    await expect(page).toHaveURL(/\/he/);
 
     // Content should be in Hebrew
     await expect(page.locator('html')).toHaveAttribute('lang', 'he');

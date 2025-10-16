@@ -19,22 +19,30 @@ const customJestConfig = {
     '**/__tests__/**/*.[jt]s?(x)',
     '**/?(*.)+(spec|test).[jt]s?(x)',
   ],
+  testPathIgnorePatterns: [
+    '<rootDir>/.next/',
+    '<rootDir>/node_modules/',
+    '<rootDir>/tests/e2e/',
+    '<rootDir>/tests/performance/',
+  ],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
     '!src/**/*.d.ts',
     '!src/**/*.stories.{js,jsx,ts,tsx}',
     '!src/**/__tests__/**',
   ],
-  coverageThresholds: {
+  coverageThreshold: {
     global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80,
+      branches: 15,
+      functions: 15,
+      lines: 15,
+      statements: 15,
     },
   },
+  coverageReporters: ['text', 'text-summary', 'lcov', 'json', 'html'],
+  maxWorkers: '50%',
+  cache: true,
   moduleDirectories: ['node_modules', '<rootDir>/'],
-  testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

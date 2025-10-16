@@ -2,7 +2,25 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.playwright-mcp" />
+      <excludeFolder url="file://$MODULE_DIR$/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/htmlcov" />
+      <excludeFolder url="file://$MODULE_DIR$/cms/.strapi" />
+      <excludeFolder url="file://$MODULE_DIR$/cms/node_modules" />
+      <excludeFolder url="file://$MODULE_DIR$/cms/public" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/.next" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/node_modules" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/playwright-report" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/src/lib" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/test-results" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/tests/lib" />
+      <excludeFolder url="file://$MODULE_DIR$/shared/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/shared/node_modules" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

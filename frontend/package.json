@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "test": "jest",
+    "test": "jest --coverage --coverageReporters=text --coverageReporters=text-summary --coverageReporters=lcov --coverageReporters=html",
     "test:watch": "jest --watch",
     "test:e2e": "playwright test"
   },
