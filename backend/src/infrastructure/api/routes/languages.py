@@ -1,99 +1,137 @@
 # Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 """
-Language API routes.
+Language API routes - proxies to Strapi i18n API.
 
-Reference: contracts/api-v1.yaml:76-121
+Reference: contracts/affilibuster.openapi.yaml
+
+Architecture: Clean architecture pattern with use cases and dependency injection.
+All language data comes from Strapi's built-in i18n plugin (/api/i18n/locales).
 """
 
-from fastapi import APIRouter, Depends
-from typing import List
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Any, Dict, List
 
-from src.infrastructure.database.config import get_db
-from src.infrastructure.database.repositories.language_repository import LanguageRepository
-from src.infrastructure.api.models.languages import (
-    LanguageResponse,
-    DetectLanguageRequest,
-    DetectedLanguageResponse,
+from fastapi import APIRouter, HTTPException
+
+from domain.use_cases.strapi_proxy import StrapiProxyGetUseCase
+from infrastructure.api.models import (
+    DetectedLanguage,
+    Language,
 )
-from src.domain.use_cases.get_all_languages import GetAllLanguages
-from src.domain.use_cases.detect_user_language import DetectUserLanguage
+from infrastructure.api.models.generated.models import (
+    LanguagesDetectPostRequest,
+    LanguagesGetResponse,
+)
+from infrastructure.dependencies import CacheServiceDep, StrapiRepoDep
+
+router = APIRouter(prefix="/languages", tags=["languages"])
 
 
-router = APIRouter(prefix='/v1/languages', tags=['languages'])
-
-
-@router.get('', response_model=List[LanguageResponse])
-async def get_languages(db: AsyncSession = Depends(get_db)):
+async def transform_strapi_locales_to_languages(
+    locale_data: Dict[str, Any],
+) -> List[Language]:
     """
-    Get all active languages.
+    Transform Strapi locale data to Language model format.
 
-    Returns list of available languages sorted by sort_order.
+    Maps Strapi locales: { id, name, code, isDefault }
+    To Language format: { code, displayName, nativeName, direction, urlPrefix, defaultCurrency, localeCode, isDefault }
     """
-    # Create repository and use case
-    repo = LanguageRepository(db)
-    use_case = GetAllLanguages(repo)
+    # Strapi i18n endpoint returns list directly, not wrapped in 'data' key
+    locales = locale_data if isinstance(locale_data, list) else locale_data.get("data", [])
 
-    # Execute use case
-    languages = await use_case.execute()
-
-    # Convert to response models
-    return [
-        LanguageResponse(
-            code=lang.code,
-            display_name=lang.display_name,
-            native_name=lang.native_name,
-            direction=lang.direction,
-            url_prefix=lang.url_prefix,
-            default_currency=lang.default_currency,
-            locale_code=lang.locale_code,
-            is_default=lang.is_default,
-            is_active=lang.is_active,
-            sort_order=lang.sort_order,
+    languages = []
+    for locale in locales:
+        lang = Language(
+            code=locale.get("code", ""),
+            displayName=locale.get("name", ""),
+            nativeName=locale.get("name", ""),  # Fallback to name
+            direction="rtl" if locale.get("code") == "he" else "ltr",  # Hebrew is RTL
+            urlPrefix=f"/{locale.get('code', '')}",
+            defaultCurrency=("USD" if locale.get("code") != "it" else "EUR"),  # Default to USD, EUR for Italian
+            localeCode=locale.get("code", ""),
+            isDefault=locale.get("isDefault", False),
         )
-        for lang in languages
-    ]
+        languages.append(lang)
+
+    return sorted(languages, key=lambda x: (x.code != "en", x.code))
 
 
-@router.post('/detect', response_model=DetectedLanguageResponse)
-async def detect_language(
-    request: DetectLanguageRequest,
-    db: AsyncSession = Depends(get_db),
+@router.get("", response_model=LanguagesGetResponse)
+async def get_languages(
+    strapi_repo: StrapiRepoDep,
+    cache_service: CacheServiceDep,
 ):
     """
-    Detect user language from Accept-Language header and other signals.
+    Get all active languages from Strapi i18n API.
 
-    Returns detected language with confidence score.
+    Returns list of configured locales sorted by language code.
     """
-    # Create repository and use case
-    repo = LanguageRepository(db)
-    use_case = DetectUserLanguage(repo)
+    try:
+        # Use Strapi proxy use case
+        use_case = StrapiProxyGetUseCase(strapi_repo, cache_service, cache_ttl=300)
+        locale_data = await use_case.execute("/i18n/locales")
 
-    # Execute use case
-    result = await use_case.execute(
-        accept_language=request.acceptLanguage,
-        user_agent=request.userAgent,
-        country_code=request.countryCode,
-    )
+        # Transform to Language model format
+        languages = await transform_strapi_locales_to_languages(locale_data)
+        return languages
 
-    # Parse browser languages from Accept-Language header
-    browser_languages = []
-    if request.acceptLanguage:
-        # Extract language codes from Accept-Language header
-        for part in request.acceptLanguage.split(','):
-            lang = part.split(';')[0].strip()
-            if lang:
-                browser_languages.append(lang)
+    except Exception as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Failed to fetch languages from Strapi: {str(e)}",
+        )
 
-    # Determine fallback language (always English)
-    default_lang = await repo.get_default()
-    fallback = default_lang.code if default_lang else 'en'
 
-    # Convert to response model
-    return DetectedLanguageResponse(
-        detected=result.language_code,
-        preferred=result.language_code,
-        browser_languages=browser_languages,
-        fallback=fallback,
-    )
+@router.post("/detect", response_model=DetectedLanguage)
+async def detect_language(
+    request: LanguagesDetectPostRequest,
+    strapi_repo: StrapiRepoDep,
+    cache_service: CacheServiceDep,
+):
+    """
+    Detect user language from Accept-Language header.
+
+    Returns detected language with confidence and suggestion.
+    """
+    try:
+        # Parse browser languages from Accept-Language header
+        accept_language = request.acceptLanguage or ""
+        browser_languages = []
+        if accept_language:
+            # Extract language codes from Accept-Language header
+            for part in accept_language.split(","):
+                lang = part.split(";")[0].strip()
+                if lang:
+                    browser_languages.append(lang)
+
+        # Get available languages from Strapi
+        use_case = StrapiProxyGetUseCase(strapi_repo, cache_service, cache_ttl=300)
+        locale_data = await use_case.execute("/i18n/locales")
+        languages = await transform_strapi_locales_to_languages(locale_data)
+        available_codes = {lang.code for lang in languages}
+
+        # Find first browser language that's available
+        detected_lang = "en"
+        confidence = 0.5  # Default low confidence
+
+        for idx, browser_lang in enumerate(browser_languages):
+            lang_code = browser_lang.split("-")[0].lower()
+            if lang_code in available_codes:
+                detected_lang = lang_code
+                # Higher confidence for languages earlier in Accept-Language list
+                confidence = max(0.9 - (idx * 0.1), 0.6)
+                break
+
+        # Return detected language with confidence
+        return DetectedLanguage(
+            detectedLanguage=detected_lang,
+            confidence=confidence,
+            shouldPrompt=confidence < 0.9,  # Prompt if not very confident
+            suggestedUrl=None,
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Failed to detect language: {str(e)}",
+        )

@@ -1,0 +1,514 @@
+# Copyright (c) 2025 Affilibuster by Ronen Druker.
+
+openapi: 3.1.0
+info:
+  title: Affilibuster Backend API
+  version: 1.0.0
+  description: |
+    Backend API for the Affilibuster platform.
+
+    **Architecture**: This spec follows a layered approach:
+    - **Layer 1 (Strapi)**: Content type schemas are defined in strapi.openapi.yaml
+    - **Layer 2 (Backend)**: References Strapi schemas and adds service APIs
+
+    Content endpoints reference Strapi schemas via external $ref.
+    Service APIs (preferences, language detection) are defined here.
+  contact:
+    name: Affilibuster API Support
+    email: api@affilibuster.com
+  license:
+    name: Proprietary
+    url: https://affilibuster.com/license
+
+tags:
+  - name: languages
+    description: Language detection and management
+  - name: preferences
+    description: User preferences management
+
+paths:
+  /languages:
+    get:
+      operationId: getLanguages
+      summary: Get all supported languages
+      description: Returns list of active languages with metadata
+      tags: [ languages ]
+      responses:
+        '200':
+          description: Languages list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Language'
+        '429':
+          description: Too many requests (rate limited)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /languages/detect:
+    post:
+      operationId: detectLanguage
+      summary: Detect user's preferred language
+      description: Analyzes Accept-Language header and user-agent to determine preferred language
+      tags: [ languages ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                acceptLanguage:
+                  type: string
+                  example: 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7'
+                userAgent:
+                  type: string
+                  example: 'Mozilla/5.0 ...'
+                countryCode:
+                  type: string
+                  example: 'IT'
+                  description: Optional ISO 3166-1 alpha-2 country code from IP geolocation
+              required:
+                - acceptLanguage
+      responses:
+        '200':
+          description: Detected language
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetectedLanguage'
+        '400':
+          description: Bad request (missing required parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # User Preferences API
+  /user/preferences:
+    get:
+      operationId: getUserPreferences
+      summary: Get user preferences
+      description: Retrieves user preferences by session ID or user ID
+      tags: [ preferences ]
+      parameters:
+        - name: X-Session-Id
+          in: header
+          required: true
+          schema:
+            type: string
+            example: 'sess-abc123def456'
+        - name: X-User-Id
+          in: header
+          required: false
+          schema:
+            type: string
+            example: 'user-789xyz'
+      responses:
+        '200':
+          description: User preferences
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreferences'
+        '404':
+          description: preferences not found (create with PUT)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      operationId: updateUserPreferences
+      summary: Update user preferences
+      description: Creates or updates user preferences
+      tags: [ preferences ]
+      parameters:
+        - name: X-Session-Id
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePreferences'
+      responses:
+        '200':
+          description: Preferences updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreferences'
+        '400':
+          description: Bad request (invalid data)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Language:
+      type: object
+      properties:
+        code:
+          type: string
+          enum: [ en, it, he ]
+          example: 'it'
+        displayName:
+          type: string
+          example: 'Italian'
+        nativeName:
+          type: string
+          example: 'Italiano'
+        direction:
+          type: string
+          enum: [ ltr, rtl ]
+          example: 'ltr'
+        urlPrefix:
+          type: string
+          example: '/it'
+        defaultCurrency:
+          type: string
+          example: 'EUR'
+        localeCode:
+          type: string
+          example: 'it-IT'
+        isDefault:
+          type: boolean
+          example: false
+      required:
+        - code
+        - displayName
+        - nativeName
+        - direction
+        - urlPrefix
+        - defaultCurrency
+        - localeCode
+        - isDefault
+
+    DetectedLanguage:
+      type: object
+      properties:
+        detectedLanguage:
+          type: string
+          enum: [ en, it, he ]
+          example: 'it'
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          example: 0.95
+        shouldPrompt:
+          type: boolean
+          description: Whether to show language switch prompt
+          example: true
+        suggestedUrl:
+          type: string
+          format: uri
+          example: 'https://affilibuster.com/it/products/eco-bottle'
+      required:
+        - detectedLanguage
+        - confidence
+        - shouldPrompt
+
+    UserPreferences:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sessionId:
+          type: string
+          example: 'sess-abc123'
+        selectedCurrency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          example: 'EUR'
+        dismissedLanguagePrompt:
+          type: boolean
+          example: true
+        detectedLanguage:
+          type: string
+          enum: [ en, it, he ]
+          example: 'it'
+        expiresAt:
+          type: string
+          format: date-time
+          example: '2025-11-03T15:30:00Z'
+      required:
+        - id
+        - sessionId
+        - selectedCurrency
+        - dismissedLanguagePrompt
+
+    UpdatePreferences:
+      type: object
+      properties:
+        selectedCurrency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          example: 'USD'
+        dismissedLanguagePrompt:
+          type: boolean
+          example: true
+        detectedLanguage:
+          type: string
+          enum: [ en, it, he ]
+          example: 'it'
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: 'Not Found'
+        message:
+          type: string
+          example: "Content with slug 'invalid-slug' not found for language 'it'"
+        code:
+          type: string
+          example: 'CONTENT_NOT_FOUND'
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - error
+        - message
+        - code
+        - timestamp
+
+    SEOMetadata:
+      type: object
+      description: SEO metadata for content
+      properties:
+        title:
+          type: string
+          example: 'Eco Bottle | Affilibuster'
+        description:
+          type: string
+          example: 'Buy sustainable reusable bottles'
+        keywords:
+          type: array
+          items:
+            type: string
+          example: [ 'bottle', 'eco', 'sustainable' ]
+        canonicalUrl:
+          type: string
+          example: 'https://affilibuster.com/products/eco-bottle'
+
+    URLData:
+      type: object
+      description: URL information with alternates
+      properties:
+        path:
+          type: string
+          example: '/products/eco-bottle'
+        languagePrefix:
+          type: string
+          example: ''
+        current:
+          type: string
+          example: 'https://affilibuster.com/products/eco-bottle'
+        canonical:
+          type: string
+          example: 'https://affilibuster.com/products/eco-bottle'
+        alternates:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            x-default: 'https://affilibuster.com/products/eco-bottle'
+            it: 'https://affilibuster.com/it/prodotti/bottiglia-ecologica'
+            he: 'https://affilibuster.com/he/products/eco-bottle'
+      required:
+        - path
+        - languagePrefix
+        - current
+        - canonical
+        - alternates
+
+    ContentSummary:
+      type: object
+      description: Brief content summary for list views
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        type:
+          type: string
+          enum: [ page, product, article ]
+          example: 'product'
+        language:
+          type: string
+          example: 'en'
+        title:
+          type: string
+          example: 'Eco Bottle'
+        slug:
+          type: string
+          example: 'eco-bottle'
+        excerpt:
+          type: string
+          example: 'Sustainable stainless steel bottle'
+        url:
+          type: string
+          example: 'https://affilibuster.com/products/eco-bottle'
+        status:
+          type: string
+          example: 'published'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-10-15T10:30:00Z'
+        publishedAt:
+          type: string
+          format: date-time
+          example: '2025-10-01T00:00:00Z'
+      required:
+        - id
+        - type
+        - language
+        - title
+        - slug
+        - url
+        - status
+        - updatedAt
+
+    Pagination:
+      type: object
+      description: Pagination metadata
+      properties:
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 20
+        totalItems:
+          type: integer
+          example: 150
+        totalPages:
+          type: integer
+          example: 8
+        hasNext:
+          type: boolean
+          example: true
+        hasPrevious:
+          type: boolean
+          example: false
+      required:
+        - page
+        - pageSize
+        - totalItems
+        - totalPages
+        - hasNext
+        - hasPrevious
+
+    ContentResponse:
+      type: object
+      description: Full content response with all details
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        type:
+          type: string
+          enum: [ page, product, article ]
+          example: 'product'
+        language:
+          type: string
+          example: 'en'
+        title:
+          type: string
+          example: 'Eco Bottle'
+        slug:
+          type: string
+          example: 'eco-bottle'
+        content:
+          type: string
+          example: '<p>Reusable water bottle...</p>'
+        excerpt:
+          type: string
+          example: 'Sustainable stainless steel bottle'
+        seo:
+          $ref: '#/components/schemas/SEOMetadata'
+        urls:
+          $ref: '#/components/schemas/URLData'
+        status:
+          type: string
+          example: 'published'
+        fallbackUsed:
+          type: boolean
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-10-01T08:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-10-15T10:30:00Z'
+        publishedAt:
+          type: string
+          format: date-time
+          example: '2025-10-01T00:00:00Z'
+        translations:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            it: 'https://affilibuster.com/it/prodotti/bottiglia-ecologica'
+            he: 'https://affilibuster.com/he/products/eco-bottle'
+      required:
+        - id
+        - type
+        - language
+        - title
+        - slug
+        - content
+        - seo
+        - urls
+        - status
+        - createdAt
+        - updatedAt
+
+    ContentListResponse:
+      type: object
+      description: Paginated content list response
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentSummary'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+        - data
+        - pagination
+
+  securitySchemes:
+    SessionAuth:
+      type: apiKey
+      in: header
+      name: X-Session-Id
+      description: Session ID for anonymous users
+
+    UserAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authenticated users (future)
+
+security:
+  - SessionAuth: [ ]

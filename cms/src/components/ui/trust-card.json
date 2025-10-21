@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_ui_trust_cards",
+  "info": {
+    "displayName": "Trust Card",
+    "icon": "star",
+    "description": "A trust/benefit card with title and description"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

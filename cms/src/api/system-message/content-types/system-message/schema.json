@@ -1,0 +1,64 @@
+{
+  "kind": "singleType",
+  "collectionName": "system_messages",
+  "info": {
+    "singularName": "system-message",
+    "pluralName": "system-messages",
+    "displayName": "System",
+    "description": "System-wide UI messages including error notifications (unknown, network, unexpected), translation unavailability notices with localized titles and messages"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "entryTitle": {
+      "type": "string",
+      "required": true
+    },
+    "unknownErrorMessage": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "networkErrorMessage": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "unexpectedErrorMessage": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "translationNotAvailableTitle": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "translationNotAvailableMessage": {
+      "type": "text",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    }
+  }
+}

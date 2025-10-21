@@ -6,30 +6,30 @@
  * Wraps content with RTL direction for Hebrew
  */
 
-'use client';
+'use client'
 
-import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { usePathname } from 'next/navigation'
+import { useEffect } from 'react'
 
 interface RTLWrapperProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export function RTLWrapper({ children }: RTLWrapperProps) {
-  const pathname = usePathname();
+  const pathname = usePathname()
 
   // Check if current path is Hebrew
-  const isRTL = pathname.startsWith('/he');
+  const isRTL = pathname.startsWith('/he')
 
   useEffect(() => {
     // Update document direction
-    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
-    document.documentElement.lang = isRTL ? 'he' : 'en';
-  }, [isRTL]);
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr'
+    document.documentElement.lang = isRTL ? 'he' : 'en'
+  }, [isRTL])
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className={isRTL ? 'rtl' : 'ltr'}>
       {children}
     </div>
-  );
+  )
 }

@@ -8,9 +8,10 @@ Reference: research.md:274-282
 
 import json
 from datetime import UTC, datetime, timedelta
-from src.domain.entities.user_preferences import UserPreferences
-from src.domain.repositories.preferences_repository import IUserPreferencesRepository
-from src.domain.repositories.cache_service import ICacheService
+
+from domain.entities.user_preferences import UserPreferences
+from domain.repositories.cache_service import ICacheService
+from domain.repositories.preferences_repository import IUserPreferencesRepository
 
 
 class UpdateUserPreferences:
@@ -65,14 +66,16 @@ class UpdateUserPreferences:
 
     def _serialize(self, preferences: UserPreferences) -> str:
         """Serialize preferences to JSON for caching."""
-        return json.dumps({
-            'id': str(preferences.id),
-            'session_id': preferences.session_id,
-            'user_id': preferences.user_id,
-            'selected_currency': preferences.selected_currency,
-            'dismissed_language_prompt': preferences.dismissed_language_prompt,
-            'detected_language': preferences.detected_language,
-            'created_at': preferences.created_at.isoformat() if preferences.created_at else None,
-            'updated_at': preferences.updated_at.isoformat() if preferences.updated_at else None,
-            'expires_at': preferences.expires_at.isoformat() if preferences.expires_at else None,
-        })
+        return json.dumps(
+            {
+                "id": str(preferences.id),
+                "session_id": preferences.session_id,
+                "user_id": preferences.user_id,
+                "selected_currency": preferences.selected_currency,
+                "dismissed_language_prompt": preferences.dismissed_language_prompt,
+                "detected_language": preferences.detected_language,
+                "created_at": (preferences.created_at.isoformat() if preferences.created_at else None),
+                "updated_at": (preferences.updated_at.isoformat() if preferences.updated_at else None),
+                "expires_at": (preferences.expires_at.isoformat() if preferences.expires_at else None),
+            }
+        )

@@ -6,11 +6,10 @@
  * Generates SEO meta tags, hreflang, and schema markup
  */
 
-import { ContentResponse } from '@/types/api';
-import { Metadata } from 'next';
+import { Metadata } from 'next'
 
 interface SEOHeadProps {
-  content: ContentResponse;
+  content: ContentResponse
 }
 
 /**
@@ -18,26 +17,29 @@ interface SEOHeadProps {
  */
 export function generateContentMetadata(content: ContentResponse): Metadata {
   return {
-    title: content.seo.title || content.title,
-    description: content.seo.description || content.excerpt,
-    keywords: content.seo.keywords,
+    title: content.seo.metaTitle || content.title,
+    description: content.seo.metaDescription || content.excerpt,
+    keywords: content.seo.metaKeywords,
     alternates: {
-      canonical: content.urls.canonical,
-      languages: content.urls.alternates,
+      canonical: content.seo.canonicalUrl,
+      languages: Object.fromEntries(Object.entries(content.translations).map(([lang, url]) => [lang, url])) as Record<
+        string,
+        string
+      >,
     },
     openGraph: {
-      title: content.seo.title || content.title,
-      description: content.seo.description || content.excerpt,
-      url: content.urls.current,
+      title: content.seo.metaTitle || content.title,
+      description: content.seo.metaDescription || content.excerpt,
+      url: content.seo.canonicalUrl,
       type: content.type === 'page' ? 'website' : 'article',
-      locale: content.language,
+      locale: content.languageCode,
     },
     twitter: {
       card: 'summary_large_image',
-      title: content.seo.title || content.title,
-      description: content.seo.description || content.excerpt,
+      title: content.seo.metaTitle || content.title,
+      description: content.seo.metaDescription || content.excerpt,
     },
-  };
+  }
 }
 
 /**
@@ -49,9 +51,9 @@ export function generateSchemaMarkup(content: ContentResponse) {
     '@type': content.type === 'product' ? 'Product' : 'Article',
     name: content.title,
     description: content.excerpt,
-    url: content.urls.current,
-    inLanguage: content.language,
-  };
+    url: content.seo.canonicalUrl,
+    inLanguage: content.languageCode,
+  }
 
   if (content.type === 'product') {
     return {
@@ -61,28 +63,22 @@ export function generateSchemaMarkup(content: ContentResponse) {
         '@type': 'Offer',
         availability: 'https://schema.org/InStock',
       },
-    };
+    }
   }
 
   return {
     ...baseSchema,
     '@type': 'Article',
     headline: content.title,
-    datePublished: content.publishedAt,
-    dateModified: content.updatedAt,
-  };
+    datePublished: content.publishedAt ? new Date(content.publishedAt).toISOString() : undefined,
+  }
 }
 
 /**
  * SEOHead component for rendering schema markup
  */
 export function SEOHead({ content }: SEOHeadProps) {
-  const schema = generateSchemaMarkup(content);
+  const schema = generateSchemaMarkup(content)
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 }

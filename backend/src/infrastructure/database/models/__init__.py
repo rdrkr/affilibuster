@@ -4,6 +4,11 @@
 SQLAlchemy database models for the Affilibuster platform.
 
 These models map domain entities to database tables.
+
+Architecture: Backend database contains only app-specific data:
+- user_preferences: User session and preference settings
+
+All user-facing content and system metadata comes directly from Strapi.
 """
 
 from sqlalchemy.orm import declarative_base
@@ -11,22 +16,9 @@ from sqlalchemy.orm import declarative_base
 Base = declarative_base()
 
 # Import all models to ensure they are registered with SQLAlchemy
-from .language import LanguageModel
-from .content import ContentModel
-from .content_version import ContentVersionModel
-from .url_route import URLRouteModel, URLRedirectModel
-from .currency import CurrencyModel
-from .user_preferences import UserPreferencesModel
-from .locale import LocaleModel
+from .user_preferences import UserPreferencesModel  # noqa: E402
 
 __all__ = [
-    'Base',
-    'LanguageModel',
-    'ContentModel',
-    'ContentVersionModel',
-    'URLRouteModel',
-    'URLRedirectModel',
-    'CurrencyModel',
-    'UserPreferencesModel',
-    'LocaleModel',
+    "Base",
+    "UserPreferencesModel",
 ]

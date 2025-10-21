@@ -51,7 +51,16 @@ async def test_get_preferences_response_schema():
 
             # Type validation
             assert isinstance(data["dismissedLanguagePrompt"], bool)
-            assert data["selectedCurrency"] in ["USD", "EUR", "ILS", "GBP", "CAD", "AUD", "JPY", "CNY"]
+            assert data["selectedCurrency"] in [
+                "USD",
+                "EUR",
+                "ILS",
+                "GBP",
+                "CAD",
+                "AUD",
+                "JPY",
+                "CNY",
+            ]
 
 
 @pytest.mark.contract

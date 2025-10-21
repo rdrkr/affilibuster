@@ -40,7 +40,7 @@ async def test_archived_content_returns_410():
         assert archive_response.status_code in [200, 204]
 
         # Verify content returns 410 Gone
-        get_response = await client.get(f"/en/article-to-archive")
+        get_response = await client.get("/en/article-to-archive")
 
         assert get_response.status_code == 410
         data = get_response.json()

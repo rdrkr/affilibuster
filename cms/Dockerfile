@@ -1,20 +1,18 @@
 # Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-FROM node:18-alpine
+FROM node:22.21-alpine
+
+# Install curl for health checks
+RUN apk add --no-cache curl
 
 WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install
 
 # Copy application code
 COPY . .
 
-# Expose port
-EXPOSE 1337
+# Expose port (configurable via ARG)
+ARG CMS_PORT
+EXPOSE ${CMS_PORT}
 
 # Run the application
-CMD ["npm", "run", "develop"]
+CMD sh -c "npm install --legacy-peer-deps && npm run develop"

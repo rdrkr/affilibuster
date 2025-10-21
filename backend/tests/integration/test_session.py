@@ -27,10 +27,7 @@ async def test_session_id_generation():
             assert len(data["sessionId"]) > 0
 
             # Should also set session ID in cookie or header
-            assert (
-                "X-Session-Id" in response.headers
-                or "Set-Cookie" in response.headers
-            )
+            assert "X-Session-Id" in response.headers or "Set-Cookie" in response.headers
 
 
 @pytest.mark.integration

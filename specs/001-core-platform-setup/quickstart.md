@@ -27,9 +27,7 @@ cd ..
 
 # Install backend dependencies
 cd backend
-python -m venv venv
-source venv/bin/activate  # or `venv\Scripts\activate` on Windows
-pip install -r requirements.txt
+uv sync
 cd ..
 
 # Install CMS dependencies
@@ -135,7 +133,7 @@ npm run develop
    - Italiano
    - עברית
 5. Select "עברית" (Hebrew)
-6. **✅ Verify**: Redirects to `http://localhost:3000/il/products/eco-bottle`
+6. **✅ Verify**: Redirects to `http://localhost:3000/he/products/eco-bottle`
 7. **✅ Verify**: Layout switches to RTL (`dir="rtl"` on `<html>`)
 8. **✅ Verify**: UI text in Hebrew
 9. **✅ Verify**: Navigation items mirrored (right-aligned)
@@ -158,7 +156,7 @@ npm run develop
 4. Open currency selector (usually in header or footer)
 5. Select "USD"
 6. **✅ Verify**: Prices update to USD format: "$29.99"
-7. Switch language to Hebrew (`/il`)
+7. Switch language to Hebrew (`/he`)
 8. **✅ Verify**: Prices STILL show in USD (preference persisted)
 9. Open DevTools → Application → Cookies
 10. **✅ Verify**: Cookie or session storage contains `selectedCurrency: USD`
@@ -181,7 +179,7 @@ npm run develop
    ```html
    <link rel="alternate" hreflang="x-default" href="http://localhost:3000/products/eco-bottle" />
    <link rel="alternate" hreflang="it" href="http://localhost:3000/it/prodotti/bottiglia-eco" />
-   <link rel="alternate" hreflang="he" href="http://localhost:3000/il/products/eco-bottle" />
+   <link rel="alternate" hreflang="he" href="http://localhost:3000/he/products/eco-bottle" />
    ```
 5. **✅ Verify**: Canonical URL points to current page:
    ```html
@@ -249,7 +247,7 @@ npm run develop
    - UI/navigation in Italian
    - Content body in English (fallback)
    - Notice displayed: "This content is not yet available in Italian"
-8. Switch to Hebrew: `http://localhost:3000/il/products/new-eco-gadget`
+8. Switch to Hebrew: `http://localhost:3000/he/products/new-eco-gadget`
 9. **✅ Verify**: Same behavior (UI in Hebrew, content in English)
 
 **Expected Result**: ✅ Graceful fallback to English when translation missing
@@ -273,7 +271,7 @@ lighthouse http://localhost:3000 --output html --output-path ./reports/lighthous
 lighthouse http://localhost:3000/it --output html --output-path ./reports/lighthouse-it.html
 
 # Audit Hebrew
-lighthouse http://localhost:3000/il --output html --output-path ./reports/lighthouse-il.html
+lighthouse http://localhost:3000/he --output html --output-path ./reports/lighthouse-il.html
 ```
 
 **✅ Verify for ALL languages**:
@@ -348,7 +346,7 @@ curl -X PUT http://localhost:8000/v1/user/preferences \
 ### Issue: Language prompt not showing
 - **Check**: Browser language settings (must be it or he, not en)
 - **Check**: Session storage for `dismissedLanguagePrompt` (clear if true)
-- **Check**: URL (prompt only shows on root domain, not /it or /il)
+- **Check**: URL (prompt only shows on root domain, not /it or /he)
 
 ### Issue: RTL layout not working for Hebrew
 - **Check**: HTML source for `dir="rtl"` attribute

@@ -4,116 +4,112 @@
  * Unit tests for useSession hook
  */
 
-import { renderHook, waitFor } from '@testing-library/react';
-import { useSession } from './useSession';
-import { apiClient } from '@/lib/api';
+import { renderHook, waitFor } from '@testing-library/react'
+import { useSession } from './useSession'
+import { apiClient } from '@/lib/api'
 
 // Mock localStorage
 const localStorageMock = (() => {
-  let store: Record<string, string> = {};
+  let store: Record<string, string> = {}
 
   return {
     getItem: (key: string) => store[key] || null,
     setItem: (key: string, value: string) => {
-      store[key] = value;
+      store[key] = value
     },
     removeItem: (key: string) => {
-      delete store[key];
+      const { [key]: excluded, ...remaining } = store
+      void excluded // Mark as intentionally excluded
+      store = remaining
     },
     clear: () => {
-      store = {};
+      store = {}
     },
-  };
-})();
+  }
+})()
 
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
-});
+})
 
 // Mock crypto.randomUUID
 Object.defineProperty(global, 'crypto', {
   value: {
     randomUUID: jest.fn(() => 'test-uuid-1234'),
   },
-});
+})
 
 // Mock apiClient
 jest.mock('@/lib/api', () => ({
   apiClient: {
     setSessionId: jest.fn(),
   },
-}));
+}))
 
 describe('useSession', () => {
   beforeEach(() => {
-    localStorageMock.clear();
-    jest.clearAllMocks();
-  });
+    localStorageMock.clear()
+    jest.clearAllMocks()
+  })
 
   it('should generate new session ID when none exists', async () => {
-    const { result } = renderHook(() => useSession());
+    const { result } = renderHook(() => useSession())
 
     await waitFor(() => {
-      expect(result.current).toBe('test-uuid-1234');
-    });
-  });
+      expect(result.current).toBe('test-uuid-1234')
+    })
+  })
 
   it('should store session ID in localStorage', async () => {
-    renderHook(() => useSession());
+    renderHook(() => useSession())
 
     await waitFor(() => {
-      expect(localStorageMock.getItem('affilibuster_session_id')).toBe(
-        'test-uuid-1234'
-      );
-    });
-  });
+      expect(localStorageMock.getItem('affilibuster_session_id')).toBe('test-uuid-1234')
+    })
+  })
 
   it('should set session ID on apiClient', async () => {
-    renderHook(() => useSession());
+    renderHook(() => useSession())
 
     await waitFor(() => {
-      expect(apiClient.setSessionId).toHaveBeenCalledWith('test-uuid-1234');
-    });
-  });
+      expect(apiClient.setSessionId).toHaveBeenCalledWith('test-uuid-1234')
+    })
+  })
 
   it('should reuse existing session ID from localStorage', async () => {
-    localStorageMock.setItem('affilibuster_session_id', 'existing-session-456');
+    localStorageMock.setItem('affilibuster_session_id', 'existing-session-456')
 
-    const { result } = renderHook(() => useSession());
+    const { result } = renderHook(() => useSession())
 
     await waitFor(() => {
-      expect(result.current).toBe('existing-session-456');
-    });
+      expect(result.current).toBe('existing-session-456')
+    })
 
     // Should not generate new UUID
-    expect(crypto.randomUUID).not.toHaveBeenCalled();
-  });
+    expect(crypto.randomUUID).not.toHaveBeenCalled()
+  })
 
   it('should set existing session ID on apiClient', async () => {
-    localStorageMock.setItem('affilibuster_session_id', 'existing-session-789');
+    localStorageMock.setItem('affilibuster_session_id', 'existing-session-789')
 
-    renderHook(() => useSession());
+    renderHook(() => useSession())
 
     await waitFor(() => {
-      expect(apiClient.setSessionId).toHaveBeenCalledWith(
-        'existing-session-789'
-      );
-    });
-  });
+      expect(apiClient.setSessionId).toHaveBeenCalledWith('existing-session-789')
+    })
+  })
 
   it('should generate different UUIDs on multiple renders', async () => {
-    (crypto.randomUUID as jest.Mock)
-      .mockReturnValueOnce('uuid-1')
-      .mockReturnValueOnce('uuid-2');
+    ;(crypto.randomUUID as jest.Mock).mockReturnValueOnce('uuid-1').mockReturnValueOnce('uuid-2')
 
-    localStorageMock.clear();
+    localStorageMock.clear()
 
-    const { result: result1 } = renderHook(() => useSession());
-    await waitFor(() => expect(result1.current).toBe('uuid-1'));
+    const { result: result1 } = renderHook(() => useSession())
+    await waitFor(() => expect(result1.current).toBe('uuid-1'))
 
-    localStorageMock.clear();
+    localStorageMock.clear()
 
-    const { result: result2 } = renderHook(() => useSession());
-    await waitFor(() => expect(result2.current).toBe('uuid-2'));
-  });
-});
+    const { result: result2 } = renderHook(() => useSession())
+    await waitFor(() => expect(result2.current).toBe('uuid-2'))
+  })
+})

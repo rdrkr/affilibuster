@@ -40,11 +40,11 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 
 ### Acceptance Scenarios
 
-1. **Given** a visitor accesses the website for the first time at the root domain (e.g. affilibuster.com), **When** the system detects their browser language or location preference differs from English, **Then** a prompt appears asking if they want to switch to their preferred language version (e.g. affilibuster.com/it or e.g. affilibuster.com/il)
+1. **Given** a visitor accesses the website for the first time at the root domain (e.g. affilibuster.com), **When** the system detects their browser language or location preference differs from English, **Then** a prompt appears asking if they want to switch to their preferred language version (e.g. affilibuster.com/it or e.g. affilibuster.com/he)
 
 2. **Given** a visitor is viewing the English version (e.g. affilibuster.com), **When** they select Italian from the language switcher, **Then** they navigate via internal link to the Italian version (e.g. affilibuster.com/it) and they can see the content of that page
 
-3. **Given** a Hebrew-speaking visitor accesses the Hebrew version (e.g. affilibuster.com/il), **When** any page loads, **Then** the layout displays in right-to-left (RTL) orientation with properly mirrored UI elements and Hebrew text, while the URL structure is in english/il/slug (customizable by te admin)
+3. **Given** a Hebrew-speaking visitor accesses the Hebrew version (e.g. affilibuster.com/he), **When** any page loads, **Then** the layout displays in right-to-left (RTL) orientation with properly mirrored UI elements and Hebrew text, while the URL structure is in english/he/slug (customizable by te admin)
 
 4. **Given** a visitor browses product pages in any language version, **When** they view prices and dates, **Then** numbers and dates are formatted according to the locale conventions, and the visitor can change the currency display from a currency selector to view prices in their preferred currency
 
@@ -70,12 +70,12 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 ### Functional Requirements
 
 #### Multi-Language Support
-- **FR-001**: System MUST support content delivery in three languages: English (primary at e.g. affilibuster.com), Italian (at e.g. affilibuster.com/it), and Hebrew (at e.g. affilibuster.com/il)
+- **FR-001**: System MUST support content delivery in three languages: English (primary at e.g. affilibuster.com), Italian (at e.g. affilibuster.com/it), and Hebrew (at e.g. affilibuster.com/he)
 - **FR-002**: System MUST detect user's browser language or location preference when they access the root domain (e.g. affilibuster.com)
 - **FR-003**: System MUST display a non-intrusive prompt asking if the user wants to switch to their detected language version when it differs from English, in case the user lands on a page whose language is different than the detected language. The prompt should be triggered only upon user interaction with the page (e.g., scroll, mouse movement, click) and only once per session.
 - **FR-004**: Users MUST be able to manually switch between language versions via a language selector visible on all pages, which redirects to the appropriate language URL path
 - **FR-005**: System MUST remember prompt dismissal preference for the current session and not re-prompt the user
-- **FR-006**: System MUST maintain language preference by serving the appropriate URL path (e.g. affilibuster.com, e.g. affilibuster.com/it, or e.g. affilibuster.com/il)
+- **FR-006**: System MUST maintain language preference by serving the appropriate URL path (e.g. affilibuster.com, e.g. affilibuster.com/it, or e.g. affilibuster.com/he)
 - **FR-007**: System MUST display Hebrew content in right-to-left (RTL) layout with properly mirrored UI components
 - **FR-008**: System MUST fall back to English content when content in the selected language is unavailable while maintaining the UI in the selected language version
 
@@ -89,8 +89,8 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 - **FR-015**: System MUST handle timezone display appropriately for international audiences
 
 #### SEO & Discoverability
-- **FR-016**: System MUST generate hreflang meta tags for all pages indicating available language versions (x-default for e.g. affilibuster.com, it for e.g. affilibuster.com/it, he for e.g. affilibuster.com/il)
-- **FR-017**: System MUST create SEO-friendly, human-readable URLs with language path prefixes: root domain for English (e.g. affilibuster.com/products/), /it/ for Italian (e.g. affilibuster.com/it/prodotti/), /il/ for Hebrew (e.g. affilibuster.com/il/products/). The URLs slugs are always customizable by the admin
+- **FR-016**: System MUST generate hreflang meta tags for all pages indicating available language versions (x-default for e.g. affilibuster.com, it for e.g. affilibuster.com/it, he for e.g. affilibuster.com/he)
+- **FR-017**: System MUST create SEO-friendly, human-readable URLs with language path prefixes: root domain for English (e.g. affilibuster.com/products/), /it/ for Italian (e.g. affilibuster.com/it/prodotti/), /he/ for Hebrew (e.g. affilibuster.com/he/products/). The URLs slugs are always customizable by the admin
 - **FR-018**: System MUST allow customization of URL slugs per language for optimal SEO. In case a slug gets changed, the system MUST automatically create 301 redirects from the old URL to the new one at the time of slug update. If a page/language version is removed, the system MUST automatically create a 410 status code response for that URL at the time of deletion.
 - **FR-019**: System MUST maintain equivalent page mapping across language versions for proper canonical and alternate URL references
 - **FR-020**: System MUST generate language-specific sitemaps for search engine crawlers (sitemap.xml, sitemap-it.xml, sitemap-il.xml)
@@ -123,12 +123,12 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 
 ### Key Entities
 
-- **Language**: Represents a supported language with code (en, it, he), display name, direction (LTR/RTL), URL path prefix (root for English, /it/ for Italian, /il/ for Hebrew), default currency, and locale formatting rules
+- **Language**: Represents a supported language with code (en, it, he), display name, direction (LTR/RTL), URL path prefix (root for English, /it/ for Italian, /he/ for Hebrew), default currency, and locale formatting rules
 - **TranslatableContent**: Abstract representation of content that can exist in multiple language versions, including status tracking for each translation and equivalent page mappings across language paths
 - **Locale**: Cultural and regional settings including date formats, number formats, default currency per language, and timezone preferences
 - **Currency**: Represents a currency option with code (USD, EUR, ILS, etc.), symbol, display format, and decimal precision
 - **ContentVersion**: Specific versions of content tied to a language, including SEO metadata (title, description, keywords, custom URL slug) and the corresponding URL path. All customizable by the admin and independent one from another (while linked via hreflang)
-- **URLRoute**: SEO-friendly URL structure with language-specific path prefixes (e.g. affilibuster.com/*, e.g. affilibuster.com/it/*, e.g. affilibuster.com/il/*), custom slugs per language, redirects (301/410), and canonical/alternate URL references for hreflang
+- **URLRoute**: SEO-friendly URL structure with language-specific path prefixes (e.g. affilibuster.com/*, e.g. affilibuster.com/it/*, e.g. affilibuster.com/he/*), custom slugs per language, redirects (301/410), and canonical/alternate URL references for hreflang
 - **UserPreferences**: Stores user choices including dismissed language prompts, selected currency, and session data for personalization
 
 ---

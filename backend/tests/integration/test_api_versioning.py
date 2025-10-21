@@ -58,10 +58,7 @@ async def test_api_version_in_response_headers():
 
         if response.status_code in [200, 404]:
             # Should include API version header
-            assert (
-                "X-API-Version" in response.headers
-                or "API-Version" in response.headers
-            )
+            assert "X-API-Version" in response.headers or "API-Version" in response.headers
 
 
 @pytest.mark.integration

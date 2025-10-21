@@ -1,0 +1,66 @@
+{
+  "collectionName": "components_ui_paginations",
+  "info": {
+    "displayName": "Pagination",
+    "description": "Pagination text labels and messages",
+    "icon": "align-right"
+  },
+  "options": {},
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "previousButton": {
+      "type": "string",
+      "required": true,
+      "default": "Previous",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "nextButton": {
+      "type": "string",
+      "required": true,
+      "default": "Next",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "showingText": {
+      "type": "string",
+      "required": true,
+      "default": "Showing {count} of {total}",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "pageText": {
+      "type": "string",
+      "required": true,
+      "default": "Page {current} of {total}",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "noItemsFound": {
+      "type": "string",
+      "required": true,
+      "default": "No items found",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    }
+  }
+}

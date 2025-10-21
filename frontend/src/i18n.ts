@@ -22,7 +22,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
   return {
     locale,
-    messages: (await import(`../messages/${locale}.json`)).default,
+    messages: {}, // Messages now come from Strapi CMS single types
     timeZone: 'UTC',
     now: new Date(),
   }

@@ -8,6 +8,7 @@ Catches all unhandled exceptions and returns standardized error responses
 
 import logging
 from datetime import UTC, datetime
+
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -49,6 +50,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
 
             # In development, include more details
             import os
+
             if os.getenv("DEBUG", "false").lower() == "true":
                 error_response["details"] = {
                     "exception_type": type(exc).__name__,

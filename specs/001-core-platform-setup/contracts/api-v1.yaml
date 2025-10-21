@@ -1,3 +1,7 @@
+# Copyright (c) 2025 Affilibuster by Ronen Druker.
+
+
+
 openapi: 3.1.0
 info:
   title: Affilibuster Multi-Language Platform API
@@ -440,7 +444,7 @@ components:
             format: uri
           example:
             en: "https://affilibuster.com/products/eco-bottle"
-            he: "https://affilibuster.com/il/products/eco-bottle"
+            he: "https://affilibuster.com/he/products/eco-bottle"
       required:
         - id
         - type
@@ -491,7 +495,7 @@ components:
           example:
             x-default: "https://affilibuster.com/products/eco-bottle"
             it: "https://affilibuster.com/it/prodotti/bottiglia-ecologica"
-            he: "https://affilibuster.com/il/products/eco-bottle"
+            he: "https://affilibuster.com/he/products/eco-bottle"
       required:
         - path
         - canonical

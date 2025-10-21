@@ -5,46 +5,53 @@
  * Reference: T125 (Create [lang] dynamic segment layout)
  */
 
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, setRequestLocale } from 'next-intl/server';
-import { notFound } from 'next/navigation';
-import { ReactNode } from 'react';
-import Script from 'next/script';
-import { Navigation } from '@/components/Navigation';
-import { Footer } from '@/components/Footer';
-import { LocaleProvider } from '@/components/LocaleProvider';
-import '../globals.css';
+import { NextIntlClientProvider } from 'next-intl'
+import { getMessages, setRequestLocale } from 'next-intl/server'
+import { notFound } from 'next/navigation'
+import { ReactNode } from 'react'
+import Script from 'next/script'
+import { Navigation } from '@/components/Navigation'
+import { Footer } from '@/components/Footer'
+import { LocaleProvider } from '@/components/LocaleProvider'
+import '../globals.css'
 
-const locales = ['en', 'it', 'he'];
+const locales = ['en', 'it', 'he']
 
 type Props = {
-  children: ReactNode;
-  params: Promise<{ lang: string }>;
-};
-
-export function generateStaticParams() {
-  return locales.map((lang) => ({ lang }));
+  children: ReactNode
+  params: Promise<{ lang: string }>
 }
 
-export default async function LocaleLayout({
-  children,
-  params,
-}: Props) {
-  const { lang } = await params;
+export function generateStaticParams() {
+  return locales.map(lang => ({ lang }))
+}
+
+export default async function LocaleLayout({ children, params }: Props) {
+  let lang = 'en'
+  try {
+    const resolvedParams = await params
+    if (resolvedParams?.lang) {
+      lang = resolvedParams.lang
+    }
+  } catch (e) {
+    console.error('Failed to resolve params in layout:', e)
+  }
 
   // Validate locale
   if (!locales.includes(lang)) {
-    notFound();
+    notFound()
   }
 
   // Enable static rendering
-  setRequestLocale(lang);
+  if (lang) {
+    setRequestLocale(lang)
+  }
 
   // Get messages for this locale
-  const messages = await getMessages();
+  const messages = await getMessages()
 
   // Determine text direction
-  const direction = lang === 'he' ? 'rtl' : 'ltr';
+  const direction = lang === 'he' ? 'rtl' : 'ltr'
 
   return (
     <html lang={lang} dir={direction} suppressHydrationWarning>
@@ -81,5 +88,5 @@ export default async function LocaleLayout({
         </NextIntlClientProvider>
       </body>
     </html>
-  );
+  )
 }

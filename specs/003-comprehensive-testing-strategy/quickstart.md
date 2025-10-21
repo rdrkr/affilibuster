@@ -552,7 +552,7 @@ View merged coverage at: `https://codecov.io/gh/your-org/affilibuster`
 **Backend**:
 ```bash
 cd backend
-pip install -r requirements.txt
+uv sync
 ```
 
 **Frontend**:

@@ -26,8 +26,8 @@ This document defines the implementation tasks for establishing comprehensive te
 ### Tasks
 
 - [X] T001 Install lcov for coverage report merging (macOS: brew install lcov)
-- [X] T002 [P] Add pytest-xdist to backend/requirements.txt per contracts/backend-requirements.txt
-- [X] T003 [P] Install backend dependencies: cd backend && pip install -r requirements.txt
+- [X] T002 [P] Add pytest-xdist to backend/pyproject.toml per contracts/backend-requirements.txt
+- [X] T003 [P] Install backend dependencies: cd backend && uv sync
 - [X] T004 [P] Add tsd and type-coverage to shared/package.json per contracts/shared-package.json
 - [X] T005 [P] Install shared module dependencies: cd shared && npm install
 - [X] T006 Verify Docker services are running: docker-compose ps (backend requires PostgreSQL/Redis)

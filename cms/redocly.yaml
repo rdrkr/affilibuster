@@ -1,0 +1,28 @@
+# Copyright (c) 2025 Affilibuster by Ronen Druker.
+
+# Redocly CLI Configuration
+# Strict OpenAPI linting with recommended-strict ruleset
+# Reference: https://redocly.com/docs/cli/configuration
+
+extends:
+  - recommended-strict
+
+# API definitions to lint
+apis:
+  affilibuster@v1:
+    root: contracts/affilibuster.openapi.yaml
+
+  strapi@v1:
+    root: contracts/strapi.openapi.yaml
+
+# Rule customizations
+rules:
+  # Allow localhost URLs for development environments
+  # Production URLs are already configured in specs
+  no-server-example.com: off
+
+  # Allow unused components referenced via external $ref
+  # Product schema is referenced from backend-api spec via $ref
+  # but appears "unused" in strapi-content-openapi.yaml file
+  # This is a false positive due to external references
+  no-unused-components: off

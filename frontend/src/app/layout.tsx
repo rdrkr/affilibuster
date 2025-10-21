@@ -5,19 +5,29 @@
  * The actual layout with locale handling is in [lang]/layout.tsx
  */
 
-import type { Metadata } from 'next';
+import type { Metadata } from 'next'
+import { contentAPI } from '@/lib/api'
 
-export const metadata: Metadata = {
-  title: 'Affilibuster - Multi-Language Affiliate Platform',
-  description:
-    'Find the best products across languages and currencies. Compare prices, read reviews, and shop with confidence.',
-  keywords: ['affiliate', 'products', 'multi-language', 'shopping'],
-};
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const response = await contentAPI.getSingleType('en', 'navigation')
+    const navData = response?.data || response
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return children;
+    return {
+      title: navData?.siteTitle || navData?.title,
+      description: navData?.siteDescription || navData?.description,
+      keywords: navData?.siteKeywords || navData?.keywords,
+    }
+  } catch (error) {
+    console.error('Failed to fetch root metadata:', error)
+    return {
+      title: undefined,
+      description: undefined,
+      keywords: undefined,
+    }
+  }
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return children
 }

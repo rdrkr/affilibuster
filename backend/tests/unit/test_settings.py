@@ -10,9 +10,7 @@ Covers:
 - Property methods
 """
 
-import pytest
-
-from src.config.settings import Settings
+from config.settings import Settings
 
 
 class TestSettingsInitialization:
@@ -28,12 +26,7 @@ class TestSettingsInitialization:
 
     def test_settings_accepts_custom_values(self):
         """Test Settings accepts custom values during initialization."""
-        settings = Settings(
-            app_env="production",
-            debug=False,
-            host="127.0.0.1",
-            port=9000
-        )
+        settings = Settings(app_env="production", debug=False, host="127.0.0.1", port=9000)
         assert settings.app_env == "production"
         assert settings.debug is False
         assert settings.host == "127.0.0.1"
@@ -162,10 +155,7 @@ class TestSettingsConfiguration:
 
     def test_settings_accepts_strapi_config(self):
         """Test Settings accepts Strapi configuration."""
-        settings = Settings(
-            strapi_url="http://cms:1337",
-            strapi_api_token="test-token"
-        )
+        settings = Settings(strapi_url="http://cms:1337", strapi_api_token="test-token")
         assert settings.strapi_url == "http://cms:1337"
         assert settings.strapi_api_token == "test-token"
 

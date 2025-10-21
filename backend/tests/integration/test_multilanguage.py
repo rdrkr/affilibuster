@@ -114,9 +114,7 @@ async def test_content_alternate_urls():
             alternates = data["urls"].get("alternates", [])
 
             # Should have Italian alternate
-            it_alternate = next(
-                (a for a in alternates if a["language"] == "it"), None
-            )
+            it_alternate = next((a for a in alternates if a["language"] == "it"), None)
             assert it_alternate is not None
             assert it_alternate["url"] == "/it/articolo-multilingue"
 

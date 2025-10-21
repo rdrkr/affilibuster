@@ -4,46 +4,77 @@
  * 410 Gone page
  * Reference: T145 (URL redirect handling - 410 status)
  * Displayed when a URL is permanently removed
+ * Fetches content from Strapi error-410 single type
  */
 
-import { Metadata } from 'next';
-import Link from 'next/link';
+import { Metadata } from 'next'
+import Link from 'next/link'
+import { contentAPI } from '@/lib/api'
 
-export const metadata: Metadata = {
-  title: '410 - Page Gone',
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+/**
+ * Generate metadata for 410 error page
+ * Fetches title and description from Strapi CMS
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const response = await contentAPI.getSingleType('en', 'error-410')
+    const errorData = response?.data || response
 
-export default function GonePage() {
+    return {
+      title: errorData?.metaTitle,
+      description: errorData?.metaDescription,
+      robots: {
+        index: false,
+        follow: false,
+      },
+    }
+  } catch (error) {
+    console.error('Failed to fetch 410 error page metadata:', error)
+    return {
+      title: undefined,
+      robots: {
+        index: false,
+        follow: false,
+      },
+    }
+  }
+}
+
+export default async function GonePage() {
+  let errorData = null
+  try {
+    // Try to fetch error-410 content from Strapi
+    const response = await contentAPI.getSingleType('en', 'error-410')
+    errorData = response?.data || response
+  } catch (error) {
+    console.error('Failed to fetch 410 error page:', error)
+  }
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50">
       <div className="max-w-md w-full text-center px-4">
         <div className="mb-8">
           <h1 className="text-6xl font-bold mb-2">410</h1>
-          <h2 className="text-2xl font-semibold text-neutral-700 mb-4">
-            Page Gone
-          </h2>
-          <p className="text-neutral-600 mb-8">
-            This page has been permanently removed and is no longer available.
-          </p>
+          {errorData?.subtitle && (
+            <h2 className="text-2xl font-semibold text-neutral-700 mb-4">{errorData.subtitle}</h2>
+          )}
+          {errorData?.message && <p className="text-neutral-600 mb-8">{errorData.message}</p>}
         </div>
 
         <div className="space-y-4">
-          <Link
-            href="/"
-            className="inline-block bg-secondary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-secondary-700 transition-colors"
-          >
-            Go to Homepage
-          </Link>
+          {errorData?.ctaText && (
+            <Link
+              href="/"
+              className="inline-block bg-secondary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-secondary-700 transition-colors"
+            >
+              {errorData.ctaText}
+            </Link>
+          )}
 
-          <p className="text-sm text-neutral-500">
-            If you believe this is an error, please contact support.
-          </p>
+          {errorData?.supportContactMessage && (
+            <p className="text-sm text-neutral-500">{errorData.supportContactMessage}</p>
+          )}
         </div>
       </div>
     </div>
-  );
+  )
 }

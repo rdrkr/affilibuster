@@ -6,8 +6,8 @@ Reference: research.md:221-234 (Intl.NumberFormat utility)
 """
 
 import pytest
-from src.domain.use_cases.convert_currency import ConvertCurrency
-from src.domain.entities.currency import Currency
+
+from domain.entities.currency import Currency
 
 
 @pytest.fixture

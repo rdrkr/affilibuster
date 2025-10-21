@@ -8,4 +8,4 @@ Reference: T138 (Strapi CMS connection)
 
 from .settings import settings
 
-__all__ = ['settings']
+__all__ = ["settings"]

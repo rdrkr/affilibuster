@@ -1,20 +1,25 @@
 {
   "name": "affilibuster-frontend",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "type-check": "tsc --noEmit",
     "test": "jest --coverage --coverageReporters=text --coverageReporters=text-summary --coverageReporters=lcov --coverageReporters=html",
     "test:watch": "jest --watch",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "generate:client": "openapi-ts --input ../contracts/affilibuster.openapi.yaml --output ./src/lib/generated --client @hey-api/client-fetch --no-log-file"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.14",
-    "next": "^15.1.3",
+    "next": "^16.0.0",
     "next-intl": "^4.3.12",
     "next-seo": "^6.4.0",
     "react": "^19.0.0",
@@ -23,6 +28,8 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
+    "@eslint/js": "^9.38.0",
+    "@hey-api/openapi-ts": "^0.86.7",
     "@playwright/test": "^1.49.1",
     "@tailwindcss/typography": "^0.5.15",
     "@testing-library/jest-dom": "^6.9.1",
@@ -38,10 +45,21 @@
     "eslint-config-prettier": "^10.1.8",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
+    "lint-staged": "^15.2.10",
     "postcss": "^8.4.0",
     "prettier": "^3.4.2",
     "tailwindcss": "^4.0.0",
     "tailwindcss-rtl": "^0.9.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.46.2"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
+    ],
+    "*.{json,css,scss,md,yaml,yml}": [
+      "prettier --write"
+    ]
   }
 }

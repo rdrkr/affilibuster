@@ -62,7 +62,6 @@ omit =
     */tests/*
     */test_*.py
     */__pycache__/*
-    */venv/*
     */virtualenv/*
 
 [coverage:report]

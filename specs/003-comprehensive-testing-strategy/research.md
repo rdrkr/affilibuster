@@ -285,7 +285,7 @@ addopts =
 ### Decision
 
 **Implement multi-level parallelization**:
-1. Add pytest-xdist to backend/requirements.txt
+1. Add pytest-xdist to backend/pyproject.toml
 2. Update Makefile with parallel test targets
 3. Configure LCOV output for all modules
 4. Create coverage merge script
@@ -451,9 +451,9 @@ addopts =
 ### New Dependencies Required
 
 **Backend**:
-```txt
-# backend/requirements.txt
-pytest-xdist>=3.6.1  # For parallel test execution
+```toml
+# backend/pyproject.toml [tool.poetry.group.dev.dependencies]
+pytest-xdist = "^3.6.1"  # For parallel test execution
 ```
 
 **Shared**:

@@ -134,7 +134,7 @@ Follow-up TODOs: None
 - Data models and entity relationships
 - Component usage and configuration
 - Quickstart guides for common scenarios
-- In-code documentation (JSDoc, Python docstrings, etc.) 
+- In-code documentation (JSDoc, Python docstrings, etc.)
 with full coverage of types, functions, parameters, returns, throws, etc.
 
 ### Code Review Gates

@@ -1,0 +1,20 @@
+# Copyright (c) 2025 Affilibuster by Ronen Druker.
+
+# ShellCheck configuration for strict Bash linting
+
+# Enable all checks
+enable=all
+
+# Disable specific checks that might be overly strict:
+## Can't follow non-constant source (used for dynamic sourcing)
+disable=SC1090
+## See if you can use ${variable//search/replace} instead
+disable=SC2001
+## Consider invoking this command separately to avoid masking its return value (or use '|| true' to ignore).
+disable=SC2312
+
+# Severity level - use warning level (includes style issues)
+severity=warning
+
+# Format for output
+format=gcc

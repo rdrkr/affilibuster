@@ -8,9 +8,10 @@ Reference: T075 (IUserPreferencesRepository), T076 (ICacheService)
 
 import json
 from typing import Optional
-from src.domain.entities.user_preferences import UserPreferences
-from src.domain.repositories.preferences_repository import IUserPreferencesRepository
-from src.domain.repositories.cache_service import ICacheService
+
+from domain.entities.user_preferences import UserPreferences
+from domain.repositories.cache_service import ICacheService
+from domain.repositories.preferences_repository import IUserPreferencesRepository
 
 
 class GetUserPreferences:
@@ -68,32 +69,34 @@ class GetUserPreferences:
 
     def _serialize(self, preferences: UserPreferences) -> str:
         """Serialize preferences to JSON for caching."""
-        return json.dumps({
-            'id': str(preferences.id),
-            'session_id': preferences.session_id,
-            'user_id': preferences.user_id,
-            'selected_currency': preferences.selected_currency,
-            'dismissed_language_prompt': preferences.dismissed_language_prompt,
-            'detected_language': preferences.detected_language,
-            'created_at': preferences.created_at.isoformat() if preferences.created_at else None,
-            'updated_at': preferences.updated_at.isoformat() if preferences.updated_at else None,
-            'expires_at': preferences.expires_at.isoformat() if preferences.expires_at else None,
-        })
+        return json.dumps(
+            {
+                "id": str(preferences.id),
+                "session_id": preferences.session_id,
+                "user_id": preferences.user_id,
+                "selected_currency": preferences.selected_currency,
+                "dismissed_language_prompt": preferences.dismissed_language_prompt,
+                "detected_language": preferences.detected_language,
+                "created_at": (preferences.created_at.isoformat() if preferences.created_at else None),
+                "updated_at": (preferences.updated_at.isoformat() if preferences.updated_at else None),
+                "expires_at": (preferences.expires_at.isoformat() if preferences.expires_at else None),
+            }
+        )
 
     def _deserialize(self, data: str) -> UserPreferences:
         """Deserialize preferences from JSON."""
-        from uuid import UUID
         from datetime import datetime
+        from uuid import UUID
 
         obj = json.loads(data)
         return UserPreferences(
-            id=UUID(obj['id']),
-            session_id=obj['session_id'],
-            user_id=obj.get('user_id'),
-            selected_currency=obj['selected_currency'],
-            dismissed_language_prompt=obj['dismissed_language_prompt'],
-            detected_language=obj.get('detected_language'),
-            created_at=datetime.fromisoformat(obj['created_at']) if obj.get('created_at') else None,
-            updated_at=datetime.fromisoformat(obj['updated_at']) if obj.get('updated_at') else None,
-            expires_at=datetime.fromisoformat(obj['expires_at']) if obj.get('expires_at') else None,
+            id=UUID(obj["id"]),
+            session_id=obj["session_id"],
+            user_id=obj.get("user_id"),
+            selected_currency=obj["selected_currency"],
+            dismissed_language_prompt=obj["dismissed_language_prompt"],
+            detected_language=obj.get("detected_language"),
+            created_at=datetime.fromisoformat(obj["created_at"]) if obj.get("created_at") else None,
+            updated_at=datetime.fromisoformat(obj["updated_at"]) if obj.get("updated_at") else None,
+            expires_at=datetime.fromisoformat(obj["expires_at"]) if obj.get("expires_at") else None,
         )

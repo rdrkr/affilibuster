@@ -8,6 +8,7 @@ Logs all API requests with method, path, status, and duration
 
 import logging
 import time
+
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 

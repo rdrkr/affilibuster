@@ -1,0 +1,75 @@
+{
+  "kind": "collectionType",
+  "collectionName": "currencies",
+  "info": {
+    "singularName": "currency",
+    "pluralName": "currencies",
+    "displayName": "Currency",
+    "description": "Supported currencies in the system with formatting rules"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "minLength": 3,
+      "maxLength": 3
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "symbol": {
+      "type": "string",
+      "required": true,
+      "maxLength": 5
+    },
+    "displayName": {
+      "type": "string",
+      "required": true
+    },
+    "decimalPlaces": {
+      "type": "integer",
+      "required": true,
+      "default": 2,
+      "min": 0,
+      "max": 8
+    },
+    "symbolPosition": {
+      "type": "enumeration",
+      "enum": ["before", "after"],
+      "required": true,
+      "default": "before"
+    },
+    "thousandsSeparator": {
+      "type": "string",
+      "maxLength": 1,
+      "default": ","
+    },
+    "decimalSeparator": {
+      "type": "string",
+      "maxLength": 1,
+      "required": true,
+      "default": "."
+    },
+    "exchangeRate": {
+      "type": "decimal",
+      "required": true,
+      "default": 1
+    },
+    "sortOrder": {
+      "type": "integer",
+      "required": true,
+      "default": 0
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    }
+  }
+}

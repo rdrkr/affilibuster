@@ -6,15 +6,16 @@ User preferences repository implementation using SQLAlchemy.
 Reference: T075 (IUserPreferencesRepository interface), T070 (UserPreferences model)
 """
 
-from typing import Optional
 from datetime import UTC, datetime
-from sqlalchemy import select, delete
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.dialects.postgresql import insert
+from typing import Optional
 
-from src.domain.repositories.preferences_repository import IUserPreferencesRepository
-from src.domain.entities.user_preferences import UserPreferences
-from src.infrastructure.database.models.user_preferences import UserPreferencesModel
+from sqlalchemy import delete, select
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from domain.entities.user_preferences import UserPreferences
+from domain.repositories.preferences_repository import IUserPreferencesRepository
+from infrastructure.database.models.user_preferences import UserPreferencesModel
 
 
 class UserPreferencesRepository(IUserPreferencesRepository):
@@ -61,14 +62,14 @@ class UserPreferencesRepository(IUserPreferencesRepository):
 
         # On conflict, update all fields except id, session_id, and created_at
         stmt = stmt.on_conflict_do_update(
-            index_elements=['session_id'],
+            index_elements=["session_id"],
             set_={
-                'user_id': stmt.excluded.user_id,
-                'selected_currency': stmt.excluded.selected_currency,
-                'dismissed_language_prompt': stmt.excluded.dismissed_language_prompt,
-                'detected_language': stmt.excluded.detected_language,
-                'updated_at': stmt.excluded.updated_at,
-                'expires_at': stmt.excluded.expires_at,
+                "user_id": stmt.excluded.user_id,
+                "selected_currency": stmt.excluded.selected_currency,
+                "dismissed_language_prompt": stmt.excluded.dismissed_language_prompt,
+                "detected_language": stmt.excluded.detected_language,
+                "updated_at": stmt.excluded.updated_at,
+                "expires_at": stmt.excluded.expires_at,
             },
         )
 
@@ -89,9 +90,7 @@ class UserPreferencesRepository(IUserPreferencesRepository):
 
     async def delete_by_session(self, session_id: str) -> bool:
         """Delete preferences by session ID."""
-        stmt = delete(UserPreferencesModel).where(
-            UserPreferencesModel.session_id == session_id
-        )
+        stmt = delete(UserPreferencesModel).where(UserPreferencesModel.session_id == session_id)
         result = await self.session.execute(stmt)
         await self.session.flush()
         return result.rowcount > 0

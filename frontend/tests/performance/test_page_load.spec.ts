@@ -13,17 +13,17 @@
  * - Total page load < 3s
  */
 
-import { test, expect, chromium } from '@playwright/test';
+import { test, expect } from '@playwright/test'
 
-const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000';
+const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000'
 
 // Performance thresholds
 const THRESHOLDS = {
-  ttfb: 600,      // Time to First Byte (ms)
-  fcp: 1800,      // First Contentful Paint (ms)
-  lcp: 2500,      // Largest Contentful Paint (ms)
-  total: 3000,    // Total page load (ms)
-};
+  ttfb: 600, // Time to First Byte (ms)
+  fcp: 1800, // First Contentful Paint (ms)
+  lcp: 2500, // Largest Contentful Paint (ms)
+  total: 3000, // Total page load (ms)
+}
 
 // 3G network conditions (Slow 3G profile)
 const SLOW_3G = {
@@ -35,27 +35,27 @@ const SLOW_3G = {
   latency: 400,
   // Network is online (not offline)
   offline: false,
-};
+}
 
 /**
  * Extract performance metrics from Navigation Timing API
  */
-async function getPerformanceMetrics(page: any) {
+async function getPerformanceMetrics(page: unknown) {
   return await page.evaluate(() => {
-    const perfData = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-    const paintEntries = window.performance.getEntriesByType('paint');
+    const perfData = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
+    const paintEntries = window.performance.getEntriesByType('paint')
 
     // Find FCP and LCP
-    const fcp = paintEntries.find(entry => entry.name === 'first-contentful-paint')?.startTime || 0;
+    const fcp = paintEntries.find(entry => entry.name === 'first-contentful-paint')?.startTime || 0
 
     // Get LCP from PerformanceObserver (if available)
-    let lcp = 0;
+    let lcp = 0
     try {
-      const lcpEntries = window.performance.getEntriesByType('largest-contentful-paint');
+      const lcpEntries = window.performance.getEntriesByType('largest-contentful-paint')
       if (lcpEntries.length > 0) {
-        lcp = lcpEntries[lcpEntries.length - 1].startTime;
+        lcp = lcpEntries[lcpEntries.length - 1].startTime
       }
-    } catch (e) {
+    } catch {
       // LCP not available
     }
 
@@ -67,182 +67,178 @@ async function getPerformanceMetrics(page: any) {
       lcp: lcp,
       domInteractive: perfData.domInteractive - perfData.fetchStart,
       transferSize: perfData.transferSize,
-    };
-  });
+    }
+  })
 }
 
 test.describe('Page Load Performance (3G)', () => {
   test.beforeEach(async ({ context }) => {
     // Enable network throttling for all tests
-    const cdpSession = await context.newCDPSession(await context.pages()[0]);
-    await cdpSession.send('Network.emulateNetworkConditions', SLOW_3G);
-  });
+    const cdpSession = await context.newCDPSession(await context.pages()[0])
+    await cdpSession.send('Network.emulateNetworkConditions', SLOW_3G)
+  })
 
   test('English homepage loads under 3s on 3G', async ({ page }) => {
-    const startTime = Date.now();
+    const startTime = Date.now()
 
-    await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+    await page.goto(BASE_URL, { waitUntil: 'networkidle' })
 
-    const loadTime = Date.now() - startTime;
-    const metrics = await getPerformanceMetrics(page);
+    const loadTime = Date.now() - startTime
+    const metrics = await getPerformanceMetrics(page)
 
-    console.log('English Homepage Performance (3G):');
-    console.log(`  TTFB: ${metrics.ttfb.toFixed(0)}ms`);
-    console.log(`  FCP: ${metrics.fcp.toFixed(0)}ms`);
-    console.log(`  LCP: ${metrics.lcp.toFixed(0)}ms`);
-    console.log(`  Total Load: ${loadTime}ms`);
-    console.log(`  Transfer Size: ${(metrics.transferSize / 1024).toFixed(2)}KB`);
+    console.log('English Homepage Performance (3G):')
+    console.log(`  TTFB: ${metrics.ttfb.toFixed(0)}ms`)
+    console.log(`  FCP: ${metrics.fcp.toFixed(0)}ms`)
+    console.log(`  LCP: ${metrics.lcp.toFixed(0)}ms`)
+    console.log(`  Total Load: ${loadTime}ms`)
+    console.log(`  Transfer Size: ${(metrics.transferSize / 1024).toFixed(2)}KB`)
 
     // Validate thresholds
-    expect(metrics.ttfb).toBeLessThan(THRESHOLDS.ttfb);
-    expect(metrics.fcp).toBeLessThan(THRESHOLDS.fcp);
-    expect(loadTime).toBeLessThan(THRESHOLDS.total);
-  });
+    expect(metrics.ttfb).toBeLessThan(THRESHOLDS.ttfb)
+    expect(metrics.fcp).toBeLessThan(THRESHOLDS.fcp)
+    expect(loadTime).toBeLessThan(THRESHOLDS.total)
+  })
 
   test('Italian homepage loads under 3s on 3G', async ({ page }) => {
-    const startTime = Date.now();
+    const startTime = Date.now()
 
-    await page.goto(`${BASE_URL}/it`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/it`, { waitUntil: 'networkidle' })
 
-    const loadTime = Date.now() - startTime;
-    const metrics = await getPerformanceMetrics(page);
+    const loadTime = Date.now() - startTime
+    const metrics = await getPerformanceMetrics(page)
 
-    console.log('Italian Homepage Performance (3G):');
-    console.log(`  TTFB: ${metrics.ttfb.toFixed(0)}ms`);
-    console.log(`  FCP: ${metrics.fcp.toFixed(0)}ms`);
-    console.log(`  Total Load: ${loadTime}ms`);
+    console.log('Italian Homepage Performance (3G):')
+    console.log(`  TTFB: ${metrics.ttfb.toFixed(0)}ms`)
+    console.log(`  FCP: ${metrics.fcp.toFixed(0)}ms`)
+    console.log(`  Total Load: ${loadTime}ms`)
 
-    expect(metrics.ttfb).toBeLessThan(THRESHOLDS.ttfb);
-    expect(metrics.fcp).toBeLessThan(THRESHOLDS.fcp);
-    expect(loadTime).toBeLessThan(THRESHOLDS.total);
-  });
+    expect(metrics.ttfb).toBeLessThan(THRESHOLDS.ttfb)
+    expect(metrics.fcp).toBeLessThan(THRESHOLDS.fcp)
+    expect(loadTime).toBeLessThan(THRESHOLDS.total)
+  })
 
   test('Hebrew homepage loads under 3s on 3G', async ({ page }) => {
-    const startTime = Date.now();
+    const startTime = Date.now()
 
-    await page.goto(`${BASE_URL}/il`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/he`, { waitUntil: 'networkidle' })
 
-    const loadTime = Date.now() - startTime;
-    const metrics = await getPerformanceMetrics(page);
+    const loadTime = Date.now() - startTime
+    const metrics = await getPerformanceMetrics(page)
 
-    console.log('Hebrew Homepage Performance (3G):');
-    console.log(`  TTFB: ${metrics.ttfb.toFixed(0)}ms`);
-    console.log(`  FCP: ${metrics.fcp.toFixed(0)}ms`);
-    console.log(`  Total Load: ${loadTime}ms`);
+    console.log('Hebrew Homepage Performance (3G):')
+    console.log(`  TTFB: ${metrics.ttfb.toFixed(0)}ms`)
+    console.log(`  FCP: ${metrics.fcp.toFixed(0)}ms`)
+    console.log(`  Total Load: ${loadTime}ms`)
 
-    expect(metrics.ttfb).toBeLessThan(THRESHOLDS.ttfb);
-    expect(metrics.fcp).toBeLessThan(THRESHOLDS.fcp);
-    expect(loadTime).toBeLessThan(THRESHOLDS.total);
-  });
+    expect(metrics.ttfb).toBeLessThan(THRESHOLDS.ttfb)
+    expect(metrics.fcp).toBeLessThan(THRESHOLDS.fcp)
+    expect(loadTime).toBeLessThan(THRESHOLDS.total)
+  })
 
   test('Product page loads under 3s on 3G', async ({ page }) => {
-    const startTime = Date.now();
+    const startTime = Date.now()
 
     // Test a product page
     await page.goto(`${BASE_URL}/products/test-product`, {
       waitUntil: 'networkidle',
-      timeout: 10000
-    });
+      timeout: 10000,
+    })
 
-    const loadTime = Date.now() - startTime;
-    const metrics = await getPerformanceMetrics(page);
+    const loadTime = Date.now() - startTime
+    const metrics = await getPerformanceMetrics(page)
 
-    console.log('Product Page Performance (3G):');
-    console.log(`  TTFB: ${metrics.ttfb.toFixed(0)}ms`);
-    console.log(`  FCP: ${metrics.fcp.toFixed(0)}ms`);
-    console.log(`  Total Load: ${loadTime}ms`);
+    console.log('Product Page Performance (3G):')
+    console.log(`  TTFB: ${metrics.ttfb.toFixed(0)}ms`)
+    console.log(`  FCP: ${metrics.fcp.toFixed(0)}ms`)
+    console.log(`  Total Load: ${loadTime}ms`)
 
-    expect(metrics.ttfb).toBeLessThan(THRESHOLDS.ttfb);
-    expect(metrics.fcp).toBeLessThan(THRESHOLDS.fcp);
-    expect(loadTime).toBeLessThan(THRESHOLDS.total);
-  });
-});
+    expect(metrics.ttfb).toBeLessThan(THRESHOLDS.ttfb)
+    expect(metrics.fcp).toBeLessThan(THRESHOLDS.fcp)
+    expect(loadTime).toBeLessThan(THRESHOLDS.total)
+  })
+})
 
 test.describe('Page Load Performance (Comparison)', () => {
   test('Compare performance across network conditions', async ({ browser }) => {
-    const results: any = {
+    const results: unknown = {
       fast4g: {},
       slow3g: {},
-    };
+    }
 
     // Test with Fast 4G
-    const fast4gContext = await browser.newContext();
-    const fast4gPage = await fast4gContext.newPage();
-    const fast4gCdp = await fast4gContext.newCDPSession(fast4gPage);
+    const fast4gContext = await browser.newContext()
+    const fast4gPage = await fast4gContext.newPage()
+    const fast4gCdp = await fast4gContext.newCDPSession(fast4gPage)
 
     await fast4gCdp.send('Network.emulateNetworkConditions', {
       downloadThroughput: (4 * 1024 * 1024) / 8,
       uploadThroughput: (3 * 1024 * 1024) / 8,
       latency: 20,
       offline: false,
-    });
+    })
 
-    const fast4gStart = Date.now();
-    await fast4gPage.goto(BASE_URL, { waitUntil: 'networkidle' });
-    results.fast4g.loadTime = Date.now() - fast4gStart;
-    results.fast4g.metrics = await getPerformanceMetrics(fast4gPage);
-    await fast4gContext.close();
+    const fast4gStart = Date.now()
+    await fast4gPage.goto(BASE_URL, { waitUntil: 'networkidle' })
+    results.fast4g.loadTime = Date.now() - fast4gStart
+    results.fast4g.metrics = await getPerformanceMetrics(fast4gPage)
+    await fast4gContext.close()
 
     // Test with Slow 3G
-    const slow3gContext = await browser.newContext();
-    const slow3gPage = await slow3gContext.newPage();
-    const slow3gCdp = await slow3gContext.newCDPSession(slow3gPage);
+    const slow3gContext = await browser.newContext()
+    const slow3gPage = await slow3gContext.newPage()
+    const slow3gCdp = await slow3gContext.newCDPSession(slow3gPage)
 
-    await slow3gCdp.send('Network.emulateNetworkConditions', SLOW_3G);
+    await slow3gCdp.send('Network.emulateNetworkConditions', SLOW_3G)
 
-    const slow3gStart = Date.now();
-    await slow3gPage.goto(BASE_URL, { waitUntil: 'networkidle' });
-    results.slow3g.loadTime = Date.now() - slow3gStart;
-    results.slow3g.metrics = await getPerformanceMetrics(slow3gPage);
-    await slow3gContext.close();
+    const slow3gStart = Date.now()
+    await slow3gPage.goto(BASE_URL, { waitUntil: 'networkidle' })
+    results.slow3g.loadTime = Date.now() - slow3gStart
+    results.slow3g.metrics = await getPerformanceMetrics(slow3gPage)
+    await slow3gContext.close()
 
-    console.log('\nPerformance Comparison:');
-    console.log('Fast 4G:');
-    console.log(`  Load Time: ${results.fast4g.loadTime}ms`);
-    console.log(`  FCP: ${results.fast4g.metrics.fcp.toFixed(0)}ms`);
-    console.log('Slow 3G:');
-    console.log(`  Load Time: ${results.slow3g.loadTime}ms`);
-    console.log(`  FCP: ${results.slow3g.metrics.fcp.toFixed(0)}ms`);
+    console.log('\nPerformance Comparison:')
+    console.log('Fast 4G:')
+    console.log(`  Load Time: ${results.fast4g.loadTime}ms`)
+    console.log(`  FCP: ${results.fast4g.metrics.fcp.toFixed(0)}ms`)
+    console.log('Slow 3G:')
+    console.log(`  Load Time: ${results.slow3g.loadTime}ms`)
+    console.log(`  FCP: ${results.slow3g.metrics.fcp.toFixed(0)}ms`)
 
     // Both should meet basic thresholds
-    expect(results.fast4g.loadTime).toBeLessThan(2000);
-    expect(results.slow3g.loadTime).toBeLessThan(THRESHOLDS.total);
-  });
-});
+    expect(results.fast4g.loadTime).toBeLessThan(2000)
+    expect(results.slow3g.loadTime).toBeLessThan(THRESHOLDS.total)
+  })
+})
 
 test.describe('Resource Loading Performance', () => {
   test('Critical resources load quickly', async ({ page }) => {
-    const resourceTimings: any[] = [];
+    const resourceTimings: unknown[] = []
 
-    page.on('response', async (response) => {
-      const url = response.url();
-      const timing = await response.request().timing();
+    page.on('response', async response => {
+      const url = response.url()
+      const timing = await response.request().timing()
 
-      if (timing && (
-        url.includes('.js') ||
-        url.includes('.css') ||
-        url.includes('.woff')
-      )) {
+      if (timing && (url.includes('.js') || url.includes('.css') || url.includes('.woff'))) {
         resourceTimings.push({
           url: url.split('/').pop(),
           duration: timing.responseEnd,
           size: (await response.body()).length,
-        });
+        })
       }
-    });
+    })
 
-    await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+    await page.goto(BASE_URL, { waitUntil: 'networkidle' })
 
-    console.log('\nCritical Resource Timings:');
+    console.log('\nCritical Resource Timings:')
     resourceTimings
       .sort((a, b) => b.duration - a.duration)
       .slice(0, 10)
       .forEach(resource => {
-        console.log(`  ${resource.url}: ${resource.duration.toFixed(0)}ms (${(resource.size / 1024).toFixed(2)}KB)`);
-      });
+        console.log(`  ${resource.url}: ${resource.duration.toFixed(0)}ms (${(resource.size / 1024).toFixed(2)}KB)`)
+      })
 
     // Ensure no single resource takes too long
-    const slowResources = resourceTimings.filter(r => r.duration > 1000);
-    expect(slowResources.length).toBeLessThan(3);
-  });
-});
+    const slowResources = resourceTimings.filter(r => r.duration > 1000)
+    expect(slowResources.length).toBeLessThan(3)
+  })
+})

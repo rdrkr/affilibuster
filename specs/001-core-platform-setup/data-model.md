@@ -19,7 +19,7 @@ interface Language {
   displayName: string;       // 'English', 'Italiano', 'עברית'
   nativeName: string;        // 'English', 'Italiano', 'עברית'
   direction: 'ltr' | 'rtl';
-  urlPrefix: string;         // '' (root for English) | '/it' | '/il'
+  urlPrefix: string;         // '' (root for English) | '/it' | '/he'
   defaultCurrency: CurrencyCode;
   localeCode: string;        // 'en-US', 'it-IT', 'he-IL'
   isDefault: boolean;
@@ -66,7 +66,7 @@ interface Language {
     "displayName": "Hebrew",
     "nativeName": "עברית",
     "direction": "rtl",
-    "urlPrefix": "/il",
+    "urlPrefix": "/he",
     "defaultCurrency": "ILS",
     "localeCode": "he-IL",
     "isDefault": false,
@@ -240,7 +240,7 @@ interface URLRedirect {
   "canonicalUrl": "https://affilibuster.com/products/eco-water-bottle",
   "alternateUrls": {
     "it": "https://affilibuster.com/it/prodotti/bottiglia-eco",
-    "he": "https://affilibuster.com/il/products/eco-water-bottle"
+    "he": "https://affilibuster.com/he/products/eco-water-bottle"
   }
 }
 ```

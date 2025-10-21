@@ -380,7 +380,7 @@ backend/
 
 #### 2.4 Testing Styles
 - [ ] Run dev server and check all pages
-- [ ] Verify RTL layout for Hebrew (/il)
+- [ ] Verify RTL layout for Hebrew (/he)
 - [ ] Test dark mode toggle
 - [ ] Check responsive design on mobile
 - [ ] Verify all Tailwind classes work

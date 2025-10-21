@@ -10,13 +10,14 @@ Covers:
 - Timestamp validation
 """
 
-import pytest
 from datetime import UTC, datetime
-from uuid import uuid4, UUID
 from unittest.mock import AsyncMock, MagicMock
+from uuid import uuid4
 
-from src.domain.use_cases.publish_content import PublishContent, ArchiveContent
-from src.domain.entities.content_version import ContentVersion
+import pytest
+
+from domain.entities.content_version import ContentVersion
+from domain.use_cases.publish_content import ArchiveContent, PublishContent
 
 
 @pytest.fixture
@@ -60,17 +61,17 @@ def draft_version(content_id):
     return ContentVersion(
         id=uuid4(),
         content_id=content_id,
-        language_code='en',
-        slug='eco-water-bottle',
-        title='Eco Water Bottle',
-        excerpt='Sustainable water bottle',
-        body='<p>Eco-friendly water bottle made from recycled materials.</p>',
-        meta_title='Eco Water Bottle - Sustainable',
-        meta_description='Best eco-friendly bottle',
+        language_code="en",
+        slug="eco-water-bottle",
+        title="Eco Water Bottle",
+        excerpt="Sustainable water bottle",
+        body="<p>Eco-friendly water bottle made from recycled materials.</p>",
+        meta_title="Eco Water Bottle - Sustainable",
+        meta_description="Best eco-friendly bottle",
         is_published=False,
         published_at=None,
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -80,17 +81,17 @@ def published_version(content_id):
     return ContentVersion(
         id=uuid4(),
         content_id=content_id,
-        language_code='en',
-        slug='eco-water-bottle',
-        title='Eco Water Bottle',
-        excerpt='Sustainable water bottle',
-        body='<p>Eco-friendly water bottle made from recycled materials.</p>',
-        meta_title='Eco Water Bottle - Sustainable',
-        meta_description='Best eco-friendly bottle',
+        language_code="en",
+        slug="eco-water-bottle",
+        title="Eco Water Bottle",
+        excerpt="Sustainable water bottle",
+        body="<p>Eco-friendly water bottle made from recycled materials.</p>",
+        meta_title="Eco Water Bottle - Sustainable",
+        meta_description="Best eco-friendly bottle",
         is_published=True,
         published_at=datetime.now(UTC),
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -98,9 +99,7 @@ class TestPublishContentSuccess:
     """Test successful content publishing operations."""
 
     @pytest.mark.asyncio
-    async def test_publish_draft_content(
-        self, publish_use_case, mock_content_repository, content_id, draft_version
-    ):
+    async def test_publish_draft_content(self, publish_use_case, mock_content_repository, content_id, draft_version):
         """Test publishing a draft content version."""
         # Arrange
         mock_content_repository.get_by_id.return_value = draft_version
@@ -108,31 +107,27 @@ class TestPublishContentSuccess:
         published = ContentVersion(
             id=draft_version.id,
             content_id=content_id,
-            language_code='en',
-            slug='eco-water-bottle',
-            title='Eco Water Bottle',
-            excerpt='Sustainable water bottle',
-            body='<p>Eco-friendly water bottle made from recycled materials.</p>',
-            meta_title='Eco Water Bottle - Sustainable',
-            meta_description='Best eco-friendly bottle',
+            language_code="en",
+            slug="eco-water-bottle",
+            title="Eco Water Bottle",
+            excerpt="Sustainable water bottle",
+            body="<p>Eco-friendly water bottle made from recycled materials.</p>",
+            meta_title="Eco Water Bottle - Sustainable",
+            meta_description="Best eco-friendly bottle",
             is_published=True,
             published_at=datetime.now(UTC),
             created_at=draft_version.created_at,
-            updated_at=datetime.now(UTC)
+            updated_at=datetime.now(UTC),
         )
         mock_content_repository.update_version.return_value = published
 
         # Act
-        result = await publish_use_case.execute(
-            content_id=content_id,
-            language_code='en',
-            published_by='user-123'
-        )
+        result = await publish_use_case.execute(content_id=content_id, language_code="en", published_by="user-123")
 
         # Assert
         assert result.is_published is True
         assert result.published_at is not None
-        mock_content_repository.get_by_id.assert_called_once_with(content_id, 'en')
+        mock_content_repository.get_by_id.assert_called_once_with(content_id, "en")
         mock_content_repository.update_version.assert_called_once()
 
     @pytest.mark.asyncio
@@ -145,11 +140,7 @@ class TestPublishContentSuccess:
         mock_content_repository.update_version.return_value = draft_version
 
         # Act
-        await publish_use_case.execute(
-            content_id=content_id,
-            language_code='en',
-            published_by='user-123'
-        )
+        await publish_use_case.execute(content_id=content_id, language_code="en", published_by="user-123")
 
         # Assert
         updated_version = mock_content_repository.update_version.call_args[0][0]
@@ -166,11 +157,7 @@ class TestPublishContentSuccess:
         mock_content_repository.update_version.return_value = draft_version
 
         # Act
-        await publish_use_case.execute(
-            content_id=content_id,
-            language_code='en',
-            published_by='user-123'
-        )
+        await publish_use_case.execute(content_id=content_id, language_code="en", published_by="user-123")
 
         after = datetime.now(UTC)
 
@@ -190,11 +177,7 @@ class TestPublishContentSuccess:
         mock_content_repository.update_version.return_value = draft_version
 
         # Act
-        await publish_use_case.execute(
-            content_id=content_id,
-            language_code='en',
-            published_by='user-123'
-        )
+        await publish_use_case.execute(content_id=content_id, language_code="en", published_by="user-123")
 
         after = datetime.now(UTC)
 
@@ -213,26 +196,22 @@ class TestPublishContentSuccess:
         expected_version = ContentVersion(
             id=draft_version.id,
             content_id=content_id,
-            language_code='en',
-            slug='eco-water-bottle',
-            title='Eco Water Bottle',
-            excerpt='Sustainable water bottle',
-            body='<p>Eco-friendly water bottle made from recycled materials.</p>',
-            meta_title='Eco Water Bottle - Sustainable',
-            meta_description='Best eco-friendly bottle',
+            language_code="en",
+            slug="eco-water-bottle",
+            title="Eco Water Bottle",
+            excerpt="Sustainable water bottle",
+            body="<p>Eco-friendly water bottle made from recycled materials.</p>",
+            meta_title="Eco Water Bottle - Sustainable",
+            meta_description="Best eco-friendly bottle",
             is_published=True,
             published_at=datetime.now(UTC),
             created_at=draft_version.created_at,
-            updated_at=datetime.now(UTC)
+            updated_at=datetime.now(UTC),
         )
         mock_content_repository.update_version.return_value = expected_version
 
         # Act
-        result = await publish_use_case.execute(
-            content_id=content_id,
-            language_code='en',
-            published_by='user-123'
-        )
+        result = await publish_use_case.execute(content_id=content_id, language_code="en", published_by="user-123")
 
         # Assert
         assert result == expected_version
@@ -243,20 +222,14 @@ class TestPublishContentErrorHandling:
     """Test error handling in content publishing."""
 
     @pytest.mark.asyncio
-    async def test_error_when_content_version_not_found(
-        self, publish_use_case, mock_content_repository, content_id
-    ):
+    async def test_error_when_content_version_not_found(self, publish_use_case, mock_content_repository, content_id):
         """Test error when content version doesn't exist."""
         # Arrange
         mock_content_repository.get_by_id.return_value = None
 
         # Act & Assert
         with pytest.raises(ValueError, match="Content version not found"):
-            await publish_use_case.execute(
-                content_id=content_id,
-                language_code='en',
-                published_by='user-123'
-            )
+            await publish_use_case.execute(content_id=content_id, language_code="en", published_by="user-123")
 
         # Repository update should not be called
         mock_content_repository.update_version.assert_not_called()
@@ -271,11 +244,7 @@ class TestPublishContentErrorHandling:
 
         # Act & Assert
         with pytest.raises(ValueError, match="Content version is already published"):
-            await publish_use_case.execute(
-                content_id=content_id,
-                language_code='en',
-                published_by='user-123'
-            )
+            await publish_use_case.execute(content_id=content_id, language_code="en", published_by="user-123")
 
         # Repository update should not be called
         mock_content_repository.update_version.assert_not_called()
@@ -290,44 +259,30 @@ class TestPublishContentErrorHandling:
 
         # Act & Assert
         with pytest.raises(ValueError) as exc_info:
-            await publish_use_case.execute(
-                content_id=content_id,
-                language_code='it',
-                published_by='user-123'
-            )
+            await publish_use_case.execute(content_id=content_id, language_code="it", published_by="user-123")
 
         error_message = str(exc_info.value)
         assert str(content_id) in error_message
-        assert 'it' in error_message
+        assert "it" in error_message
 
 
 class TestArchiveContentSuccess:
     """Test successful content archiving operations."""
 
     @pytest.mark.asyncio
-    async def test_archive_content(
-        self, archive_use_case, mock_content_repository, content_id
-    ):
+    async def test_archive_content(self, archive_use_case, mock_content_repository, content_id):
         """Test archiving content."""
         # Act
-        await archive_use_case.execute(
-            content_id=content_id,
-            archived_by='admin-user'
-        )
+        await archive_use_case.execute(content_id=content_id, archived_by="admin-user")
 
         # Assert
         mock_content_repository.archive_content.assert_called_once_with(content_id)
 
     @pytest.mark.asyncio
-    async def test_archive_calls_repository_archive_method(
-        self, archive_use_case, mock_content_repository, content_id
-    ):
+    async def test_archive_calls_repository_archive_method(self, archive_use_case, mock_content_repository, content_id):
         """Test that archive calls content repository archive method."""
         # Act
-        await archive_use_case.execute(
-            content_id=content_id,
-            archived_by='admin-123'
-        )
+        await archive_use_case.execute(content_id=content_id, archived_by="admin-123")
 
         # Assert
         mock_content_repository.archive_content.assert_called_once()
@@ -335,23 +290,15 @@ class TestArchiveContentSuccess:
         assert call_args[0] == content_id
 
     @pytest.mark.asyncio
-    async def test_archive_with_different_content_ids(
-        self, archive_use_case, mock_content_repository
-    ):
+    async def test_archive_with_different_content_ids(self, archive_use_case, mock_content_repository):
         """Test archiving different content items."""
         content_id_1 = uuid4()
         content_id_2 = uuid4()
 
         # Act
-        await archive_use_case.execute(
-            content_id=content_id_1,
-            archived_by='admin-123'
-        )
+        await archive_use_case.execute(content_id=content_id_1, archived_by="admin-123")
 
-        await archive_use_case.execute(
-            content_id=content_id_2,
-            archived_by='admin-123'
-        )
+        await archive_use_case.execute(content_id=content_id_2, archived_by="admin-123")
 
         # Assert
         assert mock_content_repository.archive_content.call_count == 2
@@ -365,23 +312,19 @@ class TestArchiveContentSuccess:
 class TestPublishContentInitialization:
     """Test PublishContent initialization."""
 
-    def test_initialization_with_repositories(
-        self, mock_content_repository, mock_url_route_repository
-    ):
+    def test_initialization_with_repositories(self, mock_content_repository, mock_url_route_repository):
         """Test use case initialization with repositories."""
         use_case = PublishContent(mock_content_repository, mock_url_route_repository)
 
         assert use_case.content_repository is mock_content_repository
         assert use_case.url_route_repository is mock_url_route_repository
 
-    def test_repositories_are_stored(
-        self, mock_content_repository, mock_url_route_repository
-    ):
+    def test_repositories_are_stored(self, mock_content_repository, mock_url_route_repository):
         """Test that repository references are stored correctly."""
         use_case = PublishContent(mock_content_repository, mock_url_route_repository)
 
-        assert hasattr(use_case, 'content_repository')
-        assert hasattr(use_case, 'url_route_repository')
+        assert hasattr(use_case, "content_repository")
+        assert hasattr(use_case, "url_route_repository")
         assert use_case.content_repository == mock_content_repository
         assert use_case.url_route_repository == mock_url_route_repository
 
@@ -389,23 +332,19 @@ class TestPublishContentInitialization:
 class TestArchiveContentInitialization:
     """Test ArchiveContent initialization."""
 
-    def test_initialization_with_repositories(
-        self, mock_content_repository, mock_url_route_repository
-    ):
+    def test_initialization_with_repositories(self, mock_content_repository, mock_url_route_repository):
         """Test use case initialization with repositories."""
         use_case = ArchiveContent(mock_content_repository, mock_url_route_repository)
 
         assert use_case.content_repository is mock_content_repository
         assert use_case.url_route_repository is mock_url_route_repository
 
-    def test_repositories_are_stored(
-        self, mock_content_repository, mock_url_route_repository
-    ):
+    def test_repositories_are_stored(self, mock_content_repository, mock_url_route_repository):
         """Test that repository references are stored correctly."""
         use_case = ArchiveContent(mock_content_repository, mock_url_route_repository)
 
-        assert hasattr(use_case, 'content_repository')
-        assert hasattr(use_case, 'url_route_repository')
+        assert hasattr(use_case, "content_repository")
+        assert hasattr(use_case, "url_route_repository")
         assert use_case.content_repository == mock_content_repository
         assert use_case.url_route_repository == mock_url_route_repository
 
@@ -422,14 +361,10 @@ class TestPublishContentEdgeCases:
         mock_content_repository.update_version.return_value = draft_version
 
         # Test with Italian language
-        await publish_use_case.execute(
-            content_id=content_id,
-            language_code='it',
-            published_by='user-123'
-        )
+        await publish_use_case.execute(content_id=content_id, language_code="it", published_by="user-123")
 
         # Assert
-        mock_content_repository.get_by_id.assert_called_with(content_id, 'it')
+        mock_content_repository.get_by_id.assert_called_with(content_id, "it")
 
     @pytest.mark.asyncio
     async def test_publish_timestamps_are_consistent(
@@ -441,11 +376,7 @@ class TestPublishContentEdgeCases:
         mock_content_repository.update_version.return_value = draft_version
 
         # Act
-        await publish_use_case.execute(
-            content_id=content_id,
-            language_code='en',
-            published_by='user-123'
-        )
+        await publish_use_case.execute(content_id=content_id, language_code="en", published_by="user-123")
 
         # Assert
         updated_version = mock_content_repository.update_version.call_args[0][0]
@@ -468,11 +399,7 @@ class TestPublishContentEdgeCases:
         mock_content_repository.update_version.return_value = draft_version
 
         # Act
-        await publish_use_case.execute(
-            content_id=content_id,
-            language_code='en',
-            published_by='user-123'
-        )
+        await publish_use_case.execute(content_id=content_id, language_code="en", published_by="user-123")
 
         # Assert
         updated_version = mock_content_repository.update_version.call_args[0][0]

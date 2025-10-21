@@ -4,7 +4,7 @@
 Middleware package for cross-cutting concerns
 """
 
-from .logging import RequestLoggingMiddleware
 from .error_handler import ErrorHandlingMiddleware
+from .logging import RequestLoggingMiddleware
 
-__all__ = ['RequestLoggingMiddleware', 'ErrorHandlingMiddleware']
+__all__ = ["RequestLoggingMiddleware", "ErrorHandlingMiddleware"]

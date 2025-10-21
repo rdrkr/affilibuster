@@ -11,12 +11,13 @@ Tests all 8 API endpoints for performance requirements:
 Reference: plan.md:77-82 (Performance targets)
 """
 
-import pytest
 import asyncio
-import time
-from httpx import AsyncClient
-from typing import List, Dict
 import statistics
+import time
+from typing import Dict
+
+import pytest
+from httpx import AsyncClient
 
 
 @pytest.fixture
@@ -36,11 +37,7 @@ def performance_thresholds():
 
 
 async def measure_endpoint_performance(
-    client: AsyncClient,
-    method: str,
-    endpoint: str,
-    payload: dict = None,
-    iterations: int = 10
+    client: AsyncClient, method: str, endpoint: str, payload: dict = None, iterations: int = 10
 ) -> Dict[str, float]:
     """
     Measure endpoint performance metrics.
@@ -103,11 +100,9 @@ async def measure_endpoint_performance(
 async def test_get_languages_performance(api_base_url, performance_thresholds):
     """Test GET /v1/languages endpoint performance."""
     async with AsyncClient(base_url=api_base_url, timeout=30.0) as client:
-        metrics = await measure_endpoint_performance(
-            client, "GET", "/v1/languages", iterations=50
-        )
+        metrics = await measure_endpoint_performance(client, "GET", "/v1/languages", iterations=50)
 
-        print(f"\nGET /v1/languages Performance:")
+        print("\nGET /v1/languages Performance:")
         print(f"  Average: {metrics['avg_ms']:.2f}ms")
         print(f"  Min: {metrics['min_ms']:.2f}ms")
         print(f"  Max: {metrics['max_ms']:.2f}ms")
@@ -115,10 +110,12 @@ async def test_get_languages_performance(api_base_url, performance_thresholds):
         print(f"  P99: {metrics['p99_ms']:.2f}ms")
         print(f"  Success Rate: {metrics['success_rate']*100:.1f}%")
 
-        assert metrics['avg_ms'] < performance_thresholds['response_time_ms'], \
-            f"Average response time {metrics['avg_ms']:.2f}ms exceeds threshold {performance_thresholds['response_time_ms']}ms"
-        assert metrics['success_rate'] >= performance_thresholds['success_rate'], \
-            f"Success rate {metrics['success_rate']*100:.1f}% below threshold {performance_thresholds['success_rate']*100}%"
+        assert (
+            metrics["avg_ms"] < performance_thresholds["response_time_ms"]
+        ), f"Average response time {metrics['avg_ms']:.2f}ms exceeds threshold {performance_thresholds['response_time_ms']}ms"
+        assert (
+            metrics["success_rate"] >= performance_thresholds["success_rate"]
+        ), f"Success rate {metrics['success_rate']*100:.1f}% below threshold {performance_thresholds['success_rate']*100}%"
 
 
 @pytest.mark.performance
@@ -126,22 +123,19 @@ async def test_get_languages_performance(api_base_url, performance_thresholds):
 async def test_detect_language_performance(api_base_url, performance_thresholds):
     """Test POST /v1/languages/detect endpoint performance."""
     async with AsyncClient(base_url=api_base_url, timeout=30.0) as client:
-        payload = {
-            "acceptLanguage": "it-IT,it;q=0.9,en;q=0.8",
-            "userAgent": "Mozilla/5.0"
-        }
+        payload = {"acceptLanguage": "it-IT,it;q=0.9,en;q=0.8", "userAgent": "Mozilla/5.0"}
 
         metrics = await measure_endpoint_performance(
             client, "POST", "/v1/languages/detect", payload=payload, iterations=50
         )
 
-        print(f"\nPOST /v1/languages/detect Performance:")
+        print("\nPOST /v1/languages/detect Performance:")
         print(f"  Average: {metrics['avg_ms']:.2f}ms")
         print(f"  P95: {metrics['p95_ms']:.2f}ms")
         print(f"  Success Rate: {metrics['success_rate']*100:.1f}%")
 
-        assert metrics['avg_ms'] < performance_thresholds['response_time_ms']
-        assert metrics['success_rate'] >= performance_thresholds['success_rate']
+        assert metrics["avg_ms"] < performance_thresholds["response_time_ms"]
+        assert metrics["success_rate"] >= performance_thresholds["success_rate"]
 
 
 @pytest.mark.performance
@@ -149,15 +143,13 @@ async def test_detect_language_performance(api_base_url, performance_thresholds)
 async def test_get_currencies_performance(api_base_url, performance_thresholds):
     """Test GET /v1/currencies endpoint performance."""
     async with AsyncClient(base_url=api_base_url, timeout=30.0) as client:
-        metrics = await measure_endpoint_performance(
-            client, "GET", "/v1/currencies", iterations=50
-        )
+        metrics = await measure_endpoint_performance(client, "GET", "/v1/currencies", iterations=50)
 
-        print(f"\nGET /v1/currencies Performance:")
+        print("\nGET /v1/currencies Performance:")
         print(f"  Average: {metrics['avg_ms']:.2f}ms")
         print(f"  P95: {metrics['p95_ms']:.2f}ms")
 
-        assert metrics['avg_ms'] < performance_thresholds['response_time_ms']
+        assert metrics["avg_ms"] < performance_thresholds["response_time_ms"]
 
 
 @pytest.mark.performance
@@ -165,22 +157,17 @@ async def test_get_currencies_performance(api_base_url, performance_thresholds):
 async def test_convert_currency_performance(api_base_url, performance_thresholds):
     """Test POST /v1/currencies/convert endpoint performance."""
     async with AsyncClient(base_url=api_base_url, timeout=30.0) as client:
-        payload = {
-            "amount": 100.0,
-            "fromCurrency": "USD",
-            "toCurrency": "EUR",
-            "locale": "it-IT"
-        }
+        payload = {"amount": 100.0, "fromCurrency": "USD", "toCurrency": "EUR", "locale": "it-IT"}
 
         metrics = await measure_endpoint_performance(
             client, "POST", "/v1/currencies/convert", payload=payload, iterations=50
         )
 
-        print(f"\nPOST /v1/currencies/convert Performance:")
+        print("\nPOST /v1/currencies/convert Performance:")
         print(f"  Average: {metrics['avg_ms']:.2f}ms")
         print(f"  P95: {metrics['p95_ms']:.2f}ms")
 
-        assert metrics['avg_ms'] < performance_thresholds['response_time_ms']
+        assert metrics["avg_ms"] < performance_thresholds["response_time_ms"]
 
 
 @pytest.mark.performance
@@ -189,16 +176,14 @@ async def test_get_content_performance(api_base_url, performance_thresholds):
     """Test GET /v1/content/{lang}/{slug} endpoint performance."""
     async with AsyncClient(base_url=api_base_url, timeout=30.0) as client:
         # Test with a common slug
-        metrics = await measure_endpoint_performance(
-            client, "GET", "/v1/content/en/test-product", iterations=50
-        )
+        metrics = await measure_endpoint_performance(client, "GET", "/v1/content/en/test-product", iterations=50)
 
-        print(f"\nGET /v1/content/{{lang}}/{{slug}} Performance:")
+        print("\nGET /v1/content/{lang}/{slug} Performance:")
         print(f"  Average: {metrics['avg_ms']:.2f}ms")
         print(f"  P95: {metrics['p95_ms']:.2f}ms")
 
         # Content endpoints may return 404, which is acceptable
-        assert metrics['avg_ms'] < performance_thresholds['response_time_ms']
+        assert metrics["avg_ms"] < performance_thresholds["response_time_ms"]
 
 
 @pytest.mark.performance
@@ -206,15 +191,13 @@ async def test_get_content_performance(api_base_url, performance_thresholds):
 async def test_list_content_performance(api_base_url, performance_thresholds):
     """Test GET /v1/content/{lang} endpoint performance."""
     async with AsyncClient(base_url=api_base_url, timeout=30.0) as client:
-        metrics = await measure_endpoint_performance(
-            client, "GET", "/v1/content/en?page=1&limit=20", iterations=50
-        )
+        metrics = await measure_endpoint_performance(client, "GET", "/v1/content/en?page=1&limit=20", iterations=50)
 
-        print(f"\nGET /v1/content/{{lang}} Performance:")
+        print("\nGET /v1/content/{lang} Performance:")
         print(f"  Average: {metrics['avg_ms']:.2f}ms")
         print(f"  P95: {metrics['p95_ms']:.2f}ms")
 
-        assert metrics['avg_ms'] < performance_thresholds['response_time_ms']
+        assert metrics["avg_ms"] < performance_thresholds["response_time_ms"]
 
 
 @pytest.mark.performance
@@ -227,16 +210,14 @@ async def test_get_preferences_performance(api_base_url, performance_thresholds)
         # Create client with headers
         client.headers.update(headers)
 
-        metrics = await measure_endpoint_performance(
-            client, "GET", "/v1/user/preferences", iterations=50
-        )
+        metrics = await measure_endpoint_performance(client, "GET", "/v1/user/preferences", iterations=50)
 
-        print(f"\nGET /v1/user/preferences Performance:")
+        print("\nGET /v1/user/preferences Performance:")
         print(f"  Average: {metrics['avg_ms']:.2f}ms")
         print(f"  P95: {metrics['p95_ms']:.2f}ms")
 
         # Preferences may not exist (404), which is acceptable
-        assert metrics['avg_ms'] < performance_thresholds['response_time_ms']
+        assert metrics["avg_ms"] < performance_thresholds["response_time_ms"]
 
 
 @pytest.mark.performance
@@ -245,10 +226,7 @@ async def test_update_preferences_performance(api_base_url, performance_threshol
     """Test PUT /v1/user/preferences endpoint performance."""
     async with AsyncClient(base_url=api_base_url, timeout=30.0) as client:
         headers = {"X-Session-Id": "test-session-perf"}
-        payload = {
-            "selectedCurrency": "EUR",
-            "dismissedLanguagePrompt": True
-        }
+        payload = {"selectedCurrency": "EUR", "dismissedLanguagePrompt": True}
 
         client.headers.update(headers)
 
@@ -256,11 +234,11 @@ async def test_update_preferences_performance(api_base_url, performance_threshol
             client, "PUT", "/v1/user/preferences", payload=payload, iterations=50
         )
 
-        print(f"\nPUT /v1/user/preferences Performance:")
+        print("\nPUT /v1/user/preferences Performance:")
         print(f"  Average: {metrics['avg_ms']:.2f}ms")
         print(f"  P95: {metrics['p95_ms']:.2f}ms")
 
-        assert metrics['avg_ms'] < performance_thresholds['response_time_ms']
+        assert metrics["avg_ms"] < performance_thresholds["response_time_ms"]
 
 
 @pytest.mark.performance
@@ -271,18 +249,15 @@ async def test_concurrent_requests_performance(api_base_url):
         # Simulate 50 concurrent requests
         start = time.perf_counter()
 
-        tasks = [
-            client.get("/v1/languages")
-            for _ in range(50)
-        ]
+        tasks = [client.get("/v1/languages") for _ in range(50)]
 
         responses = await asyncio.gather(*tasks, return_exceptions=True)
         end = time.perf_counter()
 
         total_time_ms = (end - start) * 1000
-        successful = sum(1 for r in responses if hasattr(r, 'status_code') and r.status_code == 200)
+        successful = sum(1 for r in responses if hasattr(r, "status_code") and r.status_code == 200)
 
-        print(f"\nConcurrent Load Test (50 requests):")
+        print("\nConcurrent Load Test (50 requests):")
         print(f"  Total Time: {total_time_ms:.2f}ms")
         print(f"  Avg per request: {total_time_ms/50:.2f}ms")
         print(f"  Successful: {successful}/50 ({successful/50*100:.1f}%)")
@@ -301,7 +276,7 @@ async def test_ttfb_all_endpoints(api_base_url, performance_thresholds):
             ("GET", "/v1/content/en"),
         ]
 
-        print(f"\nTTFB Test Results:")
+        print("\nTTFB Test Results:")
 
         for method, endpoint in endpoints:
             ttfb_times = []
@@ -322,8 +297,9 @@ async def test_ttfb_all_endpoints(api_base_url, performance_thresholds):
                 avg_ttfb = statistics.mean(ttfb_times)
                 print(f"  {method} {endpoint}: {avg_ttfb:.2f}ms")
 
-                assert avg_ttfb < performance_thresholds['ttfb_ms'], \
-                    f"TTFB {avg_ttfb:.2f}ms exceeds threshold {performance_thresholds['ttfb_ms']}ms"
+                assert (
+                    avg_ttfb < performance_thresholds["ttfb_ms"]
+                ), f"TTFB {avg_ttfb:.2f}ms exceeds threshold {performance_thresholds['ttfb_ms']}ms"
 
 
 if __name__ == "__main__":

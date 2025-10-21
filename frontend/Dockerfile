@@ -1,6 +1,6 @@
 # Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-FROM node:18-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
@@ -13,8 +13,9 @@ RUN npm install
 # Copy application code
 COPY . .
 
-# Expose port
-EXPOSE 3000
+# Expose port (configurable via ARG)
+ARG FRONTEND_PORT
+EXPOSE ${FRONTEND_PORT}
 
 # Run the application
 CMD ["npm", "run", "dev"]

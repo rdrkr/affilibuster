@@ -5,29 +5,32 @@
  * Generates and persists session ID for user preferences
  */
 
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { apiClient } from '@/lib/api';
+import { useEffect, useState } from 'react'
 
-const SESSION_KEY = 'affilibuster_session_id';
+const SESSION_KEY = 'affilibuster_session_id'
 
+/**
+ * Session management hook
+ * Generates and persists session ID for user preferences.
+ * Session ID is automatically included in API requests via the @/lib/api module.
+ */
 export function useSession() {
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null)
 
   useEffect(() => {
     // Try to get existing session ID from localStorage
-    let existingSessionId = localStorage.getItem(SESSION_KEY);
+    let existingSessionId = localStorage.getItem(SESSION_KEY)
 
     if (!existingSessionId) {
       // Generate new session ID (UUID v4)
-      existingSessionId = crypto.randomUUID();
-      localStorage.setItem(SESSION_KEY, existingSessionId);
+      existingSessionId = crypto.randomUUID()
+      localStorage.setItem(SESSION_KEY, existingSessionId)
     }
 
-    setSessionId(existingSessionId);
-    apiClient.setSessionId(existingSessionId);
-  }, []);
+    setSessionId(existingSessionId)
+  }, [])
 
-  return sessionId;
+  return sessionId
 }

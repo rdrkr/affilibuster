@@ -168,7 +168,7 @@ Each task includes:
 - [X] **T020A** [P] Seed Languages table with 3 languages
       - **Path**: backend/scripts/seed.py (languages function)
       - **→ Reference**: data-model.md:37-77 (Language sample data)
-      - **Data**: en (default, urlPrefix='', direction='ltr'), it (urlPrefix='/it'), he (urlPrefix='/il', direction='rtl')
+      - **Data**: en (default, urlPrefix='', direction='ltr'), it (urlPrefix='/it'), he (urlPrefix='/he', direction='rtl')
       - **→ Validation**: `SELECT * FROM languages;` returns 3 rows with correct data
 
 - [X] **T020B** [P] Seed Currencies table with 8 currencies
@@ -324,19 +324,19 @@ Each task includes:
 - [X] **T042** [P] E2E test manual language switching (Playwright)
       - **Path**: frontend/tests/e2e/language-switching.spec.ts
       - **→ Reference**: quickstart.md:125-146 (Test 2: Manual Language Switching)
-      - **Scenario**: Visit /products/eco-bottle → click language selector → select עברית → verify redirect to /il/products/eco-bottle, verify dir="rtl"
+      - **Scenario**: Visit /products/eco-bottle → click language selector → select עברית → verify redirect to /he/products/eco-bottle, verify dir="rtl"
       - **→ Validation**: Test implemented and passing
 
 - [X] **T043** [P] E2E test RTL layout for Hebrew (Playwright)
       - **Path**: frontend/tests/e2e/rtl-layout.spec.ts
       - **→ Reference**: quickstart.md:138-141 (Hebrew RTL verification), research.md:124-148 (Tailwind RTL implementation)
-      - **Scenario**: Visit /il/ → verify <html dir="rtl">, verify navigation right-aligned, verify icons mirrored
+      - **Scenario**: Visit /he/ → verify <html dir="rtl">, verify navigation right-aligned, verify icons mirrored
       - **→ Validation**: Test implemented and passing
 
 - [X] **T044** [P] E2E test currency selection (Playwright)
       - **Path**: frontend/tests/e2e/currency-selection.spec.ts
       - **→ Reference**: quickstart.md:150-168 (Test 3: Currency Selection & Persistence)
-      - **Scenario**: Visit /it → verify prices in EUR (27,50 €) → select USD → verify prices update ($29.99) → switch to /il → verify USD persists
+      - **Scenario**: Visit /it → verify prices in EUR (27,50 €) → select USD → verify prices update ($29.99) → switch to /he → verify USD persists
       - **→ Validation**: Test implemented and passing
 
 - [X] **T045** [P] E2E test SEO meta tags validation (Playwright)
@@ -921,7 +921,7 @@ Each task includes:
       - **Path**: frontend/src/app/[lang]/page.tsx
       - **→ Reference**: plan.md:254-269 (App Router structure)
       - **Implement**: Home page with translated content, fetches from API or CMS
-      - **→ Validation**: /en, /it, /il all render correctly
+      - **→ Validation**: /en, /it, /he all render correctly
 
 - [X] **T128** [P] Create product listing page
       - **Path**: frontend/src/app/[lang]/products/page.tsx
@@ -1126,7 +1126,7 @@ Each task includes:
 - [X] **T154** Run Lighthouse audits (>90 score) for all languages
       - **Path**: scripts/lighthouse-audit.sh
       - **→ Reference**: plan.md:79, 193-196 (Lighthouse >90 score plan)
-      - **Test**: lighthouse http://localhost:3000, http://localhost:3000/it, http://localhost:3000/il
+      - **Test**: lighthouse http://localhost:3000, http://localhost:3000/it, http://localhost:3000/he
       - **→ Validation**: Performance, Accessibility, Best Practices, SEO all >90 for all 3 languages
 
 - [X] **T154A** [P] Run API performance benchmarks

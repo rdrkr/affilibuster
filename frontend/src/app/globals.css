@@ -1,6 +1,6 @@
 /* Copyright (c) 2025 Affilibuster by Ronen Druker. */
 
-@import "tailwindcss";
+@import 'tailwindcss';
 @import '../styles/theme.css';
 @import '../styles/rtl.css';
 
@@ -26,12 +26,7 @@
 
 body {
   color: var(--foreground);
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      var(--background-end)
-    )
-    var(--background-start);
+  background: linear-gradient(to bottom, transparent, var(--background-end)) var(--background-start);
 }
 
 /* System theme preference support - CSS-only fallback */

@@ -6,16 +6,16 @@
  * Links to sitemap-en.xml, sitemap-it.xml, sitemap-il.xml
  */
 
-import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server'
 
 /**
  * Generate sitemap index XML
  */
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://affilibuster.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://affilibuster.com'
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<sitemapindex xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
     <loc>${baseUrl}/api/sitemap-en.xml</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
@@ -28,7 +28,7 @@ export async function GET() {
     <loc>${baseUrl}/api/sitemap-il.xml</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
   </sitemap>
-</sitemapindex>`;
+</sitemapindex>`
 
   return new NextResponse(xml, {
     status: 200,
@@ -36,5 +36,5 @@ export async function GET() {
       'Content-Type': 'application/xml',
       'Cache-Control': 'public, max-age=3600, s-maxage=3600',
     },
-  });
+  })
 }

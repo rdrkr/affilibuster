@@ -8,6 +8,7 @@ Reference: T063 (UserPreferences entity)
 
 from abc import ABC, abstractmethod
 from typing import Optional
+
 from ..entities.user_preferences import UserPreferences
 
 

@@ -4,20 +4,32 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies and uv
 RUN apt-get update && apt-get install -y \
     postgresql-client \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install uv package manager
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
+
+# Copy pyproject.toml and uv.lock for dependency resolution
+COPY pyproject.toml uv.lock ./
+
+# Install dependencies including dev (--no-install-project means don't build affilibuster-backend itself)
+# --all-extras ensures optional dev dependencies are installed for testing
+RUN /root/.local/bin/uv sync --frozen --no-install-project --all-extras
 
 # Copy application code
 COPY . .
 
-# Expose port
-EXPOSE 8000
+# Make startup script executable
+RUN chmod +x /app/docker-entrypoint.sh
 
-# Run the application
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Expose port (configurable via ARG)
+ARG BACKEND_PORT
+EXPOSE ${BACKEND_PORT}
+
+# Run the application with startup script
+CMD ["/app/docker-entrypoint.sh"]

@@ -11,7 +11,7 @@ Use **next-intl** for internationalization with Next.js 14 App Router
 ### Rationale
 - Native App Router support with middleware-based language detection
 - Supports both Static Site Generation (SSG) and Incremental Static Regeneration (ISR)
-- Provides URL-based routing strategy (/en, /it, /il) out of the box
+- Provides URL-based routing strategy (/en, /it, /he) out of the box
 - Minimal runtime overhead with compile-time optimizations
 - Strong TypeScript support for type-safe translations
 - Active maintenance and large community
@@ -173,7 +173,7 @@ Implement **hreflang tags with x-default** + **language-specific sitemaps** + **
 - **Language subdomains (it.affilibuster.com)**:
   - Pros: Clear separation, easier CDN configuration
   - Cons: Requires SSL certs per subdomain, more complex DNS, splits domain authority
-  - Verdict: URL paths (/it, /il) are simpler and maintain domain authority
+  - Verdict: URL paths (/it, /he) are simpler and maintain domain authority
 
 ### Implementation Notes
 - Generate hreflang tags in Next.js layout:

@@ -22,9 +22,7 @@ async def test_preferences_persisted_in_redis():
 
         # Create preferences
         payload = {"selectedCurrency": "EUR"}
-        response = await client.put(
-            "/v1/user/preferences", headers=headers, json=payload
-        )
+        response = await client.put("/v1/user/preferences", headers=headers, json=payload)
 
         assert response.status_code == 200
         data = response.json()
@@ -50,9 +48,7 @@ async def test_preferences_ttl_set():
         headers = {"X-Session-Id": session_id}
 
         payload = {"selectedCurrency": "ILS"}
-        response = await client.put(
-            "/v1/user/preferences", headers=headers, json=payload
-        )
+        response = await client.put("/v1/user/preferences", headers=headers, json=payload)
 
         assert response.status_code == 200
         data = response.json()

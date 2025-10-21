@@ -5,17 +5,12 @@ Database configuration and session management.
 """
 
 import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-# Get database URL from environment
-DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://affilibuster:affilibuster@localhost:5432/affilibuster')
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-# Convert to async URL if using asyncpg
-ASYNC_DATABASE_URL = DATABASE_URL.replace('postgresql://', 'postgresql+asyncpg://')
+from config import settings
 
 # Global engine and session factory (lazy-loaded)
 _async_engine = None
@@ -27,8 +22,8 @@ def get_engine():
     global _async_engine
     if _async_engine is None:
         _async_engine = create_async_engine(
-            ASYNC_DATABASE_URL,
-            echo=bool(os.getenv('SQL_ECHO', False)),
+            settings.database_url.replace("postgresql://", "postgresql+asyncpg://"),
+            echo=bool(os.getenv("SQL_ECHO", False)),
             pool_pre_ping=True,
         )
     return _async_engine
@@ -56,8 +51,8 @@ async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
             # Use session
             pass
     """
-    SessionLocal = get_session_factory()
-    async with SessionLocal() as session:
+    session_local = get_session_factory()
+    async with session_local() as session:
         try:
             yield session
             await session.commit()

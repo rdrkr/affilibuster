@@ -73,7 +73,6 @@ make coverage-view
 ### CMS Specific
 
 - [ ] Only tested custom code (not Strapi boilerplate)
-- [ ] Webhook integration tested (if applicable)
 
 ## Related Issues
 

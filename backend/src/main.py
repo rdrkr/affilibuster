@@ -2,32 +2,73 @@
 
 """
 FastAPI main application entry point.
+
+Dependency Injection:
+- Singleton instances of repositories and services are created at startup
+- Factory functions return configured use cases
+- Routes depend on interfaces, not implementations (dependency inversion)
 """
-import os
+
 import logging
-from fastapi import FastAPI, Request, status
-from fastapi.middleware.cors import CORSMiddleware
+
+from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from config import settings
+
+# Import OpenAPI contract loader
+from infrastructure.api.openapi_loader import openapi_contract_loader
+
 # Import routers
-from src.infrastructure.api.routes import languages, content, currencies, preferences, webhooks
+from infrastructure.api.routes import (
+    about,
+    components,
+    contact,
+    content_types,
+    currencies,
+    error_404,
+    error_410,
+    files,
+    footer,
+    homepage,
+    languages,
+    locales,
+    navigation,
+    preferences,
+    privacy,
+    product_page,
+    products,
+    system_message,
+    term,
+)
+
+# Import dependency injection setup
+from infrastructure.dependencies import initialize_dependencies
 
 # Import middleware
-from src.infrastructure.middleware import RequestLoggingMiddleware, ErrorHandlingMiddleware
-from src.config import settings
+from infrastructure.middleware import (
+    ErrorHandlingMiddleware,
+    RequestLoggingMiddleware,
+)
 
 # Configure logging
-logging.basicConfig(
-    level=getattr(logging, settings.log_level),
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=getattr(logging, settings.log_level), format="%(message)s")
+
+# Initialize dependencies before creating app
+initialize_dependencies()
+
+# ============================================================================
+# FastAPI Application
+# ============================================================================
 
 app = FastAPI(
     title="Affilibuster API",
-    description="Multi-language affiliate platform API",
+    description="Affiliation Platform API",
     version="1.0.0",
+    root_path="/v1",
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
@@ -36,11 +77,57 @@ app = FastAPI(
 )
 
 
+# ============================================================================
+# OpenAPI Contract Integration
+# ============================================================================
+
+
+def custom_openapi():
+    """
+    Override FastAPI's auto-generated OpenAPI schema with the contract spec.
+
+    This ensures /docs and /redoc display the exact OpenAPI contract from
+    affilibuster.openapi.yaml rather than FastAPI's derived schema.
+
+    Returns:
+        OpenAPI specification from contract file, or FastAPI's default if contract unavailable.
+    """
+    # Use FastAPI's cached openapi schema if already generated
+    if app.openapi_schema:
+        return app.openapi_schema
+
+    # Try to load the contract specification
+    contract_spec = openapi_contract_loader.get_spec()
+
+    if contract_spec:
+        # Use the contract specification as-is
+        logging.info("✅ Using OpenAPI contract for /docs and /redoc")
+        app.openapi_schema = contract_spec
+    else:
+        # Fallback to FastAPI's auto-generated schema
+        from fastapi.openapi.utils import get_openapi
+
+        logging.warning("⚠️  OpenAPI contract not found, using FastAPI auto-generated schema")
+        app.openapi_schema = get_openapi(
+            title=app.title,
+            version=app.version,
+            description=app.description,
+            routes=app.routes,
+        )
+
+    return app.openapi_schema
+
+
+# Override the default openapi method
+app.openapi = custom_openapi
+
+
 # Custom HTTP exception handler to return error responses without "detail" wrapper
+# noinspection PyUnusedLocal
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     """Custom exception handler that returns error responses directly."""
-    # If detail is a dict (from ErrorResponse.model_dump()), return it directly
+    # If detail is a dict (from Error.model_dump()), return it directly
     if isinstance(exc.detail, dict):
         return JSONResponse(
             status_code=exc.status_code,
@@ -52,17 +139,12 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         content={"detail": exc.detail},
     )
 
-# CORS Configuration
-# Allow origins from environment variable or default to localhost
-cors_origins_str = os.getenv(
-    "CORS_ORIGINS",
-    "http://localhost:3000,http://localhost:1337"
-)
-cors_origins = [origin.strip() for origin in cors_origins_str.split(",")]
 
+# CORS Configuration
+# Origins come from environment variable via settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -72,6 +154,7 @@ app.add_middleware(
 # API Version middleware
 class APIVersionMiddleware(BaseHTTPMiddleware):
     """Middleware to add API version header to all responses."""
+
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
         response.headers["X-API-Version"] = "1.0.0"
@@ -86,17 +169,37 @@ app.add_middleware(RequestLoggingMiddleware)
 # Add error handling middleware (T142)
 app.add_middleware(ErrorHandlingMiddleware)
 
-# Register routers
+# Register routers (most specific prefixes first, least specific last)
 app.include_router(languages.router)
-app.include_router(content.router)
 app.include_router(currencies.router)
+app.include_router(products.router)
 app.include_router(preferences.router)
-app.include_router(webhooks.router)
+
+# Single-type routers (no prefix - must be last)
+app.include_router(about.router)
+app.include_router(contact.router)
+app.include_router(error_404.router)
+app.include_router(error_410.router)
+app.include_router(footer.router)
+app.include_router(homepage.router)
+app.include_router(navigation.router)
+app.include_router(privacy.router)
+app.include_router(product_page.router)
+app.include_router(system_message.router)
+app.include_router(term.router)
+
+# System/meta routers (no prefix - must be absolutely last to avoid conflicts)
+app.include_router(content_types.router)
+app.include_router(components.router)
+app.include_router(files.router)
+app.include_router(locales.router)
+
 
 @app.get("/", include_in_schema=False)
 async def root():
     """Root endpoint."""
     return {"message": "Affilibuster API v1.0.0", "status": "running"}
+
 
 @app.get("/health")
 async def health():

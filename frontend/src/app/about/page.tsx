@@ -4,9 +4,9 @@
  * Root About Page - Redirects to default locale
  */
 
-import { redirect } from 'next/navigation';
+import { redirect } from 'next/navigation'
 
 export default function AboutRedirect() {
   // Redirect to default locale about page
-  redirect('/en/about');
+  redirect('/en/about')
 }

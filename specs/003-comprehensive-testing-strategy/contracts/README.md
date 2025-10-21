@@ -81,8 +81,8 @@ These contracts define the exact configuration that will be implemented in the i
 
 ### Backend Dependencies
 
-**File**: `backend-requirements.txt`
-**Target**: `backend/requirements.txt`
+**File**: `backend-pyproject.toml`
+**Target**: `backend/pyproject.toml`
 **Changes**:
 - ✅ Add `pytest-xdist>=3.6.1` for parallel execution
 
@@ -90,7 +90,7 @@ These contracts define the exact configuration that will be implemented in the i
 
 When implementing these contracts (during `/speckit.tasks`), follow this order:
 
-1. **Backend configuration** - Update pytest.ini and requirements.txt
+1. **Backend configuration** - Update pytest.ini and pyproject.toml
 2. **Frontend configuration** - Update jest.config.js
 3. **Shared configuration** - Update package.json and install dependencies
 4. **Makefile targets** - Add all test orchestration targets

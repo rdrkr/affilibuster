@@ -6,125 +6,121 @@
  * Allows users to switch between available languages
  */
 
-'use client';
+'use client'
 
-import { usePathname, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { languagesAPI } from '@/lib/api';
-import { Language } from '@/types/api';
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { contentAPI, languagesAPI } from '@/lib/api'
+
+interface NavigationData {
+  languageSelectorAriaLabel?: string
+}
 
 export function LanguageSwitcher() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const [languages, setLanguages] = useState<Language[]>([]);
-  const [currentLang, setCurrentLang] = useState('en');
-  const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const pathname = usePathname()
+  const router = useRouter()
+  const [languages, setLanguages] = useState<Language[]>([])
+  const [currentLang, setCurrentLang] = useState('en')
+  const [isOpen, setIsOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [navData, setNavData] = useState<NavigationData>({})
 
   useEffect(() => {
     // Extract current language from pathname (e.g., /it/products -> it, /he/products -> he)
-    const pathParts = pathname.split('/').filter(Boolean);
-    const firstSegment = pathParts[0];
+    const pathParts = pathname.split('/').filter(Boolean)
+    const firstSegment = pathParts[0]
     // Map URL prefixes to language codes
-    let lang = 'en';
-    if (firstSegment === 'it') lang = 'it';
-    else if (firstSegment === 'he') lang = 'he';
-    setCurrentLang(lang);
+    let lang = 'en'
+    if (firstSegment === 'it') lang = 'it'
+    else if (firstSegment === 'he') lang = 'he'
+    setCurrentLang(lang)
 
-    // Fetch available languages
-    languagesAPI
-      .getAll()
-      .then(setLanguages)
+    // Fetch available languages and navigation data
+    Promise.all([languagesAPI.getAll(), contentAPI.getSingleType(lang, 'navigation').catch(() => null)])
+      .then(([languagesData, navContent]) => {
+        setLanguages(languagesData)
+        if (navContent) {
+          const data = navContent?.data || navContent
+          if (data) {
+            setNavData(data)
+          }
+        }
+      })
       .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [pathname]);
+      .finally(() => setLoading(false))
+  }, [pathname])
 
   const handleLanguageChange = (newLang: string) => {
     // Get the path without the language prefix
-    const pathParts = pathname.split('/').filter(Boolean);
+    const pathParts = pathname.split('/').filter(Boolean)
 
     // Check if first segment is a language prefix (it, he, or en)
-    const knownPrefixes = ['it', 'he', 'en'];
-    const isCurrentPathLangPrefixed = knownPrefixes.includes(pathParts[0]);
-    const pathWithoutLang = isCurrentPathLangPrefixed
-      ? '/' + pathParts.slice(1).join('/')
-      : pathname;
+    const knownPrefixes = ['it', 'he', 'en']
+    const isCurrentPathLangPrefixed = knownPrefixes.includes(pathParts[0])
+    const pathWithoutLang = isCurrentPathLangPrefixed ? '/' + pathParts.slice(1).join('/') : pathname
 
     // Get the new language configuration
-    const language = languages.find((l) => l.code === newLang);
+    const language = languages.find(l => l.code === newLang)
     if (!language) {
-      console.error(`Language ${newLang} not found`);
-      return;
+      console.error(`Language ${newLang} not found`)
+      return
     }
 
     // Construct new path with language prefix
     // All languages now have explicit prefixes: /en /it /he
-    let newPath: string;
+    let newPath: string
     if (language.urlPrefix) {
-      const basePath = pathWithoutLang === '/' ? '' : pathWithoutLang;
-      newPath = `${language.urlPrefix}${basePath}`;
+      const basePath = pathWithoutLang === '/' ? '' : pathWithoutLang
+      newPath = `${language.urlPrefix}${basePath}`
     } else {
       // Fallback for languages without urlPrefix (shouldn't happen)
-      newPath = pathWithoutLang;
+      newPath = pathWithoutLang
     }
 
     // Ensure we have at least '/' for root paths
     if (!newPath || newPath === '') {
-      newPath = '/';
+      newPath = '/'
     }
 
     // Use router.push for language switching
-    router.push(newPath);
-    router.refresh(); // Refresh to ensure content is reloaded
-    setIsOpen(false);
-  };
-
-  if (loading) {
-    return (
-      <div className="w-32 h-10 bg-primary-700 animate-pulse rounded-lg" />
-    );
+    router.push(newPath)
+    router.refresh() // Refresh to ensure content is reloaded
+    setIsOpen(false)
   }
 
-  const currentLanguage = languages.find((l) => l.code === currentLang);
+  if (loading) {
+    return <div className="w-32 h-10 bg-primary-700 animate-pulse rounded-lg" />
+  }
+
+  const currentLanguage = languages.find(l => l.code === currentLang)
 
   return (
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-4 py-2 bg-primary-700 hover:bg-primary-600 text-white rounded-lg transition-colors shadow-sm"
-        aria-label="Select language"
+        className="flex items-center space-x-2 px-4 py-2 bg-primary-700 hover:bg-primary-600 text-white rounded-lg transition-colors shadow-sm whitespace-nowrap"
+        aria-label={navData.languageSelectorAriaLabel || ''}
         aria-expanded={isOpen}
       >
-        <span className="text-sm font-medium">
-          {currentLanguage?.nativeName || 'English'}
-        </span>
+        <span className="text-sm font-medium">{currentLanguage?.nativeName}</span>
         <svg
           className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setIsOpen(false)}
-            aria-hidden="true"
-          />
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} aria-hidden="true" />
 
           {/* Dropdown */}
           <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-neutral-800 border border-primary-200 dark:border-primary-700 rounded-lg shadow-xl z-20 overflow-hidden">
-            {languages.map((language) => (
+            {languages.map(language => (
               <button
                 key={language.code}
                 onClick={() => handleLanguageChange(language.code)}
@@ -138,11 +134,7 @@ export function LanguageSwitcher() {
                 <div className="flex items-center justify-between">
                   <span>{language.nativeName}</span>
                   {language.code === currentLang && (
-                    <svg
-                      className="w-4 h-4 text-secondary-500"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
+                    <svg className="w-4 h-4 text-secondary-500" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -157,5 +149,5 @@ export function LanguageSwitcher() {
         </>
       )}
     </div>
-  );
+  )
 }

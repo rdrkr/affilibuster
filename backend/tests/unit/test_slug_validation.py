@@ -5,14 +5,15 @@ Unit tests for slug validation logic.
 Reference: data-model.md:141-142 (slug must be unique per contentId, languageCode)
 """
 
-import pytest
 import re
-from src.domain.entities.content_version import ContentVersion
 from typing import Optional
+
+import pytest
 
 
 class SlugValidationError(Exception):
     """Raised when slug validation fails."""
+
     pass
 
 
@@ -27,15 +28,12 @@ def validate_slug_format(slug: str) -> bool:
         True if valid, False otherwise
     """
     # Slug must be lowercase alphanumeric with hyphens only
-    pattern = r'^[a-z0-9]+(?:-[a-z0-9]+)*$'
+    pattern = r"^[a-z0-9]+(?:-[a-z0-9]+)*$"
     return bool(re.match(pattern, slug))
 
 
 def validate_slug_uniqueness(
-    slug: str,
-    content_id: str,
-    language_code: str,
-    existing_slugs: dict[tuple[str, str], str]
+    slug: str, content_id: str, language_code: str, existing_slugs: dict[tuple[str, str], str]
 ) -> None:
     """
     Validate that slug is unique per (contentId, languageCode).
@@ -75,12 +73,7 @@ def validate_slug_length(slug: str, min_length: int = 2, max_length: int = 200) 
         raise SlugValidationError(f"Slug must not exceed {max_length} characters")
 
 
-def validate_slug(
-    slug: str,
-    content_id: str,
-    language_code: str,
-    existing_slugs: Optional[dict] = None
-) -> None:
+def validate_slug(slug: str, content_id: str, language_code: str, existing_slugs: Optional[dict] = None) -> None:
     """
     Validate slug against all rules.
 
@@ -96,8 +89,7 @@ def validate_slug(
     # Format validation
     if not validate_slug_format(slug):
         raise SlugValidationError(
-            f"Slug '{slug}' contains invalid characters. Use lowercase letters, "
-            "numbers, and hyphens only"
+            f"Slug '{slug}' contains invalid characters. Use lowercase letters, " "numbers, and hyphens only"
         )
 
     # Length validation
@@ -152,24 +144,16 @@ def test_slug_uniqueness_per_content_and_language():
 
     # Trying to change existing slug to different slug - should fail
     with pytest.raises(SlugValidationError, match="already exists"):
-        validate_slug_uniqueness(
-            "new-eco-bottle", "content-1", "en", existing_slugs
-        )
+        validate_slug_uniqueness("new-eco-bottle", "content-1", "en", existing_slugs)
 
     # Same slug, same content, same language - should pass (idempotent)
-    validate_slug_uniqueness(
-        "eco-bottle", "content-1", "en", existing_slugs
-    )
+    validate_slug_uniqueness("eco-bottle", "content-1", "en", existing_slugs)
 
     # Same slug, same content, different language - should pass
-    validate_slug_uniqueness(
-        "eco-bottle", "content-1", "he", existing_slugs
-    )
+    validate_slug_uniqueness("eco-bottle", "content-1", "he", existing_slugs)
 
     # Same slug, different content - should pass
-    validate_slug_uniqueness(
-        "eco-bottle", "content-3", "en", existing_slugs
-    )
+    validate_slug_uniqueness("eco-bottle", "content-3", "en", existing_slugs)
 
 
 @pytest.mark.unit
@@ -312,10 +296,6 @@ def test_slug_whitespace_variations():
 @pytest.mark.unit
 def test_update_existing_slug_same_value():
     """Test that updating slug to same value is allowed."""
-    existing_slugs = {
-        ("content-1", "en"): "eco-bottle",
-    }
-
     # Updating to same slug should be allowed (idempotent)
     # This is handled by checking existing_slugs[key] != slug in validation
     # When updating, we pass the same slug, so it should not raise

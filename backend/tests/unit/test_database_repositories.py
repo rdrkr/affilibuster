@@ -9,17 +9,24 @@ Covers:
 - UserPreferencesRepository with AsyncSession mocking
 """
 
-import pytest
 from datetime import UTC, datetime, timedelta
+from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
-from unittest.mock import AsyncMock, MagicMock, patch
 
-from src.infrastructure.database.repositories.currency_repository import CurrencyRepository
-from src.infrastructure.database.repositories.language_repository import LanguageRepository
-from src.infrastructure.database.repositories.preferences_repository import UserPreferencesRepository
-from src.domain.entities.currency import Currency
-from src.domain.entities.language import Language
-from src.domain.entities.user_preferences import UserPreferences
+import pytest
+
+from domain.entities.currency import Currency
+from domain.entities.language import Language
+from domain.entities.user_preferences import UserPreferences
+from infrastructure.database.repositories.currency_repository import (
+    CurrencyRepository,
+)
+from infrastructure.database.repositories.language_repository import (
+    LanguageRepository,
+)
+from infrastructure.database.repositories.preferences_repository import (
+    UserPreferencesRepository,
+)
 
 
 class TestCurrencyRepository:
@@ -42,13 +49,13 @@ class TestCurrencyRepository:
     def mock_currency_model(self):
         """Create mock CurrencyModel."""
         model = MagicMock()
-        model.code = 'USD'
-        model.name = 'US Dollar'
-        model.symbol = '$'
+        model.code = "USD"
+        model.name = "US Dollar"
+        model.symbol = "$"
         model.decimal_places = 2
-        model.symbol_position = 'before'
-        model.thousands_separator = ','
-        model.decimal_separator = '.'
+        model.symbol_position = "before"
+        model.thousands_separator = ","
+        model.decimal_separator = "."
         model.is_active = True
         model.sort_order = 1
         return model
@@ -66,7 +73,7 @@ class TestCurrencyRepository:
 
         # Assert
         assert len(result) == 1
-        assert result[0].code == 'USD'
+        assert result[0].code == "USD"
         mock_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
@@ -78,11 +85,11 @@ class TestCurrencyRepository:
         mock_session.execute.return_value = mock_result
 
         # Act
-        result = await repository.get_by_code('USD')
+        result = await repository.get_by_code("USD")
 
         # Assert
         assert result is not None
-        assert result.code == 'USD'
+        assert result.code == "USD"
         mock_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
@@ -94,7 +101,7 @@ class TestCurrencyRepository:
         mock_session.execute.return_value = mock_result
 
         # Act
-        result = await repository.get_by_code('INVALID')
+        result = await repository.get_by_code("INVALID")
 
         # Assert
         assert result is None
@@ -122,9 +129,9 @@ class TestCurrencyRepository:
 
         # Assert
         assert isinstance(entity, Currency)
-        assert entity.code == 'USD'
-        assert entity.name == 'US Dollar'
-        assert entity.symbol == '$'
+        assert entity.code == "USD"
+        assert entity.name == "US Dollar"
+        assert entity.symbol == "$"
 
     def test_initialization_with_session(self, mock_session):
         """Test repository initialization."""
@@ -152,13 +159,13 @@ class TestLanguageRepository:
     def mock_language_model(self):
         """Create mock LanguageModel."""
         model = MagicMock()
-        model.code = 'en'
-        model.display_name = 'English'
-        model.native_name = 'English'
-        model.direction = 'ltr'
-        model.url_prefix = ''
-        model.default_currency = 'USD'
-        model.locale_code = 'en-US'
+        model.code = "en"
+        model.display_name = "English"
+        model.native_name = "English"
+        model.direction = "ltr"
+        model.url_prefix = ""
+        model.default_currency = "USD"
+        model.locale_code = "en-US"
         model.is_default = True
         model.is_active = True
         model.sort_order = 1
@@ -177,7 +184,7 @@ class TestLanguageRepository:
 
         # Assert
         assert len(result) == 1
-        assert result[0].code == 'en'
+        assert result[0].code == "en"
         mock_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
@@ -189,11 +196,11 @@ class TestLanguageRepository:
         mock_session.execute.return_value = mock_result
 
         # Act
-        result = await repository.get_by_code('en')
+        result = await repository.get_by_code("en")
 
         # Assert
         assert result is not None
-        assert result.code == 'en'
+        assert result.code == "en"
         mock_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
@@ -205,7 +212,7 @@ class TestLanguageRepository:
         mock_session.execute.return_value = mock_result
 
         # Act
-        result = await repository.get_by_code('INVALID')
+        result = await repository.get_by_code("INVALID")
 
         # Assert
         assert result is None
@@ -222,7 +229,7 @@ class TestLanguageRepository:
         result = await repository.get_default()
 
         # Assert
-        assert result.code == 'en'
+        assert result.code == "en"
         assert result.is_default is True
         mock_session.execute.assert_called_once()
 
@@ -249,8 +256,8 @@ class TestLanguageRepository:
 
         # Assert
         assert isinstance(entity, Language)
-        assert entity.code == 'en'
-        assert entity.display_name == 'English'
+        assert entity.code == "en"
+        assert entity.display_name == "English"
         assert entity.is_default is True
 
     def test_initialization_with_session(self, mock_session):
@@ -280,9 +287,9 @@ class TestUserPreferencesRepository:
         """Create mock UserPreferencesModel."""
         model = MagicMock()
         model.id = uuid4()
-        model.session_id = 'session-123'
+        model.session_id = "session-123"
         model.user_id = None
-        model.selected_currency = 'USD'
+        model.selected_currency = "USD"
         model.dismissed_language_prompt = False
         model.detected_language = None
         model.created_at = datetime.now(UTC).replace(tzinfo=None)
@@ -293,10 +300,7 @@ class TestUserPreferencesRepository:
     @pytest.fixture
     def sample_preferences(self):
         """Create sample UserPreferences entity."""
-        return UserPreferences(
-            session_id='session-123',
-            selected_currency='USD'
-        )
+        return UserPreferences(session_id="session-123", selected_currency="USD")
 
     @pytest.mark.asyncio
     async def test_get_by_session_returns_preferences(self, repository, mock_session, mock_preferences_model):
@@ -307,11 +311,11 @@ class TestUserPreferencesRepository:
         mock_session.execute.return_value = mock_result
 
         # Act
-        result = await repository.get_by_session('session-123')
+        result = await repository.get_by_session("session-123")
 
         # Assert
         assert result is not None
-        assert result.session_id == 'session-123'
+        assert result.session_id == "session-123"
         mock_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
@@ -323,7 +327,7 @@ class TestUserPreferencesRepository:
         mock_session.execute.return_value = mock_result
 
         # Act
-        result = await repository.get_by_session('nonexistent')
+        result = await repository.get_by_session("nonexistent")
 
         # Assert
         assert result is None
@@ -332,17 +336,17 @@ class TestUserPreferencesRepository:
     async def test_get_by_user_returns_preferences(self, repository, mock_session, mock_preferences_model):
         """Test get_by_user returns preferences when found."""
         # Arrange
-        mock_preferences_model.user_id = 'user-456'
+        mock_preferences_model.user_id = "user-456"
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = mock_preferences_model
         mock_session.execute.return_value = mock_result
 
         # Act
-        result = await repository.get_by_user('user-456')
+        result = await repository.get_by_user("user-456")
 
         # Assert
         assert result is not None
-        assert result.user_id == 'user-456'
+        assert result.user_id == "user-456"
         mock_session.execute.assert_called_once()
 
     @pytest.mark.asyncio
@@ -354,13 +358,15 @@ class TestUserPreferencesRepository:
         mock_session.execute.return_value = mock_result
 
         # Act
-        result = await repository.get_by_user('nonexistent')
+        result = await repository.get_by_user("nonexistent")
 
         # Assert
         assert result is None
 
     @pytest.mark.asyncio
-    async def test_upsert_creates_or_updates_preferences(self, repository, mock_session, sample_preferences, mock_preferences_model):
+    async def test_upsert_creates_or_updates_preferences(
+        self, repository, mock_session, sample_preferences, mock_preferences_model
+    ):
         """Test upsert creates or updates preferences."""
         # Arrange
         mock_result = MagicMock()
@@ -400,7 +406,7 @@ class TestUserPreferencesRepository:
         mock_session.execute.return_value = mock_result
 
         # Act
-        deleted = await repository.delete_by_session('session-123')
+        deleted = await repository.delete_by_session("session-123")
 
         # Assert
         assert deleted is True
@@ -416,7 +422,7 @@ class TestUserPreferencesRepository:
         mock_session.execute.return_value = mock_result
 
         # Act
-        deleted = await repository.delete_by_session('nonexistent')
+        deleted = await repository.delete_by_session("nonexistent")
 
         # Assert
         assert deleted is False
@@ -428,8 +434,8 @@ class TestUserPreferencesRepository:
 
         # Assert
         assert isinstance(entity, UserPreferences)
-        assert entity.session_id == 'session-123'
-        assert entity.selected_currency == 'USD'
+        assert entity.session_id == "session-123"
+        assert entity.selected_currency == "USD"
 
     def test_initialization_with_session(self, mock_session):
         """Test repository initialization."""

@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_ui_feature_cards",
+  "info": {
+    "displayName": "Feature Card",
+    "icon": "square",
+    "description": "A card with icon, title, and description for feature showcase"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "linkUrl": {
+      "type": "string"
+    }
+  }
+}

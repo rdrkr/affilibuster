@@ -5,55 +5,91 @@ Application settings loaded from environment variables
 Uses pydantic-settings for validation and type safety
 """
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     """Application settings with environment variable support"""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file="/app/.env",
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
     )
 
-    # Database
-    database_url: str = "postgresql://postgres:postgres@localhost:5432/affilibuster"
-    database_pool_size: int = 20
-    database_max_overflow: int = 10
+    # Database - Component fields for URL construction
+    postgres_protocol: str
+    postgres_host: str
+    postgres_port: int
+    postgres_user: str
+    postgres_password: str
+    postgres_backend_name: str
 
-    # Redis
-    redis_url: str = "redis://localhost:6379"
-    redis_ttl_preferences: int = 2592000  # 30 days
+    # Redis - Component fields for URL construction
+    redis_protocol: str
+    redis_host: str
+    redis_port: int
+    redis_ttl_preferences: int
 
     # Application
-    app_env: str = "development"
-    debug: bool = True
-    log_level: str = "INFO"
+    app_env: str
+    debug: bool
+    log_level: str
 
     # Security
-    jwt_secret: str = "your-secret-key-change-in-production"
-    cors_origins: str = "http://localhost:3000,http://localhost:1337"
+    jwt_secret: str
 
-    # CMS Integration (T138)
-    strapi_url: str = "http://localhost:1337"
-    strapi_api_token: str = ""
+    # CMS Integration - Component fields for URL construction
+    cms_protocol: str
+    internal_cms_host: str = ""
+    cms_host: str
+    cms_port: int
+    strapi_api_token: str
 
     # External Services
-    exchange_rate_api_key: str = ""
-    exchange_rate_api_url: str = "https://api.exchangerate-api.com/v4/latest"
+    exchange_rate_api_key: str
+    exchange_rate_api_url: str
 
-    # Server
-    host: str = "0.0.0.0"
-    port: int = 8000
-    reload: bool = True
+    # Client
+    internal_frontend_host: str
+    frontend_host: str
+    frontend_port: int
+
+    @property
+    def cors_origins(self) -> str:
+        """CORS origins as comma-separated string"""
+        return (
+            f"http://localhost:{self.frontend_port},"
+            f"http://127.0.0.1:{self.frontend_port},"
+            f"{self.frontend_host}:{self.frontend_port},"
+            f"{self.internal_frontend_host}:{self.frontend_port}"
+        )
+
+    @property
+    def database_url(self) -> str:
+        """Construct database URL from components"""
+        return f"{self.postgres_protocol}://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_backend_name}"
+
+    @property
+    def redis_url(self) -> str:
+        """Construct Redis URL from components"""
+        return f"{self.redis_protocol}://{self.redis_host}:{self.redis_port}"
+
+    @property
+    def strapi_url(self) -> str:
+        """Construct Strapi/CMS URL from components"""
+        if self.internal_cms_host != "":
+            return f"{self.cms_protocol}://{self.internal_cms_host}:{self.cms_port}"
+
+        return f"{self.cms_protocol}://{self.cms_host}:{self.cms_port}"
 
     @property
     def cors_origins_list(self) -> List[str]:
         """Parse CORS origins from comma-separated string"""
-        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+        return [self.strapi_url]
 
     @property
     def is_production(self) -> bool:

@@ -1,3 +1,22 @@
 {
-    "makefile.configureOnOpen": false
+    "makefile.configureOnOpen": false,
+    "files.associations": {
+        "*.css": "tailwindcss",
+        "*.scss": "tailwindcss"
+    },
+    "editor.quickSuggestions": {
+        "strings": "on"
+    },
+    "tailwindCSS.includeLanguages": {
+        "plaintext": "html"
+    },
+    "cSpell.words": [
+        "Affilibuster",
+        "changeme",
+        "fflush",
+        "healthcheck",
+        "initdb",
+        "isready",
+        "strapi"
+    ]
 }

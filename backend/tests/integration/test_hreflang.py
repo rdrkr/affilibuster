@@ -159,13 +159,9 @@ async def test_hreflang_in_html_head():
     """Test that hreflang tags are included in HTML <head>."""
     async with AsyncClient(base_url="http://localhost:8000") as client:
         # Request HTML page (not JSON API)
-        response = await client.get(
-            "/en/test-article", headers={"Accept": "text/html"}
-        )
+        response = await client.get("/en/test-article", headers={"Accept": "text/html"})
 
-        if response.status_code == 200 and "text/html" in response.headers.get(
-            "content-type", ""
-        ):
+        if response.status_code == 200 and "text/html" in response.headers.get("content-type", ""):
             html = response.text
 
             # Should include hreflang link tags

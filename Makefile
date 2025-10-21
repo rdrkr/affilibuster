@@ -5,7 +5,7 @@
 NPROCS := $(shell sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4)
 MAKEFLAGS += --output-sync=target
 
-.PHONY: help dev start stop restart logs test test-backend test-frontend test-shared test-cms test-parallel test-all test-backend-fast clean clean-coverage coverage-merge coverage-view ci-test install
+.PHONY: help dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-frontend test-parallel test-all test-backend-fast audit clean clean-coverage coverage-merge coverage-view ci-test install install-backend install-frontend install-cms setup upgrade upgrade-cms upgrade-frontend upgrade-backend ps
 
 # Default target
 .DEFAULT_GOAL := help
@@ -16,13 +16,77 @@ help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 	@echo ""
 
-dev: ## Start all services (Docker + Frontend + CMS)
-	@./scripts/dev.sh
+# Linting & Formatting
 
-start: ## Start Docker services only (PostgreSQL, Redis, Backend)
+# Individual linters - check only
+lint-python-check: ## Check Python code linting (Ruff)
+	@bash scripts/lint.sh python check
+
+lint-typescript-check: ## Check TypeScript/JavaScript linting (ESLint)
+	@bash scripts/lint.sh typescript check
+
+lint-shell-check: ## Check shell script linting (shellcheck)
+	@bash scripts/lint.sh shell check
+
+# Individual linters - auto-fix
+lint-python: ## Lint and fix Python code (Ruff)
+	@bash scripts/lint.sh python
+
+lint-typescript: ## Lint and fix TypeScript/JavaScript (ESLint)
+	@bash scripts/lint.sh typescript
+
+lint-shell: ## Lint shell scripts (shellcheck - check only, no auto-fix)
+	@bash scripts/lint.sh shell
+
+# All linters
+lint-check: ## Check all linting without fixing
+	@bash scripts/lint.sh all check
+
+lint: ## Lint and fix all code
+	@bash scripts/lint.sh all
+
+format-python: ## Format Python code (Black + isort)
+	@bash scripts/format.sh python
+
+format-python-check: ## Check Python formatting without making changes
+	@bash scripts/format.sh python check
+
+format-typescript: ## Format TypeScript/JavaScript (Prettier)
+	@bash scripts/format.sh typescript
+
+format-typescript-check: ## Check TypeScript/JavaScript formatting without making changes
+	@bash scripts/format.sh typescript check
+
+format-shell: ## Format shell scripts (shfmt)
+	@bash scripts/format.sh shell
+
+format-shell-check: ## Check shell script formatting without making changes
+	@bash scripts/format.sh shell check
+
+format-makefile: ## Format Makefile (checkmake validation)
+	@bash scripts/format.sh makefile
+
+format-makefile-check: ## Check Makefile format without making changes
+	@bash scripts/format.sh makefile check
+
+format: ## Format all code (Python, JS/TS, Shell, Makefile)
+	@bash scripts/format.sh all
+
+format-check: ## Check all code formatting without making changes
+	@bash scripts/format.sh all check
+
+dev: format lint ## Start all services
+	@echo "🚀 Starting Affilibuster Development Environment..."
+	@./scripts/build.sh
+	@docker-compose logs -f 2>&1 | "./scripts/log.sh"
+
+build: format lint ## Build frontend (with linting and formatting)
+	@./scripts/build.sh --build
+
+start: ## Start Docker services only
 	@echo "🚀 Starting Docker services..."
 	@docker-compose up -d
-	@echo "✅ Services started. Access backend at http://localhost:8000"
+	@echo "✅ Services started."
 
 stop: ## Stop all Docker services
 	@echo "🛑 Stopping Docker services..."
@@ -59,69 +123,17 @@ test-frontend: ## Run frontend tests with coverage
 		--coverageReporters=text
 	@echo "✅ Frontend tests complete"
 
-test-shared: ## Run shared module type tests
-	@echo "🧪 Running shared module type tests..."
-	@cd shared && npm run test && npm run type-coverage
-	@echo "✅ Shared module tests complete"
-
-test-cms: ## Run CMS tests with coverage (when implemented)
-	@echo "🧪 Running CMS tests..."
-	@if [ -f "cms/package.json" ] && grep -q '"test"' cms/package.json; then \
-		cd cms && npm test -- --coverage --coverageReporters=lcov; \
-		echo "✅ CMS tests complete"; \
-	else \
-		echo "ℹ️  No CMS tests configured (no custom code yet)"; \
-	fi
-
 test: ## Run all tests with coverage (shows all errors)
-	@echo "🧪 Running all tests..."
-	@set -o pipefail; FAILED=0; \
-	$(MAKE) test-backend 2>&1 | tee /tmp/backend-test.log; test $${PIPESTATUS[0]} -eq 0 || FAILED=1; \
-	$(MAKE) test-frontend 2>&1 | tee /tmp/frontend-test.log; test $${PIPESTATUS[0]} -eq 0 || FAILED=1; \
-	$(MAKE) test-shared 2>&1 | tee /tmp/shared-test.log; test $${PIPESTATUS[0]} -eq 0 || FAILED=1; \
-	echo ""; \
-	BACKEND_PASSED=$$(grep -oE '[0-9]+ passed' /tmp/backend-test.log | head -1 | grep -oE '[0-9]+' || echo "0"); \
-	BACKEND_SKIPPED=$$(grep -oE '[0-9]+ skipped' /tmp/backend-test.log | head -1 | grep -oE '[0-9]+' || echo "0"); \
-	BACKEND_TOTAL=$$((BACKEND_PASSED + BACKEND_SKIPPED)); \
-	BACKEND_PCT=$$(awk "BEGIN {if ($$BACKEND_TOTAL > 0) printf \"%.0f\", ($$BACKEND_PASSED / $$BACKEND_TOTAL) * 100; else print \"0\"}"); \
-	BACKEND_COV=$$(grep 'TOTAL' /tmp/backend-test.log | awk '{print $$NF}' || echo "N/A"); \
-	FRONTEND_PASSED=$$(grep '^Tests:' /tmp/frontend-test.log | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' || echo "0"); \
-	FRONTEND_TOTAL=$$(grep '^Tests:' /tmp/frontend-test.log | grep -oE '[0-9]+ total' | grep -oE '[0-9]+' || echo "$$FRONTEND_PASSED"); \
-	FRONTEND_PCT=$$(awk "BEGIN {if ($$FRONTEND_TOTAL > 0) printf \"%.0f\", ($$FRONTEND_PASSED / $$FRONTEND_TOTAL) * 100; else print \"0\"}"); \
-	FRONTEND_COV=$$(grep 'Statements' /tmp/frontend-test.log | grep -oE '[0-9.]+%' | head -1 || echo "N/A"); \
-	SHARED_PASSED=$$(grep -oE '\([0-9]+ / [0-9]+\)' /tmp/shared-test.log | grep -oE '[0-9]+' | head -1 || echo "0"); \
-	SHARED_TOTAL=$$SHARED_PASSED; \
-	SHARED_PCT="100"; \
-	SHARED_COV="100%"; \
-	if [ $$FAILED -ne 0 ]; then \
-		echo "❌ Tests failed with errors or coverage below threshold"; \
-	else \
-		echo "✅ All tests passed!"; \
-	fi; \
-	echo ""; \
-	echo "📊 Coverage Summary:"; \
-	printf "┌─────────────┬──────────────────────┬──────────────┬──────────────────────────────────────────────────────┐\n"; \
-	printf "│ %-11s │ %-20s │ %-12s │ %-52s │\n" "Module" "Tests" "Coverage" "Report"; \
-	printf "├─────────────┼──────────────────────┼──────────────┼──────────────────────────────────────────────────────┤\n"; \
-	printf "│ %-11s │ %6s / %-6s (%3s%%) │ %12s │ %-52s │\n" "Backend" "$$BACKEND_PASSED" "$$BACKEND_TOTAL" "$$BACKEND_PCT" "$$BACKEND_COV" "file://$(PWD)/backend/htmlcov/index.html"; \
-	printf "│ %-11s │ %6s / %-6s (%3s%%) │ %12s │ %-52s │\n" "Frontend" "$$FRONTEND_PASSED" "$$FRONTEND_TOTAL" "$$FRONTEND_PCT" "$$FRONTEND_COV" "file://$(PWD)/frontend/coverage/index.html"; \
-	printf "│ %-11s │ %6s / %-6s (%3s%%) │ %12s │ %-52s │\n" "Shared" "$$SHARED_PASSED" "$$SHARED_TOTAL" "$$SHARED_PCT" "$$SHARED_COV" "Type coverage (no HTML)"; \
-	printf "└─────────────┴──────────────────────┴──────────────┴──────────────────────────────────────────────────────┘\n"; \
-	if [ $$FAILED -ne 0 ]; then \
-		exit 1; \
-	fi
+	@bash scripts/test.sh
 
 test-parallel: ## Run all tests in parallel (FAST)
-	@echo "🚀 Running all tests in parallel using $(NPROCS) cores..."
-	@$(MAKE) -j3 test-backend test-frontend test-shared
-	@echo "✅ All parallel tests complete!"
+	@bash scripts/test.sh parallel
 
-test-all: test-parallel coverage-merge ## Run all tests + merge coverage
-	@echo "✅ All tests complete with merged coverage"
+test-all: ## Run all tests + merge coverage
+	@bash scripts/test.sh merge
 
-coverage-merge: ## Merge coverage reports from all modules
-	@echo "📊 Merging coverage reports..."
-	@./scripts/merge-coverage.sh
+coverage-merge: ## Merge coverage reports
+	@bash scripts/test.sh merge-only
 
 coverage-view: ## Open merged coverage report in browser
 	@if [ -f "coverage-merged/html/index.html" ]; then \
@@ -131,20 +143,14 @@ coverage-view: ## Open merged coverage report in browser
 	fi
 
 clean-coverage: ## Clean all coverage reports
-	@echo "🧹 Cleaning coverage reports..."
-	@rm -rf backend/htmlcov backend/.coverage backend/coverage.xml backend/coverage.lcov
-	@rm -rf frontend/coverage
-	@rm -rf shared/.nyc_output shared/coverage
-	@rm -rf coverage coverage-merged
-	@echo "✅ Coverage reports cleaned"
+	@bash scripts/clean.sh coverage
 
-validate: ## Validate project setup
-	@echo "✅ Validating project setup..."
-	@./scripts/validate-setup.sh
+audit: ## Run Lighthouse performance audits
+	@bash scripts/audit.sh
 
 install-backend: ## Install backend dependencies
 	@echo "📦 Installing backend dependencies..."
-	@cd backend && pip install -r requirements.txt
+	@cd backend && uv sync
 
 install-frontend: ## Install frontend dependencies
 	@echo "📦 Installing frontend dependencies..."
@@ -157,16 +163,23 @@ install-cms: ## Install CMS dependencies
 install: install-frontend install-cms ## Install all dependencies (frontend + CMS)
 	@echo "✅ All dependencies installed"
 
-clean: ## Clean up containers, volumes, and dependencies
-	@echo "🧹 Cleaning up..."
-	@docker-compose down -v
-	@rm -rf backend/__pycache__ backend/.pytest_cache
-	@rm -rf frontend/node_modules frontend/.next
-	@rm -rf cms/node_modules cms/build
-	@echo "✅ Cleanup complete"
+setup: ## Complete development environment setup (installs all tools and dependencies)
+	@bash scripts/setup.sh
+
+upgrade: ## Update all dependencies to latest
+	@./scripts/upgrade.sh all
+
+upgrade-cms: ## Update CMS dependencies only
+	@./scripts/upgrade.sh cms
+
+upgrade-frontend: ## Update frontend dependencies only
+	@./scripts/upgrade.sh frontend
+
+upgrade-backend: ## Update backend dependencies only
+	@./scripts/upgrade.sh backend
+
+clean: ## Clean up containers, volumes, and all build artifacts (zero state)
+	@bash scripts/clean.sh
 
 ps: ## Show running containers
 	@docker-compose ps
-
-health: ## Check backend health
-	@curl -s http://localhost:8000/health | python3 -m json.tool || echo "❌ Backend not responding"

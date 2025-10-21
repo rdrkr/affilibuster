@@ -6,11 +6,12 @@ Redis cache service implementation.
 Reference: T076 (ICacheService interface), research.md:271-285
 """
 
-import os
 from typing import Optional
+
 import redis.asyncio as redis
 
-from src.domain.repositories.cache_service import ICacheService
+from config import settings
+from domain.repositories.cache_service import ICacheService
 
 
 class RedisCacheService(ICacheService):
@@ -27,7 +28,9 @@ class RedisCacheService(ICacheService):
         Args:
             redis_url: Redis connection URL (defaults to environment variable)
         """
-        self.redis_url = redis_url or os.getenv('REDIS_URL', 'redis://localhost:6379')
+        self.redis_url = redis_url or settings.redis_url
+        if not self.redis_url:
+            raise ValueError("REDIS_URL environment variable must be set or redis_url parameter provided")
         self._client: Optional[redis.Redis] = None
 
     async def _get_client(self) -> redis.Redis:
