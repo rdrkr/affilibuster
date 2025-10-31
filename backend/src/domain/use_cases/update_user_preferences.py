@@ -32,6 +32,7 @@ class UpdateUserPreferences:
         Args:
             preferences_repository: User preferences repository implementation
             cache_service: Cache service implementation
+
         """
         self.preferences_repository = preferences_repository
         self.cache_service = cache_service
@@ -45,6 +46,7 @@ class UpdateUserPreferences:
 
         Returns:
             UserPreferences: Updated preferences
+
         """
         # Refresh timestamps and TTL
         now = datetime.now(UTC).replace(tzinfo=None)
@@ -77,5 +79,5 @@ class UpdateUserPreferences:
                 "created_at": (preferences.created_at.isoformat() if preferences.created_at else None),
                 "updated_at": (preferences.updated_at.isoformat() if preferences.updated_at else None),
                 "expires_at": (preferences.expires_at.isoformat() if preferences.expires_at else None),
-            }
+            },
         )

@@ -3,14 +3,12 @@
 
 set -e
 
-echo ""
 echo "🔧 Setting up development environment..."
-echo ""
 
 # Detect OS
 if [[ "${OSTYPE}" == "darwin"* ]]; then
   OS="macos"
-  echo "📦 macOS detected - using Homebrew"
+  echo "  📦 macOS detected - using Homebrew"
 
   # Install Homebrew if not present
   if ! command -v brew >/dev/null 2>&1; then
@@ -24,11 +22,10 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
   fi
 else
   OS="linux"
-  echo "📦 Linux detected - using apt-get"
+  echo "  📦 Linux detected - using apt-get"
 fi
 
 # Install system development tools
-echo ""
 echo "📦 Installing system development tools..."
 
 # Helper function to install via brew
@@ -52,7 +49,7 @@ install_apt() {
   local apt_name=${2:-$1} # Use custom apt package name if provided
   if ! command -v "${package}" >/dev/null 2>&1; then
     echo "  Installing ${package}..."
-    sudo apt-get update >/dev/null 2>&1
+    sudo apt-get update >/dev/null
     sudo apt-get install -y "${apt_name}" || echo "  ⚠️  Failed to install ${package}"
   else
     echo "  ✅ ${package} already installed"
@@ -64,7 +61,7 @@ install_pip() {
   local package=$1
   if ! command -v "${package}" >/dev/null 2>&1 && ! python3 -m pip show "${package}" >/dev/null 2>&1; then
     echo "  Installing ${package}..."
-    python3 -m pip install "${package}" >/dev/null 2>&1 || echo "  ⚠️  Failed to install ${package}"
+    python3 -m pip install "${package}" >/dev/null || echo "  ⚠️  Failed to install ${package}"
   else
     echo "  ✅ ${package} already installed"
   fi
@@ -94,7 +91,7 @@ else
   # Python dependency manager (not in apt, use official installer)
   if ! command -v uv >/dev/null 2>&1; then
     echo "  Installing uv..."
-    curl -LsSf https://astral.sh/uv/install.sh | sh >/dev/null 2>&1 || echo "  ⚠️  Failed to install uv"
+    curl -LsSf https://astral.sh/uv/install.sh | sh >/dev/null || echo "  ⚠️  Failed to install uv"
     # Add uv to PATH for this session
     export PATH="/root/.cargo/bin:${PATH}"
   else
@@ -104,13 +101,12 @@ else
   # OpenAPI validation and linting (not in apt, use npm)
   if ! command -v redocly &>/dev/null; then
     echo "  Installing redocly-cli..."
-    npm install -g @redocly/cli >/dev/null 2>&1 || echo "  ⚠️  Failed to install redocly-cli"
+    npm install -g @redocly/cli >/dev/null || echo "  ⚠️  Failed to install redocly-cli"
   else
     echo "  ✅ redocly-cli already installed"
   fi
 fi
 
-echo ""
 echo "📦 Installing project dependencies..."
 
 # Install backend dependencies
@@ -122,22 +118,22 @@ cd ..
 # Install frontend dependencies
 echo "  Installing frontend dependencies..."
 cd frontend
-npm install --include=optional >/dev/null 2>&1
+npm install --include=optional >/dev/null
 cd ..
 
 # Install CMS dependencies
 echo "  Installing CMS dependencies..."
 cd cms
-npm install --include=optional >/dev/null 2>&1
+npm install --include=optional >/dev/null
 cd ..
 
 echo ""
 echo "📦 Installing pre-commit hooks..."
 if command -v pre-commit >/dev/null 2>&1; then
-  pre-commit install >/dev/null 2>&1
-  echo "✅ Pre-commit hooks installed"
+  pre-commit install >/dev/null
+  echo "  ✅ Pre-commit hooks installed"
 else
-  echo "❌ pre-commit not installed"
+  echo "  ❌ pre-commit not installed"
   exit 1
 fi
 

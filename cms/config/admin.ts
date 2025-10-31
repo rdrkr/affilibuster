@@ -9,18 +9,21 @@ import type { StrapiEnv } from './types'
 
 export default ({ env }: { env: StrapiEnv }) => ({
   auth: {
-    secret: env('ADMIN_JWT_SECRET', 'changeme-admin-jwt-secret-key-for-development'),
+    secret: env('ADMIN_JWT_SECRET'),
     sessions: {
       maxRefreshTokenLifespan: 30 * 24 * 60 * 60, // 30 days in seconds
       maxSessionLifespan: 7 * 24 * 60 * 60, // 7 days in seconds
     },
   },
   apiToken: {
-    salt: env('API_TOKEN_SALT', 'changeme-api-token-salt'),
+    salt: env('API_TOKEN_SALT'),
+  },
+  secrets: {
+    encryptionKey: env('API_TOKEN_ENCRYPTION_KEY'),
   },
   transfer: {
     token: {
-      salt: env('TRANSFER_TOKEN_SALT', 'changeme-transfer-token-salt'),
+      salt: env('TRANSFER_TOKEN_SALT'),
     },
   },
 })

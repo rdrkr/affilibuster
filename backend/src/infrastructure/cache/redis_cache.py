@@ -6,8 +6,6 @@ Redis cache service implementation.
 Reference: T076 (ICacheService interface), research.md:271-285
 """
 
-from typing import Optional
-
 import redis.asyncio as redis
 
 from config import settings
@@ -21,17 +19,18 @@ class RedisCacheService(ICacheService):
     Uses SETEX for atomic set-with-expiry operations.
     """
 
-    def __init__(self, redis_url: Optional[str] = None):
+    def __init__(self, redis_url: str | None = None) -> None:
         """
         Initialize Redis client.
 
         Args:
             redis_url: Redis connection URL (defaults to environment variable)
+
         """
         self.redis_url = redis_url or settings.redis_url
         if not self.redis_url:
             raise ValueError("REDIS_URL environment variable must be set or redis_url parameter provided")
-        self._client: Optional[redis.Redis] = None
+        self._client: redis.Redis | None = None
 
     async def _get_client(self) -> redis.Redis:
         """Get or create Redis client."""
@@ -39,7 +38,7 @@ class RedisCacheService(ICacheService):
             self._client = await redis.from_url(self.redis_url, decode_responses=True)
         return self._client
 
-    async def get(self, key: str) -> Optional[str]:
+    async def get(self, key: str) -> str | None:
         """
         Get a value from cache.
 
@@ -47,8 +46,7 @@ class RedisCacheService(ICacheService):
         """
         client = await self._get_client()
         try:
-            value = await client.get(key)
-            return value
+            return await client.get(key)
         except Exception:
             # Fallback to None on any error (cache miss)
             return None
@@ -61,6 +59,7 @@ class RedisCacheService(ICacheService):
             key: Cache key
             value: Value to cache
             ttl_seconds: Time to live in seconds (default: 1 hour)
+
         """
         client = await self._get_client()
         await client.setex(key, ttl_seconds, value)
@@ -71,6 +70,7 @@ class RedisCacheService(ICacheService):
 
         Returns:
             bool: True if deleted, False if key didn't exist
+
         """
         client = await self._get_client()
         result = await client.delete(key)
@@ -82,17 +82,19 @@ class RedisCacheService(ICacheService):
 
         Returns:
             bool: True if key exists, False otherwise
+
         """
         client = await self._get_client()
         result = await client.exists(key)
         return result > 0
 
-    async def get_many(self, keys: list[str]) -> dict[str, Optional[str]]:
+    async def get_many(self, keys: list[str]) -> dict[str, str | None]:
         """
         Get multiple values from cache using MGET.
 
         Returns:
             dict[str, Optional[str]]: Mapping of keys to values
+
         """
         if not keys:
             return {}

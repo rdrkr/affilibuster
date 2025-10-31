@@ -6,15 +6,12 @@ Reference: data-model.md:141-142 (slug must be unique per contentId, languageCod
 """
 
 import re
-from typing import Optional
 
 import pytest
 
 
 class SlugValidationError(Exception):
     """Raised when slug validation fails."""
-
-    pass
 
 
 def validate_slug_format(slug: str) -> bool:
@@ -26,6 +23,7 @@ def validate_slug_format(slug: str) -> bool:
 
     Returns:
         True if valid, False otherwise
+
     """
     # Slug must be lowercase alphanumeric with hyphens only
     pattern = r"^[a-z0-9]+(?:-[a-z0-9]+)*$"
@@ -33,7 +31,10 @@ def validate_slug_format(slug: str) -> bool:
 
 
 def validate_slug_uniqueness(
-    slug: str, content_id: str, language_code: str, existing_slugs: dict[tuple[str, str], str]
+    slug: str,
+    content_id: str,
+    language_code: str,
+    existing_slugs: dict[tuple[str, str], str],
 ) -> None:
     """
     Validate that slug is unique per (contentId, languageCode).
@@ -46,11 +47,12 @@ def validate_slug_uniqueness(
 
     Raises:
         SlugValidationError: If slug is not unique
+
     """
     key = (content_id, language_code)
     if key in existing_slugs and existing_slugs[key] != slug:
         raise SlugValidationError(
-            f"Slug '{slug}' already exists for content '{content_id}' in language '{language_code}'"
+            f"Slug '{slug}' already exists for content '{content_id}' in language '{language_code}'",
         )
 
 
@@ -65,6 +67,7 @@ def validate_slug_length(slug: str, min_length: int = 2, max_length: int = 200) 
 
     Raises:
         SlugValidationError: If slug length is invalid
+
     """
     if len(slug) < min_length:
         raise SlugValidationError(f"Slug must be at least {min_length} characters")
@@ -73,7 +76,7 @@ def validate_slug_length(slug: str, min_length: int = 2, max_length: int = 200) 
         raise SlugValidationError(f"Slug must not exceed {max_length} characters")
 
 
-def validate_slug(slug: str, content_id: str, language_code: str, existing_slugs: Optional[dict] = None) -> None:
+def validate_slug(slug: str, content_id: str, language_code: str, existing_slugs: dict | None = None) -> None:
     """
     Validate slug against all rules.
 
@@ -85,11 +88,12 @@ def validate_slug(slug: str, content_id: str, language_code: str, existing_slugs
 
     Raises:
         SlugValidationError: If validation fails
+
     """
     # Format validation
     if not validate_slug_format(slug):
         raise SlugValidationError(
-            f"Slug '{slug}' contains invalid characters. Use lowercase letters, " "numbers, and hyphens only"
+            f"Slug '{slug}' contains invalid characters. Use lowercase letters, numbers, and hyphens only",
         )
 
     # Length validation

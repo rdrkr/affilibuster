@@ -17,7 +17,7 @@ To regenerate models after spec changes:
 """
 
 # Re-export all auto-generated models from OpenAPI spec
-from .generated.models import *  # noqa: F401, F403
+from .generated.models import *  # noqa: F403
 
 __all__ = [
     # Auto-generated from OpenAPI spec - all models available via wildcard import

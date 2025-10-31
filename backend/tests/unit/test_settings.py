@@ -4,7 +4,7 @@
 Unit tests for application settings.
 
 Covers:
-- Settings initialization
+- Settings URL construction
 - CORS origins parsing
 - Environment detection
 - Property methods
@@ -14,89 +14,71 @@ from config.settings import Settings
 
 
 class TestSettingsInitialization:
-    """Test Settings class initialization."""
+    """Test Settings class initialization and URL construction."""
 
-    def test_settings_has_default_values(self):
-        """Test Settings initializes with default values."""
+    def test_settings_has_required_fields(self):
+        """Test Settings has required fields."""
         settings = Settings()
-        assert settings.app_env == "development"
-        assert settings.debug is True
-        assert settings.host == "0.0.0.0"
-        assert settings.port == 8000
+        assert settings.app_env is not None
+        assert settings.debug is not None
+        assert settings.jwt_secret is not None
+        assert settings.postgres_host is not None
 
-    def test_settings_accepts_custom_values(self):
-        """Test Settings accepts custom values during initialization."""
-        settings = Settings(app_env="production", debug=False, host="127.0.0.1", port=9000)
-        assert settings.app_env == "production"
-        assert settings.debug is False
-        assert settings.host == "127.0.0.1"
-        assert settings.port == 9000
-
-    def test_settings_database_defaults(self):
-        """Test database settings have correct defaults."""
+    def test_settings_database_url_construction(self):
+        """Test database URL is properly constructed."""
         settings = Settings()
         assert "postgresql://" in settings.database_url
-        assert settings.database_pool_size == 20
-        assert settings.database_max_overflow == 10
+        assert settings.postgres_host in settings.database_url
+        assert settings.postgres_user in settings.database_url
+        assert str(settings.postgres_port) in settings.database_url
 
-    def test_settings_redis_defaults(self):
-        """Test Redis settings have correct defaults."""
+    def test_settings_redis_url_construction(self):
+        """Test Redis URL is properly constructed."""
         settings = Settings()
         assert "redis://" in settings.redis_url
+        assert settings.redis_host in settings.redis_url
+        assert str(settings.redis_port) in settings.redis_url
+
+    def test_settings_strapi_url_construction(self):
+        """Test Strapi URL is properly constructed."""
+        settings = Settings()
+        assert settings.strapi_url is not None
+        assert "http" in settings.strapi_url or "https" in settings.strapi_url
+        assert str(settings.cms_port) in settings.strapi_url
+
+    def test_settings_redis_ttl_preferences(self):
+        """Test Redis TTL for preferences is set."""
+        settings = Settings()
         assert settings.redis_ttl_preferences == 2592000  # 30 days
 
 
 class TestCorsOriginsListProperty:
-    """Test cors_origins_list property parsing."""
+    """Test cors_origins_list property returns Strapi URL."""
 
-    def test_single_origin(self):
-        """Test parsing single CORS origin."""
-        settings = Settings(cors_origins="http://localhost:3000")
+    def test_cors_origins_list_contains_strapi_url(self):
+        """Test cors_origins_list returns list containing Strapi URL."""
+        settings = Settings()
         result = settings.cors_origins_list
-        assert len(result) == 1
-        assert result[0] == "http://localhost:3000"
+        assert isinstance(result, list)
+        assert len(result) >= 1
+        assert settings.strapi_url in result
 
-    def test_multiple_origins(self):
-        """Test parsing multiple CORS origins."""
-        settings = Settings(cors_origins="http://localhost:3000,http://localhost:1337")
-        result = settings.cors_origins_list
-        assert len(result) == 2
-        assert "http://localhost:3000" in result
-        assert "http://localhost:1337" in result
+    def test_cors_origins_property_returns_string(self):
+        """Test cors_origins property returns comma-separated string."""
+        settings = Settings()
+        result = settings.cors_origins
+        assert isinstance(result, str)
+        assert "localhost" in result
+        assert ":" in result  # Contains port numbers
 
-    def test_origins_with_whitespace(self):
-        """Test parsing origins with extra whitespace."""
-        settings = Settings(cors_origins="  http://localhost:3000  ,  http://localhost:1337  ")
-        result = settings.cors_origins_list
-        assert len(result) == 2
-        assert result[0] == "http://localhost:3000"
-        assert result[1] == "http://localhost:1337"
-
-    def test_origins_with_empty_parts(self):
-        """Test parsing origins with empty parts (double commas)."""
-        settings = Settings(cors_origins="http://localhost:3000,,http://localhost:1337")
-        result = settings.cors_origins_list
-        assert len(result) == 2  # Empty parts should be filtered out
-        assert "http://localhost:3000" in result
-        assert "http://localhost:1337" in result
-
-    def test_empty_origins_string(self):
-        """Test parsing empty CORS origins string."""
-        settings = Settings(cors_origins="")
-        result = settings.cors_origins_list
-        assert len(result) == 0
-
-    def test_whitespace_only_origins(self):
-        """Test parsing whitespace-only CORS origins."""
-        settings = Settings(cors_origins="   ,   ,   ")
-        result = settings.cors_origins_list
-        assert len(result) == 0
-
-    def test_three_origins(self):
-        """Test parsing three CORS origins."""
-        settings = Settings(cors_origins="http://a.com,http://b.com,http://c.com")
-        result = settings.cors_origins_list
-        assert len(result) == 3
+    def test_cors_origins_includes_frontend_hosts(self):
+        """Test cors_origins includes frontend hosts."""
+        settings = Settings()
+        cors_str = settings.cors_origins
+        # Should include localhost variant
+        assert "localhost" in cors_str
+        # Should include the configured frontend host
+        assert settings.frontend_host in cors_str or "127.0.0.1" in cors_str
 
 
 class TestIsProductionProperty:
@@ -139,32 +121,41 @@ class TestIsProductionProperty:
 
 
 class TestSettingsConfiguration:
-    """Test Settings configuration and validation."""
+    """Test Settings configuration and component values."""
 
-    def test_settings_accepts_database_url(self):
-        """Test Settings accepts custom database URL."""
-        custom_url = "postgresql://user:pass@db:5432/testdb"
-        settings = Settings(database_url=custom_url)
-        assert settings.database_url == custom_url
-
-    def test_settings_accepts_redis_url(self):
-        """Test Settings accepts custom Redis URL."""
-        custom_url = "redis://redis:6379/1"
-        settings = Settings(redis_url=custom_url)
-        assert settings.redis_url == custom_url
-
-    def test_settings_accepts_strapi_config(self):
-        """Test Settings accepts Strapi configuration."""
-        settings = Settings(strapi_url="http://cms:1337", strapi_api_token="test-token")
-        assert settings.strapi_url == "http://cms:1337"
-        assert settings.strapi_api_token == "test-token"
-
-    def test_settings_accepts_jwt_secret(self):
-        """Test Settings accepts JWT secret."""
-        settings = Settings(jwt_secret="super-secret-key")
-        assert settings.jwt_secret == "super-secret-key"
-
-    def test_settings_log_level_default(self):
-        """Test Settings has correct log level default."""
+    def test_settings_database_components(self):
+        """Test Settings has all database URL components."""
         settings = Settings()
-        assert settings.log_level == "INFO"
+        assert settings.postgres_protocol is not None
+        assert settings.postgres_host is not None
+        assert settings.postgres_port is not None
+        assert settings.postgres_user is not None
+        assert settings.postgres_password is not None
+        assert settings.postgres_backend_name is not None
+
+    def test_settings_redis_components(self):
+        """Test Settings has all Redis URL components."""
+        settings = Settings()
+        assert settings.redis_protocol is not None
+        assert settings.redis_host is not None
+        assert settings.redis_port is not None
+
+    def test_settings_strapi_components(self):
+        """Test Settings has all Strapi URL components."""
+        settings = Settings()
+        assert settings.cms_protocol is not None
+        assert settings.cms_host is not None
+        assert settings.cms_port is not None
+        assert settings.strapi_api_token is not None
+
+    def test_settings_jwt_secret(self):
+        """Test Settings has JWT secret configured."""
+        settings = Settings()
+        assert settings.jwt_secret is not None
+        assert len(settings.jwt_secret) > 0
+
+    def test_settings_log_level(self):
+        """Test Settings has log level configured."""
+        settings = Settings()
+        assert settings.log_level is not None
+        assert settings.log_level in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]

@@ -17,11 +17,11 @@ LINT_TYPE=$(echo "${LINT_TYPE}" | tr '[:upper:]' '[:lower:]')
 lint_python() {
   cd backend
   if [[ "${ACTION}" = "check" ]]; then
-    echo "📋 Checking Python code (Ruff)..."
+    echo "  📋 Checking Python code (Ruff)..."
     uv run ruff check . || LINT_FAILED=$?
   else
-    echo "🔧 Fixing Python code (Ruff)..."
-    uv run ruff check --fix . && uv run isort . && uv run black .
+    echo "  🔧 Fixing Python code (Ruff)..."
+    uv run ruff check --fix . || LINT_FAILED=$?
   fi
   cd ..
 }
@@ -29,25 +29,25 @@ lint_python() {
 # Lint TypeScript/JavaScript
 lint_typescript() {
   if [[ "${ACTION}" = "check" ]]; then
-    echo "📋 Checking TypeScript (Frontend ESLint)..."
+    echo "  📋 Checking TypeScript (Frontend ESLint)..."
     cd frontend
     npm install --silent || LINT_FAILED=$?
     npm run lint || LINT_FAILED=$?
     cd ..
 
-    echo "📋 Checking TypeScript (CMS ESLint)..."
+    echo "  📋 Checking TypeScript (CMS ESLint)..."
     cd cms
     npm install --silent || LINT_FAILED=$?
     npm run lint || LINT_FAILED=$?
     cd ..
   else
-    echo "🔧 Fixing TypeScript (Frontend)..."
+    echo "  🔧 Fixing TypeScript (Frontend)..."
     cd frontend
     npm install --silent || LINT_FAILED=$?
     npm run lint:fix || LINT_FAILED=$?
     cd ..
 
-    echo "🔧 Fixing TypeScript (CMS)..."
+    echo "  🔧 Fixing TypeScript (CMS)..."
     cd cms
     npm install --silent || LINT_FAILED=$?
     npm run lint:fix || LINT_FAILED=$?
@@ -58,9 +58,9 @@ lint_typescript() {
 # Lint Shell scripts
 lint_shell() {
   if [[ "${ACTION}" = "check" ]]; then
-    echo "📋 Checking shell scripts (shellcheck)..."
+    echo "  📋 Checking shell scripts (shellcheck)..."
   else
-    echo "🔧 Checking shell scripts (shellcheck)..."
+    echo "  🔧 Checking shell scripts (shellcheck)..."
   fi
 
   if command -v shellcheck >/dev/null 2>&1; then
@@ -78,11 +78,13 @@ lint_shell() {
       echo "${shell_files}" | xargs shellcheck || LINT_FAILED=$?
     fi
   else
-    echo "⚠️  shellcheck not installed"
+    echo "  ⚠️ shellcheck not installed"
   fi
 }
 
 # Main logic based on lint type
+echo "🔍 Starting linting: ${LINT_TYPE} (action: ${ACTION:-fix})"
+
 case "${LINT_TYPE}" in
 python)
   lint_python
@@ -98,9 +100,7 @@ shell)
 
 all)
   lint_python
-  echo ""
   lint_typescript
-  echo ""
   lint_shell
   ;;
 
@@ -117,18 +117,16 @@ all)
 esac
 
 # Print result
-echo ""
 if [[ "${ACTION}" = "check" ]]; then
   if [[ ${LINT_FAILED} -ne 0 ]]; then
-    echo "❌ Linting failed"
+    echo "  ❌ Linting failed"
     exit "${LINT_FAILED}"
   fi
   echo "✅ Linting complete"
 else
   if [[ ${LINT_FAILED} -ne 0 ]]; then
-    echo "⚠️  Some linters had issues (non-critical)"
+    echo "  ⚠️ Some linters had issues (non-critical)"
     exit "${LINT_FAILED}"
   fi
   echo "✅ All auto-fixes complete"
 fi
-echo ""

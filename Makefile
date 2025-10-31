@@ -45,7 +45,7 @@ lint-check: ## Check all linting without fixing
 lint: ## Lint and fix all code
 	@bash scripts/lint.sh all
 
-format-python: ## Format Python code (Black + isort)
+format-python: ## Format Python code (Ruff)
 	@bash scripts/format.sh python
 
 format-python-check: ## Check Python formatting without making changes

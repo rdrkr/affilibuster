@@ -179,10 +179,10 @@ const StrapiMetadataDefaults = {
 } as const
 
 /**
- * Remove DELETE operations from all paths in the spec.
- * Backend doesn't expose delete operations to frontend.
+ * Remove DELETE and PUT operations from all paths in the spec.
+ * Backend is read-only for Strapi content - no mutations allowed from frontend.
  */
-function removeDeleteOperations(spec: OpenAPISpec): OpenAPISpec {
+function removeDeleteAndPutOperations(spec: OpenAPISpec): OpenAPISpec {
   const processedSpec = { ...spec }
   const processedPaths = { ...spec.paths }
 
@@ -190,6 +190,7 @@ function removeDeleteOperations(spec: OpenAPISpec): OpenAPISpec {
     if (pathItem && typeof pathItem === 'object') {
       const processedPathItem = { ...(pathItem as Record<string, unknown>) }
       delete processedPathItem['delete']
+      delete processedPathItem['put']
       processedPaths[pathKey] = processedPathItem
     }
   })
@@ -199,43 +200,130 @@ function removeDeleteOperations(spec: OpenAPISpec): OpenAPISpec {
 }
 
 /**
- * Fix email field patterns that contain unsupported regex features.
+ * Fix Strapi pattern fields that contain unsupported regex features.
  *
- * Strapi generates email patterns with negative lookahead assertions like (?!\.)(?!.*\.\.)
- * which are not supported by Pydantic v2's Rust-based regex engine.
+ * Strapi generates patterns that are not supported by Pydantic v2's Rust-based regex engine:
+ * - Email patterns with negative lookahead assertions like (?!\.)(?!.*\.\.)
+ * - UUID patterns with complex alternation syntax
  *
- * Solution: Remove the pattern field from email fields since format: email already
- * provides RFC-compliant validation.
+ * Solution: Remove all pattern fields since the field type/format already provides validation.
  *
  * @param obj - The object to process (can be any part of the OpenAPI spec)
- * @returns The processed object with email patterns removed
+ * @returns The processed object with all pattern fields removed
  */
-function fixEmailPatterns(obj: unknown): unknown {
+function fixStrapiPatterns(obj: unknown): OpenAPISpec {
   if (obj === null || typeof obj !== 'object') {
-    return obj
+    return obj as OpenAPISpec
   }
 
   if (Array.isArray(obj)) {
-    return obj.map(item => fixEmailPatterns(item))
+    return obj.map(item => fixStrapiPatterns(item)) as unknown as OpenAPISpec
   }
 
   const processed: Record<string, unknown> = {}
 
   for (const [key, value] of Object.entries(obj)) {
-    if (typeof value === 'object' && value !== null) {
-      const valueObj = value as Record<string, unknown>
+    if (key === 'pattern') {
+      // Skip all pattern fields entirely
+      continue
+    }
 
-      // If this object has format: email and a pattern, remove the pattern
-      if (valueObj.format === 'email' && 'pattern' in valueObj) {
-        const withoutPattern = { ...valueObj }
-        delete withoutPattern.pattern
-        processed[key] = fixEmailPatterns(withoutPattern)
-      } else {
-        processed[key] = fixEmailPatterns(value)
-      }
+    if (typeof value === 'object' && value !== null) {
+      processed[key] = fixStrapiPatterns(value)
     } else {
       processed[key] = value
     }
+  }
+
+  return processed as OpenAPISpec
+}
+
+/**
+ * Remove UUID format fields from the specification.
+ *
+ * Removes all `format: uuid` fields from the spec to avoid validation issues
+ * or when UUID validation is not needed/desired.
+ *
+ * @param obj - The object to process (can be any part of the OpenAPI spec)
+ * @returns The processed object with all `format: uuid` fields removed
+ */
+function removeUuidFormat(obj: unknown): OpenAPISpec {
+  if (obj === null || typeof obj !== 'object') {
+    return obj as OpenAPISpec
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => removeUuidFormat(item)) as unknown as OpenAPISpec
+  }
+
+  const processed: Record<string, unknown> = {}
+
+  for (const [key, value] of Object.entries(obj)) {
+    // Skip format field if its value is 'uuid'
+    if (key === 'format' && value === 'uuid') {
+      continue
+    }
+
+    if (typeof value === 'object' && value !== null) {
+      processed[key] = removeUuidFormat(value)
+    } else {
+      processed[key] = value
+    }
+  }
+
+  return processed as OpenAPISpec
+}
+
+/**
+ * Add meta field to all response schemas.
+ *
+ * Strapi always returns a meta object alongside data in responses.
+ * This function adds the meta field to all response schemas that have a data field.
+ *
+ * @param spec - OpenAPI specification to modify
+ * @returns Specification with meta fields added to response schemas
+ */
+function addMetaToResponses(spec: OpenAPISpec): OpenAPISpec {
+  const processed = JSON.parse(JSON.stringify(spec)) as OpenAPISpec
+
+  if (processed.paths) {
+    Object.values(processed.paths).forEach(pathItem => {
+      if (pathItem && typeof pathItem === 'object') {
+        Object.values(pathItem).forEach((operation: unknown) => {
+          if (operation && typeof operation === 'object' && 'responses' in operation) {
+            const responses = (operation as { responses?: Record<string, unknown> }).responses
+            if (responses && typeof responses === 'object') {
+              // Process each response (200, 400, etc.)
+              Object.values(responses).forEach((response: unknown) => {
+                if (response && typeof response === 'object' && 'content' in response) {
+                  const content = (response as { content?: Record<string, unknown> }).content
+                  if (content && content['application/json']) {
+                    const jsonContent = content['application/json'] as Record<string, unknown>
+                    if (jsonContent.schema && typeof jsonContent.schema === 'object') {
+                      const schema = jsonContent.schema as Record<string, unknown>
+                      // Only add meta to schemas that have a data property
+                      if (schema.properties && typeof schema.properties === 'object') {
+                        const properties = schema.properties as Record<string, unknown>
+                        if (properties.data && !properties.meta) {
+                          // Add meta property as optional (not required)
+                          // Plugin endpoints (content-type-builder, upload) don't return meta
+                          // Content API endpoints do return meta
+                          properties.meta = {
+                            type: 'object',
+                            description: 'Metadata object containing pagination and other response metadata',
+                          }
+                          // Note: NOT adding to required array - meta is optional
+                        }
+                      }
+                    }
+                  }
+                }
+              })
+            }
+          }
+        })
+      }
+    })
   }
 
   return processed
@@ -432,13 +520,15 @@ function writeOpenAPISpec(filePath: string, spec: OpenAPISpec): void {
  * Preprocess Strapi OpenAPI specification with all required transformations.
  *
  * Applies the following transformations in order:
- * 1. Remove DELETE operations (not exposed to frontend)
+ * 1. Remove DELETE and PUT operations (backend is read-only for Strapi content)
  * 2. Add server URLs for Strapi CMS endpoints
- * 3. Fix email patterns with unsupported regex features
- * 4. Add license information to info section
- * 5. Add tags section with descriptions
- * 6. Fix populate parameter schemas with empty enum arrays
- * 7. Add security definitions to mark operations as public
+ * 3. Fix pattern fields with unsupported regex features (email, UUID, etc.)
+ * 4. Remove UUID format fields
+ * 5. Add meta field to all response schemas
+ * 6. Add license information to info section
+ * 7. Add tags section with descriptions
+ * 8. Fix populate parameter schemas with empty enum arrays
+ * 9. Add security definitions to mark operations as public
  *
  * @param spec - Raw Strapi OpenAPI specification
  * @param config - Configuration with server URLs
@@ -446,9 +536,11 @@ function writeOpenAPISpec(filePath: string, spec: OpenAPISpec): void {
  */
 function preprocessStrapiSpec(spec: OpenAPISpec, config: { strapiUrlProd: string; strapiUrlDev: string }): OpenAPISpec {
   let processed = spec
-  processed = removeDeleteOperations(processed)
+  processed = removeDeleteAndPutOperations(processed)
   processed = addStrapiServers(processed, config.strapiUrlProd, config.strapiUrlDev)
-  processed = fixEmailPatterns(processed) as OpenAPISpec
+  processed = fixStrapiPatterns(processed)
+  processed = removeUuidFormat(processed)
+  processed = addMetaToResponses(processed)
   processed = addStrapiLicense(processed)
   processed = addStrapiTags(processed)
   processed = fixEmptyPopulateEnums(processed)
@@ -814,7 +906,9 @@ async function mergeOpenAPISpecs(): Promise<void> {
     // Preprocess Strapi spec
     console.log('🔧 Preprocessing Strapi specification...')
     strapi = preprocessStrapiSpec(strapi, { strapiUrlProd, strapiUrlDev })
-    console.log('✅ Strapi spec preprocessed (DELETE ops removed, servers added, email patterns fixed)')
+    console.log(
+      '✅ Strapi spec preprocessed (PUT/DELETE ops removed, servers added, patterns fixed, UUID formats removed, meta fields added)'
+    )
 
     // Enrich Strapi spec with metadata
     console.log('✨ Enriching Strapi spec with metadata...')

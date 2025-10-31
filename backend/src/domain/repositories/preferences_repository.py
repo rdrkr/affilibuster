@@ -7,7 +7,6 @@ Reference: T063 (UserPreferences entity)
 """
 
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from ..entities.user_preferences import UserPreferences
 
@@ -20,7 +19,7 @@ class IUserPreferencesRepository(ABC):
     """
 
     @abstractmethod
-    async def get_by_session(self, session_id: str) -> Optional[UserPreferences]:
+    async def get_by_session(self, session_id: str) -> UserPreferences | None:
         """
         Get user preferences by session ID.
 
@@ -29,11 +28,11 @@ class IUserPreferencesRepository(ABC):
 
         Returns:
             Optional[UserPreferences]: Preferences if found and not expired, None otherwise
+
         """
-        pass
 
     @abstractmethod
-    async def get_by_user(self, user_id: str) -> Optional[UserPreferences]:
+    async def get_by_user(self, user_id: str) -> UserPreferences | None:
         """
         Get user preferences by user ID.
 
@@ -42,8 +41,8 @@ class IUserPreferencesRepository(ABC):
 
         Returns:
             Optional[UserPreferences]: Preferences if found and not expired, None otherwise
+
         """
-        pass
 
     @abstractmethod
     async def upsert(self, preferences: UserPreferences) -> UserPreferences:
@@ -55,8 +54,8 @@ class IUserPreferencesRepository(ABC):
 
         Returns:
             UserPreferences: Saved preferences
+
         """
-        pass
 
     @abstractmethod
     async def delete_expired(self) -> int:
@@ -65,8 +64,8 @@ class IUserPreferencesRepository(ABC):
 
         Returns:
             int: Number of deleted preferences
+
         """
-        pass
 
     @abstractmethod
     async def delete_by_session(self, session_id: str) -> bool:
@@ -78,5 +77,5 @@ class IUserPreferencesRepository(ABC):
 
         Returns:
             bool: True if deleted, False if not found
+
         """
-        pass

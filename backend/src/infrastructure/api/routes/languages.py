@@ -9,11 +9,10 @@ Architecture: Clean architecture pattern with use cases and dependency injection
 All language data comes from Strapi's built-in i18n plugin (/api/i18n/locales).
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
-from domain.use_cases.strapi_proxy import StrapiProxyGetUseCase
 from infrastructure.api.models import (
     DetectedLanguage,
     Language,
@@ -22,14 +21,14 @@ from infrastructure.api.models.generated.models import (
     LanguagesDetectPostRequest,
     LanguagesGetResponse,
 )
-from infrastructure.dependencies import CacheServiceDep, StrapiRepoDep
+from infrastructure.dependencies import StrapiProxyGetUseCaseDep
 
 router = APIRouter(prefix="/languages", tags=["languages"])
 
 
 async def transform_strapi_locales_to_languages(
-    locale_data: Dict[str, Any],
-) -> List[Language]:
+    locale_data: dict[str, Any],
+) -> list[Language]:
     """
     Transform Strapi locale data to Language model format.
 
@@ -58,8 +57,7 @@ async def transform_strapi_locales_to_languages(
 
 @router.get("", response_model=LanguagesGetResponse)
 async def get_languages(
-    strapi_repo: StrapiRepoDep,
-    cache_service: CacheServiceDep,
+    use_case: StrapiProxyGetUseCaseDep,
 ):
     """
     Get all active languages from Strapi i18n API.
@@ -67,8 +65,6 @@ async def get_languages(
     Returns list of configured locales sorted by language code.
     """
     try:
-        # Use Strapi proxy use case
-        use_case = StrapiProxyGetUseCase(strapi_repo, cache_service, cache_ttl=300)
         locale_data = await use_case.execute("/i18n/locales")
 
         # Transform to Language model format
@@ -78,15 +74,14 @@ async def get_languages(
     except Exception as e:
         raise HTTPException(
             status_code=502,
-            detail=f"Failed to fetch languages from Strapi: {str(e)}",
+            detail=f"Failed to fetch languages from Strapi: {e!s}",
         )
 
 
 @router.post("/detect", response_model=DetectedLanguage)
 async def detect_language(
     request: LanguagesDetectPostRequest,
-    strapi_repo: StrapiRepoDep,
-    cache_service: CacheServiceDep,
+    use_case: StrapiProxyGetUseCaseDep,
 ):
     """
     Detect user language from Accept-Language header.
@@ -105,7 +100,6 @@ async def detect_language(
                     browser_languages.append(lang)
 
         # Get available languages from Strapi
-        use_case = StrapiProxyGetUseCase(strapi_repo, cache_service, cache_ttl=300)
         locale_data = await use_case.execute("/i18n/locales")
         languages = await transform_strapi_locales_to_languages(locale_data)
         available_codes = {lang.code for lang in languages}
@@ -133,5 +127,5 @@ async def detect_language(
     except Exception as e:
         raise HTTPException(
             status_code=502,
-            detail=f"Failed to detect language: {str(e)}",
+            detail=f"Failed to detect language: {e!s}",
         )

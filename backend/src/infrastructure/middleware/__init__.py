@@ -1,10 +1,8 @@
 # Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-"""
-Middleware package for cross-cutting concerns
-"""
+"""Middleware package for cross-cutting concerns"""
 
 from .error_handler import ErrorHandlingMiddleware
 from .logging import RequestLoggingMiddleware
 
-__all__ = ["RequestLoggingMiddleware", "ErrorHandlingMiddleware"]
+__all__ = ["ErrorHandlingMiddleware", "RequestLoggingMiddleware"]

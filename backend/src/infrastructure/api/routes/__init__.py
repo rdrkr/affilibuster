@@ -1,5 +1,3 @@
 # Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-"""
-FastAPI route handlers.
-"""
+"""FastAPI route handlers."""

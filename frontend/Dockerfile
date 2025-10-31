@@ -4,18 +4,15 @@ FROM node:24-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
 # Copy application code
 COPY . .
+
+# Make startup script executable
+RUN chmod +x /app/docker-entrypoint.sh
 
 # Expose port (configurable via ARG)
 ARG FRONTEND_PORT
 EXPOSE ${FRONTEND_PORT}
 
-# Run the application
-CMD ["npm", "run", "dev"]
+# Run the application with startup script
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

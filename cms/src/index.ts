@@ -11,7 +11,6 @@
  */
 
 import type { Core } from '@strapi/types'
-import crypto from 'crypto'
 import * as fs from 'fs'
 import { seedDatabase } from './seed'
 
@@ -94,46 +93,64 @@ async function generateApiToken(strapi: Core.Strapi): Promise<void> {
     console.log('🔐 Checking API token for backend service...')
 
     const tokenName = 'Backend Service Token'
+    const tokenService = strapi.service('admin::api-token')
+    const TOKEN_LIFESPAN_DAYS = 30
+    const lifespanMillis = TOKEN_LIFESPAN_DAYS * 24 * 60 * 60 * 1000
 
-    // Check if a token with this name already exists
-    const existingToken = await strapi.query('admin::api-token').findOne({
+    // Check if a valid, non-expired token already exists
+    const existingTokens = await strapi.query('admin::api-token').findMany({
       where: { name: tokenName },
     })
 
-    if (existingToken) {
-      // Verify it's full-access type
-      if (existingToken.type === 'full-access') {
+    if (existingTokens && existingTokens.length > 0) {
+      const existingToken = existingTokens[0]
+      const now = new Date()
+
+      // Check if token is still valid (not expired)
+      const isExpired = existingToken.expiresAt && new Date(existingToken.expiresAt) < now
+      const isValid = existingToken.type === 'full-access' && !isExpired
+
+      if (isValid) {
         console.log(`✅ Valid API token already exists (ID: ${existingToken.id})`)
+        if (existingToken.expiresAt) {
+          const expiresAt = new Date(existingToken.expiresAt)
+          const daysRemaining = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+          console.log(`   Expires in ${daysRemaining} days (${expiresAt.toISOString()})`)
+        }
         console.log('   Skipping token generation - using existing token\n')
         return
-      } else {
-        console.log(`⚠️  Existing token found but is not full-access (type: ${existingToken.type})`)
-        console.log('   Deleting old token and creating new full-access token...')
-        await strapi.query('admin::api-token').delete({ where: { id: existingToken.id } })
       }
+
+      // Token is invalid or expired - delete it
+      console.log(`   Found ${isExpired ? 'expired' : 'invalid'} token (ID: ${existingToken.id}), deleting...`)
+      await strapi.query('admin::api-token').delete({ where: { id: existingToken.id } })
+      console.log(`   🗑️  Deleted old token`)
     }
 
-    console.log('📝 Generating new API token...')
+    console.log('📝 Generating new API token using Strapi service...')
+    console.log(`   Token will expire in ${TOKEN_LIFESPAN_DAYS} days`)
 
-    // Generate a secure random token (32 bytes = 256 bits of entropy, encoded as hex)
-    const tokenString = crypto.randomBytes(32).toString('hex')
-
-    // Hash the token for storage (security: never store plain tokens)
-    const hashedToken = crypto.createHash('sha256').update(tokenString).digest('hex')
-
-    // Create token in database
-    const token = await strapi.query('admin::api-token').create({
-      data: {
-        name: tokenName,
-        description: 'Auto-generated token for backend service authentication',
-        type: 'full-access',
-        token: hashedToken,
-        createdAt: new Date().toISOString(),
-      },
+    // Create token using Strapi's service (handles salting and hashing automatically)
+    const result = await tokenService.create({
+      name: tokenName,
+      description: 'Auto-generated token for backend service authentication',
+      type: 'full-access',
+      lifespan: lifespanMillis,
     })
 
+    // Extract the actual token from the accessKey property
+    const tokenString = result.accessKey
+
+    if (!tokenString) {
+      throw new Error('Token service did not return accessKey')
+    }
+
+    console.log('   ✅ Generated token (length: ' + tokenString.length + ' chars)')
+    if (result.expiresAt) {
+      console.log('   📅 Expires at:', result.expiresAt)
+    }
+
     // Update .env file with new token if it exists
-    let envUpdated = false
     const envPath = '/app/.env'
 
     console.log(`   🔍 Checking for .env file at: ${envPath}`)
@@ -160,7 +177,6 @@ async function generateApiToken(strapi: Core.Strapi): Promise<void> {
 
         console.log('   💾 Writing updated .env file...')
         fs.writeFileSync(envPath, envContent, 'utf-8')
-        envUpdated = true
         console.log('   ✅ Updated .env file with new token')
       } else {
         console.log('   ⚠️  .env file not found at /app/.env')
@@ -170,46 +186,7 @@ async function generateApiToken(strapi: Core.Strapi): Promise<void> {
       console.warn(`   ⚠️  Could not update .env file: ${envErrorMsg}`)
     }
 
-    // Display token with setup instructions (wider box to fit 64-char token)
-    console.log('')
-    console.log('╔═════════════════════════════════════════════════════════════════════════════╗')
-    console.log('║                       API TOKEN GENERATED SUCCESSFULLY                      ║')
-    console.log('╠═════════════════════════════════════════════════════════════════════════════╣')
-    console.log('║                                                                             ║')
-    console.log('║  Token Name: Backend Service Token                                          ║')
-    console.log('║  Type: Full Access                                                          ║')
-    console.log('║  ID: ' + String(token.id).padEnd(71) + '║')
-    console.log('║                                                                             ║')
-    console.log('╠═════════════════════════════════════════════════════════════════════════════╣')
-    console.log('║                                                                             ║')
-    console.log('║  Token: ' + tokenString.padEnd(68) + '║')
-    console.log('║                                                                             ║')
-    if (envUpdated) {
-      console.log('║  [v] Automatically saved to .env file                                       ║')
-    } else {
-      console.log('║  [!] Manual .env update required (see instructions below)                   ║')
-    }
-    console.log('║                                                                             ║')
-    console.log('╠═════════════════════════════════════════════════════════════════════════════╣')
-    console.log('║  NEXT STEPS:                                                                ║')
-    console.log('║                                                                             ║')
-    if (envUpdated) {
-      console.log('║  1. Restart your services to apply the new token:                           ║')
-      console.log('║     docker-compose restart                                                  ║')
-    } else {
-      console.log('║  1. Copy the token above (entire hex string)                                 ║')
-      console.log('║  2. Update your .env file:                                                   ║')
-      console.log('║     STRAPI_API_TOKEN=' + tokenString.padEnd(54) + '║')
-      console.log('║  3. Restart your services:                                                   ║')
-      console.log('║     docker-compose restart                                                   ║')
-    }
-    console.log('║                                                                             ║')
-    console.log('║  Backend will automatically use this token for Strapi authentication        ║')
-    console.log('║                                                                             ║')
-    console.log('╚═════════════════════════════════════════════════════════════════════════════╝')
-    console.log('')
-
-    console.log(`✅ API token created (ID: ${token.id})`)
+    console.log(`✅ API token created (length: ${tokenString.length})`)
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error)
     console.error(`⚠️  Failed to create API token: ${message}`)

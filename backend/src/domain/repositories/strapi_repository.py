@@ -9,7 +9,7 @@ clean architecture and enable testing with mocks.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any
 
 
 class IStrapiRepository(ABC):
@@ -21,7 +21,7 @@ class IStrapiRepository(ABC):
     """
 
     @abstractmethod
-    async def get(self, path: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Send a GET request to Strapi.
 
@@ -35,17 +35,18 @@ class IStrapiRepository(ABC):
         Raises:
             StrapiAPIError: If Strapi returns an error
             ConnectionError: If connection to Strapi fails
+
         """
-        pass
 
     @abstractmethod
-    async def post(self, path: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def post(self, path: str, data: dict[str, Any], params: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Send a POST request to Strapi.
 
         Args:
             path: API path
             data: Request payload
+            params: Query parameters (fields, populate, locale, status, etc.)
 
         Returns:
             Response data from Strapi
@@ -53,37 +54,5 @@ class IStrapiRepository(ABC):
         Raises:
             StrapiAPIError: If Strapi returns an error
             ConnectionError: If connection to Strapi fails
+
         """
-        pass
-
-    @abstractmethod
-    async def put(self, path: str, data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Send a PUT request to Strapi.
-
-        Args:
-            path: API path
-            data: Request payload
-
-        Returns:
-            Response data from Strapi
-
-        Raises:
-            StrapiAPIError: If Strapi returns an error
-            ConnectionError: If connection to Strapi fails
-        """
-        pass
-
-    @abstractmethod
-    async def delete(self, path: str) -> None:
-        """
-        Send a DELETE request to Strapi.
-
-        Args:
-            path: API path
-
-        Raises:
-            StrapiAPIError: If Strapi returns an error
-            ConnectionError: If connection to Strapi fails
-        """
-        pass

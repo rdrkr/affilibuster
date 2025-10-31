@@ -91,6 +91,7 @@ def custom_openapi():
 
     Returns:
         OpenAPI specification from contract file, or FastAPI's default if contract unavailable.
+
     """
     # Use FastAPI's cached openapi schema if already generated
     if app.openapi_schema:

@@ -11,32 +11,27 @@ Validates user preferences against Strapi currency data.
 
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, Header, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Header, HTTPException
 
 from domain.entities.user_preferences import UserPreferences
-from domain.use_cases.get_user_preferences import GetUserPreferences
-from domain.use_cases.strapi_proxy import StrapiProxyGetUseCase
-from domain.use_cases.update_user_preferences import UpdateUserPreferences
 from infrastructure.api.models import (
     Error,
     UpdatePreferences,
 )
 from infrastructure.api.models import UserPreferences as UserPreferencesModel
-from infrastructure.cache.redis_cache import RedisCacheService
-from infrastructure.database.config import get_db
-from infrastructure.database.repositories.preferences_repository import (
-    UserPreferencesRepository,
+from infrastructure.dependencies import (
+    GetUserPreferencesUseCaseDep,
+    PreferencesRepoDep,
+    StrapiProxyGetUseCaseDep,
+    UpdateUserPreferencesUseCaseDep,
 )
-from infrastructure.dependencies import CacheServiceDep, StrapiRepoDep
 
 router = APIRouter(prefix="/user/preferences", tags=["preferences"])
 
 
 async def validate_currency_code(
     code: str,
-    strapi_repo: StrapiRepoDep,
-    cache_service: CacheServiceDep,
+    use_case: StrapiProxyGetUseCaseDep,
 ) -> bool:
     """
     Validate that a currency code exists in Strapi.
@@ -44,8 +39,6 @@ async def validate_currency_code(
     Returns True if the currency code is valid and active, False otherwise.
     """
     try:
-        # Use Strapi proxy use case with 1-hour cache
-        use_case = StrapiProxyGetUseCase(strapi_repo, cache_service, cache_ttl=3600)
         currency_data = await use_case.execute(
             "/currencies",
             params={"pagination[pageSize]": "100"},
@@ -65,9 +58,8 @@ async def validate_currency_code(
 
 @router.get("", response_model=UserPreferencesModel, responses={404: {"model": Error}})
 async def get_preferences(
-    strapi_repo: StrapiRepoDep,
-    cache_service: CacheServiceDep,
-    db: AsyncSession = Depends(get_db),
+    get_use_case: GetUserPreferencesUseCaseDep,
+    update_use_case: UpdateUserPreferencesUseCaseDep,
     x_session_id: str = Header(..., alias="X-Session-Id"),
     x_user_id: str = Header(None, alias="X-User-Id"),
 ):
@@ -92,18 +84,11 @@ async def get_preferences(
             # Invalid format, generate new session ID
             x_session_id = str(uuid_lib.uuid4())
 
-    # Create repositories and use case
-    prefs_repo = UserPreferencesRepository(db)
-    cache_service = RedisCacheService()
-    use_case = GetUserPreferences(prefs_repo, cache_service)
-
     # Execute use case
-    prefs = await use_case.execute(x_session_id)
+    prefs = await get_use_case.execute(x_session_id)
 
     if not prefs:
         # Create new preferences with defaults for new session
-        from domain.entities.user_preferences import UserPreferences
-
         prefs = UserPreferences(
             session_id=x_session_id,
             selected_currency="USD",
@@ -111,7 +96,6 @@ async def get_preferences(
             detected_language=None,
         )
         # Save the new preferences
-        update_use_case = UpdateUserPreferences(prefs_repo, cache_service)
         prefs = await update_use_case.execute(prefs)
 
     # Convert to response model
@@ -128,9 +112,9 @@ async def get_preferences(
 @router.put("", response_model=UserPreferencesModel, responses={400: {"model": Error}})
 async def update_preferences(
     request: UpdatePreferences,
-    strapi_repo: StrapiRepoDep,
-    cache_service: CacheServiceDep,
-    db: AsyncSession = Depends(get_db),
+    strapi_use_case: StrapiProxyGetUseCaseDep,
+    update_use_case: UpdateUserPreferencesUseCaseDep,
+    prefs_repo: PreferencesRepoDep,
     x_session_id: str = Header(..., alias="X-Session-Id"),
 ):
     """
@@ -140,7 +124,7 @@ async def update_preferences(
     """
     # Validate currency if provided
     if request.selectedCurrency:
-        is_valid = await validate_currency_code(request.selectedCurrency, strapi_repo, cache_service)
+        is_valid = await validate_currency_code(request.selectedCurrency, strapi_use_case)
         if not is_valid:
             raise HTTPException(
                 status_code=400,
@@ -151,11 +135,6 @@ async def update_preferences(
                     timestamp=datetime.utcnow(),
                 ).model_dump(mode="json"),
             )
-
-    # Create repositories and use case
-    prefs_repo = UserPreferencesRepository(db)
-    cache_service = RedisCacheService()
-    use_case = UpdateUserPreferences(prefs_repo, cache_service)
 
     # Get existing preferences or create new
     existing = await prefs_repo.get_by_session(x_session_id)
@@ -179,7 +158,7 @@ async def update_preferences(
         )
 
     # Execute use case
-    updated = await use_case.execute(prefs)
+    updated = await update_use_case.execute(prefs)
 
     # Convert to response model
     return UserPreferencesModel(

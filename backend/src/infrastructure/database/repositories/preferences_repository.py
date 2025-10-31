@@ -7,7 +7,6 @@ Reference: T075 (IUserPreferencesRepository interface), T070 (UserPreferences mo
 """
 
 from datetime import UTC, datetime
-from typing import Optional
 
 from sqlalchemy import delete, select
 from sqlalchemy.dialects.postgresql import insert
@@ -19,14 +18,13 @@ from infrastructure.database.models.user_preferences import UserPreferencesModel
 
 
 class UserPreferencesRepository(IUserPreferencesRepository):
-    """
-    PostgreSQL implementation of IUserPreferencesRepository.
-    """
+    """PostgreSQL implementation of IUserPreferencesRepository."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
+        """Initialize repository with SQLAlchemy session."""
         self.session = session
 
-    async def get_by_session(self, session_id: str) -> Optional[UserPreferences]:
+    async def get_by_session(self, session_id: str) -> UserPreferences | None:
         """Get user preferences by session ID."""
         stmt = select(UserPreferencesModel).where(
             UserPreferencesModel.session_id == session_id,
@@ -36,7 +34,7 @@ class UserPreferencesRepository(IUserPreferencesRepository):
         model = result.scalar_one_or_none()
         return self._to_entity(model) if model else None
 
-    async def get_by_user(self, user_id: str) -> Optional[UserPreferences]:
+    async def get_by_user(self, user_id: str) -> UserPreferences | None:
         """Get user preferences by user ID."""
         stmt = select(UserPreferencesModel).where(
             UserPreferencesModel.user_id == user_id,
@@ -82,7 +80,7 @@ class UserPreferencesRepository(IUserPreferencesRepository):
     async def delete_expired(self) -> int:
         """Delete all expired preferences."""
         stmt = delete(UserPreferencesModel).where(
-            UserPreferencesModel.expires_at <= datetime.now(UTC).replace(tzinfo=None)
+            UserPreferencesModel.expires_at <= datetime.now(UTC).replace(tzinfo=None),
         )
         result = await self.session.execute(stmt)
         await self.session.flush()
@@ -97,6 +95,11 @@ class UserPreferencesRepository(IUserPreferencesRepository):
 
     def _to_entity(self, model: UserPreferencesModel) -> UserPreferences:
         """Convert SQLAlchemy model to domain entity."""
+        # Ensure datetimes are timezone-aware (SQLite returns naive datetimes)
+        created_at = model.created_at if model.created_at.tzinfo else model.created_at.replace(tzinfo=UTC)
+        updated_at = model.updated_at if model.updated_at.tzinfo else model.updated_at.replace(tzinfo=UTC)
+        expires_at = model.expires_at if model.expires_at.tzinfo else model.expires_at.replace(tzinfo=UTC)
+
         return UserPreferences(
             id=model.id,
             session_id=model.session_id,
@@ -104,7 +107,7 @@ class UserPreferencesRepository(IUserPreferencesRepository):
             selected_currency=model.selected_currency,
             dismissed_language_prompt=model.dismissed_language_prompt,
             detected_language=model.detected_language,
-            created_at=model.created_at,
-            updated_at=model.updated_at,
-            expires_at=model.expires_at,
+            created_at=created_at,
+            updated_at=updated_at,
+            expires_at=expires_at,
         )

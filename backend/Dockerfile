@@ -32,4 +32,4 @@ ARG BACKEND_PORT
 EXPOSE ${BACKEND_PORT}
 
 # Run the application with startup script
-CMD ["/app/docker-entrypoint.sh"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

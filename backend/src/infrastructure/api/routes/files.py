@@ -11,23 +11,21 @@ Provides access to uploaded files from Strapi's media library.
 
 from fastapi import APIRouter, Depends, HTTPException, Path
 
-from domain.use_cases.strapi_proxy import StrapiProxyGetUseCase
 from infrastructure.api.models.generated.models import (
     FilesGetParametersQuery,
     FilesGetResponse,
     FilesIdGetParametersQuery,
     FilesIdGetResponse,
 )
-from infrastructure.dependencies import CacheServiceDep, StrapiRepoDep
+from infrastructure.dependencies import StrapiProxyGetUseCaseDep
 
 router = APIRouter(prefix="", tags=["upload"])
 
 
 @router.get("/files", response_model=FilesGetResponse)
 async def get_files(
+    use_case: StrapiProxyGetUseCaseDep,
     params: FilesGetParametersQuery = Depends(),
-    strapi_repo: StrapiRepoDep = None,
-    cache_service: CacheServiceDep = None,
 ):
     """
     Get list of uploaded files (media library).
@@ -35,25 +33,22 @@ async def get_files(
     Returns paginated list of uploaded files from Strapi's media library.
     """
     try:
-        # Use Strapi proxy use case (file lists may change, use moderate caching)
-        use_case = StrapiProxyGetUseCase(strapi_repo, cache_service, cache_ttl=300)
         return await use_case.execute(
-            "/files",
+            "/upload/files",
             params=params.model_dump(exclude_none=True),
         )
     except Exception as e:
         raise HTTPException(
             status_code=502,
-            detail=f"Failed to fetch files from Strapi: {str(e)}",
+            detail=f"Failed to fetch files from Strapi: {e!s}",
         )
 
 
 @router.get("/files/{id}", response_model=FilesIdGetResponse)
 async def get_file(
+    use_case: StrapiProxyGetUseCaseDep,
     id: str = Path(..., description="File ID"),
     params: FilesIdGetParametersQuery = Depends(),
-    strapi_repo: StrapiRepoDep = None,
-    cache_service: CacheServiceDep = None,
 ):
     """
     Get a specific uploaded file metadata by ID.
@@ -61,14 +56,12 @@ async def get_file(
     Returns metadata about a specific file from Strapi's media library.
     """
     try:
-        # Use Strapi proxy use case with moderate cache (file metadata may change)
-        use_case = StrapiProxyGetUseCase(strapi_repo, cache_service, cache_ttl=300)
         return await use_case.execute(
-            f"/files/{id}",
+            f"/upload/files/{id}",
             params=params.model_dump(exclude_none=True),
         )
     except Exception as e:
         raise HTTPException(
             status_code=502,
-            detail=f"Failed to fetch file {id} from Strapi: {str(e)}",
+            detail=f"Failed to fetch file {id} from Strapi: {e!s}",
         )

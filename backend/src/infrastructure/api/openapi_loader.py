@@ -37,6 +37,7 @@ class OpenAPIContractLoader:
         Args:
             contract_path: Path to the OpenAPI contract YAML file.
                           Defaults to /contracts/affilibuster.openapi.yaml (Docker volume mount).
+
         """
         self.contract_path = Path(contract_path)
         self._cached_spec: dict[str, Any] | None = None
@@ -51,6 +52,7 @@ class OpenAPIContractLoader:
         Raises:
             FileNotFoundError: If contract file doesn't exist.
             yaml.YAMLError: If contract file is invalid YAML.
+
         """
         if self._cached_spec is not None:
             logger.debug("Returning cached OpenAPI contract")
@@ -78,7 +80,7 @@ class OpenAPIContractLoader:
             self._cached_spec = spec
             logger.info(
                 f"✅ Loaded OpenAPI contract: {spec.get('info', {}).get('title', 'Unknown')} "
-                f"v{spec.get('info', {}).get('version', 'Unknown')}"
+                f"v{spec.get('info', {}).get('version', 'Unknown')}",
             )
             logger.info(f"   Paths: {len(spec.get('paths', {}))}")
             logger.info(f"   Schemas: {len(spec.get('components', {}).get('schemas', {}))}")
@@ -96,6 +98,7 @@ class OpenAPIContractLoader:
 
         Returns:
             Cached OpenAPI specification, or None if not loaded or failed to load.
+
         """
         try:
             return self.load_contract()

@@ -12,10 +12,10 @@ run_backend_tests() {
 
   if [[ "${fast}" = "true" ]]; then
     echo "⚡ Running backend unit tests..."
-    docker-compose exec -T backend bash -c "cd /app && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest -m \"unit\" --tb=short" 2>&1 | tee /tmp/backend-test.log
+    docker-compose exec -T backend bash -c "cd /app && . /app/.env && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest -m \"unit\" --tb=short" 2>&1 | tee /tmp/backend-test.log
   else
     echo "🧪 Running backend tests..."
-    docker-compose exec -T backend bash -c "cd /app && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest" 2>&1 | tee /tmp/backend-test.log
+    docker-compose exec -T backend bash -c "cd /app && . /app/.env && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest" 2>&1 | tee /tmp/backend-test.log
   fi
 
   return "${PIPESTATUS[0]}"

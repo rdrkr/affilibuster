@@ -8,7 +8,6 @@ Reference: data-model.md:320-362
 
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from typing import Optional
 from uuid import UUID, uuid4
 
 
@@ -28,14 +27,14 @@ class UserPreferences:
     session_id: str
     selected_currency: str  # CurrencyCode
     dismissed_language_prompt: bool = False
-    detected_language: Optional[str] = None  # LanguageCode
-    user_id: Optional[str] = None
-    id: UUID = None  # type: ignore
-    created_at: datetime = None  # type: ignore
-    updated_at: datetime = None  # type: ignore
-    expires_at: datetime = None  # type: ignore
+    detected_language: str | None = None  # LanguageCode
+    user_id: str | None = None
+    id: UUID = None
+    created_at: datetime = None
+    updated_at: datetime = None
+    expires_at: datetime = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Initialize defaults and run validation."""
         if self.id is None:
             self.id = uuid4()
@@ -55,12 +54,13 @@ class UserPreferences:
 
         Raises:
             ValueError: If any business rule is violated
+
         """
-        # Rule: expiresAt must be > updatedAt
+        # expiresAt must be > updatedAt
         if self.expires_at <= self.updated_at:
             raise ValueError("expiresAt must be greater than updatedAt")
 
-        # Rule: sessionId is required
+        # sessionId is required
         if not self.session_id:
             raise ValueError("sessionId is required")
 
@@ -70,6 +70,7 @@ class UserPreferences:
 
         Args:
             currency_code: New currency code to set
+
         """
         self.selected_currency = currency_code
         self.updated_at = datetime.now(UTC).replace(tzinfo=None)
@@ -77,9 +78,7 @@ class UserPreferences:
         self.expires_at = self.updated_at + timedelta(days=30)
 
     def dismiss_language_prompt(self) -> None:
-        """
-        Mark language prompt as dismissed for this session.
-        """
+        """Mark language prompt as dismissed for this session."""
         self.dismissed_language_prompt = True
         self.updated_at = datetime.now(UTC).replace(tzinfo=None)
         # Extend TTL by 30 days from now
@@ -91,6 +90,7 @@ class UserPreferences:
 
         Returns:
             bool: True if current time is past expiresAt
+
         """
         return datetime.now(UTC).replace(tzinfo=None) > self.expires_at
 
@@ -100,5 +100,6 @@ class UserPreferences:
 
         Returns:
             str: userId if present, otherwise sessionId
+
         """
         return self.user_id if self.user_id else self.session_id

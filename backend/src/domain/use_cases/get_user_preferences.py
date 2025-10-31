@@ -7,7 +7,6 @@ Reference: T075 (IUserPreferencesRepository), T076 (ICacheService)
 """
 
 import json
-from typing import Optional
 
 from domain.entities.user_preferences import UserPreferences
 from domain.repositories.cache_service import ICacheService
@@ -32,11 +31,12 @@ class GetUserPreferences:
         Args:
             preferences_repository: User preferences repository implementation
             cache_service: Cache service implementation
+
         """
         self.preferences_repository = preferences_repository
         self.cache_service = cache_service
 
-    async def execute(self, session_id: str) -> Optional[UserPreferences]:
+    async def execute(self, session_id: str) -> UserPreferences | None:
         """
         Get user preferences by session ID with caching.
 
@@ -45,6 +45,7 @@ class GetUserPreferences:
 
         Returns:
             Optional[UserPreferences]: User preferences if found and not expired
+
         """
         # Try cache first
         cache_key = f"session:{session_id}:preferences"
@@ -80,15 +81,24 @@ class GetUserPreferences:
                 "created_at": (preferences.created_at.isoformat() if preferences.created_at else None),
                 "updated_at": (preferences.updated_at.isoformat() if preferences.updated_at else None),
                 "expires_at": (preferences.expires_at.isoformat() if preferences.expires_at else None),
-            }
+            },
         )
 
     def _deserialize(self, data: str) -> UserPreferences:
         """Deserialize preferences from JSON."""
-        from datetime import datetime
+        from datetime import UTC, datetime
         from uuid import UUID
 
         obj = json.loads(data)
+
+        # Helper to ensure timezone-aware datetimes
+        def parse_datetime(dt_str: str | None) -> datetime | None:
+            if not dt_str:
+                return None
+            dt = datetime.fromisoformat(dt_str)
+            # Ensure timezone-aware (assume UTC if naive)
+            return dt if dt.tzinfo else dt.replace(tzinfo=UTC)
+
         return UserPreferences(
             id=UUID(obj["id"]),
             session_id=obj["session_id"],
@@ -96,7 +106,7 @@ class GetUserPreferences:
             selected_currency=obj["selected_currency"],
             dismissed_language_prompt=obj["dismissed_language_prompt"],
             detected_language=obj.get("detected_language"),
-            created_at=datetime.fromisoformat(obj["created_at"]) if obj.get("created_at") else None,
-            updated_at=datetime.fromisoformat(obj["updated_at"]) if obj.get("updated_at") else None,
-            expires_at=datetime.fromisoformat(obj["expires_at"]) if obj.get("expires_at") else None,
+            created_at=parse_datetime(obj.get("created_at")),
+            updated_at=parse_datetime(obj.get("updated_at")),
+            expires_at=parse_datetime(obj.get("expires_at")),
         )

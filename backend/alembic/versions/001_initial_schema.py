@@ -1,6 +1,7 @@
 # Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-"""Initial schema - create app-specific tables only.
+"""
+Initial schema - create app-specific tables only.
 
 Revision ID: 001
 Revises:
@@ -14,7 +15,7 @@ Architecture: Backend database contains only app-specific data:
 All user-facing content and system metadata comes directly from Strapi.
 """
 
-from typing import Sequence, Union
+from collections.abc import Sequence
 
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
@@ -22,14 +23,13 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 revision: str = "001"
-down_revision: Union[str, None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
     """Create initial schema tables."""
-
     # Create user_preferences table
     op.create_table(
         "user_preferences",
@@ -38,7 +38,12 @@ def upgrade() -> None:
         sa.Column("user_id", sa.String(100), nullable=True),
         sa.Column("selected_currency", sa.String(3), nullable=False, server_default="USD"),
         sa.Column("detected_language", sa.String(2), nullable=True),
-        sa.Column("dismissed_language_prompt", sa.Boolean(), nullable=False, server_default="false"),
+        sa.Column(
+            "dismissed_language_prompt",
+            sa.Boolean(),
+            nullable=False,
+            server_default="false",
+        ),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text("NOW()")),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text("NOW()")),
         sa.Column("expires_at", sa.DateTime(), nullable=False),

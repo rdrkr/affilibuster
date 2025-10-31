@@ -30,11 +30,11 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
         except Exception as exc:
             # Log the error
             logger.error(
-                f"Unhandled exception in {request.method} {request.url.path}: {str(exc)}",
+                f"Unhandled exception in {request.method} {request.scope['path']}: {exc!s}",
                 exc_info=True,
                 extra={
                     "method": request.method,
-                    "path": request.url.path,
+                    "path": request.scope["path"],
                     "error_type": type(exc).__name__,
                 },
             )
@@ -45,7 +45,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
                 "message": "An unexpected error occurred. Please try again later.",
                 "code": "INTERNAL_SERVER_ERROR",
                 "timestamp": datetime.now(UTC).isoformat() + "Z",
-                "path": str(request.url.path),
+                "path": request.scope["path"],
             }
 
             # In development, include more details

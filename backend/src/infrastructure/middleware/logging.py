@@ -60,7 +60,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
             # Log error
             logger.error(
-                f"{method} {path} - ERROR - {duration_ms}ms: {str(exc)}",
+                f"{method} {path} - ERROR - {duration_ms}ms: {exc!s}",
                 extra={
                     "method": method,
                     "path": path,

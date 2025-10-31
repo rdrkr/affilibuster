@@ -15,7 +15,8 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-15%2B-336791)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/docker-ready-blue)](https://www.docker.com/)
 
-**A modern, production-ready affiliate platform with multi-language support, performance optimization, and clean architecture.**
+**A modern, production-ready affiliate platform with multi-language support, performance optimization, and clean
+architecture.**
 
 [Features](#-features) • [Architecture](#-architecture) • [Quick Start](#-quick-start) • [Contributing](#-contributing)
 
@@ -27,23 +28,23 @@
 
 - [Features](#-features)
 - [Architecture](#-architecture)
-    - [System Design](#system-design)
-    - [Project Structure](#project-structure)
-    - [Technology Stack](#-technology-stack)
+  - [System Design](#system-design)
+  - [Project Structure](#project-structure)
+  - [Technology Stack](#-technology-stack)
 - [Design Principles](#-design-principles)
 - [Quick Start](#-quick-start)
-    - [Prerequisites](#prerequisites)
-    - [One-Command Setup](#one-command-startup-)
-    - [Access Applications](#access-your-applications)
+  - [Prerequisites](#prerequisites)
+  - [One-Command Setup](#one-command-startup-)
+  - [Access Applications](#access-your-applications)
 - [Development](#-development)
-    - [Setup Instructions](#development-setup-with-docker-step-by-step)
-    - [Local Development](#local-development-without-docker)
+  - [Setup Instructions](#development-setup-with-docker-step-by-step)
+  - [Local Development](#local-development-without-docker)
 - [Testing](#-testing)
-    - [Running Tests](#quick-commands)
-    - [Coverage Requirements](#coverage-requirements)
+  - [Running Tests](#quick-commands)
+  - [Coverage Requirements](#coverage-requirements)
 - [Code Quality](#-code-quality--linting)
-    - [Linting & Formatting](#quick-commands-1)
-    - [Strict Standards](#strict-mode-enforcement)
+  - [Linting & Formatting](#quick-commands-1)
+  - [Strict Standards](#strict-mode-enforcement)
 - [API Documentation](#-api-documentation)
 - [Content Architecture](#-content-architecture)
 - [Internationalization](#-internationalization)
@@ -57,7 +58,8 @@
 - **🌍 Multi-Language Support**: English (default), Italian, and Hebrew with automatic RTL layout
 - **💱 Dynamic Currency**: Support for multiple currencies (USD, EUR, ILS, GBP, CAD, AUD, JPY, CNY) with user preferences
 - **🔍 SEO Optimized**: Comprehensive hreflang tags, schema markup, sitemaps, and breadcrumbs
-- **⚡ High Performance**: Static Site Generation (SSG) / Incremental Static Regeneration (ISR) with <3s load times and Lighthouse scores >90
+- **⚡ High Performance**: Static Site Generation (SSG) / Incremental Static Regeneration (ISR) with <3s load times and
+  Lighthouse scores >90
 - **🏗️ Clean Architecture**: Domain-driven design with clear separation of concerns and SOLID principles
 - **🧪 Test-First Development**: Comprehensive testing infrastructure with 80%+ coverage across all modules
 - **🔐 Secure**: Affiliate link generation, GDPR compliance, secure credential management
@@ -70,7 +72,8 @@
 
 ### System Design
 
-Affilibuster follows a **single source of truth** architecture where all content originates from Strapi CMS and flows through the backend to the frontend:
+Affilibuster follows a **single source of truth** architecture where all content originates from Strapi CMS and flows
+through the backend to the frontend:
 
 ```
 Frontend (Next.js 15, TypeScript)
@@ -194,7 +197,9 @@ affilibuster/                      # Monorepo root
 
 ## 🎯 Design Principles
 
-The Affilibuster project is built on a robust set of principles documented in [`.specify/memory/constitution.md`](.specify/memory/constitution.md). All code and features MUST adhere to these principles:
+The Affilibuster project is built on a robust set of principles documented in [
+`.specify/memory/constitution.md`](.specify/memory/constitution.md). All code and features MUST adhere to these
+principles:
 
 ### I. Clean Architecture
 
@@ -252,7 +257,8 @@ The Affilibuster project is built on a robust set of principles documented in [`
 
 ## 🔧 Backend Architecture
 
-The backend is a **BFF (Backend for Frontend)** service built with FastAPI that bridges Strapi CMS and the frontend application. It implements Clean Architecture with strict separation of concerns.
+The backend is a **BFF (Backend for Frontend)** service built with FastAPI that bridges Strapi CMS and the frontend
+application. It implements Clean Architecture with strict separation of concerns.
 
 ### Core Patterns
 
@@ -285,13 +291,14 @@ Routes depend on interfaces, not implementations, enabling easy testing and swap
 ```python
 # Domain layer (business logic)
 class IStrapiRepository(ABC):
-    @abstractmethod
-    async def get(self, path: str, params: Optional[Dict] = None): ...
+  @abstractmethod
+  async def get(self, path: str, params: Optional[Dict] = None): ...
+
 
 # Infrastructure layer (implementation)
 class StrapiRepositoryImpl(IStrapiRepository):
-    async def get(self, path: str, params: Optional[Dict] = None):
-        # httpx client, error handling, authentication
+  async def get(self, path: str, params: Optional[Dict] = None):
+# httpx client, error handling, authentication
 ```
 
 #### Centralized Dependency Injection
@@ -302,13 +309,14 @@ Single source of truth for singleton creation:
 # infrastructure/dependencies.py
 initialize_dependencies()  # Called once at startup
 
+
 # Routes receive injected dependencies
 @router.get("")
 async def handler(
-    strapi_repo: StrapiRepoDep,  # Type-safe, injected
-    cache_service: CacheServiceDep,
+  strapi_repo: StrapiRepoDep,  # Type-safe, injected
+  cache_service: CacheServiceDep,
 ):
-    ...
+  ...
 ```
 
 ### Smart Caching Strategy
@@ -637,43 +645,12 @@ uvicorn src.main:app --reload --port 8000
 
 **Code Style:**
 
-- **Formatter**: Black (120-character line width)
+- **Formatter**: Ruff
 - **Linter**: Ruff
 - **Type Checker**: Mypy (strict mode)
 
-**Format Code:**
-
-```bash
-cd backend
-black src/ tests/
-isort src/ tests/
-```
-
-**Check Types:**
-
-```bash
-mypy src/
-```
-
-**Check Linting:**
-
-```bash
-ruff check src/ tests/
-```
-
-**Type Safety & Mypy:**
-
-The project uses strict mypy configuration with pragmatic overrides for framework code:
-
-```toml
-[tool.mypy]
-python_version = "3.13"
-strict = true
-disallow_untyped_defs = false  # Pragmatic for decorators
-disallow_untyped_calls = false
-```
-
-All business logic is strictly typed. Framework integration code (routes, middleware) has relaxed checking due to FastAPI's dynamic nature.
+All business logic is strictly typed. Framework integration code (routes, middleware) has relaxed checking due to
+FastAPI's dynamic nature.
 
 **Adding New Endpoints:**
 
@@ -682,12 +659,12 @@ All business logic is strictly typed. Framework integration code (routes, middle
 ```python
 @router.get("/new-endpoint")
 async def get_new(
-    strapi_repo: StrapiRepoDep,
-    cache_service: CacheServiceDep,
+  strapi_repo: StrapiRepoDep,
+  cache_service: CacheServiceDep,
 ):
-    use_case = StrapiProxyGetUseCase(strapi_repo, cache_service)
-    data = await use_case.execute("/api/path", params={...})
-    return transform_response(data)
+  use_case = StrapiProxyGetUseCase(strapi_repo, cache_service)
+  data = await use_case.execute("/api/path", params={...})
+  return transform_response(data)
 ```
 
 2. **Define response model** in `infrastructure/api/models/__init__.py` or route file
@@ -696,11 +673,11 @@ async def get_new(
 
 ```python
 async def transform_response(strapi_data: Dict) -> YourModel:
-    attrs = strapi_data.get("attributes", strapi_data)
-    return YourModel(
-        field1=attrs.get("field1"),
-        field2=attrs.get("field2"),
-    )
+  attrs = strapi_data.get("attributes", strapi_data)
+  return YourModel(
+    field1=attrs.get("field1"),
+    field2=attrs.get("field2"),
+  )
 ```
 
 4. **Add comprehensive tests** in `tests/unit/`
@@ -786,17 +763,17 @@ Example test:
 ```python
 @pytest.mark.asyncio
 async def test_get_languages_with_cache(mocker):
-    # Arrange
-    cache_service = AsyncMock()
-    strapi_repo = AsyncMock()
-    use_case = StrapiProxyGetUseCase(strapi_repo, cache_service)
+  # Arrange
+  cache_service = AsyncMock()
+  strapi_repo = AsyncMock()
+  use_case = StrapiProxyGetUseCase(strapi_repo, cache_service)
 
-    # Act
-    result = await use_case.execute("/api/i18n/locales")
+  # Act
+  result = await use_case.execute("/api/i18n/locales")
 
-    # Assert
-    strapi_repo.get.assert_called_once()
-    cache_service.set.assert_called_once()
+  # Assert
+  strapi_repo.get.assert_called_once()
+  cache_service.set.assert_called_once()
 ```
 
 ### Coverage Requirements
@@ -822,7 +799,8 @@ This is by design - the test suite runs all modules to show all errors at once.
 make test && echo "✅ Ready to deploy" || echo "❌ Build failed"
 ```
 
-📖 **Full Testing Guide**: [specs/003-comprehensive-testing-strategy/quickstart.md](specs/003-comprehensive-testing-strategy/quickstart.md)
+📖 **Full Testing Guide
+**: [specs/003-comprehensive-testing-strategy/quickstart.md](specs/003-comprehensive-testing-strategy/quickstart.md)
 
 ---
 
@@ -850,11 +828,11 @@ make lint-shell-check          # Check shell only (ShellCheck)
 make lint-openapi-check        # Validate OpenAPI only (Redocly, check-only)
 
 # Format code
-make format                 # Format all code (Black, Prettier, shfmt)
+make format                 # Format all code (Ruff, Prettier, shfmt)
 make format-check           # Check formatting without making changes
 
 # Format specific types
-make format-python          # Format Python code (Black + isort)
+make format-python          # Format Python code (Ruff)
 make format-typescript      # Format TypeScript/JavaScript (Prettier)
 make format-shell           # Format shell scripts (shfmt)
 make format-makefile        # Validate Makefile (checkmake)
@@ -864,7 +842,7 @@ make format-makefile        # Validate Makefile (checkmake)
 
 | Language              | Linter     | Formatter | Validator     |
 |-----------------------|------------|-----------|---------------|
-| Python                | Ruff       | Black     | MyPy (strict) |
+| Python                | Ruff       | Ruff      | MyPy (strict) |
 | TypeScript/JavaScript | ESLint     | Prettier  | TypeScript    |
 | Bash                  | ShellCheck | shfmt     | N/A           |
 | OpenAPI               | Redocly    | N/A       | Redocly       |
@@ -883,23 +861,13 @@ All modules are configured in **strict mode**:
 
 ### Pre-commit Hooks
 
-Pre-commit hooks are automatically installed as part of `make setup`. They prevent accidental commits of badly formatted code:
+Pre-commit hooks are automatically installed as part of `make setup`. They prevent accidental commits of badly formatted
+code:
 
 ```bash
 # Hooks run automatically on every commit
 # To bypass: git commit --no-verify (not recommended)
 ```
-
-Configured hooks:
-
-- Auto-format code with Black, Prettier, shfmt
-- Fix imports with isort
-- Lint with Ruff, ESLint, ShellCheck, Redocly
-- Check for merge conflicts, trailing whitespace, etc.
-
-**Note**: If you skipped `make setup` and need to install hooks manually, pre-commit must be installed first: `python3 -m pip install pre-commit`, then `pre-commit install`.
-
----
 
 ## 📡 API Documentation
 
@@ -912,15 +880,15 @@ Affilibuster uses a **layered OpenAPI architecture** with auto-generated types f
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                    OpenAPI Specifications                    │
-├──────────────────────────┬──────────────────────────────────┤
-│ Layer 1: Strapi Content  │ Layer 2: Backend Services       │
-├──────────────────────────┼──────────────────────────────────┤
-│ • Product                │ • Currencies API                 │
-│ • Homepage               │ • Preferences API                │
-│ • Navigation             │ • Language Detection             │
-│ • Pages                  │ • Content Proxy Endpoints        │
-│ (i18n, rich fields)      │ (extends Strapi types)          │
-└──────────────────────────┴──────────────────────────────────┘
+├──────────────────────────┬───────────────────────────────────┤
+│ Layer 1: Strapi Content  │ Layer 2: Backend Services         │
+├──────────────────────────┼───────────────────────────────────┤
+│ • Product                │ • Currencies API                  │
+│ • Homepage               │ • Preferences API                 │
+│ • Navigation             │ • Language Detection              │
+│ • Pages                  │ • Content Proxy Endpoints         │
+│ (i18n, rich fields)      │ (extends Strapi types)            │
+└──────────────────────────┴───────────────────────────────────┘
          │                              │
          │ references via $ref          │
          └──────────────────────────────┘
@@ -1048,7 +1016,8 @@ API contracts are defined in OpenAPI 3.1.0 format:
 - **Generated TypeScript Types**: `shared/types/generated/` and re-exported from `shared/types/api.ts`
 - **Generated Python Models**: `backend/src/infrastructure/api/models/generated/models.py`
 
-**Key Principle**: OpenAPI specifications are the authoritative source of truth. Implementation follows the spec, not vice versa.
+**Key Principle**: OpenAPI specifications are the authoritative source of truth. Implementation follows the spec, not
+vice versa.
 
 #### Backend Error Handling
 
@@ -1219,9 +1188,9 @@ All content is localized in Strapi CMS:
 - **Image Optimization**: Next.js Image component with automatic optimization
 - **Code Splitting**: Automatic route-based code splitting
 - **Caching Strategy**:
-    - Backend caches products in Redis
-    - Browser cache headers configured
-    - CDN-friendly response structure
+  - Backend caches products in Redis
+  - Browser cache headers configured
+  - CDN-friendly response structure
 - **Compression**: Gzip compression for all text responses
 
 ---
@@ -1231,26 +1200,30 @@ All content is localized in Strapi CMS:
 ### Development Workflow
 
 1. **Feature Specifications** (specs/)
-    - Write feature spec defining **what** and **why**
-    - Implementation plan defining **how** (technical design)
-    - Task list defining **step-by-step** execution
+
+- Write feature spec defining **what** and **why**
+- Implementation plan defining **how** (technical design)
+- Task list defining **step-by-step** execution
 
 2. **Before Implementation**
-    - Create tests FIRST (TDD)
-    - Tests should FAIL initially (red phase)
-    - User approval on tests before implementation
+
+- Create tests FIRST (TDD)
+- Tests should FAIL initially (red phase)
+- User approval on tests before implementation
 
 3. **Implementation**
-    - Implement minimum code to pass tests (green phase)
-    - Refactor while keeping tests green
-    - Ensure code adheres to constitution principles
+
+- Implement minimum code to pass tests (green phase)
+- Refactor while keeping tests green
+- Ensure code adheres to constitution principles
 
 4. **Code Review Gates**
-    - Constitution compliance verification
-    - SOLID principles adherence check
-    - Test coverage validation (80%+)
-    - Performance impact assessment
-    - Security review for user-facing features
+
+- Constitution compliance verification
+- SOLID principles adherence check
+- Test coverage validation (80%+)
+- Performance impact assessment
+- Security review for user-facing features
 
 ### Contribution Guidelines
 
@@ -1268,25 +1241,29 @@ All content is localized in Strapi CMS:
 When adding new backend features:
 
 1. **Follow Clean Architecture pattern**
-    - Create repository interface in `domain/repositories/`
-    - Implement in `infrastructure/`
-    - Use dependency injection in routes
+
+- Create repository interface in `domain/repositories/`
+- Implement in `infrastructure/`
+- Use dependency injection in routes
 
 2. **Leverage Generic Use Cases**
-    - Use `StrapiProxyGetUseCase` for all GET requests
-    - Use `StrapiProxyMutateUseCase` for POST/PUT/DELETE
-    - No need to create individual use case classes
+
+- Use `StrapiProxyGetUseCase` for all GET requests
+- Use `StrapiProxyMutateUseCase` for POST/PUT/DELETE
+- No need to create individual use case classes
 
 3. **Implement Proper Caching**
-    - Set appropriate TTL based on data stability
-    - Use cache keys that support invalidation
-    - Test cache behavior in unit tests
+
+- Set appropriate TTL based on data stability
+- Use cache keys that support invalidation
+- Test cache behavior in unit tests
 
 4. **Write Comprehensive Tests**
-    - Unit tests for use cases and routes
-    - Mock all external dependencies (Strapi, Redis, PostgreSQL)
-    - Test both cache hit and miss scenarios
-    - Test error paths (400, 404, 502)
+
+- Unit tests for use cases and routes
+- Mock all external dependencies (Strapi, Redis, PostgreSQL)
+- Test both cache hit and miss scenarios
+- Test error paths (400, 404, 502)
 
 ### Documentation Requirements
 
