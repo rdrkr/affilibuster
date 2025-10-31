@@ -3,8 +3,36 @@
 
 set -o pipefail
 
-# Get the test mode (default|parallel|merge|merge-only)
+# Get the test mode
 MODE="${1:-default}"
+
+# Function to run backend tests
+run_backend_tests() {
+  local fast="${1:-false}"
+
+  if [[ "${fast}" = "true" ]]; then
+    echo "⚡ Running backend unit tests..."
+    docker-compose exec -T backend bash -c "cd /app && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest -m \"unit\" --tb=short" 2>&1 | tee /tmp/backend-test.log
+  else
+    echo "🧪 Running backend tests..."
+    docker-compose exec -T backend bash -c "cd /app && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest" 2>&1 | tee /tmp/backend-test.log
+  fi
+
+  return "${PIPESTATUS[0]}"
+}
+
+# Function to run frontend tests
+run_frontend_tests() {
+  echo "🧪 Running frontend tests..."
+  cd frontend && npm test -- --coverage \
+    --coverageReporters=lcov \
+    --coverageReporters=json \
+    --coverageReporters=html \
+    --coverageReporters=text 2>&1 | tee /tmp/frontend-test.log
+  local result="${PIPESTATUS[0]}"
+  cd ..
+  return "${result}"
+}
 
 # Function to run tests and display coverage summary
 run_tests() {
@@ -12,19 +40,26 @@ run_tests() {
 
   if [[ "${run_parallel}" = "true" ]]; then
     echo "🚀 Running all tests in parallel using available cores..."
-    make test-backend 2>&1 | tee /tmp/backend-test.log &
-    make test-frontend 2>&1 | tee /tmp/frontend-test.log &
-    wait
+    run_backend_tests false &
+    BACKEND_PID=$!
+    run_frontend_tests &
+    FRONTEND_PID=$!
+
+    wait "${BACKEND_PID}"
+    BACKEND_RESULT=$?
+    wait "${FRONTEND_PID}"
+    FRONTEND_RESULT=$?
+
+    test "${BACKEND_RESULT}" -eq 0 && test "${FRONTEND_RESULT}" -eq 0
+    return $?
   else
     echo "🧪 Running all tests..."
 
     # Run backend tests
-    make test-backend 2>&1 | tee /tmp/backend-test.log
-    test "${PIPESTATUS[0]}" -eq 0 || return 1
+    run_backend_tests false || return 1
 
     # Run frontend tests
-    make test-frontend 2>&1 | tee /tmp/frontend-test.log
-    test "${PIPESTATUS[0]}" -eq 0 || return 1
+    run_frontend_tests || return 1
   fi
 
   return 0
@@ -131,6 +166,21 @@ merge_coverage() {
 
 # Main logic based on mode
 case "${MODE}" in
+backend)
+  run_backend_tests false || exit 1
+  echo "✅ Backend tests passed!"
+  ;;
+
+backend-fast)
+  run_backend_tests true || exit 1
+  echo "✅ Backend unit tests passed!"
+  ;;
+
+frontend)
+  run_frontend_tests || exit 1
+  echo "✅ Frontend tests passed!"
+  ;;
+
 default)
   run_tests false || exit 1
   echo "✅ All tests passed!"
@@ -156,7 +206,7 @@ merge-only)
   ;;
 
 *)
-  echo "Usage: $0 {default|parallel|merge|merge-only}"
+  echo "Usage: $0 {backend|backend-fast|frontend|default|parallel|merge|merge-only}"
   exit 1
   ;;
 esac

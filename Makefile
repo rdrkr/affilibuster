@@ -105,23 +105,13 @@ logs-backend: ## View backend logs only
 	@docker-compose logs -f backend
 
 test-backend: ## Run backend tests with coverage
-	@echo "🧪 Running backend tests..."
-	@docker-compose exec -T backend pytest
-	@echo "✅ Backend tests complete"
+	@bash scripts/test.sh backend
 
 test-backend-fast: ## Run backend unit tests only (fast)
-	@echo "⚡ Running backend unit tests..."
-	@docker-compose exec -T backend pytest -m "unit" --tb=short
-	@echo "✅ Unit tests complete"
+	@bash scripts/test.sh backend-fast
 
 test-frontend: ## Run frontend tests with coverage
-	@echo "🧪 Running frontend tests..."
-	@cd frontend && npm test -- --coverage \
-		--coverageReporters=lcov \
-		--coverageReporters=json \
-		--coverageReporters=html \
-		--coverageReporters=text
-	@echo "✅ Frontend tests complete"
+	@bash scripts/test.sh frontend
 
 test: ## Run all tests with coverage (shows all errors)
 	@bash scripts/test.sh
