@@ -54,18 +54,9 @@ class Settings(BaseSettings):
 
     # Client
     internal_frontend_host: str
+    frontend_protocol: str
     frontend_host: str
     frontend_port: int
-
-    @property
-    def cors_origins(self) -> str:
-        """CORS origins as comma-separated string."""
-        return (
-            f"http://localhost:{self.frontend_port},"
-            f"http://127.0.0.1:{self.frontend_port},"
-            f"{self.frontend_host}:{self.frontend_port},"
-            f"{self.internal_frontend_host}:{self.frontend_port}"
-        )
 
     @property
     def database_url(self) -> str:
@@ -88,7 +79,10 @@ class Settings(BaseSettings):
     @property
     def cors_origins_list(self) -> list[str]:
         """Parse CORS origins from comma-separated string."""
-        return [self.strapi_url]
+        return [
+            f"{self.frontend_protocol}://{self.frontend_host}:{self.frontend_port}",
+            f"{self.frontend_protocol}://{self.internal_frontend_host}:{self.frontend_port}",
+        ]
 
     @property
     def is_production(self) -> bool:

@@ -6,28 +6,37 @@
  * Displays content by language and slug with ISR
  */
 
-import { contentAPI } from '@/lib/api'
+import { getProducts, getNavigation } from '@/lib/client'
 import { generateContentMetadata, SEOHead } from '@/components/SEOHead'
 import { notFound } from 'next/navigation'
 import { setRequestLocale } from 'next-intl/server'
+import type { Product, ContentResponse } from '@/lib/types'
+import { transformProductToContent } from '@/lib/transformers'
 
 interface NavigationData {
   availableInOtherLanguagesLabel?: string
 }
 
-interface ContentPageProps {
-  params: Promise<{
-    lang: string
-    slug: string
-  }>
-}
-
 // Generate metadata for SEO
-export async function generateMetadata({ params }: ContentPageProps) {
+export async function generateMetadata({ params }: { params: Promise<{ lang: string; slug: string }> }) {
   const { lang, slug } = await params
 
   try {
-    const content = await contentAPI.getBySlug(lang, slug)
+    const productsResponse = await getProducts()
+    if (!productsResponse) {
+      return {
+        title: undefined,
+        description: undefined,
+      }
+    }
+    const found = productsResponse.data.find((item: Product) => item.slug === slug)
+    if (!found) {
+      return {
+        title: undefined,
+        description: undefined,
+      }
+    }
+    const content = transformProductToContent(found, lang)
     return generateContentMetadata(content)
   } catch {
     return {
@@ -45,12 +54,14 @@ export async function generateStaticParams() {
   // Fetch content for each language
   for (const lang of languages) {
     try {
-      const content = await contentAPI.list(lang, 1, 100)
-      for (const item of content.data) {
-        params.push({
-          lang,
-          slug: item.slug,
-        })
+      const productsResponse = await getProducts()
+      if (productsResponse) {
+        for (const item of productsResponse.data) {
+          params.push({
+            lang,
+            slug: item.slug,
+          })
+        }
       }
     } catch (error) {
       console.error(`Failed to fetch content for ${lang}:`, error)
@@ -60,7 +71,7 @@ export async function generateStaticParams() {
   return params
 }
 
-export default async function ContentPage({ params }: ContentPageProps) {
+export default async function ContentPage({ params }: { params: Promise<{ lang: string; slug: string }> }) {
   let lang = 'en'
   let slug = ''
 
@@ -82,19 +93,27 @@ export default async function ContentPage({ params }: ContentPageProps) {
     setRequestLocale(lang)
   }
 
-  let content!: ContentResponse
+  let product: Product | undefined
+  let content: ContentResponse | undefined
   let navData: NavigationData | null = null
 
   try {
-    content = await contentAPI.getBySlug(lang, slug)
+    const productsResponse = await getProducts()
+    if (!productsResponse) {
+      notFound()
+    }
+    product = productsResponse.data.find((item: Product) => item.slug === slug)
+    if (!product) {
+      notFound()
+    }
+    content = transformProductToContent(product, lang)
   } catch {
     notFound()
   }
 
   // Fetch navigation data for labels
   try {
-    const navResponse = await contentAPI.getSingleType(lang, 'navigation')
-    navData = navResponse?.data || navResponse
+    navData = await getNavigation()
   } catch (error) {
     console.error('Failed to fetch navigation:', error)
   }
@@ -113,15 +132,18 @@ export default async function ContentPage({ params }: ContentPageProps) {
 
           {/* Metadata */}
           <div className="flex items-center gap-4 mt-6 text-sm text-neutral-500 dark:text-neutral-400">
-            <time dateTime={content.publishedAt ? new Date(content.publishedAt).toISOString() : undefined}>
-              {content.publishedAt &&
-                new Date(content.publishedAt).toLocaleDateString(lang, {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-            </time>
-            <span>•</span>
+            {content.publishedAt && (
+              <>
+                <time dateTime={new Date(content.publishedAt).toISOString()}>
+                  {new Date(content.publishedAt).toLocaleDateString(lang, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </time>
+                <span>•</span>
+              </>
+            )}
             <span className="capitalize">{content.type}</span>
           </div>
         </header>
@@ -129,35 +151,29 @@ export default async function ContentPage({ params }: ContentPageProps) {
         {/* Content */}
         <div
           className="prose dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-secondary-600 prose-a:no-underline hover:prose-a:underline"
-          dangerouslySetInnerHTML={{ __html: content.body }}
+          dangerouslySetInnerHTML={{ __html: content.content }}
         />
 
         {/* Language Alternates */}
-        {Object.keys(content.translations).length > 0 && navData?.availableInOtherLanguagesLabel && (
-          <aside className="mt-12 p-6 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
-            <h2 className="text-lg font-semibold mb-4">{navData.availableInOtherLanguagesLabel}</h2>
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(content.translations).map(([lang, url]) => (
-                <a
-                  key={lang}
-                  href={url}
-                  className="px-4 py-2 bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors"
-                >
-                  {lang.toUpperCase()}
-                </a>
-              ))}
-            </div>
-          </aside>
-        )}
+        {content.translations &&
+          Object.keys(content.translations).length > 0 &&
+          navData?.availableInOtherLanguagesLabel && (
+            <aside className="mt-12 p-6 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
+              <h2 className="text-lg font-semibold mb-4">{navData.availableInOtherLanguagesLabel}</h2>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(content.translations).map(([lang, url]) => (
+                  <a
+                    key={lang}
+                    href={url}
+                    className="px-4 py-2 bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors"
+                  >
+                    {lang.toUpperCase()}
+                  </a>
+                ))}
+              </div>
+            </aside>
+          )}
       </article>
     </>
   )
 }
-
-// Enable ISR (Incremental Static Regeneration)
-// Revalidate every 60 seconds
-export const revalidate = 60
-
-// Generate pages at build time for the first 100 content items per language
-// Additional pages will be generated on-demand
-export const dynamicParams = true

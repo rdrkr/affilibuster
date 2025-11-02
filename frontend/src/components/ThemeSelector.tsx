@@ -8,7 +8,7 @@
 'use client'
 
 import { useState, useEffect, ReactNode } from 'react'
-import { contentAPI } from '@/lib/api'
+import { getNavigation } from '@/lib/client'
 import { usePathname } from 'next/navigation'
 
 type Theme = 'light' | 'dark' | 'system'
@@ -53,12 +53,7 @@ export function ThemeSelector() {
   useEffect(() => {
     async function fetchNavigation() {
       try {
-        // Extract language from pathname
-        const pathParts = pathname.split('/').filter(Boolean)
-        const lang = pathParts[0] === 'it' || pathParts[0] === 'he' || pathParts[0] === 'en' ? pathParts[0] : 'en'
-
-        const data = await contentAPI.getSingleType(lang, 'navigation')
-        const navContent = data?.data || data
+        const navContent = await getNavigation()
         if (navContent) {
           setNavData(navContent)
         }

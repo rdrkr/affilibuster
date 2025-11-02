@@ -52,7 +52,7 @@ async def transform_strapi_locales_to_languages(
         )
         languages.append(lang)
 
-    return sorted(languages, key=lambda x: (x.code != "en", x.code))
+    return sorted(languages, key=lambda x: (x.code.value != "en", x.code.value))
 
 
 @router.get("", response_model=LanguagesGetResponse)
@@ -102,7 +102,7 @@ async def detect_language(
         # Get available languages from Strapi
         locale_data = await use_case.execute("/i18n/locales")
         languages = await transform_strapi_locales_to_languages(locale_data)
-        available_codes = {lang.code for lang in languages}
+        available_codes = {lang.code.value for lang in languages}
 
         # Find first browser language that's available
         detected_lang = "en"

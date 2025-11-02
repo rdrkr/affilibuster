@@ -9,7 +9,8 @@
 'use client'
 
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
-import { languagesAPI } from '@/lib/api'
+import { getLanguages } from '@/lib/client'
+import type { Language } from '@/lib/types'
 
 interface LocaleContextValue {
   locale: string
@@ -36,11 +37,12 @@ export function LocaleProvider({ children, initialLocale = 'en' }: LocaleProvide
 
   useEffect(() => {
     // Fetch language details
-    languagesAPI
-      .getAll()
+    getLanguages()
       .then(languages => {
-        const found = languages.find(l => l.code === locale)
-        setLanguage(found || null)
+        if (languages) {
+          const found = languages.find(l => l.code === locale)
+          setLanguage(found || null)
+        }
       })
       .catch(console.error)
   }, [locale])

@@ -61,24 +61,6 @@ class TestCorsOriginsListProperty:
         result = settings.cors_origins_list
         assert isinstance(result, list)
         assert len(result) >= 1
-        assert settings.strapi_url in result
-
-    def test_cors_origins_property_returns_string(self):
-        """Test cors_origins property returns comma-separated string."""
-        settings = Settings()
-        result = settings.cors_origins
-        assert isinstance(result, str)
-        assert "localhost" in result
-        assert ":" in result  # Contains port numbers
-
-    def test_cors_origins_includes_frontend_hosts(self):
-        """Test cors_origins includes frontend hosts."""
-        settings = Settings()
-        cors_str = settings.cors_origins
-        # Should include localhost variant
-        assert "localhost" in cors_str
-        # Should include the configured frontend host
-        assert settings.frontend_host in cors_str or "127.0.0.1" in cors_str
 
 
 class TestIsProductionProperty:

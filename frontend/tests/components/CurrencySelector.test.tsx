@@ -283,7 +283,9 @@ describe('CurrencySelector Component', () => {
     render(<CurrencySelector />)
 
     await waitFor(() => {
-      const buttonText = screen.getByRole('button', { name: /select currency/i }).textContent
+      const buttonText = screen.getByRole('button', {
+        name: /select currency/i,
+      }).textContent
       // Should contain both symbol (€) and code (EUR)
       expect(buttonText).toContain('€')
       expect(buttonText).toContain('EUR')

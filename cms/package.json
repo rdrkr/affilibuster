@@ -4,15 +4,21 @@
   "private": true,
   "description": "Affiliate platform CMS",
   "scripts": {
-    "develop": "strapi develop",
-    "start": "strapi start",
-    "build": "strapi build",
     "strapi": "strapi",
+    "openapi:generate": "strapi openapi generate --output ../contracts/strapi.openapi.yaml && npx tsx ./scripts/merge-openapi.ts && npx @redocly/cli lint /contracts/strapi.openapi.yaml && npx @redocly/cli lint /contracts/affilibuster.openapi.yaml",
     "lint": "eslint --max-warnings 0 .",
-    "lint:fix": "eslint --fix .",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "openapi:generate": "strapi openapi generate --output ../contracts/strapi.openapi.yaml"
+    "lint:fix": "eslint --fix --max-warnings 0 .",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "type-check": "tsc --noEmit -p tsconfig.json",
+    "preflight": "npm run openapi:generate && npm run format:fix && npm run lint:fix",
+    "dev": "npm run preflight && strapi develop",
+    "develop": "npm run dev",
+    "prebuild": "npm run preflight",
+    "build": "strapi build",
+    "clean": "rm -rf coverage node_modules build .tmp .strapi dist public types ../contracts/strapi.openapi.yaml ../contracts/affilibuster.openapi.yaml",
+    "prestart": "npm run build",
+    "start": "strapi start"
   },
   "dependencies": {
     "@strapi/strapi": "^5.28.0",
@@ -52,7 +58,7 @@
     ]
   },
   "strapi": {
-    "uuid": "00000000-0000-0000-0000-000000000000"
+    "uuid": "f7dd1be1-42f2-4868-a3da-645d455df353"
   },
   "engines": {
     "node": ">=20.0.0 <=22.x.x",

@@ -6,6 +6,7 @@ version = "0.1.0"
 description = "Multi-language affiliate platform backend API"
 authors = [{ name = "Affilibuster Team" }]
 requires-python = ">=3.13"
+readme = "../README.md"
 dependencies = [
   "fastapi==0.120.4",
   "uvicorn[standard]>=0.34.0",
@@ -71,11 +72,13 @@ docstring-code-format = true
 [tool.datamodel-codegen]
 field-constraints = true
 snake-case-field = true
+no-alias = false # allow camelCase aliases
 strip-default-none = false
 target-python-version = "3.13"
 use-schema-description = true
 use-field-description = true
 capitalize-enum-members = true
+formatters = ["ruff-format", "ruff-check"]
 input-file-type = "openapi"
 openapi-scopes = ["schemas", "paths", "tags", "parameters"]
 output-model-type = "pydantic_v2.BaseModel"

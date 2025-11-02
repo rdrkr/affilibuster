@@ -7,7 +7,9 @@
 
 import { setRequestLocale } from 'next-intl/server'
 import { Metadata } from 'next'
-import { contentAPI } from '@/lib/api'
+import { getAbout } from '@/lib/client'
+import type { ApiAboutAboutDocument } from '@/lib/generated/types.gen'
+import type { UiFeatureItemEntry } from '@/lib/types'
 
 // Important: Strapi CMS must be running during build for content to be fetched
 // Pages are rendered statically with ISR revalidation
@@ -21,11 +23,10 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { lang = 'en' } = await params
+  await params
 
   try {
-    const response = await contentAPI.getSingleType(lang, 'about')
-    const aboutData = response?.data || response
+    const aboutData = await getAbout()
 
     return {
       title: aboutData?.metaTitle,
@@ -56,16 +57,15 @@ export default async function AboutPage({ params }: Props) {
     setRequestLocale(lang)
   }
 
-  let aboutData: unknown = null
+  let aboutData: ApiAboutAboutDocument | null = null
   try {
-    const response = await contentAPI.getSingleType(lang, 'about')
-    aboutData = response?.data || response
+    aboutData = await getAbout()
   } catch (error) {
     console.error('Failed to fetch about page:', error)
   }
 
   // Don't render page if data is unavailable
-  if (!aboutData?.heroTitle || !aboutData?.missionTitle) {
+  if (!aboutData || !aboutData.heroTitle || !aboutData.missionTitle) {
     return null
   }
 
@@ -116,7 +116,7 @@ export default async function AboutPage({ params }: Props) {
                 {aboutData.featuresTitle}
               </h2>
               <div className="grid md:grid-cols-2 gap-6 my-8 not-prose">
-                {aboutData.featuresList.map((feature: unknown, index: number) => (
+                {aboutData.featuresList.map((feature: UiFeatureItemEntry, index: number) => (
                   <div
                     key={index}
                     className="bg-white dark:bg-neutral-800 p-6 rounded-xl border border-primary-200 dark:border-primary-700 shadow-sm"

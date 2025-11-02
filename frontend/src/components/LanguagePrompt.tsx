@@ -10,8 +10,9 @@
 
 import { useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { contentAPI, languagesAPI, preferencesAPI } from '@/lib/api'
+import { getNavigation, getLanguages, detectLanguage, getUserPreferences, updateUserPreferences } from '@/lib/client'
 import { useSession } from '@/hooks/useSession'
+import type { Language } from '@/lib/types'
 
 interface NavigationData {
   promptTitleTemplate?: string
@@ -40,10 +41,8 @@ export function LanguagePrompt() {
     else if (firstSegment === 'he') lang = 'he'
 
     // Fetch navigation data from CMS
-    contentAPI
-      .getSingleType(lang, 'navigation')
-      .then(data => {
-        const navContent = data?.data || data
+    getNavigation()
+      .then(navContent => {
         if (navContent) {
           setNavData(navContent)
         }
@@ -51,27 +50,24 @@ export function LanguagePrompt() {
       .catch(console.error)
 
     // Check preferences and detect language
-    preferencesAPI
-      .get()
+    getUserPreferences()
       .then(prefs => {
         // Don't show if user already dismissed
-        if (prefs.dismissedLanguagePrompt) return
+        if (!prefs || prefs.dismissedLanguagePrompt) return
 
         // Detect language from browser
-        languagesAPI
-          .detect({
-            acceptLanguage: navigator.language,
-            userAgent: navigator.userAgent,
-          })
+        detectLanguage(navigator.language, navigator.userAgent)
           .then(async result => {
-            if (result.shouldPrompt && result.detectedLanguage !== lang) {
+            if (result && result.shouldPrompt && result.detectedLanguage !== lang) {
               setDetectedLang(result.detectedLanguage)
 
               // Get language details
-              const languages = await languagesAPI.getAll()
-              const detected = languages.find(l => l.code === result.detectedLanguage)
-              setDetectedLanguage(detected || null)
-              setShow(true)
+              const languages = await getLanguages()
+              if (languages) {
+                const detected = languages.find(l => l.code === result.detectedLanguage)
+                setDetectedLanguage(detected || null)
+                setShow(true)
+              }
             }
           })
           .catch(console.error)
@@ -84,9 +80,9 @@ export function LanguagePrompt() {
 
     try {
       // Update preferences
-      await preferencesAPI.update({
+      await updateUserPreferences({
         dismissedLanguagePrompt: true,
-        detectedLanguage: detectedLang,
+        detectedLanguage: detectedLanguage.code as 'en' | 'it' | 'he',
       })
 
       // Navigate to detected language
@@ -107,7 +103,7 @@ export function LanguagePrompt() {
 
   const handleDismiss = async () => {
     try {
-      await preferencesAPI.update({ dismissedLanguagePrompt: true })
+      await updateUserPreferences({ dismissedLanguagePrompt: true })
       setShow(false)
     } catch (error) {
       console.error('Failed to dismiss prompt:', error)

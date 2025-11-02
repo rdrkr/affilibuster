@@ -6,17 +6,16 @@
  */
 
 import type { Metadata } from 'next'
-import { contentAPI } from '@/lib/api'
+import { getNavigation } from '@/lib/client'
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const response = await contentAPI.getSingleType('en', 'navigation')
-    const navData = response?.data || response
+    const navData = await getNavigation()
 
     return {
-      title: navData?.siteTitle || navData?.title,
-      description: navData?.siteDescription || navData?.description,
-      keywords: navData?.siteKeywords || navData?.keywords,
+      title: navData?.siteTitle || navData?.brandName,
+      description: navData?.siteDescription,
+      keywords: typeof navData?.siteKeywords === 'string' ? navData.siteKeywords.split(',') : undefined,
     }
   } catch (error) {
     console.error('Failed to fetch root metadata:', error)

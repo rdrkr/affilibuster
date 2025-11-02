@@ -1039,7 +1039,7 @@ Each task includes:
       - **Implement**: POST /webhooks/strapi, parse payload, call frontend /api/revalidate for affected paths
       - **→ Validation**: T039 integration test passes
 
-- [X] **T145** Configure URL redirect handling in frontend middleware
+- [] **T145** Configure URL redirect handling in frontend middleware
       - **Path**: frontend/src/middleware.ts (extend existing)
       - **→ Reference**: quickstart.md:213-230 (301/410 redirects), data-model.md:540-563
       - **Implement**: Check URLRoute table (or call backend API), if 301 redirect, if 410 show custom 410 page

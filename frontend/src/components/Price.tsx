@@ -9,8 +9,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { currenciesAPI, preferencesAPI } from '@/lib/api'
+import { getCurrencies, getUserPreferences } from '@/lib/client'
 import { useSession } from '@/hooks/useSession'
+import type { Currency } from '@/lib/types'
 
 interface PriceProps {
   amount: number
@@ -28,12 +29,14 @@ export function Price({ amount, currencyCode = 'USD', showCurrencyCode = true, c
     if (!sessionId) return
 
     // Get user's preferred currency and all currencies
-    Promise.all([currenciesAPI.getAll(), preferencesAPI.get().catch(() => null)])
+    Promise.all([getCurrencies(), getUserPreferences().catch(() => null)])
       .then(([currencies, prefs]) => {
         const targetCurrency = prefs?.selectedCurrency || currencyCode
 
-        const found = currencies.find(c => c.code === targetCurrency)
-        setCurrency(found || null)
+        if (currencies) {
+          const found = currencies.find((c: Currency) => c.code === targetCurrency)
+          setCurrency(found || null)
+        }
       })
       .catch(console.error)
       .finally(() => setLoading(false))

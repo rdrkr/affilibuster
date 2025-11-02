@@ -6,7 +6,6 @@
 
 import { renderHook, waitFor } from '@testing-library/react'
 import { useSession } from './useSession'
-import { apiClient } from '@/lib/api'
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -39,13 +38,6 @@ Object.defineProperty(global, 'crypto', {
   },
 })
 
-// Mock apiClient
-jest.mock('@/lib/api', () => ({
-  apiClient: {
-    setSessionId: jest.fn(),
-  },
-}))
-
 describe('useSession', () => {
   beforeEach(() => {
     localStorageMock.clear()
@@ -68,14 +60,6 @@ describe('useSession', () => {
     })
   })
 
-  it('should set session ID on apiClient', async () => {
-    renderHook(() => useSession())
-
-    await waitFor(() => {
-      expect(apiClient.setSessionId).toHaveBeenCalledWith('test-uuid-1234')
-    })
-  })
-
   it('should reuse existing session ID from localStorage', async () => {
     localStorageMock.setItem('affilibuster_session_id', 'existing-session-456')
 
@@ -87,16 +71,6 @@ describe('useSession', () => {
 
     // Should not generate new UUID
     expect(crypto.randomUUID).not.toHaveBeenCalled()
-  })
-
-  it('should set existing session ID on apiClient', async () => {
-    localStorageMock.setItem('affilibuster_session_id', 'existing-session-789')
-
-    renderHook(() => useSession())
-
-    await waitFor(() => {
-      expect(apiClient.setSessionId).toHaveBeenCalledWith('existing-session-789')
-    })
   })
 
   it('should generate different UUIDs on multiple renders', async () => {

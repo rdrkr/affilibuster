@@ -8,27 +8,18 @@
 
 import { setRequestLocale } from 'next-intl/server'
 import { Metadata } from 'next'
-import { contentAPI } from '@/lib/api'
+import { getTerm } from '@/lib/client'
+import type { ApiTermTermDocument } from '@/lib/generated/types.gen'
 
 type Props = {
   params: Promise<{ lang: string }>
 }
 
-interface TermData {
-  title?: string
-  lastUpdated?: string
-  lastUpdatedLabel?: string
-  content?: string
-  metaTitle?: string
-  metaDescription?: string
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { lang = 'en' } = await params
+  await params
 
   try {
-    const response = await contentAPI.getSingleType(lang, 'term')
-    const termData = response?.data || response
+    const termData = await getTerm()
 
     return {
       title: termData?.metaTitle,
@@ -49,7 +40,7 @@ export function generateStaticParams() {
 
 export default async function TermsPage({ params }: Props) {
   let lang = 'en'
-  let termData: TermData = {}
+  let termData: ApiTermTermDocument | null = null
 
   try {
     const resolvedParams = await params
@@ -67,14 +58,13 @@ export default async function TermsPage({ params }: Props) {
 
   // Fetch term content from backend API
   try {
-    const response = await contentAPI.getSingleType(lang, 'term')
-    termData = response?.data || response
+    termData = await getTerm()
   } catch (error) {
     console.error('Failed to fetch term content:', error)
   }
 
   // Don't render page if data is unavailable
-  if (!termData.title || !termData.content) {
+  if (!termData || !termData.title || !termData.content) {
     return null
   }
 

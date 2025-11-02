@@ -8,7 +8,7 @@
  * Reference: data-model.md:540-563 (URL Slug Change Flow)
  */
 
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000'
 
@@ -31,7 +31,7 @@ test.describe('URL Redirects - 301 Permanent Redirect', () => {
     }
 
     // Verify we ended up at the correct new URL
-    await expect(page).toHaveURL(/products\/[^\/]+/)
+    await expect(page).toHaveURL(/products\/[^\\/]+/)
 
     // Content should load correctly at new URL
     await expect(page.locator('h1')).toBeVisible()

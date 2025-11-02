@@ -7,7 +7,7 @@
  */
 
 import Link from 'next/link'
-import { contentAPI } from '@/lib/api'
+import { getError404 } from '@/lib/client'
 
 type Props = {
   params: Promise<{ lang: string }>
@@ -27,8 +27,7 @@ export default async function NotFoundPage({ params }: Props) {
   let errorData = null
   try {
     // Try to fetch error-404 content from Strapi with language fallback
-    const response = await contentAPI.getSingleType(lang, 'error-404')
-    errorData = response?.data || response
+    errorData = await getError404()
   } catch (error) {
     console.error('Failed to fetch 404 error page:', error)
   }

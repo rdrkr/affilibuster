@@ -10,7 +10,7 @@ echo "  🔐 Loading environment variables..."
 . /app/.env
 
 echo "  🔄 Installing dependencies (including dev)..."
-uv sync --all-extras
+uv sync --quiet --all-extras
 #shellcheck disable=SC1091
 . /app/.venv/bin/activate
 

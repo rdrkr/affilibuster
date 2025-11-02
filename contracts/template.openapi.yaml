@@ -497,6 +497,212 @@ components:
         - data
         - pagination
 
+    Currency:
+      type: object
+      description: Currency configuration and metadata
+      properties:
+        documentId:
+          type: string
+          format: uuid
+          description: The document ID, represented by a UUID
+        id:
+          type: number
+          description: Internal ID
+        code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: ISO 4217 currency code (e.g., USD, EUR, ILS)
+          example: 'USD'
+        name:
+          type: string
+          description: Full currency name
+          example: 'US Dollar'
+        symbol:
+          type: string
+          description: Currency symbol
+          example: '$'
+        displayName:
+          type: string
+          description: Display name for UI
+          example: 'USD ($)'
+        decimalPlaces:
+          type: integer
+          minimum: 0
+          maximum: 8
+          default: 2
+          description: Number of decimal places for amounts
+        symbolPosition:
+          type: string
+          enum: [ before, after ]
+          default: before
+          description: Whether symbol appears before or after amount
+        thousandsSeparator:
+          type: string
+          default: ','
+          description: Thousands separator character
+        decimalSeparator:
+          type: string
+          default: '.'
+          description: Decimal separator character
+        exchangeRate:
+          type: number
+          default: 1
+          description: Exchange rate relative to base currency
+        sortOrder:
+          type: integer
+          default: 0
+          description: Display order in currency lists
+        isActive:
+          type: boolean
+          default: true
+          description: Whether currency is currently available
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        publishedAt:
+          type: string
+          format: date-time
+      required:
+        - documentId
+        - id
+        - code
+        - name
+        - symbol
+        - displayName
+        - decimalPlaces
+        - symbolPosition
+        - thousandsSeparator
+        - decimalSeparator
+        - exchangeRate
+        - sortOrder
+        - isActive
+        - publishedAt
+
+    Navigation:
+      type: object
+      description: Navigation menu configuration
+      properties:
+        brandName:
+          type: string
+          example: 'Affilibuster'
+        homeLabel:
+          type: string
+          example: 'Home'
+        productsLabel:
+          type: string
+          example: 'Products'
+        aboutLabel:
+          type: string
+          example: 'About'
+        contactLabel:
+          type: string
+          example: 'Contact'
+        languageSelectorLabel:
+          type: string
+          example: 'Language'
+        currencySelectorLabel:
+          type: string
+          example: 'Currency'
+        themeSelectorLabel:
+          type: string
+          example: 'Theme'
+        themeLightLabel:
+          type: string
+          example: 'Light'
+        themeDarkLabel:
+          type: string
+          example: 'Dark'
+        themeSystemLabel:
+          type: string
+          example: 'System'
+        mobileMenuLabel:
+          type: string
+          example: 'Menu'
+        mobileMenuCloseLabel:
+          type: string
+          example: 'Close'
+        twitterLabel:
+          type: string
+          example: 'Twitter'
+        facebookLabel:
+          type: string
+          example: 'Facebook'
+        currencySelectorAriaLabel:
+          type: string
+          example: 'Select currency'
+        languageSelectorAriaLabel:
+          type: string
+          example: 'Select language'
+        themeSelectorAriaLabel:
+          type: string
+          example: 'Select theme'
+        browseProductsButton:
+          type: string
+          example: 'Browse Products'
+        promptTitleTemplate:
+          type: string
+          example: 'Language Preference'
+        promptMessageTemplate:
+          type: string
+          example: 'Would you like to switch to {language}?'
+        yesButtonTemplate:
+          type: string
+          example: 'Yes'
+        noButtonText:
+          type: string
+          example: 'No'
+
+    Footer:
+      type: object
+      description: Footer content and links
+      properties:
+        brandDescription:
+          type: string
+          example: 'High-quality sustainable products for modern living'
+        quickLinksTitle:
+          type: string
+          example: 'Quick Links'
+        privacyPolicyLabel:
+          type: string
+          example: 'Privacy Policy'
+        termsOfServiceLabel:
+          type: string
+          example: 'Terms of Service'
+        contactLabel:
+          type: string
+          example: 'Contact'
+        aboutUsLabel:
+          type: string
+          example: 'About Us'
+        newsletterTitle:
+          type: string
+          example: 'Newsletter'
+        newsletterDescription:
+          type: string
+          example: 'Subscribe to get updates'
+        subscribeButton:
+          type: string
+          example: 'Subscribe'
+        emailPlaceholder:
+          type: string
+          example: 'your@email.com'
+        copyrightText:
+          type: string
+          example: 'Affilibuster. All rights reserved.'
+        footerTagline:
+          type: string
+          example: 'Sustainable living starts here'
+        twitterAriaLabel:
+          type: string
+          example: 'Follow us on Twitter'
+        facebookAriaLabel:
+          type: string
+          example: 'Follow us on Facebook'
+
   securitySchemes:
     SessionAuth:
       type: apiKey

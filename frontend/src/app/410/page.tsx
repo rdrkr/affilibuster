@@ -9,7 +9,7 @@
 
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { contentAPI } from '@/lib/api'
+import { getError410 } from '@/lib/client'
 
 /**
  * Generate metadata for 410 error page
@@ -17,8 +17,7 @@ import { contentAPI } from '@/lib/api'
  */
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const response = await contentAPI.getSingleType('en', 'error-410')
-    const errorData = response?.data || response
+    const errorData = await getError410()
 
     return {
       title: errorData?.metaTitle,
@@ -44,8 +43,7 @@ export default async function GonePage() {
   let errorData = null
   try {
     // Try to fetch error-410 content from Strapi
-    const response = await contentAPI.getSingleType('en', 'error-410')
-    errorData = response?.data || response
+    errorData = await getError410()
   } catch (error) {
     console.error('Failed to fetch 410 error page:', error)
   }

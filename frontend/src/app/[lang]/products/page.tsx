@@ -5,10 +5,12 @@
  * Shows all products for the current language
  */
 
-import { contentAPI } from '@/lib/api'
+import { getProductPage, getProducts } from '@/lib/client'
 import Link from 'next/link'
 import { setRequestLocale } from 'next-intl/server'
 import { Metadata } from 'next'
+import type { ApiProductPageProductPageDocument } from '@/lib/generated/types.gen'
+import type { Product } from '@/lib/types'
 
 type Props = {
   params: Promise<{ lang: string }>
@@ -20,11 +22,10 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { lang = 'en' } = await params
+  await params
 
   try {
-    const response = await contentAPI.getSingleType(lang, 'product-page')
-    const productsPageData = response?.data || response
+    const productsPageData = await getProductPage()
 
     return {
       title: productsPageData?.metaTitle,
@@ -58,24 +59,27 @@ export default async function ProductsPage({ params, searchParams }: Props) {
     setRequestLocale(lang)
   }
 
-  let content: unknown
-  let productsPageData: unknown = null
+  let products: Product[] = []
+  let productsPageData: ApiProductPageProductPageDocument | null = null
 
   try {
-    // Fetch products page metadata and content
-    const pageResponse = await contentAPI.getSingleType(lang, 'product-page')
-    productsPageData = pageResponse?.data || pageResponse
+    // Fetch products page metadata
+    productsPageData = await getProductPage()
 
     // Fetch products list
-    content = await contentAPI.list(lang, currentPage, 24)
+    const productsResponse = await getProducts({
+      'pagination[page]': currentPage,
+      'pagination[pageSize]': 24,
+    })
+
+    if (productsResponse) {
+      products = productsResponse.data
+    }
   } catch (error) {
     console.error('Failed to fetch products:', error)
     // Don't render error page if CMS data unavailable
     return null
   }
-
-  // Filter to only show products (not pages)
-  const products = content.data.filter((item: unknown) => item.type === 'product')
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -97,7 +101,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
       {products.length > 0 ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((item: unknown) => (
+            {products.map(item => (
               <Link
                 key={item.id}
                 href={`/${lang}/${item.slug}`}
@@ -129,46 +133,18 @@ export default async function ProductsPage({ params, searchParams }: Props) {
           </div>
 
           {/* Pagination - Only show if CMS button labels available */}
-          {content.pagination.totalPages > 1 && productsPageData?.previousButton && productsPageData?.nextButton && (
+          {currentPage > 1 && productsPageData?.previousButton && (
             <div className="mt-12 flex items-center justify-center gap-2">
-              {/* Previous Button */}
-              {content.pagination.hasPrevious && (
-                <Link
-                  href={`/${lang}/products?page=${currentPage - 1}`}
-                  className="px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
-                >
-                  {productsPageData.previousButton}
-                </Link>
-              )}
+              <Link
+                href={`/${lang}/products?page=${currentPage - 1}`}
+                className="px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
+              >
+                {productsPageData.previousButton}
+              </Link>
 
-              {/* Page Numbers */}
-              <div className="flex items-center gap-2">
-                {Array.from({ length: content.pagination.totalPages }, (_, i) => i + 1)
-                  .filter(page => {
-                    // Show first page, last page, current page, and 2 pages around current
-                    return page === 1 || page === content.pagination.totalPages || Math.abs(page - currentPage) <= 2
-                  })
-                  .map((page, index, array) => (
-                    <div key={page} className="flex items-center gap-2">
-                      {/* Show ellipsis if there's a gap */}
-                      {index > 0 && page - array[index - 1] > 1 && <span className="text-neutral-400">...</span>}
+              <span className="text-sm text-neutral-600 dark:text-neutral-400">Page {currentPage}</span>
 
-                      <Link
-                        href={`/${lang}/products?page=${page}`}
-                        className={`px-4 py-2 border rounded-md transition-colors ${
-                          page === currentPage
-                            ? 'bg-secondary-600 text-white border-secondary-600'
-                            : 'bg-white dark:bg-neutral-800 border-neutral-300 dark:border-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-700'
-                        }`}
-                      >
-                        {page}
-                      </Link>
-                    </div>
-                  ))}
-              </div>
-
-              {/* Next Button */}
-              {content.pagination.hasNext && (
+              {products.length === 24 && productsPageData?.nextButton && (
                 <Link
                   href={`/${lang}/products?page=${currentPage + 1}`}
                   className="px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
@@ -179,21 +155,12 @@ export default async function ProductsPage({ params, searchParams }: Props) {
             </div>
           )}
 
-          {/* Pagination Info - Only show if CMS templates available */}
+          {/* Pagination Info - Only show if CMS template available */}
           {productsPageData?.showingText && (
             <div className="mt-8 text-center text-sm text-neutral-600 dark:text-neutral-400">
               {productsPageData.showingText
                 .replace('{count}', String(products.length))
-                .replace('{total}', String(content.pagination.totalItems))}
-              {content.pagination.totalPages > 1 && productsPageData?.pageText && (
-                <>
-                  {' '}
-                  ·{' '}
-                  {productsPageData.pageText
-                    .replace('{current}', String(currentPage))
-                    .replace('{total}', String(content.pagination.totalPages))}
-                </>
-              )}
+                .replace('{total}', String(products.length))}
             </div>
           )}
         </>
@@ -205,6 +172,3 @@ export default async function ProductsPage({ params, searchParams }: Props) {
     </div>
   )
 }
-
-// Enable ISR (Incremental Static Regeneration)
-export const revalidate = 60 // Revalidate every 60 seconds

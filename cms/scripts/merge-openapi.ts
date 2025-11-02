@@ -376,19 +376,34 @@ function addStrapiLicense(spec: OpenAPISpec): OpenAPISpec {
 function addStrapiTags(spec: OpenAPISpec): OpenAPISpec {
   const tags = [
     { name: 'about', description: 'About page content management' },
-    { name: 'contact', description: 'Contact page content and contact information' },
-    { name: 'content-type-builder', description: 'Strapi content type schema introspection' },
-    { name: 'currency', description: 'Currency configuration and exchange rates' },
+    {
+      name: 'contact',
+      description: 'Contact page content and contact information',
+    },
+    {
+      name: 'content-type-builder',
+      description: 'Strapi content type schema introspection',
+    },
+    {
+      name: 'currency',
+      description: 'Currency configuration and exchange rates',
+    },
     { name: 'error-404', description: '404 error page content' },
     { name: 'error-410', description: '410 Gone error page content' },
     { name: 'footer', description: 'Footer content and links' },
     { name: 'homepage', description: 'Homepage content and hero sections' },
-    { name: 'i18n', description: 'Internationalization (i18n) locale management' },
+    {
+      name: 'i18n',
+      description: 'Internationalization (i18n) locale management',
+    },
     { name: 'navigation', description: 'Navigation menu structure and items' },
     { name: 'privacy', description: 'Privacy policy content' },
     { name: 'product', description: 'Product catalog and details' },
     { name: 'product-page', description: 'Product page layout and content' },
-    { name: 'system-message', description: 'System-wide messages and notifications' },
+    {
+      name: 'system-message',
+      description: 'System-wide messages and notifications',
+    },
     { name: 'term', description: 'Terms and conditions content' },
     { name: 'upload', description: 'File upload and media library management' },
   ]

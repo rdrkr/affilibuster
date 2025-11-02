@@ -117,16 +117,13 @@ all)
 esac
 
 # Print result
+if [[ ${LINT_FAILED} -ne 0 ]]; then
+  echo "❌ Linting failed"
+  exit "${LINT_FAILED}"
+fi
+
 if [[ "${ACTION}" = "check" ]]; then
-  if [[ ${LINT_FAILED} -ne 0 ]]; then
-    echo "  ❌ Linting failed"
-    exit "${LINT_FAILED}"
-  fi
   echo "✅ Linting complete"
 else
-  if [[ ${LINT_FAILED} -ne 0 ]]; then
-    echo "  ⚠️ Some linters had issues (non-critical)"
-    exit "${LINT_FAILED}"
-  fi
   echo "✅ All auto-fixes complete"
 fi

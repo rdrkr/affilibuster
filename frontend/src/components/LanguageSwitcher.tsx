@@ -10,7 +10,8 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { contentAPI, languagesAPI } from '@/lib/api'
+import { getLanguages, getNavigation } from '@/lib/client'
+import type { Language } from '@/lib/types'
 
 interface NavigationData {
   languageSelectorAriaLabel?: string
@@ -19,7 +20,7 @@ interface NavigationData {
 export function LanguageSwitcher() {
   const pathname = usePathname()
   const router = useRouter()
-  const [languages, setLanguages] = useState<Language[]>([])
+  const [languages, setLanguages] = useState<Language[] | null>(null)
   const [currentLang, setCurrentLang] = useState('en')
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -36,14 +37,11 @@ export function LanguageSwitcher() {
     setCurrentLang(lang)
 
     // Fetch available languages and navigation data
-    Promise.all([languagesAPI.getAll(), contentAPI.getSingleType(lang, 'navigation').catch(() => null)])
+    Promise.all([getLanguages(), getNavigation().catch(() => null)])
       .then(([languagesData, navContent]) => {
         setLanguages(languagesData)
         if (navContent) {
-          const data = navContent?.data || navContent
-          if (data) {
-            setNavData(data)
-          }
+          setNavData(navContent)
         }
       })
       .catch(console.error)
@@ -60,6 +58,10 @@ export function LanguageSwitcher() {
     const pathWithoutLang = isCurrentPathLangPrefixed ? '/' + pathParts.slice(1).join('/') : pathname
 
     // Get the new language configuration
+    if (!languages) {
+      console.error('Languages not loaded')
+      return
+    }
     const language = languages.find(l => l.code === newLang)
     if (!language) {
       console.error(`Language ${newLang} not found`)
@@ -88,7 +90,7 @@ export function LanguageSwitcher() {
     setIsOpen(false)
   }
 
-  if (loading) {
+  if (loading || !languages) {
     return <div className="w-32 h-10 bg-primary-700 animate-pulse rounded-lg" />
   }
 

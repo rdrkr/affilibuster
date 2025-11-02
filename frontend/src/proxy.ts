@@ -1,11 +1,11 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 /**
- * Next.js Middleware for i18n routing, session management, and URL redirects
- * Reference: T124 (i18n proxy), T137 (Session ID generation), T145 (URL redirect handling)
+ * Next.js Middleware for i18n routing and session management
+ * Reference: T124 (i18n proxy), T137 (Session ID generation)
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import createIntlMiddleware from 'next-intl/middleware'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -18,60 +18,7 @@ const intlMiddleware = createIntlMiddleware({
   localeDetection: true,
 })
 
-/**
- * T145: Check for URL redirects (301/410) from backend
- */
-async function checkUrlRedirect(pathname: string): Promise<{
-  type: 'redirect' | 'gone' | 'none'
-  destination?: string
-} | null> {
-  try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL
-    if (!apiUrl) {
-      console.warn('NEXT_PUBLIC_API_URL not configured, skipping URL redirect check')
-      return null
-    }
-
-    // Call backend API to check if this URL has a redirect or is gone
-    // Note: apiUrl already includes /v1 from environment configuration
-    const response = await fetch(`${apiUrl}/url-routes/check?path=${encodeURIComponent(pathname)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      // Use short timeout for proxy
-      signal: AbortSignal.timeout(1000),
-    })
-
-    if (!response.ok) {
-      // No redirect found or API error
-      return null
-    }
-
-    return await response.json()
-  } catch (error) {
-    // If API is unreachable or times out, allow request to proceed
-    console.warn('URL redirect check failed:', error)
-    return null
-  }
-}
-
 export default async function proxy(request: NextRequest) {
-  const pathname = request.nextUrl.pathname
-
-  // T145: Check for URL redirects before proceeding
-  const redirectInfo = await checkUrlRedirect(pathname)
-
-  if (redirectInfo) {
-    if (redirectInfo.type === 'redirect' && redirectInfo.destination) {
-      // 301 Permanent Redirect
-      return NextResponse.redirect(new URL(redirectInfo.destination, request.url), { status: 301 })
-    } else if (redirectInfo.type === 'gone') {
-      // 410 Gone - redirect to custom 410 page
-      return NextResponse.rewrite(new URL('/410', request.url))
-    }
-  }
-
   // Handle i18n routing
   const response = intlMiddleware(request)
 

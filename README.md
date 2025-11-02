@@ -8,9 +8,10 @@
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 [![Python 3.13+](https://img.shields.io/badge/python-3.13%2B-blue)](https://www.python.org/)
 [![Node.js 22+](https://img.shields.io/badge/node.js-22%2B-green)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/typescript-5.3%2B-blue)](https://www.typescriptlang.org/)
-[![Next.js 15+](https://img.shields.io/badge/next.js-15%2B-black)](https://nextjs.org/)
-[![FastAPI](https://img.shields.io/badge/fastapi-0.115%2B-teal)](https://fastapi.tiangolo.com/)
+[![TypeScript](https://img.shields.io/badge/typescript-5.7%2B-blue)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/react-19%2B-blue)](https://reactjs.org/)
+[![Next.js 16+](https://img.shields.io/badge/next.js-16%2B-black)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/fastapi-0.120%2B-teal)](https://fastapi.tiangolo.com/)
 [![Strapi 5+](https://img.shields.io/badge/strapi-5%2B-purple)](https://strapi.io/)
 [![PostgreSQL](https://img.shields.io/badge/postgresql-15%2B-336791)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/docker-ready-blue)](https://www.docker.com/)
@@ -76,7 +77,7 @@ Affilibuster follows a **single source of truth** architecture where all content
 through the backend to the frontend:
 
 ```
-Frontend (Next.js 15, TypeScript)
+Frontend (Next.js 16, React 19, TypeScript)
   ↓ (API calls only)
 Backend API (FastAPI, Python 3.13)
   ↓ (syncs from)
@@ -104,7 +105,7 @@ affilibuster/                      # Monorepo root
 │   │   └── unit/                 # Unit tests
 │   └── alembic/                  # Database migrations
 │
-├── frontend/                      # Next.js 15 frontend
+├── frontend/                      # Next.js 16 frontend
 │   ├── src/
 │   │   ├── app/                  # Next.js App Router pages
 │   │   │   └── [lang]/           # Language-specific routes
@@ -149,8 +150,9 @@ affilibuster/                      # Monorepo root
 <details>
 <summary><b>Frontend</b></summary>
 
-- **Framework**: Next.js 15 (App Router, SSG/ISR)
-- **Language**: TypeScript 5.3+ (strict mode)
+- **Framework**: Next.js 16 (App Router, SSG/ISR)
+- **UI Library**: React 19
+- **Language**: TypeScript 5.7+ (strict mode)
 - **Styling**: Tailwind CSS 4 with RTL support
 - **Internationalization**: next-intl
 - **SEO**: next-seo with schema markup
@@ -162,7 +164,7 @@ affilibuster/                      # Monorepo root
 <details>
 <summary><b>Backend</b></summary>
 
-- **Framework**: FastAPI 0.115+ (async, OpenAPI/Swagger)
+- **Framework**: FastAPI 0.120+ (async, OpenAPI/Swagger)
 - **Language**: Python 3.13+ (strict typing with MyPy)
 - **Database**: PostgreSQL 15+ with SQLAlchemy ORM
 - **Cache**: Redis (session management, caching)
@@ -739,16 +741,6 @@ make coverage-merge        # Merge all module reports
 make coverage-view         # Open merged HTML report
 ```
 
-### Test Categories (Backend)
-
-```bash
-# Filter by test type using pytest markers
-docker-compose exec backend pytest -m "unit"           # Unit tests only
-docker-compose exec backend pytest -m "integration"    # Integration tests
-docker-compose exec backend pytest -m "contract"       # API contract tests
-docker-compose exec backend pytest -m "not slow"       # Skip slow tests
-```
-
 #### Backend Testing Patterns
 
 All backend tests follow these patterns:
@@ -758,51 +750,12 @@ All backend tests follow these patterns:
 - **In-Memory Database**: Use SQLite for database tests without external dependencies
 - **No External Services**: All integrations mocked (Strapi, Redis, PostgreSQL)
 
-Example test:
-
-```python
-@pytest.mark.asyncio
-async def test_get_languages_with_cache(mocker):
-  # Arrange
-  cache_service = AsyncMock()
-  strapi_repo = AsyncMock()
-  use_case = StrapiProxyGetUseCase(strapi_repo, cache_service)
-
-  # Act
-  result = await use_case.execute("/api/i18n/locales")
-
-  # Assert
-  strapi_repo.get.assert_called_once()
-  cache_service.set.assert_called_once()
-```
-
 ### Coverage Requirements
 
-| Module   | Target | Tool                                   |
-|----------|--------|----------------------------------------|
-| Backend  | 80%    | pytest + coverage.py                   |
-| Frontend | 80%    | Jest                                   |
-| CMS      | 60%    | Jest (lower due to Strapi boilerplate) |
-
-### Error Handling
-
-⚠️ **Important**: `make test` will **FAIL** (exit code ≠ 0) if:
-
-- Any test fails
-- Coverage falls below the required thresholds
-- Any module encounters errors
-
-This is by design - the test suite runs all modules to show all errors at once.
-
-```bash
-# Use in CI/CD pipelines
-make test && echo "✅ Ready to deploy" || echo "❌ Build failed"
-```
-
-📖 **Full Testing Guide
-**: [specs/003-comprehensive-testing-strategy/quickstart.md](specs/003-comprehensive-testing-strategy/quickstart.md)
-
----
+| Module   | Target | Tool                 |
+|----------|--------|----------------------|
+| Backend  | 94%    | pytest + coverage.py |
+| Frontend | 80%    | Jest                 |
 
 ## 🎨 Code Quality & Linting
 
@@ -847,17 +800,6 @@ make format-makefile        # Validate Makefile (checkmake)
 | Bash                  | ShellCheck | shfmt     | N/A           |
 | OpenAPI               | Redocly    | N/A       | Redocly       |
 | Makefile              | checkmake  | N/A       | N/A           |
-
-### Strict Mode Enforcement
-
-All modules are configured in **strict mode**:
-
-- ✅ No `any` types in TypeScript
-- ✅ All functions must have explicit return types
-- ✅ Comprehensive type coverage (95%+ for shared types)
-- ✅ Documentation required for all public APIs (Python)
-- ✅ No unused imports or variables
-- ✅ Consistent code style enforced
 
 ### Pre-commit Hooks
 
@@ -980,33 +922,6 @@ See [redocly.yaml](cms/redocly.yaml) for full configuration.
 - **ReDoc**: `/redoc`
 - **OpenAPI JSON**: `/openapi.json`
 
-#### Content Endpoints
-
-```bash
-# Get single type content (page, footer, etc.)
-GET /api/v1/content/single-types/{lang}/{type_name}
-
-# Examples
-GET /api/v1/content/single-types/en/homepage
-GET /api/v1/content/single-types/it/privacy
-GET /api/v1/content/single-types/he/about
-
-# List products (with pagination)
-GET /api/v1/content/{lang}?page=1&pageSize=20
-
-# Get specific product
-GET /api/v1/content/{lang}/{slug}
-
-# Health check
-GET /health
-```
-
-#### Supported Languages
-
-- `en` - English (default)
-- `it` - Italian
-- `he` - Hebrew
-
 ### API Contracts
 
 API contracts are defined in OpenAPI 3.1.0 format:
@@ -1124,40 +1039,6 @@ That's it! Backend automatically syncs new language on next startup. **Zero back
 4. **No Fallback Strings** - Missing content shows "not available" message
 5. **Backend Caches Content** - Products synced to database for fast access
 
----
-
-## 🌍 Internationalization
-
-### Supported Languages
-
-| Code | Language | Direction | Status    |
-|------|----------|-----------|-----------|
-| `en` | English  | LTR       | ✅ Default |
-| `it` | Italian  | LTR       | ✅ Active  |
-| `he` | Hebrew   | RTL       | ✅ Active  |
-
-### Supported Currencies
-
-USD, EUR, ILS, GBP, CAD, AUD, JPY, CNY
-
-### Frontend i18n Configuration
-
-- **Framework**: next-intl
-- **Route Structure**: `/[lang]/...` (e.g., `/en/products`, `/it/about`, `/he/contact`)
-- **Default Locale**: English (root domain `/`)
-- **RTL Support**: Automatic layout flip for Hebrew with tailwindcss-rtl
-
-### Content Localization
-
-All content is localized in Strapi CMS:
-
-- Products have localized title, description, and metadata
-- Pages have localized content and SEO metadata
-- Navigation menus are language-specific
-- Translation status tracking for each language
-
----
-
 ## ⚡ Performance & SEO
 
 ### Performance Targets
@@ -1184,96 +1065,12 @@ All content is localized in Strapi CMS:
 ### Optimization Techniques
 
 - **Static Site Generation (SSG)**: Pre-render pages at build time
-- **Incremental Static Regeneration (ISR)**: Update static pages without full rebuild
 - **Image Optimization**: Next.js Image component with automatic optimization
 - **Code Splitting**: Automatic route-based code splitting
 - **Caching Strategy**:
-  - Backend caches products in Redis
   - Browser cache headers configured
   - CDN-friendly response structure
 - **Compression**: Gzip compression for all text responses
-
----
-
-## 🤝 Contributing
-
-### Development Workflow
-
-1. **Feature Specifications** (specs/)
-
-- Write feature spec defining **what** and **why**
-- Implementation plan defining **how** (technical design)
-- Task list defining **step-by-step** execution
-
-2. **Before Implementation**
-
-- Create tests FIRST (TDD)
-- Tests should FAIL initially (red phase)
-- User approval on tests before implementation
-
-3. **Implementation**
-
-- Implement minimum code to pass tests (green phase)
-- Refactor while keeping tests green
-- Ensure code adheres to constitution principles
-
-4. **Code Review Gates**
-
-- Constitution compliance verification
-- SOLID principles adherence check
-- Test coverage validation (80%+)
-- Performance impact assessment
-- Security review for user-facing features
-
-### Contribution Guidelines
-
-- Follow the [Constitution](`.specify/memory/constitution.md`) principles
-- Maintain SOLID principles and Clean Architecture
-- Write tests BEFORE implementation (TDD)
-- Keep test coverage above 80% (per module)
-- Document public APIs (JSDoc, Python docstrings)
-- Follow code style guides (Black, Prettier, Ruff, ESLint)
-- Use pre-commit hooks to catch issues early
-- Create meaningful commit messages
-
-#### Backend Contribution Guidelines
-
-When adding new backend features:
-
-1. **Follow Clean Architecture pattern**
-
-- Create repository interface in `domain/repositories/`
-- Implement in `infrastructure/`
-- Use dependency injection in routes
-
-2. **Leverage Generic Use Cases**
-
-- Use `StrapiProxyGetUseCase` for all GET requests
-- Use `StrapiProxyMutateUseCase` for POST/PUT/DELETE
-- No need to create individual use case classes
-
-3. **Implement Proper Caching**
-
-- Set appropriate TTL based on data stability
-- Use cache keys that support invalidation
-- Test cache behavior in unit tests
-
-4. **Write Comprehensive Tests**
-
-- Unit tests for use cases and routes
-- Mock all external dependencies (Strapi, Redis, PostgreSQL)
-- Test both cache hit and miss scenarios
-- Test error paths (400, 404, 502)
-
-### Documentation Requirements
-
-- Maintain API contracts in OpenAPI format
-- Document data models and entity relationships
-- Provide component usage examples
-- Include quickstart guides for common scenarios
-- In-code documentation (JSDoc, docstrings) with full coverage
-
----
 
 ## 📚 Additional Documentation
 
@@ -1332,89 +1129,6 @@ make health            # Check backend health
 make clean             # Clean up everything
 make build             # Build for production
 ```
-
----
-
-## 🔧 Troubleshooting
-
-### macOS (Colima)
-
-**Issue**: Colima not starting
-
-```bash
-colima status         # Check status
-colima stop           # Stop
-colima start          # Start
-docker ps             # Verify Docker connection
-```
-
-### Port Conflicts
-
-**Issue**: Port already in use (5432, 6379, 8000, 3000, 1337)
-
-```bash
-lsof -i :5432         # Find process using port
-kill -9 <PID>         # Kill process
-# OR change port in docker-compose.yaml
-```
-
-### Database Connection Issues
-
-**Issue**: Backend can't connect to PostgreSQL
-
-```bash
-docker compose ps     # Check container status
-docker compose logs postgres  # View PostgreSQL logs
-```
-
-### Strapi Won't Start
-
-```bash
-docker-compose logs strapi
-docker-compose down
-docker volume rm affilibuster_strapi_uploads
-docker-compose up strapi
-```
-
-### Permission Issues
-
-```bash
-chmod +x scripts/*.sh
-```
-
-### Backend-Specific Issues
-
-**ImportError: cannot import name 'X' from 'infrastructure.api.models'**
-
-**Cause**: Model not in OpenAPI spec or auto-generated models
-**Solution**: Define custom model in route file or add to spec
-
-**502 Bad Gateway**
-
-**Cause**: Strapi is unreachable
-**Solution**: Check STRAPI_URL and STRAPI_API_TOKEN in .env, verify Strapi is running
-
-**Cache Not Working**
-
-**Cause**: Redis connection failed
-**Solution**: Check REDIS_URL, verify Redis is running
-
-**Type Errors from Mypy**
-
-**Solution**: Add type guards or use `.get()` method instead of direct indexing
-
----
-
-## 🔗 Links
-
-- [Backend API Documentation](http://localhost:8000/docs)
-- [Backend Repository](./backend)
-- [Frontend Repository](./frontend)
-- [CMS Repository](./cms)
-- [Feature Specifications](./specs/)
-- [Constitution & Principles](.specify/memory/constitution.md)
-
----
 
 <div align="center">
 

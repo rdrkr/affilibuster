@@ -7,6 +7,7 @@
  */
 
 import { Metadata } from 'next'
+import type { ContentResponse } from '@/lib/types'
 
 interface SEOHeadProps {
   content: ContentResponse
@@ -17,27 +18,26 @@ interface SEOHeadProps {
  */
 export function generateContentMetadata(content: ContentResponse): Metadata {
   return {
-    title: content.seo.metaTitle || content.title,
-    description: content.seo.metaDescription || content.excerpt,
-    keywords: content.seo.metaKeywords,
+    title: content.seo?.title || content.title,
+    description: content.seo?.description || content.excerpt,
+    keywords: content.seo?.keywords,
     alternates: {
-      canonical: content.seo.canonicalUrl,
-      languages: Object.fromEntries(Object.entries(content.translations).map(([lang, url]) => [lang, url])) as Record<
-        string,
-        string
-      >,
+      canonical: content.seo?.canonicalUrl,
+      languages: Object.fromEntries(
+        Object.entries(content.translations || {}).map(([lang, url]) => [lang, url])
+      ) as Record<string, string>,
     },
     openGraph: {
-      title: content.seo.metaTitle || content.title,
-      description: content.seo.metaDescription || content.excerpt,
-      url: content.seo.canonicalUrl,
+      title: content.seo?.title || content.title,
+      description: content.seo?.description || content.excerpt,
+      url: content.seo?.canonicalUrl,
       type: content.type === 'page' ? 'website' : 'article',
-      locale: content.languageCode,
+      locale: content.language,
     },
     twitter: {
       card: 'summary_large_image',
-      title: content.seo.metaTitle || content.title,
-      description: content.seo.metaDescription || content.excerpt,
+      title: content.seo?.title || content.title,
+      description: content.seo?.description || content.excerpt,
     },
   }
 }
@@ -51,8 +51,8 @@ export function generateSchemaMarkup(content: ContentResponse) {
     '@type': content.type === 'product' ? 'Product' : 'Article',
     name: content.title,
     description: content.excerpt,
-    url: content.seo.canonicalUrl,
-    inLanguage: content.languageCode,
+    url: content.seo?.canonicalUrl,
+    inLanguage: content.language,
   }
 
   if (content.type === 'product') {

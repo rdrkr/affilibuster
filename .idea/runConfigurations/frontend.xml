@@ -8,6 +8,8 @@
           </list>
         </option>
         <option name="sourceFilePath" value="docker-compose.yaml" />
+        <option name="upDetach" value="false" />
+        <option name="upNoDeps" value="true" />
       </settings>
     </deployment>
     <method v="2" />

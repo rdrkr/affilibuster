@@ -9,9 +9,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { contentAPI, currenciesAPI, preferencesAPI } from '@/lib/api'
+import { getCurrencies, getUserPreferences, updateUserPreferences, getNavigation } from '@/lib/client'
 import { useSession } from '@/hooks/useSession'
-import { usePathname } from 'next/navigation'
+import type { Currency } from '@/lib/types'
 
 interface NavigationData {
   currencySelectorAriaLabel?: string
@@ -19,8 +19,7 @@ interface NavigationData {
 
 export function CurrencySelector() {
   const sessionId = useSession()
-  const pathname = usePathname()
-  const [currencies, setCurrencies] = useState<Currency[]>([])
+  const [currencies, setCurrencies] = useState<Currency[] | null>(null)
   const [selectedCurrency, setSelectedCurrency] = useState('USD')
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -30,9 +29,11 @@ export function CurrencySelector() {
     if (!sessionId) return
 
     // Fetch currencies and user preferences
-    Promise.all([currenciesAPI.getAll(), preferencesAPI.get().catch(() => null)])
+    Promise.all([getCurrencies(), getUserPreferences().catch(() => null)])
       .then(([currenciesData, prefsData]) => {
-        setCurrencies(currenciesData)
+        if (currenciesData) {
+          setCurrencies(currenciesData)
+        }
         if (prefsData) {
           setSelectedCurrency(prefsData.selectedCurrency)
         }
@@ -45,12 +46,7 @@ export function CurrencySelector() {
   useEffect(() => {
     async function fetchNavigation() {
       try {
-        // Extract language from pathname
-        const pathParts = pathname.split('/').filter(Boolean)
-        const lang = pathParts[0] === 'it' || pathParts[0] === 'he' || pathParts[0] === 'en' ? pathParts[0] : 'en'
-
-        const data = await contentAPI.getSingleType(lang, 'navigation')
-        const navContent = data?.data || data
+        const navContent = await getNavigation()
         if (navContent) {
           setNavData(navContent)
         }
@@ -59,11 +55,11 @@ export function CurrencySelector() {
       }
     }
     fetchNavigation()
-  }, [pathname])
+  }, [])
 
   const handleCurrencyChange = async (currencyCode: string) => {
     try {
-      await preferencesAPI.update({ selectedCurrency: currencyCode })
+      await updateUserPreferences({ selectedCurrency: currencyCode })
       setSelectedCurrency(currencyCode)
       setIsOpen(false)
     } catch (error) {
@@ -71,7 +67,7 @@ export function CurrencySelector() {
     }
   }
 
-  if (loading) {
+  if (loading || !currencies) {
     return <div className="w-24 h-10 bg-primary-700 animate-pulse rounded-lg" />
   }
 

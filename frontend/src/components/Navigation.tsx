@@ -4,7 +4,7 @@
  * Navigation Component
  * Reference: T115 (Navigation component - multi-language aware)
  * Main navigation bar with language-aware links
- * Fetches nav labels from Strapi CMS
+ * Receives nav data from server-side layout
  */
 
 'use client'
@@ -14,66 +14,25 @@ import { usePathname } from 'next/navigation'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { CurrencySelector } from './CurrencySelector'
 import { ThemeSelector } from './ThemeSelector'
-import { useEffect, useState } from 'react'
-import { contentAPI } from '@/lib/api'
+import { useState } from 'react'
+import type { Navigation as NavigationType } from '@/lib/types'
 
 interface NavLink {
   href: string
   label: string
 }
 
-interface NavigationData {
-  brandName?: string
-  homeLabel?: string
-  productsLabel?: string
-  aboutLabel?: string
-  contactLabel?: string
-  languageSelectorLabel?: string
-  currencySelectorLabel?: string
-  themeSelectorLabel?: string
-  themeLightLabel?: string
-  themeDarkLabel?: string
-  themeSystemLabel?: string
-  mobileMenuLabel?: string
-  mobileMenuCloseLabel?: string
-  twitterLabel?: string
-  facebookLabel?: string
-  currencySelectorAriaLabel?: string
-  languageSelectorAriaLabel?: string
-  themeSelectorAriaLabel?: string
-  browseProductsButton?: string
-  promptTitleTemplate?: string
-  promptMessageTemplate?: string
-  yesButtonTemplate?: string
-  noButtonText?: string
+interface NavigationProps {
+  data: NavigationType | null
+  lang: string
 }
 
-export function Navigation() {
+export function Navigation({ data: navData, lang }: NavigationProps) {
   const pathname = usePathname()
-  const [navData, setNavData] = useState<NavigationData | null>(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  // Extract current language prefix
-  const pathParts = pathname.split('/').filter(Boolean)
-  const lang = pathParts[0] === 'it' || pathParts[0] === 'he' || pathParts[0] === 'en' ? pathParts[0] : 'en'
-  const langPrefix = pathParts[0] === 'it' || pathParts[0] === 'he' || pathParts[0] === 'en' ? `/${pathParts[0]}` : ''
-
-  // Fetch navigation labels from CMS
-  useEffect(() => {
-    async function fetchNavigation() {
-      try {
-        const data = await contentAPI.getSingleType(lang, 'navigation')
-        const navContent = data?.data || data
-        if (navContent) {
-          setNavData(navContent)
-        }
-      } catch (error) {
-        console.error('Failed to fetch navigation:', error)
-        setNavData(null)
-      }
-    }
-    fetchNavigation()
-  }, [lang])
+  // Build language prefix
+  const langPrefix = ['it', 'he', 'en'].includes(lang) ? `/${lang}` : ''
 
   // Don't render navigation if data is unavailable
   if (!navData) {

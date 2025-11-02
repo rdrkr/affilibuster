@@ -24,15 +24,15 @@ format_python() {
 format_typescript() {
   if [[ "${CHECK_ONLY}" = "check" ]]; then
     echo "  ✨ Checking TypeScript/JavaScript formatting..."
-    cd frontend && npm run format:check
-    cd ..
-    cd cms && npm run format:check
-    cd ..
-  else
-    echo "  ✨ Formatting TypeScript/JavaScript..."
     cd frontend && npm run format
     cd ..
     cd cms && npm run format
+    cd ..
+  else
+    echo "  ✨ Formatting TypeScript/JavaScript..."
+    cd frontend && npm run format:fix
+    cd ..
+    cd cms && npm run format:fix
     cd ..
   fi
 }

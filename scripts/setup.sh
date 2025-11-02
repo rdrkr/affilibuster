@@ -109,25 +109,24 @@ fi
 
 echo "📦 Installing project dependencies..."
 
+# Install CMS dependencies
+echo "  🧰 Installing cms dependencies..."
+cd cms
+npm install --silent --include=optional
+cd ..
+
 # Install backend dependencies
-echo "  Installing backend dependencies..."
+echo "  🧰 Installing backend dependencies..."
 cd backend
-uv sync --all-extras
+uv sync --quiet --all-extras
 cd ..
 
 # Install frontend dependencies
-echo "  Installing frontend dependencies..."
+echo "  🧰 Installing frontend dependencies..."
 cd frontend
-npm install --include=optional >/dev/null
+npm install --silent --include=optional
 cd ..
 
-# Install CMS dependencies
-echo "  Installing CMS dependencies..."
-cd cms
-npm install --include=optional >/dev/null
-cd ..
-
-echo ""
 echo "📦 Installing pre-commit hooks..."
 if command -v pre-commit >/dev/null 2>&1; then
   pre-commit install >/dev/null
@@ -144,4 +143,3 @@ echo "Next steps:"
 echo "  1. Start services: make dev"
 echo "  2. Run tests: make test"
 echo "  3. Check code: make lint"
-echo ""

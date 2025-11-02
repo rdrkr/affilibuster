@@ -65,7 +65,7 @@ if [[ "${UPGRADE_CMS}" = true ]]; then
 
     # Update dependencies
     echo '  📥 Updating CMS dependencies...'
-    npm update
+    npm update || true
 
     # Clean install to ensure consistency
     echo '  🔄 Running clean install...'
@@ -88,7 +88,7 @@ if [[ "${UPGRADE_FRONTEND}" = true ]]; then
   docker-compose exec frontend sh -c "
     # Update dependencies
     echo '  📥 Updating frontend dependencies...'
-    npm update
+    npm update || true
 
     # Clean Next.js cache
     echo '  🧹 Clearing Next.js cache...'

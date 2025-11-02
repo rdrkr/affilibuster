@@ -4,60 +4,23 @@
  * Footer Component
  * Reference: T116 (Footer component - multi-language aware)
  * Site footer with language-aware links
- * Fetches footer content from Strapi CMS
+ * Receives footer data from server-side layout
  */
 
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { contentAPI } from '@/lib/api'
+import type { Footer as FooterType } from '@/lib/types'
 
-interface FooterData {
-  brandDescription?: string
-  quickLinksTitle?: string
-  privacyPolicyLabel?: string
-  termsOfServiceLabel?: string
-  contactLabel?: string
-  aboutUsLabel?: string
-  newsletterTitle?: string
-  newsletterDescription?: string
-  subscribeButton?: string
-  emailPlaceholder?: string
-  copyrightText?: string
-  footerTagline?: string
-  twitterAriaLabel?: string
-  facebookAriaLabel?: string
+interface FooterProps {
+  data: FooterType | null
+  lang: string
 }
 
-export function Footer() {
-  const pathname = usePathname()
+export function Footer({ data: footerData, lang }: FooterProps) {
   const currentYear = new Date().getFullYear()
-  const [footerData, setFooterData] = useState<FooterData | null>(null)
-
-  // Extract current language prefix
-  const pathParts = pathname.split('/').filter(Boolean)
-  const lang = pathParts[0] === 'it' || pathParts[0] === 'he' || pathParts[0] === 'en' ? pathParts[0] : 'en'
-  const langPrefix = pathParts[0] === 'it' || pathParts[0] === 'he' || pathParts[0] === 'en' ? `/${pathParts[0]}` : ''
+  const langPrefix = ['it', 'he', 'en'].includes(lang) ? `/${lang}` : ''
   const isRTL = lang === 'he'
-
-  // Fetch footer content from CMS
-  useEffect(() => {
-    async function fetchFooter() {
-      try {
-        const data = await contentAPI.getSingleType(lang, 'footer')
-        const content = data?.data || data
-        if (content) {
-          setFooterData(content)
-        }
-      } catch (error) {
-        console.error('Failed to fetch footer:', error)
-        setFooterData(null)
-      }
-    }
-    fetchFooter()
-  }, [lang])
 
   // Don't render footer if data is unavailable
   if (!footerData) {

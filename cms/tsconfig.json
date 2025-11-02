@@ -16,5 +16,5 @@
     "rootDir": "."
   },
   "include": ["./", "./**/*.ts", "./**/*.js", "src/**/*.json"],
-  "exclude": ["node_modules/", "build/", "dist/", ".strapi/", ".cache/", ".tmp/", "**/*.test.*", "src/plugins/**"]
+  "exclude": ["node_modules", "build", "dist", ".strapi", ".cache", ".tmp", "**/*.test.*", "src/plugins/**"]
 }

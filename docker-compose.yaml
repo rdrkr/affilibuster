@@ -131,15 +131,13 @@ services:
     env_file: # Load environment variables from .env file at build time
       - .env
     environment:
-      NEXT_PUBLIC_API_URL: "${BACKEND_PROTOCOL}://${INTERNAL_BACKEND_HOST}:${BACKEND_PORT}/v1"
+      NEXT_SERVER_SIDE_API_URL: "${BACKEND_PROTOCOL}://${INTERNAL_BACKEND_HOST}:${BACKEND_PORT}/v1"
     ports:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     volumes:
       - ./frontend:/app
       - ./contracts:/contracts
       - ./.env:/app/.env
-      - /app/node_modules
-      - /app/.next
     healthcheck:
       test: [ "CMD", "curl", "-f", "${FRONTEND_PROTOCOL}://${INTERNAL_FRONTEND_HOST}:${FRONTEND_PORT}" ]
       interval: 5s

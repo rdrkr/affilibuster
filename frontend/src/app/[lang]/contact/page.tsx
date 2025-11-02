@@ -7,7 +7,9 @@
 
 import { setRequestLocale } from 'next-intl/server'
 import { Metadata } from 'next'
-import { contentAPI } from '@/lib/api'
+import { getContact } from '@/lib/client'
+import type { ApiContactContactDocument } from '@/lib/generated/types.gen'
+import type { UiContactCardEntry } from '@/lib/types'
 
 type Props = {
   params: Promise<{ lang: string }>
@@ -18,11 +20,10 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { lang = 'en' } = await params
+  await params
 
   try {
-    const response = await contentAPI.getSingleType(lang, 'contact')
-    const contactData = response?.data || response
+    const contactData = await getContact()
 
     return {
       title: contactData?.metaTitle,
@@ -53,16 +54,15 @@ export default async function ContactPage({ params }: Props) {
     setRequestLocale(lang)
   }
 
-  let contactData: unknown = null
+  let contactData: ApiContactContactDocument | null = null
   try {
-    const response = await contentAPI.getSingleType(lang, 'contact')
-    contactData = response?.data || response
+    contactData = await getContact()
   } catch (error) {
     console.error('Failed to fetch contact page:', error)
   }
 
   // Don't render page if data is unavailable
-  if (!contactData?.heroTitle || !contactData?.contactCards) {
+  if (!contactData || !contactData.heroTitle || !contactData.contactCards) {
     return null
   }
 
@@ -93,7 +93,7 @@ export default async function ContactPage({ params }: Props) {
       {/* Content Section */}
       <div className="container mx-auto px-4 py-16 max-w-5xl">
         <div className="grid md:grid-cols-2 gap-6 mb-12">
-          {contactData.contactCards.map((card: unknown, index: number) => (
+          {contactData.contactCards.map((card: UiContactCardEntry, index: number) => (
             <div
               key={index}
               className={`bg-white dark:bg-neutral-800 p-8 rounded-xl border shadow-lg hover:shadow-xl transition-shadow ${index % 2 === 0 ? 'border-primary-200 dark:border-primary-700' : 'border-secondary-200 dark:border-secondary-700'}`}

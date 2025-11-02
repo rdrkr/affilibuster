@@ -8,27 +8,18 @@
 
 import { setRequestLocale } from 'next-intl/server'
 import { Metadata } from 'next'
-import { contentAPI } from '@/lib/api'
+import { getPrivacy } from '@/lib/client'
+import type { ApiPrivacyPrivacyDocument } from '@/lib/generated/types.gen'
 
 type Props = {
   params: Promise<{ lang: string }>
 }
 
-interface PrivacyData {
-  title?: string
-  lastUpdated?: string
-  lastUpdatedLabel?: string
-  content?: string
-  metaTitle?: string
-  metaDescription?: string
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { lang = 'en' } = await params
+  await params
 
   try {
-    const response = await contentAPI.getSingleType(lang, 'privacy')
-    const privacyData = response?.data || response
+    const privacyData = await getPrivacy()
 
     return {
       title: privacyData?.metaTitle,
@@ -49,7 +40,7 @@ export function generateStaticParams() {
 
 export default async function PrivacyPage({ params }: Props) {
   let lang = 'en'
-  let privacyData: PrivacyData = {}
+  let privacyData: ApiPrivacyPrivacyDocument | null = null
 
   try {
     const resolvedParams = await params
@@ -67,14 +58,13 @@ export default async function PrivacyPage({ params }: Props) {
 
   // Fetch privacy content from backend API
   try {
-    const response = await contentAPI.getSingleType(lang, 'privacy')
-    privacyData = response?.data || response
+    privacyData = await getPrivacy()
   } catch (error) {
     console.error('Failed to fetch privacy content:', error)
   }
 
   // Don't render page if data is unavailable
-  if (!privacyData.title || !privacyData.content) {
+  if (!privacyData || !privacyData.title || !privacyData.content) {
     return null
   }
 

@@ -12,7 +12,7 @@ set -e
 # Load environment variables from .env if available
 if [[ -f .env ]]; then
   # shellcheck disable=SC1091
-  source .env
+  . .env
 fi
 
 # shellcheck disable=SC2154

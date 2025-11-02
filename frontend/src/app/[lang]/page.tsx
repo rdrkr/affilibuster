@@ -6,10 +6,12 @@
  * Fetches content from Strapi homepage single type
  */
 
-import { contentAPI } from '@/lib/api'
+import { getHomepage, getProducts } from '@/lib/client'
 import Link from 'next/link'
 import { setRequestLocale } from 'next-intl/server'
 import { LanguagePrompt } from '@/components/LanguagePrompt'
+import type { ApiHomepageHomepageDocument } from '@/lib/generated/types.gen'
+import type { UiFeatureCardEntry, Product } from '@/lib/types'
 
 // Important: Strapi CMS must be running during build for content to be fetched
 // Pages are rendered statically with ISR revalidation
@@ -38,16 +40,22 @@ export default async function HomePage({ params }: Props) {
     setRequestLocale(lang)
   }
 
-  let homepageData: unknown = null
-  let productsList: unknown = null
+  let homepageData: ApiHomepageHomepageDocument | null = null
+  let productsList: Product[] = []
 
   try {
     // Fetch homepage content from Strapi
-    const homepageResponse = await contentAPI.getSingleType(lang, 'homepage')
-    homepageData = homepageResponse?.data || homepageResponse
+    homepageData = await getHomepage()
 
     // Fetch featured products
-    productsList = await contentAPI.list(lang, 1, 3)
+    const productsResponse = await getProducts({
+      'pagination[page]': 1,
+      'pagination[pageSize]': 3,
+    })
+
+    if (productsResponse) {
+      productsList = productsResponse.data
+    }
   } catch (error) {
     console.error('Failed to fetch content:', error)
   }
@@ -61,9 +69,9 @@ export default async function HomePage({ params }: Props) {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              {
+              {homepageData?.heroTitle ? (
                 <>
-                  {homepageData?.heroTitle.split('**').map((part: string, i: number) =>
+                  {homepageData.heroTitle.split('**').map((part: string, i: number) =>
                     i % 2 === 1 ? (
                       <span key={i} className="text-secondary-400">
                         {part}
@@ -73,7 +81,7 @@ export default async function HomePage({ params }: Props) {
                     )
                   )}
                 </>
-              }
+              ) : null}
             </h1>
             {homepageData?.heroSubtitle && (
               <p className="text-xl text-neutral-200 mb-8 max-w-2xl mx-auto">{homepageData.heroSubtitle}</p>
@@ -82,10 +90,10 @@ export default async function HomePage({ params }: Props) {
             {/* Feature Cards Grid - Only show if CMS data available */}
             {homepageData?.featureCards && homepageData.featureCards.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
-                {homepageData.featureCards.map((card: unknown) => (
+                {homepageData.featureCards.map((card: UiFeatureCardEntry, index: number) => (
                   <Link
-                    key={card.id}
-                    href={card.href || '/'}
+                    key={index}
+                    href={card.linkUrl || '/'}
                     className="group bg-primary-700 hover:bg-primary-600 rounded-xl p-6 transition-all duration-300 hover:scale-105"
                   >
                     <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
@@ -93,7 +101,7 @@ export default async function HomePage({ params }: Props) {
                         <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
                       </svg>
                     </div>
-                    <h3 className="font-semibold mb-2">{card.label}</h3>
+                    <h3 className="font-semibold mb-2">{card.title}</h3>
                     <p className="text-sm text-neutral-200">{card.description}</p>
                   </Link>
                 ))}
@@ -104,7 +112,7 @@ export default async function HomePage({ params }: Props) {
       </section>
 
       {/* Featured Products Section */}
-      {productsList && productsList.data && productsList.data.length > 0 && (
+      {productsList.length > 0 && (
         <section className="py-16 bg-neutral-50 dark:bg-neutral-900">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-8">
@@ -124,10 +132,10 @@ export default async function HomePage({ params }: Props) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {productsList.data.map((item: unknown) => (
+              {productsList.map((product: Product) => (
                 <Link
-                  key={item.id}
-                  href={`/${lang}/${item.slug}`}
+                  key={product.id}
+                  href={`/${lang}/${product.slug}`}
                   className="group bg-white dark:bg-neutral-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border-2 border-primary-100 dark:border-primary-900 hover:border-tertiary-400 flex flex-col"
                 >
                   {/* Product Image */}
@@ -150,11 +158,11 @@ export default async function HomePage({ params }: Props) {
                   {/* Content */}
                   <div className="p-6 flex flex-col flex-1">
                     <h3 className="text-xl font-bold mb-2 group-hover:text-primary-600 transition-colors">
-                      {item.title}
+                      {product.title}
                     </h3>
-                    {item.excerpt && (
-                      <p className="text-neutral-600 dark:text-neutral-400 line-clamp-2 mb-4">{item.excerpt}</p>
-                    )}
+                    {product.excerpt ? (
+                      <p className="text-neutral-600 dark:text-neutral-400 line-clamp-2 mb-4">{product.excerpt}</p>
+                    ) : null}
                     <button className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors mt-auto">
                       {homepageData?.viewDetailsButtonText}
                     </button>
@@ -164,11 +172,11 @@ export default async function HomePage({ params }: Props) {
             </div>
 
             {/* Pagination Info - Only show if CMS template available */}
-            {productsList.pagination?.totalItems > 0 && homepageData?.showingProductsTemplate && (
+            {homepageData?.showingProductsTemplate && (
               <div className="mt-8 text-center text-sm text-neutral-600 dark:text-neutral-400">
                 {homepageData.showingProductsTemplate
-                  .replace('{count}', productsList.data.length)
-                  .replace('{total}', productsList.pagination.totalItems)}
+                  .replace('{count}', String(productsList.length))
+                  .replace('{total}', String(productsList.length))}
               </div>
             )}
           </div>
@@ -209,9 +217,9 @@ export default async function HomePage({ params }: Props) {
         <section className="py-16">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl font-bold text-center mb-12">
-              {
+              {homepageData?.whyChooseUsTitle ? (
                 <>
-                  {homepageData?.whyChooseUsTitle.split('**').map((part: string, i: number) =>
+                  {homepageData.whyChooseUsTitle.split('**').map((part: string, i: number) =>
                     i % 2 === 1 ? (
                       <span key={i} className="text-secondary-500">
                         {part}
@@ -221,11 +229,11 @@ export default async function HomePage({ params }: Props) {
                     )
                   )}
                 </>
-              }
+              ) : null}
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {homepageData.trustCards.map((card: unknown, index: number) => (
+              {homepageData?.trustCards?.map((card: Record<string, unknown>, index: number) => (
                 <div key={index} className="text-center">
                   <div className="bg-primary-100 dark:bg-primary-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg className="w-10 h-10 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
@@ -236,8 +244,8 @@ export default async function HomePage({ params }: Props) {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{card.title}</h3>
-                  <p className="text-neutral-600 dark:text-neutral-400">{card.description}</p>
+                  <h3 className="text-xl font-bold mb-2">{String(card.title)}</h3>
+                  <p className="text-neutral-600 dark:text-neutral-400">{String(card.description)}</p>
                 </div>
               ))}
             </div>
@@ -247,6 +255,3 @@ export default async function HomePage({ params }: Props) {
     </>
   )
 }
-
-// Enable ISR (Incremental Static Regeneration)
-export const revalidate = 60 // Revalidate every 60 seconds
