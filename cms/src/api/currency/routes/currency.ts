@@ -2,4 +2,6 @@
 
 import { factories } from '@strapi/strapi'
 
-export default factories.createCoreRouter('api::currency.currency')
+export default factories.createCoreRouter('api::currency.currency', {
+  only: ['find', 'findOne'],
+})

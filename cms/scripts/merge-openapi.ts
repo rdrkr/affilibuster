@@ -179,10 +179,10 @@ const StrapiMetadataDefaults = {
 } as const
 
 /**
- * Remove DELETE and PUT operations from all paths in the spec.
+ * Remove DELETE, POST and PUT operations from all paths in the spec.
  * Backend is read-only for Strapi content - no mutations allowed from frontend.
  */
-function removeDeleteAndPutOperations(spec: OpenAPISpec): OpenAPISpec {
+function removeWriteOperations(spec: OpenAPISpec): OpenAPISpec {
   const processedSpec = { ...spec }
   const processedPaths = { ...spec.paths }
 
@@ -191,9 +191,31 @@ function removeDeleteAndPutOperations(spec: OpenAPISpec): OpenAPISpec {
       const processedPathItem = { ...(pathItem as Record<string, unknown>) }
       delete processedPathItem['delete']
       delete processedPathItem['put']
+      delete processedPathItem['post']
       processedPaths[pathKey] = processedPathItem
     }
   })
+
+  processedSpec.paths = processedPaths
+  return processedSpec
+}
+
+/**
+ * Remove content-type-builder paths from the specification.
+ *
+ * Removes /content-types and /content-types/{uid} paths as these are
+ * internal Strapi system endpoints that should not be exposed in the backend API.
+ *
+ * @param spec - OpenAPI specification to modify
+ * @returns Specification with content-type-builder paths removed
+ */
+function removeContentTypesPaths(spec: OpenAPISpec): OpenAPISpec {
+  const processedSpec = { ...spec }
+  const processedPaths = { ...spec.paths }
+
+  // Remove content-type-builder paths
+  delete processedPaths['/content-types']
+  delete processedPaths['/content-types/{uid}']
 
   processedSpec.paths = processedPaths
   return processedSpec
@@ -277,7 +299,7 @@ function removeUuidFormat(obj: unknown): OpenAPISpec {
 /**
  * Add meta field to all response schemas.
  *
- * Strapi always returns a meta object alongside data in responses.
+ * Strapi always returns a metaobject alongside data in responses.
  * This function adds the meta field to all response schemas that have a data field.
  *
  * @param spec - OpenAPI specification to modify
@@ -535,15 +557,16 @@ function writeOpenAPISpec(filePath: string, spec: OpenAPISpec): void {
  * Preprocess Strapi OpenAPI specification with all required transformations.
  *
  * Applies the following transformations in order:
- * 1. Remove DELETE and PUT operations (backend is read-only for Strapi content)
- * 2. Add server URLs for Strapi CMS endpoints
- * 3. Fix pattern fields with unsupported regex features (email, UUID, etc.)
- * 4. Remove UUID format fields
- * 5. Add meta field to all response schemas
- * 6. Add license information to info section
- * 7. Add tags section with descriptions
- * 8. Fix populate parameter schemas with empty enum arrays
- * 9. Add security definitions to mark operations as public
+ * - Remove DELETE, POST and PUT operations (backend is read-only for Strapi content)
+ * - Remove content-type-builder paths (/content-types and /content-types/{uid})
+ * - Add server URLs for Strapi CMS endpoints
+ * - Fix pattern fields with unsupported regex features (email, UUID, etc.)
+ * - Remove UUID format fields
+ * - Add meta field to all response schemas
+ * - Add license information to info section
+ * - Add tags section with descriptions
+ * - Fix populate parameter schemas with empty enum arrays
+ * - Add security definitions to mark operations as public
  *
  * @param spec - Raw Strapi OpenAPI specification
  * @param config - Configuration with server URLs
@@ -551,7 +574,8 @@ function writeOpenAPISpec(filePath: string, spec: OpenAPISpec): void {
  */
 function preprocessStrapiSpec(spec: OpenAPISpec, config: { strapiUrlProd: string; strapiUrlDev: string }): OpenAPISpec {
   let processed = spec
-  processed = removeDeleteAndPutOperations(processed)
+  processed = removeWriteOperations(processed)
+  processed = removeContentTypesPaths(processed)
   processed = addStrapiServers(processed, config.strapiUrlProd, config.strapiUrlDev)
   processed = fixStrapiPatterns(processed)
   processed = removeUuidFormat(processed)

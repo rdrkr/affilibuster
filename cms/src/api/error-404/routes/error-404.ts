@@ -2,4 +2,6 @@
 
 import { factories } from '@strapi/strapi'
 
-export default factories.createCoreRouter('api::error-404.error-404')
+export default factories.createCoreRouter('api::error-404.error-404', {
+  only: ['find'],
+})

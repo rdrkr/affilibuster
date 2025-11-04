@@ -4,6 +4,7 @@
 set -e
 
 echo "🚀 Backend startup script..."
+cd /app || exit 1
 
 echo "  🔐 Loading environment variables..."
 #shellcheck disable=SC1091
@@ -12,14 +13,10 @@ echo "  🔐 Loading environment variables..."
 echo "  🔄 Installing dependencies (including dev)..."
 uv sync --quiet --all-extras
 #shellcheck disable=SC1091
-. /app/.venv/bin/activate
+. .venv/bin/activate
 
 echo "  🔧 Generating Python models from OpenAPI specification..."
-mkdir -p /app/src/infrastructure/api/models/generated
-touch /app/src/infrastructure/api/models/generated/__init__.py
-datamodel-codegen \
-  --input /contracts/affilibuster.openapi.yaml \
-  --output /app/src/infrastructure/api/models/generated/models.py
+uv run task openapi-generate
 
 # Function to wait for database
 wait_for_db() {
@@ -37,7 +34,8 @@ wait_for_db
 
 # Run database migrations
 echo "  📋 Running database migrations..."
-alembic upgrade head || {
+# shellcheck disable=SC2154
+PYTHONPATH=/app/src:${PYTHONPATH} alembic upgrade head || {
   echo "❌️ Database migrations completed with warnings"
   exit 1
 }
@@ -46,4 +44,4 @@ echo "✅ Backend startup complete, starting application..."
 
 # Start the application from src directory for proper module imports
 # shellcheck disable=SC2154
-cd src && exec python -m uvicorn main:app --host "${INTERNAL_BACKEND_HOST}" --port "${BACKEND_PORT}"
+uv run task start --host "${INTERNAL_BACKEND_HOST}" --port "${BACKEND_PORT}"

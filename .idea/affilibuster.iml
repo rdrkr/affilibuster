@@ -12,6 +12,7 @@
       <sourceFolder url="file://$MODULE_DIR$/cms/config" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/cms/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/frontend/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/backend/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.playwright-mcp" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/backend/.venv" />
@@ -43,9 +44,14 @@
       <excludeFolder url="file://$MODULE_DIR$/backend/src/infrastructure/api/models/generated" />
       <excludeFolder url="file://$MODULE_DIR$/backend/src/affilibuster_backend.egg-info" />
       <excludeFolder url="file://$MODULE_DIR$/frontend/src/lib/generated" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/src/affilibuster_backend/infrastructure/api/models/generated" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/src/affilibuster_backend/domain/entities/generated" />
     </content>
     <orderEntry type="jdk" jdkName="uv (backend)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="uv (backend) interpreter library" level="application" />
+  </component>
+  <component name="PyDocumentationSettings">
+    <option name="renderExternalDocumentation" value="true" />
   </component>
 </module>

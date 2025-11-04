@@ -30,7 +30,6 @@ if [[ "$1" = "--build" ]]; then
 fi
 
 echo "🚀 Starting Affilibuster Services..."
-echo ""
 
 # Get the project root directory
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -45,8 +44,13 @@ cleanup() {
   exit 0
 }
 
-# Register cleanup function for Ctrl+C and script exit
-trap cleanup SIGINT SIGTERM EXIT
+if [[ "${BUILD_FLAG}" == "--build" ]]; then
+  # Register cleanup function for Ctrl+C and script exit (normal mode)
+  trap cleanup SIGINT SIGTERM EXIT
+else
+  # Register cleanup function only for Ctrl+C (build mode - don't cleanup on exit)
+  trap cleanup SIGINT SIGTERM
+fi
 
 # Kill any processes using our ports
 kill_port() {
@@ -79,26 +83,26 @@ echo "✅ Services started (containers initializing, may take 30-60 seconds)!"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "📍 Access your applications:"
-echo "   🌐 Frontend:       ${FRONTEND_URL}"
-echo "   🔌 Backend API:    ${BACKEND_URL}"
-echo "   📚 API Docs:       ${BACKEND_URL}/docs"
-echo "   🎨 CMS Admin:      ${CMS_URL}/admin"
+echo "  🌐 Frontend:       ${FRONTEND_URL}"
+echo "  🔌 Backend API:    ${BACKEND_URL}"
+echo "  📚 API Docs:       ${BACKEND_URL}/docs"
+echo "  🎨 CMS Admin:      ${CMS_URL}/admin"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "📊 Service Status:"
 # shellcheck disable=SC2154
-echo "   - PostgreSQL:      Running (port ${POSTGRES_PORT})"
+echo "  - PostgreSQL:      Running (port ${POSTGRES_PORT})"
 # shellcheck disable=SC2154
-echo "   - Redis:           Running (port ${REDIS_PORT})"
+echo "  - Redis:           Running (port ${REDIS_PORT})"
 # shellcheck disable=SC2154
-echo "   - Backend API:     Running (port ${BACKEND_PORT})"
+echo "  - Backend API:     Running (port ${BACKEND_PORT})"
 # shellcheck disable=SC2154
-echo "   - Strapi CMS:      Running (port ${CMS_PORT})"
+echo "  - Strapi CMS:      Running (port ${CMS_PORT})"
 # shellcheck disable=SC2154
-echo "   - Frontend:        Running (port ${FRONTEND_PORT})"
+echo "  - Frontend:        Running (port ${FRONTEND_PORT})"
 echo ""
 echo "💡 Tips:"
-echo "   - View logs: docker-compose logs -f [service]"
-echo "   - Stop services: docker-compose down"
-echo "   - Run tests: make test"
+echo "  - View logs: docker-compose logs -f [service]"
+echo "  - Stop services: docker-compose down"
+echo "  - Run tests: make test"
 echo ""

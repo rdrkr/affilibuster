@@ -44,20 +44,41 @@ async function createMissingLocales(strapi: Core.Strapi): Promise<void> {
       { code: 'he', name: 'עברית' },
     ]
 
-    // Identify missing locales
+    // Identify missing locales (by code)
     const missingLocales = requiredLocales.filter(locale => !existingCodes.includes(locale.code))
 
-    if (missingLocales.length === 0) {
-      console.log('   ✅ All required locales already exist')
+    // Identify locales with incorrect names
+    const localesToUpdate = requiredLocales.filter(required => {
+      const existing = existingLocales.find((loc: LocaleData) => loc.code === required.code)
+      return existing && existing.name !== required.name
+    })
+
+    if (missingLocales.length === 0 && localesToUpdate.length === 0) {
+      console.log('   ✅ All required locales exist with correct names')
       return
     }
 
     // Create missing locales using createMany (workaround for create() bug)
-    console.log(`   Creating ${missingLocales.length} missing locale(s)...`)
+    if (missingLocales.length > 0) {
+      console.log(`   Creating ${missingLocales.length} missing locale(s)...`)
+      await strapi.query('plugin::i18n.locale').createMany({ data: missingLocales })
+      console.log(`   ✅ Successfully created locales: ${missingLocales.map(l => l.code).join(', ')}`)
+    }
 
-    await strapi.query('plugin::i18n.locale').createMany({ data: missingLocales })
-
-    console.log(`   ✅ Successfully created locales: ${missingLocales.map(l => l.code).join(', ')}`)
+    // Update locales with incorrect names
+    if (localesToUpdate.length > 0) {
+      console.log(`   Updating ${localesToUpdate.length} locale name(s)...`)
+      for (const locale of localesToUpdate) {
+        const existing = existingLocales.find((loc: LocaleData) => loc.code === locale.code)
+        if (existing) {
+          await strapi.query('plugin::i18n.locale').update({
+            where: { id: existing.id },
+            data: { name: locale.name },
+          })
+          console.log(`   ✅ Updated locale ${locale.code}: name changed to "${locale.name}"`)
+        }
+      }
+    }
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error)
     console.error(`   ❌ Failed to create locales: ${message}`)

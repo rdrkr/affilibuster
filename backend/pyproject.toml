@@ -8,11 +8,11 @@ authors = [{ name = "Affilibuster Team" }]
 requires-python = ">=3.13"
 readme = "../README.md"
 dependencies = [
-  "fastapi==0.120.4",
+  "fastapi==0.121.0",
   "uvicorn[standard]>=0.34.0",
   "sqlalchemy>=2.0.37",
   "alembic==1.17.1",
-  "pydantic>=2.10.5",
+  "pydantic>=2.12.4",
   "pydantic-settings>=2.7.1",
   "psycopg2-binary>=2.9.10",
   "asyncpg>=0.30.0",
@@ -25,9 +25,10 @@ dependencies = [
   "email-validator>=2.0.0",
   "aiosqlite>=0.20.0",
   "pyyaml>=6.0.2",
+  "greenlet>=3.2.4",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
   "pytest>=8.3.4",
   "pytest-asyncio>=1.2.0",
@@ -35,18 +36,42 @@ dev = [
   "pytest-xdist>=3.6.1",
   "pytest-mock>=3.12.0",
   "aiosqlite>=0.20.0",
-  "ruff>=0.14.3",
+  "ruff>=0.14.4",
   "mypy>=1.14.1",
+  "taskipy>=1.14.1",
+  "types-pyyaml>=6.0.12.20250915",
 ]
 
+[tool.taskipy.tasks]
+start = { cmd = """\
+    exec python -m uvicorn affilibuster_backend.main:app \
+    """, cwd = "src", help = "starts the FastAPI server" }
+clean = { cmd = """\
+    find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true && \
+    find . -type f -name '*.pyc' -delete 2>/dev/null || true && \
+    find . -type f -name '*.pyo' -delete 2>/dev/null || true && \
+    rm -rf .pytest_cache .coverage htmlcov .mypy_cache || true && \
+    rm -rf coverage.lcov coverage.xml venv .venv src/affilibuster_backend/domain/entities/generated || true \
+    """, help = "removes Python cache files, coverage files, and build artifacts" }
+lint = { cmd = "ruff check . && mypy .", help = "runs code style checks with ruff and type checking with mypy" }
+lint-fix = { cmd = "ruff check . --fix && mypy .", help = "auto-fixes code style issues with ruff and type checking with mypy" }
+format = { cmd = "ruff format . --check", help = "checks code formatting without making changes" }
+format-fix = { cmd = "ruff format .", help = "formats code using ruff" }
+openapi-generate = { cmd = """\
+    mkdir -p src/affilibuster_backend/domain/entities/generated && \
+    touch src/affilibuster_backend/domain/entities/generated/__init__.py && \
+    datamodel-codegen \
+      --input ../contracts/affilibuster.openapi.yaml \
+      --output src/affilibuster_backend/domain/entities/generated/models.py \
+    """, help = "generates Python models from OpenAPI specification" }
+
 [tool.ruff]
-src = ["src"]
 target-version = "py313"
 line-length = 120
 respect-gitignore = true
 
 [tool.ruff.lint]
-#select = ["ALL"]
+select = ["ALL"]
 extend-ignore = [
   "TRY003", # Avoid specifying long messages outside the exception class
   "EM102", # Exception must not use an f-string literal, assign to variable first
@@ -60,7 +85,24 @@ extend-ignore = [
 "tests/**/*.py" = [
   "PLC0415", # `import` should be at the top-level of a file
   "S101", # Use of assert detected,
+  "S105", # Possible hardcoded password (test tokens)
+  "S106", # Possible hardcoded password (test tokens)
   "ANN201", # Missing return type annotation for public function
+  "ANN202", # Missing return type annotation for private function
+  "ANN001", # Missing type annotation for function argument (pytest fixtures)
+  "ARG001", # Unused function argument (pytest fixtures can be unused)
+  "ARG002", # Unused function argument
+  "SLF001", # Private member accessed
+  "PLR2004", # Magic value used in comparison
+  "D104", # Missing docstring in public package (test __init__.py files)
+  "PTH123", # Use of open() in tests is acceptable
+  "PERF401", # List comprehension optimization in test fixtures
+  "ERA001", # Commented-out code (useful for documenting alternatives in tests)
+  "FBT003", # Boolean positional value in function call (tests can use booleans)
+  "PT011", # pytest.raises can be broad in tests
+  "N815", # mixedCase variable names (for matching API responses)
+  "SIM117", # Multiple with statements are clearer in tests
+  "SIM105", # contextlib.suppress is less clear in tests
 ]
 
 [tool.ruff.lint.flake8-builtins]
@@ -86,22 +128,145 @@ output-model-type = "pydantic_v2.BaseModel"
 [tool.mypy]
 python_version = "3.13"
 strict = true
-mypy_path = "src"
 exclude = ["generated", ".venv", "venv"]
 explicit_package_bases = true
 namespace_packages = true
+ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = "infrastructure.api.models.generated.*"
+module = "affilibuster_backend.domain.entities.generated.*"
 ignore_errors = true
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[[tool.mypy.overrides]]
+module = "tests.*"
+# Relax mypy strictness for test files
+disallow_untyped_defs = false
+disallow_untyped_calls = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
 
 [tool.pytest.ini_options]
+# Test discovery
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+
+# Output options
+addopts = """\
+  --verbose \
+  --strict-markers \
+  --tb=short \
+  -n auto \
+  --dist worksteal \
+  --cov=src \
+  --cov-report=term-missing \
+  --cov-report=html \
+  --cov-report=xml \
+  --cov-report=lcov \
+  --cov-fail-under=100 \
+  --cov-branch \
+  --no-cov-on-fail \
+  --cov-context=test \
+"""
+
+# Filter warnings
+filterwarnings = [
+  # Treat all warnings as errors
+  "error",
+  # Ignore specific warnings
+  "ignore::pytest.PytestUnraisableExceptionWarning"
+]
+
+# Asyncio mode
 asyncio_mode = "auto"
-addopts = "--cov=src --cov-report=term-missing --cov-report=html"
+
+# Markers
+# Usage examples:
+#   pytest -m "unit"                  # Run only unit tests
+#   pytest -m "integration"           # Run only integration tests
+#   pytest -m "contract"              # Run only contract tests
+#   pytest -m "not slow"              # Skip slow tests
+#   pytest -m "unit or integration"   # Run unit OR integration tests
+#   pytest -m "integration and not slow"  # Integration tests that aren't slow
+markers = [
+  "unit: Unit tests (fast, no external dependencies)",
+  "integration: Integration tests (requires DB/Redis)",
+  "contract: Contract tests (API schema validation)",
+  "performance: Performance and load tests",
+  "slow: Slow running tests (>5 seconds)",
+  "requires_db: Tests that require database connection",
+  "requires_redis: Tests that require Redis connection",
+  "serial: Tests that must run serially (not in parallel)",
+]
+
+# Coverage options
+[tool.coverage.run]
+source = ["src"]
+parallel = true
+concurrency = ["multiprocessing"]
+omit = [
+  "*/tests/*",
+  "*/test_*.py",
+  "*/__pycache__/*",
+  "*/venv/*",
+  "*/virtualenv/*",
+  "*/alembic/*",
+  "*/database/alembic/*",
+  "*/domain/entities/generated/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "@abstractmethod"
+]
+
+# see https://alembic.sqlalchemy.org/en/latest/tutorial.html#using-pep-621
+[tool.alembic]
+script_location = "src/affilibuster_backend/infrastructure/database/alembic"
+file_template = "%%(year)d%%(month).2d%%(day).2d_%%(hour).2d%%(minute).2d_%%(rev)s_%%(slug)s"
+prepend_sys_path = "src"
+timezone = "UTC"
+truncate_slug_length = 40
+version_path_separator = "os"  # Use os.pathsep. Default configuration used for new projects.
+
+# Logging configuration
+[[tool.alembic.loggers]]
+keys = ["root", "sqlalchemy", "alembic"]
+
+[[tool.alembic.handlers]]
+keys = "console"
+
+[[tool.alembic.formatters]]
+keys = "generic"
+
+[[tool.alembic.logger_root]]
+level = "WARN"
+handlers = "console"
+qualname = ""
+
+[[tool.alembic.logger_sqlalchemy]]
+level = "WARN"
+handlers = ""
+qualname = "sqlalchemy.engine"
+
+[[tool.alembic.logger_alembic]]
+level = "INFO"
+handlers = ""
+qualname = "alembic"
+
+[[tool.alembic.handler_console]]
+class = "StreamHandler"
+args = "(sys.stderr,)"
+level = "NOTSET"
+formatter = "generic"
+
+[[tool.alembic.formatter_generic]]
+format = "%(levelname)-5.5s [%(name)s] %(message)s"
+datefmt = "%H:%M:%S"

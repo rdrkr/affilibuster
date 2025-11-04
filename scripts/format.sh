@@ -12,10 +12,10 @@ format_python() {
   cd backend
   if [[ "${CHECK_ONLY}" = "check" ]]; then
     echo "  ✨ Checking Python formatting..."
-    uv run ruff format --check .
+    uv run task format
   else
     echo "✨ Formatting Python..."
-    uv run ruff format .
+    uv run task format-fix
   fi
   cd ..
 }

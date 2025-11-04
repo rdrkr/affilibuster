@@ -19,38 +19,9 @@
 **A modern, production-ready affiliate platform with multi-language support, performance optimization, and clean
 architecture.**
 
-[Features](#-features) • [Architecture](#-architecture) • [Quick Start](#-quick-start) • [Contributing](#-contributing)
+[Features](#-features) • [Architecture](#-architecture) • [Quick Start](#-quick-start) • [Development](#-development) • [Testing](#-testing)
 
 </div>
-
----
-
-## Table of Contents
-
-- [Features](#-features)
-- [Architecture](#-architecture)
-  - [System Design](#system-design)
-  - [Project Structure](#project-structure)
-  - [Technology Stack](#-technology-stack)
-- [Design Principles](#-design-principles)
-- [Quick Start](#-quick-start)
-  - [Prerequisites](#prerequisites)
-  - [One-Command Setup](#one-command-startup-)
-  - [Access Applications](#access-your-applications)
-- [Development](#-development)
-  - [Setup Instructions](#development-setup-with-docker-step-by-step)
-  - [Local Development](#local-development-without-docker)
-- [Testing](#-testing)
-  - [Running Tests](#quick-commands)
-  - [Coverage Requirements](#coverage-requirements)
-- [Code Quality](#-code-quality--linting)
-  - [Linting & Formatting](#quick-commands-1)
-  - [Strict Standards](#strict-mode-enforcement)
-- [API Documentation](#-api-documentation)
-- [Content Architecture](#-content-architecture)
-- [Internationalization](#-internationalization)
-- [Performance & SEO](#-performance--seo)
-- [Contributing](#-contributing)
 
 ---
 
@@ -62,10 +33,56 @@ architecture.**
 - **⚡ High Performance**: Static Site Generation (SSG) / Incremental Static Regeneration (ISR) with <3s load times and
   Lighthouse scores >90
 - **🏗️ Clean Architecture**: Domain-driven design with clear separation of concerns and SOLID principles
-- **🧪 Test-First Development**: Comprehensive testing infrastructure with 80%+ coverage across all modules
+- **🧪 Test-First Development**: Comprehensive testing infrastructure
+  15%, CMS 60%)
 - **🔐 Secure**: Affiliate link generation, GDPR compliance, secure credential management
 - **📱 Responsive Design**: Mobile-first approach with Tailwind CSS
 - **🎨 Headless CMS**: Strapi integration with full content management capabilities
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+Install Docker for your platform:
+
+- **macOS**: Docker Desktop or `brew install colima docker docker-compose docker-buildx`
+- **Linux**: `curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh`
+- **Windows**: Download [Docker Desktop](https://www.docker.com/products/docker-desktop)
+
+### One-Command Setup ⚡
+
+```bash
+# Clone and setup
+git clone https://github.com/rdrkr/affilibuster.git
+cd affilibuster
+
+# Complete first-time setup (installs tools, dependencies, and hooks)
+make setup
+
+# Start all services
+make dev
+```
+
+**⏱️ Wait ~30 seconds** for all services to be ready.
+
+### Access Your Applications
+
+| Service           | URL                         | Notes                      |
+|-------------------|-----------------------------|----------------------------|
+| **Frontend**      | http://localhost:3000       | Next.js (English, default) |
+| **Frontend (IT)** | http://localhost:3000/it    | Italian locale             |
+| **Frontend (HE)** | http://localhost:3000/he    | Hebrew locale (RTL)        |
+| **Backend API**   | http://localhost:8000       | FastAPI REST API           |
+| **API Docs**      | http://localhost:8000/docs  | Swagger UI                 |
+| **CMS Admin**     | http://localhost:1337/admin | Strapi admin panel         |
+
+### Stop Services
+
+```bash
+make stop
+```
 
 ---
 
@@ -82,9 +99,6 @@ Frontend (Next.js 16, React 19, TypeScript)
 Backend API (FastAPI, Python 3.13)
   ↓ (syncs from)
 Strapi CMS (Headless, PostgreSQL)
-  ├── Products (collection type)
-  ├── Single Types (pages)
-  └── System Metadata (languages, currencies)
 ```
 
 **Key Rule**: Frontend NEVER talks to Strapi directly. All content flows through the backend API.
@@ -92,639 +106,265 @@ Strapi CMS (Headless, PostgreSQL)
 ### Project Structure
 
 ```
-affilibuster/                      # Monorepo root
-├── backend/                       # FastAPI backend
+affilibuster/                          # Monorepo root
+├── backend/                           # FastAPI backend
+│   ├── src/affilibuster_backend/
+│   │   ├── config/                    # Configuration & settings
+│   │   ├── domain/                    # Business logic (Clean Architecture)
+│   │   │   ├── entities/              # Domain models
+│   │   │   ├── repositories/          # Repository interfaces
+│   │   │   └── use_cases/             # Business logic
+│   │   ├── infrastructure/            # External integrations
+│   │   │   ├── api/                   # FastAPI routes, models, middleware
+│   │   │   │   └── routes/            # API endpoints
+│   │   │   ├── cache/                 # Redis implementation
+│   │   │   ├── cms/                   # Strapi HTTP client
+│   │   │   ├── database/              # SQLAlchemy setup & models
+│   │   │   │   ├── alembic/           # Database migrations
+│   │   │   │   ├── models/            # Database models
+│   │   │   │   └── repositories/      # Repository implementations
+│   │   │   ├── middleware/            # Custom middleware
+│   │   │   └── dependencies.py        # Dependency injection
+│   │   └── main.py                    # Application entry point
+│   └── tests/
+│       ├── fixtures/                  # Test data and helpers
+│       ├── integration/               # Integration tests
+│       │   └── infrastructure/        # Infrastructure integration tests
+│       └── unit/                      # Unit tests
+│           ├── config/                # Configuration tests
+│           ├── domain/                # Domain layer tests
+│           └── infrastructure/        # Infrastructure layer tests
+│
+├── frontend/                          # Next.js 16 frontend
 │   ├── src/
-│   │   ├── domain/               # Business logic (entities, use cases)
-│   │   ├── infrastructure/       # External integrations (API, DB, CMS)
-│   │   └── config/               # Configuration & settings
-│   ├── tests/
-│   │   ├── contract/             # API contract tests
-│   │   ├── integration/          # Integration tests
-│   │   ├── performance/          # Performance tests
-│   │   └── unit/                 # Unit tests
-│   └── alembic/                  # Database migrations
+│   │   ├── app/                       # Next.js App Router pages
+│   │   │   ├── [lang]/                # Language-specific routes
+│   │   │   │   ├── [slug]/            # Dynamic product pages
+│   │   │   │   ├── about/             # About page
+│   │   │   │   ├── contact/           # Contact page
+│   │   │   │   ├── privacy/           # Privacy policy
+│   │   │   │   ├── products/          # Products listing
+│   │   │   │   └── terms/             # Terms of service
+│   │   │   ├── api/                   # API routes (sitemaps)
+│   │   │   └── globals.css            # Global styles
+│   │   ├── components/                # React components
+│   │   ├── hooks/                     # Custom React hooks
+│   │   ├── i18n/                      # Internationalization config
+│   │   ├── lib/                       # Utilities, API clients, transformers
+│   │   ├── styles/                    # CSS modules and themes
+│   │   ├── i18n.ts                    # i18n configuration
+│   │   └── proxy.ts                   # Development proxy
+│   └── tests/                         # Test files (component, e2e, performance)
 │
-├── frontend/                      # Next.js 16 frontend
+├── cms/                               # Strapi 5 headless CMS
+│   ├── config/                        # Strapi configuration files
 │   ├── src/
-│   │   ├── app/                  # Next.js App Router pages
-│   │   │   └── [lang]/           # Language-specific routes
-│   │   ├── components/           # React components
-│   │   ├── lib/                  # Utilities, API clients, hooks
-│   │   ├── types/                # TypeScript type definitions
-│   │   ├── i18n/                 # Internationalization config
-│   │   └── styles/               # Global styles
-│   ├── tests/
-│   │   ├── components/           # Component tests (Jest + RTL)
-│   │   ├── integration/          # E2E tests (Playwright)
-│   │   └── unit/                 # Utility tests
-│   └── public/                   # Static assets
+│   │   ├── api/                       # Custom content types and APIs
+│   │   │   ├── about/                 # About page content
+│   │   │   ├── contact/               # Contact page content
+│   │   │   ├── currency/              # Currency configuration
+│   │   │   ├── footer/                # Footer content
+│   │   │   ├── homepage/              # Homepage content
+│   │   │   ├── navigation/            # Navigation structure
+│   │   │   ├── product/               # Product content type
+│   │   │   └── [other content types]  # Additional content types
+│   │   ├── components/                # UI component schemas
+│   │   ├── index.ts                   # Strapi entry point
+│   │   └── seed.ts                    # Database seeding script
+│   └── scripts/                       # Build and utility scripts
 │
-├── cms/                           # Strapi 5 headless CMS
-│   ├── config/                   # Strapi configuration
-│   ├── src/api/                  # Custom controllers & services
-│   ├── types/generated/          # Generated TypeScript types
-│   ├── database/migrations/      # Database migrations
-│   └── public/uploads/           # Uploaded media
+├── contracts/                         # OpenAPI specifications (source of truth)
+│   ├── template.openapi.yaml          # Backend API specification
+│   ├── strapi.openapi.yaml            # Strapi content types (auto-generated)
+│   └── affilibuster.openapi.yaml      # Merged specification (auto-generated)
 │
-├── contracts/                     # OpenAPI specifications (source of truth)
-│   ├── template.openapi.yaml     # Backend API specification
-│   ├── strapi.openapi.yaml       # Strapi content types (auto-generated)
-│   └── affilibuster.openapi.yaml # Merged specification (auto-generated)
+├── specs/                             # Feature specifications & designs
+├── scripts/                           # Development & deployment scripts
+│   ├── audit.sh                       # Security audit
+│   ├── build.sh                       # Build all services
+│   ├── clean.sh                       # Clean build artifacts
+│   ├── format.sh                      # Format code
+│   ├── lint.sh                        # Lint code
+│   ├── setup.sh                       # Development setup
+│   ├── test.sh                        # Run tests
+│   └── upgrade.sh                     # Upgrade dependencies
 │
-├── specs/                         # Feature specifications & designs
-│   ├── 001-core-platform-setup/
-│   └── 003-comprehensive-testing-strategy/
+├── .specify/                          # SpecKit project configuration
+│   ├── memory/constitution.md         # Project constitution & principles
+│   ├── scripts/                       # SpecKit automation scripts
+│   └── templates/                     # Documentation templates
 │
-├── scripts/                       # Development & deployment scripts
-├── .specify/                      # SpecKit project configuration
-│   ├── memory/constitution.md    # Project constitution & principles
-│   └── templates/                # Documentation templates
+├── .claude/                           # Claude AI configuration
+│   └── commands/                       # Custom AI commands
 │
-└── docker-compose.yaml             # Local development environment
+├── data/                              # Static data files
+│   └── seed-data.json                 # Initial data for seeding
+│
+├── docs/                              # Project documentation
+│   └── eco-friendly-affiliate-website-prd.md
+│
+└── docker-compose.yaml                # Local development environment
 
 ```
 
 ### 🛠️ Technology Stack
 
-<details>
-<summary><b>Frontend</b></summary>
-
-- **Framework**: Next.js 16 (App Router, SSG/ISR)
-- **UI Library**: React 19
-- **Language**: TypeScript 5.7+ (strict mode)
-- **Styling**: Tailwind CSS 4 with RTL support
-- **Internationalization**: next-intl
-- **SEO**: next-seo with schema markup
-- **Testing**: Jest + React Testing Library (unit), Playwright (E2E)
-- **Package Manager**: npm
-
-</details>
-
-<details>
-<summary><b>Backend</b></summary>
-
-- **Framework**: FastAPI 0.120+ (async, OpenAPI/Swagger)
-- **Language**: Python 3.13+ (strict typing with MyPy)
-- **Database**: PostgreSQL 15+ with SQLAlchemy ORM
-- **Cache**: Redis (session management, caching)
-- **Migrations**: Alembic
-- **Testing**: pytest with asyncio support, 80% coverage requirement
-- **Package Manager**: uv
-
-</details>
-
-<details>
-<summary><b>CMS</b></summary>
-
-- **Platform**: Strapi 5+ (headless CMS)
-- **Database**: PostgreSQL 15+ (shared with backend)
-- **Internationalization**: i18n plugin for multi-language content
-- **API**: REST API with full CRUD operations
-- **Admin Panel**: Built-in React admin dashboard
-
-</details>
-
-<details>
-<summary><b>Infrastructure</b></summary>
-
-- **Containerization**: Docker & Docker Compose
-- **Database**: PostgreSQL 15
-- **Cache**: Redis
-- **Environment**: macOS (Colima), Linux, Windows (WSL2)
-
-</details>
+- **Frontend**: Next.js 16, React 19, TypeScript 5.7+, Tailwind CSS 4, next-intl
+- **Backend**: FastAPI 0.120+, Python 3.13+, PostgreSQL 15+, Redis, Alembic
+- **CMS**: Strapi 5+, PostgreSQL 15+, i18n plugin
+- **Infrastructure**: Docker & Docker Compose
 
 ---
 
 ## 🎯 Design Principles
 
-The Affilibuster project is built on a robust set of principles documented in [
-`.specify/memory/constitution.md`](.specify/memory/constitution.md). All code and features MUST adhere to these
-principles:
+The project follows these core principles documented in [
+`.specify/memory/constitution.md`](.specify/memory/constitution.md):
 
-### I. Clean Architecture
-
-- Core business logic isolated from framework dependencies
-- Clear separation of concerns: entities, use cases, interface adapters, frameworks
-- No database, UI, or external service dependencies in business logic
-
-### II. SOLID Principles (Non-Negotiable)
-
-- **S**ingle Responsibility: Each module/class has one reason to change
-- **O**pen/Closed: Open for extension, closed for modification
-- **L**iskov Substitution: Subtypes are substitutable for base types
-- **I**nterface Segregation: Many specific interfaces over one general interface
-- **D**ependency Inversion: Depend on abstractions, not concretions
-
-### III. Test-First Development (TDD)
-
-- Tests written BEFORE implementation
-- Tests MUST fail initially (red phase)
-- Implement minimum code to pass tests (green phase)
-- Refactor while keeping tests green
-- User approval required before implementation begins
-
-### IV. Modular & Reusable Architecture
-
-- Generic, configurable components for reusability across affiliate sites
-- Clear configuration boundaries (site-specific data vs. shared logic)
-
-### V. Integration Testing Priority
-
-- Integration tests for new module or service contracts
-- Tests for changes to existing contracts or APIs
-- Inter-service and inter-module communication tests
-- Critical user flow testing
-
-### VI. API-First Design
-
-- Clear contract definitions before implementation
-- RESTful APIs for all data operations
-- API versioning from the start
-- Comprehensive API documentation
-- Support for headless CMS integration
-
-### VII. Performance & SEO Standards
-
-- Page load time <3s on 3G connections
-- Lighthouse performance score >90
-- Schema markup for products and reviews
-- hreflang tags for multi-language support
-- Image optimization (lazy loading, WebP, responsive)
-- Static HTML generation where feasible
-- Pagination instead of infinite scroll
+- **Clean Architecture**: Business logic isolated from framework dependencies
+- **SOLID Principles**: Single responsibility, open/closed, Liskov substitution, interface segregation, dependency
+  inversion
+- **Test-First Development**: Tests written before implementation (TDD)
+- **API-First Design**: OpenAPI specifications as source of truth
+- **Modular Architecture**: Reusable components across affiliate sites
+- **Performance & SEO Standards**: <3s load times, Lighthouse scores >90
+- **Strong Typing**: Strict type safety with explicit annotations and generated model usage
 
 ---
 
-## 🔧 Backend Architecture
+### Clean Architecture Layers
 
-The backend is a **BFF (Backend for Frontend)** service built with FastAPI that bridges Strapi CMS and the frontend
-application. It implements Clean Architecture with strict separation of concerns.
-
-### Core Patterns
-
-#### Generic Reusable Use Cases
-
-Instead of creating individual use case files for each endpoint, two generic classes handle all Strapi operations:
-
-- **StrapiProxyGetUseCase**: Handles GET requests with intelligent caching
-- **StrapiProxyMutateUseCase**: Handles POST/PUT/DELETE requests with automatic cache invalidation
-
-**Benefits:**
-
-- DRY principle: No code duplication across 24+ endpoints
-- Consistent caching and error handling
-- Easy to add new endpoints (3 lines of code)
-- Maintains Clean Architecture principles
-
-Example:
-
-```python
-# ONE generic class handles ALL GET requests
-use_case = StrapiProxyGetUseCase(strapi_repo, cache_service, cache_ttl=300)
-result = await use_case.execute("/any/strapi/path", params={...})
-```
-
-#### Repository Pattern with Interfaces
-
-Routes depend on interfaces, not implementations, enabling easy testing and swapping implementations:
-
-```python
-# Domain layer (business logic)
-class IStrapiRepository(ABC):
-  @abstractmethod
-  async def get(self, path: str, params: Optional[Dict] = None): ...
-
-
-# Infrastructure layer (implementation)
-class StrapiRepositoryImpl(IStrapiRepository):
-  async def get(self, path: str, params: Optional[Dict] = None):
-# httpx client, error handling, authentication
-```
-
-#### Centralized Dependency Injection
-
-Single source of truth for singleton creation:
-
-```python
-# infrastructure/dependencies.py
-initialize_dependencies()  # Called once at startup
-
-
-# Routes receive injected dependencies
-@router.get("")
-async def handler(
-  strapi_repo: StrapiRepoDep,  # Type-safe, injected
-  cache_service: CacheServiceDep,
-):
-  ...
-```
-
-### Smart Caching Strategy
-
-- **Languages**: 5-minute TTL (config rarely changes)
-- **Currencies**: 1-hour TTL (stable data)
-- **Products**: 5-minute TTL (moderate updates)
-- **User Preferences**: 30-day TTL (session-based)
-- **Cache Invalidation**: Automatic on mutations
-
-### Backend Project Structure
+Affilibuster implements **Clean Architecture** with strict dependency rules to ensure business logic remains isolated
+from external concerns:
 
 ```
-backend/
-├── src/
-│   ├── main.py                          # FastAPI application entry point
-│   ├── config/
-│   │   └── settings.py                  # Pydantic settings (environment variables)
-│   │
-│   ├── domain/                          # Business logic (no framework dependencies)
-│   │   ├── entities/
-│   │   │   └── user_preferences.py      # Domain models
-│   │   ├── repositories/
-│   │   │   ├── strapi_repository.py     # IStrapiRepository interface
-│   │   │   ├── cache_service.py         # ICacheService interface
-│   │   │   └── preferences_repository.py
-│   │   └── use_cases/
-│   │       ├── strapi_proxy.py          # Generic Strapi use cases
-│   │       ├── get_user_preferences.py
-│   │       └── update_user_preferences.py
-│   │
-│   ├── infrastructure/                  # Technical implementations
-│   │   ├── api/
-│   │   │   ├── routes/
-│   │   │   │   ├── languages.py         # GET /languages, POST /languages/detect
-│   │   │   │   ├── currencies.py        # GET /currencies, POST /currencies/convert
-│   │   │   │   ├── content.py           # GET /content/{lang}/{slug}, etc.
-│   │   │   │   └── preferences.py       # GET/PUT /user/preferences
-│   │   │   ├── models/
-│   │   │   │   ├── __init__.py
-│   │   │   │   └── generated/
-│   │   │   │       └── models.py        # Auto-generated from OpenAPI spec
-│   │   │   └── middleware/
-│   │   │
-│   │   ├── cms/
-│   │   │   └── strapi_repository_impl.py # Strapi HTTP client (httpx)
-│   │   │
-│   │   ├── cache/
-│   │   │   └── redis_cache.py            # Redis cache implementation
-│   │   │
-│   │   ├── database/
-│   │   │   ├── config.py                 # SQLAlchemy async setup
-│   │   │   ├── models/                   # SQLAlchemy ORM models
-│   │   │   └── repositories/             # Database query implementations
-│   │   │
-│   │   └── dependencies.py               # Centralized dependency injection
-│   │
-├── tests/
-│   ├── unit/
-│   │   ├── test_strapi_proxy_use_cases.py    # Generic use case tests
-│   │   ├── test_currencies_route.py
-│   │   ├── test_languages_route.py
-│   │   ├── test_content_route.py
-│   │   └── test_user_preferences.py
-│   ├── integration/
-│   ├── contract/
-│   └── conftest.py
-│
-├── alembic/                             # Database migrations
-│   ├── versions/
-│   └── env.py
-│
-└── pyproject.toml
+┌─────────────────────────────────────────────────────┐
+│                Frameworks & Drivers                 │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │
+│  │ Next.js     │  │ FastAPI     │  │ Strapi      │  │
+│  │ React       │  │ PostgreSQL  │  │ Redis       │  │
+│  └─────────────┘  └─────────────┘  └─────────────┘  │
+└─────────────────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────┐
+│                 Interface Adapters                  │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │
+│  │ Routes      │  │ Controllers │  │Repositories │  │
+│  │ Views       │  │ Presenters  │  │ Gateways    │  │
+│  └─────────────┘  └─────────────┘  └─────────────┘  │
+└─────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────┐
+│                      Use Cases                      │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │
+│  │ Business    │  │ Application │  │ Domain      │  │
+│  │ Rules       │  │ Services    │  │ Logic       │  │
+│  └─────────────┘  └─────────────┘  └─────────────┘  │
+└─────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────┐
+│                        Entities                     │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │
+│  │ Product     │  │ User        │  │ Language    │  │
+│  │ Currency    │  │ Locale      │  │ Config      │  │
+│  └─────────────┘  └─────────────┘  └─────────────┘  │
+└─────────────────────────────────────────────────────┘
 ```
 
----
+#### Layer Responsibilities
 
-## 🚀 Quick Start
+**Entities (Innermost Circle)**
 
-### Prerequisites
+- Core business objects and enterprise-wide business rules
+- Pure domain models with no framework dependencies
+- Examples: `Product`, `User`, `Language`, `Currency` entities
 
-#### macOS
+**Use Cases**
 
-```bash
-# Option 1: Docker Desktop
-# Download from: https://www.docker.com/products/docker-desktop
+- Application-specific business rules
+- Orchestrate data flow between entities and interface adapters
+- Contain the application's use case logic
 
-# Option 2: Colima + Docker CLI (lighter alternative)
-brew install colima docker docker-compose docker-buildx
-colima start
+**Interface Adapters**
+
+- Convert data from/to external formats
+- Presenters, controllers, repositories, gateways
+- Interface between use cases and frameworks
+- Examples: FastAPI routes, React components, repository implementations
+
+**Frameworks & Drivers (Outermost Circle)**
+
+- UI frameworks, databases, external APIs
+- All technical infrastructure details
+- Examples: Next.js, FastAPI, PostgreSQL, Strapi, Redis
+
+#### Dependency Flow
+
+**Critical Rule**: Dependencies point **inward only** - outer layers depend on inner layers, never the reverse:
+
+```
+Frameworks → Interface Adapters → Use Cases → Entities
 ```
 
-#### Linux
+This ensures:
 
-```bash
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-sudo apt-get install docker-compose-plugin
-```
-
-#### Windows
-
-Download [Docker Desktop](https://www.docker.com/products/docker-desktop)
-
-### Environment Configuration
-
-Before starting services, configure your environment:
-
-```bash
-# Copy environment template
-cp .env.dev.example .env
-
-# Edit .env with your configuration
-# See .env.dev.example for detailed documentation
-```
-
-**For Docker** (default): Use pre-configured values in `.env.example`
-**For Local Development**: Replace `postgres`, `redis`, `strapi` hostnames with `localhost`
-
-See [`.env.example`](.env.dev.example) for complete configuration documentation.
-
-#### Backend Environment Variables
-
-Backend-specific configuration:
-
-```bash
-# Application
-APP_ENV=development                           # development or production
-DEBUG=true                                     # Enable debug mode
-LOG_LEVEL=DEBUG                               # DEBUG, INFO, WARNING, ERROR
-
-# Server
-BACKEND_PROTOCOL=http                         # http or https
-BACKEND_PORT=8000                            # Backend API port
-BACKEND_HOST=localhost                       # Backend hostname
-INTERNAL_BACKEND_HOST=backend                # Internal Docker hostname
-
-# Security
-JWT_SECRET=your-secret-key-change-in-production
-
-# External Services
-EXCHANGE_RATE_API_KEY=your-exchange-rate-api-key
-EXCHANGE_RATE_API_URL=https://api.exchangerate-api.com/v4/latest
-
-# Database & Cache (shared with CMS)
-POSTGRES_PROTOCOL=postgresql
-POSTGRES_HOST=postgres
-POSTGRES_PORT=5432
-POSTGRES_USER=affilibuster
-POSTGRES_PASSWORD=affilibuster
-POSTGRES_BACKEND_NAME=affilibuster_db_backend
-POSTGRES_SSL=false
-
-REDIS_PROTOCOL=redis
-REDIS_HOST=redis
-REDIS_PORT=6379
-REDIS_TTL_PREFERENCES=2592000  # 30 days in seconds
-```
-
-### One-Command Startup ⚡
-
-Start **everything** (Docker + Backend + Frontend + CMS) with one command:
-
-```bash
-make dev
-```
-
-This single command:
-
-- ✅ Checks Docker is running
-- ✅ Starts PostgreSQL + Redis + Backend + Strapi (Docker)
-- ✅ Auto-installs frontend dependencies
-- ✅ Starts Next.js frontend
-- ✅ Shows all service logs
-- ✅ Handles cleanup on Ctrl+C
-
-**⏱️ Wait ~30 seconds** for all services to be ready.
-
-### Access Your Applications
-
-| Service           | URL                         | Notes                                      |
-|-------------------|-----------------------------|--------------------------------------------|
-| **Frontend**      | http://localhost:3000       | Next.js (English, default)                 |
-| **Frontend (IT)** | http://localhost:3000/it    | Italian locale                             |
-| **Frontend (HE)** | http://localhost:3000/he    | Hebrew locale (RTL)                        |
-| **Backend API**   | http://localhost:8000       | FastAPI REST API                           |
-| **API Docs**      | http://localhost:8000/docs  | Swagger UI                                 |
-| **API ReDoc**     | http://localhost:8000/redoc | ReDoc documentation                        |
-| **CMS Admin**     | http://localhost:1337/admin | Strapi admin panel (takes ~60s first time) |
-| **CMS API**       | http://localhost:1337/api   | REST API                                   |
-
-### Stop Services
-
-Press **Ctrl+C** in the terminal or run:
-
-```bash
-make stop
-```
-
----
+- **Business logic isolation** - no framework dependencies in domain layer
+- **Testability** - inner layers can be tested independently
+- **Flexibility** - frameworks can be replaced without affecting business logic
+- **Maintainability** - clear separation of concerns
 
 ## 🛠️ Development
 
-### Development Setup with Docker (Step by Step)
-
-<details>
-<summary><b>1. Clone and Configure Environment</b></summary>
+### Getting Started
 
 ```bash
-git clone https://github.com/rdrkr/affilibuster.git
-cd affilibuster
+# Show all available commands
+make help
 
-# Copy environment configuration
-cp .env.dev.example .env
+# Complete first-time setup
+make setup
 
-# Edit .env if needed (default values work for Docker)
-```
+# Start all services (Docker + Frontend + CMS)
+make dev
 
-</details>
-
-<details>
-<summary><b>2. Start Docker Services</b></summary>
-
-```bash
-# Start Docker services only
+# Start only Docker services
 make start
 
-# Or with docker-compose
-docker-compose up -d
-```
+# Stop services
+make stop
 
-Services started:
+# Restart services
+make restart
 
-- PostgreSQL (port 5432)
-- Redis (port 6379)
-- Backend API (port 8000)
+# View logs
+make logs                # All services
+make logs-backend        # Backend only
 
-</details>
-
-<details>
-<summary><b>3. Verify Services are Healthy</b></summary>
-
-```bash
-docker-compose ps
-# Or
+# Check service status
 make ps
-
-# Health check
-curl http://localhost:8000/health
-# Or
 make health
 ```
 
-All services should show "healthy" status.
+### Development Workflow
 
-</details>
-
-<details>
-<summary><b>4. View Logs</b></summary>
-
-```bash
-# All services
-make logs
-
-# Backend only
-make logs-backend
-
-# Or with docker-compose
-docker-compose logs -f backend
-```
-
-</details>
-
-<details>
-<summary><b>5. Start Frontend (Separate Terminal)</b></summary>
-
-```bash
-cd frontend
-npm install
-cp .env.dev.example .env.local
-npm run dev
-```
-
-Access at: http://localhost:3000
-
-</details>
-
-<details>
-<summary><b>6. Start CMS (Separate Terminal)</b></summary>
-
-```bash
-cd cms
-npm install
-cp .env.dev.example .env
-npm run develop
-```
-
-Access at: http://localhost:1337/admin
-
-</details>
-
-### Local Development (without Docker)
-
-<details>
-<summary><b>Backend Setup</b></summary>
-
-```bash
-cd backend
-
-# Install dependencies
-uv sync
-
-# Setup environment (copy from root and edit)
-cp ../.env.dev.example .env
-
-# Run migrations
-alembic upgrade head
-
-# Start server
-uvicorn src.main:app --reload --port 8000
-```
-
-</details>
-
-#### Backend Development Guidelines
-
-**Code Style:**
-
-- **Formatter**: Ruff
-- **Linter**: Ruff
-- **Type Checker**: Mypy (strict mode)
-
-All business logic is strictly typed. Framework integration code (routes, middleware) has relaxed checking due to
-FastAPI's dynamic nature.
-
-**Adding New Endpoints:**
-
-1. **Create route handler** in `infrastructure/api/routes/`:
-
-```python
-@router.get("/new-endpoint")
-async def get_new(
-  strapi_repo: StrapiRepoDep,
-  cache_service: CacheServiceDep,
-):
-  use_case = StrapiProxyGetUseCase(strapi_repo, cache_service)
-  data = await use_case.execute("/api/path", params={...})
-  return transform_response(data)
-```
-
-2. **Define response model** in `infrastructure/api/models/__init__.py` or route file
-
-3. **Add helper transformation function** to normalize Strapi response:
-
-```python
-async def transform_response(strapi_data: Dict) -> YourModel:
-  attrs = strapi_data.get("attributes", strapi_data)
-  return YourModel(
-    field1=attrs.get("field1"),
-    field2=attrs.get("field2"),
-  )
-```
-
-4. **Add comprehensive tests** in `tests/unit/`
-
-<details>
-<summary><b>Frontend Setup</b></summary>
-
-```bash
-cd frontend
-
-npm install
-# Copy NEXT_PUBLIC_* variables from root .env.dev.example to .env.local
-cp ../.env.dev.example .env.local
-# Edit .env.local to only keep NEXT_PUBLIC_* variables, update URLs to localhost
-
-npm run dev
-```
-
-</details>
-
-<details>
-<summary><b>CMS Setup</b></summary>
-
-```bash
-cd cms
-
-npm install
-# Copy Strapi variables from root .env.dev.example to .env
-cp ../.env.dev.example .env
-
-npm run develop
-```
-
-</details>
+1. **Environment Setup**: `make setup` handles all prerequisites
+2. **Start Development**: `make dev` starts everything you need
+3. **Code Changes**: Edit files in your preferred editor
+4. **Testing**: Run `make test` to ensure quality
+5. **Code Quality**: Use `make lint` and `make format` to maintain standards
+6. **Deployment**: Use `make build` for production builds
 
 ---
 
 ## 🧪 Testing
 
-Affilibuster has comprehensive testing infrastructure with 80%+ coverage requirements.
-
 ### Quick Commands
 
 ```bash
-# Run all tests
+# Run all tests with coverage
 make test
 
 # Run tests in parallel (faster)
@@ -732,84 +372,43 @@ make test-parallel
 
 # Individual modules
 make test-backend          # Backend (pytest)
-make test-backend-fast     # Backend unit tests only
 make test-frontend         # Frontend (Jest)
 make test-cms              # CMS (when custom code added)
 
-# Coverage
+# Coverage reports
 make coverage-merge        # Merge all module reports
 make coverage-view         # Open merged HTML report
 ```
 
-#### Backend Testing Patterns
+---
 
-All backend tests follow these patterns:
-
-- **Async Tests**: Use `@pytest.mark.asyncio` for async functions
-- **Mocking**: Use `AsyncMock` for repository mocking, `mocker.patch()` for dependencies
-- **In-Memory Database**: Use SQLite for database tests without external dependencies
-- **No External Services**: All integrations mocked (Strapi, Redis, PostgreSQL)
-
-### Coverage Requirements
-
-| Module   | Target | Tool                 |
-|----------|--------|----------------------|
-| Backend  | 94%    | pytest + coverage.py |
-| Frontend | 80%    | Jest                 |
-
-## 🎨 Code Quality & Linting
-
-Affilibuster enforces strict code quality standards across all languages.
+## 🎨 Code Quality
 
 ### Quick Commands
 
 ```bash
-# Check code style (all modules)
-make lint
-
-# Check specific types
-make lint-python            # Check Python code (Ruff)
-make lint-typescript        # Check TypeScript/JavaScript (ESLint)
-make lint-shell             # Check shell scripts (ShellCheck)
-make lint-openapi           # Validate OpenAPI specifications (Redocly)
-
-# Check-only mode (no auto-fix)
-make lint-check                # Check all without fixing
-make lint-python-check         # Check Python only (Ruff)
-make lint-typescript-check     # Check TypeScript only (ESLint)
-make lint-shell-check          # Check shell only (ShellCheck)
-make lint-openapi-check        # Validate OpenAPI only (Redocly, check-only)
+# Check code style
+make lint              # Check all code style
+make lint-fix          # Auto-fix linting issues
 
 # Format code
-make format                 # Format all code (Ruff, Prettier, shfmt)
-make format-check           # Check formatting without making changes
+make format            # Format all code
+make format-check      # Check formatting without changes
 
-# Format specific types
-make format-python          # Format Python code (Ruff)
-make format-typescript      # Format TypeScript/JavaScript (Prettier)
-make format-shell           # Format shell scripts (shfmt)
-make format-makefile        # Validate Makefile (checkmake)
+# Specific modules
+make lint-python            # Check Python code
+make lint-typescript        # Check TypeScript/JavaScript
+make lint-openapi           # Validate OpenAPI specs
 ```
 
-### Tools by Language
+### Tools & Standards
 
-| Language              | Linter     | Formatter | Validator     |
-|-----------------------|------------|-----------|---------------|
-| Python                | Ruff       | Ruff      | MyPy (strict) |
-| TypeScript/JavaScript | ESLint     | Prettier  | TypeScript    |
-| Bash                  | ShellCheck | shfmt     | N/A           |
-| OpenAPI               | Redocly    | N/A       | Redocly       |
-| Makefile              | checkmake  | N/A       | N/A           |
+- **Python**: Ruff (linter/formatter), MyPy (type checker)
+- **TypeScript**: ESLint (linter), Prettier (formatter)
+- **OpenAPI**: Redocly (validation)
+- **Pre-commit hooks**: Automatically installed with `make setup`
 
-### Pre-commit Hooks
-
-Pre-commit hooks are automatically installed as part of `make setup`. They prevent accidental commits of badly formatted
-code:
-
-```bash
-# Hooks run automatically on every commit
-# To bypass: git commit --no-verify (not recommended)
-```
+---
 
 ## 📡 API Documentation
 
@@ -855,134 +454,28 @@ Affilibuster uses a **layered OpenAPI architecture** with auto-generated types f
 - **Merged Specification**: `contracts/affilibuster.openapi.yaml` - Merged spec (generated by Backend during startup)
 - **Backend references Strapi** via external `$ref` for clean separation of concerns
 
-#### Code Generation Workflow
+### Interactive Documentation
 
-Code generation is handled automatically by each service container during startup:
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+- **OpenAPI JSON**: http://localhost:8000/openapi.json
 
-**CMS (Strapi)**:
+### OpenAPI Architecture
 
-- Generates `contracts/strapi.openapi.yaml` from content types
-- Runs automatically before Strapi server starts
+Affilibuster uses a **layered OpenAPI architecture** with auto-generated types:
 
-**Backend (FastAPI)**:
+- **Layer 1**: Strapi content schemas (auto-generated)
+- **Layer 2**: Backend API contracts (extends Strapi types)
+- **Generated Code**: TypeScript and Python models from merged spec
 
-- Merges `template.openapi.yaml` + `strapi.openapi.yaml` → `affilibuster.openapi.yaml`
-- Generates Python models from merged spec
-- Runs automatically during container startup
-
-**Frontend (Next.js)**:
-
-- Generates TypeScript types from `affilibuster.openapi.yaml`
-- Runs automatically during container startup
-
-**To manually regenerate Strapi OpenAPI** (when content types change):
+### Key Commands
 
 ```bash
-cd cms
-npm run openapi:generate
-```
-
-**Validate Specifications**:
-
-```bash
-# Using Redocly CLI with strict linting rules (recommended)
+# Validate OpenAPI specifications
 make lint-openapi
 
-# Or run directly
-redocly lint contracts/template.openapi.yaml
-redocly lint contracts/strapi.openapi.yaml
-```
-
-**Configuration**: OpenAPI linting rules are defined in `redocly.yaml` at the repository root:
-
-- Uses `recommended-strict` ruleset for comprehensive validation
-- Allows localhost URLs for development (see `no-server-example.com` rule)
-- Allows external schema references (see `no-unused-components` rule)
-
-See [redocly.yaml](cms/redocly.yaml) for full configuration.
-
-#### Type Safety
-
-- **TypeScript**: Generated in `shared/types/generated/` from `@hey-api/openapi-ts`
-- **Python**: Generated in `backend/src/infrastructure/api/models/generated/` from `datamodel-code-generator`
-- **Both** use the same source OpenAPI spec, ensuring frontend and backend types always match
-
-**Important**: Always regenerate types after OpenAPI spec changes to maintain type safety.
-
-### REST API Endpoints
-
-#### Base URLs
-
-- Development: `http://localhost:8000`
-- Production: `https://api.affilibuster.com` (example)
-
-#### Interactive Documentation
-
-- **Swagger UI**: `/docs`
-- **ReDoc**: `/redoc`
-- **OpenAPI JSON**: `/openapi.json`
-
-### API Contracts
-
-API contracts are defined in OpenAPI 3.1.0 format:
-
-- **Backend API**: `contracts/template.openapi.yaml`
-- **Strapi Content**: `contracts/strapi.openapi.yaml`
-- **Generated TypeScript Types**: `shared/types/generated/` and re-exported from `shared/types/api.ts`
-- **Generated Python Models**: `backend/src/infrastructure/api/models/generated/models.py`
-
-**Key Principle**: OpenAPI specifications are the authoritative source of truth. Implementation follows the spec, not
-vice versa.
-
-#### Backend Error Handling
-
-All backend errors return a consistent JSON response format:
-
-```json
-{
-  "error": "Not Found",
-  "message": "Content not found",
-  "code": "CONTENT_NOT_FOUND",
-  "timestamp": "2025-10-29T12:00:00Z"
-}
-```
-
-| HTTP Code | Meaning     | When                         |
-|-----------|-------------|------------------------------|
-| 200       | Success     | Normal operation             |
-| 400       | Bad Request | Invalid parameters           |
-| 404       | Not Found   | Content/preference not found |
-| 502       | Bad Gateway | Strapi unreachable           |
-
-#### Data Flow Examples
-
-**Getting Languages with Cache:**
-
-```
-1. Client: GET /v1/languages
-2. Route: Calls StrapiProxyGetUseCase
-3. Use Case: Checks cache → MISS → Calls Strapi
-4. Repository: HTTP GET /api/i18n/locales with Bearer token
-5. Use Case: Caches result (5-minute TTL)
-6. Route: Transforms Strapi format → Language schema
-7. Client: Returns sorted language list (EN first)
-```
-
-On subsequent requests within 5 minutes:
-
-- Cache HIT → Skip Strapi call → Faster response (~10ms vs ~200ms)
-
-**User Preferences (Backend Database):**
-
-```
-1. Client: GET /v1/user/preferences
-   Header: X-Session-Id: session-abc-123
-2. Route: Validates session ID format
-3. Use Case: Checks cache → Queries PostgreSQL
-4. Database: SELECT * FROM user_preferences WHERE session_id = ?
-5. Use Case: Caches with 30-day TTL
-6. Route: Returns UserPreferencesModel
-7. Client: Receives currency, language preferences, etc.
+# Regenerate Strapi OpenAPI (when content types change)
+cd cms && npm run openapi:generate
 ```
 
 ---
@@ -991,53 +484,20 @@ On subsequent requests within 5 minutes:
 
 ### Single Source of Truth: Strapi CMS
 
-All user-facing content originates from Strapi CMS, ensuring:
-
-- **Consistency**: One authoritative source for all content
-- **Scalability**: Easy to add new languages without backend code changes
-- **Maintainability**: No hardcoded fallback strings in frontend
+All user-facing content originates from Strapi CMS, ensuring consistency and scalability.
 
 ### Content Types
 
-#### Collection Types (Multi-instance)
+- **Collection Types**: Products, languages, currencies, locales
+- **Single Types**: Navigation, footer, homepage, about, contact, legal pages
 
-- `product` - Affiliate products with URLs, pricing, featured status
-- `system-language` - Supported languages with RTL support info
-- `currency` - Supported currencies with exchange rates
-- `system-locale` - Language-currency locale combinations
+### Adding New Languages
 
-#### Single Types (One instance per language)
+1. Update `cms/scripts/seed.ts` with new language seeding
+2. Run `make seed` or let it happen automatically on startup
+3. **Zero backend code changes required**
 
-- `navigation` - Navigation menus, language/theme selectors
-- `footer` - Footer links, contact info
-- `homepage`, `about`, `contact` - Page content
-- `privacy`, `term` - Legal pages
-- `error-404`, `error-410` - Error pages
-
-### Adding New Languages (Scalable Approach)
-
-To add French without changing backend code:
-
-1. **Update `cms/scripts/seed.ts`** - Add seeding functions for the new language
-
-2. **Run the seed script** - Seeds both database and makes API calls to Strapi:
-
-```bash
-cd cms
-npm run seed
-```
-
-Or let it happen automatically on first Strapi bootstrap during `make build` or `docker-compose up`.
-
-That's it! Backend automatically syncs new language on next startup. **Zero backend code changes required.**
-
-### Critical Requirements
-
-1. **No Frontend → Strapi Direct Access** - All frontend requests must go through backend
-2. **All Content Must Be Published** - Draft content returns 404
-3. **Single Types Need `publishedAt`** - Required field to be queryable
-4. **No Fallback Strings** - Missing content shows "not available" message
-5. **Backend Caches Content** - Products synced to database for fast access
+---
 
 ## ⚡ Performance & SEO
 
@@ -1045,90 +505,17 @@ That's it! Backend automatically syncs new language on next startup. **Zero back
 
 - Page load <3s on 3G connections
 - Lighthouse scores >90
-- LCP (Largest Contentful Paint) <2.5s
-- FCP (First Contentful Paint) <1.8s
-- TTFB (Time to First Byte) <600ms
+- LCP <2.5s, FCP <1.8s, TTFB <600ms
 
 ### SEO Features
 
-- ✅ Comprehensive hreflang tags for multi-language support
-- ✅ Schema markup (Product, BreadcrumbList, Organization)
-- ✅ Sitemaps (en, it, he) with proper URLs
-- ✅ Breadcrumb navigation at page level
-- ✅ SEO-friendly slugs in content
-- ✅ Meta tags (title, description, keywords)
-- ✅ OG tags for social sharing
-- ✅ Image optimization (lazy loading, WebP, responsive)
-- ✅ Critical CSS inlined
-- ✅ Pagination instead of infinite scroll
-
-### Optimization Techniques
-
-- **Static Site Generation (SSG)**: Pre-render pages at build time
-- **Image Optimization**: Next.js Image component with automatic optimization
-- **Code Splitting**: Automatic route-based code splitting
-- **Caching Strategy**:
-  - Browser cache headers configured
-  - CDN-friendly response structure
-- **Compression**: Gzip compression for all text responses
-
-## 📚 Additional Documentation
-
-### Feature Specifications
-
-- [Feature Specifications](./specs/)
-- [Core Platform Setup](./specs/001-core-platform-setup/)
-- [Testing Strategy](./specs/003-comprehensive-testing-strategy/)
-
-### Quick References
-
-- [Constitution & Principles](.specify/memory/constitution.md)
-- [Testing Quick Start](specs/003-comprehensive-testing-strategy/quickstart.md)
+- Comprehensive hreflang tags for multi-language support
+- Schema markup (Product, BreadcrumbList, Organization)
+- Sitemaps for each language
+- Meta tags, OG tags, image optimization
+- Critical CSS inlined, pagination instead of infinite scroll
 
 ---
-
-## 🛠️ Quick Commands Reference
-
-### Development
-
-```bash
-make help                      # Show all available commands
-make setup                     # Complete first-time setup (tools + dependencies + hooks)
-make dev                       # Start all services (Docker + Frontend + CMS)
-make start                     # Start only Docker services
-make stop                      # Stop Docker services
-make restart                   # Restart Docker services
-make logs                      # View all service logs
-make logs-backend              # View backend logs only
-```
-
-### Testing
-
-```bash
-make test              # All tests with coverage
-make test-parallel     # Tests in parallel (faster)
-make test-backend      # Backend tests only
-make test-frontend     # Frontend tests only
-make test-cms          # CMS tests only
-```
-
-### Code Quality
-
-```bash
-make lint              # Check all code style
-make lint-fix          # Auto-fix linting issues
-make format            # Format all code
-make format-check      # Check formatting without changes
-```
-
-### Utilities
-
-```bash
-make ps                # Show running containers
-make health            # Check backend health
-make clean             # Clean up everything
-make build             # Build for production
-```
 
 <div align="center">
 

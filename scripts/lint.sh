@@ -16,12 +16,14 @@ LINT_TYPE=$(echo "${LINT_TYPE}" | tr '[:upper:]' '[:lower:]')
 # Lint Python code
 lint_python() {
   cd backend
+  uv sync --quiet --all-extras || LINT_FAILED=$?
+
   if [[ "${ACTION}" = "check" ]]; then
     echo "  📋 Checking Python code (Ruff)..."
-    uv run ruff check . || LINT_FAILED=$?
+    uv run task lint || LINT_FAILED=$?
   else
     echo "  🔧 Fixing Python code (Ruff)..."
-    uv run ruff check --fix . || LINT_FAILED=$?
+    uv run task lint-fix || LINT_FAILED=$?
   fi
   cd ..
 }
@@ -118,12 +120,12 @@ esac
 
 # Print result
 if [[ ${LINT_FAILED} -ne 0 ]]; then
-  echo "❌ Linting failed"
+  echo "  ❌ Linting failed"
   exit "${LINT_FAILED}"
 fi
 
 if [[ "${ACTION}" = "check" ]]; then
-  echo "✅ Linting complete"
+  echo "  ✅ Linting complete"
 else
-  echo "✅ All auto-fixes complete"
+  echo "  ✅ All auto-fixes complete"
 fi

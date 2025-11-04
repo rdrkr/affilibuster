@@ -11,6 +11,7 @@ Provides:
 
 import asyncio
 import os
+from pathlib import Path
 
 import httpx
 import pytest
@@ -18,12 +19,11 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from config import settings
-from infrastructure.cms.strapi_repository_impl import StrapiRepositoryImpl
-from infrastructure.database.config import get_db
-from infrastructure.database.models import Base
-from main import app
-from tests.helpers.strapi_test_data import StrapiTestDataManager
+from affilibuster_backend.config import settings
+from affilibuster_backend.infrastructure.cms.strapi_repository_impl import StrapiRepositoryImpl
+from affilibuster_backend.infrastructure.database.config import get_db
+from affilibuster_backend.infrastructure.database.models import Base
+from affilibuster_backend.main import app
 
 # Test database URL (use in-memory SQLite for tests)
 TEST_POSTGRES_URL = "sqlite+aiosqlite:///:memory:"
@@ -31,7 +31,7 @@ TEST_POSTGRES_URL = "sqlite+aiosqlite:///:memory:"
 
 def is_running_in_docker() -> bool:
     """Detect if running inside Docker container."""
-    return os.path.exists("/.dockerenv") or os.environ.get("DOCKER_ENV") == "true"
+    return Path("/.dockerenv").exists() or os.environ.get("DOCKER_ENV") == "true"
 
 
 def get_strapi_url() -> str:
@@ -114,7 +114,7 @@ def strapi_token():
 
 
 @pytest_asyncio.fixture
-async def wait_for_strapi(strapi_url):
+async def wait_for_strapi(strapi_url: str):
     """
     Fixture that waits for Strapi to be healthy before tests run.
 
@@ -128,21 +128,19 @@ async def wait_for_strapi(strapi_url):
             async with httpx.AsyncClient() as client:
                 response = await client.get(f"{strapi_url}/_health", timeout=5.0)
                 if response.status_code in (200, 204):
-                    print(f"✅ Strapi is healthy at {strapi_url}")
                     yield
                     return
         except (httpx.ConnectError, httpx.ReadError, httpx.TimeoutException):
             pass
 
         if attempt < max_retries - 1:
-            print(f"⏳ Waiting for Strapi... (attempt {attempt + 1}/{max_retries})")
             await asyncio.sleep(retry_delay)
 
     raise RuntimeError(f"Strapi did not become healthy at {strapi_url} after {max_retries} attempts")
 
 
 @pytest.fixture
-async def real_strapi_repository(strapi_url, strapi_token):
+async def real_cms_repository(strapi_url, strapi_token):
     """Fixture providing a real Strapi repository client."""
     return StrapiRepositoryImpl(base_url=strapi_url, api_token=strapi_token)
 
@@ -156,9 +154,13 @@ async def integration_app(wait_for_strapi):
     """
     # Reinitialize dependencies to pick up fresh settings
     # This ensures we use the latest token from .env
-    from infrastructure.dependencies import initialize_dependencies
+    from affilibuster_backend.infrastructure.dependencies import initialize_dependencies
 
     initialize_dependencies()
+
+    # Re-apply database override for integration tests that need database
+    # (e.g., preferences routes that store data in PostgreSQL)
+    app.dependency_overrides[get_db] = override_get_db
 
     yield app
 
@@ -167,27 +169,42 @@ async def integration_app(wait_for_strapi):
 
 
 @pytest_asyncio.fixture
-async def strapi_test_data(real_strapi_repository):
+async def integration_client(integration_app):
     """
-    Fixture providing test data management for integration tests.
+    Fixture providing an async HTTP client for real integration tests.
 
-    Creates test content in Strapi before test runs.
-    Cleans up after test completes.
+    Uses real Strapi service (no mocking).
+    Creates database tables for tests that need them (e.g., user preferences).
+    Depends on integration_app to ensure dependencies are reinitialized.
     """
-    manager = StrapiTestDataManager(real_strapi_repository)
+    # Create database tables
+    async with test_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
-    # Create test data
-    try:
-        await manager.create_test_homepage()
-        await manager.create_test_navigation()
-        await manager.create_test_about()
-    except Exception as e:
-        print(f"⚠️ Warning: Could not create all test data: {e}")
+    async with AsyncClient(transport=ASGITransport(app=integration_app), base_url="http://backend:8000") as client:
+        yield client
 
-    yield manager
+    # Drop tables after tests
+    async with test_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
 
-    # Cleanup
-    await manager.cleanup()
+
+@pytest.fixture
+def strapi_test_data(wait_for_strapi):
+    """
+    Fixture ensuring Strapi is ready with seeded data.
+
+    Strapi should already be seeded via 'npm run seed' in the CMS.
+    This fixture just ensures Strapi is available before tests run.
+
+    Tests should use expected_seed_data constants for assertions:
+        from tests.fixtures.expected_seed_data import EXPECTED_CURRENCIES
+
+    IMPORTANT: If cms/src/seed.ts changes, update tests/fixtures/expected_seed_data.py
+    """
+    # Strapi is ready (wait_for_strapi dependency ensures this)
+    # No test data creation needed - Strapi is already seeded
+    return
 
 
 @pytest.fixture
