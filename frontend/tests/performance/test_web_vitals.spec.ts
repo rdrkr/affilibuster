@@ -16,7 +16,7 @@
 
 import { test, expect } from '@playwright/test'
 
-const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000'
+const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN ?? 'http://localhost:3000'
 
 // Google's "Good" thresholds
 const WEB_VITALS_THRESHOLDS = {
@@ -38,9 +38,16 @@ interface WebVitalsMetrics {
 }
 
 /**
- * Capture Web Vitals using Performance Observer API
+ * Capture Web Vitals using Performance Observer API.
+ *
+ * Monitors and collects Core Web Vitals metrics (LCP, FID, CLS, FCP, TTFB)
+ * using browser Performance Observer API over a 5-second observation period.
+ *
+ * @param page - Playwright page instance to capture metrics from
+ * @returns Promise resolving to Web Vitals metrics object with all core measurements
  */
-async function captureWebVitals(page: unknown): Promise<WebVitalsMetrics> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function captureWebVitals(page: any): Promise<WebVitalsMetrics> {
   return await page.evaluate(() => {
     return new Promise<WebVitalsMetrics>(resolve => {
       const metrics: Partial<WebVitalsMetrics> = {}
@@ -56,15 +63,18 @@ async function captureWebVitals(page: unknown): Promise<WebVitalsMetrics> {
       // Capture LCP
       const lcpObserver = new PerformanceObserver(list => {
         const entries = list.getEntries()
-        const lastEntry = entries[entries.length - 1] as unknown
-        metrics.lcp = lastEntry.renderTime || lastEntry.loadTime
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const lastEntry = entries[entries.length - 1] as any
+
+        metrics.lcp = lastEntry.renderTime ?? lastEntry.loadTime
       })
       lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true })
 
       // Capture FID
       const fidObserver = new PerformanceObserver(list => {
         const entries = list.getEntries()
-        entries.forEach((entry: unknown) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        entries.forEach((entry: any) => {
           if (!metrics.fid) {
             metrics.fid = entry.processingStart - entry.startTime
             metricsCollected++
@@ -83,7 +93,8 @@ async function captureWebVitals(page: unknown): Promise<WebVitalsMetrics> {
       // Capture CLS
       let clsValue = 0
       const clsObserver = new PerformanceObserver(list => {
-        for (const entry of list.getEntries() as unknown[]) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        for (const entry of list.getEntries() as any[]) {
           if (!entry.hadRecentInput) {
             clsValue += entry.value
           }
@@ -107,6 +118,7 @@ async function captureWebVitals(page: unknown): Promise<WebVitalsMetrics> {
 
       // Capture TTFB
       const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
+
       if (navigationEntry) {
         metrics.ttfb = navigationEntry.responseStart - navigationEntry.requestStart
         metricsCollected++
@@ -117,7 +129,9 @@ async function captureWebVitals(page: unknown): Promise<WebVitalsMetrics> {
       setTimeout(() => {
         const lcpEntries = performance.getEntriesByType('largest-contentful-paint')
         if (lcpEntries.length > 0) {
-          const lastLcp = lcpEntries[lcpEntries.length - 1] as unknown
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const lastLcp = lcpEntries[lcpEntries.length - 1] as any
+
           metrics.lcp = lastLcp.renderTime || lastLcp.loadTime
           metricsCollected++
         }
@@ -141,11 +155,11 @@ test.describe('Web Vitals - English Pages', () => {
     const metrics = await captureWebVitals(page)
 
     console.log('\nEnglish Homepage Web Vitals:')
-    console.log(`  LCP: ${metrics.lcp.toFixed(0)}ms (threshold: ${WEB_VITALS_THRESHOLDS.lcp}ms)`)
-    console.log(`  FID: ${metrics.fid.toFixed(0)}ms (threshold: ${WEB_VITALS_THRESHOLDS.fid}ms)`)
-    console.log(`  CLS: ${metrics.cls.toFixed(3)} (threshold: ${WEB_VITALS_THRESHOLDS.cls})`)
-    console.log(`  FCP: ${metrics.fcp.toFixed(0)}ms (threshold: ${WEB_VITALS_THRESHOLDS.fcp}ms)`)
-    console.log(`  TTFB: ${metrics.ttfb.toFixed(0)}ms (threshold: ${WEB_VITALS_THRESHOLDS.ttfb}ms)`)
+    console.log(`  LCP: ${metrics.lcp.toFixed(0)}ms (threshold: ${WEB_VITALS_THRESHOLDS.lcp.toString()}ms)`)
+    console.log(`  FID: ${metrics.fid.toFixed(0)}ms (threshold: ${WEB_VITALS_THRESHOLDS.fid.toString()}ms)`)
+    console.log(`  CLS: ${metrics.cls.toFixed(3)} (threshold: ${WEB_VITALS_THRESHOLDS.cls.toString()})`)
+    console.log(`  FCP: ${metrics.fcp.toFixed(0)}ms (threshold: ${WEB_VITALS_THRESHOLDS.fcp.toString()}ms)`)
+    console.log(`  TTFB: ${metrics.ttfb.toFixed(0)}ms (threshold: ${WEB_VITALS_THRESHOLDS.ttfb.toString()}ms)`)
 
     // Validate all metrics
     expect(metrics.lcp).toBeLessThan(WEB_VITALS_THRESHOLDS.lcp)
@@ -227,14 +241,16 @@ test.describe('Web Vitals - Interactive Elements', () => {
     const startTime = Date.now()
 
     // Click language switcher
+
     await page.click('[data-testid="language-switcher"]', { timeout: 5000 }).catch(() => {
       // Fallback if data-testid not found
+
       page.click('button:has-text("English")')
     })
 
     const interactionDelay = Date.now() - startTime
 
-    console.log(`\nLanguage Switcher Interaction Delay: ${interactionDelay}ms`)
+    console.log(`\nLanguage Switcher Interaction Delay: ${interactionDelay.toString()}ms`)
 
     // Should respond within 200ms (INP threshold)
     expect(interactionDelay).toBeLessThan(WEB_VITALS_THRESHOLDS.inp)
@@ -248,12 +264,13 @@ test.describe('Web Vitals - Interactive Elements', () => {
 
     await page.click('[data-testid="currency-selector"]', { timeout: 5000 }).catch(() => {
       // Fallback
+
       page.click('button:has-text("USD")')
     })
 
     const interactionDelay = Date.now() - startTime
 
-    console.log(`\nCurrency Selector Interaction Delay: ${interactionDelay}ms`)
+    console.log(`\nCurrency Selector Interaction Delay: ${interactionDelay.toString()}ms`)
 
     expect(interactionDelay).toBeLessThan(WEB_VITALS_THRESHOLDS.inp)
   })
@@ -261,7 +278,7 @@ test.describe('Web Vitals - Interactive Elements', () => {
 
 test.describe('Web Vitals - Comparison Report', () => {
   test('Generate Web Vitals report for all languages', async ({ page }) => {
-    const results: { [key: string]: WebVitalsMetrics } = {}
+    const results: Record<string, WebVitalsMetrics> = {}
 
     const pages = [
       { name: 'English', url: BASE_URL },

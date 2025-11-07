@@ -13,9 +13,36 @@
  * - Total page load < 3s
  */
 
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
-const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000'
+interface PerformanceMetrics {
+  ttfb: number
+  domContentLoaded: number
+  loadComplete: number
+  fcp: number
+  lcp: number
+  domInteractive: number
+  transferSize: number
+}
+
+interface NetworkResults {
+  fast4g: {
+    loadTime?: number
+    metrics?: PerformanceMetrics
+  }
+  slow3g: {
+    loadTime?: number
+    metrics?: PerformanceMetrics
+  }
+}
+
+interface ResourceTiming {
+  url: string | undefined
+  duration: number
+  size: number
+}
+
+const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN ?? 'http://localhost:3000'
 
 // Performance thresholds
 const THRESHOLDS = {
@@ -38,9 +65,15 @@ const SLOW_3G = {
 }
 
 /**
- * Extract performance metrics from Navigation Timing API
+ * Extract performance metrics from Navigation Timing API.
+ *
+ * Measures key performance indicators including TTFB, FCP, LCP, and total load time
+ * using the browser's Performance API.
+ *
+ * @param page - Playwright page instance to extract metrics from
+ * @returns Promise resolving to performance metrics object with timing measurements
  */
-async function getPerformanceMetrics(page: unknown) {
+async function getPerformanceMetrics(page: Page): Promise<PerformanceMetrics> {
   return await page.evaluate(() => {
     const perfData = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
     const paintEntries = window.performance.getEntriesByType('paint')
@@ -53,7 +86,8 @@ async function getPerformanceMetrics(page: unknown) {
     try {
       const lcpEntries = window.performance.getEntriesByType('largest-contentful-paint')
       if (lcpEntries.length > 0) {
-        lcp = lcpEntries[lcpEntries.length - 1].startTime
+        const lastEntry = lcpEntries[lcpEntries.length - 1]
+        lcp = lastEntry ? lastEntry.startTime : 0
       }
     } catch {
       // LCP not available
@@ -74,8 +108,12 @@ async function getPerformanceMetrics(page: unknown) {
 test.describe('Page Load Performance (3G)', () => {
   test.beforeEach(async ({ context }) => {
     // Enable network throttling for all tests
-    const cdpSession = await context.newCDPSession(await context.pages()[0])
-    await cdpSession.send('Network.emulateNetworkConditions', SLOW_3G)
+    const pages = context.pages()
+    const firstPage = pages[0]
+    if (firstPage) {
+      const cdpSession = await context.newCDPSession(firstPage)
+      await cdpSession.send('Network.emulateNetworkConditions', SLOW_3G)
+    }
   })
 
   test('English homepage loads under 3s on 3G', async ({ page }) => {
@@ -160,7 +198,7 @@ test.describe('Page Load Performance (3G)', () => {
 
 test.describe('Page Load Performance (Comparison)', () => {
   test('Compare performance across network conditions', async ({ browser }) => {
-    const results: unknown = {
+    const results: NetworkResults = {
       fast4g: {},
       slow3g: {},
     }
@@ -198,21 +236,21 @@ test.describe('Page Load Performance (Comparison)', () => {
 
     console.log('\nPerformance Comparison:')
     console.log('Fast 4G:')
-    console.log(`  Load Time: ${results.fast4g.loadTime}ms`)
-    console.log(`  FCP: ${results.fast4g.metrics.fcp.toFixed(0)}ms`)
+    console.log(`  Load Time: ${results.fast4g.loadTime ?? 0}ms`)
+    console.log(`  FCP: ${results.fast4g.metrics?.fcp.toFixed(0) ?? 'N/A'}ms`)
     console.log('Slow 3G:')
-    console.log(`  Load Time: ${results.slow3g.loadTime}ms`)
-    console.log(`  FCP: ${results.slow3g.metrics.fcp.toFixed(0)}ms`)
+    console.log(`  Load Time: ${results.slow3g.loadTime ?? 0}ms`)
+    console.log(`  FCP: ${results.slow3g.metrics?.fcp.toFixed(0) ?? 'N/A'}ms`)
 
     // Both should meet basic thresholds
-    expect(results.fast4g.loadTime).toBeLessThan(2000)
-    expect(results.slow3g.loadTime).toBeLessThan(THRESHOLDS.total)
+    expect(results.fast4g.loadTime ?? 0).toBeLessThan(2000)
+    expect(results.slow3g.loadTime ?? 0).toBeLessThan(THRESHOLDS.total)
   })
 })
 
 test.describe('Resource Loading Performance', () => {
   test('Critical resources load quickly', async ({ page }) => {
-    const resourceTimings: unknown[] = []
+    const resourceTimings: ResourceTiming[] = []
 
     page.on('response', async response => {
       const url = response.url()
@@ -234,7 +272,9 @@ test.describe('Resource Loading Performance', () => {
       .sort((a, b) => b.duration - a.duration)
       .slice(0, 10)
       .forEach(resource => {
-        console.log(`  ${resource.url}: ${resource.duration.toFixed(0)}ms (${(resource.size / 1024).toFixed(2)}KB)`)
+        console.log(
+          `  ${resource.url ?? 'unknown'}: ${resource.duration.toFixed(0)}ms (${(resource.size / 1024).toFixed(2)}KB)`
+        )
       })
 
     // Ensure no single resource takes too long

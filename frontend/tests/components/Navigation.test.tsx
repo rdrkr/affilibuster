@@ -4,9 +4,10 @@
  * Unit tests for Navigation component
  */
 
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { Navigation } from '@/components/Navigation'
 import { usePathname } from 'next/navigation'
+import { createMockNavigation } from '../helpers/mockFactories'
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -22,42 +23,57 @@ jest.mock('@/components/CurrencySelector', () => ({
   CurrencySelector: () => <div data-testid="currency-selector">CurrencySelector</div>,
 }))
 
+jest.mock('@/components/ThemeSelector', () => ({
+  ThemeSelector: () => <div data-testid="theme-selector">ThemeSelector</div>,
+}))
+
 describe('Navigation', () => {
+  const mockNavData = createMockNavigation({
+    brandName: 'Affilibuster',
+    homeLabel: 'Home',
+    productsLabel: 'Products',
+    aboutLabel: 'About',
+    contactLabel: 'Contact',
+    mobileMenuLabel: 'Open menu',
+    mobileMenuCloseLabel: 'Close menu',
+  })
+
   beforeEach(() => {
     jest.clearAllMocks()
+    ;(usePathname as jest.Mock).mockReturnValue('/en')
   })
 
   describe('logo', () => {
     it('should render Affilibuster logo', () => {
-      usePathname.mockReturnValue('/')
+      ;(usePathname as jest.Mock).mockReturnValue('/')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="en" />)
 
       expect(screen.getByText('Affilibuster')).toBeInTheDocument()
     })
 
     it('should link logo to root for English', () => {
-      usePathname.mockReturnValue('/products')
+      ;(usePathname as jest.Mock).mockReturnValue('/en/products')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="en" />)
 
       const logo = screen.getByText('Affilibuster')
-      expect(logo).toHaveAttribute('href', '/')
+      expect(logo).toHaveAttribute('href', '/en')
     })
 
     it('should link logo to Italian root', () => {
-      usePathname.mockReturnValue('/it/products')
+      ;(usePathname as jest.Mock).mockReturnValue('/it/products')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="it" />)
 
       const logo = screen.getByText('Affilibuster')
       expect(logo).toHaveAttribute('href', '/it')
     })
 
     it('should link logo to Hebrew root', () => {
-      usePathname.mockReturnValue('/he/about')
+      ;(usePathname as jest.Mock).mockReturnValue('/he/about')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="he" />)
 
       const logo = screen.getByText('Affilibuster')
       expect(logo).toHaveAttribute('href', '/he')
@@ -66,33 +82,33 @@ describe('Navigation', () => {
 
   describe('navigation links', () => {
     it('should render all navigation links', () => {
-      usePathname.mockReturnValue('/')
+      ;(usePathname as jest.Mock).mockReturnValue('/')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="en" />)
 
       expect(screen.getByText('Home')).toBeInTheDocument()
       expect(screen.getByText('Products')).toBeInTheDocument()
       expect(screen.getByText('About')).toBeInTheDocument()
     })
 
-    it('should render links without prefix for English', () => {
-      usePathname.mockReturnValue('/products')
+    it('should render links with English prefix', () => {
+      ;(usePathname as jest.Mock).mockReturnValue('/en/products')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="en" />)
 
       const homeLink = screen.getByText('Home')
       const productsLink = screen.getByText('Products')
       const aboutLink = screen.getByText('About')
 
-      expect(homeLink).toHaveAttribute('href', '/')
-      expect(productsLink).toHaveAttribute('href', '/products')
-      expect(aboutLink).toHaveAttribute('href', '/about')
+      expect(homeLink).toHaveAttribute('href', '/en')
+      expect(productsLink).toHaveAttribute('href', '/en/products')
+      expect(aboutLink).toHaveAttribute('href', '/en/about')
     })
 
     it('should render links with Italian prefix', () => {
-      usePathname.mockReturnValue('/it/about')
+      ;(usePathname as jest.Mock).mockReturnValue('/it/about')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="it" />)
 
       const homeLink = screen.getByText('Home')
       const productsLink = screen.getByText('Products')
@@ -104,9 +120,9 @@ describe('Navigation', () => {
     })
 
     it('should render links with Hebrew prefix', () => {
-      usePathname.mockReturnValue('/he/products')
+      ;(usePathname as jest.Mock).mockReturnValue('/he/products')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="he" />)
 
       const homeLink = screen.getByText('Home')
       expect(homeLink).toHaveAttribute('href', '/he')
@@ -115,58 +131,58 @@ describe('Navigation', () => {
 
   describe('active link styling', () => {
     it('should highlight active link on home page', () => {
-      usePathname.mockReturnValue('/')
+      ;(usePathname as jest.Mock).mockReturnValue('/en/')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="en" />)
 
       const homeLink = screen.getByText('Home')
-      expect(homeLink).toHaveClass('text-white')
+      expect(homeLink).toHaveClass('bg-primary-700')
     })
 
     it('should highlight active link on products page', () => {
-      usePathname.mockReturnValue('/products')
+      ;(usePathname as jest.Mock).mockReturnValue('/en/products')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="en" />)
 
       const productsLink = screen.getByText('Products')
-      expect(productsLink).toHaveClass('text-white')
+      expect(productsLink).toHaveClass('bg-primary-700')
     })
 
     it('should highlight active link on Italian about page', () => {
-      usePathname.mockReturnValue('/it/about')
+      ;(usePathname as jest.Mock).mockReturnValue('/it/about')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="it" />)
 
       const aboutLink = screen.getByText('About')
-      expect(aboutLink).toHaveClass('text-white')
+      expect(aboutLink).toHaveClass('bg-primary-700')
     })
 
     it('should not highlight inactive links', () => {
-      usePathname.mockReturnValue('/products')
+      ;(usePathname as jest.Mock).mockReturnValue('/en/products')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="en" />)
 
       const homeLink = screen.getByText('Home')
       const aboutLink = screen.getByText('About')
 
-      expect(homeLink).not.toHaveClass('text-white')
-      expect(aboutLink).not.toHaveClass('text-white')
+      expect(homeLink).not.toHaveClass('bg-primary-700')
+      expect(aboutLink).not.toHaveClass('bg-primary-700')
     })
   })
 
   describe('child components', () => {
     it('should render LanguageSwitcher', () => {
-      usePathname.mockReturnValue('/')
+      ;(usePathname as jest.Mock).mockReturnValue('/')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="en" />)
 
       expect(screen.getByTestId('language-switcher')).toBeInTheDocument()
     })
 
     it('should render CurrencySelector', () => {
-      usePathname.mockReturnValue('/')
+      ;(usePathname as jest.Mock).mockReturnValue('/')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="en" />)
 
       expect(screen.getByTestId('currency-selector')).toBeInTheDocument()
     })
@@ -174,27 +190,27 @@ describe('Navigation', () => {
 
   describe('mobile menu button', () => {
     it('should render mobile menu button', () => {
-      usePathname.mockReturnValue('/')
+      ;(usePathname as jest.Mock).mockReturnValue('/')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="en" />)
 
       const mobileButton = screen.getByLabelText('Open menu')
       expect(mobileButton).toBeInTheDocument()
     })
 
     it('should have proper aria-label', () => {
-      usePathname.mockReturnValue('/')
+      ;(usePathname as jest.Mock).mockReturnValue('/')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="en" />)
 
       const mobileButton = screen.getByLabelText('Open menu')
       expect(mobileButton).toHaveAttribute('aria-label', 'Open menu')
     })
 
     it('should contain hamburger icon', () => {
-      usePathname.mockReturnValue('/')
+      ;(usePathname as jest.Mock).mockReturnValue('/')
 
-      render(<Navigation />)
+      render(<Navigation data={mockNavData} lang="en" />)
 
       const button = screen.getByLabelText('Open menu')
       const svg = button.querySelector('svg')
@@ -204,18 +220,18 @@ describe('Navigation', () => {
 
   describe('styling', () => {
     it('should have nav tag', () => {
-      usePathname.mockReturnValue('/')
+      ;(usePathname as jest.Mock).mockReturnValue('/')
 
-      const { container } = render(<Navigation />)
+      const { container } = render(<Navigation data={mockNavData} lang="en" />)
 
       const nav = container.querySelector('nav')
       expect(nav).toBeInTheDocument()
     })
 
     it('should have primary background', () => {
-      usePathname.mockReturnValue('/')
+      ;(usePathname as jest.Mock).mockReturnValue('/')
 
-      const { container } = render(<Navigation />)
+      const { container } = render(<Navigation data={mockNavData} lang="en" />)
 
       const nav = container.querySelector('nav')
       expect(nav).toHaveClass('bg-primary-800')
@@ -223,12 +239,165 @@ describe('Navigation', () => {
     })
 
     it('should have shadow styling', () => {
-      usePathname.mockReturnValue('/')
+      ;(usePathname as jest.Mock).mockReturnValue('/')
 
-      const { container } = render(<Navigation />)
+      const { container } = render(<Navigation data={mockNavData} lang="en" />)
 
       const nav = container.querySelector('nav')
       expect(nav).toHaveClass('shadow-lg')
+    })
+  })
+
+  describe('null data handling', () => {
+    it('should return null when navData is null', () => {
+      ;(usePathname as jest.Mock).mockReturnValue('/')
+
+      const { container } = render(<Navigation data={null} lang="en" />)
+
+      expect(container.querySelector('nav')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('mobile menu functionality', () => {
+    it('should open mobile menu when button is clicked', () => {
+      ;(usePathname as jest.Mock).mockReturnValue('/')
+
+      render(<Navigation data={mockNavData} lang="en" />)
+
+      const button = screen.getByLabelText('Open menu')
+      fireEvent.click(button)
+
+      // Mobile menu should be visible with links
+      const mobileLinks = screen.getAllByText('Home')
+      // Desktop + mobile = 2
+      expect(mobileLinks.length).toBeGreaterThan(1)
+    })
+
+    it('should update aria-label when menu is opened', () => {
+      ;(usePathname as jest.Mock).mockReturnValue('/')
+
+      render(<Navigation data={mockNavData} lang="en" />)
+
+      const button = screen.getByLabelText('Open menu')
+      fireEvent.click(button)
+
+      // Aria-label should change to close
+      const closeButton = screen.getByLabelText('Close menu')
+      expect(closeButton).toBeInTheDocument()
+    })
+
+    it('should close mobile menu when link is clicked', () => {
+      ;(usePathname as jest.Mock).mockReturnValue('/')
+
+      const { container } = render(<Navigation data={mockNavData} lang="en" />)
+
+      // Open menu
+      const openButton = screen.getByLabelText('Open menu')
+      fireEvent.click(openButton)
+
+      // Verify mobile menu panel is visible
+      const mobilePanel = container.querySelector('.md\\:hidden.bg-white')
+      expect(mobilePanel).toBeInTheDocument()
+
+      // Find mobile menu link (there should be 2 "Home" links now - desktop and mobile)
+      const mobileLinks = screen.getAllByText('Home')
+      const mobileHomeLink = mobileLinks[1] // Second one is mobile
+
+      // Click mobile link
+      if (mobileHomeLink) {
+        fireEvent.click(mobileHomeLink)
+      }
+
+      // Menu should close - mobile panel should be gone
+      const closedPanel = container.querySelector('.md\\:hidden.bg-white')
+      expect(closedPanel).not.toBeInTheDocument()
+    })
+
+    it('should render mobile menu links with correct hrefs', () => {
+      ;(usePathname as jest.Mock).mockReturnValue('/')
+
+      render(<Navigation data={mockNavData} lang="en" />)
+
+      // Open menu
+      const button = screen.getByLabelText('Open menu')
+      fireEvent.click(button)
+
+      // Check all links are present
+      const allHomeLinks = screen.getAllByText('Home')
+      const allProductsLinks = screen.getAllByText('Products')
+      const allAboutLinks = screen.getAllByText('About')
+
+      // Should have 2 of each (desktop + mobile)
+      expect(allHomeLinks.length).toBe(2)
+      expect(allProductsLinks.length).toBe(2)
+      expect(allAboutLinks.length).toBe(2)
+    })
+
+    it('should highlight active link in mobile menu', () => {
+      ;(usePathname as jest.Mock).mockReturnValue('/en/products')
+
+      render(<Navigation data={mockNavData} lang="en" />)
+
+      // Open menu
+      const button = screen.getByLabelText('Open menu')
+      fireEvent.click(button)
+
+      // Get mobile Products link (second one)
+      const productLinks = screen.getAllByText('Products')
+      const mobileProductsLink = productLinks[1]
+
+      // Should have active styling
+      expect(mobileProductsLink).toHaveClass('bg-primary-50')
+    })
+  })
+
+  describe('language prefixes', () => {
+    it('should use Italian prefix for lang="it"', () => {
+      ;(usePathname as jest.Mock).mockReturnValue('/it')
+
+      render(<Navigation data={mockNavData} lang="it" />)
+
+      const logo = screen.getByText('Affilibuster')
+      expect(logo).toHaveAttribute('href', '/it')
+
+      const homeLink = screen.getByText('Home')
+      expect(homeLink).toHaveAttribute('href', '/it')
+    })
+
+    it('should use Hebrew prefix for lang="he"', () => {
+      ;(usePathname as jest.Mock).mockReturnValue('/he')
+
+      render(<Navigation data={mockNavData} lang="he" />)
+
+      const logo = screen.getByText('Affilibuster')
+      expect(logo).toHaveAttribute('href', '/he')
+
+      const homeLink = screen.getByText('Home')
+      expect(homeLink).toHaveAttribute('href', '/he')
+    })
+
+    it('should use English prefix for lang="en"', () => {
+      ;(usePathname as jest.Mock).mockReturnValue('/en')
+
+      render(<Navigation data={mockNavData} lang="en" />)
+
+      const logo = screen.getByText('Affilibuster')
+      expect(logo).toHaveAttribute('href', '/en')
+
+      const homeLink = screen.getByText('Home')
+      expect(homeLink).toHaveAttribute('href', '/en')
+    })
+
+    it('should use empty prefix for unknown lang', () => {
+      ;(usePathname as jest.Mock).mockReturnValue('/')
+
+      render(<Navigation data={mockNavData} lang="fr" />)
+
+      const logo = screen.getByText('Affilibuster')
+      expect(logo).toHaveAttribute('href', '/')
+
+      const homeLink = screen.getByText('Home')
+      expect(homeLink).toHaveAttribute('href', '/')
     })
   })
 })

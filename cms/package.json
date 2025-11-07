@@ -6,47 +6,48 @@
   "scripts": {
     "strapi": "strapi",
     "openapi:generate": "strapi openapi generate --output ../contracts/strapi.openapi.yaml && npx tsx ./scripts/merge-openapi.ts && npx @redocly/cli lint /contracts/strapi.openapi.yaml && npx @redocly/cli lint /contracts/affilibuster.openapi.yaml",
-    "lint": "eslint --max-warnings 0 .",
-    "lint:fix": "eslint --fix --max-warnings 0 .",
+    "type-check": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint --max-warnings 0 . && npm run type-check",
+    "lint:fix": "eslint --fix --max-warnings 0 . && npm run type-check",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
-    "type-check": "tsc --noEmit -p tsconfig.json",
     "preflight": "npm run openapi:generate && npm run format:fix && npm run lint:fix",
     "dev": "npm run preflight && strapi develop",
     "develop": "npm run dev",
     "prebuild": "npm run preflight",
     "build": "strapi build",
-    "clean": "rm -rf coverage node_modules build .tmp .strapi dist public types ../contracts/strapi.openapi.yaml ../contracts/affilibuster.openapi.yaml",
+    "clean": "rm -rf coverage node_modules build .tmp .strapi dist public",
     "prestart": "npm run build",
     "start": "strapi start"
   },
   "dependencies": {
-    "@strapi/strapi": "^5.28.0",
-    "pg": "^8.13.1",
+    "@strapi/strapi": "^5.30.1",
+    "pg": "^8.16.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.30.1",
-    "styled-components": "^6.1.15",
-    "zod": "3.26.0-canary.20250708T225111"
+    "styled-components": "^6.1.19"
   },
   "overrides": {
     "zod": "3.26.0-canary.20250708T225111"
   },
   "devDependencies": {
-    "@eslint/js": "^9.38.0",
-    "@redocly/cli": "^2.8.0",
+    "@eslint/js": "^9.39.1",
+    "@redocly/cli": "^2.11.1",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^24.7.2",
-    "@typescript-eslint/eslint-plugin": "^8.46.2",
-    "@typescript-eslint/parser": "^8.46.2",
-    "eslint": "^9.18.0",
+    "@types/node": "^24.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.3",
+    "@typescript-eslint/parser": "^8.46.3",
+    "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsdoc": "^61.1.12",
     "jiti": "^2.6.1",
-    "lint-staged": "^15.2.10",
-    "prettier": "^3.4.2",
-    "tsx": "^4.7.0",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.46.2"
+    "js-yaml": "^4.1.0",
+    "lint-staged": "^16.2.6",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.3"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

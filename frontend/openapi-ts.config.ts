@@ -9,5 +9,15 @@ export default defineConfig({
     lint: 'eslint',
     path: './src/lib/generated',
   },
-  plugins: ['@hey-api/typescript'],
+  parser: {
+    transforms: {
+      enums: 'root',
+    },
+  },
+  plugins: [
+    {
+      name: '@hey-api/typescript',
+      enums: 'typescript',
+    },
+  ],
 })

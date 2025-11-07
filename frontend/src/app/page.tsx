@@ -6,9 +6,11 @@
  */
 
 import { redirect } from 'next/navigation'
+import { getDefaultLanguage } from '@/config/languages'
 
-export default function RootPage() {
-  // Redirect to default locale
+export default async function RootPage() {
+  // Redirect to default locale dynamically fetched from backend
   // The proxy will handle locale detection and redirect appropriately
-  redirect('/en')
+  const defaultLang = await getDefaultLanguage()
+  redirect(`/${defaultLang.code}`)
 }

@@ -11,7 +11,7 @@ Validates user preferences against Strapi currency data.
 
 import re
 import uuid as uuid_lib
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Header, HTTPException
@@ -20,9 +20,7 @@ from affilibuster_backend.domain.entities import (
     Error,
     UpdatePreferences,
 )
-from affilibuster_backend.domain.entities import UserPreferences as UserPreferencesModel
-from affilibuster_backend.domain.entities.generated.models import CurrenciesGetResponse
-from affilibuster_backend.domain.entities.user_preferences import UserPreferences
+from affilibuster_backend.domain.entities.generated.models import CurrenciesGetResponse, CurrencyCode, UserPreferences
 from affilibuster_backend.infrastructure.dependencies import (
     GetCMSContentUseCaseDep,
     GetUserPreferencesUseCaseDep,
@@ -37,7 +35,7 @@ MAX_SESSION_ID_LENGTH = 64
 
 
 async def validate_currency_code(
-    code: str,
+    code: CurrencyCode,
     use_case: GetCMSContentUseCaseDep,
 ) -> bool:
     """
@@ -53,7 +51,8 @@ async def validate_currency_code(
 
         # Check if currency code exists and is active
         # currency_data is a Pydantic CurrenciesGetResponse model with a 'data' field
-        return any(curr.code == code and curr.is_active for curr in currency_data.data)
+        # Compare enum value with currency code string from Strapi
+        return any(curr.code == code.value and curr.is_active for curr in currency_data.data)
     except Exception:  # noqa: BLE001
         # On any error (network, parsing, CMS unavailable), we can't validate, so return False
         return False
@@ -65,7 +64,7 @@ async def get_preferences(
     update_use_case: UpdateUserPreferencesUseCaseDep,
     x_session_id: Annotated[str, Header(alias="X-Session-Id")],
     _x_user_id: Annotated[str | None, Header(alias="X-User-Id")] = None,
-) -> UserPreferencesModel:
+) -> UserPreferences:
     """
     Get user preferences by session ID or user ID.
 
@@ -89,24 +88,23 @@ async def get_preferences(
 
     if not prefs:
         # Create new preferences with defaults for new session
+        now = datetime.now(UTC)
         prefs = UserPreferences(
+            id=uuid_lib.uuid4(),
             session_id=x_session_id,
-            selected_currency="USD",
+            user_id=None,
+            selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=False,
             detected_language=None,
+            created_at=now,
+            updated_at=now,
+            expires_at=now + timedelta(days=30),
         )
         # Save the new preferences
         prefs = await update_use_case.execute(prefs)
 
-    # Convert to response model
-    return UserPreferencesModel(
-        id=prefs.id,
-        sessionId=prefs.session_id,
-        selectedCurrency=prefs.selected_currency,
-        dismissedLanguagePrompt=prefs.dismissed_language_prompt,
-        detectedLanguage=prefs.detected_language,
-        expiresAt=prefs.expires_at,
-    )
+    # UserPreferences extends the generated API model, so return it directly
+    return prefs
 
 
 @router.put("", responses={400: {"model": Error}})
@@ -116,7 +114,7 @@ async def update_preferences(
     update_use_case: UpdateUserPreferencesUseCaseDep,
     prefs_repo: PreferencesRepoDep,
     x_session_id: Annotated[str, Header(alias="X-Session-Id")],
-) -> UserPreferencesModel:
+) -> UserPreferences:
     """
     Update user preferences.
 
@@ -146,28 +144,24 @@ async def update_preferences(
         if request.dismissed_language_prompt is not None:
             existing.dismissed_language_prompt = request.dismissed_language_prompt
         if request.detected_language is not None:
-            # Convert enum to string value for entity
-            existing.detected_language = request.detected_language.value if request.detected_language else None
+            existing.detected_language = request.detected_language
         prefs = existing
     else:
         # Create new
+        now = datetime.now(UTC)
         prefs = UserPreferences(
+            id=uuid_lib.uuid4(),
             session_id=x_session_id,
-            selected_currency=request.selected_currency or "USD",
-            dismissed_language_prompt=request.dismissed_language_prompt or False,
-            # Convert enum to string value for entity
-            detected_language=request.detected_language.value if request.detected_language else None,
+            user_id=None,
+            selected_currency=request.selected_currency or CurrencyCode.USD,
+            dismissed_language_prompt=request.dismissed_language_prompt
+            if request.dismissed_language_prompt is not None
+            else False,
+            detected_language=request.detected_language,
+            created_at=now,
+            updated_at=now,
+            expires_at=now + timedelta(days=30),
         )
 
-    # Execute use case
-    updated = await update_use_case.execute(prefs)
-
-    # Convert to response model
-    return UserPreferencesModel(
-        id=updated.id,
-        sessionId=updated.session_id,
-        selectedCurrency=updated.selected_currency,
-        dismissedLanguagePrompt=updated.dismissed_language_prompt,
-        detectedLanguage=updated.detected_language,
-        expiresAt=updated.expires_at,
-    )
+    # Execute use case and return directly (UserPreferences extends the generated API model)
+    return await update_use_case.execute(prefs)

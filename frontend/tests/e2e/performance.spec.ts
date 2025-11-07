@@ -31,8 +31,8 @@ test.describe('Performance', () => {
       return {
         domContentLoaded: navigation.domContentLoadedEventEnd - navigation.fetchStart,
         loadComplete: navigation.loadEventEnd - navigation.fetchStart,
-        firstPaint: performance.getEntriesByName('first-paint')[0]?.startTime || 0,
-        firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0,
+        firstPaint: performance.getEntriesByName('first-paint')[0]?.startTime ?? 0,
+        firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime ?? 0,
       }
     })
 
@@ -156,8 +156,12 @@ test.describe('Performance', () => {
 
         const observer = new PerformanceObserver(list => {
           for (const entry of list.getEntries()) {
-            if ((entry as unknown).hadRecentInput) continue
-            clsValue += (entry as unknown).value
+            const layoutShiftEntry = entry as PerformanceEntry & {
+              hadRecentInput?: boolean
+              value?: number
+            }
+            if (layoutShiftEntry.hadRecentInput) continue
+            clsValue += layoutShiftEntry.value ?? 0
           }
         })
 

@@ -58,7 +58,7 @@ if [[ "${UPGRADE_CMS}" = true ]]; then
   echo -e "${BLUE}📦 Upgrading CMS (Strapi)...${NC}"
 
   # Run upgrade inside Strapi container (has correct Node version)
-  docker-compose exec strapi sh -c "
+  docker compose exec strapi sh -c "
     # Clean previous build to avoid stale compilation issues
     echo '  🧹 Cleaning previous builds...'
     rm -rf dist build node_modules/.vite node_modules/.esbuild
@@ -85,7 +85,7 @@ if [[ "${UPGRADE_FRONTEND}" = true ]]; then
   echo -e "${BLUE}📦 Upgrading Frontend (Next.js)...${NC}"
 
   # Run upgrade inside Frontend container (has correct Node version)
-  docker-compose exec frontend sh -c "
+  docker compose exec frontend sh -c "
     # Update dependencies
     echo '  📥 Updating frontend dependencies...'
     npm update || true
@@ -104,7 +104,7 @@ if [[ "${UPGRADE_BACKEND}" = true ]]; then
   echo -e "${BLUE}📦 Upgrading Backend (Python)...${NC}"
 
   # Run upgrade inside Backend container (has correct Python version)
-  docker-compose exec backend sh -c "
+  docker compose exec backend sh -c "
     echo '  📥 Updating Python dependencies...'
     uv sync --upgrade
     echo '  ℹ️  Dependencies updated successfully'
@@ -117,7 +117,7 @@ fi
 # === Rebuild Docker Images ===
 if [[ "${UPGRADE_CMS}" = true ]] || [[ "${UPGRADE_BACKEND}" = true ]]; then
   echo -e "${YELLOW}⚠️  Docker images may need to be rebuilt${NC}"
-  echo "  Run 'docker-compose up -d --build' to rebuild with new dependencies"
+  echo "  Run 'docker compose up -d --build' to rebuild with new dependencies"
   echo ""
 fi
 

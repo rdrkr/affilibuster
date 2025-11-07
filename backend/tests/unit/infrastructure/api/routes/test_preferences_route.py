@@ -14,7 +14,11 @@ import pytest
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 
-from affilibuster_backend.domain.entities.user_preferences import UserPreferences
+from affilibuster_backend.domain.entities.generated.models import (
+    CurrencyCode,
+    DetectedLanguage2,
+    UserPreferences,
+)
 from affilibuster_backend.infrastructure.api.routes.preferences import router, validate_currency_code
 
 
@@ -30,7 +34,7 @@ class TestValidateCurrencyCode:
         use_case.execute.side_effect = Exception("Test exception")
 
         # Act
-        result = await validate_currency_code("USD", use_case)
+        result = await validate_currency_code(CurrencyCode.USD, use_case)
 
         # Assert
         assert result is False
@@ -43,7 +47,7 @@ class TestValidateCurrencyCode:
         use_case.execute.side_effect = RuntimeError("HTTP error")
 
         # Act
-        result = await validate_currency_code("EUR", use_case)
+        result = await validate_currency_code(CurrencyCode.EUR, use_case)
 
         # Assert
         assert result is False
@@ -56,7 +60,7 @@ class TestValidateCurrencyCode:
         use_case.execute.side_effect = TimeoutError("Request timeout")
 
         # Act
-        result = await validate_currency_code("GBP", use_case)
+        result = await validate_currency_code(CurrencyCode.GBP, use_case)
 
         # Assert
         assert result is False
@@ -98,7 +102,7 @@ class TestGetPreferencesRoute:
         new_prefs = UserPreferences(
             id=uuid4(),
             session_id="test-session",
-            selected_currency="USD",
+            selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=False,
             detected_language=None,
             created_at=datetime.now(UTC),
@@ -184,7 +188,7 @@ class TestUpdatePreferencesRoute:
         existing_prefs = UserPreferences(
             id=uuid4(),
             session_id="test-session",
-            selected_currency="USD",
+            selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=False,
             detected_language=None,
             created_at=datetime.now(UTC),
@@ -197,7 +201,7 @@ class TestUpdatePreferencesRoute:
         updated_prefs = UserPreferences(
             id=existing_prefs.id,
             session_id="test-session",
-            selected_currency="EUR",
+            selected_currency=CurrencyCode.EUR,
             dismissed_language_prompt=False,
             detected_language=None,
             created_at=datetime.now(UTC),
@@ -244,7 +248,7 @@ class TestUpdatePreferencesRoute:
         new_prefs = UserPreferences(
             id=uuid4(),
             session_id="test-session",
-            selected_currency="EUR",
+            selected_currency=CurrencyCode.EUR,
             dismissed_language_prompt=False,
             detected_language=None,
             created_at=datetime.now(UTC),
@@ -289,7 +293,7 @@ class TestUpdatePreferencesRoute:
         existing_prefs = UserPreferences(
             id=uuid4(),
             session_id="test-session",
-            selected_currency="USD",
+            selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=False,
             detected_language=None,
             created_at=datetime.now(UTC),
@@ -302,7 +306,7 @@ class TestUpdatePreferencesRoute:
         updated_prefs = UserPreferences(
             id=existing_prefs.id,
             session_id="test-session",
-            selected_currency="USD",  # unchanged
+            selected_currency=CurrencyCode.USD,  # unchanged
             dismissed_language_prompt=True,  # changed
             detected_language=None,  # unchanged
             created_at=datetime.now(UTC),
@@ -345,7 +349,7 @@ class TestUpdatePreferencesRoute:
         existing_prefs = UserPreferences(
             id=uuid4(),
             session_id="test-session",
-            selected_currency="USD",
+            selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=False,
             detected_language=None,
             created_at=datetime.now(UTC),
@@ -358,9 +362,9 @@ class TestUpdatePreferencesRoute:
         updated_prefs = UserPreferences(
             id=existing_prefs.id,
             session_id="test-session",
-            selected_currency="USD",  # unchanged
+            selected_currency=CurrencyCode.USD,  # unchanged
             dismissed_language_prompt=False,  # unchanged
-            detected_language="it",  # changed
+            detected_language=DetectedLanguage2.IT,  # changed
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),
             expires_at=datetime.now(UTC) + timedelta(days=30),
@@ -383,8 +387,8 @@ class TestUpdatePreferencesRoute:
         data = response.json()
         assert data["detectedLanguage"] == "it"
 
-        # Verify the existing preferences object was updated
-        assert existing_prefs.detected_language == "it"
+        # Verify existing preferences object was updated
+        assert existing_prefs.detected_language == DetectedLanguage2.IT
 
     @pytest.mark.asyncio
     async def test_update_all_fields_on_existing_preferences(
@@ -401,7 +405,7 @@ class TestUpdatePreferencesRoute:
         existing_prefs = UserPreferences(
             id=uuid4(),
             session_id="test-session",
-            selected_currency="USD",
+            selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=False,
             detected_language=None,
             created_at=datetime.now(UTC),
@@ -414,9 +418,9 @@ class TestUpdatePreferencesRoute:
         updated_prefs = UserPreferences(
             id=existing_prefs.id,
             session_id="test-session",
-            selected_currency="EUR",
+            selected_currency=CurrencyCode.EUR,
             dismissed_language_prompt=True,
-            detected_language="he",
+            detected_language=DetectedLanguage2.HE,
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),
             expires_at=datetime.now(UTC) + timedelta(days=30),
@@ -446,6 +450,62 @@ class TestUpdatePreferencesRoute:
         assert data["detectedLanguage"] == "he"
 
         # Verify all fields were updated
-        assert existing_prefs.selected_currency == "EUR"
+        assert existing_prefs.selected_currency == CurrencyCode.EUR
         assert existing_prefs.dismissed_language_prompt is True
-        assert existing_prefs.detected_language == "he"
+        assert existing_prefs.detected_language == DetectedLanguage2.HE
+
+    @pytest.mark.asyncio
+    async def test_update_preferences_with_invalid_currency_raises_400(
+        self, test_app, mock_update_use_case, mock_prefs_repo
+    ):
+        """Test PUT with invalid currency raises 400 error (covers line 127)."""
+        from affilibuster_backend.infrastructure.dependencies import (
+            get_cms_content_use_case,
+            get_preferences_repo,
+            get_update_user_preferences_use_case,
+        )
+
+        # Create mock strapi use case that returns currencies NOT including JPY
+        mock_invalid_strapi_use_case = AsyncMock()
+
+        class MockCurrency:
+            def __init__(self, code, is_active) -> None:
+                self.code = code
+                self.is_active = is_active
+
+        class MockCurrencyResponse:
+            def __init__(self) -> None:
+                self.data = [
+                    MockCurrency("USD", True),
+                    MockCurrency("EUR", True),
+                    # JPY is NOT in the list
+                ]
+
+        mock_invalid_strapi_use_case.execute.return_value = MockCurrencyResponse()
+
+        # Mock no existing preferences (so we test validation before anything else)
+        mock_prefs_repo.get_by_session.return_value = None
+
+        # Override dependencies
+        test_app.dependency_overrides[get_cms_content_use_case] = lambda: mock_invalid_strapi_use_case
+        test_app.dependency_overrides[get_update_user_preferences_use_case] = lambda: mock_update_use_case
+        test_app.dependency_overrides[get_preferences_repo] = lambda: mock_prefs_repo
+
+        async with AsyncClient(transport=ASGITransport(app=test_app), base_url="http://test") as client:
+            response = await client.put(
+                "/v1/user/preferences",
+                headers={"X-Session-Id": "test-session"},
+                json={"selectedCurrency": "JPY"},  # JPY is valid enum but not in Strapi
+            )
+
+        # Should return 400 with INVALID_CURRENCY error
+        assert response.status_code == 400
+        data = response.json()
+        assert "detail" in data
+        error_detail = data["detail"]
+        assert error_detail["code"] == "INVALID_CURRENCY"
+        assert "JPY" in error_detail["message"]
+
+        # Verify validation was attempted but update was not called
+        mock_invalid_strapi_use_case.execute.assert_called_once()
+        mock_update_use_case.execute.assert_not_called()

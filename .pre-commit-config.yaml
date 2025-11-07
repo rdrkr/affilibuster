@@ -1,6 +1,30 @@
 # Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 fail_fast: false
+exclude: |
+  (?x)^(
+    \.git/|
+    \.next/|
+    \.pytest_cache/|
+    \.venv/|
+    __pycache__/|
+    alembic/versions/|
+    backend/htmlcov/|
+    backend/src/affilibuster_backend/domain/entities/generated/|
+    build/|
+    cms/build/|
+    cms/types/|
+    contracts/affilibuster.openapi.yaml|
+    contracts/strapi.openapi.yaml|
+    coverage/|
+    dist/|
+    frontend/coverage/|
+    frontend/src/lib/generated/|
+    htmlcov/|
+    node_modules/|
+    package-lock\.json|
+    venv/
+  )
 repos:
   # Security scanning
   - repo: https://github.com/gitleaks/gitleaks
@@ -22,25 +46,6 @@ repos:
           - '|#|'
           - --use-current-year
           - --detect-license-in-X-top-lines=3
-        exclude: |
-          (?x)^(
-            node_modules/|
-            \.git/|
-            dist/|
-            build/|
-            \.next/|
-            htmlcov/|
-            coverage/|
-            __pycache__/|
-            \.pytest_cache/|
-            \.venv/|
-            venv/|
-            alembic/versions/|
-            backend/htmlcov/|
-            frontend/coverage/|
-            cms/build/|
-            package-lock\.json
-          )
 
   # Copyright header enforcement - TypeScript, JavaScript
   - repo: https://github.com/Lucas-C/pre-commit-hooks
@@ -56,25 +61,6 @@ repos:
           - '|//|'
           - --use-current-year
           - --detect-license-in-X-top-lines=3
-        exclude: |
-          (?x)^(
-            node_modules/|
-            \.git/|
-            dist/|
-            build/|
-            \.next/|
-            htmlcov/|
-            coverage/|
-            __pycache__/|
-            \.pytest_cache/|
-            \.venv/|
-            venv/|
-            alembic/versions/|
-            backend/htmlcov/|
-            frontend/coverage/|
-            cms/build/|
-            package-lock\.json
-          )
 
   # General file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks

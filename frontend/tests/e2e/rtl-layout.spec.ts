@@ -4,8 +4,9 @@
  * E2E test for RTL layout (Hebrew).
  * Reference: data-model.md:210-230 (RTL language support)
  */
+import { CodeEnum } from '@/lib/generated/types.gen'
 
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.describe('RTL Layout', () => {
   test('should apply RTL direction for Hebrew pages', async ({ page }) => {
@@ -15,7 +16,7 @@ test.describe('RTL Layout', () => {
     // HTML should have dir="rtl"
     const html = page.locator('html')
     await expect(html).toHaveAttribute('dir', 'rtl')
-    await expect(html).toHaveAttribute('lang', 'he')
+    await expect(html).toHaveAttribute('lang', CodeEnum.HE)
   })
 
   test('should NOT apply RTL for English or Italian', async ({ page }) => {
@@ -65,7 +66,7 @@ test.describe('RTL Layout', () => {
 
     // Should contain Hebrew characters
     const content = await page.textContent('body')
-    const hasHebrew = /[\u0590-\u05FF]/.test(content || '')
+    const hasHebrew = /[\u0590-\u05FF]/.test(content ?? '')
 
     expect(hasHebrew).toBeTruthy()
   })
@@ -79,7 +80,7 @@ test.describe('RTL Layout', () => {
 
     // Should still be RTL
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
-    await expect(page.locator('html')).toHaveAttribute('lang', 'he')
+    await expect(page.locator('html')).toHaveAttribute('lang', CodeEnum.HE)
   })
 
   test('should handle mixed LTR content in RTL page', async ({ page }) => {

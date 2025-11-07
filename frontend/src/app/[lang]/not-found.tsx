@@ -8,17 +8,20 @@
 
 import Link from 'next/link'
 import { getError404 } from '@/lib/client'
+import { CodeEnum } from '@/lib/generated/types.gen'
 
-type Props = {
-  params: Promise<{ lang: string }>
+interface Props {
+  params?: Promise<{ lang: string }>
 }
 
 export default async function NotFoundPage({ params }: Props) {
-  let lang = 'en'
+  let lang: CodeEnum = CodeEnum.EN
   try {
-    const resolvedParams = await params
-    if (resolvedParams?.lang) {
-      lang = resolvedParams.lang
+    if (params) {
+      const resolvedParams = await params
+      if (resolvedParams.lang) {
+        lang = resolvedParams.lang as CodeEnum
+      }
     }
   } catch (e) {
     console.error('Failed to resolve params:', e)
@@ -27,7 +30,7 @@ export default async function NotFoundPage({ params }: Props) {
   let errorData = null
   try {
     // Try to fetch error-404 content from Strapi with language fallback
-    errorData = await getError404()
+    errorData = await getError404(lang)
   } catch (error) {
     console.error('Failed to fetch 404 error page:', error)
   }

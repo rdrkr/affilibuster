@@ -9,8 +9,9 @@
  */
 
 import { expect, test } from '@playwright/test'
+import { CodeEnum } from '@/lib/generated/types.gen'
 
-const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000'
+const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN ?? 'http://localhost:3000'
 
 test.describe('URL Redirects - 301 Permanent Redirect', () => {
   test('should redirect old product URL to new URL with 301 status', async ({ page }) => {
@@ -45,7 +46,7 @@ test.describe('URL Redirects - 301 Permanent Redirect', () => {
 
     // Should still be on Italian site after redirect
     await expect(page).toHaveURL(/\/it\//)
-    await expect(page.locator('html')).toHaveAttribute('lang', 'it')
+    await expect(page.locator('html')).toHaveAttribute('lang', CodeEnum.IT)
   })
 
   test('should preserve query parameters during 301 redirect', async ({ page }) => {
@@ -101,7 +102,7 @@ test.describe('URL Redirects - 410 Gone Status', () => {
     })
 
     // Page should be in Italian
-    await expect(page.locator('html')).toHaveAttribute('lang', 'it')
+    await expect(page.locator('html')).toHaveAttribute('lang', CodeEnum.IT)
 
     // Should show Italian message like "Questo contenuto non è più disponibile"
     const body = await page.locator('body').textContent()

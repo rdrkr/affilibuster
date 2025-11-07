@@ -6,24 +6,27 @@
  */
 
 import { setRequestLocale } from 'next-intl/server'
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { getContact } from '@/lib/client'
 import type { ApiContactContactDocument } from '@/lib/generated/types.gen'
-import type { UiContactCardEntry } from '@/lib/types'
+import { _1Enum2 } from '@/lib/generated/types.gen'
+import type { UiContactCardEntry, LanguageCode } from '@/lib/types'
+import { SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
 
-type Props = {
+interface Props {
   params: Promise<{ lang: string }>
 }
 
 export function generateStaticParams() {
-  return [{ lang: 'en' }, { lang: 'it' }, { lang: 'he' }]
+  return SUPPORTED_LANGUAGE_CODES.map(lang => ({ lang }))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  await params
+  const resolvedParams = await params
+  const lang = resolvedParams.lang
 
   try {
-    const contactData = await getContact()
+    const contactData = await getContact(lang as LanguageCode, [_1Enum2.CONTACT_CARDS])
 
     return {
       title: contactData?.metaTitle,
@@ -39,30 +42,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ContactPage({ params }: Props) {
-  let lang = 'en'
+  let lang: LanguageCode = 'en' as LanguageCode
   try {
     const resolvedParams = await params
-    if (resolvedParams?.lang) {
-      lang = resolvedParams.lang
+    if (resolvedParams.lang) {
+      lang = resolvedParams.lang as LanguageCode
     }
   } catch (e) {
     console.error('Failed to resolve params:', e)
   }
 
   // Enable static rendering
-  if (lang) {
-    setRequestLocale(lang)
-  }
+  setRequestLocale(lang)
 
   let contactData: ApiContactContactDocument | null = null
   try {
-    contactData = await getContact()
+    contactData = await getContact(lang, [_1Enum2.CONTACT_CARDS])
   } catch (error) {
     console.error('Failed to fetch contact page:', error)
   }
 
   // Don't render page if data is unavailable
-  if (!contactData || !contactData.heroTitle || !contactData.contactCards) {
+  if (!contactData?.heroTitle || !contactData.contactCards) {
     return null
   }
 
@@ -72,7 +73,7 @@ export default async function ContactPage({ params }: Props) {
       <section className="bg-gradient-to-br from-primary-800 via-primary-700 to-primary-900 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            {contactData?.heroTitle && (
+            {contactData.heroTitle && (
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 {contactData.heroTitle.split('**').map((part: string, i: number) =>
                   i % 2 === 1 ? (
@@ -85,7 +86,7 @@ export default async function ContactPage({ params }: Props) {
                 )}
               </h1>
             )}
-            {contactData?.heroSubtitle && <p className="text-xl text-neutral-200">{contactData.heroSubtitle}</p>}
+            {contactData.heroSubtitle && <p className="text-xl text-neutral-200">{contactData.heroSubtitle}</p>}
           </div>
         </div>
       </section>
@@ -146,9 +147,9 @@ export default async function ContactPage({ params }: Props) {
             </div>
             <div>
               <h2 className="text-2xl font-bold mb-2 text-neutral-900 dark:text-white">
-                {contactData?.responseTimeTitle}
+                {contactData.responseTimeTitle}
               </h2>
-              <p className="text-neutral-700 dark:text-neutral-200">{contactData?.responseTimeText}</p>
+              <p className="text-neutral-700 dark:text-neutral-200">{contactData.responseTimeText}</p>
             </div>
           </div>
         </div>
@@ -166,9 +167,9 @@ export default async function ContactPage({ params }: Props) {
             </div>
             <div>
               <h2 className="text-2xl font-bold mb-2 text-neutral-900 dark:text-white">
-                {contactData?.officeHoursTitle}
+                {contactData.officeHoursTitle}
               </h2>
-              <p className="text-neutral-700 dark:text-neutral-200">{contactData?.officeHoursText}</p>
+              <p className="text-neutral-700 dark:text-neutral-200">{contactData.officeHoursText}</p>
             </div>
           </div>
         </div>

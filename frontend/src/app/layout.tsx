@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const navData = await getNavigation()
 
     return {
-      title: navData?.siteTitle || navData?.brandName,
+      title: navData?.siteTitle ?? navData?.brandName,
       description: navData?.siteDescription,
       keywords: typeof navData?.siteKeywords === 'string' ? navData.siteKeywords.split(',') : undefined,
     }

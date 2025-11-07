@@ -5,7 +5,8 @@
  * Reference: quickstart.md:220-234 (Test 5: Content Navigation)
  */
 
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+import { CodeEnum } from '@/lib/generated/types.gen'
 
 test.describe('Content Navigation', () => {
   test('should navigate to product page', async ({ page }) => {
@@ -33,7 +34,7 @@ test.describe('Content Navigation', () => {
 
     // Should still be in Italian
     await expect(page).toHaveURL(/\/it/)
-    await expect(page.locator('html')).toHaveAttribute('lang', 'it')
+    await expect(page.locator('html')).toHaveAttribute('lang', CodeEnum.IT)
   })
 
   test('should load breadcrumb navigation', async ({ page }) => {

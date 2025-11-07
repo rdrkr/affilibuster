@@ -11,18 +11,16 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { CurrencySelector } from '@/components/CurrencySelector'
-import { currenciesAPI, preferencesAPI } from '@/lib/api'
+import * as client from '@/lib/client'
 import { useSession } from '@/hooks/useSession'
+import { CurrencyCode } from '@/lib/types'
 
 // Mock dependencies
-jest.mock('@/lib/api', () => ({
-  currenciesAPI: {
-    getAll: jest.fn(),
-  },
-  preferencesAPI: {
-    get: jest.fn(),
-    update: jest.fn(),
-  },
+jest.mock('@/lib/client', () => ({
+  getCurrencies: jest.fn(),
+  getUserPreferences: jest.fn(),
+  updateUserPreferences: jest.fn(),
+  getNavigation: jest.fn(),
 }))
 
 jest.mock('@/hooks/useSession', () => ({
@@ -34,8 +32,9 @@ describe('CurrencySelector Component', () => {
 
   const mockCurrencies = [
     {
-      code: 'USD',
-      displayName: 'US Dollar',
+      code: CurrencyCode.USD,
+      name: 'US Dollar',
+      displayName: 'US Dollar ($)',
       symbol: '$',
       decimalPlaces: 2,
       symbolPosition: 'before' as const,
@@ -45,8 +44,9 @@ describe('CurrencySelector Component', () => {
       sortOrder: 1,
     },
     {
-      code: 'EUR',
-      displayName: 'Euro',
+      code: CurrencyCode.EUR,
+      name: 'Euro',
+      displayName: 'Euro (€)',
       symbol: '€',
       decimalPlaces: 2,
       symbolPosition: 'after' as const,
@@ -56,8 +56,9 @@ describe('CurrencySelector Component', () => {
       sortOrder: 2,
     },
     {
-      code: 'ILS',
-      displayName: 'Israeli Shekel',
+      code: CurrencyCode.ILS,
+      name: 'Israeli Shekel',
+      displayName: 'Israeli Shekel (₪)',
       symbol: '₪',
       decimalPlaces: 2,
       symbolPosition: 'before' as const,
@@ -71,7 +72,7 @@ describe('CurrencySelector Component', () => {
   const mockPreferences = {
     id: '123',
     sessionId: mockSessionId,
-    selectedCurrency: 'EUR',
+    selectedCurrency: CurrencyCode.EUR,
     dismissedLanguagePrompt: false,
     createdAt: '2025-01-01T00:00:00Z',
     updatedAt: '2025-01-01T00:00:00Z',
@@ -81,9 +82,10 @@ describe('CurrencySelector Component', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     ;(useSession as jest.Mock).mockReturnValue(mockSessionId)
-    ;(currenciesAPI.getAll as jest.Mock).mockResolvedValue(mockCurrencies)
-    ;(preferencesAPI.get as jest.Mock).mockResolvedValue(mockPreferences)
-    ;(preferencesAPI.update as jest.Mock).mockResolvedValue(mockPreferences)
+    ;(client.getCurrencies as jest.Mock).mockResolvedValue(mockCurrencies)
+    ;(client.getUserPreferences as jest.Mock).mockResolvedValue(mockPreferences)
+    ;(client.updateUserPreferences as jest.Mock).mockResolvedValue(mockPreferences)
+    ;(client.getNavigation as jest.Mock).mockResolvedValue({ currencySelectorAriaLabel: 'Select currency' })
   })
 
   it('should render currency selector button', async () => {
@@ -108,7 +110,7 @@ describe('CurrencySelector Component', () => {
   })
 
   it('should default to USD when no preferences exist', async () => {
-    ;(preferencesAPI.get as jest.Mock).mockRejectedValue(new Error('Not found'))
+    ;(client.getUserPreferences as jest.Mock).mockRejectedValue(new Error('Not found'))
 
     render(<CurrencySelector />)
 
@@ -152,8 +154,8 @@ describe('CurrencySelector Component', () => {
 
     // Should call update API
     await waitFor(() => {
-      expect(preferencesAPI.update).toHaveBeenCalledWith({
-        selectedCurrency: 'USD',
+      expect(client.updateUserPreferences).toHaveBeenCalledWith({
+        selectedCurrency: CurrencyCode.USD,
       })
     })
   })
@@ -231,7 +233,7 @@ describe('CurrencySelector Component', () => {
 
   it('should handle API errors gracefully', async () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
-    ;(preferencesAPI.update as jest.Mock).mockRejectedValue(new Error('API Error'))
+    ;(client.updateUserPreferences as jest.Mock).mockRejectedValue(new Error('API Error'))
 
     render(<CurrencySelector />)
 
@@ -275,8 +277,8 @@ describe('CurrencySelector Component', () => {
     await new Promise(resolve => setTimeout(resolve, 100))
 
     // Should not have called APIs
-    expect(currenciesAPI.getAll).not.toHaveBeenCalled()
-    expect(preferencesAPI.get).not.toHaveBeenCalled()
+    expect(client.getCurrencies).not.toHaveBeenCalled()
+    expect(client.getUserPreferences).not.toHaveBeenCalled()
   })
 
   it('should display currency symbol and code', async () => {
@@ -288,7 +290,7 @@ describe('CurrencySelector Component', () => {
       }).textContent
       // Should contain both symbol (€) and code (EUR)
       expect(buttonText).toContain('€')
-      expect(buttonText).toContain('EUR')
+      expect(buttonText).toContain(CurrencyCode.EUR)
     })
   })
 
@@ -353,8 +355,9 @@ describe('CurrencySelector Component', () => {
     const manyCurrencies = [
       ...mockCurrencies,
       {
-        code: 'GBP',
-        displayName: 'British Pound',
+        code: CurrencyCode.GBP,
+        name: 'British Pound',
+        displayName: 'British Pound (£)',
         symbol: '£',
         decimalPlaces: 2,
         symbolPosition: 'before' as const,
@@ -364,8 +367,9 @@ describe('CurrencySelector Component', () => {
         sortOrder: 4,
       },
       {
-        code: 'JPY',
-        displayName: 'Japanese Yen',
+        code: CurrencyCode.JPY,
+        name: 'Japanese Yen',
+        displayName: 'Japanese Yen (¥)',
         symbol: '¥',
         decimalPlaces: 0,
         symbolPosition: 'before' as const,
@@ -376,7 +380,7 @@ describe('CurrencySelector Component', () => {
       },
     ]
 
-    ;(currenciesAPI.getAll as jest.Mock).mockResolvedValue(manyCurrencies)
+    ;(client.getCurrencies as jest.Mock).mockResolvedValue(manyCurrencies)
 
     render(<CurrencySelector />)
 
@@ -394,5 +398,19 @@ describe('CurrencySelector Component', () => {
     expect(screen.getByText('Israeli Shekel')).toBeInTheDocument()
     expect(screen.getByText('British Pound')).toBeInTheDocument()
     expect(screen.getByText('Japanese Yen')).toBeInTheDocument()
+  })
+
+  it('should handle navigation fetch error gracefully', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
+    ;(client.getNavigation as jest.Mock).mockRejectedValue(new Error('Network error'))
+
+    render(<CurrencySelector />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/€ EUR/)).toBeInTheDocument()
+    })
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to fetch navigation:', expect.any(Error))
+    consoleErrorSpy.mockRestore()
   })
 })

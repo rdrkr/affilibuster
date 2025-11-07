@@ -6,7 +6,7 @@ set -e
 echo "🧹 Cleaning up..."
 
 echo "  🐳 Stopping Docker services..."
-docker-compose down -v
+docker compose down -v
 
 echo "  🖼️ Removing Docker images..."
 docker rmi -f \

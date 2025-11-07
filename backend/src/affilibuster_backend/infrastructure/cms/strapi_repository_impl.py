@@ -82,9 +82,10 @@ class StrapiRepositoryImpl(ICMSRepository):  # type: ignore[misc]
         headers = self._get_headers()
 
         # Convert BaseModel params to dict for httpx
+        # Use mode='json' to ensure enums serialize as strings
         query_params: dict[str, Any] = {}
         if params is not None:
-            query_params = params.model_dump(exclude_none=True)
+            query_params = params.model_dump(mode="json", exclude_none=True)
 
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
@@ -143,9 +144,10 @@ class StrapiRepositoryImpl(ICMSRepository):  # type: ignore[misc]
         request_data = data.model_dump(exclude_none=True)
 
         # Convert BaseModel params to dict for httpx
+        # Use mode='json' to ensure enums serialize as strings
         query_params: dict[str, Any] = {}
         if params is not None:
-            query_params = params.model_dump(exclude_none=True)
+            query_params = params.model_dump(mode="json", exclude_none=True)
 
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:

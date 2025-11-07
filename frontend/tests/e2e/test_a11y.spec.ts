@@ -13,10 +13,11 @@
  * - Robust: Compatible with assistive technologies
  */
 
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
+import { CodeEnum, CurrencyCode } from '@/lib/generated/types.gen'
 
-const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000'
+const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN ?? 'http://localhost:3000'
 
 test.describe('Accessibility - WCAG 2.1 AA Compliance', () => {
   test('English homepage has no accessibility violations', async ({ page }) => {
@@ -32,7 +33,7 @@ test.describe('Accessibility - WCAG 2.1 AA Compliance', () => {
 
     if (accessibilityScanResults.violations.length > 0) {
       console.log('\nViolations:')
-      accessibilityScanResults.violations.forEach((violation: unknown) => {
+      accessibilityScanResults.violations.forEach(violation => {
         console.log(`  - ${violation.id}: ${violation.description}`)
         console.log(`    Impact: ${violation.impact}`)
         console.log(`    Nodes: ${violation.nodes.length}`)
@@ -96,7 +97,7 @@ test.describe('Accessibility - Keyboard Navigation', () => {
         if (el) {
           return {
             tag: el.tagName,
-            type: (el as unknown).type,
+            type: (el as HTMLInputElement).type,
             text: el.textContent?.trim().substring(0, 50),
           }
         }
@@ -158,7 +159,7 @@ test.describe('Accessibility - Keyboard Navigation', () => {
         return el?.getAttribute('data-testid') || el?.textContent || ''
       })
 
-      if (focused.includes('currency') || focused.includes('USD') || focused.includes('EUR')) {
+      if (focused.includes('currency') || focused.includes(CurrencyCode.USD) || focused.includes(CurrencyCode.EUR)) {
         found = true
         await page.keyboard.press('Enter')
         break
@@ -255,14 +256,14 @@ test.describe('Accessibility - Screen Reader Support', () => {
     const headings = await page.evaluate(() => {
       const h = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
       return h.map(heading => ({
-        level: parseInt(heading.tagName[1]),
+        level: parseInt(heading.tagName[1] ?? '1'),
         text: heading.textContent?.trim().substring(0, 50),
       }))
     })
 
     console.log('\nHeading Hierarchy:')
     headings.forEach(h => {
-      console.log(`  ${'  '.repeat(h.level - 1)}H${h.level}: ${h.text}`)
+      console.log(`  ${'  '.repeat(h.level - 1)}H${h.level}: ${h.text ?? ''}`)
     })
 
     // Should have exactly one H1
@@ -271,8 +272,12 @@ test.describe('Accessibility - Screen Reader Support', () => {
 
     // Headings should not skip levels
     for (let i = 1; i < headings.length; i++) {
-      const levelDiff = headings[i].level - headings[i - 1].level
-      expect(levelDiff).toBeLessThanOrEqual(1)
+      const current = headings[i]
+      const previous = headings[i - 1]
+      if (current && previous) {
+        const levelDiff = current.level - previous.level
+        expect(levelDiff).toBeLessThanOrEqual(1)
+      }
     }
   })
 
@@ -309,7 +314,7 @@ test.describe('Accessibility - Color Contrast', () => {
       .analyze()
 
     // Check for color contrast violations specifically
-    const colorContrastViolations = contrastResults.violations.filter((v: unknown) => v.id === 'color-contrast')
+    const colorContrastViolations = contrastResults.violations.filter(v => v.id === 'color-contrast')
 
     console.log(`\nColor Contrast Violations: ${colorContrastViolations.length}`)
 
@@ -342,9 +347,9 @@ test.describe('Accessibility - Focus Management', () => {
 
     // Should have visible focus indicator (outline or box-shadow)
     const hasFocusIndicator =
-      (focusStyles?.outline && focusStyles.outline !== 'none') ||
-      (focusStyles?.outlineWidth && focusStyles.outlineWidth !== '0px') ||
-      (focusStyles?.boxShadow && focusStyles.boxShadow !== 'none')
+      (focusStyles?.outline !== undefined && focusStyles.outline !== 'none') ||
+      (focusStyles?.outlineWidth !== undefined && focusStyles.outlineWidth !== '0px') ||
+      (focusStyles?.boxShadow !== undefined && focusStyles.boxShadow !== 'none')
 
     expect(hasFocusIndicator).toBeTruthy()
   })
@@ -370,9 +375,9 @@ test.describe('Accessibility - Focus Management', () => {
 test.describe('Accessibility - Language Support', () => {
   test('HTML lang attribute is set correctly for each language', async ({ page }) => {
     const languages = [
-      { url: BASE_URL, expected: 'en' },
-      { url: `${BASE_URL}/it`, expected: 'it' },
-      { url: `${BASE_URL}/he`, expected: 'he' },
+      { url: BASE_URL, expected: CodeEnum.EN },
+      { url: `${BASE_URL}/it`, expected: CodeEnum.IT },
+      { url: `${BASE_URL}/he`, expected: CodeEnum.HE },
     ]
 
     for (const { url, expected } of languages) {

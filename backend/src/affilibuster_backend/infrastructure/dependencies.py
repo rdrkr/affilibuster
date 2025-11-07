@@ -15,8 +15,8 @@ from affilibuster_backend.domain.repositories.cache_service import ICacheService
 from affilibuster_backend.domain.repositories.cms_repository import ICMSRepository
 from affilibuster_backend.domain.repositories.preferences_repository import IUserPreferencesRepository
 from affilibuster_backend.domain.use_cases.get_cms_content_use_case import GetCMSContentUseCase
-from affilibuster_backend.domain.use_cases.get_user_preferences import GetUserPreferences
-from affilibuster_backend.domain.use_cases.update_user_preferences import UpdateUserPreferences
+from affilibuster_backend.domain.use_cases.get_user_preferences_use_case import GetUserPreferencesUseCase
+from affilibuster_backend.domain.use_cases.update_user_preferences_use_case import UpdateUserPreferencesUseCase
 from affilibuster_backend.infrastructure.cache.redis_cache import RedisCacheService
 from affilibuster_backend.infrastructure.cms.strapi_repository_impl import StrapiRepositoryImpl
 from affilibuster_backend.infrastructure.database.config import get_db
@@ -72,17 +72,17 @@ def get_preferences_repo(
 def get_get_user_preferences_use_case(
     prefs_repo: Annotated[IUserPreferencesRepository, Depends(get_preferences_repo)],
     cache_service: Annotated[ICacheService, Depends(get_cache_service)],
-) -> GetUserPreferences:
-    """Provide GetUserPreferences use case instance."""
-    return GetUserPreferences(prefs_repo, cache_service)
+) -> GetUserPreferencesUseCase:
+    """Provide GetUserPreferencesUseCase use case instance."""
+    return GetUserPreferencesUseCase(prefs_repo, cache_service)
 
 
 def get_update_user_preferences_use_case(
     prefs_repo: Annotated[IUserPreferencesRepository, Depends(get_preferences_repo)],
     cache_service: Annotated[ICacheService, Depends(get_cache_service)],
-) -> UpdateUserPreferences:
-    """Provide UpdateUserPreferences use case instance."""
-    return UpdateUserPreferences(prefs_repo, cache_service)
+) -> UpdateUserPreferencesUseCase:
+    """Provide UpdateUserPreferencesUseCase use case instance."""
+    return UpdateUserPreferencesUseCase(prefs_repo, cache_service)
 
 
 # Type aliases for use in route signatures
@@ -90,5 +90,5 @@ CMSRepoDep = Annotated[ICMSRepository, Depends(get_cms_repo)]
 GetCMSContentUseCaseDep = Annotated[GetCMSContentUseCase, Depends(get_cms_content_use_case)]
 CacheServiceDep = Annotated[ICacheService, Depends(get_cache_service)]
 PreferencesRepoDep = Annotated[IUserPreferencesRepository, Depends(get_preferences_repo)]
-GetUserPreferencesUseCaseDep = Annotated[GetUserPreferences, Depends(get_get_user_preferences_use_case)]
-UpdateUserPreferencesUseCaseDep = Annotated[UpdateUserPreferences, Depends(get_update_user_preferences_use_case)]
+GetUserPreferencesUseCaseDep = Annotated[GetUserPreferencesUseCase, Depends(get_get_user_preferences_use_case)]
+UpdateUserPreferencesUseCaseDep = Annotated[UpdateUserPreferencesUseCase, Depends(get_update_user_preferences_use_case)]

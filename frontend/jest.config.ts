@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-import { Config } from 'jest'
-import nextJest from 'next/jest'
+import type { Config } from 'jest'
+import nextJest from 'next/jest.js'
 
 const createJestConfig = nextJest({
   // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
@@ -27,16 +27,26 @@ const customJestConfig: Config = {
     '!src/**/*.d.ts',
     '!src/**/*.stories.{js,jsx,ts,tsx}',
     '!src/**/__tests__/**',
+    '!src/lib/generated/**',
+    // Server Components, middleware, and route handlers (covered by Playwright)
+    '!src/app/**/page.tsx',
+    '!src/app/**/layout.tsx',
+    '!src/app/**/not-found.tsx',
+    '!src/app/**/route.ts',
+    '!src/proxy.ts',
+    '!src/i18n.ts',
+    '!src/i18n/**',
+    '!src/config/**',
   ],
   coverageThreshold: {
     global: {
-      branches: 15,
-      functions: 15,
-      lines: 15,
-      statements: 15,
+      branches: 90,
+      functions: 97,
+      lines: 100,
+      statements: 99,
     },
   },
-  coverageReporters: ['text', 'text-summary', 'lcov', 'json', 'html'],
+  coverageReporters: ['lcov', 'json', 'html'],
   maxWorkers: '50%',
   cache: true,
   moduleDirectories: ['node_modules', '<rootDir>/'],

@@ -5,20 +5,21 @@
  * Reference: T124 (i18n proxy), T137 (Session ID generation)
  */
 
-import { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
 import createIntlMiddleware from 'next-intl/middleware'
 import { v4 as uuidv4 } from 'uuid'
+import { SUPPORTED_LANGUAGE_CODES, DEFAULT_LANGUAGE_CODE } from '@/lib/types'
 
 // Create next-intl proxy
 const intlMiddleware = createIntlMiddleware({
-  locales: ['en', 'it', 'he'],
-  defaultLocale: 'en',
+  locales: [...SUPPORTED_LANGUAGE_CODES],
+  defaultLocale: DEFAULT_LANGUAGE_CODE,
   localePrefix: 'always',
   alternateLinks: true,
   localeDetection: true,
 })
 
-export default async function proxy(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   // Handle i18n routing
   const response = intlMiddleware(request)
 

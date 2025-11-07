@@ -2,7 +2,7 @@
 
 # Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-# Start all Affilibuster services via docker-compose
+# Start all Affilibuster services via docker compose
 # Usage:
 #   ./scripts/build.sh          - Start all services
 #   ./scripts/build.sh --build  - Rebuild and start all services
@@ -39,7 +39,7 @@ cd "${PROJECT_ROOT}"
 cleanup() {
   echo ""
   echo "🛑 Shutting down services..."
-  docker-compose down
+  docker compose down
   echo "✅ All services stopped"
   exit 0
 }
@@ -74,9 +74,9 @@ kill_port "${BACKEND_PORT}" # Backend
 # shellcheck disable=SC2154
 kill_port "${CMS_PORT}" # Strapi
 
-# Start all services via frontend (docker-compose dependency chain handles startup order)
+# Start all services via frontend (docker compose dependency chain handles startup order)
 # shellcheck disable=SC2248
-docker-compose up ${BUILD_FLAG} -d frontend
+docker compose up ${BUILD_FLAG} -d frontend
 
 echo ""
 echo "✅ Services started (containers initializing, may take 30-60 seconds)!"
@@ -102,7 +102,7 @@ echo "  - Strapi CMS:      Running (port ${CMS_PORT})"
 echo "  - Frontend:        Running (port ${FRONTEND_PORT})"
 echo ""
 echo "💡 Tips:"
-echo "  - View logs: docker-compose logs -f [service]"
-echo "  - Stop services: docker-compose down"
+echo "  - View logs: docker compose logs -f [service]"
+echo "  - Stop services: docker compose down"
 echo "  - Run tests: make test"
 echo ""

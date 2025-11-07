@@ -75,6 +75,60 @@ class TestErrorHandling:
         response = await async_client.post("/health")
         assert response.status_code == 405
 
+    async def test_http_exception_handler_with_dict_detail(self, integration_client, strapi_test_data):
+        """Test http_exception_handler returns dict detail directly (covers main.py line 137)."""
+        # Use a valid CurrencyCode enum that exists but we'll mock Strapi to reject it
+        # Actually, we can't mock in integration test, so let's use the existing test
+        # The preferences route raises HTTPException with dict detail for invalid currency
+        # But all currencies in the enum are valid in Strapi, so this won't work
+
+        # Instead, let's test by checking existing endpoints that return 400
+        # Actually, the test already exists in test_preferences_route.py that triggers this
+        # But we need to verify the exception handler works correctly
+
+        # The simplest way is to directly test the exception handler
+        from datetime import UTC, datetime
+
+        from fastapi import HTTPException
+        from fastapi.responses import JSONResponse
+
+        from affilibuster_backend.domain.entities import Error
+        from affilibuster_backend.main import http_exception_handler
+
+        # Create a mock request
+        class MockRequest:
+            pass
+
+        request = MockRequest()
+
+        # Create HTTPException with dict detail (like our routes do)
+        error_dict = Error(
+            error="Bad Request",
+            message="Test error message",
+            code="TEST_ERROR",
+            timestamp=datetime.now(UTC),
+        ).model_dump(mode="json")
+
+        exc = HTTPException(status_code=400, detail=error_dict)
+
+        # Call the exception handler
+        response = await http_exception_handler(request, exc)
+
+        # Verify it returns JSONResponse with dict detail directly
+        assert isinstance(response, JSONResponse)
+        assert response.status_code == 400
+
+        # The response body should be the error dict directly, not wrapped in "detail"
+        import json
+
+        # Convert response.body to bytes if it's a memoryview, then decode
+        body_bytes = bytes(response.body) if isinstance(response.body, memoryview) else response.body
+        body = json.loads(body_bytes.decode())
+        assert "error" in body
+        assert "code" in body
+        assert body["code"] == "TEST_ERROR"
+        assert "detail" not in body  # Should NOT be wrapped
+
 
 @pytest.mark.integration
 @pytest.mark.asyncio

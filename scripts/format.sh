@@ -68,14 +68,11 @@ format_shell() {
 # Format Makefile
 format_makefile() {
   if command -v checkmake >/dev/null 2>&1; then
-    if [[ "${CHECK_ONLY}" = "check" ]]; then
-      echo "  ✨ Checking Makefile format..."
-    else
-      echo "  ✨ Checking Makefile format..."
-    fi
+    echo "  ✨ Checking Makefile format..."
+
     # checkmake warns about missing "all" target, but we use .DEFAULT_GOAL := help
     # which is a valid alternative, so we ignore this specific warning
-    checkmake --config=.checkmake Makefile 2>&1 | grep -v "minphony" && echo "✅ Makefile is properly formatted"
+    checkmake --config=.checkmake Makefile
   else
     echo "  ⚠️ checkmake not installed. Install it with: brew install checkmake"
     exit 1

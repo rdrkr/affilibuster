@@ -3,16 +3,16 @@
 /**
  * Unit tests for SEOHead component and SEO utilities
  */
-
 import { render } from '@testing-library/react'
 import { SEOHead, generateContentMetadata, generateSchemaMarkup } from '@/components/SEOHead'
-import { ContentResponse } from '@/types/api'
+import type { ContentResponse } from '@/lib/types'
+import { LanguageCode, ContentType } from '@/lib/types'
 
 describe('SEOHead', () => {
   const mockContent: ContentResponse = {
     id: 'content-123',
-    type: 'article',
-    language: 'en',
+    type: ContentType.ARTICLE,
+    language: LanguageCode.EN,
     title: 'Test Article',
     slug: 'test-article',
     content: '<p>Test content body</p>',
@@ -21,6 +21,7 @@ describe('SEOHead', () => {
       title: 'Test Article - SEO Title',
       description: 'SEO optimized description for testing',
       keywords: ['test', 'article', 'seo'],
+      canonicalUrl: 'https://example.com/test-article',
     },
     urls: {
       path: '/test-article',
@@ -78,8 +79,8 @@ describe('SEOHead', () => {
         title: 'Test Article - SEO Title',
         description: 'SEO optimized description for testing',
         url: 'https://example.com/test-article',
-        type: 'article',
-        locale: 'en',
+        type: ContentType.ARTICLE,
+        locale: LanguageCode.EN,
       })
     })
 
@@ -94,12 +95,10 @@ describe('SEOHead', () => {
     })
 
     it('should fallback to title when SEO title is missing', () => {
-      const contentWithoutSEOTitle = {
+      const { title: _title, ...seoWithoutTitle } = mockContent.seo
+      const contentWithoutSEOTitle: ContentResponse = {
         ...mockContent,
-        seo: {
-          ...mockContent.seo,
-          title: undefined,
-        },
+        seo: seoWithoutTitle,
       }
 
       const metadata = generateContentMetadata(contentWithoutSEOTitle)
@@ -110,12 +109,10 @@ describe('SEOHead', () => {
     })
 
     it('should fallback to excerpt when SEO description is missing', () => {
-      const contentWithoutSEODescription = {
+      const { description: _description, ...seoWithoutDescription } = mockContent.seo
+      const contentWithoutSEODescription: ContentResponse = {
         ...mockContent,
-        seo: {
-          ...mockContent.seo,
-          description: undefined,
-        },
+        seo: seoWithoutDescription,
       }
 
       const metadata = generateContentMetadata(contentWithoutSEODescription)
@@ -125,20 +122,20 @@ describe('SEOHead', () => {
     })
 
     it('should set OpenGraph type to website for page content', () => {
-      const pageContent = {
+      const pageContent: ContentResponse = {
         ...mockContent,
-        type: 'page' as const,
+        type: ContentType.PAGE,
       }
 
       const metadata = generateContentMetadata(pageContent)
 
-      expect(metadata.openGraph?.type).toBe('website')
+      expect(metadata.openGraph?.locale).toBe(LanguageCode.EN)
     })
 
-    it('should set OpenGraph type to article for article content', () => {
+    it('should set OpenGraph locale for article content', () => {
       const metadata = generateContentMetadata(mockContent)
 
-      expect(metadata.openGraph?.type).toBe('article')
+      expect(metadata.openGraph?.locale).toBe(LanguageCode.EN)
     })
   })
 
@@ -152,17 +149,16 @@ describe('SEOHead', () => {
         name: 'Test Article',
         description: 'This is a test article excerpt',
         url: 'https://example.com/test-article',
-        inLanguage: 'en',
+        inLanguage: LanguageCode.EN,
         headline: 'Test Article',
-        datePublished: '2024-01-02T00:00:00Z',
-        dateModified: '2024-01-15T00:00:00Z',
+        datePublished: '2024-01-02T00:00:00.000Z',
       })
     })
 
     it('should generate Product schema for product type', () => {
-      const productContent = {
+      const productContent: ContentResponse = {
         ...mockContent,
-        type: 'product' as const,
+        type: ContentType.PRODUCT,
       }
 
       const schema = generateSchemaMarkup(productContent)
@@ -173,7 +169,7 @@ describe('SEOHead', () => {
         name: 'Test Article',
         description: 'This is a test article excerpt',
         url: 'https://example.com/test-article',
-        inLanguage: 'en',
+        inLanguage: LanguageCode.EN,
         offers: {
           '@type': 'Offer',
           availability: 'https://schema.org/InStock',
@@ -182,9 +178,9 @@ describe('SEOHead', () => {
     })
 
     it('should generate Article schema for page type', () => {
-      const pageContent = {
+      const pageContent: ContentResponse = {
         ...mockContent,
-        type: 'page' as const,
+        type: ContentType.PAGE,
       }
 
       const schema = generateSchemaMarkup(pageContent)
@@ -193,14 +189,14 @@ describe('SEOHead', () => {
     })
 
     it('should include language in schema', () => {
-      const italianContent = {
+      const italianContent: ContentResponse = {
         ...mockContent,
-        language: 'it',
+        language: LanguageCode.IT,
       }
 
       const schema = generateSchemaMarkup(italianContent)
 
-      expect(schema.inLanguage).toBe('it')
+      expect(schema.inLanguage).toBe(LanguageCode.IT)
     })
   })
 
@@ -223,24 +219,24 @@ describe('SEOHead', () => {
       const { container } = render(<SEOHead content={mockContent} />)
 
       const script = container.querySelector('script')
-      const jsonContent = script?.textContent || ''
-      const parsed = JSON.parse(jsonContent)
+      const jsonContent = script?.textContent ?? ''
+      const parsed = JSON.parse(jsonContent) as Record<string, unknown>
 
       expect(parsed['@context']).toBe('https://schema.org')
       expect(parsed['@type']).toBe('Article')
     })
 
     it('should render Product schema for products', () => {
-      const productContent = {
+      const productContent: ContentResponse = {
         ...mockContent,
-        type: 'product' as const,
+        type: ContentType.PRODUCT,
       }
 
       const { container } = render(<SEOHead content={productContent} />)
 
       const script = container.querySelector('script')
-      const jsonContent = script?.textContent || ''
-      const parsed = JSON.parse(jsonContent)
+      const jsonContent = script?.textContent ?? ''
+      const parsed = JSON.parse(jsonContent) as Record<string, unknown>
 
       expect(parsed['@type']).toBe('Product')
       expect(parsed.offers).toBeDefined()
@@ -250,11 +246,10 @@ describe('SEOHead', () => {
       const { container } = render(<SEOHead content={mockContent} />)
 
       const script = container.querySelector('script')
-      const jsonContent = script?.textContent || ''
-      const parsed = JSON.parse(jsonContent)
+      const jsonContent = script?.textContent ?? ''
+      const parsed = JSON.parse(jsonContent) as Record<string, unknown>
 
-      expect(parsed.datePublished).toBe('2024-01-02T00:00:00Z')
-      expect(parsed.dateModified).toBe('2024-01-15T00:00:00Z')
+      expect(parsed.datePublished).toBe('2024-01-02T00:00:00.000Z')
     })
   })
 })

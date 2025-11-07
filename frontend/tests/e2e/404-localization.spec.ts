@@ -4,6 +4,7 @@
  * E2E test for 404-page localization.
  * Reference: quickstart.md:236-249 (Localized error pages)
  */
+import { CodeEnum } from '@/lib/generated/types.gen'
 
 import { expect, test } from '@playwright/test'
 
@@ -19,7 +20,7 @@ test.describe('404 Page Localization', () => {
     await expect(page).toHaveTitle(/404|Not Found/i)
 
     // Content should be in English
-    await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+    await expect(page.locator('html')).toHaveAttribute('lang', CodeEnum.EN)
   })
 
   test('should show Italian 404 page for non-existent Italian URL', async ({ page }) => {
@@ -32,7 +33,7 @@ test.describe('404 Page Localization', () => {
     await expect(page.locator('[data-testid="404-page"]')).toBeVisible()
 
     // Content should be in Italian
-    await expect(page.locator('html')).toHaveAttribute('lang', 'it')
+    await expect(page.locator('html')).toHaveAttribute('lang', CodeEnum.IT)
 
     // Should contain Italian text
     await expect(page.locator('body')).toContainText(/pagina non trovata|404/i)
@@ -45,7 +46,7 @@ test.describe('404 Page Localization', () => {
     expect(response?.status()).toBe(404)
 
     // Should show 404 page in Hebrew (RTL)
-    await expect(page.locator('html')).toHaveAttribute('lang', 'he')
+    await expect(page.locator('html')).toHaveAttribute('lang', CodeEnum.HE)
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
   })
 
@@ -81,7 +82,7 @@ test.describe('404 Page Localization', () => {
     await page.goto('/it/non-existent')
 
     // Should still be in Italian context
-    await expect(page.locator('html')).toHaveAttribute('lang', 'it')
+    await expect(page.locator('html')).toHaveAttribute('lang', CodeEnum.IT)
 
     // Language selector should show Italian
     const languageSelector = page.locator('[data-testid="language-selector"]')

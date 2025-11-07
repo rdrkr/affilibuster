@@ -12,13 +12,17 @@ from uuid import uuid4
 
 import pytest
 
-from affilibuster_backend.domain.entities.user_preferences import UserPreferences
-from affilibuster_backend.domain.use_cases.update_user_preferences import UpdateUserPreferences
+from affilibuster_backend.domain.entities.generated.models import (
+    CurrencyCode,
+    DetectedLanguage2,
+    UserPreferences,
+)
+from affilibuster_backend.domain.use_cases.update_user_preferences_use_case import UpdateUserPreferencesUseCase
 
 
 @pytest.mark.unit
 class TestUpdateUserPreferencesExecute:
-    """Test UpdateUserPreferences.execute() method."""
+    """Test UpdateUserPreferencesUseCase.execute() method."""
 
     @pytest.fixture
     def preferences_repository(self):
@@ -33,7 +37,7 @@ class TestUpdateUserPreferencesExecute:
     @pytest.fixture
     def use_case(self, preferences_repository, cache_service):
         """Create use case with mocked dependencies."""
-        return UpdateUserPreferences(preferences_repository, cache_service)
+        return UpdateUserPreferencesUseCase(preferences_repository, cache_service)
 
     @pytest.fixture
     def sample_preferences(self):
@@ -42,7 +46,7 @@ class TestUpdateUserPreferencesExecute:
             id=uuid4(),
             session_id="test-session-123",
             user_id=None,
-            selected_currency="USD",
+            selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=False,
             detected_language=None,
         )
@@ -76,7 +80,7 @@ class TestUpdateUserPreferencesExecute:
         sample_preferences,
     ):
         """Test execute updates the updated_at timestamp."""
-        before_execute = datetime.now(UTC).replace(tzinfo=None)
+        before_execute = datetime.now(UTC)
         preferences_repository.upsert.return_value = sample_preferences
 
         await use_case.execute(sample_preferences)
@@ -94,7 +98,7 @@ class TestUpdateUserPreferencesExecute:
         sample_preferences,
     ):
         """Test execute sets expires_at to 30 days from now."""
-        before_execute = datetime.now(UTC).replace(tzinfo=None)
+        before_execute = datetime.now(UTC)
         preferences_repository.upsert.return_value = sample_preferences
 
         await use_case.execute(sample_preferences)
@@ -118,16 +122,16 @@ class TestUpdateUserPreferencesExecute:
             id=sample_preferences.id,
             session_id=sample_preferences.session_id,
             user_id="user-123",
-            selected_currency="EUR",
+            selected_currency=CurrencyCode.EUR,
             dismissed_language_prompt=True,
-            detected_language="en",
+            detected_language=DetectedLanguage2.EN,
         )
         preferences_repository.upsert.return_value = updated_prefs
 
         result = await use_case.execute(sample_preferences)
 
         assert result.user_id == "user-123"
-        assert result.selected_currency == "EUR"
+        assert result.selected_currency == CurrencyCode.EUR
         assert result.dismissed_language_prompt is True
 
     async def test_execute_preserves_session_id(
@@ -151,16 +155,16 @@ class TestUpdateUserPreferencesExecute:
             id=uuid4(),
             session_id="logged-in-session",
             user_id="user-456",
-            selected_currency="JPY",
+            selected_currency=CurrencyCode.JPY,
             dismissed_language_prompt=False,
-            detected_language="ja",
+            detected_language=DetectedLanguage2.IT,
         )
         preferences_repository.upsert.return_value = prefs
 
         result = await use_case.execute(prefs)
 
         assert result.user_id == "user-456"
-        assert result.selected_currency == "JPY"
+        assert result.selected_currency == CurrencyCode.JPY
         call_args = cache_service.set.call_args
         assert call_args[0][0] == "session:logged-in-session:preferences"
 
@@ -181,49 +185,49 @@ class TestUpdateUserPreferencesExecute:
         serialized = call_args[0][1]
         assert isinstance(serialized, str)
 
-        # Should be valid JSON
+        # Should be valid JSON with camelCase fields (by_alias=True)
         import json
 
         data = json.loads(serialized)
-        assert "session_id" in data
-        assert "selected_currency" in data
+        assert "sessionId" in data
+        assert "selectedCurrency" in data
 
 
 @pytest.mark.unit
 class TestUpdateUserPreferencesSerialize:
-    """Test UpdateUserPreferences._serialize() method."""
+    """Test UpdateUserPreferencesUseCase serialization."""
 
     @pytest.fixture
     def use_case(self):
         """Create use case."""
-        return UpdateUserPreferences(AsyncMock(), AsyncMock())
+        return UpdateUserPreferencesUseCase(AsyncMock(), AsyncMock())
 
     def test_serialize_complete_preferences(self, use_case):
         """Test serialization of complete preferences."""
-        now = datetime.now(UTC).replace(tzinfo=None)
+        now = datetime.now(UTC)
         prefs = UserPreferences(
             id=uuid4(),
             session_id="test-session",
             user_id="user-123",
-            selected_currency="USD",
+            selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=True,
-            detected_language="en",
+            detected_language=DetectedLanguage2.EN,
             created_at=now,
             updated_at=now,
             expires_at=now + timedelta(days=30),
         )
 
-        result = use_case._serialize(prefs)
+        result = prefs.model_dump_json(by_alias=True)
 
         assert isinstance(result, str)
         import json
 
         data = json.loads(result)
-        assert data["session_id"] == "test-session"
-        assert data["user_id"] == "user-123"
-        assert data["selected_currency"] == "USD"
-        assert data["dismissed_language_prompt"] is True
-        assert data["detected_language"] == "en"
+        assert data["sessionId"] == "test-session"
+        assert data["userId"] == "user-123"
+        assert data["selectedCurrency"] == "USD"
+        assert data["dismissedLanguagePrompt"] is True
+        assert data["detectedLanguage"] == "en"
 
     def test_serialize_minimal_preferences(self, use_case):
         """Test serialization with minimal required fields."""
@@ -231,19 +235,19 @@ class TestUpdateUserPreferencesSerialize:
             id=uuid4(),
             session_id="min-session",
             user_id=None,
-            selected_currency="USD",
+            selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=False,
         )
 
-        result = use_case._serialize(prefs)
+        result = prefs.model_dump_json(by_alias=True)
 
         import json
 
         data = json.loads(result)
-        assert data["session_id"] == "min-session"
-        assert data["user_id"] is None
-        assert data["selected_currency"] == "USD"
-        assert data["dismissed_language_prompt"] is False
+        assert data["sessionId"] == "min-session"
+        assert data["userId"] is None
+        assert data["selectedCurrency"] == "USD"
+        assert data["dismissedLanguagePrompt"] is False
 
     def test_serialize_includes_all_required_fields(self, use_case):
         """Test serialization includes all required JSON fields."""
@@ -251,22 +255,22 @@ class TestUpdateUserPreferencesSerialize:
             id=uuid4(),
             session_id="test",
             user_id=None,
-            selected_currency="EUR",
+            selected_currency=CurrencyCode.EUR,
             dismissed_language_prompt=False,
         )
 
-        result = use_case._serialize(prefs)
+        result = prefs.model_dump_json(by_alias=True)
 
         import json
 
         data = json.loads(result)
         required_fields = [
             "id",
-            "session_id",
-            "user_id",
-            "selected_currency",
-            "dismissed_language_prompt",
-            "detected_language",
+            "sessionId",
+            "userId",
+            "selectedCurrency",
+            "dismissedLanguagePrompt",
+            "detectedLanguage",
         ]
         for field in required_fields:
             assert field in data
@@ -274,7 +278,7 @@ class TestUpdateUserPreferencesSerialize:
 
 @pytest.mark.unit
 class TestUpdateUserPreferencesIntegration:
-    """Integration tests for UpdateUserPreferences workflow."""
+    """Integration tests for UpdateUserPreferencesUseCase workflow."""
 
     @pytest.fixture
     def preferences_repository(self):
@@ -289,7 +293,7 @@ class TestUpdateUserPreferencesIntegration:
     @pytest.fixture
     def use_case(self, preferences_repository, cache_service):
         """Create use case with mocked dependencies."""
-        return UpdateUserPreferences(preferences_repository, cache_service)
+        return UpdateUserPreferencesUseCase(preferences_repository, cache_service)
 
     async def test_currency_change_updates_ttl(self, use_case, preferences_repository, cache_service):
         """Test changing currency updates cache with full TTL."""
@@ -297,21 +301,21 @@ class TestUpdateUserPreferencesIntegration:
             id=uuid4(),
             session_id="user-session",
             user_id=None,
-            selected_currency="USD",
+            selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=False,
         )
         updated_prefs = UserPreferences(
             id=original.id,
             session_id=original.session_id,
             user_id=original.user_id,
-            selected_currency="EUR",  # Changed
+            selected_currency=CurrencyCode.EUR,  # Changed
             dismissed_language_prompt=original.dismissed_language_prompt,
         )
         preferences_repository.upsert.return_value = updated_prefs
 
         result = await use_case.execute(original)
 
-        assert result.selected_currency == "EUR"
+        assert result.selected_currency == CurrencyCode.EUR
         call_args = cache_service.set.call_args
         assert call_args[1]["ttl_seconds"] == 30 * 24 * 60 * 60
 
@@ -321,7 +325,7 @@ class TestUpdateUserPreferencesIntegration:
             id=uuid4(),
             session_id="user-session",
             user_id=None,
-            selected_currency="USD",
+            selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=False,
         )
         updated_prefs = UserPreferences(

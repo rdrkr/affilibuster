@@ -85,8 +85,18 @@ else
   install_apt "pre-commit" "pre-commit"
   install_apt "shfmt" "shfmt"
   install_apt "shellcheck" "shellcheck"
-  # checkmake not in apt, use pip
-  install_pip "checkmake"
+
+  # checkmake (Go binary - install from GitHub releases)
+  if ! command -v checkmake >/dev/null 2>&1; then
+    echo "  Installing checkmake..."
+    CHECKMAKE_VERSION="0.2.2"
+    curl -sSL "https://github.com/mrtazz/checkmake/releases/download/${CHECKMAKE_VERSION}/checkmake-${CHECKMAKE_VERSION}.linux.amd64" -o /tmp/checkmake &&
+      sudo mv /tmp/checkmake /usr/local/bin/checkmake &&
+      sudo chmod +x /usr/local/bin/checkmake ||
+      echo "  ⚠️  Failed to install checkmake"
+  else
+    echo "  ✅ checkmake already installed"
+  fi
 
   # Python dependency manager (not in apt, use official installer)
   if ! command -v uv >/dev/null 2>&1; then

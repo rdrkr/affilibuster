@@ -12,13 +12,133 @@ import type { Core } from '@strapi/types'
 import * as fs from 'fs'
 
 /**
- * Get the seed data file path
+ * TypeScript interfaces for seed data structure
+ */
+
+/** Currency type */
+type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'ILS' | 'CAD' | 'AUD' | 'JPY' | 'CNY'
+type SymbolPosition = 'before' | 'after'
+
+/** Localized content base structure */
+interface LocalizedContent {
+  documentId: string
+  id: number
+  entryTitle: string
+  createdAt: string
+  updatedAt: string
+  publishedAt: string
+  locale: string
+  localizations: unknown[]
+}
+
+/** Product data structure */
+interface ProductData {
+  title: string
+  description: string
+  content: string
+  excerpt: string
+  affiliateUrl: string
+  price: number
+  currency: CurrencyCode
+  category: string
+  featured: boolean
+}
+
+/** Currency data structure */
+interface CurrencyData {
+  code: CurrencyCode
+  name: string
+  symbol: string
+  decimalPlaces: number
+  symbolPosition: SymbolPosition
+  thousandsSeparator: string
+  decimalSeparator: string
+  exchangeRate: number
+  sortOrder: number
+}
+
+/** Seed data structure */
+interface SeedDataStructure {
+  singleTypes: {
+    navigation: {
+      en: LocalizedContent & Record<string, unknown>
+      it: LocalizedContent & Record<string, unknown>
+      he: LocalizedContent & Record<string, unknown>
+    }
+    homepage: {
+      en: LocalizedContent & Record<string, unknown>
+      it: LocalizedContent & Record<string, unknown>
+      he: LocalizedContent & Record<string, unknown>
+    }
+    about: {
+      en: LocalizedContent & Record<string, unknown>
+      it: LocalizedContent & Record<string, unknown>
+      he: LocalizedContent & Record<string, unknown>
+    }
+    contact: {
+      en: LocalizedContent & Record<string, unknown>
+      it: LocalizedContent & Record<string, unknown>
+      he: LocalizedContent & Record<string, unknown>
+    }
+    productPage: {
+      en: LocalizedContent & Record<string, unknown>
+      it: LocalizedContent & Record<string, unknown>
+      he: LocalizedContent & Record<string, unknown>
+    }
+    footer: {
+      en: LocalizedContent & Record<string, unknown>
+      it: LocalizedContent & Record<string, unknown>
+      he: LocalizedContent & Record<string, unknown>
+    }
+    privacy: {
+      en: LocalizedContent & Record<string, unknown>
+      it: LocalizedContent & Record<string, unknown>
+      he: LocalizedContent & Record<string, unknown>
+    }
+    term: {
+      en: LocalizedContent & Record<string, unknown>
+      it: LocalizedContent & Record<string, unknown>
+      he: LocalizedContent & Record<string, unknown>
+    }
+    error404: {
+      en: LocalizedContent & Record<string, unknown>
+      it: LocalizedContent & Record<string, unknown>
+      he: LocalizedContent & Record<string, unknown>
+    }
+    error410: {
+      en: LocalizedContent & Record<string, unknown>
+      it: LocalizedContent & Record<string, unknown>
+      he: LocalizedContent & Record<string, unknown>
+    }
+    systemMessage: {
+      en: LocalizedContent & Record<string, unknown>
+      it: LocalizedContent & Record<string, unknown>
+      he: LocalizedContent & Record<string, unknown>
+    }
+  }
+  collections: {
+    products: {
+      en: ProductData[]
+      it: ProductData[]
+      he: ProductData[]
+    }
+    currencies: CurrencyData[]
+  }
+}
+
+/**
+ * Get the seed data file path.
+ *
+ * Checks for seed data in Docker volume mount location first (/data/seed-data.json),
+ * falls back to relative path for local development.
+ *
+ * @returns Absolute path to seed-data.json file
  */
 const getSeedDataPath = () => {
   return fs.existsSync('/data/seed-data.json') ? '/data/seed-data.json' : '../data/seed-data.json'
 }
 
-const seedData = JSON.parse(fs.readFileSync(getSeedDataPath(), 'utf-8'))
+const seedData: SeedDataStructure = JSON.parse(fs.readFileSync(getSeedDataPath(), 'utf-8')) as SeedDataStructure
 
 /**
  * Seed script state tracking
@@ -29,7 +149,21 @@ interface SeedState {
 }
 
 /**
- * Generate slug from title
+ * Database document with documentId (return type from Strapi queries)
+ */
+interface DocumentResult {
+  documentId: string
+  [key: string]: unknown
+}
+
+/**
+ * Generate URL-friendly slug from title.
+ *
+ * Converts title to lowercase, replaces non-alphanumeric characters with hyphens,
+ * and removes leading/trailing hyphens.
+ *
+ * @param title - Original title text
+ * @returns URL-friendly slug (e.g., "My Product" becomes "my-product")
  */
 function generateSlug(title: string): string {
   return title
@@ -39,7 +173,23 @@ function generateSlug(title: string): string {
 }
 
 /**
- * Create or update a product (collection type) - idempotent
+ * Create or update a product (collection type) - idempotent operation.
+ *
+ * Checks if product exists by slug, title, and locale. Updates if exists, creates if not.
+ * All products are automatically published after creation/update.
+ *
+ * @param strapi - Strapi core instance for accessing document services
+ * @param title - Product title
+ * @param locale - Locale code (en, it, he)
+ * @param description - Short product description
+ * @param content - Full product content/details
+ * @param excerpt - Brief excerpt for listings
+ * @param affiliateUrl - Affiliate link URL
+ * @param price - Product price as decimal number
+ * @param currency - Currency code (USD, EUR, GBP, etc.)
+ * @param category - Product category
+ * @param featured - Whether product is featured
+ * @param state - Seeding state tracker for success/failure counts
  */
 async function updateProduct(
   strapi: Core.Strapi,
@@ -73,11 +223,11 @@ async function updateProduct(
     }
 
     // Check if product already exists with this slug and locale
-    const existing = await strapi.db.query('api::product.product').findOne({
+    const existing = (await strapi.db.query('api::product.product').findOne({
       where: { locale, slug, title },
-    })
+    })) as DocumentResult | null
 
-    if (existing) {
+    if (existing !== null) {
       // Update existing product and publish
       await strapi.documents('api::product.product').update({
         documentId: existing.documentId,
@@ -115,7 +265,22 @@ async function updateProduct(
 }
 
 /**
- * Create or update a currency (collection type) - idempotent
+ * Create or update a currency (collection type) - idempotent operation.
+ *
+ * Checks if currency exists by code. Updates if exists, creates if not.
+ * All currencies are automatically published and marked as active after creation/update.
+ *
+ * @param strapi - Strapi core instance for accessing document services
+ * @param code - ISO currency code (USD, EUR, etc.)
+ * @param name - Full currency name
+ * @param symbol - Currency symbol ($, €, etc.)
+ * @param decimalPlaces - Number of decimal places for display
+ * @param symbolPosition - Position of symbol relative to amount (before/after)
+ * @param thousandsSep - Thousands separator character
+ * @param decimalSep - Decimal separator character
+ * @param exchangeRate - Exchange rate relative to base currency
+ * @param sortOrder - Display order in currency lists
+ * @param state - Seeding state tracker for success/failure counts
  */
 async function updateCurrency(
   strapi: Core.Strapi,
@@ -146,11 +311,11 @@ async function updateCurrency(
     }
 
     // Check if currency already exists with this code
-    const existing = await strapi.db.query('api::currency.currency').findOne({
+    const existing = (await strapi.db.query('api::currency.currency').findOne({
       where: { code },
-    })
+    })) as DocumentResult | null
 
-    if (existing) {
+    if (existing !== null) {
       // Update existing currency and publish
       await strapi.documents('api::currency.currency').update({
         documentId: existing.documentId,
@@ -202,8 +367,17 @@ type SingleTypeUID =
   | 'api::system-message.system-message'
 
 /**
- * Update single type with locale data - type-safe version
- * For single types, we check if document exists and create/update accordingly
+ * Create or update a single type with locale-specific data - type-safe version.
+ *
+ * For single types, checks if document exists for the given locale.
+ * Creates new document if missing. Filters out system-generated fields before creation.
+ * All single types are automatically published after creation.
+ *
+ * @param strapi - Strapi core instance for accessing document services
+ * @param uid - Strapi content type UID (e.g., 'api::homepage.homepage')
+ * @param locale - Locale code (en, it, he)
+ * @param data - Content data including entryTitle and locale-specific fields
+ * @param state - Seeding state tracker for success/failure counts
  */
 async function updateSingleType(
   strapi: Core.Strapi,
@@ -214,11 +388,11 @@ async function updateSingleType(
 ): Promise<void> {
   try {
     // Check if single type document exists for this locale
-    const existing = await strapi.db.query(uid).findOne({
+    const existing = (await strapi.db.query(uid).findOne({
       where: { locale },
-    })
+    })) as DocumentResult | null
 
-    if (!existing) {
+    if (existing === null) {
       // Filter out system-generated fields before passing to Strapi.
       // Strapi auto-generates: id, documentId, createdAt, updatedAt, publishedAt
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -243,8 +417,17 @@ async function updateSingleType(
 }
 
 /**
- * Main seed function - populates database with initial content
- * Data is loaded from data/seed-data.json
+ * Main seed function - populates database with initial content.
+ *
+ * Loads data from data/seed-data.json and populates all single types and collections
+ * across all supported locales (en, it, he). Operations are idempotent - safe to run multiple times.
+ *
+ * Populates:
+ * - Single types: navigation, footer, homepage, about, contact, privacy, terms, product-page, error pages
+ * - Collections: products (in all locales), currencies
+ *
+ * @param strapi - Strapi core instance for accessing document and database services
+ * @throws Error if seeding encounters failures
  */
 export async function seedDatabase(strapi: Core.Strapi): Promise<void> {
   const state: SeedState = {
@@ -604,8 +787,8 @@ export async function seedDatabase(strapi: Core.Strapi): Promise<void> {
   // Summary
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.log('📊 Population Summary:')
-  console.log(`   ✅ Success: ${state.successCount}`)
-  console.log(`   ❌ Failed:  ${state.failureCount}`)
+  console.log(`   ✅ Success: ${state.successCount.toString()}`)
+  console.log(`   ❌ Failed:  ${state.failureCount.toString()}`)
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.log('')
 

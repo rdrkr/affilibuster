@@ -11,47 +11,48 @@ import Link from 'next/link'
 import { setRequestLocale } from 'next-intl/server'
 import { LanguagePrompt } from '@/components/LanguagePrompt'
 import type { ApiHomepageHomepageDocument } from '@/lib/generated/types.gen'
-import type { UiFeatureCardEntry, Product } from '@/lib/types'
+import { _1Enum4 } from '@/lib/generated/types.gen'
+import type { UiFeatureCardEntry, Product, LanguageCode } from '@/lib/types'
+import { SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
 
 // Important: Strapi CMS must be running during build for content to be fetched
 // Pages are rendered statically with ISR revalidation
 
-type Props = {
+interface Props {
   params: Promise<{ lang: string }>
 }
 
 export function generateStaticParams() {
-  return [{ lang: 'en' }, { lang: 'it' }, { lang: 'he' }]
+  return SUPPORTED_LANGUAGE_CODES.map(lang => ({ lang }))
 }
 
 export default async function HomePage({ params }: Props) {
-  let lang = 'en'
+  let lang: LanguageCode = 'en' as LanguageCode
   try {
     const resolvedParams = await params
-    if (resolvedParams?.lang) {
-      lang = resolvedParams.lang
+    if (resolvedParams.lang) {
+      lang = resolvedParams.lang as LanguageCode
     }
   } catch (e) {
     console.error('Failed to resolve params:', e)
   }
 
   // Enable static rendering
-  if (lang) {
-    setRequestLocale(lang)
-  }
+  setRequestLocale(lang)
 
   let homepageData: ApiHomepageHomepageDocument | null = null
   let productsList: Product[] = []
 
   try {
-    // Fetch homepage content from Strapi
-    homepageData = await getHomepage()
+    // Fetch homepage content from Strapi with nested components
+    homepageData = await getHomepage(lang, [_1Enum4.TRUST_CARDS, _1Enum4.FEATURE_CARDS])
 
     // Fetch featured products
     const productsResponse = await getProducts({
       'pagination[page]': 1,
       'pagination[pageSize]': 3,
-    })
+      locale: lang,
+    } as Parameters<typeof getProducts>[0])
 
     if (productsResponse) {
       productsList = productsResponse.data
@@ -93,7 +94,7 @@ export default async function HomePage({ params }: Props) {
                 {homepageData.featureCards.map((card: UiFeatureCardEntry, index: number) => (
                   <Link
                     key={index}
-                    href={card.linkUrl || '/'}
+                    href={card.linkUrl ?? '/'}
                     className="group bg-primary-700 hover:bg-primary-600 rounded-xl p-6 transition-all duration-300 hover:scale-105"
                   >
                     <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
@@ -217,7 +218,7 @@ export default async function HomePage({ params }: Props) {
         <section className="py-16">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl font-bold text-center mb-12">
-              {homepageData?.whyChooseUsTitle ? (
+              {homepageData.whyChooseUsTitle ? (
                 <>
                   {homepageData.whyChooseUsTitle.split('**').map((part: string, i: number) =>
                     i % 2 === 1 ? (
@@ -233,7 +234,7 @@ export default async function HomePage({ params }: Props) {
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {homepageData?.trustCards?.map((card: Record<string, unknown>, index: number) => (
+              {homepageData.trustCards.map((card: Record<string, unknown>, index: number) => (
                 <div key={index} className="text-center">
                   <div className="bg-primary-100 dark:bg-primary-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg className="w-10 h-10 text-primary-600" fill="currentColor" viewBox="0 0 20 20">

@@ -139,6 +139,7 @@ services:
     volumes:
       - ./frontend:/app
       - ./contracts:/contracts
+      - ./data:/data
       - ./.env:/app/.env
     healthcheck:
       test: [ "CMD", "curl", "-f", "${FRONTEND_PROTOCOL}://${INTERNAL_FRONTEND_HOST}:${FRONTEND_PORT}" ]

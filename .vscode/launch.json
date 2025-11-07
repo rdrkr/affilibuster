@@ -1,29 +1,217 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "name": "Next.js: debug server-side",
-        "type": "node-terminal",
-        "request": "launch",
-        "command": "npm run dev"
-      },
-      {
-        "name": "Next.js: debug client-side",
-        "type": "chrome",
-        "request": "launch",
-        "url": "http://localhost:3000",
-        "webRoot": "${workspaceFolder}"
-      },
-      {
-        "name": "Next.js: debug full stack",
-        "type": "node-terminal",
-        "request": "launch",
-        "command": "npm run dev",
-        "serverReadyAction": {
-          "pattern": "- Local:.+(https?://.+)",
-          "uriFormat": "%s",
-          "action": "debugWithChrome"
-        }
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Frontend: Debug Server-Side",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/frontend",
+      "presentation": {
+        "group": "frontend",
+        "order": 1
       }
-    ]
-  }
+    },
+    {
+      "name": "Frontend: Debug Client-Side",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/frontend",
+      "presentation": {
+        "group": "frontend",
+        "order": 2
+      }
+    },
+    {
+      "name": "Frontend: Debug Full Stack",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/frontend",
+      "serverReadyAction": {
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      },
+      "presentation": {
+        "group": "frontend",
+        "order": 3
+      }
+    },
+    {
+      "name": "Backend: Debug FastAPI Server",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "affilibuster_backend.main:app",
+        "--reload",
+        "--port",
+        "8000",
+        "--host",
+        "0.0.0.0"
+      ],
+      "cwd": "${workspaceFolder}/backend/src",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/backend/src"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "presentation": {
+        "group": "backend",
+        "order": 1
+      }
+    },
+    {
+      "name": "Backend: Debug Current Test File",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "${file}",
+        "-v",
+        "--no-cov"
+      ],
+      "cwd": "${workspaceFolder}/backend",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "presentation": {
+        "group": "backend",
+        "order": 2
+      }
+    },
+    {
+      "name": "Backend: Debug All Tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests",
+        "-v",
+        "--no-cov"
+      ],
+      "cwd": "${workspaceFolder}/backend",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "presentation": {
+        "group": "backend",
+        "order": 3
+      }
+    },
+    {
+      "name": "CMS: Debug Strapi Server",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run develop",
+      "cwd": "${workspaceFolder}/cms",
+      "presentation": {
+        "group": "cms",
+        "order": 1
+      }
+    },
+    {
+      "name": "CMS: Debug Strapi Build",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run build",
+      "cwd": "${workspaceFolder}/cms",
+      "presentation": {
+        "group": "cms",
+        "order": 2
+      }
+    },
+    {
+      "name": "Frontend: Debug Jest Tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "test",
+        "--",
+        "--runInBand",
+        "--no-coverage"
+      ],
+      "cwd": "${workspaceFolder}/frontend",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "presentation": {
+        "group": "frontend-tests",
+        "order": 1
+      }
+    },
+    {
+      "name": "Frontend: Debug Current Jest Test",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/frontend/node_modules/.bin/jest",
+      "args": [
+        "${fileBasenameNoExtension}",
+        "--runInBand",
+        "--no-coverage"
+      ],
+      "cwd": "${workspaceFolder}/frontend",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "presentation": {
+        "group": "frontend-tests",
+        "order": 2
+      }
+    },
+    {
+      "name": "Frontend: Debug Playwright Tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "test:e2e",
+        "--",
+        "--headed"
+      ],
+      "cwd": "${workspaceFolder}/frontend",
+      "console": "integratedTerminal",
+      "presentation": {
+        "group": "frontend-tests",
+        "order": 3
+      }
+    },
+    {
+      "name": "Full Stack: Debug All Services",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "make dev",
+      "cwd": "${workspaceFolder}",
+      "presentation": {
+        "group": "fullstack",
+        "order": 1
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack: Frontend + Backend",
+      "configurations": [
+        "Frontend: Debug Server-Side",
+        "Backend: Debug FastAPI Server"
+      ],
+      "presentation": {
+        "group": "compounds",
+        "order": 1
+      }
+    },
+    {
+      "name": "Full Stack: All Services (Frontend + Backend + CMS)",
+      "configurations": [
+        "Frontend: Debug Server-Side",
+        "Backend: Debug FastAPI Server",
+        "CMS: Debug Strapi Server"
+      ],
+      "presentation": {
+        "group": "compounds",
+        "order": 2
+      }
+    }
+  ]
+}

@@ -12,10 +12,10 @@ run_backend_tests() {
 
   if [[ "${fast}" = "true" ]]; then
     echo "⚡ Running backend unit tests..."
-    docker-compose exec -T backend bash -c "cd /app && . /app/.env && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest -m \"unit\" --tb=short" 2>&1 | tee /tmp/backend-test.log
+    docker compose exec -T backend bash -c "cd /app && . /app/.env && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest -m \"unit\" --tb=short" 2>&1 | tee /tmp/backend-test.log
   else
     echo "🧪 Running backend tests..."
-    docker-compose exec -T backend bash -c "cd /app && . /app/.env && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest" 2>&1 | tee /tmp/backend-test.log
+    docker compose exec -T backend bash -c "cd /app && . /app/.env && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest" 2>&1 | tee /tmp/backend-test.log
   fi
 
   return "${PIPESTATUS[0]}"
@@ -28,7 +28,7 @@ run_frontend_tests() {
     --coverageReporters=lcov \
     --coverageReporters=json \
     --coverageReporters=html \
-    --coverageReporters=text 2>&1 | tee /tmp/frontend-test.log
+    --coverageReporters=text-summary 2>&1 | tee /tmp/frontend-test.log
   local result="${PIPESTATUS[0]}"
   cd ..
   return "${result}"
@@ -80,15 +80,20 @@ display_coverage_summary() {
   FRONTEND_PASSED=$(grep '^Tests:' /tmp/frontend-test.log | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' || echo "0")
   FRONTEND_TOTAL=$(grep '^Tests:' /tmp/frontend-test.log | grep -oE '[0-9]+ total' | grep -oE '[0-9]+' || echo "${FRONTEND_PASSED}")
   FRONTEND_PCT=$(awk "BEGIN {if (${FRONTEND_TOTAL} > 0) printf \"%.0f\", (${FRONTEND_PASSED} / ${FRONTEND_TOTAL}) * 100; else print \"0\"}")
-  FRONTEND_COV=$(grep 'Statements' /tmp/frontend-test.log | grep -oE '[0-9.]+%' | head -1 || echo "N/A")
+  # Extract from text-summary format: "Lines        : 100% ( 414/414 )"
+  FRONTEND_COV=$(grep -E 'Lines\s+:' /tmp/frontend-test.log | grep -oE '[0-9.]+%' | head -1 || echo "N/A")
 
-  echo "📊 Coverage Summary:"
-  printf "┌─────────────┬──────────────────────┬──────────────┬──────────────────────────────────────────────────────┐\n"
-  printf "│ %-11s │ %-20s │ %-12s │ %-52s │\n" "Module" "Tests" "Coverage" "Report"
-  printf "├─────────────┼──────────────────────┼──────────────┼──────────────────────────────────────────────────────┤\n"
-  printf "│ %-11s │ %6s / %-6s (%3s%%) │ %12s │ %-52s │\n" "Backend" "${BACKEND_PASSED}" "${BACKEND_TOTAL}" "${BACKEND_PCT}" "${BACKEND_COV}" "file://$(pwd)/backend/htmlcov/index.html"
-  printf "│ %-11s │ %6s / %-6s (%3s%%) │ %12s │ %-52s │\n" "Frontend" "${FRONTEND_PASSED}" "${FRONTEND_TOTAL}" "${FRONTEND_PCT}" "${FRONTEND_COV}" "file://$(pwd)/frontend/coverage/index.html"
-  printf "└─────────────┴──────────────────────┴──────────────┴──────────────────────────────────────────────────────┘\n"
+  # Create hyperlinks for reports
+  BACKEND_REPORT_URL="file://$(pwd)/backend/htmlcov/index.html"
+  FRONTEND_REPORT_URL="file://$(pwd)/frontend/coverage/index.html"
+
+  echo "📊 Coverage Summary:" &&
+    printf "┌─────────────┬──────────────────────┬──────────┬─────────────────┐\n" &&
+    printf "│ %-11s │ %-20s │ %-8s │ %-15s │\n" "Module" "Tests" "Coverage" "Report" &&
+    printf "├─────────────┼──────────────────────┼──────────┼─────────────────┤\n" &&
+    printf $'│ %-11s │ %6s/%-6s (%3s%%) │ %6s   │ \033[34;4m\033]8;;%s\033\\\\%s\033]8;;\033\\\\\033[0m │\n' "Backend" "${BACKEND_PASSED}" "${BACKEND_TOTAL}" "${BACKEND_PCT}" "${BACKEND_COV}" "${BACKEND_REPORT_URL}" "Backend Report " &&
+    printf $'│ %-11s │ %6s/%-6s (%3s%%) │ %6s   │ \033[34;4m\033]8;;%s\033\\\\%s\033]8;;\033\\\\\033[0m │\n' "Frontend" "${FRONTEND_PASSED}" "${FRONTEND_TOTAL}" "${FRONTEND_PCT}" "${FRONTEND_COV}" "${FRONTEND_REPORT_URL}" "Frontend Report" &&
+    printf "└─────────────┴──────────────────────┴──────────┴─────────────────┘\n"
 }
 
 # Function to merge coverage reports

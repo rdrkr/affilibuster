@@ -19,20 +19,43 @@ interface BootstrapContext {
 }
 
 interface LocaleData {
+  id?: number
   code: string
   name: string
 }
 
+interface ApiToken {
+  id: number
+  name: string
+  description?: string
+  type: string
+  accessKey?: string
+  expiresAt?: string | Date
+  createdAt?: string | Date
+  updatedAt?: string | Date
+}
+
+interface TokenCreateResult {
+  id: number
+  accessKey: string
+  expiresAt?: string | Date
+}
+
 /**
- * Create missing i18n locales in the database
- * Checks for existing locales and only creates missing ones (idempotent)
+ * Create missing i18n locales in the database.
+ *
+ * Checks for existing locales and only creates missing ones (idempotent).
+ * Supports English, Italian, and Hebrew locales matching the platform configuration.
+ *
+ * @param strapi - Strapi core instance for accessing plugins and services
  */
 async function createMissingLocales(strapi: Core.Strapi): Promise<void> {
   try {
     console.log('📍 Checking for missing i18n locales...')
 
     // Get existing locales from the database
-    const existingLocales = await strapi.plugin('i18n').service('locales').find()
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const existingLocales = (await strapi.plugin('i18n').service('locales').find()) as LocaleData[]
 
     const existingCodes = existingLocales.map((locale: LocaleData) => locale.code)
     console.log(`   Found existing locales: ${existingCodes.join(', ')}`)
@@ -49,8 +72,8 @@ async function createMissingLocales(strapi: Core.Strapi): Promise<void> {
 
     // Identify locales with incorrect names
     const localesToUpdate = requiredLocales.filter(required => {
-      const existing = existingLocales.find((loc: LocaleData) => loc.code === required.code)
-      return existing && existing.name !== required.name
+      const existing = existingLocales.find(loc => loc.code === required.code)
+      return existing !== undefined && existing.name !== required.name
     })
 
     if (missingLocales.length === 0 && localesToUpdate.length === 0) {
@@ -60,17 +83,17 @@ async function createMissingLocales(strapi: Core.Strapi): Promise<void> {
 
     // Create missing locales using createMany (workaround for create() bug)
     if (missingLocales.length > 0) {
-      console.log(`   Creating ${missingLocales.length} missing locale(s)...`)
+      console.log(`   Creating ${missingLocales.length.toString()} missing locale(s)...`)
       await strapi.query('plugin::i18n.locale').createMany({ data: missingLocales })
       console.log(`   ✅ Successfully created locales: ${missingLocales.map(l => l.code).join(', ')}`)
     }
 
     // Update locales with incorrect names
     if (localesToUpdate.length > 0) {
-      console.log(`   Updating ${localesToUpdate.length} locale name(s)...`)
+      console.log(`   Updating ${localesToUpdate.length.toString()} locale name(s)...`)
       for (const locale of localesToUpdate) {
-        const existing = existingLocales.find((loc: LocaleData) => loc.code === locale.code)
-        if (existing) {
+        const existing = existingLocales.find(loc => loc.code === locale.code)
+        if (existing?.id !== undefined) {
           await strapi.query('plugin::i18n.locale').update({
             where: { id: existing.id },
             data: { name: locale.name },
@@ -87,9 +110,13 @@ async function createMissingLocales(strapi: Core.Strapi): Promise<void> {
 }
 
 /**
- * Seed the database with initial content using Strapi's internal APIs
- * Populates: currencies, products, and single types (navigation, footer, etc.) in 3 locales
- * Note: The standalone HTTP-based version remains at cms/scripts/seed.ts for manual use
+ * Seed the database with initial content using Strapi's internal APIs.
+ *
+ * Populates currencies, products, and single types (navigation, footer, etc.) in 3 locales.
+ * This is a wrapper around the main seeding function from seed.ts.
+ * Note: The standalone HTTP-based version remains at cms/scripts/seed.ts for manual use.
+ *
+ * @param strapi - Strapi core instance for accessing document and database services
  */
 async function seedDatabaseWrapper(strapi: Core.Strapi): Promise<void> {
   try {
@@ -105,9 +132,13 @@ async function seedDatabaseWrapper(strapi: Core.Strapi): Promise<void> {
 }
 
 /**
- * Generate API token for backend authentication
- * Checks for existing valid token first, only creates new one if needed
- * Creates a token with full-access permissions for backend service
+ * Generate API token for backend authentication.
+ *
+ * Checks for existing valid token first, only creates new one if needed.
+ * Creates a token with full-access permissions for backend service.
+ * Token expires after 30 days and is automatically written to .env file.
+ *
+ * @param strapi - Strapi core instance for accessing API token services
  */
 async function generateApiToken(strapi: Core.Strapi): Promise<void> {
   try {
@@ -119,63 +150,62 @@ async function generateApiToken(strapi: Core.Strapi): Promise<void> {
     const lifespanMillis = TOKEN_LIFESPAN_DAYS * 24 * 60 * 60 * 1000
 
     // Check if a valid, non-expired token already exists
-    const existingTokens = await strapi.query('admin::api-token').findMany({
+    const existingTokens = (await strapi.query('admin::api-token').findMany({
       where: { name: tokenName },
-    })
+    })) as ApiToken[]
 
-    if (existingTokens && existingTokens.length > 0) {
-      const existingToken = existingTokens[0]
+    const existingToken = existingTokens[0] ?? null
+    if (existingToken) {
       const now = new Date()
 
       // Check if token is still valid (not expired)
-      const isExpired = existingToken.expiresAt && new Date(existingToken.expiresAt) < now
+      const isExpired = existingToken.expiresAt !== undefined && new Date(existingToken.expiresAt) < now
       const isValid = existingToken.type === 'full-access' && !isExpired
 
       if (isValid) {
-        console.log(`✅ Valid API token already exists (ID: ${existingToken.id})`)
-        if (existingToken.expiresAt) {
+        console.log(`✅ Valid API token already exists (ID: ${existingToken.id.toString()})`)
+        if (existingToken.expiresAt !== undefined) {
           const expiresAt = new Date(existingToken.expiresAt)
           const daysRemaining = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-          console.log(`   Expires in ${daysRemaining} days (${expiresAt.toISOString()})`)
+          console.log(`   Expires in ${daysRemaining.toString()} days (${expiresAt.toISOString()})`)
         }
         console.log('   Skipping token generation - using existing token\n')
         return
       }
 
       // Token is invalid or expired - delete it
-      console.log(`   Found ${isExpired ? 'expired' : 'invalid'} token (ID: ${existingToken.id}), deleting...`)
+      console.log(
+        `   Found ${isExpired ? 'expired' : 'invalid'} token (ID: ${existingToken.id.toString()}), deleting...`
+      )
       await strapi.query('admin::api-token').delete({ where: { id: existingToken.id } })
       console.log(`   🗑️  Deleted old token`)
     }
 
     console.log('📝 Generating new API token using Strapi service...')
-    console.log(`   Token will expire in ${TOKEN_LIFESPAN_DAYS} days`)
+    console.log(`   Token will expire in ${TOKEN_LIFESPAN_DAYS.toString()} days`)
 
     // Create token using Strapi's service (handles salting and hashing automatically)
-    const result = await tokenService.create({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const result = (await tokenService.create({
       name: tokenName,
       description: 'Auto-generated token for backend service authentication',
       type: 'full-access',
       lifespan: lifespanMillis,
-    })
+    })) as TokenCreateResult
 
     // Extract the actual token from the accessKey property
     const tokenString = result.accessKey
 
-    if (!tokenString) {
-      throw new Error('Token service did not return accessKey')
-    }
-
-    console.log('   ✅ Generated token (length: ' + tokenString.length + ' chars)')
-    if (result.expiresAt) {
-      console.log('   📅 Expires at:', result.expiresAt)
+    console.log('   ✅ Generated token (length: ' + tokenString.length.toString() + ' chars)')
+    if (result.expiresAt !== undefined) {
+      console.log('   📅 Expires at:', result.expiresAt.toString())
     }
 
     // Update .env file with new token if it exists
     const envPath = '/app/.env'
 
     console.log(`   🔍 Checking for .env file at: ${envPath}`)
-    console.log(`   📁 File exists: ${fs.existsSync(envPath)}`)
+    console.log(`   📁 File exists: ${fs.existsSync(envPath).toString()}`)
 
     try {
       if (fs.existsSync(envPath)) {
@@ -207,7 +237,7 @@ async function generateApiToken(strapi: Core.Strapi): Promise<void> {
       console.warn(`   ⚠️  Could not update .env file: ${envErrorMsg}`)
     }
 
-    console.log(`✅ API token created (length: ${tokenString.length})`)
+    console.log(`✅ API token created (length: ${tokenString.length.toString()})`)
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error)
     console.error(`⚠️  Failed to create API token: ${message}`)
@@ -218,11 +248,21 @@ async function generateApiToken(strapi: Core.Strapi): Promise<void> {
 
 // noinspection JSUnusedGlobalSymbols
 /**
- * Bootstrap function that runs on Strapi startup
+ * Strapi bootstrap lifecycle configuration.
+ *
+ * Exports the bootstrap lifecycle hook that runs during Strapi server startup.
  */
 export default {
   /**
-   * Strapi bootstrap lifecycle event
+   * Bootstrap lifecycle hook executed on Strapi startup.
+   *
+   * Performs initial CMS setup including:
+   * - Creating missing i18n locales (Italian, Hebrew)
+   * - Generating API token for backend authentication
+   * - Seeding database with initial content
+   *
+   * @param root0 - Bootstrap context object
+   * @param root0.strapi - Strapi core instance
    */
   async bootstrap({ strapi }: BootstrapContext): Promise<void> {
     console.log('🚀 Running Strapi bootstrap...')

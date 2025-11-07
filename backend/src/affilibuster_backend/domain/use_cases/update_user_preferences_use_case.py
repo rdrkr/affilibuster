@@ -1,20 +1,19 @@
 # Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 """
-UpdateUserPreferences use case.
+UpdateUserPreferencesUseCase use case.
 
 Reference: research.md:274-282
 """
 
-import json
 from datetime import UTC, datetime, timedelta
 
-from affilibuster_backend.domain.entities.user_preferences import UserPreferences
+from affilibuster_backend.domain.entities.generated.models import UserPreferences
 from affilibuster_backend.domain.repositories.cache_service import ICacheService
 from affilibuster_backend.domain.repositories.preferences_repository import IUserPreferencesRepository
 
 
-class UpdateUserPreferences:
+class UpdateUserPreferencesUseCase:
     """
     Use case for updating user preferences.
 
@@ -49,7 +48,7 @@ class UpdateUserPreferences:
 
         """
         # Refresh timestamps and TTL
-        now = datetime.now(UTC).replace(tzinfo=None)
+        now = datetime.now(UTC)
         preferences.updated_at = now
         preferences.expires_at = now + timedelta(days=30)
 
@@ -60,24 +59,8 @@ class UpdateUserPreferences:
         cache_key = f"session:{preferences.session_id}:preferences"
         await self.cache_service.set(
             cache_key,
-            self._serialize(updated),
+            updated.model_dump_json(by_alias=True),
             ttl_seconds=30 * 24 * 60 * 60,  # 30 days
         )
 
         return updated
-
-    def _serialize(self, preferences: UserPreferences) -> str:
-        """Serialize preferences to JSON for caching."""
-        return json.dumps(
-            {
-                "id": str(preferences.id),
-                "session_id": preferences.session_id,
-                "user_id": preferences.user_id,
-                "selected_currency": preferences.selected_currency,
-                "dismissed_language_prompt": preferences.dismissed_language_prompt,
-                "detected_language": preferences.detected_language,
-                "created_at": (preferences.created_at.isoformat() if preferences.created_at else None),
-                "updated_at": (preferences.updated_at.isoformat() if preferences.updated_at else None),
-                "expires_at": (preferences.expires_at.isoformat() if preferences.expires_at else None),
-            },
-        )

@@ -10,6 +10,7 @@
 
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
+import { Direction, LanguageCode, DEFAULT_LANGUAGE_CODE } from '@/lib/types'
 
 interface RTLWrapperProps {
   children: React.ReactNode
@@ -20,15 +21,17 @@ export function RTLWrapper({ children }: RTLWrapperProps) {
 
   // Check if current path is Hebrew
   const isRTL = pathname.startsWith('/he')
+  const direction: Direction = isRTL ? Direction.RTL : Direction.LTR
+  const lang: LanguageCode = isRTL ? LanguageCode.HE : DEFAULT_LANGUAGE_CODE
 
   useEffect(() => {
     // Update document direction
-    document.documentElement.dir = isRTL ? 'rtl' : 'ltr'
-    document.documentElement.lang = isRTL ? 'he' : 'en'
-  }, [isRTL])
+    document.documentElement.dir = direction
+    document.documentElement.lang = lang
+  }, [direction, lang])
 
   return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} className={isRTL ? 'rtl' : 'ltr'}>
+    <div dir={direction} className={direction}>
       {children}
     </div>
   )

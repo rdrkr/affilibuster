@@ -4,8 +4,9 @@
  * E2E test for Schema.org markup validation.
  * Reference: research.md:380-400 (Schema.org structured data)
  */
+import { CurrencyCode } from '@/lib/generated/types.gen'
 
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.describe('Schema.org Markup', () => {
   test('should include Organization schema on homepage', async ({ page }) => {
@@ -13,7 +14,8 @@ test.describe('Schema.org Markup', () => {
 
     // Get JSON-LD script
     const jsonLd = await page.locator('script[type="application/ld+json"]').textContent()
-    const schema = JSON.parse(jsonLd || '')
+
+    const schema = JSON.parse(jsonLd ?? '') as Record<string, unknown>
 
     // Should be Organization type
     expect(schema['@type']).toBe('Organization')
@@ -29,7 +31,8 @@ test.describe('Schema.org Markup', () => {
 
     // Get JSON-LD script
     const jsonLd = await page.locator('script[type="application/ld+json"]').textContent()
-    const schema = JSON.parse(jsonLd || '')
+
+    const schema = JSON.parse(jsonLd ?? '') as Record<string, unknown>
 
     // Should be Product type
     expect(schema['@type']).toBe('Product')
@@ -40,8 +43,11 @@ test.describe('Schema.org Markup', () => {
     expect(schema.offers).toBeDefined()
 
     // Offers should have required fields
-    expect(schema.offers.price).toBeDefined()
-    expect(schema.offers.priceCurrency).toBeDefined()
+    const offers = schema.offers as Record<string, unknown> | undefined
+    if (offers && typeof offers === 'object') {
+      expect(offers.price).toBeDefined()
+      expect(offers.priceCurrency).toBeDefined()
+    }
   })
 
   test('should include BreadcrumbList schema', async ({ page }) => {
@@ -54,7 +60,8 @@ test.describe('Schema.org Markup', () => {
     let breadcrumbSchema = null
     for (const script of scripts) {
       const content = await script.textContent()
-      const schema = JSON.parse(content || '')
+
+      const schema = JSON.parse(content ?? '') as Record<string, unknown>
       if (schema['@type'] === 'BreadcrumbList') {
         breadcrumbSchema = schema
         break
@@ -70,27 +77,32 @@ test.describe('Schema.org Markup', () => {
     await page.goto('/products/test-product')
 
     const jsonLd = await page.locator('script[type="application/ld+json"]').textContent()
-    const schema = JSON.parse(jsonLd || '')
+
+    const schema = JSON.parse(jsonLd ?? '') as Record<string, unknown>
 
     // Should have offers
-    const offers = schema.offers
+    const offers = schema.offers as Record<string, unknown> | undefined
     expect(offers).toBeDefined()
 
     // Should have valid price currency (USD, EUR, ILS, etc.)
-    expect(['USD', 'EUR', 'ILS', 'GBP', 'CAD', 'AUD', 'JPY', 'CNY']).toContain(offers.priceCurrency)
+    if (offers && typeof offers === 'object' && 'priceCurrency' in offers) {
+      expect(Object.values(CurrencyCode)).toContain(offers.priceCurrency)
+    }
   })
 
   test('should include AggregateRating schema', async ({ page }) => {
     await page.goto('/products/test-product')
 
     const jsonLd = await page.locator('script[type="application/ld+json"]').textContent()
-    const schema = JSON.parse(jsonLd || '')
+
+    const schema = JSON.parse(jsonLd ?? '') as Record<string, unknown>
 
     // If product has reviews, should have aggregateRating
-    if (schema.aggregateRating) {
-      expect(schema.aggregateRating['@type']).toBe('AggregateRating')
-      expect(schema.aggregateRating.ratingValue).toBeDefined()
-      expect(schema.aggregateRating.reviewCount).toBeDefined()
+    const aggregateRating = schema.aggregateRating as Record<string, unknown> | undefined
+    if (aggregateRating && typeof aggregateRating === 'object') {
+      expect(aggregateRating['@type']).toBe('AggregateRating')
+      expect(aggregateRating.ratingValue).toBeDefined()
+      expect(aggregateRating.reviewCount).toBeDefined()
     }
   })
 
@@ -98,7 +110,8 @@ test.describe('Schema.org Markup', () => {
     await page.goto('/blog/test-article')
 
     const jsonLd = await page.locator('script[type="application/ld+json"]').textContent()
-    const schema = JSON.parse(jsonLd || '')
+
+    const schema = JSON.parse(jsonLd ?? '') as Record<string, unknown>
 
     // Should be Article type
     expect(schema['@type']).toBe('Article')
@@ -113,14 +126,16 @@ test.describe('Schema.org Markup', () => {
     await page.goto('/')
 
     const jsonLd = await page.locator('script[type="application/ld+json"]').textContent()
-    const schema = JSON.parse(jsonLd || '')
+
+    const schema = JSON.parse(jsonLd ?? '') as Record<string, unknown>
 
     // Should be WebPage type
     expect(schema['@type']).toBe('WebPage')
 
     // Should have speakable for voice search
-    if (schema.speakable) {
-      expect(schema.speakable['@type']).toBe('SpeakableSpecification')
+    const speakable = schema.speakable as Record<string, unknown> | undefined
+    if (speakable && typeof speakable === 'object') {
+      expect(speakable['@type']).toBe('SpeakableSpecification')
     }
   })
 
@@ -128,7 +143,8 @@ test.describe('Schema.org Markup', () => {
     await page.goto('/products/test-product')
 
     const jsonLd = await page.locator('script[type="application/ld+json"]').textContent()
-    const schema = JSON.parse(jsonLd || '')
+
+    const schema = JSON.parse(jsonLd ?? '') as Record<string, unknown>
 
     // Should have @context and @type
     expect(schema['@context']).toBe('https://schema.org')

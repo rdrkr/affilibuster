@@ -34,7 +34,6 @@ architecture.**
   Lighthouse scores >90
 - **🏗️ Clean Architecture**: Domain-driven design with clear separation of concerns and SOLID principles
 - **🧪 Test-First Development**: Comprehensive testing infrastructure
-  15%, CMS 60%)
 - **🔐 Secure**: Affiliate link generation, GDPR compliance, secure credential management
 - **📱 Responsive Design**: Mobile-first approach with Tailwind CSS
 - **🎨 Headless CMS**: Strapi integration with full content management capabilities
@@ -514,6 +513,132 @@ All user-facing content originates from Strapi CMS, ensuring consistency and sca
 - Sitemaps for each language
 - Meta tags, OG tags, image optimization
 - Critical CSS inlined, pagination instead of infinite scroll
+
+---
+
+## 📚 Acknowledgments
+
+Affilibuster is built on the shoulders of giants. We are deeply grateful to the open-source community and the
+maintainers of the following projects:
+
+### Core Frameworks
+
+- **[Next.js](https://nextjs.org/)** ([MIT](https://github.com/vercel/next.js/blob/canary/license.md)) - React framework
+  for production
+- **[React](https://reactjs.org/)** ([MIT](https://github.com/facebook/react/blob/main/LICENSE)) - JavaScript library
+  for building user interfaces
+- **[FastAPI](https://fastapi.tiangolo.com/)** ([MIT](https://github.com/tiangolo/fastapi/blob/master/LICENSE)) - Modern
+  Python web framework
+- **[Strapi](https://strapi.io/)** ([MIT](https://github.com/strapi/strapi/blob/master/LICENSE)) - Headless CMS
+- **[Python](https://www.python.org/)** ([PSF](https://docs.python.org/3/license.html)) - Programming language
+- **[Node.js](https://nodejs.org/)** ([MIT](https://github.com/nodejs/node/blob/main/LICENSE)) - JavaScript runtime
+
+### Databases & Infrastructure
+
+- **[PostgreSQL](https://www.postgresql.org/)** ([PostgreSQL License](https://www.postgresql.org/about/licence/)) -
+  Advanced open-source database
+- **[Redis](https://redis.io/)** ([BSD-3-Clause](https://github.com/redis/redis/blob/unstable/COPYING)) - In-memory data
+  structure store
+- **[Docker](https://www.docker.com/)** ([Apache 2.0](https://github.com/docker/docker/blob/master/LICENSE)) -
+  Containerization platform
+
+### Backend Dependencies (Python)
+
+- **[Uvicorn](https://www.uvicorn.org/)** ([BSD-3-Clause](https://github.com/encode/uvicorn/blob/master/LICENSE.md)) -
+  ASGI server
+- **[SQLAlchemy](https://www.sqlalchemy.org/)** ([MIT](https://github.com/sqlalchemy/sqlalchemy/blob/main/LICENSE)) -
+  Python SQL toolkit and ORM
+- **[Alembic](https://alembic.sqlalchemy.org/)** ([MIT](https://github.com/sqlalchemy/alembic/blob/main/LICENSE)) -
+  Database migration tool
+- **[Pydantic](https://pydantic-docs.helpmanual.io/)** ([MIT](https://github.com/pydantic/pydantic/blob/main/LICENSE)) -
+  Data validation using Python type annotations
+- **[asyncpg](https://github.com/MagicStack/asyncpg)
+  ** ([Apache 2.0](https://github.com/MagicStack/asyncpg/blob/master/LICENSE)) - Fast PostgreSQL client library
+- **[HTTPX](https://www.python-httpx.org/)** ([BSD-3-Clause](https://github.com/encode/httpx/blob/master/LICENSE.md)) -
+  HTTP client for Python
+- **[python-jose](https://github.com/mpdavis/python-jose)
+  ** ([MIT](https://github.com/mpdavis/python-jose/blob/master/LICENSE)) - JavaScript Object Signing and Encryption (
+  JOSE) for Python
+- **[Passlib](https://passlib.readthedocs.io/)** ([BSD](https://github.com/glic3rinu/passlib/blob/master/LICENSE)) -
+  Password hashing library
+
+### Frontend Dependencies (TypeScript/JavaScript)
+
+- **[TypeScript](https://www.typescriptlang.org/)
+  ** ([Apache 2.0](https://github.com/microsoft/TypeScript/blob/main/LICENSE.txt)) - Typed superset of JavaScript
+- **[Tailwind CSS](https://tailwindcss.com/)
+  ** ([MIT](https://github.com/tailwindlabs/tailwindcss/blob/master/LICENSE)) - Utility-first CSS framework
+- **[next-intl](https://next-intl.dev/)** ([MIT](https://github.com/amannn/next-intl/blob/main/LICENSE)) -
+  Internationalization for Next.js
+- **[next-seo](https://github.com/garmeeh/next-seo)** ([MIT](https://github.com/garmeeh/next-seo/blob/master/LICENSE)) -
+  SEO plugin for Next.js
+
+### Development & Testing Tools
+
+- **[pytest](https://pytest.org/)** ([MIT](https://github.com/pytest-dev/pytest/blob/main/LICENSE)) - Python testing
+  framework
+- **[Jest](https://jestjs.io/)** ([MIT](https://github.com/jestjs/jest/blob/main/LICENSE)) - JavaScript testing
+  framework
+- **[Playwright](https://playwright.dev/)** ([Apache 2.0](https://github.com/microsoft/playwright/blob/main/LICENSE)) -
+  End-to-end testing framework
+- **[Testing Library](https://testing-library.com/)
+  ** ([MIT](https://github.com/testing-library/react-testing-library/blob/main/LICENSE)) - Testing utilities for React
+- **[Ruff](https://docs.astral.sh/ruff/)** ([MIT](https://github.com/astral-sh/ruff/blob/main/LICENSE)) - Extremely fast
+  Python linter and formatter
+- **[ESLint](https://eslint.org/)** ([MIT](https://github.com/eslint/eslint/blob/main/LICENSE)) - JavaScript/TypeScript
+  linter
+- **[Prettier](https://prettier.io/)** ([MIT](https://github.com/prettier/prettier/blob/main/LICENSE)) - Code formatter
+- **[MyPy](https://mypy-lang.org/)** ([MIT](https://github.com/python/mypy/blob/master/LICENSE)) - Static type checker
+  for Python
+- **[uv](https://docs.astral.sh/uv/)** ([MIT/Apache 2.0](https://github.com/astral-sh/uv/blob/main/LICENSE-MIT)) -
+  Extremely fast Python package manager
+- **[pre-commit](https://pre-commit.com/)** ([MIT](https://github.com/pre-commit/pre-commit/blob/main/LICENSE)) - Git
+  hooks framework
+
+### Code Generation & API Tools
+
+- **[@hey-api/openapi-ts](https://heyapi.dev/)** ([MIT](https://github.com/hey-api/openapi-ts/blob/main/LICENSE)) -
+  OpenAPI TypeScript code generator
+- **[datamodel-code-generator](https://github.com/koxudaxi/datamodel-code-generator)
+  ** ([MIT](https://github.com/koxudaxi/datamodel-code-generator/blob/main/LICENSE)) - Pydantic model generator from
+  OpenAPI
+- **[Redocly CLI](https://redocly.com/)** ([MIT](https://github.com/Redocly/redocly-cli/blob/main/LICENSE)) - OpenAPI
+  validation and bundling
+
+### Security & Quality
+
+- **[Gitleaks](https://gitleaks.io/)** ([MIT](https://github.com/gitleaks/gitleaks/blob/master/LICENSE)) - Secrets
+  scanning tool
+- **[Axe-core](https://www.deque.com/axe/)** ([MPL-2.0](https://github.com/dequelabs/axe-core/blob/develop/LICENSE)) -
+  Accessibility testing engine
+
+### GitHub Actions
+
+- **[actions/checkout](https://github.com/actions/checkout)
+  ** ([MIT](https://github.com/actions/checkout/blob/main/LICENSE)) - Checkout repository code
+- **[actions/setup-python](https://github.com/actions/setup-python)
+  ** ([MIT](https://github.com/actions/setup-python/blob/main/LICENSE)) - Set up Python environment
+- **[actions/setup-node](https://github.com/actions/setup-node)
+  ** ([MIT](https://github.com/actions/setup-node/blob/main/LICENSE)) - Set up Node.js environment
+- **[astral-sh/setup-uv](https://github.com/astral-sh/setup-uv)
+  ** ([MIT](https://github.com/astral-sh/setup-uv/blob/main/LICENSE)) - Set up uv package manager
+- **[docker/setup-buildx-action](https://github.com/docker/setup-buildx-action)
+  ** ([Apache 2.0](https://github.com/docker/setup-buildx-action/blob/master/LICENSE)) - Set up Docker Buildx
+- **[actions/upload-artifact](https://github.com/actions/upload-artifact)
+  ** ([MIT](https://github.com/actions/upload-artifact/blob/main/LICENSE)) - Upload build artifacts
+- **[actions/cache](https://github.com/actions/cache)** ([MIT](https://github.com/actions/cache/blob/main/LICENSE)) -
+  Cache dependencies
+
+### Additional Libraries
+
+For a complete list of all dependencies, please see:
+
+- Backend: [`backend/pyproject.toml`](backend/pyproject.toml)
+- Frontend: [`frontend/package.json`](frontend/package.json)
+- CMS: [`cms/package.json`](cms/package.json)
+
+We are grateful to all the maintainers and contributors of these projects. Without their dedication and hard work,
+Affilibuster would not be possible. Thank you! 🙏
 
 ---
 

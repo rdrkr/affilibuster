@@ -5,7 +5,7 @@
 NPROCS := $(shell sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4)
 MAKEFLAGS += --output-sync=target
 
-.PHONY: help dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-frontend test-parallel test-all test-backend-fast audit clean clean-coverage coverage-merge coverage-view ci-test install install-backend install-frontend install-cms setup upgrade upgrade-cms upgrade-frontend upgrade-backend ps
+.PHONY: help all dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-frontend test-parallel test-all test-backend-fast audit clean clean-coverage coverage-merge coverage-view ci-test install install-backend install-frontend install-cms setup upgrade upgrade-cms upgrade-frontend upgrade-backend ps pre-commit
 
 # Default target
 .DEFAULT_GOAL := help
@@ -16,7 +16,14 @@ help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 	@echo ""
 
+all: clean install pre-commit start test ## Run complete workflow: clean, install, pre-commit, build, test
+
 # Linting & Formatting
+
+pre-commit: ## Run pre-commit hooks on all files
+	@echo "🔍 Running pre-commit on all files..."
+	@pre-commit run --all-files
+	@echo "✅ Pre-commit checks complete"
 
 # Individual linters - check only
 lint-python-check: ## Check Python code linting (Ruff)
@@ -78,31 +85,31 @@ format-check: ## Check all code formatting without making changes
 dev: format lint ## Start all services
 	@echo "🚀 Starting Affilibuster Development Environment..."
 	@./scripts/build.sh
-	@docker-compose logs -f 2>&1 | "./scripts/log.sh"
+	@docker compose logs -f 2>&1 | "./scripts/log.sh"
 
 build: format lint ## Build frontend (with linting and formatting)
 	@./scripts/build.sh --build
 
 start: ## Start Docker services only
 	@echo "🚀 Starting Docker services..."
-	@docker-compose up -d
+	@docker compose up -d frontend
 	@echo "✅ Services started."
 
 stop: ## Stop all Docker services
 	@echo "🛑 Stopping Docker services..."
-	@docker-compose down
+	@docker compose down
 	@echo "✅ Services stopped"
 
 restart: ## Restart Docker services
 	@echo "🔄 Restarting Docker services..."
-	@docker-compose restart
+	@docker compose restart
 	@echo "✅ Services restarted"
 
 logs: ## View Docker logs (all services)
-	@docker-compose logs -f
+	@docker compose logs -f
 
 logs-backend: ## View backend logs only
-	@docker-compose logs -f backend
+	@docker compose logs -f backend
 
 test-backend: ## Run backend tests with coverage
 	@bash scripts/test.sh backend
@@ -140,17 +147,17 @@ audit: ## Run Lighthouse performance audits
 
 install-backend: ## Install backend dependencies
 	@echo "📦 Installing backend dependencies..."
-	@cd backend && uv sync
+	@cd backend && uv sync --all-extras
 
 install-frontend: ## Install frontend dependencies
 	@echo "📦 Installing frontend dependencies..."
-	@cd frontend && npm install
+	@cd frontend && npm install --include=optional
 
 install-cms: ## Install CMS dependencies
 	@echo "📦 Installing CMS dependencies..."
-	@cd cms && npm install
+	@cd cms && npm install --include=optional
 
-install: install-frontend install-cms ## Install all dependencies (frontend + CMS)
+install: install-backend install-frontend install-cms ## Install all dependencies (backend + frontend + CMS)
 	@echo "✅ All dependencies installed"
 
 setup: ## Complete development environment setup (installs all tools and dependencies)
@@ -172,4 +179,4 @@ clean: ## Clean up containers, volumes, and all build artifacts (zero state)
 	@bash scripts/clean.sh
 
 ps: ## Show running containers
-	@docker-compose ps
+	@docker compose ps

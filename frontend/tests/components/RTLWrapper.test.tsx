@@ -7,6 +7,7 @@
 import { render } from '@testing-library/react'
 import { usePathname } from 'next/navigation'
 import { RTLWrapper } from '@/components/RTLWrapper'
+import { LanguageCode } from '@/lib/types'
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -23,7 +24,7 @@ describe('RTLWrapper', () => {
 
   describe('LTR (English) paths', () => {
     it('should set ltr direction for root path', () => {
-      usePathname.mockReturnValue('/')
+      ;(usePathname as jest.Mock).mockReturnValue('/')
 
       render(
         <RTLWrapper>
@@ -32,11 +33,11 @@ describe('RTLWrapper', () => {
       )
 
       expect(document.documentElement.dir).toBe('ltr')
-      expect(document.documentElement.lang).toBe('en')
+      expect(document.documentElement.lang).toBe(LanguageCode.EN)
     })
 
     it('should set ltr direction for /en path', () => {
-      usePathname.mockReturnValue('/en/about')
+      ;(usePathname as jest.Mock).mockReturnValue('/en/about')
 
       render(
         <RTLWrapper>
@@ -45,11 +46,11 @@ describe('RTLWrapper', () => {
       )
 
       expect(document.documentElement.dir).toBe('ltr')
-      expect(document.documentElement.lang).toBe('en')
+      expect(document.documentElement.lang).toBe(LanguageCode.EN)
     })
 
     it('should set ltr direction for /it path', () => {
-      usePathname.mockReturnValue('/it/products')
+      ;(usePathname as jest.Mock).mockReturnValue('/it/products')
 
       render(
         <RTLWrapper>
@@ -58,11 +59,11 @@ describe('RTLWrapper', () => {
       )
 
       expect(document.documentElement.dir).toBe('ltr')
-      expect(document.documentElement.lang).toBe('en')
+      expect(document.documentElement.lang).toBe(LanguageCode.EN)
     })
 
     it('should render children with ltr wrapper', () => {
-      usePathname.mockReturnValue('/en/about')
+      ;(usePathname as jest.Mock).mockReturnValue('/en/about')
 
       const { container } = render(
         <RTLWrapper>
@@ -78,7 +79,7 @@ describe('RTLWrapper', () => {
 
   describe('RTL (Hebrew) paths', () => {
     it('should set rtl direction for /he path', () => {
-      usePathname.mockReturnValue('/he/about')
+      ;(usePathname as jest.Mock).mockReturnValue('/he/about')
 
       render(
         <RTLWrapper>
@@ -87,11 +88,11 @@ describe('RTLWrapper', () => {
       )
 
       expect(document.documentElement.dir).toBe('rtl')
-      expect(document.documentElement.lang).toBe('he')
+      expect(document.documentElement.lang).toBe(LanguageCode.HE)
     })
 
     it('should set rtl direction for /he path', () => {
-      usePathname.mockReturnValue('/he/products')
+      ;(usePathname as jest.Mock).mockReturnValue('/he/products')
 
       render(
         <RTLWrapper>
@@ -100,11 +101,11 @@ describe('RTLWrapper', () => {
       )
 
       expect(document.documentElement.dir).toBe('rtl')
-      expect(document.documentElement.lang).toBe('he')
+      expect(document.documentElement.lang).toBe(LanguageCode.HE)
     })
 
     it('should render children with rtl wrapper', () => {
-      usePathname.mockReturnValue('/he/about')
+      ;(usePathname as jest.Mock).mockReturnValue('/he/about')
 
       const { container } = render(
         <RTLWrapper>
@@ -120,7 +121,7 @@ describe('RTLWrapper', () => {
 
   describe('children rendering', () => {
     it('should render text children', () => {
-      usePathname.mockReturnValue('/en')
+      ;(usePathname as jest.Mock).mockReturnValue('/en')
 
       const { getByText } = render(<RTLWrapper>Hello World</RTLWrapper>)
 
@@ -128,7 +129,7 @@ describe('RTLWrapper', () => {
     })
 
     it('should render multiple children', () => {
-      usePathname.mockReturnValue('/en')
+      ;(usePathname as jest.Mock).mockReturnValue('/en')
 
       const { getByText } = render(
         <RTLWrapper>
@@ -144,7 +145,7 @@ describe('RTLWrapper', () => {
     })
 
     it('should render nested components', () => {
-      usePathname.mockReturnValue('/he')
+      ;(usePathname as jest.Mock).mockReturnValue('/he')
 
       const { getByTestId } = render(
         <RTLWrapper>
@@ -161,7 +162,7 @@ describe('RTLWrapper', () => {
 
   describe('direction switching', () => {
     it('should update direction when path changes from ltr to rtl', () => {
-      usePathname.mockReturnValue('/en/about')
+      ;(usePathname as jest.Mock).mockReturnValue('/en/about')
 
       const { rerender } = render(
         <RTLWrapper>
@@ -170,8 +171,7 @@ describe('RTLWrapper', () => {
       )
 
       expect(document.documentElement.dir).toBe('ltr')
-
-      usePathname.mockReturnValue('/he/about')
+      ;(usePathname as jest.Mock).mockReturnValue('/he/about')
 
       rerender(
         <RTLWrapper>
@@ -183,7 +183,7 @@ describe('RTLWrapper', () => {
     })
 
     it('should update direction when path changes from rtl to ltr', () => {
-      usePathname.mockReturnValue('/he/products')
+      ;(usePathname as jest.Mock).mockReturnValue('/he/products')
 
       const { rerender } = render(
         <RTLWrapper>
@@ -192,8 +192,7 @@ describe('RTLWrapper', () => {
       )
 
       expect(document.documentElement.dir).toBe('rtl')
-
-      usePathname.mockReturnValue('/en/products')
+      ;(usePathname as jest.Mock).mockReturnValue('/en/products')
 
       rerender(
         <RTLWrapper>

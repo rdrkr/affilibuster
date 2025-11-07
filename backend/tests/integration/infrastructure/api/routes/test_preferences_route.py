@@ -395,7 +395,8 @@ class TestPreferencesCurrencyValidation:
             headers={"X-Session-Id": session_id},
             json={"selectedCurrency": "XYZ"},
         )
-        assert response.status_code == 400
+        # FastAPI returns 422 for Pydantic validation errors
+        assert response.status_code == 422
 
 
 @pytest.mark.integration

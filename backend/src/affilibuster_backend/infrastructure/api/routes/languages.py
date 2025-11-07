@@ -17,6 +17,7 @@ from affilibuster_backend.domain.entities import (
 )
 from affilibuster_backend.domain.entities.generated.models import (
     Code,
+    CurrencyCode,
     DetectedLanguage1,
     Direction,
     LanguagesDetectPostRequest,
@@ -58,17 +59,17 @@ async def transform_strapi_locales_to_languages(
 
         lang = Language(
             code=code_enum,
-            displayName=locale.name,
-            nativeName=locale.name,  # Fallback to name
-            direction=Direction.RTL if code_str == "he" else Direction.LTR,  # Hebrew is RTL
-            urlPrefix=f"/{code_str}",
-            defaultCurrency=("USD" if code_str != "it" else "EUR"),  # Default to USD, EUR for Italian
-            localeCode=code_str,
-            isDefault=locale.is_default,
+            display_name=locale.name,
+            native_name=locale.name,  # Fallback to name
+            direction=Direction.RTL if code_enum == Code.HE else Direction.LTR,  # Hebrew is RTL
+            url_prefix=f"/{code_str}",
+            default_currency=CurrencyCode.EUR if code_enum == Code.IT else CurrencyCode.USD,
+            locale_code=code_str,
+            is_default=locale.is_default,
         )
         languages.append(lang)
 
-    return sorted(languages, key=lambda x: (x.code.value != "en", x.code.value))
+    return sorted(languages, key=lambda x: (x.code != Code.EN, x.code.value))
 
 
 @router.get("")
@@ -87,7 +88,7 @@ async def get_languages(
         )
 
         # Transform to Language model format
-        return await transform_strapi_locales_to_languages(locale_data)
+        return LanguagesGetResponse(root=await transform_strapi_locales_to_languages(locale_data))
 
     except Exception as e:
         raise HTTPException(
@@ -125,32 +126,31 @@ async def detect_language(
         languages = await transform_strapi_locales_to_languages(locale_data)
         available_codes = {lang.code.value for lang in languages}
 
+        # Map string codes to DetectedLanguage1 enum
+        detected_lang_map = {
+            Code.EN.value: DetectedLanguage1.EN,
+            Code.IT.value: DetectedLanguage1.IT,
+            Code.HE.value: DetectedLanguage1.HE,
+        }
+
         # Find first browser language that's available
-        detected_lang_code = "en"
+        detected_lang = DetectedLanguage1.EN  # Default
         confidence = 0.5  # Default low confidence
 
         for idx, browser_lang in enumerate(browser_languages):
             lang_code = browser_lang.split("-")[0].lower()
             if lang_code in available_codes:
-                detected_lang_code = lang_code
+                detected_lang = detected_lang_map.get(lang_code, DetectedLanguage1.EN)
                 # Higher confidence for languages earlier in Accept-Language list
                 confidence = max(0.9 - (idx * 0.1), 0.6)
                 break
 
-        # Map string to enum
-        detected_lang_map = {
-            "en": DetectedLanguage1.EN,
-            "it": DetectedLanguage1.IT,
-            "he": DetectedLanguage1.HE,
-        }
-        detected_lang = detected_lang_map.get(detected_lang_code, DetectedLanguage1.EN)
-
         # Return detected language with confidence
         return DetectedLanguage(
-            detectedLanguage=detected_lang,
+            detected_language=detected_lang,
             confidence=confidence,
-            shouldPrompt=confidence < LANGUAGE_DETECTION_CONFIDENCE_THRESHOLD,  # Prompt if not very confident
-            suggestedUrl=None,
+            should_prompt=confidence < LANGUAGE_DETECTION_CONFIDENCE_THRESHOLD,  # Prompt if not very confident
+            suggested_url=None,
         )
 
     except Exception as e:

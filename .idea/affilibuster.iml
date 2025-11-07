@@ -13,6 +13,7 @@
       <sourceFolder url="file://$MODULE_DIR$/cms/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/frontend/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/backend/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/frontend/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.playwright-mcp" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/backend/.venv" />

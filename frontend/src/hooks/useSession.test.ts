@@ -12,7 +12,7 @@ const localStorageMock = (() => {
   let store: Record<string, string> = {}
 
   return {
-    getItem: (key: string) => store[key] || null,
+    getItem: (key: string) => store[key] ?? null,
     setItem: (key: string, value: string) => {
       store[key] = value
     },
@@ -32,9 +32,10 @@ Object.defineProperty(window, 'localStorage', {
 })
 
 // Mock crypto.randomUUID
+const mockRandomUUID = jest.fn(() => 'test-uuid-1234')
 Object.defineProperty(global, 'crypto', {
   value: {
-    randomUUID: jest.fn(() => 'test-uuid-1234'),
+    randomUUID: mockRandomUUID,
   },
 })
 
@@ -70,20 +71,25 @@ describe('useSession', () => {
     })
 
     // Should not generate new UUID
-    expect(crypto.randomUUID).not.toHaveBeenCalled()
+
+    expect(mockRandomUUID).not.toHaveBeenCalled()
   })
 
   it('should generate different UUIDs on multiple renders', async () => {
-    ;(crypto.randomUUID as jest.Mock).mockReturnValueOnce('uuid-1').mockReturnValueOnce('uuid-2')
+    mockRandomUUID.mockReturnValueOnce('uuid-1').mockReturnValueOnce('uuid-2')
 
     localStorageMock.clear()
 
     const { result: result1 } = renderHook(() => useSession())
-    await waitFor(() => expect(result1.current).toBe('uuid-1'))
+    await waitFor(() => {
+      expect(result1.current).toBe('uuid-1')
+    })
 
     localStorageMock.clear()
 
     const { result: result2 } = renderHook(() => useSession())
-    await waitFor(() => expect(result2.current).toBe('uuid-2'))
+    await waitFor(() => {
+      expect(result2.current).toBe('uuid-2')
+    })
   })
 })

@@ -6,12 +6,12 @@ User preferences repository implementation using SQLAlchemy.
 Reference: T075 (IUserPreferencesRepository interface), T070 (UserPreferences model)
 """
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from affilibuster_backend.domain.entities.user_preferences import UserPreferences
+from affilibuster_backend.domain.entities.generated.models import UserPreferences
 from affilibuster_backend.domain.repositories.preferences_repository import IUserPreferencesRepository
 from affilibuster_backend.infrastructure.database.models.user_preferences import UserPreferencesModel
 
@@ -54,14 +54,23 @@ class UserPreferencesRepository(IUserPreferencesRepository):  # type: ignore[mis
         result = await self.session.execute(stmt)
         existing_model = result.scalar_one_or_none()
 
+        # Ensure timestamps are set (database requires NOT NULL but API model allows None)
+        # Convert timezone-aware datetimes to naive by removing tzinfo
+        now = datetime.now(UTC).replace(tzinfo=None)
+        created_at_naive = preferences.created_at.replace(tzinfo=None) if preferences.created_at else now
+        updated_at_naive = preferences.updated_at.replace(tzinfo=None) if preferences.updated_at else now
+        expires_at_naive = (
+            preferences.expires_at.replace(tzinfo=None) if preferences.expires_at else (now + timedelta(days=30))
+        )
+
         if existing_model:
             # Update existing record, preserving its ID and created_at
             existing_model.user_id = preferences.user_id
             existing_model.selected_currency = preferences.selected_currency
             existing_model.dismissed_language_prompt = preferences.dismissed_language_prompt
             existing_model.detected_language = preferences.detected_language
-            existing_model.updated_at = preferences.updated_at
-            existing_model.expires_at = preferences.expires_at
+            existing_model.updated_at = updated_at_naive
+            existing_model.expires_at = expires_at_naive
             await self.session.commit()
             return self._to_entity(existing_model)
         # Insert new record
@@ -72,9 +81,9 @@ class UserPreferencesRepository(IUserPreferencesRepository):  # type: ignore[mis
             selected_currency=preferences.selected_currency,
             dismissed_language_prompt=preferences.dismissed_language_prompt,
             detected_language=preferences.detected_language,
-            created_at=preferences.created_at,
-            updated_at=preferences.updated_at,
-            expires_at=preferences.expires_at,
+            created_at=created_at_naive,
+            updated_at=updated_at_naive,
+            expires_at=expires_at_naive,
         )
         self.session.add(new_model)
         await self.session.commit()

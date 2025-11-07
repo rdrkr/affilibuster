@@ -13,6 +13,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { getNavigation, getLanguages, detectLanguage, getUserPreferences, updateUserPreferences } from '@/lib/client'
 import { useSession } from '@/hooks/useSession'
 import type { Language } from '@/lib/types'
+import { LanguageCode, SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
 
 interface NavigationData {
   promptTitleTemplate?: string
@@ -36,12 +37,12 @@ export function LanguagePrompt() {
     // Extract current language from pathname
     const pathParts = pathname.split('/').filter(Boolean)
     const firstSegment = pathParts[0]
-    let lang = 'en'
-    if (firstSegment === 'it') lang = 'it'
-    else if (firstSegment === 'he') lang = 'he'
+    let lang = LanguageCode.EN
+    if (firstSegment === LanguageCode.IT) lang = LanguageCode.IT
+    else if (firstSegment === LanguageCode.HE) lang = LanguageCode.HE
 
     // Fetch navigation data from CMS
-    getNavigation()
+    void getNavigation()
       .then(navContent => {
         if (navContent) {
           setNavData(navContent)
@@ -50,24 +51,24 @@ export function LanguagePrompt() {
       .catch(console.error)
 
     // Check preferences and detect language
-    getUserPreferences()
+    void getUserPreferences()
       .then(prefs => {
         // Don't show if user already dismissed
         if (!prefs || prefs.dismissedLanguagePrompt) return
 
         // Detect language from browser
-        detectLanguage(navigator.language, navigator.userAgent)
+        void detectLanguage(navigator.language, navigator.userAgent)
           .then(async result => {
-            if (result && result.shouldPrompt && result.detectedLanguage !== lang) {
+            if (!result) return
+
+            if (result.shouldPrompt && result.detectedLanguage !== lang) {
               setDetectedLang(result.detectedLanguage)
 
               // Get language details
               const languages = await getLanguages()
-              if (languages) {
-                const detected = languages.find(l => l.code === result.detectedLanguage)
-                setDetectedLanguage(detected || null)
-                setShow(true)
-              }
+              const detected = languages.find(l => l.code === result.detectedLanguage)
+              setDetectedLanguage(detected ?? null)
+              setShow(true)
             }
           })
           .catch(console.error)
@@ -82,12 +83,12 @@ export function LanguagePrompt() {
       // Update preferences
       await updateUserPreferences({
         dismissedLanguagePrompt: true,
-        detectedLanguage: detectedLanguage.code as 'en' | 'it' | 'he',
+        detectedLanguage: detectedLanguage.code,
       })
 
       // Navigate to detected language
       const pathParts = pathname.split('/').filter(Boolean)
-      const isCurrentPathLangPrefixed = pathParts[0] === 'it' || pathParts[0] === 'he' || pathParts[0] === 'en'
+      const isCurrentPathLangPrefixed = SUPPORTED_LANGUAGE_CODES.includes(pathParts[0] as LanguageCode)
       const pathWithoutLang = isCurrentPathLangPrefixed ? '/' + pathParts.slice(1).join('/') : pathname
 
       const newPath = detectedLanguage.urlPrefix
@@ -150,13 +151,17 @@ export function LanguagePrompt() {
             <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">{messageText}</p>
             <div className="flex flex-col sm:flex-row gap-2">
               <button
-                onClick={handleAccept}
+                onClick={() => {
+                  void handleAccept()
+                }}
                 className="px-4 py-2 bg-secondary-600 text-white rounded-md hover:bg-secondary-700 transition-colors font-medium"
               >
                 {yesButtonText}
               </button>
               <button
-                onClick={handleDismiss}
+                onClick={() => {
+                  void handleDismiss()
+                }}
                 className="px-4 py-2 bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors"
               >
                 {noButtonText}

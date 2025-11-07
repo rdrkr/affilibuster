@@ -9,19 +9,12 @@ a multi-language, SEO-optimized platform that can serve as a foundation for mult
 
 ### Key Characteristics
 
-- **Architecture**: BFF (Backend for Frontend) pattern with strict separation
+- **Architecture**: BFF (Backend for Frontend) pattern - `Frontend (Next.js) → Backend API (FastAPI) → Strapi CMS`
+  - **FRONTEND NEVER TALKS TO STRAPI DIRECTLY** - All content flows through the backend API
 - **Languages**: English (default), Italian, Hebrew (RTL support)
 - **Performance**: Lighthouse scores >90, <3s load times on 3G
-- **Testing**: Coverage requirements (Backend 100%, Frontend 15%)
+- **Testing**: 100% project line coverage
 - **SEO**: Comprehensive schema markup, hreflang tags, sitemaps
-
-### Critical Architecture Rule
-
-```
-Frontend (Next.js) → Backend API (FastAPI) → Strapi CMS
-```
-
-**FRONTEND NEVER TALKS TO STRAPI DIRECTLY** - All content flows through the backend API.
 
 ## Technology Stack
 
@@ -357,19 +350,100 @@ async def test_get_languages_with_cache(mocker):
 ### Python (Backend)
 
 - **Formatter**: Ruff (120 char line length)
-- **Linter**: Ruff
+- **Linter**: Ruff (all rules enabled)
 - **Type Checker**: Mypy (strict mode)
-- **Docstrings**: Required for all public APIs
+- **Docstrings**: **REQUIRED** for all public APIs (enforced by Ruff pydocstyle rules)
+  - **Convention**: Google-style docstrings
+  - **Scope**: All public functions, classes, methods, and modules
+  - **Content**: Must include description, parameters, returns, and raises
+  - **Enforcement**: `make lint` will fail if docstrings are missing or incomplete
 - **Import Order**: Enforced by Ruff
 - **Naming**: snake_case for functions/variables, PascalCase for classes
 
-### TypeScript (Frontend)
+### TypeScript/JavaScript (Frontend & CMS)
 
+- **Formatter**: Prettier
+- **Linter**: ESLint with typescript-eslint
+- **Documentation**: **REQUIRED** JSDoc comments (enforced by eslint-plugin-jsdoc)
+  - **Scope**: All exported functions, classes, methods, interfaces, types, and enums
+  - **Content**: Must include description, `@param` for parameters, `@returns` for return values
+  - **TypeScript Integration**: No need for `@type` tags (TypeScript provides types)
+  - **Enforcement**: `npm run lint` will fail if JSDoc is missing or incomplete
 - **No `any` types**: Strict mode enforced
 - **Explicit return types**: Required for all functions
-- **Documentation**: JSDoc required for all public APIs
 - **No unused imports/variables**: Enforced by ESLint
 - **Naming**: camelCase for functions/variables, PascalCase for components/types
+
+### Documentation Examples
+
+**Python (Google-style docstrings):**
+
+```python
+def calculate_affiliate_commission(
+  price: Decimal,
+  commission_rate: Decimal,
+  currency: str = "USD"
+) -> Decimal:
+  """Calculate the affiliate commission for a product sale.
+
+  This function computes the commission amount based on the product price
+  and the applicable commission rate for the affiliate program.
+
+  Args:
+      price: The product price before commission.
+      commission_rate: The commission rate as a decimal (e.g., 0.10 for 10%).
+      currency: The currency code for the transaction. Defaults to "USD".
+
+  Returns:
+      The calculated commission amount in the specified currency.
+
+  Raises:
+      ValueError: If price is negative or commission_rate is not between 0 and 1.
+
+  Example:
+      >>> calculate_affiliate_commission(Decimal("100.00"), Decimal("0.15"))
+      Decimal('15.00')
+  """
+  if price < 0:
+    raise ValueError("Price cannot be negative")
+  if not 0 <= commission_rate <= 1:
+    raise ValueError("Commission rate must be between 0 and 1")
+  return price * commission_rate
+```
+
+**TypeScript (JSDoc):**
+
+```typescript
+/**
+ * Fetches product data from the backend API.
+ *
+ * This function retrieves product information including pricing,
+ * descriptions, and affiliate links for the specified product ID.
+ *
+ * @param productId - The unique identifier for the product
+ * @param locale - The locale for localized content (e.g., 'en', 'it', 'he')
+ * @returns Promise resolving to the product data
+ * @throws {ApiError} When the product is not found or API request fails
+ *
+ * @example
+ * ```typescript
+ * const product = await fetchProduct('prod-123', 'en');
+ * console.log(product.name);
+ * ```
+
+*/
+export async function fetchProduct(
+productId: string,
+locale: string
+): Promise<Product> {
+const response = await fetch(`/api/products/${productId}?locale=${locale}`);
+if (!response.ok) {
+throw new ApiError(`Failed to fetch product: ${response.statusText}`);
+}
+return response.json();
+}
+
+```
 
 ## Multi-Language Support
 
@@ -390,18 +464,13 @@ USD, EUR, ILS, GBP, CAD, AUD, JPY, CNY
 3. Backend automatically syncs on next startup
 4. **Zero backend code changes required**
 
-## Critical Rules
+## Critical Operational Rules
 
-1. **Never delete CMS/Strapi database without permission**
-2. **Frontend NEVER talks to Strapi directly** - all requests go through backend
-3. **All content must be published in Strapi** - draft content returns 404
-4. **No fallback strings in frontend** - all content from Strapi
-5. **OpenAPI specs are source of truth** - implementation follows spec
-6. **Test-first development** - write tests before implementation
-7. **Coverage requirements**: Backend 100%, Frontend 15%, CMS 60% - tests must pass these thresholds
-8. **Follow Clean Architecture** - no framework dependencies in domain layer
-9. **Repository pattern** - depend on interfaces, not implementations
-10. **Document all public APIs** - JSDoc/docstrings required
+**Important**: For architectural principles (Clean Architecture, SOLID, TDD, API-First, etc.), see the "Core Principles" section above.
+
+1. **Never delete CMS/Strapi database without permission** - contains production content
+2. **All content must be published in Strapi** - draft content returns 404
+3. **No fallback strings in frontend** - all user-facing content comes from CMS through backend
 
 ## Environment Configuration
 

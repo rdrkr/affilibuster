@@ -7,6 +7,16 @@
 
 import type { StrapiEnv } from './types'
 
+/**
+ * Configure Strapi admin panel authentication and security settings.
+ *
+ * Configures JWT secrets, session lifespans, API token salts, and encryption keys
+ * for secure admin panel access and API token generation.
+ *
+ * @param root0 - Configuration object
+ * @param root0.env - Strapi environment configuration helper for accessing environment variables
+ * @returns Admin panel configuration object
+ */
 export default ({ env }: { env: StrapiEnv }) => ({
   auth: {
     secret: env('ADMIN_JWT_SECRET'),

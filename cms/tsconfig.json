@@ -13,8 +13,18 @@
     "noEmitOnError": true,
     "noImplicitThis": true,
     "outDir": "dist",
-    "rootDir": "."
+    "rootDir": ".",
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": false
   },
-  "include": ["./", "./**/*.ts", "./**/*.js", "src/**/*.json"],
-  "exclude": ["node_modules", "build", "dist", ".strapi", ".cache", ".tmp", "**/*.test.*", "src/plugins/**"]
+  "include": ["*.ts", "*.tsx", "*.mjs", "*.mts", "**/*.ts", "**/*.tsx", "**/*.mjs", "**/*.mts", "**/*.json"],
+  "exclude": ["node_modules", "build", "dist", ".strapi", ".cache", ".tmp", "src/plugins/**"]
 }

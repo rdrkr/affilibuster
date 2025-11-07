@@ -7,7 +7,7 @@
  * Fetches content from Strapi error-410 single type
  */
 
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getError410 } from '@/lib/client'
 

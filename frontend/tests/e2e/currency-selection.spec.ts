@@ -5,22 +5,23 @@
  * Reference: quickstart.md:150-168 (Test 3: Currency Selection & Persistence)
  */
 
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+import { CurrencyCode } from '@/lib/generated/types.gen'
 
 test.describe('Currency Selection', () => {
   test('should display default currency based on language', async ({ page }) => {
     // English -> USD
     await page.goto('/')
     const currencySelector = page.locator('[data-testid="currency-selector"]')
-    await expect(currencySelector).toContainText('USD')
+    await expect(currencySelector).toContainText(CurrencyCode.USD)
 
     // Italian -> EUR
     await page.goto('/it')
-    await expect(currencySelector).toContainText('EUR')
+    await expect(currencySelector).toContainText(CurrencyCode.EUR)
 
     // Hebrew -> ILS
     await page.goto('/he')
-    await expect(currencySelector).toContainText('ILS')
+    await expect(currencySelector).toContainText(CurrencyCode.ILS)
   })
 
   test('should allow manual currency change', async ({ page }) => {
@@ -34,7 +35,7 @@ test.describe('Currency Selection', () => {
     await page.locator('[data-testid="currency-option-EUR"]').click()
 
     // Currency should update
-    await expect(page.locator('[data-testid="currency-selector"]')).toContainText('EUR')
+    await expect(page.locator('[data-testid="currency-selector"]')).toContainText(CurrencyCode.EUR)
 
     // Prices should update to EUR
     const price = page.locator('[data-testid="price"]').first()
@@ -53,7 +54,7 @@ test.describe('Currency Selection', () => {
     await page.goto('/products')
 
     // Currency should still be GBP
-    await expect(page.locator('[data-testid="currency-selector"]')).toContainText('GBP')
+    await expect(page.locator('[data-testid="currency-selector"]')).toContainText(CurrencyCode.GBP)
   })
 
   test('should persist currency choice on reload', async ({ page }) => {
@@ -66,7 +67,7 @@ test.describe('Currency Selection', () => {
     await page.reload()
 
     // Currency should still be EUR
-    await expect(page.locator('[data-testid="currency-selector"]')).toContainText('EUR')
+    await expect(page.locator('[data-testid="currency-selector"]')).toContainText(CurrencyCode.EUR)
   })
 
   test('should convert prices when currency changes', async ({ page }) => {
@@ -75,7 +76,7 @@ test.describe('Currency Selection', () => {
 
     // Get original USD price
     const originalPrice = await page.locator('[data-testid="price"]').first().textContent()
-    const usdAmount = parseFloat(originalPrice?.replace(/[^0-9.]/g, '') || '0')
+    const usdAmount = parseFloat(originalPrice?.replace(/[^0-9.]/g, '') ?? '0')
 
     // Change to EUR
     await page.locator('[data-testid="currency-selector"]').click()
@@ -86,7 +87,7 @@ test.describe('Currency Selection', () => {
 
     // Get EUR price
     const eurPrice = await page.locator('[data-testid="price"]').first().textContent()
-    const eurAmount = parseFloat(eurPrice?.replace(/[^0-9.]/g, '') || '0')
+    const eurAmount = parseFloat(eurPrice?.replace(/[^0-9.]/g, '') ?? '0')
 
     // EUR amount should be different from USD (exchange rate applied)
     expect(eurAmount).not.toBe(usdAmount)
@@ -120,12 +121,10 @@ test.describe('Currency Selection', () => {
     // Open currency selector
     await page.locator('[data-testid="currency-selector"]').click()
 
-    // Should have all supported currencies
-    const currencies = ['USD', 'EUR', 'ILS', 'GBP', 'CAD', 'AUD', 'JPY', 'CNY']
-
-    for (const currency of currencies) {
+    // Check all currencies are present
+    Object.values(CurrencyCode).forEach(currency => {
       const option = page.locator(`[data-testid="currency-option-${currency}"]`)
-      await expect(option).toBeVisible()
-    }
+      expect(option).toBeVisible()
+    })
   })
 })

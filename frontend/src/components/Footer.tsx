@@ -11,6 +11,7 @@
 
 import Link from 'next/link'
 import type { Footer as FooterType } from '@/lib/types'
+import { LanguageCode, SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
 
 interface FooterProps {
   data: FooterType | null
@@ -19,8 +20,8 @@ interface FooterProps {
 
 export function Footer({ data: footerData, lang }: FooterProps) {
   const currentYear = new Date().getFullYear()
-  const langPrefix = ['it', 'he', 'en'].includes(lang) ? `/${lang}` : ''
-  const isRTL = lang === 'he'
+  const langPrefix = SUPPORTED_LANGUAGE_CODES.includes(lang as LanguageCode) ? `/${lang}` : ''
+  const isRTL = (lang as LanguageCode) === LanguageCode.HE
 
   // Don't render footer if data is unavailable
   if (!footerData) {

@@ -19,8 +19,8 @@ import * as yaml from 'js-yaml'
 interface OpenAPISpec {
   openapi: string
   info: Record<string, unknown>
-  servers?: Array<Record<string, unknown>>
-  tags?: Array<Record<string, unknown>>
+  servers?: Record<string, unknown>[]
+  tags?: Record<string, unknown>[]
   paths: Record<string, unknown>
   components?: {
     schemas?: Record<string, unknown>
@@ -28,7 +28,7 @@ interface OpenAPISpec {
     responses?: Record<string, unknown>
     securitySchemes?: Record<string, unknown>
   }
-  security?: Array<Record<string, unknown>>
+  security?: Record<string, unknown>[]
   [key: string]: unknown
 }
 
@@ -58,6 +58,7 @@ interface ParameterMetadata {
 interface SchemaMetadata {
   description?: string
   example?: unknown
+  default?: unknown
   propertyDescriptions?: Record<string, string>
 }
 
@@ -129,10 +130,6 @@ const StrapiMetadataDefaults = {
         'The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.',
       example: '550e8400-e29b-41d4-a716-446655440000',
     },
-    id: {
-      description:
-        'The numeric database ID for this specific entry. Note: documentId should be used for API operations as it remains stable across versions.',
-    },
     createdAt: {
       description: 'Timestamp when this entry was first created in the CMS.',
       example: '2025-10-30T17:41:47.696Z',
@@ -169,6 +166,8 @@ const StrapiMetadataDefaults = {
 
   /**
    * Get complete default metadata specification.
+   *
+   * @returns Complete metadata object with parameters and schemas defaults
    */
   getDefaults(): OpenAPISpecMetadata {
     return {
@@ -180,7 +179,11 @@ const StrapiMetadataDefaults = {
 
 /**
  * Remove DELETE, POST and PUT operations from all paths in the spec.
+ *
  * Backend is read-only for Strapi content - no mutations allowed from frontend.
+ *
+ * @param spec - OpenAPI specification to modify
+ * @returns Specification with write operations removed
  */
 function removeWriteOperations(spec: OpenAPISpec): OpenAPISpec {
   const processedSpec = { ...spec }
@@ -189,9 +192,9 @@ function removeWriteOperations(spec: OpenAPISpec): OpenAPISpec {
   Object.entries(processedPaths).forEach(([pathKey, pathItem]) => {
     if (pathItem && typeof pathItem === 'object') {
       const processedPathItem = { ...(pathItem as Record<string, unknown>) }
-      delete processedPathItem['delete']
-      delete processedPathItem['put']
-      delete processedPathItem['post']
+      delete processedPathItem.delete
+      delete processedPathItem.put
+      delete processedPathItem.post
       processedPaths[pathKey] = processedPathItem
     }
   })
@@ -261,6 +264,42 @@ function fixStrapiPatterns(obj: unknown): OpenAPISpec {
 }
 
 /**
+ * Remove $id fields from schemas in the specification.
+ *
+ * Removes all `$id` fields from schema definitions to avoid conflicts
+ * or validation issues with code generators.
+ *
+ * @param obj - The object to process (can be any part of the OpenAPI spec)
+ * @returns The processed object with all `$id` fields removed
+ */
+function removeSchemaIds(obj: unknown): OpenAPISpec {
+  if (obj === null || typeof obj !== 'object') {
+    return obj as OpenAPISpec
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => removeSchemaIds(item)) as unknown as OpenAPISpec
+  }
+
+  const processed: Record<string, unknown> = {}
+
+  for (const [key, value] of Object.entries(obj)) {
+    // Skip all $id fields
+    if (key === '$id') {
+      continue
+    }
+
+    if (typeof value === 'object' && value !== null) {
+      processed[key] = removeSchemaIds(value)
+    } else {
+      processed[key] = value
+    }
+  }
+
+  return processed as OpenAPISpec
+}
+
+/**
  * Remove UUID format fields from the specification.
  *
  * Removes all `format: uuid` fields from the spec to avoid validation issues
@@ -297,6 +336,80 @@ function removeUuidFormat(obj: unknown): OpenAPISpec {
 }
 
 /**
+ * Remove default values from publishedAt fields in the specification.
+ *
+ * Removes all `default` fields from publishedAt properties to ensure
+ * deterministic OpenAPI generation without timestamp-based changes.
+ *
+ * @param obj - The object to process (can be any part of the OpenAPI spec)
+ * @returns The processed object with all publishedAt default fields removed
+ */
+function removePublishedAtDefaults(obj: unknown): OpenAPISpec {
+  if (obj === null || typeof obj !== 'object') {
+    return obj as OpenAPISpec
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => removePublishedAtDefaults(item)) as unknown as OpenAPISpec
+  }
+
+  const processed: Record<string, unknown> = {}
+
+  for (const [key, value] of Object.entries(obj)) {
+    // If this is a publishedAt property and it has a default field, remove it
+    if (key === 'publishedAt' && typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      const publishedAtObj = value as Record<string, unknown>
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { default: _defaultValue, ...rest } = publishedAtObj
+      processed[key] = removePublishedAtDefaults(rest)
+    } else if (typeof value === 'object' && value !== null) {
+      processed[key] = removePublishedAtDefaults(value)
+    } else {
+      processed[key] = value
+    }
+  }
+
+  return processed as OpenAPISpec
+}
+
+/**
+ * Add id property to component schemas.
+ *
+ * Strapi includes an `id` field in all component responses, but the auto-generated
+ * OpenAPI spec doesn't include it in component schemas. This causes Pydantic validation
+ * to fail with `additionalProperties: false` when the backend receives component data.
+ *
+ * This function adds the `id` property to component schemas that need it.
+ *
+ * @param spec - OpenAPI specification to modify
+ * @returns Specification with id fields added to component schemas
+ */
+function addIdToComponentSchemas(spec: OpenAPISpec): OpenAPISpec {
+  const processed = JSON.parse(JSON.stringify(spec)) as OpenAPISpec
+
+  // Component schemas that need id field (Strapi components)
+  const componentSchemas = ['UiContactCardEntry', 'UiFeatureCardEntry', 'UiFeatureItemEntry', 'UiTrustCardEntry']
+
+  if (processed.components?.schemas) {
+    Object.entries(processed.components.schemas).forEach(([schemaName, schema]) => {
+      if (componentSchemas.includes(schemaName) && schema && typeof schema === 'object') {
+        const schemaObj = schema as Record<string, unknown>
+        if (schemaObj.properties && typeof schemaObj.properties === 'object') {
+          const properties = schemaObj.properties as Record<string, unknown>
+          // Add id property if not already present
+          properties.id ??= {
+            type: 'integer',
+            description: 'Component ID',
+          }
+        }
+      }
+    })
+  }
+
+  return processed
+}
+
+/**
  * Add meta field to all response schemas.
  *
  * Strapi always returns a metaobject alongside data in responses.
@@ -308,52 +421,56 @@ function removeUuidFormat(obj: unknown): OpenAPISpec {
 function addMetaToResponses(spec: OpenAPISpec): OpenAPISpec {
   const processed = JSON.parse(JSON.stringify(spec)) as OpenAPISpec
 
-  if (processed.paths) {
-    Object.values(processed.paths).forEach(pathItem => {
-      if (pathItem && typeof pathItem === 'object') {
-        Object.values(pathItem).forEach((operation: unknown) => {
-          if (operation && typeof operation === 'object' && 'responses' in operation) {
-            const responses = (operation as { responses?: Record<string, unknown> }).responses
-            if (responses && typeof responses === 'object') {
-              // Process each response (200, 400, etc.)
-              Object.values(responses).forEach((response: unknown) => {
-                if (response && typeof response === 'object' && 'content' in response) {
-                  const content = (response as { content?: Record<string, unknown> }).content
-                  if (content && content['application/json']) {
-                    const jsonContent = content['application/json'] as Record<string, unknown>
-                    if (jsonContent.schema && typeof jsonContent.schema === 'object') {
-                      const schema = jsonContent.schema as Record<string, unknown>
-                      // Only add meta to schemas that have a data property
-                      if (schema.properties && typeof schema.properties === 'object') {
-                        const properties = schema.properties as Record<string, unknown>
-                        if (properties.data && !properties.meta) {
-                          // Add meta property as optional (not required)
-                          // Plugin endpoints (content-type-builder, upload) don't return meta
-                          // Content API endpoints do return meta
-                          properties.meta = {
-                            type: 'object',
-                            description: 'Metadata object containing pagination and other response metadata',
-                          }
-                          // Note: NOT adding to required array - meta is optional
+  Object.values(processed.paths).forEach(pathItem => {
+    if (pathItem && typeof pathItem === 'object') {
+      Object.values(pathItem).forEach((operation: unknown) => {
+        if (operation && typeof operation === 'object' && 'responses' in operation) {
+          const responses = (operation as { responses?: Record<string, unknown> }).responses
+          if (responses && typeof responses === 'object') {
+            // Process each response (200, 400, etc.)
+            Object.values(responses).forEach((response: unknown) => {
+              if (response && typeof response === 'object' && 'content' in response) {
+                const content = (response as { content?: Record<string, unknown> }).content
+                if (content?.['application/json']) {
+                  const jsonContent = content['application/json'] as Record<string, unknown>
+                  if (jsonContent.schema && typeof jsonContent.schema === 'object') {
+                    const schema = jsonContent.schema as Record<string, unknown>
+                    // Only add meta to schemas that have a data property
+                    if (schema.properties && typeof schema.properties === 'object') {
+                      const properties = schema.properties as Record<string, unknown>
+                      if (properties.data && !properties.meta) {
+                        // Add meta property as optional (not required)
+                        // Plugin endpoints (content-type-builder, upload) don't return meta
+                        // Content API endpoints do return meta
+                        properties.meta = {
+                          type: 'object',
+                          description: 'Metadata object containing pagination and other response metadata',
                         }
+                        // Note: NOT adding to required array - meta is optional
                       }
                     }
                   }
                 }
-              })
-            }
+              }
+            })
           }
-        })
-      }
-    })
-  }
+        }
+      })
+    }
+  })
 
   return processed
 }
 
 /**
  * Add servers section to Strapi spec.
+ *
  * Documents available Strapi endpoints for internal backend use.
+ *
+ * @param spec - OpenAPI specification to modify
+ * @param prodUrl - Production Strapi CMS URL
+ * @param devUrl - Development Strapi CMS URL
+ * @returns Specification with servers section added
  */
 function addStrapiServers(spec: OpenAPISpec, prodUrl: string, devUrl: string): OpenAPISpec {
   const processedSpec = { ...spec }
@@ -376,6 +493,9 @@ function addStrapiServers(spec: OpenAPISpec, prodUrl: string, devUrl: string): O
  * Add license information to Strapi spec info section.
  *
  * Required by OpenAPI best practices and redocly validation.
+ *
+ * @param spec - OpenAPI specification to modify
+ * @returns Specification with license information added
  */
 function addStrapiLicense(spec: OpenAPISpec): OpenAPISpec {
   return {
@@ -394,6 +514,9 @@ function addStrapiLicense(spec: OpenAPISpec): OpenAPISpec {
  * Add tags section with descriptions to Strapi spec.
  *
  * Provides human-readable descriptions for all content types and system APIs.
+ *
+ * @param spec - OpenAPI specification to modify
+ * @returns Specification with tags section added
  */
 function addStrapiTags(spec: OpenAPISpec): OpenAPISpec {
   const tags = [
@@ -448,54 +571,52 @@ function addStrapiTags(spec: OpenAPISpec): OpenAPISpec {
 function fixEmptyPopulateEnums(spec: OpenAPISpec): OpenAPISpec {
   const fixed = JSON.parse(JSON.stringify(spec)) as OpenAPISpec
 
-  if (fixed.paths) {
-    Object.values(fixed.paths).forEach(pathItem => {
-      if (pathItem && typeof pathItem === 'object') {
-        Object.values(pathItem).forEach((operation: unknown) => {
-          if (operation && typeof operation === 'object' && 'parameters' in operation) {
-            const params = (operation as { parameters?: unknown[] }).parameters
-            if (Array.isArray(params)) {
-              params.forEach(param => {
-                if (
-                  param &&
-                  typeof param === 'object' &&
-                  'name' in param &&
-                  param.name === 'populate' &&
-                  'schema' in param
-                ) {
-                  const schema = param.schema as Record<string, unknown>
-                  if (schema.anyOf && Array.isArray(schema.anyOf)) {
-                    // Remove anyOf options with empty enum arrays (both direct and nested in items)
-                    schema.anyOf = schema.anyOf.filter((option: unknown) => {
-                      if (option && typeof option === 'object') {
-                        const opt = option as Record<string, unknown>
+  Object.values(fixed.paths).forEach(pathItem => {
+    if (pathItem && typeof pathItem === 'object') {
+      Object.values(pathItem).forEach((operation: unknown) => {
+        if (operation && typeof operation === 'object' && 'parameters' in operation) {
+          const params = (operation as { parameters?: unknown[] }).parameters
+          if (Array.isArray(params)) {
+            params.forEach(param => {
+              if (
+                param &&
+                typeof param === 'object' &&
+                'name' in param &&
+                param.name === 'populate' &&
+                'schema' in param
+              ) {
+                const schema = param.schema as Record<string, unknown>
+                if (schema.anyOf && Array.isArray(schema.anyOf)) {
+                  // Remove anyOf options with empty enum arrays (both direct and nested in items)
+                  schema.anyOf = schema.anyOf.filter((option: unknown) => {
+                    if (option && typeof option === 'object') {
+                      const opt = option as Record<string, unknown>
 
-                        // Check for direct enum
-                        if (opt.enum && Array.isArray(opt.enum) && opt.enum.length === 0) {
-                          return false // Remove options with empty enum
-                        }
-
-                        // Check for nested items.enum (for array types)
-                        if (opt.items && typeof opt.items === 'object') {
-                          const items = opt.items as Record<string, unknown>
-                          if (items.enum && Array.isArray(items.enum) && items.enum.length === 0) {
-                            return false // Remove options with empty items.enum
-                          }
-                        }
-
-                        return true // Keep all other options
+                      // Check for direct enum
+                      if (opt.enum && Array.isArray(opt.enum) && opt.enum.length === 0) {
+                        return false // Remove options with empty enum
                       }
-                      return true
-                    })
-                  }
+
+                      // Check for nested items.enum (for array types)
+                      if (opt.items && typeof opt.items === 'object') {
+                        const items = opt.items as Record<string, unknown>
+                        if (items.enum && Array.isArray(items.enum) && items.enum.length === 0) {
+                          return false // Remove options with empty items.enum
+                        }
+                      }
+
+                      return true // Keep all other options
+                    }
+                    return true
+                  })
                 }
-              })
-            }
+              }
+            })
           }
-        })
-      }
-    })
-  }
+        }
+      })
+    }
+  })
 
   return fixed
 }
@@ -561,7 +682,9 @@ function writeOpenAPISpec(filePath: string, spec: OpenAPISpec): void {
  * - Remove content-type-builder paths (/content-types and /content-types/{uid})
  * - Add server URLs for Strapi CMS endpoints
  * - Fix pattern fields with unsupported regex features (email, UUID, etc.)
+ * - Remove $id fields from schemas
  * - Remove UUID format fields
+ * - Add id property to component schemas (Strapi components always include id)
  * - Add meta field to all response schemas
  * - Add license information to info section
  * - Add tags section with descriptions
@@ -570,6 +693,8 @@ function writeOpenAPISpec(filePath: string, spec: OpenAPISpec): void {
  *
  * @param spec - Raw Strapi OpenAPI specification
  * @param config - Configuration with server URLs
+ * @param config.strapiUrlProd - Production Strapi URL
+ * @param config.strapiUrlDev - Development Strapi URL
  * @returns Preprocessed specification
  */
 function preprocessStrapiSpec(spec: OpenAPISpec, config: { strapiUrlProd: string; strapiUrlDev: string }): OpenAPISpec {
@@ -578,7 +703,10 @@ function preprocessStrapiSpec(spec: OpenAPISpec, config: { strapiUrlProd: string
   processed = removeContentTypesPaths(processed)
   processed = addStrapiServers(processed, config.strapiUrlProd, config.strapiUrlDev)
   processed = fixStrapiPatterns(processed)
+  processed = removeSchemaIds(processed)
   processed = removeUuidFormat(processed)
+  processed = removePublishedAtDefaults(processed)
+  processed = addIdToComponentSchemas(processed)
   processed = addMetaToResponses(processed)
   processed = addStrapiLicense(processed)
   processed = addStrapiTags(processed)
@@ -615,20 +743,20 @@ function mergePaths(template: OpenAPISpec, strapi: OpenAPISpec): Record<string, 
 function mergeComponents(template: OpenAPISpec, strapi: OpenAPISpec) {
   return {
     schemas: {
-      ...(template.components?.schemas || {}),
-      ...(strapi.components?.schemas || {}),
+      ...(template.components?.schemas ?? {}),
+      ...(strapi.components?.schemas ?? {}),
     },
     parameters: {
-      ...(template.components?.parameters || {}),
-      ...(strapi.components?.parameters || {}),
+      ...(template.components?.parameters ?? {}),
+      ...(strapi.components?.parameters ?? {}),
     },
     responses: {
-      ...(template.components?.responses || {}),
-      ...(strapi.components?.responses || {}),
+      ...(template.components?.responses ?? {}),
+      ...(strapi.components?.responses ?? {}),
     },
     securitySchemes: {
-      ...(template.components?.securitySchemes || {}),
-      ...(strapi.components?.securitySchemes || {}),
+      ...(template.components?.securitySchemes ?? {}),
+      ...(strapi.components?.securitySchemes ?? {}),
     },
   }
 }
@@ -643,16 +771,16 @@ function mergeComponents(template: OpenAPISpec, strapi: OpenAPISpec) {
  * @param strapi - Strapi OpenAPI spec
  * @returns Merged tags array
  */
-function mergeTags(template: OpenAPISpec, strapi: OpenAPISpec): Array<{ name: string; description?: string }> {
-  const templateTags = template.tags || []
-  const strapiTags = strapi.tags || []
+function mergeTags(template: OpenAPISpec, strapi: OpenAPISpec): { name: string; description?: string }[] {
+  const templateTags = template.tags ?? []
+  const strapiTags = strapi.tags ?? []
 
   // Create a map to ensure unique tags by name (template takes precedence)
   const tagMap = new Map<string, { name: string; description?: string }>()
 
   // Add Strapi tags first
   strapiTags.forEach(tag => {
-    if (tag && typeof tag === 'object' && 'name' in tag) {
+    if ('name' in tag) {
       const tagObj = tag as { name: string; description?: string }
       tagMap.set(tagObj.name, tagObj)
     }
@@ -660,7 +788,7 @@ function mergeTags(template: OpenAPISpec, strapi: OpenAPISpec): Array<{ name: st
 
   // Add template tags (overwrite if duplicate)
   templateTags.forEach(tag => {
-    if (tag && typeof tag === 'object' && 'name' in tag) {
+    if ('name' in tag) {
       const tagObj = tag as { name: string; description?: string }
       tagMap.set(tagObj.name, tagObj)
     }
@@ -677,6 +805,8 @@ function mergeTags(template: OpenAPISpec, strapi: OpenAPISpec): Array<{ name: st
  * @param mergedComponents - Merged components
  * @param mergedTags - Merged tags
  * @param config - Configuration with server URLs
+ * @param config.backendUrlProd - Production backend URL
+ * @param config.backendUrlDev - Development backend URL
  * @returns Complete merged specification
  */
 function buildMergedSpec(
@@ -721,7 +851,7 @@ function buildMergedSpec(
 function enrichWithMetadata(spec: OpenAPISpec, metadata: OpenAPISpecMetadata): OpenAPISpec {
   const enriched = JSON.parse(JSON.stringify(spec)) as OpenAPISpec
 
-  // Enrich parameters in paths
+  // Enrich parameters and response schemas in paths
   Object.values(enriched.paths).forEach(pathItem => {
     if (pathItem && typeof pathItem === 'object') {
       const pathObj = pathItem as Record<string, unknown>
@@ -730,7 +860,7 @@ function enrichWithMetadata(spec: OpenAPISpec, metadata: OpenAPISpecMetadata): O
       Object.values(pathObj).forEach(operation => {
         if (operation && typeof operation === 'object') {
           const op = operation as Record<string, unknown>
-          const parameters = op.parameters as Array<Record<string, unknown>> | undefined
+          const parameters = op.parameters as Record<string, unknown>[] | undefined
 
           if (parameters && Array.isArray(parameters)) {
             parameters.forEach(param => {
@@ -784,6 +914,27 @@ function enrichWithMetadata(spec: OpenAPISpec, metadata: OpenAPISpecMetadata): O
               }
             })
           }
+
+          // Enrich response schemas
+          const responses = op.responses as Record<string, unknown> | undefined
+          if (responses && typeof responses === 'object') {
+            Object.values(responses).forEach(response => {
+              if (response && typeof response === 'object') {
+                const resp = response as Record<string, unknown>
+                const content = resp.content as Record<string, unknown> | undefined
+                if (content && typeof content === 'object') {
+                  Object.values(content).forEach(mediaType => {
+                    if (mediaType && typeof mediaType === 'object') {
+                      const media = mediaType as Record<string, unknown>
+                      if (media.schema) {
+                        enrichSchemaObject(media.schema, metadata)
+                      }
+                    }
+                  })
+                }
+              }
+            })
+          }
         }
       })
     }
@@ -823,11 +974,17 @@ function enrichSchemaObject(schema: unknown, metadata: OpenAPISpecMetadata): voi
         // Match by property name
         const nameMetadata = metadata.schemas?.[propName]
         if (nameMetadata) {
-          if (!prop.description && nameMetadata.description) {
+          // Override description if metadata provides one
+          if (nameMetadata.description) {
             prop.description = nameMetadata.description
           }
-          if (!prop.example && nameMetadata.example !== undefined) {
+          // Override example if metadata provides one
+          if (nameMetadata.example !== undefined) {
             prop.example = nameMetadata.example
+          }
+          // Override default if metadata provides one
+          if (nameMetadata.default !== undefined) {
+            prop.default = nameMetadata.default
           }
         }
 
@@ -837,11 +994,18 @@ function enrichSchemaObject(schema: unknown, metadata: OpenAPISpecMetadata): voi
           const formatKey = `${format}_format`
           const formatMetadata = metadata.schemas?.[formatKey]
           if (formatMetadata) {
-            if (!prop.description && formatMetadata.description) {
-              prop.description = formatMetadata.description
-            }
-            if (!prop.example && formatMetadata.example !== undefined) {
-              prop.example = formatMetadata.example
+            // Only apply format metadata if property name didn't match
+            // (property name takes precedence)
+            if (!nameMetadata) {
+              if (formatMetadata.description) {
+                prop.description = formatMetadata.description
+              }
+              if (formatMetadata.example !== undefined) {
+                prop.example = formatMetadata.example
+              }
+              if (formatMetadata.default !== undefined) {
+                prop.default = formatMetadata.default
+              }
             }
           }
         }
@@ -861,7 +1025,9 @@ function enrichSchemaObject(schema: unknown, metadata: OpenAPISpecMetadata): voi
   ;['allOf', 'anyOf', 'oneOf'].forEach(key => {
     const compositeSchemas = schemaObj[key]
     if (Array.isArray(compositeSchemas)) {
-      compositeSchemas.forEach(s => enrichSchemaObject(s, metadata))
+      compositeSchemas.forEach(s => {
+        enrichSchemaObject(s, metadata)
+      })
     }
   })
 }
@@ -900,7 +1066,7 @@ function addMissingSummaries(spec: OpenAPISpec): OpenAPISpec {
     }
   })
 
-  console.log(`   ✓ Added ${summaryCount} missing summaries`)
+  console.log(`   ✓ Added ${summaryCount.toString()} missing summaries`)
   return spec
 }
 
@@ -915,7 +1081,7 @@ function addMissingSummaries(spec: OpenAPISpec): OpenAPISpec {
  * preprocesses the Strapi spec, merges them, and writes the
  * final Affilibuster OpenAPI specification.
  */
-async function mergeOpenAPISpecs(): Promise<void> {
+function mergeOpenAPISpecs(): void {
   const contractsDir = path.resolve(__dirname, '../../contracts')
   const templateFile = 'template.openapi.yaml'
   const strapiFile = 'strapi.openapi.yaml'
@@ -926,12 +1092,12 @@ async function mergeOpenAPISpecs(): Promise<void> {
   const outputPath = path.join(contractsDir, outputFile)
 
   // Environment variables for Strapi URLs
-  const strapiUrlProd = process.env.CMS_URL_PROD || ''
-  const strapiUrlDev = process.env.CMS_URL_DEV || ''
+  const strapiUrlProd = process.env.CMS_URL_PROD ?? ''
+  const strapiUrlDev = process.env.CMS_URL_DEV ?? ''
 
   // Environment variables for Backend URLs
-  const backendUrlProd = process.env.BACKEND_URL_PROD || ''
-  const backendUrlDev = process.env.BACKEND_URL_DEV || ''
+  const backendUrlProd = process.env.BACKEND_URL_PROD ?? ''
+  const backendUrlDev = process.env.BACKEND_URL_DEV ?? ''
 
   try {
     // Read files
@@ -946,7 +1112,7 @@ async function mergeOpenAPISpecs(): Promise<void> {
     console.log('🔧 Preprocessing Strapi specification...')
     strapi = preprocessStrapiSpec(strapi, { strapiUrlProd, strapiUrlDev })
     console.log(
-      '✅ Strapi spec preprocessed (PUT/DELETE ops removed, servers added, patterns fixed, UUID formats removed, meta fields added)'
+      '✅ Strapi spec preprocessed (PUT/DELETE ops removed, servers added, patterns fixed, $id fields removed, UUID formats removed, publishedAt defaults removed, id fields added to components, meta fields added)'
     )
 
     // Enrich Strapi spec with metadata
@@ -963,40 +1129,30 @@ async function mergeOpenAPISpecs(): Promise<void> {
     writeOpenAPISpec(strapiPath, strapi)
     console.log(`✅ Updated: ${strapiPath}`)
 
-    // Validate
-    if (!template.paths) {
-      // noinspection ExceptionCaughtLocallyJS
-      throw new Error(`'${templateFile}' missing paths section`)
-    }
-    if (!strapi.paths) {
-      // noinspection ExceptionCaughtLocallyJS
-      throw new Error(`'${strapiFile}' missing paths section`)
-    }
-
     // Merge specifications
     console.log('🔀 Merging paths...')
     const mergedPaths = mergePaths(template, strapi)
-    console.log(`   ✓ Template paths: ${Object.keys(template.paths).length}`)
-    console.log(`   ✓ Strapi paths: ${Object.keys(strapi.paths).length}`)
-    console.log(`   ✓ Merged total: ${Object.keys(mergedPaths).length}`)
+    console.log(`   ✓ Template paths: ${Object.keys(template.paths).length.toString()}`)
+    console.log(`   ✓ Strapi paths: ${Object.keys(strapi.paths).length.toString()}`)
+    console.log(`   ✓ Merged total: ${Object.keys(mergedPaths).length.toString()}`)
 
     console.log('🔀 Merging components...')
     const mergedComponents = mergeComponents(template, strapi)
-    const templateSchemaCount = Object.keys(template.components?.schemas || {}).length
-    const strapiSchemaCount = Object.keys(strapi.components?.schemas || {}).length
+    const templateSchemaCount = Object.keys(template.components?.schemas ?? {}).length
+    const strapiSchemaCount = Object.keys(strapi.components?.schemas ?? {}).length
     const mergedSchemaCount = Object.keys(mergedComponents.schemas).length
 
-    console.log(`   ✓ Template schemas: ${templateSchemaCount}`)
-    console.log(`   ✓ Strapi schemas: ${strapiSchemaCount}`)
-    console.log(`   ✓ Merged total: ${mergedSchemaCount}`)
+    console.log(`   ✓ Template schemas: ${templateSchemaCount.toString()}`)
+    console.log(`   ✓ Strapi schemas: ${strapiSchemaCount.toString()}`)
+    console.log(`   ✓ Merged total: ${mergedSchemaCount.toString()}`)
 
     console.log('🔀 Merging tags...')
     const mergedTags = mergeTags(template, strapi)
-    const templateTagCount = template.tags?.length || 0
-    const strapiTagCount = strapi.tags?.length || 0
-    console.log(`   ✓ Template tags: ${templateTagCount}`)
-    console.log(`   ✓ Strapi tags: ${strapiTagCount}`)
-    console.log(`   ✓ Merged total: ${mergedTags.length}`)
+    const templateTagCount = template.tags?.length ?? 0
+    const strapiTagCount = strapi.tags?.length ?? 0
+    console.log(`   ✓ Template tags: ${templateTagCount.toString()}`)
+    console.log(`   ✓ Strapi tags: ${strapiTagCount.toString()}`)
+    console.log(`   ✓ Merged total: ${mergedTags.length.toString()}`)
 
     // Build merged spec
     console.log('🏗️  Building merged specification...')
@@ -1021,9 +1177,9 @@ async function mergeOpenAPISpecs(): Promise<void> {
 
     // Summary
     console.log('\n📊 Merge Summary:')
-    console.log(`   • Paths: ${Object.keys(mergedPaths).length} total`)
-    console.log(`   • Schemas: ${mergedSchemaCount} total`)
-    console.log(`   • Tags: ${mergedTags.length} total`)
+    console.log(`   • Paths: ${Object.keys(mergedPaths).length.toString()} total`)
+    console.log(`   • Schemas: ${mergedSchemaCount.toString()} total`)
+    console.log(`   • Tags: ${mergedTags.length.toString()} total`)
     console.log(`   • Ready for bundling and linting`)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
@@ -1033,5 +1189,4 @@ async function mergeOpenAPISpecs(): Promise<void> {
 }
 
 // Run
-// noinspection JSIgnoredPromiseFromCall
 mergeOpenAPISpecs()

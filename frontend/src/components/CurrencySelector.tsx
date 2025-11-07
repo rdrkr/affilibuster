@@ -11,7 +11,7 @@
 import { useEffect, useState } from 'react'
 import { getCurrencies, getUserPreferences, updateUserPreferences, getNavigation } from '@/lib/client'
 import { useSession } from '@/hooks/useSession'
-import type { Currency } from '@/lib/types'
+import type { Currency, CurrencyCode } from '@/lib/types'
 
 interface NavigationData {
   currencySelectorAriaLabel?: string
@@ -29,17 +29,17 @@ export function CurrencySelector() {
     if (!sessionId) return
 
     // Fetch currencies and user preferences
-    Promise.all([getCurrencies(), getUserPreferences().catch(() => null)])
+    void Promise.all([getCurrencies(), getUserPreferences().catch(() => null)])
       .then(([currenciesData, prefsData]) => {
-        if (currenciesData) {
-          setCurrencies(currenciesData)
-        }
+        setCurrencies(currenciesData)
         if (prefsData) {
           setSelectedCurrency(prefsData.selectedCurrency)
         }
       })
       .catch(console.error)
-      .finally(() => setLoading(false))
+      .finally(() => {
+        setLoading(false)
+      })
   }, [sessionId])
 
   // Fetch navigation labels from CMS
@@ -54,10 +54,10 @@ export function CurrencySelector() {
         console.error('Failed to fetch navigation:', error)
       }
     }
-    fetchNavigation()
+    void fetchNavigation()
   }, [])
 
-  const handleCurrencyChange = async (currencyCode: string) => {
+  const handleCurrencyChange = async (currencyCode: CurrencyCode) => {
     try {
       await updateUserPreferences({ selectedCurrency: currencyCode })
       setSelectedCurrency(currencyCode)
@@ -76,9 +76,11 @@ export function CurrencySelector() {
   return (
     <div className="relative">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen)
+        }}
         className="flex items-center space-x-2 px-3 py-2 bg-primary-700 hover:bg-primary-600 text-white rounded-lg transition-colors shadow-sm whitespace-nowrap"
-        aria-label={navData.currencySelectorAriaLabel || ''}
+        aria-label={navData.currencySelectorAriaLabel ?? ''}
         aria-expanded={isOpen}
       >
         <span className="text-sm font-medium">
@@ -97,14 +99,22 @@ export function CurrencySelector() {
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} aria-hidden="true" />
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => {
+              setIsOpen(false)
+            }}
+            aria-hidden="true"
+          />
 
           {/* Dropdown */}
           <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-neutral-800 border border-primary-200 dark:border-primary-700 rounded-lg shadow-xl z-20 max-h-96 overflow-y-auto">
             {currencies.map(currency => (
               <button
                 key={currency.code}
-                onClick={() => handleCurrencyChange(currency.code)}
+                onClick={() => {
+                  void handleCurrencyChange(currency.code as CurrencyCode)
+                }}
                 className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-50 dark:hover:bg-primary-900 transition-colors ${
                   currency.code === selectedCurrency
                     ? 'bg-primary-50 dark:bg-primary-900 font-medium text-primary-700 dark:text-primary-300'

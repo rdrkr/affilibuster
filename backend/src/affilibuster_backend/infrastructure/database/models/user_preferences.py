@@ -9,13 +9,15 @@ Reference: data-model.md:666-677
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import Boolean, Column, DateTime, String, UniqueConstraint
+from sqlalchemy import Boolean, Column, DateTime, Enum, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column
 
-from . import Base
+from affilibuster_backend.domain.entities.generated.models import CurrencyCode, DetectedLanguage2
+from affilibuster_backend.infrastructure.database.models import Base
 
 
-class UserPreferencesModel(Base):
+class UserPreferencesModel(Base):  # type: ignore[misc]
     """
     SQLAlchemy model for user_preferences table.
 
@@ -31,9 +33,14 @@ class UserPreferencesModel(Base):
     session_id = Column(String(100), nullable=False, unique=True)
     user_id = Column(String(100), nullable=True)
 
-    # Currency and Language as strings (sourced from Strapi)
-    selected_currency = Column(String(3), nullable=False, default="USD")
-    detected_language = Column(String(2), nullable=True)
+    # Currency and Language as enums (sourced from OpenAPI-generated models)
+    # Store as VARCHAR strings, not PostgreSQL enum types
+    selected_currency: Mapped[CurrencyCode] = mapped_column(
+        Enum(CurrencyCode, native_enum=False, length=10), nullable=False, default=CurrencyCode.USD
+    )
+    detected_language: Mapped[DetectedLanguage2 | None] = mapped_column(
+        Enum(DetectedLanguage2, native_enum=False, length=10), nullable=True
+    )
 
     # Preferences
     dismissed_language_prompt = Column(Boolean, nullable=False, default=False, server_default="false")

@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react'
 import { getCurrencies, getUserPreferences } from '@/lib/client'
 import { useSession } from '@/hooks/useSession'
 import type { Currency } from '@/lib/types'
+import { CurrencyCode, SymbolPositionEnum } from '@/lib/generated/types.gen'
 
 interface PriceProps {
   amount: number
@@ -20,7 +21,12 @@ interface PriceProps {
   className?: string
 }
 
-export function Price({ amount, currencyCode = 'USD', showCurrencyCode = true, className = '' }: PriceProps) {
+export function Price({
+  amount,
+  currencyCode = CurrencyCode.USD,
+  showCurrencyCode = true,
+  className = '',
+}: PriceProps) {
   const sessionId = useSession()
   const [currency, setCurrency] = useState<Currency | null>(null)
   const [loading, setLoading] = useState(true)
@@ -29,17 +35,16 @@ export function Price({ amount, currencyCode = 'USD', showCurrencyCode = true, c
     if (!sessionId) return
 
     // Get user's preferred currency and all currencies
-    Promise.all([getCurrencies(), getUserPreferences().catch(() => null)])
+    void Promise.all([getCurrencies(), getUserPreferences().catch(() => null)])
       .then(([currencies, prefs]) => {
-        const targetCurrency = prefs?.selectedCurrency || currencyCode
-
-        if (currencies) {
-          const found = currencies.find((c: Currency) => c.code === targetCurrency)
-          setCurrency(found || null)
-        }
+        const targetCurrency = prefs?.selectedCurrency ?? currencyCode
+        const found = currencies.find((c: Currency) => c.code === targetCurrency)
+        setCurrency(found ?? null)
       })
       .catch(console.error)
-      .finally(() => setLoading(false))
+      .finally(() => {
+        setLoading(false)
+      })
   }, [sessionId, currencyCode])
 
   if (loading) {
@@ -67,7 +72,7 @@ export function Price({ amount, currencyCode = 'USD', showCurrencyCode = true, c
 
   // Position symbol
   const display =
-    currency.symbolPosition === 'before'
+    currency.symbolPosition === SymbolPositionEnum.BEFORE
       ? `${currency.symbol}${localizedNumber}`
       : `${localizedNumber} ${currency.symbol}`
 

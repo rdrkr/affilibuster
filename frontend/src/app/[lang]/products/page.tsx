@@ -8,24 +8,26 @@
 import { getProductPage, getProducts } from '@/lib/client'
 import Link from 'next/link'
 import { setRequestLocale } from 'next-intl/server'
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import type { ApiProductPageProductPageDocument } from '@/lib/generated/types.gen'
 import type { Product } from '@/lib/types'
+import { SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
 
-type Props = {
+interface Props {
   params: Promise<{ lang: string }>
   searchParams?: Promise<{ page?: string }>
 }
 
 export function generateStaticParams() {
-  return [{ lang: 'en' }, { lang: 'it' }, { lang: 'he' }]
+  return SUPPORTED_LANGUAGE_CODES.map(lang => ({ lang }))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  await params
+  const resolvedParams = await params
+  const lang = resolvedParams.lang
 
   try {
-    const productsPageData = await getProductPage()
+    const productsPageData = await getProductPage(lang)
 
     return {
       title: productsPageData?.metaTitle,
@@ -44,7 +46,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
   let lang = 'en'
   try {
     const resolvedParams = await params
-    if (resolvedParams?.lang) {
+    if (resolvedParams.lang) {
       lang = resolvedParams.lang
     }
   } catch (e) {
@@ -52,7 +54,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
   }
 
   const resolvedSearchParams = await searchParams
-  const currentPage = Number(resolvedSearchParams?.page) || 1
+  const currentPage = resolvedSearchParams?.page ? Number(resolvedSearchParams.page) : 1
 
   // Enable static rendering
   if (lang) {
@@ -64,13 +66,14 @@ export default async function ProductsPage({ params, searchParams }: Props) {
 
   try {
     // Fetch products page metadata
-    productsPageData = await getProductPage()
+    productsPageData = await getProductPage(lang)
 
     // Fetch products list
     const productsResponse = await getProducts({
       'pagination[page]': currentPage,
       'pagination[pageSize]': 24,
-    })
+      locale: lang,
+    } as Parameters<typeof getProducts>[0])
 
     if (productsResponse) {
       products = productsResponse.data
@@ -136,7 +139,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
           {currentPage > 1 && productsPageData?.previousButton && (
             <div className="mt-12 flex items-center justify-center gap-2">
               <Link
-                href={`/${lang}/products?page=${currentPage - 1}`}
+                href={`/${lang}/products?page=${(currentPage - 1).toString()}`}
                 className="px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
               >
                 {productsPageData.previousButton}
@@ -144,9 +147,9 @@ export default async function ProductsPage({ params, searchParams }: Props) {
 
               <span className="text-sm text-neutral-600 dark:text-neutral-400">Page {currentPage}</span>
 
-              {products.length === 24 && productsPageData?.nextButton && (
+              {products.length === 24 && productsPageData.nextButton && (
                 <Link
-                  href={`/${lang}/products?page=${currentPage + 1}`}
+                  href={`/${lang}/products?page=${(currentPage + 1).toString()}`}
                   className="px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
                 >
                   {productsPageData.nextButton}

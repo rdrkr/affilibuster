@@ -6,8 +6,9 @@
  * Generates SEO meta tags, hreflang, and schema markup
  */
 
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import type { ContentResponse } from '@/lib/types'
+import { ContentType } from '@/lib/types'
 
 interface SEOHeadProps {
   content: ContentResponse
@@ -18,26 +19,24 @@ interface SEOHeadProps {
  */
 export function generateContentMetadata(content: ContentResponse): Metadata {
   return {
-    title: content.seo?.title || content.title,
-    description: content.seo?.description || content.excerpt,
-    keywords: content.seo?.keywords,
+    title: content.seo.title ?? content.title,
+    description: content.seo.description ?? content.excerpt,
+    keywords: content.seo.keywords,
     alternates: {
-      canonical: content.seo?.canonicalUrl,
-      languages: Object.fromEntries(
-        Object.entries(content.translations || {}).map(([lang, url]) => [lang, url])
-      ) as Record<string, string>,
+      canonical: content.seo.canonicalUrl,
+      languages: content.urls.alternates,
     },
     openGraph: {
-      title: content.seo?.title || content.title,
-      description: content.seo?.description || content.excerpt,
-      url: content.seo?.canonicalUrl,
-      type: content.type === 'page' ? 'website' : 'article',
+      title: content.seo.title ?? content.title,
+      description: content.seo.description ?? content.excerpt,
+      url: content.seo.canonicalUrl,
+      type: content.type === ContentType.PAGE ? 'website' : 'article',
       locale: content.language,
     },
     twitter: {
       card: 'summary_large_image',
-      title: content.seo?.title || content.title,
-      description: content.seo?.description || content.excerpt,
+      title: content.seo.title ?? content.title,
+      description: content.seo.description ?? content.excerpt,
     },
   }
 }
@@ -48,14 +47,14 @@ export function generateContentMetadata(content: ContentResponse): Metadata {
 export function generateSchemaMarkup(content: ContentResponse) {
   const baseSchema = {
     '@context': 'https://schema.org',
-    '@type': content.type === 'product' ? 'Product' : 'Article',
+    '@type': content.type === ContentType.PRODUCT ? 'Product' : 'Article',
     name: content.title,
     description: content.excerpt,
-    url: content.seo?.canonicalUrl,
+    url: content.seo.canonicalUrl,
     inLanguage: content.language,
   }
 
-  if (content.type === 'product') {
+  if (content.type === ContentType.PRODUCT) {
     return {
       ...baseSchema,
       '@type': 'Product',

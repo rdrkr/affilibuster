@@ -6,8 +6,10 @@
  * research.md:186-188 (sitemap-en.xml, sitemap-it.xml, sitemap-il.xml)
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { getProducts } from '@/lib/client'
+import { SUPPORTED_LANGUAGE_CODES, isLanguageCode, LanguageCode } from '@/lib/types'
 
 interface SitemapURL {
   loc: string
@@ -18,15 +20,18 @@ interface SitemapURL {
 
 /**
  * Fetch product content from backend API for sitemap generation
+ *
+ * @param lang - The language code for which to fetch products
+ * @returns Array of product data for the specified language
  */
-async function fetchProductsForLanguage(lang: string): Promise<unknown[]> {
+async function fetchProductsForLanguage(lang: LanguageCode): Promise<unknown[]> {
   try {
     // Fetch products for the specified language
     // Fetch up to 1000 products (1000 products per page, page 1)
     const products = await getProducts({
       'pagination[page]': 1,
       'pagination[pageSize]': 1000,
-    })
+    } as Parameters<typeof getProducts>[0])
 
     return Array.isArray(products) ? products : []
   } catch (error) {
@@ -52,7 +57,7 @@ function generateSitemapXML(urls: SitemapURL[]): string {
       }
 
       if (url.priority !== undefined) {
-        entry += `\n    <priority>${url.priority}</priority>`
+        entry += `\n    <priority>${url.priority.toString()}</priority>`
       }
 
       entry += `\n  </url>`
@@ -81,22 +86,31 @@ function escapeXml(unsafe: string): string {
 /**
  * GET handler for language-specific sitemaps
  * Routes: /api/sitemap-en.xml, /api/sitemap-it.xml, /api/sitemap-il.xml
+ *
+ * @param request - The Next.js request object
+ * @param context - The route context with params
+ * @returns XML sitemap response or error
  */
 export async function GET(request: NextRequest, context: { params: Promise<{ lang: string }> }) {
   try {
     // Next.js 15: params is now a Promise
     const { lang: langParam } = await context.params
-    const lang = langParam.replace('.xml', '') // Extract lang from filename
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://affilibuster.com'
+    const urlLang = langParam.replace('.xml', '') // Extract lang from filename
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://affilibuster.com'
 
-    // Validate language
-    const validLangs = ['en', 'it', 'il', 'he']
-    if (!validLangs.includes(lang)) {
+    // Valid URL languages include 'il' as an alias for 'he'
+    const validUrlLangs = [...SUPPORTED_LANGUAGE_CODES, 'il'] as const
+    if (!validUrlLangs.includes(urlLang as (typeof validUrlLangs)[number])) {
       return new NextResponse('Invalid language', { status: 404 })
     }
 
     // Map 'il' to 'he' for API calls (il is URL prefix, he is language code)
-    const apiLang = lang === 'il' ? 'he' : lang
+    const apiLang: LanguageCode = urlLang === 'il' ? LanguageCode.HE : (urlLang as LanguageCode)
+
+    // Validate the API language code
+    if (!isLanguageCode(apiLang)) {
+      return new NextResponse('Invalid language', { status: 404 })
+    }
 
     // Fetch products from backend
     const content = await fetchProductsForLanguage(apiLang)
@@ -105,7 +119,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ lan
     const urls: SitemapURL[] = []
 
     // Add homepage
-    const homePath = lang === 'en' ? '/' : `/${lang}`
+    const homePath = (urlLang as LanguageCode) === LanguageCode.EN ? '/' : `/${urlLang}`
     urls.push({
       loc: `${baseUrl}${homePath}`,
       changefreq: 'daily',
@@ -115,7 +129,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ lan
     // Add static pages
     const staticPages = ['about', 'contact', 'privacy', 'terms']
     for (const page of staticPages) {
-      const pagePath = lang === 'en' ? `/${page}` : `/${lang}/${page}`
+      const pagePath = (urlLang as LanguageCode) === LanguageCode.EN ? `/${page}` : `/${urlLang}/${page}`
       urls.push({
         loc: `${baseUrl}${pagePath}`,
         changefreq: 'monthly',
@@ -129,12 +143,14 @@ export async function GET(request: NextRequest, context: { params: Promise<{ lan
       const itemSlug = String((item as Record<string, unknown>).slug)
       if (!itemSlug) continue // Skip items without slug
 
-      const path = lang === 'en' ? `/products/${itemSlug}` : `/${lang}/products/${itemSlug}`
+      const path =
+        (urlLang as LanguageCode) === LanguageCode.EN ? `/products/${itemSlug}` : `/${urlLang}/products/${itemSlug}`
 
       const itemRecord = item as Record<string, unknown>
+      const updatedAt = itemRecord.updatedAt
       urls.push({
         loc: `${baseUrl}${path}`,
-        lastmod: String(itemRecord.updatedAt || ''),
+        lastmod: updatedAt != null && typeof updatedAt === 'string' ? updatedAt : '',
         changefreq: 'monthly',
         priority: 0.6,
       })

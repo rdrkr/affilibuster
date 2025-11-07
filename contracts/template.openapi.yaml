@@ -155,6 +155,11 @@ paths:
 
 components:
   schemas:
+    CurrencyCode:
+      type: string
+      enum: [ USD, EUR, GBP, ILS, CAD, AUD, JPY, CNY ]
+      description: ISO 4217 currency codes
+      example: 'USD'
     Language:
       type: object
       properties:
@@ -176,8 +181,7 @@ components:
           type: string
           example: '/it'
         defaultCurrency:
-          type: string
-          example: 'EUR'
+          $ref: '#/components/schemas/CurrencyCode'
         localeCode:
           type: string
           example: 'it-IT'
@@ -229,10 +233,12 @@ components:
         sessionId:
           type: string
           example: 'sess-abc123'
-        selectedCurrency:
+        userId:
           type: string
-          pattern: '^[A-Z]{3}$'
-          example: 'EUR'
+          example: 'user-789xyz'
+          description: 'User ID for logged-in users (takes precedence over sessionId)'
+        selectedCurrency:
+          $ref: '#/components/schemas/CurrencyCode'
         dismissedLanguagePrompt:
           type: boolean
           example: true
@@ -240,6 +246,16 @@ components:
           type: string
           enum: [ en, it, he ]
           example: 'it'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-11-01T10:00:00Z'
+          description: 'Timestamp when preferences were created'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-11-02T14:30:00Z'
+          description: 'Timestamp when preferences were last updated'
         expiresAt:
           type: string
           format: date-time
@@ -254,9 +270,7 @@ components:
       type: object
       properties:
         selectedCurrency:
-          type: string
-          pattern: '^[A-Z]{3}$'
-          example: 'USD'
+          $ref: '#/components/schemas/CurrencyCode'
         dismissedLanguagePrompt:
           type: boolean
           example: true

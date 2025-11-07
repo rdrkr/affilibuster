@@ -6,27 +6,30 @@
  */
 
 import { setRequestLocale } from 'next-intl/server'
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { getAbout } from '@/lib/client'
 import type { ApiAboutAboutDocument } from '@/lib/generated/types.gen'
-import type { UiFeatureItemEntry } from '@/lib/types'
+import { _1Enum } from '@/lib/generated/types.gen'
+import type { UiFeatureItemEntry, LanguageCode } from '@/lib/types'
+import { SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
 
 // Important: Strapi CMS must be running during build for content to be fetched
 // Pages are rendered statically with ISR revalidation
 
-type Props = {
+interface Props {
   params: Promise<{ lang: string }>
 }
 
 export function generateStaticParams() {
-  return [{ lang: 'en' }, { lang: 'it' }, { lang: 'he' }]
+  return SUPPORTED_LANGUAGE_CODES.map(lang => ({ lang }))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  await params
+  const resolvedParams = await params
+  const lang = resolvedParams.lang
 
   try {
-    const aboutData = await getAbout()
+    const aboutData = await getAbout(lang as LanguageCode, [_1Enum.FEATURES_LIST])
 
     return {
       title: aboutData?.metaTitle,
@@ -42,30 +45,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function AboutPage({ params }: Props) {
-  let lang = 'en'
+  let lang: LanguageCode = 'en' as LanguageCode
   try {
     const resolvedParams = await params
-    if (resolvedParams?.lang) {
-      lang = resolvedParams.lang
+    if (resolvedParams.lang) {
+      lang = resolvedParams.lang as LanguageCode
     }
   } catch (e) {
     console.error('Failed to resolve params:', e)
   }
 
   // Enable static rendering
-  if (lang) {
-    setRequestLocale(lang)
-  }
+  setRequestLocale(lang)
 
   let aboutData: ApiAboutAboutDocument | null = null
   try {
-    aboutData = await getAbout()
+    aboutData = await getAbout(lang, [_1Enum.FEATURES_LIST])
   } catch (error) {
     console.error('Failed to fetch about page:', error)
   }
 
   // Don't render page if data is unavailable
-  if (!aboutData || !aboutData.heroTitle || !aboutData.missionTitle) {
+  if (!aboutData?.heroTitle || !aboutData.missionTitle) {
     return null
   }
 
@@ -75,7 +76,7 @@ export default async function AboutPage({ params }: Props) {
       <section className="bg-gradient-to-br from-primary-800 via-primary-700 to-primary-900 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            {aboutData?.heroTitle && (
+            {aboutData.heroTitle && (
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 {aboutData.heroTitle.split('**').map((part: string, i: number) =>
                   i % 2 === 1 ? (
@@ -88,7 +89,7 @@ export default async function AboutPage({ params }: Props) {
                 )}
               </h1>
             )}
-            {aboutData?.heroSubtitle && <p className="text-xl text-neutral-200">{aboutData.heroSubtitle}</p>}
+            {aboutData.heroSubtitle && <p className="text-xl text-neutral-200">{aboutData.heroSubtitle}</p>}
           </div>
         </div>
       </section>
@@ -96,12 +97,12 @@ export default async function AboutPage({ params }: Props) {
       {/* Content Section */}
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <div className="prose dark:prose-invert max-w-none">
-          {aboutData?.missionTitle && (
+          {aboutData.missionTitle && (
             <>
               <h2 className="text-3xl font-bold mt-8 mb-4 text-primary-800 dark:text-primary-300">
                 {aboutData.missionTitle}
               </h2>
-              {aboutData?.missionContent && (
+              {aboutData.missionContent && (
                 <div
                   className="text-lg text-neutral-700 dark:text-neutral-300 mb-6"
                   dangerouslySetInnerHTML={{ __html: aboutData.missionContent }}
@@ -110,7 +111,7 @@ export default async function AboutPage({ params }: Props) {
             </>
           )}
 
-          {aboutData?.featuresList && aboutData.featuresList.length > 0 && (
+          {aboutData.featuresList && aboutData.featuresList.length > 0 && (
             <>
               <h2 className="text-3xl font-bold mt-12 mb-6 text-primary-800 dark:text-primary-300">
                 {aboutData.featuresTitle}
@@ -139,11 +140,11 @@ export default async function AboutPage({ params }: Props) {
           )}
 
           <h2 className="text-3xl font-bold mt-12 mb-4 text-primary-800 dark:text-primary-300">
-            {aboutData?.techStackTitle}
+            {aboutData.techStackTitle}
           </h2>
-          <p className="text-lg text-neutral-700 dark:text-neutral-300 mb-8">{aboutData?.techStackDescription}</p>
+          <p className="text-lg text-neutral-700 dark:text-neutral-300 mb-8">{aboutData.techStackDescription}</p>
 
-          {aboutData?.ctaTitle && (
+          {aboutData.ctaTitle && (
             <div className="bg-gradient-to-br from-secondary-50 to-secondary-100 dark:from-secondary-900 dark:to-secondary-800 p-8 rounded-2xl my-8 border border-secondary-200 dark:border-secondary-700">
               <h2 className="text-2xl font-bold mb-4 text-neutral-900 dark:text-white">{aboutData.ctaTitle}</h2>
               {aboutData.ctaText && (

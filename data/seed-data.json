@@ -240,7 +240,43 @@
         "updatedAt": "2025-01-01T00:00:00.000Z",
         "publishedAt": "2025-01-01T00:00:00.000Z",
         "locale": "en",
-        "localizations": []
+        "localizations": [],
+        "featureCards": [
+          {
+            "title": "Fast Delivery",
+            "description": "Quick and reliable shipping on all products",
+            "linkUrl": "/products"
+          },
+          {
+            "title": "Secure Shopping",
+            "description": "Safe and encrypted transactions guaranteed",
+            "linkUrl": "/products"
+          },
+          {
+            "title": "Best Prices",
+            "description": "Competitive prices on quality products",
+            "linkUrl": "/products"
+          },
+          {
+            "title": "Quality Products",
+            "description": "Hand-picked selection of top-rated items",
+            "linkUrl": "/products"
+          }
+        ],
+        "trustCards": [
+          {
+            "title": "Quality Verified",
+            "description": "Every product is carefully reviewed and tested by our team to ensure it meets our high quality standards."
+          },
+          {
+            "title": "Trusted by Thousands",
+            "description": "Join thousands of satisfied customers who trust us to help them find the best products for their needs."
+          },
+          {
+            "title": "Money Back Guarantee",
+            "description": "Shop with confidence knowing that all purchases are protected by our comprehensive satisfaction guarantee."
+          }
+        ]
       },
       "it": {
         "documentId": "be7f35cd-5445-56b9-9254-5dfaf106cd73",
@@ -267,7 +303,43 @@
         "updatedAt": "2025-01-01T00:00:00.000Z",
         "publishedAt": "2025-01-01T00:00:00.000Z",
         "locale": "it",
-        "localizations": []
+        "localizations": [],
+        "featureCards": [
+          {
+            "title": "Consegna Veloce",
+            "description": "Spedizione rapida e affidabile su tutti i prodotti",
+            "linkUrl": "/products"
+          },
+          {
+            "title": "Shopping Sicuro",
+            "description": "Transazioni sicure e crittografate garantite",
+            "linkUrl": "/products"
+          },
+          {
+            "title": "Migliori Prezzi",
+            "description": "Prezzi competitivi su prodotti di qualità",
+            "linkUrl": "/products"
+          },
+          {
+            "title": "Prodotti di Qualità",
+            "description": "Selezione curata di articoli più votati",
+            "linkUrl": "/products"
+          }
+        ],
+        "trustCards": [
+          {
+            "title": "Qualità Verificata",
+            "description": "Ogni prodotto è attentamente esaminato e testato dal nostro team per garantire che soddisfi i nostri elevati standard di qualità."
+          },
+          {
+            "title": "Fidato da Migliaia",
+            "description": "Unisciti a migliaia di clienti soddisfatti che si fidano di noi per aiutarli a trovare i migliori prodotti per le loro esigenze."
+          },
+          {
+            "title": "Garanzia Soddisfatti o Rimborsati",
+            "description": "Acquista con fiducia sapendo che tutti gli acquisti sono protetti dalla nostra garanzia di soddisfazione completa."
+          }
+        ]
       },
       "he": {
         "documentId": "8eb9e0d7-a2bb-5e7d-bc73-028e4c3fb615",
@@ -294,7 +366,43 @@
         "updatedAt": "2025-01-01T00:00:00.000Z",
         "publishedAt": "2025-01-01T00:00:00.000Z",
         "locale": "he",
-        "localizations": []
+        "localizations": [],
+        "featureCards": [
+          {
+            "title": "משלוח מהיר",
+            "description": "משלוח מהיר ואמין על כל המוצרים",
+            "linkUrl": "/products"
+          },
+          {
+            "title": "קניות בטוחות",
+            "description": "עסקאות בטוחות ומוצפנות מובטחות",
+            "linkUrl": "/products"
+          },
+          {
+            "title": "המחירים הטובים ביותר",
+            "description": "מחירים תחרוtiים על מוצרי איכות",
+            "linkUrl": "/products"
+          },
+          {
+            "title": "מוצרי איכות",
+            "description": "מבחר נבחר של פריטים מדורגים מעולה",
+            "linkUrl": "/products"
+          }
+        ],
+        "trustCards": [
+          {
+            "title": "איכות מאומתת",
+            "description": "כל מוצר נבדק ונבחן בקפידה על ידי הצוות שלנו כדי להבטיח שהוא עומד בסטנדרטים הגבוהים שלנו."
+          },
+          {
+            "title": "מהימן על ידי אלפים",
+            "description": "הצטרף לאלפי לקוחות מרוצים שסומכים עלינו לעזור להם למצוא את המוצרים הטובים ביותר לצרכיהם."
+          },
+          {
+            "title": "החזר כספי מובטח",
+            "description": "קנה בביטחון בידיעה שכל הרכישות מוגנות על ידי ערבות השביעות המקיפה שלנו."
+          }
+        ]
       }
     },
     "about": {

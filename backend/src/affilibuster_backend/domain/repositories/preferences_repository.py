@@ -8,7 +8,7 @@ Reference: T063 (UserPreferences entity)
 
 from abc import ABC, abstractmethod
 
-from affilibuster_backend.domain.entities.user_preferences import UserPreferences
+from affilibuster_backend.domain.entities.generated.models import UserPreferences
 
 
 class IUserPreferencesRepository(ABC):

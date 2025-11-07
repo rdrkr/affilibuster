@@ -8,12 +8,12 @@ authors = [{ name = "Affilibuster Team" }]
 requires-python = ">=3.13"
 readme = "../README.md"
 dependencies = [
-  "fastapi==0.121.0",
+  "fastapi==0.121.1",
   "uvicorn[standard]>=0.34.0",
   "sqlalchemy>=2.0.37",
   "alembic==1.17.1",
   "pydantic>=2.12.4",
-  "pydantic-settings>=2.7.1",
+  "pydantic-settings>=2.12.0",
   "psycopg2-binary>=2.9.10",
   "asyncpg>=0.30.0",
   "redis==7.0.1",
@@ -30,8 +30,8 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-  "pytest>=8.3.4",
-  "pytest-asyncio>=1.2.0",
+  "pytest>=8.4.2",
+  "pytest-asyncio>=1.3.0",
   "pytest-cov>=6.0.0",
   "pytest-xdist>=3.6.1",
   "pytest-mock>=3.12.0",
@@ -51,7 +51,7 @@ clean = { cmd = """\
     find . -type f -name '*.pyc' -delete 2>/dev/null || true && \
     find . -type f -name '*.pyo' -delete 2>/dev/null || true && \
     rm -rf .pytest_cache .coverage htmlcov .mypy_cache || true && \
-    rm -rf coverage.lcov coverage.xml venv .venv src/affilibuster_backend/domain/entities/generated || true \
+    rm -rf coverage.lcov coverage.xml venv .venv || true \
     """, help = "removes Python cache files, coverage files, and build artifacts" }
 lint = { cmd = "ruff check . && mypy .", help = "runs code style checks with ruff and type checking with mypy" }
 lint-fix = { cmd = "ruff check . --fix && mypy .", help = "auto-fixes code style issues with ruff and type checking with mypy" }
@@ -63,12 +63,15 @@ openapi-generate = { cmd = """\
     datamodel-codegen \
       --input ../contracts/affilibuster.openapi.yaml \
       --output src/affilibuster_backend/domain/entities/generated/models.py \
+      --custom-file-header "# Copyright (c) 2025 Affilibuster by Ronen Druker." \
+      --allow-population-by-field-name \
     """, help = "generates Python models from OpenAPI specification" }
 
 [tool.ruff]
 target-version = "py313"
 line-length = 120
 respect-gitignore = true
+extend-exclude = ["src/affilibuster_backend/domain/entities/generated"]
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -107,6 +110,10 @@ extend-ignore = [
 
 [tool.ruff.lint.flake8-builtins]
 strict-checking = true
+
+[tool.ruff.lint.pydocstyle]
+# Use Google-style docstrings for consistency
+convention = "google"
 
 [tool.ruff.format]
 docstring-code-format = true

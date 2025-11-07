@@ -33,25 +33,25 @@ lint_typescript() {
   if [[ "${ACTION}" = "check" ]]; then
     echo "  📋 Checking TypeScript (Frontend ESLint)..."
     cd frontend
-    npm install --silent || LINT_FAILED=$?
+    npm install --silent --include=optional || LINT_FAILED=$?
     npm run lint || LINT_FAILED=$?
     cd ..
 
     echo "  📋 Checking TypeScript (CMS ESLint)..."
     cd cms
-    npm install --silent || LINT_FAILED=$?
+    npm install --silent --include=optional || LINT_FAILED=$?
     npm run lint || LINT_FAILED=$?
     cd ..
   else
     echo "  🔧 Fixing TypeScript (Frontend)..."
     cd frontend
-    npm install --silent || LINT_FAILED=$?
+    npm install --silent --include=optional || LINT_FAILED=$?
     npm run lint:fix || LINT_FAILED=$?
     cd ..
 
     echo "  🔧 Fixing TypeScript (CMS)..."
     cd cms
-    npm install --silent || LINT_FAILED=$?
+    npm install --silent --include=optional || LINT_FAILED=$?
     npm run lint:fix || LINT_FAILED=$?
     cd ..
   fi

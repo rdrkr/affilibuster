@@ -7,7 +7,8 @@
 
 'use client'
 
-import { useState, useEffect, ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import { useState, useEffect } from 'react'
 import { getNavigation } from '@/lib/client'
 import { usePathname } from 'next/navigation'
 
@@ -32,7 +33,7 @@ export function ThemeSelector() {
     setMounted(true)
     // Get theme from localStorage
     const savedTheme = localStorage.getItem('theme') as Theme | null
-    const currentTheme: Theme = (savedTheme as Theme) || 'system'
+    const currentTheme: Theme = savedTheme ?? 'system'
     setTheme(currentTheme)
     applyTheme(currentTheme)
 
@@ -46,7 +47,9 @@ export function ThemeSelector() {
     }
 
     mediaQuery.addEventListener('change', handleSystemThemeChange)
-    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange)
+    return () => {
+      mediaQuery.removeEventListener('change', handleSystemThemeChange)
+    }
   }, [])
 
   // Fetch navigation labels from CMS
@@ -61,7 +64,7 @@ export function ThemeSelector() {
         console.error('Failed to fetch navigation:', error)
       }
     }
-    fetchNavigation()
+    void fetchNavigation()
   }, [pathname])
 
   const applyTheme = (newTheme: Theme) => {
@@ -101,7 +104,7 @@ export function ThemeSelector() {
     ? [
         {
           value: 'light',
-          label: navData.themeLightLabel || '',
+          label: navData.themeLightLabel ?? '',
           icon: (
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -114,7 +117,7 @@ export function ThemeSelector() {
         },
         {
           value: 'dark',
-          label: navData.themeDarkLabel || '',
+          label: navData.themeDarkLabel ?? '',
           icon: (
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
@@ -123,7 +126,7 @@ export function ThemeSelector() {
         },
         {
           value: 'system',
-          label: navData.themeSystemLabel || '',
+          label: navData.themeSystemLabel ?? '',
           icon: (
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -142,9 +145,11 @@ export function ThemeSelector() {
   return (
     <div className="relative">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen)
+        }}
         className="flex items-center space-x-2 px-3 py-2 bg-primary-700 hover:bg-primary-600 text-white rounded-lg transition-colors shadow-sm"
-        aria-label={navData?.themeSelectorAriaLabel || ''}
+        aria-label={navData?.themeSelectorAriaLabel ?? ''}
         aria-expanded={isOpen}
       >
         {currentTheme?.icon}
@@ -161,14 +166,22 @@ export function ThemeSelector() {
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} aria-hidden="true" />
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => {
+              setIsOpen(false)
+            }}
+            aria-hidden="true"
+          />
 
           {/* Dropdown */}
           <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-neutral-800 border border-primary-200 dark:border-primary-700 rounded-lg shadow-xl z-20 overflow-hidden">
             {themes.map(themeOption => (
               <button
                 key={themeOption.value}
-                onClick={() => handleThemeChange(themeOption.value)}
+                onClick={() => {
+                  handleThemeChange(themeOption.value)
+                }}
                 className={`w-full text-left px-4 py-3 text-sm hover:bg-primary-50 dark:hover:bg-primary-900 transition-colors flex items-center gap-3 ${
                   themeOption.value === theme
                     ? 'bg-primary-50 dark:bg-primary-900 font-medium text-primary-700 dark:text-primary-300'

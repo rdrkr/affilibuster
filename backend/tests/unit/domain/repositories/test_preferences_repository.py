@@ -11,7 +11,11 @@ from uuid import uuid4
 
 import pytest
 
-from affilibuster_backend.domain.entities.user_preferences import UserPreferences
+from affilibuster_backend.domain.entities.generated.models import (
+    CurrencyCode,
+    DetectedLanguage2,
+    UserPreferences,
+)
 from affilibuster_backend.infrastructure.database.repositories.preferences_repository import (
     UserPreferencesRepository,
 )
@@ -35,7 +39,7 @@ class TestUserPreferencesRepositoryGetBySession:
                 id=uuid4(),
                 session_id="test-session-123",
                 user_id=None,
-                selected_currency="USD",
+                selected_currency=CurrencyCode.USD,
                 dismissed_language_prompt=False,
             )
 
@@ -47,7 +51,7 @@ class TestUserPreferencesRepositoryGetBySession:
             retrieved = await repo.get_by_session("test-session-123")
             assert retrieved is not None
             assert retrieved.session_id == "test-session-123"
-            assert retrieved.selected_currency == "USD"
+            assert retrieved.selected_currency == CurrencyCode.USD
 
     async def test_get_by_session_returns_none_for_missing(self, async_client):
         """Test get_by_session returns None for non-existent session."""
@@ -75,7 +79,7 @@ class TestUserPreferencesRepositoryGetByUser:
                 id=uuid4(),
                 session_id="user-session",
                 user_id="user-123",
-                selected_currency="EUR",
+                selected_currency=CurrencyCode.EUR,
                 dismissed_language_prompt=True,
             )
 
@@ -84,7 +88,7 @@ class TestUserPreferencesRepositoryGetByUser:
             result = await repo.get_by_user("user-123")
             assert result is not None
             assert result.user_id == "user-123"
-            assert result.selected_currency == "EUR"
+            assert result.selected_currency == CurrencyCode.EUR
 
     async def test_get_by_user_returns_none_for_missing(self, async_client):
         """Test get_by_user returns None for non-existent user."""
@@ -112,14 +116,14 @@ class TestUserPreferencesRepositoryUpsert:
                 id=uuid4(),
                 session_id="new-session",
                 user_id=None,
-                selected_currency="USD",
+                selected_currency=CurrencyCode.USD,
                 dismissed_language_prompt=False,
             )
 
             result = await repo.upsert(prefs)
             assert result is not None
             assert result.session_id == "new-session"
-            assert result.selected_currency == "USD"
+            assert result.selected_currency == CurrencyCode.USD
 
     async def test_upsert_updates_existing_preferences(self, async_client):
         """Test upsert updates existing preferences."""
@@ -132,7 +136,7 @@ class TestUserPreferencesRepositoryUpsert:
                 id=uuid4(),
                 session_id="update-session",
                 user_id=None,
-                selected_currency="USD",
+                selected_currency=CurrencyCode.USD,
                 dismissed_language_prompt=False,
             )
 
@@ -140,11 +144,11 @@ class TestUserPreferencesRepositoryUpsert:
             await repo.upsert(prefs)
 
             # Update
-            prefs.selected_currency = "EUR"
+            prefs.selected_currency = CurrencyCode.EUR
             prefs.user_id = "user-123"
             result = await repo.upsert(prefs)
 
-            assert result.selected_currency == "EUR"
+            assert result.selected_currency == CurrencyCode.EUR
             assert result.user_id == "user-123"
 
     async def test_upsert_preserves_created_at_on_update(self, async_client):
@@ -154,12 +158,12 @@ class TestUserPreferencesRepositoryUpsert:
         async with TestSessionLocal() as session:
             repo = UserPreferencesRepository(session)
 
-            now = datetime.now(UTC).replace(tzinfo=None)
+            now = datetime.now(UTC)
             prefs = UserPreferences(
                 id=uuid4(),
                 session_id="preserve-session",
                 user_id=None,
-                selected_currency="USD",
+                selected_currency=CurrencyCode.USD,
                 dismissed_language_prompt=False,
                 created_at=now - timedelta(days=10),
             )
@@ -169,7 +173,7 @@ class TestUserPreferencesRepositoryUpsert:
             original_created_at = initial.created_at
 
             # Update
-            prefs.selected_currency = "EUR"
+            prefs.selected_currency = CurrencyCode.EUR
             updated = await repo.upsert(prefs)
 
             # created_at should be unchanged
@@ -212,14 +216,14 @@ class TestUserPreferencesRepositoryDeleteBySession:
                 id=uuid4(),
                 session_id="delete-target-session",
                 user_id=None,
-                selected_currency="USD",
+                selected_currency=CurrencyCode.USD,
                 dismissed_language_prompt=False,
             )
             prefs2 = UserPreferences(
                 id=uuid4(),
                 session_id="delete-keep-session",
                 user_id=None,
-                selected_currency="EUR",
+                selected_currency=CurrencyCode.EUR,
                 dismissed_language_prompt=False,
             )
 
@@ -265,9 +269,9 @@ class TestUserPreferencesRepositoryToEntity:
                 id=uuid4(),
                 session_id="convert-session",
                 user_id="user-xyz",
-                selected_currency="GBP",
+                selected_currency=CurrencyCode.GBP,
                 dismissed_language_prompt=True,
-                detected_language="en",
+                detected_language=DetectedLanguage2.EN,
             )
 
             await repo.upsert(prefs)
@@ -277,6 +281,6 @@ class TestUserPreferencesRepositoryToEntity:
             assert retrieved.id == prefs.id
             assert retrieved.session_id == "convert-session"
             assert retrieved.user_id == "user-xyz"
-            assert retrieved.selected_currency == "GBP"
+            assert retrieved.selected_currency == CurrencyCode.GBP
             assert retrieved.dismissed_language_prompt is True
-            assert retrieved.detected_language == "en"
+            assert retrieved.detected_language == DetectedLanguage2.EN

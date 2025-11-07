@@ -4,8 +4,9 @@
  * E2E test for SEO meta tags validation.
  * Reference: quickstart.md:200-218 (Test 5: SEO Meta Tags)
  */
+import { CodeEnum } from '@/lib/generated/types.gen'
 
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.describe('SEO Meta Tags', () => {
   test('should include all required meta tags on homepage', async ({ page }) => {
@@ -73,7 +74,7 @@ test.describe('SEO Meta Tags', () => {
     await page.goto('/it')
 
     const htmlLang = await page.locator('html').getAttribute('lang')
-    expect(htmlLang).toBe('it')
+    expect(htmlLang).toBe(CodeEnum.IT)
 
     // og:locale should be it_IT
     const ogLocale = page.locator('meta[property="og:locale"]')
@@ -89,10 +90,11 @@ test.describe('SEO Meta Tags', () => {
 
     // Should be valid JSON
     const jsonContent = await jsonLd.textContent()
-    expect(() => JSON.parse(jsonContent || '')).not.toThrow()
+    expect(() => JSON.parse(jsonContent ?? '')).not.toThrow()
 
     // Should have @context
-    const data = JSON.parse(jsonContent || '')
+
+    const data = JSON.parse(jsonContent ?? '') as Record<string, unknown>
     expect(data['@context']).toBe('https://schema.org')
   })
 

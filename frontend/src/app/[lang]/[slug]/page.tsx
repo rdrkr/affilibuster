@@ -12,6 +12,8 @@ import { notFound } from 'next/navigation'
 import { setRequestLocale } from 'next-intl/server'
 import type { Product, ContentResponse } from '@/lib/types'
 import { transformProductToContent } from '@/lib/transformers'
+import { getLanguageCodes } from '@/config/languages'
+import { CodeEnum } from '@/lib/generated/types.gen'
 
 interface NavigationData {
   availableInOtherLanguagesLabel?: string
@@ -22,7 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const { lang, slug } = await params
 
   try {
-    const productsResponse = await getProducts()
+    const productsResponse = await getProducts({ locale: lang as CodeEnum })
     if (!productsResponse) {
       return {
         title: undefined,
@@ -36,7 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
         description: undefined,
       }
     }
-    const content = transformProductToContent(found, lang)
+    const content = transformProductToContent(found, lang as CodeEnum)
     return generateContentMetadata(content)
   } catch {
     return {
@@ -48,13 +50,13 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 
 // Generate static params for SSG
 export async function generateStaticParams() {
-  const languages = ['en', 'it', 'he']
+  const languages = await getLanguageCodes()
   const params: { lang: string; slug: string }[] = []
 
   // Fetch content for each language
   for (const lang of languages) {
     try {
-      const productsResponse = await getProducts()
+      const productsResponse = await getProducts({ locale: lang })
       if (productsResponse) {
         for (const item of productsResponse.data) {
           params.push({
@@ -72,15 +74,16 @@ export async function generateStaticParams() {
 }
 
 export default async function ContentPage({ params }: { params: Promise<{ lang: string; slug: string }> }) {
-  let lang = 'en'
+  let lang = CodeEnum.EN
+  setRequestLocale(lang)
   let slug = ''
 
   try {
     const resolvedParams = await params
-    if (resolvedParams?.lang) {
-      lang = resolvedParams.lang
+    if (resolvedParams.lang) {
+      lang = resolvedParams.lang as CodeEnum
     }
-    if (resolvedParams?.slug) {
+    if (resolvedParams.slug) {
       slug = resolvedParams.slug
     }
   } catch (e) {
@@ -89,16 +92,13 @@ export default async function ContentPage({ params }: { params: Promise<{ lang: 
   }
 
   // Enable static rendering
-  if (lang) {
-    setRequestLocale(lang)
-  }
 
   let product: Product | undefined
   let content: ContentResponse | undefined
   let navData: NavigationData | null = null
 
   try {
-    const productsResponse = await getProducts()
+    const productsResponse = await getProducts({ locale: lang })
     if (!productsResponse) {
       notFound()
     }
@@ -113,7 +113,7 @@ export default async function ContentPage({ params }: { params: Promise<{ lang: 
 
   // Fetch navigation data for labels
   try {
-    navData = await getNavigation()
+    navData = await getNavigation(lang)
   } catch (error) {
     console.error('Failed to fetch navigation:', error)
   }

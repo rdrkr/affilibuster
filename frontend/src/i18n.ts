@@ -7,16 +7,14 @@
 
 import { getRequestConfig } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-
-// List of supported locales
-const locales = ['en', 'it', 'he']
+import { isLanguageCode } from './lib/types'
 
 export default getRequestConfig(async ({ requestLocale }) => {
   // Get the locale from the request
   const locale = await requestLocale
 
   // Validate that the incoming locale is valid
-  if (!locale || !locales.includes(locale)) {
+  if (!locale || !isLanguageCode(locale)) {
     notFound()
   }
 

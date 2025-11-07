@@ -8,22 +8,27 @@
 
 'use client'
 
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { getLanguages } from '@/lib/client'
-import type { Language } from '@/lib/types'
+import type { Language, LanguageCode } from '@/lib/types'
+import { Direction, DEFAULT_LANGUAGE_CODE } from '@/lib/types'
 
 interface LocaleContextValue {
   locale: string
-  direction: 'ltr' | 'rtl'
+  direction: Direction
   language: Language | null
   setLocale: (locale: string) => void
 }
 
 const LocaleContext = createContext<LocaleContextValue>({
-  locale: 'en',
-  direction: 'ltr',
+  locale: DEFAULT_LANGUAGE_CODE,
+  direction: Direction.LTR,
   language: null,
-  setLocale: () => {},
+  // Default no-op setLocale - will be overridden by LocaleProvider
+  setLocale: () => {
+    // Intentionally empty default implementation
+  },
 })
 
 interface LocaleProviderProps {
@@ -31,23 +36,21 @@ interface LocaleProviderProps {
   initialLocale?: string
 }
 
-export function LocaleProvider({ children, initialLocale = 'en' }: LocaleProviderProps) {
+export function LocaleProvider({ children, initialLocale = DEFAULT_LANGUAGE_CODE }: LocaleProviderProps) {
   const [locale, setLocale] = useState(initialLocale)
   const [language, setLanguage] = useState<Language | null>(null)
 
   useEffect(() => {
     // Fetch language details
-    getLanguages()
+    void getLanguages()
       .then(languages => {
-        if (languages) {
-          const found = languages.find(l => l.code === locale)
-          setLanguage(found || null)
-        }
+        const found = languages.find(l => l.code === (locale as LanguageCode))
+        setLanguage(found ?? null)
       })
       .catch(console.error)
   }, [locale])
 
-  const direction = language?.direction || 'ltr'
+  const direction: Direction = language?.direction ?? Direction.LTR
 
   return <LocaleContext.Provider value={{ locale, direction, language, setLocale }}>{children}</LocaleContext.Provider>
 }
@@ -56,9 +59,5 @@ export function LocaleProvider({ children, initialLocale = 'en' }: LocaleProvide
  * Hook to access locale context
  */
 export function useLocale() {
-  const context = useContext(LocaleContext)
-  if (!context) {
-    throw new Error('useLocale must be used within a LocaleProvider')
-  }
-  return context
+  return useContext(LocaleContext)
 }

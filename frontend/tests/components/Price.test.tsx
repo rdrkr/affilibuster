@@ -3,50 +3,57 @@
 /**
  * Unit tests for Price component
  */
+import { CodeEnum, CurrencyCode, SymbolPositionEnum } from '@/lib/generated/types.gen'
 
 import { render, screen, waitFor } from '@testing-library/react'
 import { Price } from '@/components/Price'
-import { currenciesAPI, preferencesAPI } from '@/lib/api'
+import * as client from '@/lib/client'
 import { useSession } from '@/hooks/useSession'
 
 // Mock dependencies
 jest.mock('@/hooks/useSession')
-jest.mock('@/lib/api', () => ({
-  currenciesAPI: {
-    getAll: jest.fn(),
-  },
-  preferencesAPI: {
-    get: jest.fn(),
-  },
+jest.mock('@/lib/client', () => ({
+  getCurrencies: jest.fn(),
+  getUserPreferences: jest.fn(),
 }))
 
 const mockUseSession = useSession as jest.MockedFunction<typeof useSession>
-const mockGetAllCurrencies = currenciesAPI.getAll as jest.MockedFunction<typeof currenciesAPI.getAll>
-const mockGetPreferences = preferencesAPI.get as jest.MockedFunction<typeof preferencesAPI.get>
+const mockGetCurrencies = client.getCurrencies as jest.MockedFunction<typeof client.getCurrencies>
+const mockGetUserPreferences = client.getUserPreferences as jest.MockedFunction<typeof client.getUserPreferences>
 
 describe('Price', () => {
   const mockCurrencies = [
     {
-      code: 'USD',
+      documentId: 'usd-doc-id',
+      id: 1,
+      code: CurrencyCode.USD,
       name: 'US Dollar',
       symbol: '$',
+      displayName: 'US Dollar',
       decimalPlaces: 2,
-      symbolPosition: 'before',
+      symbolPosition: SymbolPositionEnum.BEFORE as const,
       thousandsSeparator: ',',
       decimalSeparator: '.',
-      isActive: true,
+      exchangeRate: 1.0,
       sortOrder: 1,
+      isActive: true,
+      publishedAt: '2025-01-01T00:00:00.000Z',
     },
     {
-      code: 'EUR',
+      documentId: 'eur-doc-id',
+      id: 2,
+      code: CurrencyCode.EUR,
       name: 'Euro',
       symbol: '€',
+      displayName: 'Euro',
       decimalPlaces: 2,
-      symbolPosition: 'after',
+      symbolPosition: SymbolPositionEnum.AFTER as const,
       thousandsSeparator: '.',
       decimalSeparator: ',',
-      isActive: true,
+      exchangeRate: 0.92,
       sortOrder: 2,
+      isActive: true,
+      publishedAt: '2025-01-01T00:00:00.000Z',
     },
   ]
 
@@ -57,10 +64,18 @@ describe('Price', () => {
 
   describe('loading state', () => {
     it('should show loading skeleton while fetching data', () => {
-      mockGetAllCurrencies.mockReturnValue(
-        new Promise(() => {}) // Never resolves
+      // Mock promises that never resolve to test loading state
+      mockGetCurrencies.mockReturnValue(
+        new Promise<never>(() => {
+          // Intentionally empty - testing loading state
+        })
       )
-      mockGetPreferences.mockReturnValue(new Promise(() => {}))
+
+      mockGetUserPreferences.mockReturnValue(
+        new Promise<never>(() => {
+          // Intentionally empty - testing loading state
+        })
+      )
 
       const { container } = render(<Price amount={99.99} />)
 
@@ -69,8 +84,17 @@ describe('Price', () => {
     })
 
     it('should not render actual price while loading', () => {
-      mockGetAllCurrencies.mockReturnValue(new Promise(() => {}))
-      mockGetPreferences.mockReturnValue(new Promise(() => {}))
+      mockGetCurrencies.mockReturnValue(
+        new Promise<never>(() => {
+          // Intentionally empty - testing loading state
+        })
+      )
+
+      mockGetUserPreferences.mockReturnValue(
+        new Promise<never>(() => {
+          // Intentionally empty - testing loading state
+        })
+      )
 
       render(<Price amount={99.99} />)
 
@@ -80,12 +104,13 @@ describe('Price', () => {
 
   describe('USD formatting', () => {
     it('should format USD with default settings', async () => {
-      mockGetAllCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetPreferences.mockResolvedValue({
+      mockGetCurrencies.mockResolvedValue(mockCurrencies)
+      mockGetUserPreferences.mockResolvedValue({
+        id: '1',
         sessionId: 'test-session',
-        selectedCurrency: 'USD',
+        selectedCurrency: CurrencyCode.USD,
         dismissedLanguagePrompt: false,
-        detectedLanguage: 'en',
+        detectedLanguage: CodeEnum.EN,
       })
 
       render(<Price amount={1234.56} />)
@@ -96,46 +121,49 @@ describe('Price', () => {
     })
 
     it('should show currency code when showCurrencyCode is true', async () => {
-      mockGetAllCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetPreferences.mockResolvedValue({
+      mockGetCurrencies.mockResolvedValue(mockCurrencies)
+      mockGetUserPreferences.mockResolvedValue({
+        id: '1',
         sessionId: 'test-session',
-        selectedCurrency: 'USD',
+        selectedCurrency: CurrencyCode.USD,
         dismissedLanguagePrompt: false,
-        detectedLanguage: 'en',
+        detectedLanguage: CodeEnum.EN,
       })
 
       render(<Price amount={99.99} showCurrencyCode={true} />)
 
       await waitFor(() => {
-        expect(screen.getByText('USD')).toBeInTheDocument()
+        expect(screen.getByText(CurrencyCode.USD)).toBeInTheDocument()
       })
     })
 
     it('should hide currency code when showCurrencyCode is false', async () => {
-      mockGetAllCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetPreferences.mockResolvedValue({
+      mockGetCurrencies.mockResolvedValue(mockCurrencies)
+      mockGetUserPreferences.mockResolvedValue({
+        id: '1',
         sessionId: 'test-session',
-        selectedCurrency: 'USD',
+        selectedCurrency: CurrencyCode.USD,
         dismissedLanguagePrompt: false,
-        detectedLanguage: 'en',
+        detectedLanguage: CodeEnum.EN,
       })
 
       render(<Price amount={99.99} showCurrencyCode={false} />)
 
       await waitFor(() => {
-        expect(screen.queryByText('USD')).not.toBeInTheDocument()
+        expect(screen.queryByText(CurrencyCode.USD)).not.toBeInTheDocument()
       })
     })
   })
 
   describe('EUR formatting', () => {
     it('should format EUR with symbol after amount', async () => {
-      mockGetAllCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetPreferences.mockResolvedValue({
+      mockGetCurrencies.mockResolvedValue(mockCurrencies)
+      mockGetUserPreferences.mockResolvedValue({
+        id: '1',
         sessionId: 'test-session',
-        selectedCurrency: 'EUR',
+        selectedCurrency: CurrencyCode.EUR,
         dismissedLanguagePrompt: false,
-        detectedLanguage: 'it',
+        detectedLanguage: CodeEnum.IT,
       })
 
       render(<Price amount={1234.56} currencyCode="EUR" />)
@@ -148,12 +176,13 @@ describe('Price', () => {
 
   describe('user preferences', () => {
     it('should use user preferred currency over prop', async () => {
-      mockGetAllCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetPreferences.mockResolvedValue({
+      mockGetCurrencies.mockResolvedValue(mockCurrencies)
+      mockGetUserPreferences.mockResolvedValue({
+        id: '1',
         sessionId: 'test-session',
-        selectedCurrency: 'EUR',
+        selectedCurrency: CurrencyCode.EUR,
         dismissedLanguagePrompt: false,
-        detectedLanguage: 'en',
+        detectedLanguage: CodeEnum.EN,
       })
 
       render(<Price amount={100} currencyCode="USD" />)
@@ -164,8 +193,8 @@ describe('Price', () => {
     })
 
     it('should fallback to prop currency when preferences fail', async () => {
-      mockGetAllCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetPreferences.mockRejectedValue(new Error('Network error'))
+      mockGetCurrencies.mockResolvedValue(mockCurrencies)
+      mockGetUserPreferences.mockRejectedValue(new Error('Network error'))
 
       render(<Price amount={100} currencyCode="USD" />)
 
@@ -181,37 +210,39 @@ describe('Price', () => {
 
       render(<Price amount={100} />)
 
-      expect(mockGetAllCurrencies).not.toHaveBeenCalled()
-      expect(mockGetPreferences).not.toHaveBeenCalled()
+      expect(mockGetCurrencies).not.toHaveBeenCalled()
+      expect(mockGetUserPreferences).not.toHaveBeenCalled()
     })
 
     it('should fetch data when session ID becomes available', async () => {
       mockUseSession.mockReturnValue('test-session-456')
-      mockGetAllCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetPreferences.mockResolvedValue({
+      mockGetCurrencies.mockResolvedValue(mockCurrencies)
+      mockGetUserPreferences.mockResolvedValue({
+        id: '1',
         sessionId: 'test-session-456',
-        selectedCurrency: 'USD',
+        selectedCurrency: CurrencyCode.USD,
         dismissedLanguagePrompt: false,
-        detectedLanguage: 'en',
+        detectedLanguage: CodeEnum.EN,
       })
 
       render(<Price amount={100} />)
 
       await waitFor(() => {
-        expect(mockGetAllCurrencies).toHaveBeenCalled()
-        expect(mockGetPreferences).toHaveBeenCalled()
+        expect(mockGetCurrencies).toHaveBeenCalled()
+        expect(mockGetUserPreferences).toHaveBeenCalled()
       })
     })
   })
 
   describe('error handling', () => {
     it('should show plain amount when currency not found', async () => {
-      mockGetAllCurrencies.mockResolvedValue([])
-      mockGetPreferences.mockResolvedValue({
+      mockGetCurrencies.mockResolvedValue([])
+      mockGetUserPreferences.mockResolvedValue({
+        id: '1',
         sessionId: 'test-session',
-        selectedCurrency: 'XXX',
+        selectedCurrency: CurrencyCode.USD,
         dismissedLanguagePrompt: false,
-        detectedLanguage: 'en',
+        detectedLanguage: CodeEnum.EN,
       })
 
       render(<Price amount={123.45} />)
@@ -222,8 +253,8 @@ describe('Price', () => {
     })
 
     it('should handle API errors gracefully', async () => {
-      mockGetAllCurrencies.mockRejectedValue(new Error('API error'))
-      mockGetPreferences.mockRejectedValue(new Error('API error'))
+      mockGetCurrencies.mockRejectedValue(new Error('API error'))
+      mockGetUserPreferences.mockRejectedValue(new Error('API error'))
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
 
       render(<Price amount={100} />)
@@ -238,12 +269,13 @@ describe('Price', () => {
 
   describe('custom className', () => {
     it('should apply custom className', async () => {
-      mockGetAllCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetPreferences.mockResolvedValue({
+      mockGetCurrencies.mockResolvedValue(mockCurrencies)
+      mockGetUserPreferences.mockResolvedValue({
+        id: '1',
         sessionId: 'test-session',
-        selectedCurrency: 'USD',
+        selectedCurrency: CurrencyCode.USD,
         dismissedLanguagePrompt: false,
-        detectedLanguage: 'en',
+        detectedLanguage: CodeEnum.EN,
       })
 
       const { container } = render(<Price amount={100} className="custom-class" />)
@@ -259,24 +291,30 @@ describe('Price', () => {
     it('should respect currency decimal places', async () => {
       const jpyCurrencies = [
         {
-          code: 'JPY',
+          documentId: 'jpy-doc-id',
+          id: 1,
+          code: CurrencyCode.JPY,
           name: 'Japanese Yen',
           symbol: '¥',
+          displayName: 'Japanese Yen',
           decimalPlaces: 0,
-          symbolPosition: 'before',
+          symbolPosition: SymbolPositionEnum.BEFORE as const,
           thousandsSeparator: ',',
           decimalSeparator: '.',
-          isActive: true,
+          exchangeRate: 149.5,
           sortOrder: 1,
+          isActive: true,
+          publishedAt: '2025-01-01T00:00:00.000Z',
         },
       ]
 
-      mockGetAllCurrencies.mockResolvedValue(jpyCurrencies)
-      mockGetPreferences.mockResolvedValue({
+      mockGetCurrencies.mockResolvedValue(jpyCurrencies)
+      mockGetUserPreferences.mockResolvedValue({
+        id: '1',
         sessionId: 'test-session',
-        selectedCurrency: 'JPY',
+        selectedCurrency: CurrencyCode.JPY,
         dismissedLanguagePrompt: false,
-        detectedLanguage: 'ja',
+        detectedLanguage: CodeEnum.EN, // Change to valid language code
       })
 
       render(<Price amount={5000} currencyCode="JPY" />)

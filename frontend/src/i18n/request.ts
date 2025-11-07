@@ -7,16 +7,15 @@
  */
 
 import { getRequestConfig } from 'next-intl/server'
+import { DEFAULT_LANGUAGE_CODE, isLanguageCode, type LanguageCode } from '@/lib/types'
 
-export default getRequestConfig(async ({ locale }) => {
+export default getRequestConfig(({ locale }) => {
   // Validate that the incoming locale parameter matches supported locales
-  const supportedLocales = ['en', 'it', 'he']
+  let validatedLocale: LanguageCode = locale ? (locale as LanguageCode) : DEFAULT_LANGUAGE_CODE
 
-  let validatedLocale = locale || 'en'
-
-  if (!supportedLocales.includes(validatedLocale)) {
-    console.warn(`Invalid locale requested: ${validatedLocale}, falling back to 'en'`)
-    validatedLocale = 'en'
+  if (!isLanguageCode(validatedLocale)) {
+    console.warn(`Invalid locale requested: ${String(validatedLocale)}, falling back to '${DEFAULT_LANGUAGE_CODE}'`)
+    validatedLocale = DEFAULT_LANGUAGE_CODE
   }
 
   return {

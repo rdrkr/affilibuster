@@ -8,30 +8,35 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import Script from 'next/script'
 import { Navigation } from '@/components/Navigation'
 import { Footer } from '@/components/Footer'
 import { LocaleProvider } from '@/components/LocaleProvider'
 import { getNavigation, getFooter } from '@/lib/client'
+import {
+  SUPPORTED_LANGUAGE_CODES,
+  DEFAULT_LANGUAGE_CODE,
+  isLanguageCode,
+  getDirectionForLanguage,
+  type LanguageCode,
+} from '@/lib/types'
 import '../globals.css'
 
-const locales = ['en', 'it', 'he']
-
-type Props = {
+interface Props {
   children: ReactNode
   params: Promise<{ lang: string }>
 }
 
 export function generateStaticParams() {
-  return locales.map(lang => ({ lang }))
+  return SUPPORTED_LANGUAGE_CODES.map(lang => ({ lang }))
 }
 
 export default async function LocaleLayout({ children, params }: Props) {
-  let lang = 'en'
+  let lang: LanguageCode = DEFAULT_LANGUAGE_CODE
   try {
     const resolvedParams = await params
-    if (resolvedParams?.lang) {
+    if (resolvedParams.lang && isLanguageCode(resolvedParams.lang)) {
       lang = resolvedParams.lang
     }
   } catch (e) {
@@ -39,14 +44,12 @@ export default async function LocaleLayout({ children, params }: Props) {
   }
 
   // Validate locale
-  if (!locales.includes(lang)) {
+  if (!isLanguageCode(lang)) {
     notFound()
   }
 
   // Enable static rendering
-  if (lang) {
-    setRequestLocale(lang)
-  }
+  setRequestLocale(lang)
 
   // Get messages for this locale
   const messages = await getMessages()
@@ -56,19 +59,19 @@ export default async function LocaleLayout({ children, params }: Props) {
   let footerData = null
 
   try {
-    navigationData = await getNavigation()
+    navigationData = await getNavigation(lang)
   } catch (error) {
     console.error('Failed to fetch navigation in layout:', error)
   }
 
   try {
-    footerData = await getFooter()
+    footerData = await getFooter(lang)
   } catch (error) {
     console.error('Failed to fetch footer in layout:', error)
   }
 
-  // Determine text direction
-  const direction = lang === 'he' ? 'rtl' : 'ltr'
+  // Determine text direction using type-safe helper
+  const direction = getDirectionForLanguage(lang)
 
   return (
     <html lang={lang} dir={direction} suppressHydrationWarning>

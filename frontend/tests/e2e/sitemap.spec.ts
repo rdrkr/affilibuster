@@ -15,7 +15,7 @@ test.describe('Sitemap', () => {
     expect(response?.status()).toBe(200)
 
     // Should be XML content type
-    const contentType = response?.headers()['content-type'] || ''
+    const contentType = response?.headers()['content-type'] ?? ''
     expect(contentType).toContain('xml')
   })
 
@@ -51,8 +51,8 @@ test.describe('Sitemap', () => {
     expect(content).toContain('<lastmod>')
 
     // Lastmod should be valid ISO date
-    const lastmodMatch = content.match(/<lastmod>([^<]+)<\/lastmod>/)
-    if (lastmodMatch) {
+    const lastmodMatch = /<lastmod>([^<]+)<\/lastmod>/.exec(content)
+    if (lastmodMatch?.[1]) {
       const date = new Date(lastmodMatch[1])
       expect(date.toString()).not.toBe('Invalid Date')
     }

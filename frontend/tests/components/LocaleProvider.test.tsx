@@ -3,48 +3,51 @@
 /**
  * Unit tests for LocaleProvider component
  */
+import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
+import { CurrencyCode } from '@/lib/types'
 
 import { render, screen, waitFor, renderHook } from '@testing-library/react'
 import { LocaleProvider, useLocale } from '@/components/LocaleProvider'
-import { languagesAPI } from '@/lib/api'
-import { Language } from '@/types/api'
+import * as client from '@/lib/client'
+import type { Language } from '@/lib/types'
 
 // Mock API
-jest.mock('@/lib/api', () => ({
-  languagesAPI: {
-    getAll: jest.fn(),
-  },
+jest.mock('@/lib/client', () => ({
+  getLanguages: jest.fn(),
 }))
 
-const mockLanguagesAPI = languagesAPI as jest.Mocked<typeof languagesAPI>
+const mockGetLanguages = client.getLanguages as jest.MockedFunction<typeof client.getLanguages>
 
 describe('LocaleProvider', () => {
   const mockLanguages: Language[] = [
     {
-      code: 'en',
+      code: CodeEnum.EN,
       displayName: 'English',
       nativeName: 'English',
-      direction: 'ltr',
+      direction: DirectionEnum.LTR,
       urlPrefix: '/en',
-      defaultCurrency: 'USD',
+      defaultCurrency: CurrencyCode.USD,
+      localeCode: 'en-US',
       isDefault: true,
     },
     {
-      code: 'he',
+      code: CodeEnum.HE,
       displayName: 'Hebrew',
       nativeName: 'עברית',
-      direction: 'rtl',
+      direction: DirectionEnum.RTL,
       urlPrefix: '/he',
-      defaultCurrency: 'ILS',
+      defaultCurrency: CurrencyCode.ILS,
+      localeCode: 'he-IL',
       isDefault: false,
     },
     {
-      code: 'it',
+      code: CodeEnum.IT,
       displayName: 'Italian',
       nativeName: 'Italiano',
-      direction: 'ltr',
+      direction: DirectionEnum.LTR,
       urlPrefix: '/it',
-      defaultCurrency: 'EUR',
+      defaultCurrency: CurrencyCode.EUR,
+      localeCode: 'it-IT',
       isDefault: false,
     },
   ]
@@ -54,28 +57,33 @@ describe('LocaleProvider', () => {
   })
 
   describe('initialization', () => {
-    it('should initialize with default locale', async () => {
-      mockLanguagesAPI.getAll.mockResolvedValue(mockLanguages)
+    it('should initialize with default locale', () => {
+      mockGetLanguages.mockResolvedValue(mockLanguages)
 
       const { result } = renderHook(() => useLocale(), {
         wrapper: ({ children }) => <LocaleProvider>{children}</LocaleProvider>,
       })
 
-      expect(result.current.locale).toBe('en')
+      expect(result.current.locale).toBe(CodeEnum.EN)
     })
 
-    it('should initialize with custom locale', async () => {
-      mockLanguagesAPI.getAll.mockResolvedValue(mockLanguages)
+    it('should initialize with custom locale', () => {
+      mockGetLanguages.mockResolvedValue(mockLanguages)
 
       const { result } = renderHook(() => useLocale(), {
         wrapper: ({ children }) => <LocaleProvider initialLocale="it">{children}</LocaleProvider>,
       })
 
-      expect(result.current.locale).toBe('it')
+      expect(result.current.locale).toBe(CodeEnum.IT)
     })
 
     it('should default to ltr direction before language loads', () => {
-      mockLanguagesAPI.getAll.mockReturnValue(new Promise(() => {})) // Never resolves
+      // Mock promise that never resolves to test loading state
+      mockGetLanguages.mockReturnValue(
+        new Promise<never>(() => {
+          // Intentionally empty - testing loading/pending state
+        })
+      )
 
       const { result } = renderHook(() => useLocale(), {
         wrapper: ({ children }) => <LocaleProvider>{children}</LocaleProvider>,
@@ -87,19 +95,19 @@ describe('LocaleProvider', () => {
 
   describe('language loading', () => {
     it('should fetch language details on mount', async () => {
-      mockLanguagesAPI.getAll.mockResolvedValue(mockLanguages)
+      mockGetLanguages.mockResolvedValue(mockLanguages)
 
       renderHook(() => useLocale(), {
         wrapper: ({ children }) => <LocaleProvider>{children}</LocaleProvider>,
       })
 
       await waitFor(() => {
-        expect(mockLanguagesAPI.getAll).toHaveBeenCalled()
+        expect(mockGetLanguages).toHaveBeenCalled()
       })
     })
 
     it('should set language from API response', async () => {
-      mockLanguagesAPI.getAll.mockResolvedValue(mockLanguages)
+      mockGetLanguages.mockResolvedValue(mockLanguages)
 
       const { result } = renderHook(() => useLocale(), {
         wrapper: ({ children }) => <LocaleProvider>{children}</LocaleProvider>,
@@ -111,7 +119,7 @@ describe('LocaleProvider', () => {
     })
 
     it('should set rtl direction for Hebrew', async () => {
-      mockLanguagesAPI.getAll.mockResolvedValue(mockLanguages)
+      mockGetLanguages.mockResolvedValue(mockLanguages)
 
       const { result } = renderHook(() => useLocale(), {
         wrapper: ({ children }) => <LocaleProvider initialLocale="he">{children}</LocaleProvider>,
@@ -123,7 +131,7 @@ describe('LocaleProvider', () => {
     })
 
     it('should set ltr direction for Italian', async () => {
-      mockLanguagesAPI.getAll.mockResolvedValue(mockLanguages)
+      mockGetLanguages.mockResolvedValue(mockLanguages)
 
       const { result } = renderHook(() => useLocale(), {
         wrapper: ({ children }) => <LocaleProvider initialLocale="it">{children}</LocaleProvider>,
@@ -137,43 +145,43 @@ describe('LocaleProvider', () => {
 
   describe('setLocale', () => {
     it('should update locale when setLocale is called', async () => {
-      mockLanguagesAPI.getAll.mockResolvedValue(mockLanguages)
+      mockGetLanguages.mockResolvedValue(mockLanguages)
 
       const { result } = renderHook(() => useLocale(), {
         wrapper: ({ children }) => <LocaleProvider>{children}</LocaleProvider>,
       })
 
       await waitFor(() => {
-        expect(result.current.locale).toBe('en')
+        expect(result.current.locale).toBe(CodeEnum.EN)
       })
 
-      result.current.setLocale('it')
+      result.current.setLocale(CodeEnum.IT)
 
       await waitFor(() => {
-        expect(result.current.locale).toBe('it')
+        expect(result.current.locale).toBe(CodeEnum.IT)
       })
     })
 
     it('should update language when locale changes', async () => {
-      mockLanguagesAPI.getAll.mockResolvedValue(mockLanguages)
+      mockGetLanguages.mockResolvedValue(mockLanguages)
 
       const { result } = renderHook(() => useLocale(), {
         wrapper: ({ children }) => <LocaleProvider>{children}</LocaleProvider>,
       })
 
       await waitFor(() => {
-        expect(result.current.language?.code).toBe('en')
+        expect(result.current.language?.code).toBe(CodeEnum.EN)
       })
 
-      result.current.setLocale('he')
+      result.current.setLocale(CodeEnum.HE)
 
       await waitFor(() => {
-        expect(result.current.language?.code).toBe('he')
+        expect(result.current.language?.code).toBe(CodeEnum.HE)
       })
     })
 
     it('should update direction when changing to rtl language', async () => {
-      mockLanguagesAPI.getAll.mockResolvedValue(mockLanguages)
+      mockGetLanguages.mockResolvedValue(mockLanguages)
 
       const { result } = renderHook(() => useLocale(), {
         wrapper: ({ children }) => <LocaleProvider>{children}</LocaleProvider>,
@@ -183,7 +191,7 @@ describe('LocaleProvider', () => {
         expect(result.current.direction).toBe('ltr')
       })
 
-      result.current.setLocale('he')
+      result.current.setLocale(CodeEnum.HE)
 
       await waitFor(() => {
         expect(result.current.direction).toBe('rtl')
@@ -194,7 +202,7 @@ describe('LocaleProvider', () => {
   describe('error handling', () => {
     it('should handle API error gracefully', async () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
-      mockLanguagesAPI.getAll.mockRejectedValue(new Error('API error'))
+      mockGetLanguages.mockRejectedValue(new Error('API error'))
 
       const { result } = renderHook(() => useLocale(), {
         wrapper: ({ children }) => <LocaleProvider>{children}</LocaleProvider>,
@@ -209,7 +217,7 @@ describe('LocaleProvider', () => {
     })
 
     it('should handle missing language in API response', async () => {
-      mockLanguagesAPI.getAll.mockResolvedValue(mockLanguages)
+      mockGetLanguages.mockResolvedValue(mockLanguages)
 
       const { result } = renderHook(() => useLocale(), {
         wrapper: ({ children }) => <LocaleProvider initialLocale="fr">{children}</LocaleProvider>,
@@ -224,8 +232,8 @@ describe('LocaleProvider', () => {
   })
 
   describe('children rendering', () => {
-    it('should render children', async () => {
-      mockLanguagesAPI.getAll.mockResolvedValue(mockLanguages)
+    it('should render children', () => {
+      mockGetLanguages.mockResolvedValue(mockLanguages)
 
       render(
         <LocaleProvider>
@@ -243,7 +251,7 @@ describe('LocaleProvider', () => {
       const { result } = renderHook(() => useLocale())
 
       // Context has default values, so it doesn't throw
-      expect(result.current.locale).toBe('en')
+      expect(result.current.locale).toBe(CodeEnum.EN)
       expect(result.current.direction).toBe('ltr')
     })
   })

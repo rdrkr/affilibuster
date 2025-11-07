@@ -20,8 +20,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: getProtocol(process.env.BACKEND_PROTOCOL),
-        hostname: process.env.BACKEND_HOST || 'localhost',
-        port: process.env.BACKEND_PORT || '8000',
+        hostname: process.env.BACKEND_HOST ?? 'localhost',
+        port: process.env.BACKEND_PORT ?? '8000',
         pathname: '/uploads/**',
       },
     ],

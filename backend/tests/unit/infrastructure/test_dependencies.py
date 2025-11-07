@@ -14,8 +14,8 @@ from affilibuster_backend.domain.repositories.cache_service import ICacheService
 from affilibuster_backend.domain.repositories.cms_repository import ICMSRepository
 from affilibuster_backend.domain.repositories.preferences_repository import IUserPreferencesRepository
 from affilibuster_backend.domain.use_cases.get_cms_content_use_case import GetCMSContentUseCase
-from affilibuster_backend.domain.use_cases.get_user_preferences import GetUserPreferences
-from affilibuster_backend.domain.use_cases.update_user_preferences import UpdateUserPreferences
+from affilibuster_backend.domain.use_cases.get_user_preferences_use_case import GetUserPreferencesUseCase
+from affilibuster_backend.domain.use_cases.update_user_preferences_use_case import UpdateUserPreferencesUseCase
 from affilibuster_backend.infrastructure.dependencies import (
     get_cache_service,
     get_cms_content_use_case,
@@ -138,7 +138,7 @@ class TestDependencyGetters:
         use_case = get_get_user_preferences_use_case(prefs_repo=prefs_repo, cache_service=cache_service)
 
         assert use_case is not None
-        assert isinstance(use_case, GetUserPreferences)
+        assert isinstance(use_case, GetUserPreferencesUseCase)
 
     def test_get_update_user_preferences_use_case_returns_instance(self):
         """Test get_update_user_preferences_use_case returns use case."""
@@ -148,4 +148,4 @@ class TestDependencyGetters:
         use_case = get_update_user_preferences_use_case(prefs_repo=prefs_repo, cache_service=cache_service)
 
         assert use_case is not None
-        assert isinstance(use_case, UpdateUserPreferences)
+        assert isinstance(use_case, UpdateUserPreferencesUseCase)

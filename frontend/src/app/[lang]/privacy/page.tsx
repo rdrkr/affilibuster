@@ -7,19 +7,21 @@
  */
 
 import { setRequestLocale } from 'next-intl/server'
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { getPrivacy } from '@/lib/client'
 import type { ApiPrivacyPrivacyDocument } from '@/lib/generated/types.gen'
+import { SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
 
-type Props = {
+interface Props {
   params: Promise<{ lang: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  await params
+  const resolvedParams = await params
+  const lang = resolvedParams.lang
 
   try {
-    const privacyData = await getPrivacy()
+    const privacyData = await getPrivacy(lang)
 
     return {
       title: privacyData?.metaTitle,
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export function generateStaticParams() {
-  return [{ lang: 'en' }, { lang: 'it' }, { lang: 'he' }]
+  return SUPPORTED_LANGUAGE_CODES.map(lang => ({ lang }))
 }
 
 export default async function PrivacyPage({ params }: Props) {
@@ -44,7 +46,7 @@ export default async function PrivacyPage({ params }: Props) {
 
   try {
     const resolvedParams = await params
-    if (resolvedParams?.lang) {
+    if (resolvedParams.lang) {
       lang = resolvedParams.lang
     }
   } catch (e) {
@@ -58,13 +60,13 @@ export default async function PrivacyPage({ params }: Props) {
 
   // Fetch privacy content from backend API
   try {
-    privacyData = await getPrivacy()
+    privacyData = await getPrivacy(lang)
   } catch (error) {
     console.error('Failed to fetch privacy content:', error)
   }
 
   // Don't render page if data is unavailable
-  if (!privacyData || !privacyData.title || !privacyData.content) {
+  if (!privacyData?.title || !privacyData.content) {
     return null
   }
 
