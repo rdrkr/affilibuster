@@ -4,14 +4,23 @@
  * Unit tests for Navigation component
  */
 
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { Navigation } from '@/components/Navigation'
 import { usePathname } from 'next/navigation'
 import { createMockNavigation } from '../helpers/mockFactories'
+import { useAuth } from '@/lib/auth'
+import { StatusEnum } from '@/lib/generated/types.gen'
+import type { User } from '@/lib/auth/types'
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   usePathname: jest.fn(),
+}))
+
+// Mock useAuth hook
+const mockLogout = jest.fn()
+jest.mock('@/lib/auth', () => ({
+  useAuth: jest.fn(),
 }))
 
 // Mock child components
@@ -38,9 +47,27 @@ describe('Navigation', () => {
     mobileMenuCloseLabel: 'Close menu',
   })
 
+  const mockUser: User = {
+    id: '123',
+    email: 'test@example.com',
+    displayName: 'Test User',
+    emailVerified: true,
+    status: StatusEnum.ACTIVE,
+    createdAt: '2025-11-01T10:00:00Z',
+    updatedAt: '2025-11-01T10:00:00Z',
+    lastLoginAt: '2025-11-01T10:00:00Z',
+  }
+
   beforeEach(() => {
     jest.clearAllMocks()
     ;(usePathname as jest.Mock).mockReturnValue('/en')
+    // Default: not authenticated
+    ;(useAuth as jest.Mock).mockReturnValue({
+      user: null,
+      isLoading: false,
+      isAuthenticated: false,
+      logout: mockLogout,
+    })
   })
 
   describe('logo', () => {
@@ -136,7 +163,7 @@ describe('Navigation', () => {
       render(<Navigation data={mockNavData} lang="en" />)
 
       const homeLink = screen.getByText('Home')
-      expect(homeLink).toHaveClass('bg-primary-700')
+      expect(homeLink).toHaveClass('bg-primary-800')
     })
 
     it('should highlight active link on products page', () => {
@@ -145,7 +172,7 @@ describe('Navigation', () => {
       render(<Navigation data={mockNavData} lang="en" />)
 
       const productsLink = screen.getByText('Products')
-      expect(productsLink).toHaveClass('bg-primary-700')
+      expect(productsLink).toHaveClass('bg-primary-800')
     })
 
     it('should highlight active link on Italian about page', () => {
@@ -154,7 +181,7 @@ describe('Navigation', () => {
       render(<Navigation data={mockNavData} lang="it" />)
 
       const aboutLink = screen.getByText('About')
-      expect(aboutLink).toHaveClass('bg-primary-700')
+      expect(aboutLink).toHaveClass('bg-primary-800')
     })
 
     it('should not highlight inactive links', () => {
@@ -165,8 +192,8 @@ describe('Navigation', () => {
       const homeLink = screen.getByText('Home')
       const aboutLink = screen.getByText('About')
 
-      expect(homeLink).not.toHaveClass('bg-primary-700')
-      expect(aboutLink).not.toHaveClass('bg-primary-700')
+      expect(homeLink).not.toHaveClass('bg-primary-800')
+      expect(aboutLink).not.toHaveClass('bg-primary-800')
     })
   })
 
@@ -234,7 +261,7 @@ describe('Navigation', () => {
       const { container } = render(<Navigation data={mockNavData} lang="en" />)
 
       const nav = container.querySelector('nav')
-      expect(nav).toHaveClass('bg-primary-800')
+      expect(nav).toHaveClass('bg-primary-900')
       expect(nav).toHaveClass('text-white')
     })
 
@@ -249,12 +276,27 @@ describe('Navigation', () => {
   })
 
   describe('null data handling', () => {
-    it('should return null when navData is null', () => {
+    it('should render minimal navigation with selectors when navData is null', () => {
       ;(usePathname as jest.Mock).mockReturnValue('/')
 
       const { container } = render(<Navigation data={null} lang="en" />)
 
-      expect(container.querySelector('nav')).not.toBeInTheDocument()
+      // Navigation should still render (minimal version)
+      const nav = container.querySelector('nav')
+      expect(nav).toBeInTheDocument()
+      expect(nav).toHaveAttribute('data-testid', 'main-navigation')
+
+      // Should render language/currency/theme selectors (they don't depend on navData)
+      expect(container.querySelector('[data-testid="language-switcher"]')).toBeInTheDocument()
+      expect(container.querySelector('[data-testid="currency-selector"]')).toBeInTheDocument()
+      expect(container.querySelector('[data-testid="theme-selector"]')).toBeInTheDocument()
+
+      // Should render logo with fallback brand name
+      expect(container.textContent).toContain('Affilibuster')
+
+      // Should NOT render nav links (they depend on navData)
+      const navLinks = container.querySelectorAll('a[href*="/products"], a[href*="/about"], a[href*="/contact"]')
+      expect(navLinks.length).toBe(0)
     })
   })
 
@@ -398,6 +440,315 @@ describe('Navigation', () => {
 
       const homeLink = screen.getByText('Home')
       expect(homeLink).toHaveAttribute('href', '/')
+    })
+  })
+
+  describe('authentication UI', () => {
+    describe('when not authenticated', () => {
+      it('should show login and sign up buttons', () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: null,
+          isLoading: false,
+          isAuthenticated: false,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        expect(screen.getByRole('link', { name: /log in/i })).toBeInTheDocument()
+        expect(screen.getByRole('link', { name: /sign up/i })).toBeInTheDocument()
+      })
+
+      it('should link login button to login page', () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: null,
+          isLoading: false,
+          isAuthenticated: false,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        const loginLink = screen.getByRole('link', { name: /log in/i })
+        expect(loginLink).toHaveAttribute('href', '/en/login')
+      })
+
+      it('should link sign up button to registration page', () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: null,
+          isLoading: false,
+          isAuthenticated: false,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        const signUpLink = screen.getByRole('link', { name: /sign up/i })
+        expect(signUpLink).toHaveAttribute('href', '/en/register')
+      })
+
+      it('should not show user menu', () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: null,
+          isLoading: false,
+          isAuthenticated: false,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        expect(screen.queryByText('Test User')).not.toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: /account menu/i })).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when authenticated', () => {
+      it('should show user menu with display name', () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: mockUser,
+          isLoading: false,
+          isAuthenticated: true,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        expect(screen.getByText('Test User')).toBeInTheDocument()
+      })
+
+      it('should not show login and sign up buttons', () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: mockUser,
+          isLoading: false,
+          isAuthenticated: true,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        expect(screen.queryByRole('link', { name: /log in/i })).not.toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: /sign up/i })).not.toBeInTheDocument()
+      })
+
+      it('should open user dropdown when clicked', async () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: mockUser,
+          isLoading: false,
+          isAuthenticated: true,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        const userButton = screen.getByRole('button', { name: /test user/i })
+        fireEvent.click(userButton)
+
+        await waitFor(() => {
+          expect(screen.getByRole('link', { name: /profile/i })).toBeInTheDocument()
+        })
+      })
+
+      it('should show profile link in dropdown', async () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: mockUser,
+          isLoading: false,
+          isAuthenticated: true,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        const userButton = screen.getByRole('button', { name: /test user/i })
+        fireEvent.click(userButton)
+
+        await waitFor(() => {
+          const profileLink = screen.getByRole('link', { name: /profile/i })
+          expect(profileLink).toHaveAttribute('href', '/en/profile')
+        })
+      })
+
+      it('should show settings link in dropdown', async () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: mockUser,
+          isLoading: false,
+          isAuthenticated: true,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        const userButton = screen.getByRole('button', { name: /test user/i })
+        fireEvent.click(userButton)
+
+        await waitFor(() => {
+          const settingsLink = screen.getByRole('link', { name: /settings/i })
+          expect(settingsLink).toHaveAttribute('href', '/en/settings')
+        })
+      })
+
+      it('should show logout button in dropdown', async () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: mockUser,
+          isLoading: false,
+          isAuthenticated: true,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        const userButton = screen.getByRole('button', { name: /test user/i })
+        fireEvent.click(userButton)
+
+        await waitFor(() => {
+          expect(screen.getByRole('button', { name: /log out/i })).toBeInTheDocument()
+        })
+      })
+
+      it('should call logout when logout button is clicked', async () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: mockUser,
+          isLoading: false,
+          isAuthenticated: true,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        const userButton = screen.getByRole('button', { name: /test user/i })
+        fireEvent.click(userButton)
+
+        await waitFor(() => {
+          const logoutButton = screen.getByRole('button', { name: /log out/i })
+          fireEvent.click(logoutButton)
+        })
+
+        expect(mockLogout).toHaveBeenCalled()
+      })
+
+      it('should close dropdown when clicking profile link', async () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: mockUser,
+          isLoading: false,
+          isAuthenticated: true,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        const userButton = screen.getByRole('button', { name: /test user/i })
+        fireEvent.click(userButton)
+
+        await waitFor(() => {
+          expect(screen.getByRole('link', { name: /profile/i })).toBeInTheDocument()
+        })
+
+        // Click the profile link
+        const profileLink = screen.getByRole('link', { name: /profile/i })
+        fireEvent.click(profileLink)
+
+        // Dropdown should close
+        await waitFor(() => {
+          expect(screen.queryByRole('link', { name: /settings/i })).not.toBeInTheDocument()
+        })
+      })
+
+      it('should close dropdown when clicking settings link', async () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: mockUser,
+          isLoading: false,
+          isAuthenticated: true,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        const userButton = screen.getByRole('button', { name: /test user/i })
+        fireEvent.click(userButton)
+
+        await waitFor(() => {
+          expect(screen.getByRole('link', { name: /settings/i })).toBeInTheDocument()
+        })
+
+        // Click the settings link
+        const settingsLink = screen.getByRole('link', { name: /settings/i })
+        fireEvent.click(settingsLink)
+
+        // Dropdown should close
+        await waitFor(() => {
+          expect(screen.queryByRole('link', { name: /profile/i })).not.toBeInTheDocument()
+        })
+      })
+
+      it('should close dropdown when clicking outside', async () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: mockUser,
+          isLoading: false,
+          isAuthenticated: true,
+          logout: mockLogout,
+        })
+
+        const { container } = render(<Navigation data={mockNavData} lang="en" />)
+
+        const userButton = screen.getByRole('button', { name: /test user/i })
+        fireEvent.click(userButton)
+
+        await waitFor(() => {
+          expect(screen.getByRole('link', { name: /profile/i })).toBeInTheDocument()
+        })
+
+        // Click outside
+        fireEvent.mouseDown(container)
+
+        await waitFor(() => {
+          expect(screen.queryByRole('link', { name: /profile/i })).not.toBeInTheDocument()
+        })
+      })
+    })
+
+    describe('when loading', () => {
+      it('should show loading skeleton', () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: null,
+          isLoading: true,
+          isAuthenticated: false,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        // Should show some loading indicator
+        expect(screen.getByTestId('auth-loading')).toBeInTheDocument()
+      })
+
+      it('should not show login buttons while loading', () => {
+        ;(usePathname as jest.Mock).mockReturnValue('/en')
+        ;(useAuth as jest.Mock).mockReturnValue({
+          user: null,
+          isLoading: true,
+          isAuthenticated: false,
+          logout: mockLogout,
+        })
+
+        render(<Navigation data={mockNavData} lang="en" />)
+
+        expect(screen.queryByRole('link', { name: /log in/i })).not.toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: /sign up/i })).not.toBeInTheDocument()
+      })
     })
   })
 })

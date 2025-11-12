@@ -28,7 +28,7 @@ const customJestConfig: Config = {
     '!src/**/*.stories.{js,jsx,ts,tsx}',
     '!src/**/__tests__/**',
     '!src/lib/generated/**',
-    // Server Components, middleware, and route handlers (covered by Playwright)
+    // Server Components, proxy, and route handlers (covered by Playwright)
     '!src/app/**/page.tsx',
     '!src/app/**/layout.tsx',
     '!src/app/**/not-found.tsx',

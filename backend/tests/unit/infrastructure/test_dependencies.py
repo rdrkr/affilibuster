@@ -12,17 +12,27 @@ import pytest
 
 from affilibuster_backend.domain.repositories.cache_service import ICacheService
 from affilibuster_backend.domain.repositories.cms_repository import ICMSRepository
+from affilibuster_backend.domain.repositories.email_verification_token_repository import (
+    IEmailVerificationTokenRepository,
+)
+from affilibuster_backend.domain.repositories.password_reset_token_repository import IPasswordResetTokenRepository
 from affilibuster_backend.domain.repositories.preferences_repository import IUserPreferencesRepository
+from affilibuster_backend.domain.repositories.url_redirect_repository import IURLRedirectRepository
 from affilibuster_backend.domain.use_cases.get_cms_content_use_case import GetCMSContentUseCase
+from affilibuster_backend.domain.use_cases.get_url_redirect_use_case import GetURLRedirectUseCase
 from affilibuster_backend.domain.use_cases.get_user_preferences_use_case import GetUserPreferencesUseCase
 from affilibuster_backend.domain.use_cases.update_user_preferences_use_case import UpdateUserPreferencesUseCase
 from affilibuster_backend.infrastructure.dependencies import (
     get_cache_service,
     get_cms_content_use_case,
     get_cms_repo,
+    get_email_verification_token_repo,
     get_get_user_preferences_use_case,
+    get_password_reset_token_repo,
     get_preferences_repo,
     get_update_user_preferences_use_case,
+    get_url_redirect_repo,
+    get_url_redirect_use_case,
     initialize_dependencies,
 )
 
@@ -149,3 +159,45 @@ class TestDependencyGetters:
 
         assert use_case is not None
         assert isinstance(use_case, UpdateUserPreferencesUseCase)
+
+    @pytest.mark.asyncio
+    async def test_get_email_verification_token_repo_returns_repository(self):
+        """Test get_email_verification_token_repo returns repository instance."""
+        from affilibuster_backend.infrastructure.database.config import get_db
+
+        async for db in get_db():
+            repo = get_email_verification_token_repo(db=db)
+            assert repo is not None
+            assert isinstance(repo, IEmailVerificationTokenRepository)
+            break
+
+    @pytest.mark.asyncio
+    async def test_get_password_reset_token_repo_returns_repository(self):
+        """Test get_password_reset_token_repo returns repository instance."""
+        from affilibuster_backend.infrastructure.database.config import get_db
+
+        async for db in get_db():
+            repo = get_password_reset_token_repo(db=db)
+            assert repo is not None
+            assert isinstance(repo, IPasswordResetTokenRepository)
+            break
+
+    @pytest.mark.asyncio
+    async def test_get_url_redirect_repo_returns_repository(self):
+        """Test get_url_redirect_repo returns repository instance."""
+        from affilibuster_backend.infrastructure.database.config import get_db
+
+        async for db in get_db():
+            repo = get_url_redirect_repo(db=db)
+            assert repo is not None
+            assert isinstance(repo, IURLRedirectRepository)
+            break
+
+    def test_get_url_redirect_use_case_returns_instance(self):
+        """Test get_url_redirect_use_case returns use case."""
+        redirect_repo = AsyncMock(spec=IURLRedirectRepository)
+
+        use_case = get_url_redirect_use_case(redirect_repo=redirect_repo)
+
+        assert use_case is not None
+        assert isinstance(use_case, GetURLRedirectUseCase)

@@ -60,7 +60,7 @@ export function Footer({ data: footerData, lang }: FooterProps) {
                 </text>
               </svg>
             </div>
-            <p className="text-neutral-300 mb-6 max-w-sm">{footerData.brandDescription}</p>
+            <p className="text-neutral-100 mb-6 max-w-sm">{footerData.brandDescription}</p>
             <div className="flex space-x-4">
               <a
                 href="https://twitter.com"
@@ -89,16 +89,15 @@ export function Footer({ data: footerData, lang }: FooterProps) {
 
           {/* Quick Links */}
           <div className="flex flex-col items-center">
+            <h2 className={`w-full text-lg font-semibold mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+              {footerData.quickLinksTitle}
+            </h2>
             <ul className={`space-y-3 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-              <h3 className={`w-full text-lg font-semibold mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
-                {footerData.quickLinksTitle}
-              </h3>
-
               {footerLinks.map(link => (
                 <li key={link.href}>
                   <Link
                     href={`${langPrefix}${link.href}`}
-                    className="text-neutral-300 hover:text-secondary-400 transition-colors"
+                    className="text-neutral-100 hover:text-secondary-400 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -109,8 +108,8 @@ export function Footer({ data: footerData, lang }: FooterProps) {
 
           {/* Newsletter */}
           <div className="flex flex-col">
-            <h3 className="text-lg font-semibold mb-4">{footerData.newsletterTitle}</h3>
-            <p className="text-neutral-300 text-sm mb-4">{footerData.newsletterDescription}</p>
+            <h2 className="text-lg font-semibold mb-4">{footerData.newsletterTitle}</h2>
+            <p className="text-neutral-100 text-sm mb-4">{footerData.newsletterDescription}</p>
             <div className="flex gap-2">
               <Input
                 type="email"
@@ -127,10 +126,10 @@ export function Footer({ data: footerData, lang }: FooterProps) {
 
         {/* Copyright */}
         <div className="border-t border-primary-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-neutral-400 text-sm">
+          <p className="text-neutral-200 text-sm">
             &copy; {currentYear} {footerData.copyrightText}
           </p>
-          <div className="flex items-center gap-6 text-sm text-neutral-400">
+          <div className="flex items-center gap-6 text-sm text-neutral-200">
             <span>{footerData.footerTagline}</span>
           </div>
         </div>

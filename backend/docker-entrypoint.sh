@@ -33,15 +33,37 @@ wait_for_db() {
 wait_for_db
 
 # Run database migrations
-echo "  📋 Running database migrations..."
-# shellcheck disable=SC2154
-PYTHONPATH=/app/src:${PYTHONPATH} alembic upgrade head || {
-  echo "❌️ Database migrations completed with warnings"
+if [ "${SKIP_MIGRATIONS:-0}" = "1" ]; then
+  echo "  ⏭️  Skipping database migrations (SKIP_MIGRATIONS=1)"
+else
+  echo "  📋 Running database migrations..."
+  # shellcheck disable=SC2154
+  PYTHONPATH=/app/src:${PYTHONPATH} alembic upgrade head || {
+    echo "❌️ Database migrations failed"
+    exit 1
+  }
+fi
+
+# Seed database with initial data
+echo "  🌱 Seeding database..."
+uv run task seed || {
+  echo "❌️ Database seeding failed"
   exit 1
 }
 
 echo "✅ Backend startup complete, starting application..."
 
-# Start the application from src directory for proper module imports
+# Build SSL flags if HTTPS is enabled
+SSL_FLAGS=""
 # shellcheck disable=SC2154
-uv run task start --host "${INTERNAL_BACKEND_HOST}" --port "${BACKEND_PORT}"
+if [ "${BACKEND_PROTOCOL}" = "https" ]; then
+  echo "  🔒 HTTPS enabled - adding SSL certificates"
+  SSL_FLAGS="--ssl-keyfile ${SSL_KEY_PATH} --ssl-certfile ${SSL_CERT_PATH}"
+fi
+
+# Start the application from src directory for proper module imports
+# Bind to 0.0.0.0 to accept connections from all interfaces (required for healthchecks and Docker networking)
+# INTERNAL_BACKEND_HOST is for inter-container communication URLs, not binding
+# shellcheck disable=SC2154
+# shellcheck disable=SC2086
+uv run task start --host 0.0.0.0 --port "${BACKEND_PORT}" ${SSL_FLAGS}

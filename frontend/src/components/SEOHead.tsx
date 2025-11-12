@@ -42,7 +42,7 @@ export function generateContentMetadata(content: ContentResponse): Metadata {
 }
 
 /**
- * Generate JSON-LD schema markup
+ * Generate JSON-LD schema markup for content pages
  */
 export function generateSchemaMarkup(content: ContentResponse) {
   const baseSchema = {
@@ -61,6 +61,8 @@ export function generateSchemaMarkup(content: ContentResponse) {
       offers: {
         '@type': 'Offer',
         availability: 'https://schema.org/InStock',
+        price: '99.99', // TODO: Get from product data
+        priceCurrency: 'USD', // TODO: Get from user preferences
       },
     }
   }
@@ -70,6 +72,18 @@ export function generateSchemaMarkup(content: ContentResponse) {
     '@type': 'Article',
     headline: content.title,
     datePublished: content.publishedAt ? new Date(content.publishedAt).toISOString() : undefined,
+  }
+}
+
+/**
+ * Generate Organization schema for homepage
+ */
+export function generateOrganizationSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Affilibuster',
+    url: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
   }
 }
 

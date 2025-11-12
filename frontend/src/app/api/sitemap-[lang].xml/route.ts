@@ -91,10 +91,21 @@ function escapeXml(unsafe: string): string {
  * @param context - The route context with params
  * @returns XML sitemap response or error
  */
-export async function GET(request: NextRequest, context: { params: Promise<{ lang: string }> }) {
+export async function GET(
+  request: NextRequest,
+  context: {
+    params: Promise<Record<string, string | string[]>>
+  }
+) {
   try {
-    // Next.js 15: params is now a Promise
-    const { lang: langParam } = await context.params
+    // Next.js 16: params is now a Promise
+    const params = await context.params
+    const langParam = typeof params.lang === 'string' ? params.lang : params.lang?.[0]
+
+    if (!langParam) {
+      return new NextResponse('Language parameter is required', { status: 400 })
+    }
+
     const urlLang = langParam.replace('.xml', '') // Extract lang from filename
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://affilibuster.com'
 

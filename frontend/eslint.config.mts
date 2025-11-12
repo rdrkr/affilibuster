@@ -5,8 +5,12 @@ import { defineConfig } from 'eslint/config'
 import * as tseslint from 'typescript-eslint'
 import prettier from 'eslint-config-prettier'
 import jsdoc from 'eslint-plugin-jsdoc'
+import nextVitals from 'eslint-config-next/core-web-vitals'
+import nextTs from 'eslint-config-next/typescript'
 
 export default defineConfig([
+  ...nextVitals,
+  ...nextTs,
   {
     ignores: [
       '.next/**',
@@ -94,6 +98,13 @@ export default defineConfig([
           caughtErrorsIgnorePattern: '^_',
         },
       ],
+    },
+  },
+  // Disable problematic rule for api-types.ts (causes stack overflow on large union types)
+  {
+    files: ['src/lib/core/api-types.ts'],
+    rules: {
+      '@typescript-eslint/no-redundant-type-constituents': 'off',
     },
   },
   // Relaxed rules for E2E and performance tests (Playwright API limitations)

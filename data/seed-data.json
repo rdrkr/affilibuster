@@ -1199,6 +1199,44 @@
         "updatedAt": "2025-01-01T00:00:00.000Z",
         "publishedAt": "2025-01-01T00:00:00.000Z"
       }
+    ],
+    "redirects": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440001",
+        "from_path": "/old-page",
+        "to_path": "/new-page",
+        "status_code": 301,
+        "reason": "page_moved",
+        "created_by": "seed",
+        "created_at": "2025-01-01T00:00:00.000Z"
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440002",
+        "from_path": "/legacy-product",
+        "to_path": "/en/products/premium-wireless-earbuds",
+        "status_code": 301,
+        "reason": "slug_changed",
+        "created_by": "seed",
+        "created_at": "2025-01-01T00:00:00.000Z"
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440003",
+        "from_path": "/deleted-content",
+        "to_path": null,
+        "status_code": 410,
+        "reason": "content_deleted",
+        "created_by": "seed",
+        "created_at": "2025-01-01T00:00:00.000Z"
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440004",
+        "from_path": "/old-about",
+        "to_path": "/en/about",
+        "status_code": 301,
+        "reason": "page_moved",
+        "created_by": "seed",
+        "created_at": "2025-01-01T00:00:00.000Z"
+      }
     ]
   }
 }

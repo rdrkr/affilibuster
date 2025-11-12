@@ -34,11 +34,11 @@ services:
       PGPORT: ${POSTGRES_PORT}
     command: postgres -p ${POSTGRES_PORT}
     ports:
-      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_BACKEND_NAME}" ]
+      test: [ 'CMD-SHELL', 'pg_isready -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_BACKEND_NAME}' ]
       interval: 5s
       timeout: 10s
       retries: 50
@@ -50,18 +50,16 @@ services:
       - .env
     command: redis-server --port ${REDIS_PORT}
     ports:
-      - "${REDIS_PORT}:${REDIS_PORT}"
+      - '${REDIS_PORT}:${REDIS_PORT}'
     volumes:
       - redis_data:/data
     healthcheck:
-      test: [ "CMD", "redis-cli", "-p", "${REDIS_PORT}", "ping" ]
+      test: [ 'CMD', 'redis-cli', '-p', '${REDIS_PORT}', 'ping' ]
       interval: 5s
       timeout: 10s
       retries: 50
 
   strapi:
-    mem_limit: 4g
-    cpus: 2
     build:
       context: ./cms
       dockerfile: Dockerfile
@@ -73,8 +71,8 @@ services:
         condition: service_healthy
     env_file: # Load environment variables from .env file at build time
       - .env
-    ports:
-      - "${CMS_PORT}:${CMS_PORT}"
+    expose:
+      - '${CMS_PORT}'
     volumes:
       - ./cms:/app
       - ./contracts:/contracts
@@ -82,7 +80,51 @@ services:
       - ./.env:/app/.env
       - strapi_uploads:/app/public/uploads
     healthcheck:
-      test: [ "CMD", "curl", "-f", "${CMS_PROTOCOL}://${CMS_HOST}:${CMS_PORT}/admin" ]
+      # noinspection HttpUrlsUsage
+      test: [ "CMD", "curl", "-f", "http://${CMS_HOST}:${CMS_PORT}/admin" ]
+      interval: 5s
+      timeout: 10s
+      retries: 50
+
+  strapi-proxy:
+    build:
+      context: ./cms
+      dockerfile_inline: |
+        # Nginx reverse proxy for Strapi CMS with SSL support
+        FROM nginx:1.27-alpine
+
+        # Install gettext for envsubst (environment variable substitution)
+        RUN apk add --no-cache gettext
+
+        # Copy Nginx configuration template
+        COPY nginx.conf.template /etc/nginx/nginx.conf.template
+
+        # Create directory for certificates
+        RUN mkdir -p /etc/nginx/certs
+
+        # Create startup script to substitute env vars and start nginx
+        RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
+            echo 'envsubst '"'"'$$CMS_PORT $$CMS_HOST'"'"' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf' >> /docker-entrypoint.sh && \
+            echo 'exec nginx -g "daemon off;"' >> /docker-entrypoint.sh && \
+            chmod +x /docker-entrypoint.sh
+
+        # Expose HTTPS port and HTTP redirect port (1338)
+        EXPOSE ${CMS_PORT} 1338
+
+        # Use custom entrypoint
+        ENTRYPOINT ["/docker-entrypoint.sh"]
+    restart: on-failure:2
+    depends_on:
+      strapi:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - '${CMS_PORT}:${CMS_PORT}'
+    volumes:
+      - ./certs:/etc/nginx/certs:ro
+    healthcheck:
+      test: [ "CMD", "curl", "-fk", "${CMS_PROTOCOL}://${CMS_HOST}:${CMS_PORT}/admin" ]
       interval: 5s
       timeout: 10s
       retries: 50
@@ -99,20 +141,21 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      strapi:
+      strapi-proxy:
         condition: service_healthy
     env_file: # Load environment variables from .env file at build time
       - .env
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
+      - '${BACKEND_PORT}:${BACKEND_PORT}'
     volumes:
       - ./backend:/app
       - ./contracts:/contracts
       - ./data:/data
       - ./.env:/app/.env
       - backend_venv:/app/.venv
+      - ./certs:/certs:ro
     healthcheck:
-      test: [ "CMD", "curl", "-f", "${BACKEND_PROTOCOL}://${INTERNAL_BACKEND_HOST}:${BACKEND_PORT}/health" ]
+      test: [ 'CMD', 'curl', '-fk', '${BACKEND_PROTOCOL}://${BACKEND_HOST}:${BACKEND_PORT}/health' ]
       interval: 5s
       timeout: 10s
       retries: 50
@@ -123,8 +166,6 @@ services:
       dockerfile: Dockerfile
       args:
         FRONTEND_PORT: ${FRONTEND_PORT}
-    mem_limit: 2g
-    cpus: 1
     restart: on-failure:2
     depends_on:
       backend:
@@ -134,19 +175,53 @@ services:
     environment:
       # Next.js respects PORT env var for custom listen port
       PORT: ${FRONTEND_PORT}
-      NEXT_SERVER_SIDE_API_URL: "${BACKEND_PROTOCOL}://${INTERNAL_BACKEND_HOST}:${BACKEND_PORT}/v1"
+      NEXT_SERVER_SIDE_API_URL: '${BACKEND_PROTOCOL}://${INTERNAL_BACKEND_HOST}:${BACKEND_PORT}/v1'
     ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+      - '${FRONTEND_PORT}:${FRONTEND_PORT}'
     volumes:
       - ./frontend:/app
       - ./contracts:/contracts
       - ./data:/data
       - ./.env:/app/.env
+      - ./certs:/certs:ro
     healthcheck:
-      test: [ "CMD", "curl", "-f", "${FRONTEND_PROTOCOL}://${INTERNAL_FRONTEND_HOST}:${FRONTEND_PORT}" ]
+      test: [ 'CMD', 'curl', '-fk', '${FRONTEND_PROTOCOL}://${FRONTEND_HOST}:${FRONTEND_PORT}' ]
       interval: 5s
       timeout: 10s
       retries: 50
+
+  test-runner:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.test-runner
+    restart: 'no'
+    depends_on:
+      frontend:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      # Point to frontend via host.docker.internal (like accessing from host browser)
+      PLAYWRIGHT_BASE_URL: 'https://host.docker.internal:${FRONTEND_PORT}'
+      # Disable dev server startup in tests
+      SKIP_WEBSERVER: '1'
+    ports:
+      - '${PLAYWRIGHT_REPORT_PORT}:${PLAYWRIGHT_REPORT_PORT}'
+    volumes:
+      - ./frontend:/app
+      - ./contracts:/contracts
+      - ./data:/data
+      - ./.env:/app/.env
+      - ./certs:/certs:ro
+    # Enable host.docker.internal for accessing host network (where frontend is exposed)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # Recommended Playwright Docker settings
+    ipc: host # Prevents Chromium from running out of memory
+    init: true # Avoids zombie processes
+    # Override entrypoint to prevent running frontend dev server
+    entrypoint: [ ]
+    command: [ 'tail', '-f', '/dev/null' ]
 
 volumes:
   postgres_data:

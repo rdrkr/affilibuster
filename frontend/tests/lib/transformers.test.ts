@@ -5,7 +5,7 @@
  * Tests Product to ContentResponse transformation with all edge cases
  */
 
-import { transformProductToContent } from '@/lib/transformers'
+import { transformProductToContent } from '@/lib/core/transformers'
 import { createMockProduct } from '../helpers/mockFactories'
 import type { Product } from '@/lib/types'
 import { LanguageCode, CurrencyCode } from '@/lib/types'

@@ -20,13 +20,457 @@ info:
     name: Proprietary
     url: https://affilibuster.com/license
 
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://api.affilibuster.com
+    description: Production server
+
 tags:
+  - name: auth
+    description: User authentication and authorization
   - name: languages
     description: Language detection and management
   - name: preferences
     description: User preferences management
+  - name: system
+    description: System health and utility endpoints
 
 paths:
+  # Authentication API
+  /auth/register:
+    post:
+      operationId: registerUser
+      summary: Register a new user
+      description: Creates a new user account with email and password
+      tags: [ auth ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'user@example.com'
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: 'SecurePassword123!'
+                displayName:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                  example: 'John Doe'
+              required:
+                - email
+                - password
+                - displayName
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Validation error (invalid email, weak password)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      operationId: loginUser
+      summary: Login with email and password
+      description: Authenticates user and returns JWT tokens
+      tags: [ auth ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'user@example.com'
+                password:
+                  type: string
+                  format: password
+                  example: 'SecurePassword123!'
+                rememberMe:
+                  type: boolean
+                  default: false
+                  example: false
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: 'access_token=eyJ...; HttpOnly; Secure; SameSite=Strict'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too many login attempts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/logout:
+    post:
+      operationId: logoutUser
+      summary: Logout current user
+      description: Invalidates current session and clears cookies
+      tags: [ auth ]
+      security:
+        - UserAuth: [ ]
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Logged out successfully'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/refresh:
+    post:
+      operationId: refreshToken
+      summary: Refresh access token
+      description: Issues a new access token using refresh token
+      tags: [ auth ]
+      security:
+        - UserAuth: [ ]
+      responses:
+        '200':
+          description: Token refreshed successfully
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: 'access_token=eyJ...; HttpOnly; Secure; SameSite=Strict'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResponse'
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/verify-email:
+    post:
+      operationId: verifyEmail
+      summary: Verify email address
+      description: Verifies user email with token from verification email
+      tags: [ auth ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthVerifyEmailPostRequest'
+      responses:
+        '200':
+          description: Email verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Email verified successfully'
+        '400':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/resend-verification:
+    post:
+      operationId: resendVerification
+      summary: Resend verification email
+      description: Sends a new verification email to user
+      tags: [ auth ]
+      security:
+        - UserAuth: [ ]
+      responses:
+        '200':
+          description: Verification email sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Verification email sent'
+        '400':
+          description: Email already verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/forgot-password:
+    post:
+      operationId: forgotPassword
+      summary: Request password reset
+      description: Sends password reset email (always returns success for security)
+      tags: [ auth ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'user@example.com'
+              required:
+                - email
+      responses:
+        '200':
+          description: If email exists, reset link sent (generic response for security)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'If email exists, password reset link has been sent'
+        '422':
+          description: Validation error (invalid email format)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/reset-password:
+    post:
+      operationId: resetPassword
+      summary: Reset password with token
+      description: Resets password using token from reset email
+      tags: [ auth ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: 'xyz789abc123'
+                newPassword:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: 'NewSecurePassword123!'
+              required:
+                - token
+                - newPassword
+      responses:
+        '200':
+          description: Password reset successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Password reset successfully'
+        '400':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Validation error (weak password)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # Profile Management API
+  /auth/profile:
+    get:
+      operationId: getUserProfile
+      summary: Get current user profile
+      description: Retrieves authenticated user's profile information
+      tags: [ auth ]
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      operationId: updateUserProfile
+      summary: Update user profile
+      description: Updates authenticated user's display name
+      tags: [ auth ]
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                displayName:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                  example: 'Jane Smith'
+              required:
+                - displayName
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/profile/change-password:
+    post:
+      operationId: changePassword
+      summary: Change password
+      description: Changes authenticated user's password (requires current password)
+      tags: [ auth ]
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPassword:
+                  type: string
+                  format: password
+                  example: 'OldPassword123!'
+                newPassword:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: 'NewPassword123!'
+              required:
+                - currentPassword
+                - newPassword
+      responses:
+        '200':
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Password changed successfully. Please log in again.'
+        '400':
+          description: Validation error or incorrect current password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /languages:
     get:
       operationId: getLanguages
@@ -153,8 +597,228 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /v1/redirects/check:
+    get:
+      operationId: checkRedirect
+      summary: Check if a URL has a redirect
+      description: Check if the given source URL has a redirect configured and return the target URL if found
+      tags:
+        - redirects
+      parameters:
+        - name: source_url
+          in: query
+          required: true
+          description: The source URL path to check for redirects
+          schema:
+            type: string
+            example: '/old-page'
+      responses:
+        '200':
+          description: Redirect check result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedirectCheckResponse'
+        '422':
+          description: Validation error (missing required parameter)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # System Endpoints
+  /:
+    get:
+      operationId: getRoot
+      summary: API root endpoint
+      description: Returns basic API information and status
+      tags:
+        - system
+      responses:
+        '200':
+          description: API information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RootResponse'
+        '429':
+          description: Too many requests (rate limited)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /health:
+    get:
+      operationId: healthCheck
+      summary: Health check endpoint
+      description: Returns the health status of the API
+      tags:
+        - system
+      responses:
+        '200':
+          description: API health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '429':
+          description: Too many requests (rate limited)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
+    # Authentication Schemas
+    User:
+      type: object
+      description: User account information
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        email:
+          type: string
+          format: email
+          example: 'user@example.com'
+        displayName:
+          type: string
+          example: 'John Doe'
+        emailVerified:
+          type: boolean
+          example: false
+        status:
+          type: string
+          enum: [ active, locked, deleted ]
+          example: 'active'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-11-01T10:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-11-02T14:30:00Z'
+        lastLoginAt:
+          oneOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          example: '2025-11-10T09:15:00Z'
+      required:
+        - id
+        - email
+        - displayName
+        - emailVerified
+        - status
+        - createdAt
+        - updatedAt
+
+    UserProfile:
+      type: object
+      description: User profile information (without password)
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+        email:
+          type: string
+          format: email
+          example: 'user@example.com'
+        display_name:
+          type: string
+          example: 'John Doe'
+        email_verified:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+          example: '2025-11-02T14:30:00Z'
+        last_login_at:
+          oneOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          example: '2025-11-10T09:15:00Z'
+      required:
+        - id
+        - email
+        - display_name
+        - email_verified
+        - created_at
+
+    RegisterResponse:
+      type: object
+      description: Response after successful registration
+      properties:
+        success:
+          type: boolean
+          example: true
+        user:
+          $ref: '#/components/schemas/User'
+        verificationToken:
+          oneOf:
+            - type: string
+            - type: 'null'
+          description: 'Email verification token (only in test/dev)'
+          example: 'abc123def456'
+        message:
+          type: string
+          example: 'Registration successful. Please check your email for verification.'
+      required:
+        - success
+        - user
+        - message
+
+    LoginResponse:
+      type: object
+      description: Response after successful login
+      properties:
+        success:
+          type: boolean
+          example: true
+        user:
+          $ref: '#/components/schemas/User'
+        sessionToken:
+          type: string
+          description: 'Session token (also set in HTTP-only cookie)'
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+        message:
+          type: string
+          example: 'Login successful'
+      required:
+        - success
+        - user
+        - sessionToken
+
+    RefreshResponse:
+      type: object
+      description: Response after successful token refresh
+      properties:
+        success:
+          type: boolean
+          example: true
+        sessionToken:
+          type: string
+          description: 'New access token (also set in HTTP-only cookie)'
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+        expiresAt:
+          type: string
+          format: date-time
+          example: '2025-11-15T10:00:00Z'
+        user:
+          $ref: '#/components/schemas/User'
+      required:
+        - success
+        - sessionToken
+        - expiresAt
+        - user
+
     CurrencyCode:
       type: string
       enum: [ USD, EUR, GBP, ILS, CAD, AUD, JPY, CNY ]
@@ -278,6 +942,29 @@ components:
           type: string
           enum: [ en, it, he ]
           example: 'it'
+
+    RedirectCheckResponse:
+      type: object
+      description: Response from redirect check endpoint
+      properties:
+        found:
+          type: boolean
+          description: Whether a redirect was found for the given source URL
+          example: true
+        targetUrl:
+          oneOf:
+            - type: string
+            - type: 'null'
+          description: The target URL to redirect to (null if no redirect found)
+          example: '/new-page'
+        statusCode:
+          oneOf:
+            - type: integer
+            - type: 'null'
+          description: HTTP status code for the redirect (301 or 302, null if no redirect found)
+          example: 301
+      required:
+        - found
 
     Error:
       type: object
@@ -717,6 +1404,71 @@ components:
           type: string
           example: 'Follow us on Facebook'
 
+    AuthVerifyEmailPostRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          description: 'Email verification token'
+          example: 'abc123def456'
+      required:
+        - token
+
+    AuthRefreshPostRequest:
+      type: object
+      properties:
+        sessionToken:
+          type: string
+          description: 'Session token to refresh'
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+      required:
+        - sessionToken
+
+    AuthLogoutPostRequest:
+      type: object
+      properties:
+        sessionToken:
+          type: string
+          description: 'Session token to invalidate'
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+      required:
+        - sessionToken
+
+    AuthResendVerificationPostRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+          description: 'User ID to resend verification to'
+          example: '550e8400-e29b-41d4-a716-446655440000'
+      required:
+        - userId
+
+    RootResponse:
+      type: object
+      description: API root endpoint response
+      properties:
+        message:
+          type: string
+          example: 'Affilibuster API v1.0.0'
+        status:
+          type: string
+          example: 'running'
+      required:
+        - message
+        - status
+
+    HealthResponse:
+      type: object
+      description: Health check endpoint response
+      properties:
+        status:
+          type: string
+          example: 'healthy'
+      required:
+        - status
+
   securitySchemes:
     SessionAuth:
       type: apiKey
@@ -724,11 +1476,17 @@ components:
       name: X-Session-Id
       description: Session ID for anonymous users
 
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authenticated users
+
     UserAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT token for authenticated users (future)
+      description: JWT token for authenticated users (alias for bearerAuth)
 
 security:
   - SessionAuth: [ ]

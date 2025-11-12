@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 /**
- * Root Page - Redirects to default locale
+ * Root Page - redirects to default locale
  * Reference: T126 (Root page with language detection)
  */
 

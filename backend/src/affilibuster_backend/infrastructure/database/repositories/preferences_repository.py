@@ -16,7 +16,7 @@ from affilibuster_backend.domain.repositories.preferences_repository import IUse
 from affilibuster_backend.infrastructure.database.models.user_preferences import UserPreferencesModel
 
 
-class UserPreferencesRepository(IUserPreferencesRepository):  # type: ignore[misc]
+class UserPreferencesRepository(IUserPreferencesRepository):
     """PostgreSQL implementation of IUserPreferencesRepository."""
 
     def __init__(self, session: AsyncSession) -> None:

@@ -10,6 +10,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ThemeSelector } from '@/components/ThemeSelector'
 import * as client from '@/lib/client'
 import { usePathname } from 'next/navigation'
+import { createMockNavigation } from '../helpers/mockFactories'
 
 jest.mock('@/lib/client', () => ({
   getNavigation: jest.fn(),
@@ -31,13 +32,13 @@ const mockMatchMedia = (matches: boolean) => ({
 })
 
 describe('ThemeSelector', () => {
-  const mockNavData = {
+  const mockNavData = createMockNavigation({
     themeSelectorLabel: 'Theme',
     themeSelectorAriaLabel: 'Select theme',
     themeLightLabel: 'Light',
     themeDarkLabel: 'Dark',
     themeSystemLabel: 'System',
-  }
+  })
 
   beforeEach(() => {
     jest.clearAllMocks()

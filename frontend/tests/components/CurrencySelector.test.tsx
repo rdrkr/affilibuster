@@ -12,24 +12,20 @@ import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { CurrencySelector } from '@/components/CurrencySelector'
 import * as client from '@/lib/client'
-import { useSession } from '@/hooks/useSession'
+import { useCurrency } from '@/lib/currency/useCurrency'
 import { CurrencyCode } from '@/lib/types'
 
 // Mock dependencies
 jest.mock('@/lib/client', () => ({
   getCurrencies: jest.fn(),
-  getUserPreferences: jest.fn(),
-  updateUserPreferences: jest.fn(),
   getNavigation: jest.fn(),
 }))
 
-jest.mock('@/hooks/useSession', () => ({
-  useSession: jest.fn(),
+jest.mock('@/lib/currency/useCurrency', () => ({
+  useCurrency: jest.fn(),
 }))
 
 describe('CurrencySelector Component', () => {
-  const mockSessionId = 'test-session-123'
-
   const mockCurrencies = [
     {
       code: CurrencyCode.USD,
@@ -69,23 +65,16 @@ describe('CurrencySelector Component', () => {
     },
   ]
 
-  const mockPreferences = {
-    id: '123',
-    sessionId: mockSessionId,
-    selectedCurrency: CurrencyCode.EUR,
-    dismissedLanguagePrompt: false,
-    createdAt: '2025-01-01T00:00:00Z',
-    updatedAt: '2025-01-01T00:00:00Z',
-    expiresAt: '2025-02-01T00:00:00Z',
-  }
+  const mockSetCurrency = jest.fn()
 
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(useSession as jest.Mock).mockReturnValue(mockSessionId)
     ;(client.getCurrencies as jest.Mock).mockResolvedValue(mockCurrencies)
-    ;(client.getUserPreferences as jest.Mock).mockResolvedValue(mockPreferences)
-    ;(client.updateUserPreferences as jest.Mock).mockResolvedValue(mockPreferences)
     ;(client.getNavigation as jest.Mock).mockResolvedValue({ currencySelectorAriaLabel: 'Select currency' })
+    ;(useCurrency as jest.Mock).mockReturnValue({
+      currency: CurrencyCode.EUR,
+      setCurrency: mockSetCurrency,
+    })
   })
 
   it('should render currency selector button', async () => {
@@ -96,27 +85,42 @@ describe('CurrencySelector Component', () => {
       expect(screen.getByRole('button', { name: /select currency/i })).toBeInTheDocument()
     })
 
-    // Verify EUR is displayed (from mockPreferences)
+    // Verify EUR is displayed (from useCurrency mock)
     expect(screen.getByText(/€ EUR/)).toBeInTheDocument()
   })
 
-  it('should display user preferred currency from API', async () => {
+  it('should display current currency from useCurrency hook', async () => {
     render(<CurrencySelector />)
 
-    // Should load and display EUR (from mockPreferences)
+    // Should load and display EUR (from useCurrency mock)
     await waitFor(() => {
       expect(screen.getByText(/€ EUR/)).toBeInTheDocument()
     })
   })
 
-  it('should default to USD when no preferences exist', async () => {
-    ;(client.getUserPreferences as jest.Mock).mockRejectedValue(new Error('Not found'))
+  it('should display USD when useCurrency returns USD', async () => {
+    ;(useCurrency as jest.Mock).mockReturnValue({
+      currency: CurrencyCode.USD,
+      setCurrency: mockSetCurrency,
+    })
 
     render(<CurrencySelector />)
 
-    // Should default to USD
     await waitFor(() => {
       expect(screen.getByText(/\$ USD/)).toBeInTheDocument()
+    })
+  })
+
+  it('should display ILS when useCurrency returns ILS', async () => {
+    ;(useCurrency as jest.Mock).mockReturnValue({
+      currency: CurrencyCode.ILS,
+      setCurrency: mockSetCurrency,
+    })
+
+    render(<CurrencySelector />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/₪ ILS/)).toBeInTheDocument()
     })
   })
 
@@ -137,7 +141,7 @@ describe('CurrencySelector Component', () => {
     expect(screen.getAllByText('₪ ILS').length).toBeGreaterThan(0)
   })
 
-  it('should call API to update currency when option is selected', async () => {
+  it('should call useCurrency setCurrency when option is selected', async () => {
     render(<CurrencySelector />)
 
     await waitFor(() => {
@@ -149,33 +153,28 @@ describe('CurrencySelector Component', () => {
     fireEvent.click(button)
 
     // Click USD
-    const usdOption = screen.getByText('$ USD')
+    const usdOption = screen.getByRole('menuitem', { name: /\$ USD/i })
     fireEvent.click(usdOption)
 
-    // Should call update API
-    await waitFor(() => {
-      expect(client.updateUserPreferences).toHaveBeenCalledWith({
-        selectedCurrency: CurrencyCode.USD,
-      })
-    })
+    // Should call setCurrency from useCurrency hook
+    expect(mockSetCurrency).toHaveBeenCalledWith(CurrencyCode.USD)
   })
 
-  it('should update displayed currency after selection', async () => {
-    render(<CurrencySelector />)
+  it('should update displayed currency when useCurrency value changes', async () => {
+    const { rerender } = render(<CurrencySelector />)
 
     await waitFor(() => {
       expect(screen.getByText(/€ EUR/)).toBeInTheDocument()
     })
 
-    // Open dropdown
-    const button = screen.getByRole('button', { name: /select currency/i })
-    fireEvent.click(button)
+    // Simulate currency change from hook
+    ;(useCurrency as jest.Mock).mockReturnValue({
+      currency: CurrencyCode.ILS,
+      setCurrency: mockSetCurrency,
+    })
 
-    // Click ILS
-    const ilsOption = screen.getByText('₪ ILS')
-    fireEvent.click(ilsOption)
+    rerender(<CurrencySelector />)
 
-    // Should update to ILS
     await waitFor(() => {
       expect(screen.getByText(/₪ ILS/)).toBeInTheDocument()
     })
@@ -192,16 +191,13 @@ describe('CurrencySelector Component', () => {
     const button = screen.getByRole('button', { name: /select currency/i })
     fireEvent.click(button)
 
-    // Dropdown should be visible
-    expect(screen.getByText('$ USD')).toBeInTheDocument()
-
     // Click USD
-    const usdOption = screen.getByText('$ USD')
+    const usdOption = screen.getByRole('menuitem', { name: /\$ USD/i })
     fireEvent.click(usdOption)
 
-    // Dropdown should close
+    // Dropdown should close - USD option should no longer be visible
     await waitFor(() => {
-      expect(screen.queryByText('$ USD')).not.toBeInTheDocument()
+      expect(screen.queryByRole('menuitem', { name: /\$ USD/i })).not.toBeInTheDocument()
     })
   })
 
@@ -217,7 +213,7 @@ describe('CurrencySelector Component', () => {
     fireEvent.click(button)
 
     // Dropdown should be visible
-    expect(screen.getByText('$ USD')).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /\$ USD/i })).toBeInTheDocument()
 
     // Click backdrop
     const backdrop = document.querySelector('[aria-hidden="true"]')
@@ -227,37 +223,8 @@ describe('CurrencySelector Component', () => {
 
     // Dropdown should close
     await waitFor(() => {
-      expect(screen.queryByText('$ USD')).not.toBeInTheDocument()
+      expect(screen.queryByRole('menuitem', { name: /\$ USD/i })).not.toBeInTheDocument()
     })
-  })
-
-  it('should handle API errors gracefully', async () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
-    ;(client.updateUserPreferences as jest.Mock).mockRejectedValue(new Error('API Error'))
-
-    render(<CurrencySelector />)
-
-    await waitFor(() => {
-      expect(screen.getByText(/€ EUR/)).toBeInTheDocument()
-    })
-
-    // Open dropdown
-    const button = screen.getByRole('button', { name: /select currency/i })
-    fireEvent.click(button)
-
-    // Click USD
-    const usdOption = screen.getByText('$ USD')
-    fireEvent.click(usdOption)
-
-    // Should log error
-    await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalled()
-    })
-
-    // Component should not crash
-    expect(screen.getByRole('button', { name: /select currency/i })).toBeInTheDocument()
-
-    consoleSpy.mockRestore()
   })
 
   it('should show loading state initially', () => {
@@ -266,19 +233,6 @@ describe('CurrencySelector Component', () => {
     // Should show loading skeleton
     const loadingElement = document.querySelector('.animate-pulse')
     expect(loadingElement).toBeInTheDocument()
-  })
-
-  it('should not load data without session ID', async () => {
-    ;(useSession as jest.Mock).mockReturnValue(null)
-
-    render(<CurrencySelector />)
-
-    // Wait a bit
-    await new Promise(resolve => setTimeout(resolve, 100))
-
-    // Should not have called APIs
-    expect(client.getCurrencies).not.toHaveBeenCalled()
-    expect(client.getUserPreferences).not.toHaveBeenCalled()
   })
 
   it('should display currency symbol and code', async () => {
@@ -325,7 +279,7 @@ describe('CurrencySelector Component', () => {
     // Find EUR button (currently selected)
     const euroButtons = screen.getAllByText('€ EUR')
     const euroButton = euroButtons
-      .find(el => el.closest('button')?.getAttribute('role') === 'option')
+      .find(el => el.closest('button')?.getAttribute('role') === 'menuitem')
       ?.closest('button')
 
     // Should have highlighting class
@@ -429,5 +383,42 @@ describe('CurrencySelector Component', () => {
     // Should still render with default aria label
     const button = screen.getByRole('button')
     expect(button).toBeInTheDocument()
+  })
+
+  it('should handle getCurrencies error gracefully', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
+    ;(client.getCurrencies as jest.Mock).mockRejectedValue(new Error('API error'))
+
+    render(<CurrencySelector />)
+
+    // Should still show loading state
+    const loadingElement = document.querySelector('.animate-pulse')
+    expect(loadingElement).toBeInTheDocument()
+
+    await waitFor(() => {
+      expect(consoleErrorSpy).toHaveBeenCalled()
+    })
+
+    consoleErrorSpy.mockRestore()
+  })
+
+  it('should have testid attributes for E2E testing', async () => {
+    render(<CurrencySelector />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/€ EUR/)).toBeInTheDocument()
+    })
+
+    // Button should have data-testid
+    const button = screen.getByTestId('currency-selector')
+    expect(button).toBeInTheDocument()
+
+    // Open dropdown
+    fireEvent.click(button)
+
+    // Currency options should have test IDs
+    expect(screen.getByTestId('currency-option-USD')).toBeInTheDocument()
+    expect(screen.getByTestId('currency-option-EUR')).toBeInTheDocument()
+    expect(screen.getByTestId('currency-option-ILS')).toBeInTheDocument()
   })
 })

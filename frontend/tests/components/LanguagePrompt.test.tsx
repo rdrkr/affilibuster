@@ -8,14 +8,14 @@
  * Reference: T111 (LanguagePrompt component implementation)
  */
 
-import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { LanguagePrompt } from '@/components/LanguagePrompt'
 import * as client from '@/lib/client'
-import { useRouter, usePathname } from 'next/navigation'
-import { useSession } from '@/hooks/useSession'
+import { useSession } from '@/lib/core/useSession'
 import { CodeEnum } from '@/lib/generated/types.gen'
 import { CurrencyCode } from '@/lib/types'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { usePathname, useRouter } from 'next/navigation'
+import { createMockLanguages, createMockNavigation } from '../helpers/mockFactories'
 
 // Mock dependencies
 jest.mock('next/navigation', () => ({
@@ -31,7 +31,7 @@ jest.mock('@/lib/client', () => ({
   getNavigation: jest.fn(),
 }))
 
-jest.mock('@/hooks/useSession', () => ({
+jest.mock('@/lib/core/useSession', () => ({
   useSession: jest.fn(),
 }))
 
@@ -49,32 +49,7 @@ describe('LanguagePrompt Component', () => {
 
   const mockSessionId = 'test-session-123'
 
-  const mockLanguages = [
-    {
-      code: CodeEnum.EN,
-      displayName: 'English',
-      nativeName: 'English',
-      direction: 'ltr' as const,
-      urlPrefix: '/en',
-      defaultCurrency: CurrencyCode.USD,
-      localeCode: 'en-US',
-      isDefault: true,
-      isActive: true,
-      sortOrder: 1,
-    },
-    {
-      code: CodeEnum.IT,
-      displayName: 'Italian',
-      nativeName: 'Italiano',
-      direction: 'ltr' as const,
-      urlPrefix: '/it',
-      defaultCurrency: CurrencyCode.EUR,
-      localeCode: 'it-IT',
-      isDefault: false,
-      isActive: true,
-      sortOrder: 2,
-    },
-  ]
+  const mockLanguages = createMockLanguages()
 
   const mockPreferences = {
     id: '123',
@@ -95,12 +70,14 @@ describe('LanguagePrompt Component', () => {
     ;(client.getUserPreferences as jest.Mock).mockResolvedValue(mockPreferences)
     ;(client.updateUserPreferences as jest.Mock).mockResolvedValue(mockPreferences)
     ;(client.detectLanguage as jest.Mock).mockResolvedValue({ code: CodeEnum.EN, confidence: 1.0 })
-    ;(client.getNavigation as jest.Mock).mockResolvedValue({
-      promptTitleTemplate: 'Switch to {language}?',
-      promptMessageTemplate: 'We detected you might prefer viewing this site in {language}',
-      yesButtonTemplate: 'Yes, switch to {language}',
-      noButtonText: 'No thanks',
-    })
+    ;(client.getNavigation as jest.Mock).mockResolvedValue(
+      createMockNavigation({
+        promptTitleTemplate: 'Switch to {language}?',
+        promptMessageTemplate: 'We detected you might prefer viewing this site in {language}',
+        yesButtonTemplate: 'Yes, switch to {language}',
+        noButtonText: 'No thanks',
+      })
+    )
   })
 
   it('should show prompt when Italian is detected for English page', async () => {
@@ -429,8 +406,8 @@ describe('LanguagePrompt Component', () => {
 
     // Yes button should have secondary variant styling (from Button component)
     const yesButton = screen.getByText(/Yes, switch to Italiano/)
-    expect(yesButton).toHaveClass('bg-secondary-500')
-    expect(yesButton).toHaveClass('hover:bg-secondary-600')
+    expect(yesButton).toHaveClass('bg-secondary-800')
+    expect(yesButton).toHaveClass('hover:bg-secondary-900')
 
     // No button should have ghost variant styling (from Button component)
     const noButton = screen.getByText(/No thanks/)

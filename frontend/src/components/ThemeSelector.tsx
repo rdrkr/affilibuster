@@ -7,21 +7,14 @@
 
 'use client'
 
-import type { ReactNode } from 'react'
-import { useState, useEffect } from 'react'
-import { getNavigation } from '@/lib/client'
-import { usePathname } from 'next/navigation'
 import { Dropdown, type DropdownItem } from '@/components/Dropdown'
+import { getNavigation } from '@/lib/client'
+import type { Navigation } from '@/lib/types'
+import { usePathname } from 'next/navigation'
+import type { ReactNode } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 
 type Theme = 'light' | 'dark' | 'system'
-
-interface NavigationData {
-  themeSelectorLabel?: string
-  themeSelectorAriaLabel?: string
-  themeLightLabel?: string
-  themeDarkLabel?: string
-  themeSystemLabel?: string
-}
 
 const themeIcons: Record<Theme, ReactNode> = {
   light: (
@@ -49,19 +42,61 @@ const themeIcons: Record<Theme, ReactNode> = {
   ),
 }
 
+/**
+ * Helper function to apply theme to document
+ * @param newTheme - Theme to apply
+ */
+function applyTheme(newTheme: Theme): void {
+  const root = document.documentElement
+
+  // Determine if should be dark mode
+  let isDark = false
+
+  if (newTheme === 'dark') {
+    localStorage.theme = 'dark'
+    isDark = true
+  } else if (newTheme === 'light') {
+    localStorage.theme = 'light'
+    isDark = false
+  } else {
+    // System mode - remove theme from localStorage
+    localStorage.removeItem('theme')
+    isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  }
+
+  root.classList.remove('light', 'dark')
+  root.classList.add(isDark ? 'dark' : 'light')
+}
+
 export function ThemeSelector() {
   const pathname = usePathname()
-  const [theme, setTheme] = useState<Theme>('system')
-  const [mounted, setMounted] = useState(false)
-  const [navData, setNavData] = useState<NavigationData | null>(null)
+  const [navData, setNavData] = useState<Navigation | null>(null)
 
-  useEffect(() => {
-    setMounted(true)
-    // Get theme from localStorage
+  // Use lazy initialization for theme
+  const [theme, setTheme] = useState<Theme>(() => {
+    // This code only runs on the client after mount
+    /* istanbul ignore next */
+    if (typeof window === 'undefined') return 'system'
     const savedTheme = localStorage.getItem('theme') as Theme | null
-    const currentTheme: Theme = savedTheme ?? 'system'
-    setTheme(currentTheme)
-    applyTheme(currentTheme)
+    return savedTheme ?? 'system'
+  })
+
+  // Track if we're on the client using useSyncExternalStore
+  /* istanbul ignore next - useSyncExternalStore callbacks are not fully testable in Jest */
+  const isClient = useSyncExternalStore(
+    () => {
+      return () => {
+        // No-op unsubscribe function
+      }
+    },
+    () => true, // getSnapshot for client
+    () => false // getServerSnapshot for SSR
+  )
+
+  // Apply theme on mount and listen for system changes
+  useEffect(() => {
+    // Apply the theme (already in state from lazy initialization)
+    applyTheme(theme)
 
     // Listen for system theme changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
@@ -76,7 +111,7 @@ export function ThemeSelector() {
     return () => {
       mediaQuery.removeEventListener('change', handleSystemThemeChange)
     }
-  }, [])
+  }, [theme])
 
   // Fetch navigation labels from CMS
   useEffect(() => {
@@ -93,35 +128,13 @@ export function ThemeSelector() {
     void fetchNavigation()
   }, [pathname])
 
-  const applyTheme = (newTheme: Theme) => {
-    const root = document.documentElement
-
-    // Determine if should be dark mode
-    let isDark = false
-
-    if (newTheme === 'dark') {
-      localStorage.theme = 'dark'
-      isDark = true
-    } else if (newTheme === 'light') {
-      localStorage.theme = 'light'
-      isDark = false
-    } else {
-      // System mode - remove theme from localStorage
-      localStorage.removeItem('theme')
-      isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    }
-
-    root.classList.remove('light', 'dark')
-    root.classList.add(isDark ? 'dark' : 'light')
-  }
-
   const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme)
     applyTheme(newTheme)
   }
 
-  // Don't render until mounted to avoid hydration mismatch
-  if (!mounted || !navData) {
+  // Don't render until client-side hydration is complete
+  if (!isClient || !navData) {
     return <div className="w-32 h-10 bg-primary-700 animate-pulse rounded-lg" />
   }
 
@@ -149,7 +162,7 @@ export function ThemeSelector() {
       items={themes}
       onChange={handleThemeChange}
       ariaLabel={navData.themeSelectorAriaLabel ?? 'Select theme'}
-      buttonClassName="flex items-center space-x-2 px-3 py-2 bg-primary-700 hover:bg-primary-600 text-white rounded-lg transition-colors shadow-sm whitespace-nowrap h-10"
+      buttonClassName="flex items-center space-x-2 px-3 py-2 bg-primary-900 hover:bg-primary-800 text-white rounded-lg transition-colors shadow-sm whitespace-nowrap h-10"
       renderTrigger={selectedItem => (
         <div className="flex items-center gap-2">
           {selectedItem?.icon}

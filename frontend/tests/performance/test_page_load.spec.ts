@@ -42,7 +42,10 @@ interface ResourceTiming {
   size: number
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN ?? 'http://localhost:3000'
+// Base URL for tests that create new contexts (uses same env vars as Playwright config)
+const BASE_URL =
+  process.env.PLAYWRIGHT_BASE_URL ??
+  (process.env.FRONTEND_PORT ? `http://localhost:${process.env.FRONTEND_PORT}` : 'http://localhost:3000')
 
 // Performance thresholds
 const THRESHOLDS = {
@@ -105,7 +108,7 @@ async function getPerformanceMetrics(page: Page): Promise<PerformanceMetrics> {
   })
 }
 
-test.describe('Page Load Performance (3G)', () => {
+test.describe('@performance Page Load Performance (3G)', () => {
   test.beforeEach(async ({ context }) => {
     // Enable network throttling for all tests
     const pages = context.pages()
@@ -119,7 +122,7 @@ test.describe('Page Load Performance (3G)', () => {
   test('English homepage loads under 3s on 3G', async ({ page }) => {
     const startTime = Date.now()
 
-    await page.goto(BASE_URL, { waitUntil: 'networkidle' })
+    await page.goto('/', { waitUntil: 'networkidle' })
 
     const loadTime = Date.now() - startTime
     const metrics = await getPerformanceMetrics(page)
@@ -140,7 +143,7 @@ test.describe('Page Load Performance (3G)', () => {
   test('Italian homepage loads under 3s on 3G', async ({ page }) => {
     const startTime = Date.now()
 
-    await page.goto(`${BASE_URL}/it`, { waitUntil: 'networkidle' })
+    await page.goto('/it', { waitUntil: 'networkidle' })
 
     const loadTime = Date.now() - startTime
     const metrics = await getPerformanceMetrics(page)
@@ -158,7 +161,7 @@ test.describe('Page Load Performance (3G)', () => {
   test('Hebrew homepage loads under 3s on 3G', async ({ page }) => {
     const startTime = Date.now()
 
-    await page.goto(`${BASE_URL}/he`, { waitUntil: 'networkidle' })
+    await page.goto('/he', { waitUntil: 'networkidle' })
 
     const loadTime = Date.now() - startTime
     const metrics = await getPerformanceMetrics(page)
@@ -177,7 +180,7 @@ test.describe('Page Load Performance (3G)', () => {
     const startTime = Date.now()
 
     // Test a product page
-    await page.goto(`${BASE_URL}/products/test-product`, {
+    await page.goto('/products/test-product', {
       waitUntil: 'networkidle',
       timeout: 10000,
     })
@@ -196,7 +199,7 @@ test.describe('Page Load Performance (3G)', () => {
   })
 })
 
-test.describe('Page Load Performance (Comparison)', () => {
+test.describe('@performance Page Load Performance (Comparison)', () => {
   test('Compare performance across network conditions', async ({ browser }) => {
     const results: NetworkResults = {
       fast4g: {},
@@ -248,7 +251,7 @@ test.describe('Page Load Performance (Comparison)', () => {
   })
 })
 
-test.describe('Resource Loading Performance', () => {
+test.describe('@performance Resource Loading Performance', () => {
   test('Critical resources load quickly', async ({ page }) => {
     const resourceTimings: ResourceTiming[] = []
 
@@ -265,7 +268,7 @@ test.describe('Resource Loading Performance', () => {
       }
     })
 
-    await page.goto(BASE_URL, { waitUntil: 'networkidle' })
+    await page.goto('/', { waitUntil: 'networkidle' })
 
     console.log('\nCritical Resource Timings:')
     resourceTimings

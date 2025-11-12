@@ -8,35 +8,30 @@
 
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { getLanguages, getNavigation } from '@/lib/client'
-import type { Language } from '@/lib/types'
-import { LanguageCode, DEFAULT_LANGUAGE_CODE } from '@/lib/types'
 import { Dropdown, type DropdownItem } from '@/components/Dropdown'
-
-interface NavigationData {
-  languageSelectorAriaLabel?: string
-}
+import { getLanguages, getNavigation } from '@/lib/client'
+import type { Language, Navigation } from '@/lib/types'
+import { DEFAULT_LANGUAGE_CODE, LanguageCode } from '@/lib/types'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 export function LanguageSwitcher() {
   const pathname = usePathname()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [languages, setLanguages] = useState<Language[] | null>(null)
-  const [currentLang, setCurrentLang] = useState(DEFAULT_LANGUAGE_CODE)
   const [loading, setLoading] = useState(true)
-  const [navData, setNavData] = useState<NavigationData>({})
+  const [navData, setNavData] = useState<Navigation | null>(null)
+
+  // Extract current language directly from pathname
+  const pathParts = pathname.split('/').filter(Boolean)
+  const firstSegment = pathParts[0]
+  // Map URL prefixes to language codes
+  let currentLang = DEFAULT_LANGUAGE_CODE
+  if (firstSegment === LanguageCode.IT) currentLang = LanguageCode.IT
+  else if (firstSegment === LanguageCode.HE) currentLang = LanguageCode.HE
 
   useEffect(() => {
-    // Extract current language from pathname (e.g., /it/products -> it, /he/products -> he)
-    const pathParts = pathname.split('/').filter(Boolean)
-    const firstSegment = pathParts[0]
-    // Map URL prefixes to language codes
-    let lang = DEFAULT_LANGUAGE_CODE
-    if (firstSegment === LanguageCode.IT) lang = LanguageCode.IT
-    else if (firstSegment === LanguageCode.HE) lang = LanguageCode.HE
-    setCurrentLang(lang)
-
     // Fetch available languages and navigation data
     Promise.all([getLanguages(), getNavigation().catch(() => null)])
       .then(([languagesData, navContent]) => {
@@ -51,46 +46,26 @@ export function LanguageSwitcher() {
       })
   }, [pathname])
 
-  const handleLanguageChange = (newLang: LanguageCode) => {
+  const handleLanguageChange = (newLang: LanguageCode): void => {
     // Get the path without the language prefix
     const pathParts = pathname.split('/').filter(Boolean)
 
-    // Check if first segment is a language prefix (it, he, or en)
+    // Check if first segment is a language prefix (en, it, he)
     const knownPrefixes = Object.values(LanguageCode)
     const isCurrentPathLangPrefixed = pathParts[0] ? knownPrefixes.includes(pathParts[0] as LanguageCode) : false
     const pathWithoutLang = isCurrentPathLangPrefixed ? '/' + pathParts.slice(1).join('/') : pathname
 
-    // Get the new language configuration
-    /* istanbul ignore next -- Defensive code: UI prevents calling this when languages is null (dropdown only renders when languages exists) */
-    if (!languages) {
-      console.error('Languages not loaded')
-      return
-    }
-    const language = languages.find(l => l.code === newLang)
-    if (!language) {
-      console.error(`Language ${newLang} not found`)
-      return
-    }
-
     // Construct new path with language prefix
-    // All languages now have explicit prefixes: /en /it /he
-    let newPath: string
-    if (language.urlPrefix) {
-      const basePath = pathWithoutLang === '/' ? '' : pathWithoutLang
-      newPath = `${language.urlPrefix}${basePath}`
-    } else {
-      // Fallback for languages without urlPrefix (shouldn't happen)
-      newPath = pathWithoutLang
-    }
+    // All languages have explicit prefixes: /en /it /he
+    const basePath = pathWithoutLang === '/' ? '' : pathWithoutLang
+    const newPath = `/${newLang}${basePath}`
 
-    // Ensure we have at least '/' for root paths
-    if (!newPath || newPath === '') {
-      newPath = '/'
-    }
+    // Preserve query parameters
+    const queryString = searchParams.toString()
+    const newUrl = queryString ? `${newPath}?${queryString}` : newPath
 
-    // Use router.push for language switching
-    router.push(newPath)
-    router.refresh() // Refresh to ensure content is reloaded
+    // Navigate to new language URL
+    router.push(newUrl)
   }
 
   if (loading || !languages) {
@@ -109,8 +84,10 @@ export function LanguageSwitcher() {
       value={currentLang}
       items={languageItems}
       onChange={handleLanguageChange}
-      ariaLabel={navData.languageSelectorAriaLabel ?? 'Select language'}
-      buttonClassName="flex items-center space-x-2 px-4 py-2 bg-primary-700 hover:bg-primary-600 text-white rounded-lg transition-colors shadow-sm whitespace-nowrap h-10"
+      ariaLabel={navData?.languageSelectorAriaLabel ?? 'Select language'}
+      buttonClassName="flex items-center space-x-2 px-4 py-2 bg-primary-900 hover:bg-primary-800 text-white rounded-lg transition-colors shadow-sm whitespace-nowrap h-10"
+      data-testid="language-selector"
+      itemTestIdPrefix="language-option"
       renderTrigger={() => (
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">{currentLanguage?.nativeName}</span>

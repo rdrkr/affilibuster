@@ -10,7 +10,8 @@ Dependency Injection:
 """
 
 import logging
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable
+from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI, Request
@@ -23,12 +24,16 @@ from starlette.responses import Response
 
 from affilibuster_backend.config import settings
 
+# Import domain models
+from affilibuster_backend.domain.entities.generated.models import HealthResponse, RootResponse
+
 # Import OpenAPI contract loader
 from affilibuster_backend.infrastructure.api.openapi_loader import openapi_contract_loader
 
 # Import routers
 from affilibuster_backend.infrastructure.api.routes import (
     about,
+    auth,
     components,
     contact,
     currencies,
@@ -44,6 +49,8 @@ from affilibuster_backend.infrastructure.api.routes import (
     privacy,
     product_page,
     products,
+    profile,
+    redirects,
     system_message,
     term,
 )
@@ -60,8 +67,48 @@ from affilibuster_backend.infrastructure.middleware import (
 # Configure logging
 logging.basicConfig(level=getattr(logging, settings.log_level), format="%(message)s")
 
-# Initialize dependencies before creating app
-initialize_dependencies()
+# Module logger
+logger = logging.getLogger(__name__)
+
+
+# ============================================================================
+# Application Lifespan
+# ============================================================================
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    """
+    Application lifespan handler.
+
+    Startup:
+    - Run database migrations (Alembic)
+    - Initialize dependencies
+
+    Shutdown:
+    - Cleanup resources
+
+    Note: Database migrations are handled by Alembic.
+    Run `alembic upgrade head` before starting the app, or
+    migrations will be applied automatically on startup via Docker.
+
+    Args:
+        _app: FastAPI application instance (unused, required by FastAPI signature).
+    """
+    # Startup
+    logger.info("🚀 Starting Affilibuster API...")
+
+    # Initialize dependencies
+    logger.info("📦 Initializing dependencies...")
+    initialize_dependencies()
+
+    logger.info("✅ Affilibuster API started successfully")
+
+    yield
+
+    # Shutdown
+    logger.info("🛑 Shutting down Affilibuster API...")
+
 
 # ============================================================================
 # FastAPI Application
@@ -77,10 +124,8 @@ app = FastAPI(
     openapi_url="/openapi.json",
     # Serialize responses using field aliases (camelCase)
     response_model_by_alias=True,
+    lifespan=lifespan,
 )
-
-# Module logger
-logger = logging.getLogger(__name__)
 
 
 # ============================================================================
@@ -176,10 +221,13 @@ app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(ErrorHandlingMiddleware)
 
 # Register routers (most specific prefixes first, least specific last)
+app.include_router(auth.router)
+app.include_router(profile.router)
 app.include_router(languages.router)
 app.include_router(currencies.router)
 app.include_router(products.router)
 app.include_router(preferences.router)
+app.include_router(redirects.router)
 
 # Single-type routers (no prefix - must be last)
 app.include_router(about.router)
@@ -201,12 +249,12 @@ app.include_router(locales.router)
 
 
 @app.get("/", include_in_schema=False)
-async def root() -> dict[str, str]:
+async def root() -> RootResponse:
     """Root endpoint."""
-    return {"message": "Affilibuster API v1.0.0", "status": "running"}
+    return RootResponse(message="Affilibuster API v1.0.0", status="running")
 
 
 @app.get("/health")
-async def health() -> dict[str, str]:
+async def health() -> HealthResponse:
     """Health check endpoint."""
-    return {"status": "healthy"}
+    return HealthResponse(status="healthy")

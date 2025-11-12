@@ -1,48 +1,19 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 /**
- * E2E test for performance targets.
- * Reference: quickstart.md:251-270 (Test 7: Performance Metrics)
+ * E2E tests for performance optimization features.
+ * These tests verify that performance optimizations are correctly configured.
+ *
+ * Note: Actual performance timing tests are in tests/performance/ directory
+ * which includes network throttling and comprehensive Web Vitals measurements.
  */
 
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../fixtures'
+import { navigateAndWait } from '../helpers/waits'
 
-test.describe('Performance', () => {
-  test('should load homepage within 2 seconds', async ({ page }) => {
-    const startTime = Date.now()
-
-    await page.goto('/')
-
-    // Wait for page to be fully loaded
-    await page.waitForLoadState('networkidle')
-
-    const loadTime = Date.now() - startTime
-
-    // Should load in under 2000ms
-    expect(loadTime).toBeLessThan(2000)
-  })
-
-  test('should achieve good Lighthouse scores', async ({ page }) => {
-    await page.goto('/')
-
-    // Get performance metrics
-    const metrics = await page.evaluate(() => {
-      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
-      return {
-        domContentLoaded: navigation.domContentLoadedEventEnd - navigation.fetchStart,
-        loadComplete: navigation.loadEventEnd - navigation.fetchStart,
-        firstPaint: performance.getEntriesByName('first-paint')[0]?.startTime ?? 0,
-        firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime ?? 0,
-      }
-    })
-
-    // Performance targets
-    expect(metrics.firstContentfulPaint).toBeLessThan(1500) // FCP < 1.5s
-    expect(metrics.domContentLoaded).toBeLessThan(2000) // DCL < 2s
-  })
-
+test.describe('Performance Optimizations', () => {
   test('should lazy load images below the fold', async ({ page }) => {
-    await page.goto('/')
+    await navigateAndWait(page, '/')
 
     // Check images have loading="lazy"
     const images = page.locator('img[loading="lazy"]')
@@ -53,7 +24,7 @@ test.describe('Performance', () => {
   })
 
   test('should use Next.js Image optimization', async ({ page }) => {
-    await page.goto('/products')
+    await navigateAndWait(page, '/products')
 
     // Product images should use Next.js Image component
     // (generates srcset, uses WebP, etc.)
@@ -69,7 +40,7 @@ test.describe('Performance', () => {
   })
 
   test('should prefetch critical resources', async ({ page }) => {
-    await page.goto('/')
+    await navigateAndWait(page, '/')
 
     // Check for prefetch/preload links
     const preloadLinks = page.locator('link[rel="preload"], link[rel="prefetch"]')
@@ -80,7 +51,7 @@ test.describe('Performance', () => {
   })
 
   test('should bundle JavaScript efficiently', async ({ page }) => {
-    await page.goto('/')
+    await navigateAndWait(page, '/')
 
     // Get all loaded scripts
     const scripts = await page.evaluate(() => {
@@ -90,13 +61,25 @@ test.describe('Performance', () => {
     // Should use code splitting (multiple chunks)
     expect(scripts.length).toBeGreaterThan(1)
 
-    // Should have hashed filenames for caching
-    const hashedScripts = scripts.filter(src => /\.[a-f0-9]{8,}\./i.test(src))
-    expect(hashedScripts.length).toBeGreaterThan(0)
+    // Hashed filenames only available in production builds
+    // Skip hash check in development (detected by presence of dev-specific paths or chunks directory structure)
+    const isDevBuild = scripts.some(
+      src =>
+        src.includes('[turbopack]') ||
+        src.includes('/chunks/src_') ||
+        src.includes('/dev/') ||
+        !src.includes('/_next/static/chunks')
+    )
+
+    if (!isDevBuild) {
+      // Should have hashed filenames for caching in production
+      const hashedScripts = scripts.filter(src => /\.[a-f0-9]{8,}\./i.test(src))
+      expect(hashedScripts.length).toBeGreaterThan(0)
+    }
   })
 
   test('should use font optimization', async ({ page }) => {
-    await page.goto('/')
+    await navigateAndWait(page, '/')
 
     // Check for font-display: swap
     const fontFaces = await page.evaluate(() => {
@@ -123,59 +106,6 @@ test.describe('Performance', () => {
     if (fontFaces.length > 0) {
       expect(fontFaces).toContain('swap')
     }
-  })
-
-  test('should minimize Time to Interactive (TTI)', async ({ page }) => {
-    const startTime = Date.now()
-
-    await page.goto('/')
-
-    // Wait for page to be interactive
-    await page.waitForLoadState('load')
-
-    // Try to interact with element
-    const button = page.locator('[data-testid="currency-selector"]')
-    await button.click()
-
-    const interactiveTime = Date.now() - startTime
-
-    // Should be interactive within 3 seconds
-    expect(interactiveTime).toBeLessThan(3000)
-  })
-
-  test('should minimize Cumulative Layout Shift (CLS)', async ({ page }) => {
-    await page.goto('/')
-
-    // Wait for page to stabilize
-    await page.waitForTimeout(2000)
-
-    // Get CLS from performance API
-    const cls = await page.evaluate(() => {
-      return new Promise(resolve => {
-        let clsValue = 0
-
-        const observer = new PerformanceObserver(list => {
-          for (const entry of list.getEntries()) {
-            const layoutShiftEntry = entry as PerformanceEntry & {
-              hadRecentInput?: boolean
-              value?: number
-            }
-            if (layoutShiftEntry.hadRecentInput) continue
-            clsValue += layoutShiftEntry.value ?? 0
-          }
-        })
-
-        observer.observe({ type: 'layout-shift', buffered: true })
-
-        setTimeout(() => {
-          observer.disconnect()
-          resolve(clsValue)
-        }, 1000)
-      })
-    })
-
-    // CLS should be under 0.1 (good)
-    expect(cls).toBeLessThan(0.1)
   })
 
   test('should use compression for assets', async ({ page, context }) => {

@@ -13,6 +13,8 @@ Tests:
 
 import pytest
 
+from affilibuster_backend.domain.entities.generated.models import HealthResponse, RootResponse
+
 
 @pytest.mark.integration
 @pytest.mark.asyncio
@@ -24,17 +26,18 @@ class TestMainAppEndpoints:
         """Test root endpoint returns status message."""
         response = await async_client.get("/", headers={"Authorization": ""})
         assert response.status_code == 200
-        data = response.json()
-        assert "message" in data
-        assert "status" in data
-        assert data["status"] == "running"
+        assert response.status_code == 200
+        data = RootResponse(**response.json())
+        assert data.message is not None
+        assert data.status == "running"
 
     async def test_health_endpoint_returns_healthy(self, async_client):
         """Test health endpoint returns healthy status."""
         response = await async_client.get("/health")
         assert response.status_code == 200
-        data = response.json()
-        assert data["status"] == "healthy"
+        assert response.status_code == 200
+        data = HealthResponse(**response.json())
+        assert data.status == "healthy"
 
 
 @pytest.mark.integration
@@ -91,15 +94,21 @@ class TestErrorHandling:
 
         from fastapi import HTTPException
         from fastapi.responses import JSONResponse
+        from starlette.requests import Request
 
         from affilibuster_backend.domain.entities import Error
         from affilibuster_backend.main import http_exception_handler
 
-        # Create a mock request
-        class MockRequest:
-            pass
-
-        request = MockRequest()
+        # Create a minimal Request object
+        scope = {
+            "type": "http",
+            "method": "GET",
+            "path": "/test",
+            "query_string": b"",
+            "headers": [],
+            "server": ("testserver", 80),
+        }
+        request = Request(scope)
 
         # Create HTTPException with dict detail (like our routes do)
         error_dict = Error(
@@ -146,7 +155,9 @@ class TestCORS:
         """Test health endpoint is accessible."""
         response = await async_client.get("/health")
         assert response.status_code == 200
-        assert response.json()["status"] == "healthy"
+        assert response.status_code == 200
+        data = HealthResponse(**response.json())
+        assert data.status == "healthy"
 
 
 @pytest.mark.integration
@@ -160,7 +171,8 @@ class TestMiddlewareIntegration:
         response = await async_client.get("/health")
         assert response.status_code == 200
         # Middleware should allow request to pass through
-        assert response.json()["status"] == "healthy"
+        data = HealthResponse(**response.json())
+        assert data.status == "healthy"
 
     async def test_error_handling_middleware_active(self, async_client):
         """Test error handling middleware is active."""
@@ -176,8 +188,8 @@ class TestMiddlewareIntegration:
         response = await async_client.get("/health")
         assert response.status_code == 200
         assert "X-API-Version" in response.headers
-        data = response.json()
-        assert data["status"] == "healthy"
+        data = HealthResponse(**response.json())
+        assert data.status == "healthy"
 
 
 @pytest.mark.integration

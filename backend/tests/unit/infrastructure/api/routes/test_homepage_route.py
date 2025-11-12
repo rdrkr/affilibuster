@@ -170,3 +170,111 @@ class TestParseHomepageQueryParams:
         assert result.populate == [PopulateEnum5.FEATURE_CARDS]
         assert result.locale == "he"
         assert result.filters is None
+
+    @pytest.mark.asyncio
+    async def test_parse_with_valid_filters_json(self):
+        """Test that valid JSON filters are parsed correctly."""
+        # Create mock request
+
+        class MockQueryParams:
+            def __init__(self, params: dict[str, str | None]) -> None:
+                self._params = params
+
+            def get(self, key: str, default: str | None = None) -> str | None:
+                return self._params.get(key, default)
+
+            def getlist(self, key: str) -> list[str]:
+                return []
+
+            def multi_items(self) -> list[tuple[str, str | None]]:
+                return [(k, v) for k, v in self._params.items()]
+
+            def __iter__(self) -> Iterator[tuple[str, str | None]]:
+                return iter(self._params.items())
+
+        mock_request = MagicMock()
+        mock_request.query_params = MockQueryParams(
+            {
+                "locale": "en",
+                "filters": '{"name": {"$contains": "test"}}',
+            }
+        )
+
+        # Execute
+        result = await parse_homepage_query_params(mock_request)
+
+        # Assert
+        assert result.filters == {"name": {"$contains": "test"}}
+        assert result.locale == "en"
+
+    @pytest.mark.asyncio
+    async def test_parse_with_invalid_filters_json(self):
+        """Test that invalid JSON filters are handled gracefully."""
+
+        class MockQueryParams:
+            def __init__(self, params: dict[str, str | None]) -> None:
+                self._params = params
+
+            def get(self, key: str, default: str | None = None) -> str | None:
+                return self._params.get(key, default)
+
+            def getlist(self, key: str) -> list[str]:
+                return []
+
+            def multi_items(self) -> list[tuple[str, str | None]]:
+                return [(k, v) for k, v in self._params.items()]
+
+            def __iter__(self) -> Iterator[tuple[str, str | None]]:
+                return iter(self._params.items())
+
+        mock_request = MagicMock()
+        mock_request.query_params = MockQueryParams(
+            {
+                "locale": "en",
+                "filters": "invalid-json{",
+            }
+        )
+
+        # Execute
+        result = await parse_homepage_query_params(mock_request)
+
+        # Assert - invalid JSON should result in None
+        assert result.filters is None
+        assert result.locale == "en"
+
+    @pytest.mark.asyncio
+    async def test_parse_with_status_parameter(self):
+        """Test that status parameter is parsed as Status1 enum."""
+
+        class MockQueryParams:
+            def __init__(self, params: dict[str, str | None]) -> None:
+                self._params = params
+
+            def get(self, key: str, default: str | None = None) -> str | None:
+                return self._params.get(key, default)
+
+            def getlist(self, key: str) -> list[str]:
+                return []
+
+            def multi_items(self) -> list[tuple[str, str | None]]:
+                return [(k, v) for k, v in self._params.items()]
+
+            def __iter__(self) -> Iterator[tuple[str, str | None]]:
+                return iter(self._params.items())
+
+        mock_request = MagicMock()
+        mock_request.query_params = MockQueryParams(
+            {
+                "locale": "en",
+                "status": "published",
+            }
+        )
+
+        # Execute
+        result = await parse_homepage_query_params(mock_request)
+
+        # Assert
+        from affilibuster_backend.domain.entities.generated.models import Status1
+
+        assert result.status == Status1.PUBLISHED
+        assert result.locale == "en"

@@ -44,7 +44,19 @@ Follow-up TODOs: None
 - Refactor while keeping tests green
 - User approval required before implementation begins
 
-**Rationale**: TDD ensures requirements are clear, code is testable by design, and regressions are caught immediately. Essential for maintaining quality across reusable components.
+**E2E vs Performance Test Separation** (NON-NEGOTIABLE):
+- **E2E tests** verify CORRECTNESS only, not timing
+  - NO explicit timeouts (use global 5-minute timeout)
+  - NO `waitForTimeout()` calls - wait for conditions/elements, not arbitrary time
+  - Tests MUST pass regardless of system load or resource constraints
+  - Use helper functions from `tests/helpers/` for standard wait patterns
+- **Performance tests** verify TIMING requirements
+  - Run on production builds ONLY (skip in development)
+  - Use strict timing thresholds from `tests/config/performance-thresholds.ts`
+  - Network throttling to simulate real-world conditions
+  - Tag with `@performance` for easy filtering
+
+**Rationale**: TDD ensures requirements are clear, code is testable by design, and regressions are caught immediately. Separating correctness from performance prevents flaky tests in resource-constrained environments and provides clear debugging signals. Essential for maintaining quality across reusable components.
 
 ### IV. Modular & Reusable Architecture
 **MUST** build components for reusability across multiple affiliate sites:

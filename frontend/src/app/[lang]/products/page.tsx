@@ -6,17 +6,17 @@
  */
 
 import { getProductPage, getProducts } from '@/lib/client'
-import Link from 'next/link'
 import { setRequestLocale } from 'next-intl/server'
 import type { Metadata } from 'next'
-import { Button } from '@/components/Button'
-import type { ApiProductPageProductPageDocument } from '@/lib/generated/types.gen'
+import { ProductsClient } from '@/components/ProductsClient'
+import type { Category } from '@/components/CategoryFilter'
+import type { ApiProductPageProductPageDocument, Pagination } from '@/lib/generated/types.gen'
 import type { Product } from '@/lib/types'
 import { SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
 
 interface Props {
   params: Promise<{ lang: string }>
-  searchParams?: Promise<{ page?: string }>
+  searchParams?: Promise<{ page?: string; category?: string }>
 }
 
 export function generateStaticParams() {
@@ -56,6 +56,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
 
   const resolvedSearchParams = await searchParams
   const currentPage = resolvedSearchParams?.page ? Number(resolvedSearchParams.page) : 1
+  const selectedCategory = resolvedSearchParams?.category ?? null
 
   // Enable static rendering
   if (lang) {
@@ -64,6 +65,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
 
   let products: Product[] = []
   let productsPageData: ApiProductPageProductPageDocument | null = null
+  let totalPages = 1
 
   try {
     // Fetch products page metadata
@@ -72,18 +74,29 @@ export default async function ProductsPage({ params, searchParams }: Props) {
     // Fetch products list
     const productsResponse = await getProducts({
       'pagination[page]': currentPage,
-      'pagination[pageSize]': 24,
+      'pagination[pageSize]': 2, // Small page size for testing pagination
       locale: lang,
     } as Parameters<typeof getProducts>[0])
 
     if (productsResponse) {
       products = productsResponse.data
+      // Get total pages from API metadata using generated Pagination type
+      // Meta is generically typed, so we need to assert the pagination property type
+      const pagination = productsResponse.meta?.pagination as Pagination | undefined
+      totalPages = pagination?.totalPages ?? 1
     }
   } catch (error) {
     console.error('Failed to fetch products:', error)
     // Don't render error page if CMS data unavailable
     return null
   }
+
+  // Mock categories for now - TODO: Fetch from CMS
+  const categories: Category[] = [
+    { id: 'electronics', name: 'Electronics' },
+    { id: 'home', name: 'Home & Garden' },
+    { id: 'sports', name: 'Sports & Outdoors' },
+  ]
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -101,72 +114,15 @@ export default async function ProductsPage({ params, searchParams }: Props) {
         )}
       </div>
 
-      {/* Products Grid */}
-      {products.length > 0 ? (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map(item => (
-              <Link
-                key={item.id}
-                href={`/${lang}/${item.slug}`}
-                className="group border-2 border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-tertiary-400 bg-white dark:bg-neutral-800"
-              >
-                {/* Placeholder Image */}
-                <div className="bg-neutral-200 dark:bg-neutral-700 h-48 flex items-center justify-center">
-                  <svg className="w-16 h-16 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-
-                {/* Content */}
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2 group-hover:text-secondary-600 transition-colors">
-                    {item.title}
-                  </h3>
-                  {item.excerpt && (
-                    <p className="text-neutral-600 dark:text-neutral-400 line-clamp-3">{item.excerpt}</p>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {/* Pagination - Only show if CMS button labels available */}
-          {currentPage > 1 && productsPageData?.previousButton && (
-            <div className="mt-12 flex items-center justify-center gap-2">
-              <Link href={`/${lang}/products?page=${(currentPage - 1).toString()}`}>
-                <Button variant="ghost">{productsPageData.previousButton}</Button>
-              </Link>
-
-              <span className="text-sm text-neutral-600 dark:text-neutral-400">Page {currentPage}</span>
-
-              {products.length === 24 && productsPageData.nextButton && (
-                <Link href={`/${lang}/products?page=${(currentPage + 1).toString()}`}>
-                  <Button variant="ghost">{productsPageData.nextButton}</Button>
-                </Link>
-              )}
-            </div>
-          )}
-
-          {/* Pagination Info - Only show if CMS template available */}
-          {productsPageData?.showingText && (
-            <div className="mt-8 text-center text-sm text-neutral-600 dark:text-neutral-400">
-              {productsPageData.showingText
-                .replace('{count}', String(products.length))
-                .replace('{total}', String(products.length))}
-            </div>
-          )}
-        </>
-      ) : (
-        <div className="text-center py-16">
-          <p className="text-xl text-neutral-600 dark:text-neutral-400">{productsPageData?.noProductsMessage}</p>
-        </div>
-      )}
+      {/* Products Grid with Filters and Pagination */}
+      <ProductsClient
+        products={products}
+        lang={lang}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        categories={categories}
+        selectedCategory={selectedCategory}
+      />
     </div>
   )
 }

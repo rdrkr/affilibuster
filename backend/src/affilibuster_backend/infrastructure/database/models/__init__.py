@@ -19,9 +19,19 @@ class Base(DeclarativeBase):
 
 
 # Import all models to ensure they are registered with SQLAlchemy
+from .email_verification_token import EmailVerificationTokenModel  # noqa: E402
+from .password_reset_token import PasswordResetTokenModel  # noqa: E402
+from .url_redirect import URLRedirectModel  # noqa: E402
+from .user import UserModel  # noqa: E402
 from .user_preferences import UserPreferencesModel  # noqa: E402
+from .user_session import UserSessionModel  # noqa: E402
 
 __all__ = [
     "Base",
+    "EmailVerificationTokenModel",
+    "PasswordResetTokenModel",
+    "URLRedirectModel",
+    "UserModel",
     "UserPreferencesModel",
+    "UserSessionModel",
 ]

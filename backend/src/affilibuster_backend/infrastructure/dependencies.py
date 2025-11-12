@@ -6,7 +6,7 @@ Dependency Injection Configuration.
 Centralizes all DI setup to avoid circular imports.
 """
 
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,7 +14,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from affilibuster_backend.domain.repositories.cache_service import ICacheService
 from affilibuster_backend.domain.repositories.cms_repository import ICMSRepository
 from affilibuster_backend.domain.repositories.preferences_repository import IUserPreferencesRepository
+from affilibuster_backend.domain.repositories.url_redirect_repository import IURLRedirectRepository
 from affilibuster_backend.domain.use_cases.get_cms_content_use_case import GetCMSContentUseCase
+from affilibuster_backend.domain.use_cases.get_url_redirect_use_case import GetURLRedirectUseCase
 from affilibuster_backend.domain.use_cases.get_user_preferences_use_case import GetUserPreferencesUseCase
 from affilibuster_backend.domain.use_cases.update_user_preferences_use_case import UpdateUserPreferencesUseCase
 from affilibuster_backend.infrastructure.cache.redis_cache import RedisCacheService
@@ -23,6 +25,14 @@ from affilibuster_backend.infrastructure.database.config import get_db
 from affilibuster_backend.infrastructure.database.repositories.preferences_repository import (
     UserPreferencesRepository,
 )
+
+if TYPE_CHECKING:
+    from affilibuster_backend.infrastructure.database.repositories.email_verification_token_repository import (
+        EmailVerificationTokenRepository,
+    )
+    from affilibuster_backend.infrastructure.database.repositories.password_reset_token_repository import (
+        PasswordResetTokenRepository,
+    )
 
 # Singleton instances (created once at startup)
 _cms_repo: ICMSRepository | None = None
@@ -85,6 +95,58 @@ def get_update_user_preferences_use_case(
     return UpdateUserPreferencesUseCase(prefs_repo, cache_service)
 
 
+def get_email_verification_token_repo(
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> "EmailVerificationTokenRepository":
+    """
+    Provide email verification token repository instance.
+
+    Uses local imports to avoid circular dependencies at module load time.
+    """
+    from affilibuster_backend.infrastructure.database.repositories.email_verification_token_repository import (
+        EmailVerificationTokenRepository,
+    )
+
+    return EmailVerificationTokenRepository(db)
+
+
+def get_password_reset_token_repo(
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> "PasswordResetTokenRepository":
+    """
+    Provide password reset token repository instance.
+
+    Uses local imports to avoid circular dependencies at module load time.
+    """
+    from affilibuster_backend.infrastructure.database.repositories.password_reset_token_repository import (
+        PasswordResetTokenRepository,
+    )
+
+    return PasswordResetTokenRepository(db)
+
+
+def get_url_redirect_repo(
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> IURLRedirectRepository:
+    """
+    Provide URL redirect repository instance.
+
+    Creates a new repository instance with the current database session.
+    """
+    from affilibuster_backend.infrastructure.database.repositories.url_redirect_repository import (
+        URLRedirectRepository,
+    )
+
+    return URLRedirectRepository(db)
+
+
+def get_url_redirect_use_case(
+    redirect_repo: Annotated[IURLRedirectRepository, Depends(get_url_redirect_repo)],
+) -> GetURLRedirectUseCase:
+    """Provide GetURLRedirectUseCase instance."""
+    return GetURLRedirectUseCase(redirect_repo)
+
+
 # Type aliases for use in route signatures
 CMSRepoDep = Annotated[ICMSRepository, Depends(get_cms_repo)]
 GetCMSContentUseCaseDep = Annotated[GetCMSContentUseCase, Depends(get_cms_content_use_case)]
@@ -92,3 +154,5 @@ CacheServiceDep = Annotated[ICacheService, Depends(get_cache_service)]
 PreferencesRepoDep = Annotated[IUserPreferencesRepository, Depends(get_preferences_repo)]
 GetUserPreferencesUseCaseDep = Annotated[GetUserPreferencesUseCase, Depends(get_get_user_preferences_use_case)]
 UpdateUserPreferencesUseCaseDep = Annotated[UpdateUserPreferencesUseCase, Depends(get_update_user_preferences_use_case)]
+URLRedirectRepoDep = Annotated[IURLRedirectRepository, Depends(get_url_redirect_repo)]
+GetURLRedirectUseCaseDep = Annotated[GetURLRedirectUseCase, Depends(get_url_redirect_use_case)]

@@ -1039,11 +1039,11 @@ Each task includes:
       - **Implement**: POST /webhooks/strapi, parse payload, call frontend /api/revalidate for affected paths
       - **→ Validation**: T039 integration test passes
 
-- [] **T145** Configure URL redirect handling in frontend middleware
-      - **Path**: frontend/src/middleware.ts (extend existing)
+- [X] **T145** Configure URL redirect handling in frontend middleware
+      - **Path**: frontend/src/proxy.ts (renamed from middleware.ts)
       - **→ Reference**: quickstart.md:213-230 (301/410 redirects), data-model.md:540-563
-      - **Implement**: Check URLRoute table (or call backend API), if 301 redirect, if 410 show custom 410 page
-      - **→ Validation**: T046 E2E test passes
+      - **Implement**: Backend API endpoint /v1/redirects/check, frontend proxy calls API before i18n routing
+      - **→ Validation**: Unit and integration tests pass, E2E tests in redirects.spec.ts
 
 - [X] **T146** Implement hreflang tag generation
       - **Path**: frontend/src/lib/seo/hreflang.ts

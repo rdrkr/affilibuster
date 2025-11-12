@@ -13,15 +13,15 @@ describe('Button Component', () => {
   it('should apply primary variant by default', () => {
     render(<Button>Primary</Button>)
     const button = screen.getByRole('button')
-    expect(button.className).toContain('bg-primary-600')
-    expect(button.className).toContain('hover:bg-primary-700')
+    expect(button.className).toContain('bg-primary-800')
+    expect(button.className).toContain('hover:bg-primary-900')
   })
 
   it('should apply secondary variant', () => {
     render(<Button variant="secondary">Secondary</Button>)
     const button = screen.getByRole('button')
-    expect(button.className).toContain('bg-secondary-500')
-    expect(button.className).toContain('hover:bg-secondary-600')
+    expect(button.className).toContain('bg-secondary-800')
+    expect(button.className).toContain('hover:bg-secondary-900')
   })
 
   it('should apply ghost variant', () => {

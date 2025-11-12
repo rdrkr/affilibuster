@@ -16,7 +16,7 @@
       "name": "Frontend: Debug Client-Side",
       "type": "chrome",
       "request": "launch",
-      "url": "http://localhost:3000",
+      "url": "https://localhost:3000",
       "webRoot": "${workspaceFolder}/frontend",
       "presentation": {
         "group": "frontend",

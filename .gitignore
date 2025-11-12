@@ -13,6 +13,8 @@
 *.pem
 *.key
 *.crt
+*.cert
+!.gitkeep
 
 ###################
 # Python / Backend
@@ -151,7 +153,6 @@ dist
 
 # Gatsby files
 .cache/
-public
 
 # SvelteKit build output
 .svelte-kit
@@ -169,7 +170,6 @@ cms/.strapi/
 cms/.tmp/
 cms/build/
 cms/dist/
-cms/public/uploads/*
 
 # TailwindCSS
 .tailwindcss-*
@@ -358,3 +358,4 @@ openapi-ts-error-*.log
 
 .fake
 /cms/core
+/frontend/core

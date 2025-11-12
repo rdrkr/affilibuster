@@ -18,10 +18,31 @@ To regenerate models after spec changes:
 """
 
 # Re-export union types for CMS repository type safety
-from .cms_entities import CMSAPIError, CMSRequest, CMSResponse  # noqa: F401
+from .cms_entities import CMSAPIError, CMSRequest, CMSResponse
+
+# Re-export authentication domain entities
+from .email_verification_token import EmailVerificationToken
 
 # Re-export all auto-generated models from OpenAPI spec
 # noinspection PyUnusedImports
 from .generated.models import *  # noqa: F403
+from .password_reset_token import PasswordResetToken
+from .user import Email, HashedPassword, UserEntity, UserStatus
+from .user_session import UserSession
 
-# Note: __all__ is intentionally not defined to allow wildcard imports to export all models
+__all__ = [
+    "CMSAPIError",
+    "CMSRequest",
+    "CMSResponse",
+    "Email",
+    "EmailVerificationToken",
+    "HashedPassword",
+    "PasswordResetToken",
+    "UserEntity",
+    "UserSession",
+    "UserStatus",
+]
+
+# Note: Domain UserEntity is used for business logic, repositories, and use cases.
+# The OpenAPI-generated User model from .generated.models is used for API responses.
+# No naming conflict - UserEntity is the internal domain model.

@@ -2,10 +2,11 @@
 
 """Alembic migration environment setup."""
 
-from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from affilibuster_backend.config import settings
+from affilibuster_backend.infrastructure.database.models import Base
+from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -16,7 +17,8 @@ config.set_main_option("sqlalchemy.url", settings.database_url)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-target_metadata = None
+# Import all models to ensure they are registered with SQLAlchemy
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

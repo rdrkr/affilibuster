@@ -168,7 +168,7 @@ export default async function ContactPage({ params }: Props) {
           className="bg-gradient-to-br from-secondary-50 to-secondary-100 dark:from-secondary-900 dark:to-secondary-800 border-secondary-200 dark:border-secondary-700"
         >
           <div className="flex items-start gap-4">
-            <div className="bg-primary-600 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0">
+            <div className="bg-primary-900 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"

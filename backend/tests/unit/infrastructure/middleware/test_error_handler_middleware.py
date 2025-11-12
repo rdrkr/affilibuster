@@ -6,9 +6,11 @@ Unit tests for ErrorHandlingMiddleware.
 Tests exception handling and error response formatting.
 """
 
+from __future__ import annotations
+
 import json
 import os
-from typing import Never
+from typing import TYPE_CHECKING, Any, Never
 from unittest.mock import patch
 
 import pytest
@@ -17,6 +19,20 @@ from starlette.requests import Request
 from starlette.testclient import TestClient
 
 from affilibuster_backend.infrastructure.middleware.error_handler import ErrorHandlingMiddleware
+
+if TYPE_CHECKING:
+    from starlette.types import Receive, Scope, Send
+
+
+async def noop_app(scope: Scope, receive: Receive, send: Send) -> None:
+    """No-op ASGI app for testing middleware in isolation."""
+
+
+def decode_response_body(body: bytes | memoryview[Any]) -> str:
+    """Decode response body handling both bytes and memoryview."""
+    if isinstance(body, memoryview):
+        return bytes(body).decode()
+    return body.decode()
 
 
 def create_mock_request(method: str, path: str) -> Request:
@@ -189,7 +205,7 @@ class TestErrorHandlingMiddlewareDirectDispatch:
         """Test middleware dispatch directly catches exceptions and returns proper error response."""
         from affilibuster_backend.infrastructure.middleware.error_handler import ErrorHandlingMiddleware
 
-        middleware = ErrorHandlingMiddleware(app=None)
+        middleware = ErrorHandlingMiddleware(app=noop_app)
         request = create_mock_request("GET", "/test")
 
         async def failing_call_next(_: Request) -> Never:
@@ -198,7 +214,7 @@ class TestErrorHandlingMiddlewareDirectDispatch:
         response = await middleware.dispatch(request, failing_call_next)
 
         assert response.status_code == 500
-        data = json.loads(response.body.decode())
+        data = json.loads(decode_response_body(response.body))
         assert data["error"] == "Internal Server Error"
         assert data["code"] == "INTERNAL_SERVER_ERROR"
         assert data["message"] == "An unexpected error occurred. Please try again later."
@@ -213,7 +229,7 @@ class TestErrorHandlingMiddlewareDirectDispatch:
         from affilibuster_backend.infrastructure.middleware.error_handler import ErrorHandlingMiddleware
 
         with patch.dict(os.environ, {"DEBUG": "true"}):
-            middleware = ErrorHandlingMiddleware(app=None)
+            middleware = ErrorHandlingMiddleware(app=noop_app)
             request = create_mock_request("GET", "/test-debug")
 
             async def failing_call_next(_: Request) -> Never:
@@ -222,7 +238,7 @@ class TestErrorHandlingMiddlewareDirectDispatch:
             response = await middleware.dispatch(request, failing_call_next)
 
             assert response.status_code == 500
-            data = json.loads(response.body.decode())
+            data = json.loads(decode_response_body(response.body))
             assert "details" in data
             assert data["details"]["exception_type"] == "ValueError"
             assert data["details"]["exception_message"] == "Debug mode error"
@@ -235,7 +251,7 @@ class TestErrorHandlingMiddlewareDirectDispatch:
         from affilibuster_backend.infrastructure.middleware.error_handler import ErrorHandlingMiddleware
 
         with patch.dict(os.environ, {"DEBUG": "false"}):
-            middleware = ErrorHandlingMiddleware(app=None)
+            middleware = ErrorHandlingMiddleware(app=noop_app)
             request = create_mock_request("GET", "/test-prod")
 
             async def failing_call_next(_: Request) -> Never:
@@ -244,6 +260,6 @@ class TestErrorHandlingMiddlewareDirectDispatch:
             response = await middleware.dispatch(request, failing_call_next)
 
             assert response.status_code == 500
-            data = json.loads(response.body.decode())
+            data = json.loads(decode_response_body(response.body))
             assert "details" not in data
             assert data["error"] == "Internal Server Error"

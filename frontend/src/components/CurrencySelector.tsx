@@ -9,38 +9,28 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getCurrencies, getUserPreferences, updateUserPreferences, getNavigation } from '@/lib/client'
-import { useSession } from '@/hooks/useSession'
-import type { Currency, CurrencyCode } from '@/lib/types'
+import { getCurrencies, getNavigation } from '@/lib/client'
+import type { CurrencyCode, Currency, Navigation } from '@/lib/types'
 import { Dropdown, type DropdownItem } from '@/components/Dropdown'
-
-interface NavigationData {
-  currencySelectorAriaLabel?: string
-}
+import { useCurrency } from '@/lib/currency/useCurrency'
 
 export function CurrencySelector() {
-  const sessionId = useSession()
+  const { currency, setCurrency } = useCurrency()
   const [currencies, setCurrencies] = useState<Currency[] | null>(null)
-  const [selectedCurrency, setSelectedCurrency] = useState('USD')
   const [loading, setLoading] = useState(true)
-  const [navData, setNavData] = useState<NavigationData>({})
+  const [navData, setNavData] = useState<Navigation | null>(null)
 
+  // Fetch available currencies from backend
   useEffect(() => {
-    if (!sessionId) return
-
-    // Fetch currencies and user preferences
-    void Promise.all([getCurrencies(), getUserPreferences().catch(() => null)])
-      .then(([currenciesData, prefsData]) => {
+    void getCurrencies()
+      .then(currenciesData => {
         setCurrencies(currenciesData)
-        if (prefsData) {
-          setSelectedCurrency(prefsData.selectedCurrency)
-        }
       })
       .catch(console.error)
       .finally(() => {
         setLoading(false)
       })
-  }, [sessionId])
+  }, [])
 
   // Fetch navigation labels from CMS
   useEffect(() => {
@@ -57,35 +47,30 @@ export function CurrencySelector() {
     void fetchNavigation()
   }, [])
 
-  const handleCurrencyChange = (currencyCode: CurrencyCode) => {
-    void (async () => {
-      try {
-        await updateUserPreferences({ selectedCurrency: currencyCode })
-        setSelectedCurrency(currencyCode)
-      } catch (error) {
-        console.error('Failed to update currency:', error)
-      }
-    })()
+  const handleCurrencyChange = (currencyCode: CurrencyCode): void => {
+    setCurrency(currencyCode)
   }
 
   if (loading || !currencies) {
     return <div className="w-24 h-10 bg-primary-700 animate-pulse rounded-lg" />
   }
 
-  const currencyItems: DropdownItem<CurrencyCode>[] = currencies.map(currency => ({
-    value: currency.code as CurrencyCode,
-    label: `${currency.symbol} ${currency.code}`,
+  const currencyItems: DropdownItem<CurrencyCode>[] = currencies.map(curr => ({
+    value: curr.code as CurrencyCode,
+    label: `${curr.symbol} ${curr.code}`,
   }))
 
-  const currentCurrency = currencies.find(c => c.code === selectedCurrency)
+  const currentCurrency = currencies.find(c => (c.code as CurrencyCode) === currency)
 
   return (
     <Dropdown
-      value={selectedCurrency as CurrencyCode}
+      value={currency}
       items={currencyItems}
       onChange={handleCurrencyChange}
-      ariaLabel={navData.currencySelectorAriaLabel ?? 'Select currency'}
-      buttonClassName="flex items-center space-x-2 px-3 py-2 bg-primary-700 hover:bg-primary-600 text-white rounded-lg transition-colors shadow-sm whitespace-nowrap h-10"
+      ariaLabel={navData?.currencySelectorAriaLabel ?? 'Select currency'}
+      buttonClassName="flex items-center space-x-2 px-3 py-2 bg-primary-900 hover:bg-primary-800 text-white rounded-lg transition-colors shadow-sm whitespace-nowrap h-10"
+      data-testid="currency-selector"
+      itemTestIdPrefix="currency-option"
       renderTrigger={() => (
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">

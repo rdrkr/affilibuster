@@ -7,20 +7,14 @@
 
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
-import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
 import Script from 'next/script'
 import { Navigation } from '@/components/Navigation'
 import { Footer } from '@/components/Footer'
 import { LocaleProvider } from '@/components/LocaleProvider'
+import { VerificationReminder } from '@/components/auth/VerificationReminder'
 import { getNavigation, getFooter } from '@/lib/client'
-import {
-  SUPPORTED_LANGUAGE_CODES,
-  DEFAULT_LANGUAGE_CODE,
-  isLanguageCode,
-  getDirectionForLanguage,
-  type LanguageCode,
-} from '@/lib/types'
+import { SUPPORTED_LANGUAGE_CODES, DEFAULT_LANGUAGE_CODE, isLanguageCode, type LanguageCode } from '@/lib/types'
 import '../globals.css'
 
 interface Props {
@@ -43,9 +37,10 @@ export default async function LocaleLayout({ children, params }: Props) {
     console.error('Failed to resolve params in layout:', e)
   }
 
-  // Validate locale
+  // Validate locale - redirect to default language instead of notFound()
+  // Note: notFound() is not allowed in layouts, only in pages
   if (!isLanguageCode(lang)) {
-    notFound()
+    lang = DEFAULT_LANGUAGE_CODE
   }
 
   // Enable static rendering
@@ -70,43 +65,40 @@ export default async function LocaleLayout({ children, params }: Props) {
     console.error('Failed to fetch footer in layout:', error)
   }
 
-  // Determine text direction using type-safe helper
-  const direction = getDirectionForLanguage(lang)
+  // Note: lang and dir attributes are now set server-side in root layout.tsx
+  // No need for client-side JavaScript to set these attributes.
 
   return (
-    <html lang={lang} dir={direction} suppressHydrationWarning>
-      <head>
-        <Script
-          id="theme-script"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var root = document.documentElement;
-                  var isDark = localStorage.theme === 'dark' ||
-                    (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    <>
+      <Script
+        id="theme-script"
+        strategy="beforeInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              try {
+                var root = document.documentElement;
+                var isDark = localStorage.theme === 'dark' ||
+                  (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-                  // Explicitly set the theme class
-                  root.classList.remove('light', 'dark');
-                  root.classList.add(isDark ? 'dark' : 'light');
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
-      </head>
-      <body>
-        <NextIntlClientProvider messages={messages}>
-          <LocaleProvider>
-            <div className="min-h-screen flex flex-col">
-              <Navigation data={navigationData} lang={lang} />
-              <main className="flex-1">{children}</main>
-              <Footer data={footerData} lang={lang} />
-            </div>
-          </LocaleProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+                // Explicitly set the theme class
+                root.classList.remove('light', 'dark');
+                root.classList.add(isDark ? 'dark' : 'light');
+              } catch (e) {}
+            })();
+          `,
+        }}
+      />
+      <NextIntlClientProvider messages={messages}>
+        <LocaleProvider>
+          <div className="min-h-screen flex flex-col">
+            <Navigation data={navigationData} lang={lang} />
+            <VerificationReminder />
+            <main className="flex-1">{children}</main>
+            <Footer data={footerData} lang={lang} />
+          </div>
+        </LocaleProvider>
+      </NextIntlClientProvider>
+    </>
   )
 }

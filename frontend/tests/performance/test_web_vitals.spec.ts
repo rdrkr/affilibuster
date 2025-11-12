@@ -16,7 +16,10 @@
 
 import { test, expect } from '@playwright/test'
 
-const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN ?? 'http://localhost:3000'
+// Base URL for tests (uses same env vars as Playwright config)
+const BASE_URL =
+  process.env.PLAYWRIGHT_BASE_URL ??
+  (process.env.FRONTEND_PORT ? `http://localhost:${process.env.FRONTEND_PORT}` : 'http://localhost:3000')
 
 // Google's "Good" thresholds
 const WEB_VITALS_THRESHOLDS = {
@@ -145,7 +148,7 @@ async function captureWebVitals(page: any): Promise<WebVitalsMetrics> {
   })
 }
 
-test.describe('Web Vitals - English Pages', () => {
+test.describe('@performance Web Vitals - English Pages', () => {
   test('Homepage meets Web Vitals thresholds', async ({ page }) => {
     await page.goto(BASE_URL)
 
@@ -185,7 +188,7 @@ test.describe('Web Vitals - English Pages', () => {
   })
 })
 
-test.describe('Web Vitals - Italian Pages', () => {
+test.describe('@performance Web Vitals - Italian Pages', () => {
   test('Italian homepage meets Web Vitals thresholds', async ({ page }) => {
     await page.goto(`${BASE_URL}/it`)
     await page.waitForLoadState('networkidle')
@@ -203,7 +206,7 @@ test.describe('Web Vitals - Italian Pages', () => {
   })
 })
 
-test.describe('Web Vitals - Hebrew Pages (RTL)', () => {
+test.describe('@performance Web Vitals - Hebrew Pages (RTL)', () => {
   test('Hebrew homepage meets Web Vitals thresholds', async ({ page }) => {
     await page.goto(`${BASE_URL}/he`)
     await page.waitForLoadState('networkidle')
@@ -232,7 +235,7 @@ test.describe('Web Vitals - Hebrew Pages (RTL)', () => {
   })
 })
 
-test.describe('Web Vitals - Interactive Elements', () => {
+test.describe('@performance Web Vitals - Interactive Elements', () => {
   test('Language switcher interaction has low delay', async ({ page }) => {
     await page.goto(BASE_URL)
     await page.waitForLoadState('networkidle')
@@ -276,7 +279,7 @@ test.describe('Web Vitals - Interactive Elements', () => {
   })
 })
 
-test.describe('Web Vitals - Comparison Report', () => {
+test.describe('@performance Web Vitals - Comparison Report', () => {
   test('Generate Web Vitals report for all languages', async ({ page }) => {
     const results: Record<string, WebVitalsMetrics> = {}
 

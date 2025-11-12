@@ -9,8 +9,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getCurrencies, getUserPreferences } from '@/lib/client'
-import { useSession } from '@/hooks/useSession'
+import { useLocale } from 'next-intl'
+import { getCurrencies } from '@/lib/client'
+import { useCurrency } from '@/lib/currency/useCurrency'
+import { convertCurrency } from '@/lib/currency/exchange-rates'
 import type { Currency } from '@/lib/types'
 import { CurrencyCode, SymbolPositionEnum } from '@/lib/generated/types.gen'
 
@@ -27,59 +29,65 @@ export function Price({
   showCurrencyCode = true,
   className = '',
 }: PriceProps) {
-  const sessionId = useSession()
-  const [currency, setCurrency] = useState<Currency | null>(null)
+  const locale = useLocale()
+  const { currency: selectedCurrency } = useCurrency()
+  const [currencies, setCurrencies] = useState<Currency[] | null>(null)
   const [loading, setLoading] = useState(true)
 
+  // Fetch all currencies from backend
   useEffect(() => {
-    if (!sessionId) return
-
-    // Get user's preferred currency and all currencies
-    void Promise.all([getCurrencies(), getUserPreferences().catch(() => null)])
-      .then(([currencies, prefs]) => {
-        const targetCurrency = prefs?.selectedCurrency ?? currencyCode
-        const found = currencies.find((c: Currency) => c.code === targetCurrency)
-        setCurrency(found ?? null)
+    void getCurrencies()
+      .then(currenciesData => {
+        setCurrencies(currenciesData)
       })
       .catch(console.error)
       .finally(() => {
         setLoading(false)
       })
-  }, [sessionId, currencyCode])
+  }, [])
 
-  if (loading) {
+  if (loading || !currencies) {
     return (
       <span className={`inline-block h-6 w-16 bg-neutral-200 dark:bg-neutral-700 animate-pulse rounded ${className}`} />
     )
   }
 
-  if (!currency) {
+  // Find currency details for both source and target currencies
+  const sourceCurrency = currencies.find(c => c.code === currencyCode)
+  const targetCurrency = currencies.find(c => (c.code as CurrencyCode) === selectedCurrency)
+
+  if (!sourceCurrency || !targetCurrency) {
     return <span className={className}>{amount}</span>
   }
 
-  // Format the number with proper decimal places
-  const formatted = amount.toLocaleString('en-US', {
-    minimumFractionDigits: currency.decimalPlaces,
-    maximumFractionDigits: currency.decimalPlaces,
+  // Convert price to selected currency
+  const convertedAmount = convertCurrency(amount, currencyCode as CurrencyCode, selectedCurrency)
+
+  // Format the number with proper decimal places and locale-specific formatting
+  const formatted = convertedAmount.toLocaleString(locale, {
+    minimumFractionDigits: targetCurrency.decimalPlaces,
+    maximumFractionDigits: targetCurrency.decimalPlaces,
     useGrouping: true,
   })
 
-  // Apply currency-specific separators
+  // Apply currency-specific separators (override locale defaults if needed)
   const localizedNumber = formatted
     .replace(/,/g, '###THOUSAND###')
-    .replace(/\./g, currency.decimalSeparator)
-    .replace(/###THOUSAND###/g, currency.thousandsSeparator)
+    .replace(/\./g, targetCurrency.decimalSeparator)
+    .replace(/###THOUSAND###/g, targetCurrency.thousandsSeparator)
 
-  // Position symbol
+  // Position symbol according to currency configuration
   const display =
-    currency.symbolPosition === SymbolPositionEnum.BEFORE
-      ? `${currency.symbol}${localizedNumber}`
-      : `${localizedNumber} ${currency.symbol}`
+    targetCurrency.symbolPosition === SymbolPositionEnum.BEFORE
+      ? `${targetCurrency.symbol}${localizedNumber}`
+      : `${localizedNumber} ${targetCurrency.symbol}`
 
   return (
-    <span className={`font-medium ${className}`}>
+    <span className={`font-medium ${className}`} data-testid="price">
       {display}
-      {showCurrencyCode && <span className="text-xs text-neutral-500 dark:text-neutral-400 ml-1">{currency.code}</span>}
+      {showCurrencyCode && (
+        <span className="text-xs text-neutral-500 dark:text-neutral-400 ml-1">{targetCurrency.code}</span>
+      )}
     </span>
   )
 }

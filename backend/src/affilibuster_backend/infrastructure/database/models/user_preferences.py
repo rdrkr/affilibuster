@@ -6,10 +6,10 @@ SQLAlchemy model for UserPreferences entity.
 Reference: data-model.md:666-677
 """
 
-import uuid
+import uuid as uuid_module
 from datetime import UTC, datetime
 
-from sqlalchemy import Boolean, Column, DateTime, Enum, String, UniqueConstraint
+from sqlalchemy import Boolean, DateTime, Enum, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -17,7 +17,7 @@ from affilibuster_backend.domain.entities.generated.models import CurrencyCode, 
 from affilibuster_backend.infrastructure.database.models import Base
 
 
-class UserPreferencesModel(Base):  # type: ignore[misc]
+class UserPreferencesModel(Base):
     """
     SQLAlchemy model for user_preferences table.
 
@@ -27,11 +27,11 @@ class UserPreferencesModel(Base):  # type: ignore[misc]
     __tablename__ = "user_preferences"
 
     # Primary Key
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid_module.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid_module.uuid4)
 
     # Session/User Identifiers
-    session_id = Column(String(100), nullable=False, unique=True)
-    user_id = Column(String(100), nullable=True)
+    session_id: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    user_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     # Currency and Language as enums (sourced from OpenAPI-generated models)
     # Store as VARCHAR strings, not PostgreSQL enum types
@@ -43,23 +43,25 @@ class UserPreferencesModel(Base):  # type: ignore[misc]
     )
 
     # Preferences
-    dismissed_language_prompt = Column(Boolean, nullable=False, default=False, server_default="false")
+    dismissed_language_prompt: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
 
     # Audit Fields
-    created_at = Column(
+    created_at: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
         default=lambda: datetime.now(UTC).replace(tzinfo=None),
         server_default="NOW()",
     )
-    updated_at = Column(
+    updated_at: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
         default=lambda: datetime.now(UTC).replace(tzinfo=None),
         onupdate=lambda: datetime.now(UTC).replace(tzinfo=None),
         server_default="NOW()",
     )
-    expires_at = Column(DateTime, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
     # Constraints
     __table_args__ = (UniqueConstraint("session_id", name="uq_session_id"),)

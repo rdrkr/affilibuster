@@ -50,7 +50,7 @@ export default async function GonePage() {
   }
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-      <div className="max-w-md w-full text-center px-4">
+      <div className="max-w-md w-full text-center px-4" data-testid="410-page">
         <div className="mb-8">
           <h1 className="text-6xl font-bold mb-2">410</h1>
           {errorData?.subtitle && (
@@ -61,7 +61,7 @@ export default async function GonePage() {
 
         <div className="space-y-4">
           {errorData?.ctaText && (
-            <Link href="/">
+            <Link href="/" data-testid="410-home-link">
               <Button variant="secondary">{errorData.ctaText}</Button>
             </Link>
           )}

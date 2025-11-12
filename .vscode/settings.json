@@ -4,9 +4,7 @@
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit"
   },
-  "editor.rulers": [
-    120
-  ],
+  "editor.rulers": [120],
   "editor.tabSize": 2,
   "editor.detectIndentation": true,
   "editor.insertSpaces": true,
@@ -43,19 +41,13 @@
       "source.fixAll": "explicit",
       "source.organizeImports": "explicit"
     },
-    "editor.rulers": [
-      120
-    ],
+    "editor.rulers": [120],
     "editor.tabSize": 4,
     "editor.insertSpaces": true
   },
   "python.analysis.typeCheckingMode": "strict",
   "python.testing.pytestEnabled": true,
-  "python.testing.pytestArgs": [
-    "tests",
-    "--verbose",
-    "--no-cov"
-  ],
+  "python.testing.pytestArgs": ["tests", "--verbose", "--no-cov"],
   "python.testing.cwd": "${workspaceFolder}/backend",
   "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
   "python.terminal.activateEnvironment": true,
@@ -63,24 +55,8 @@
   "ruff.organizeImports": true,
   "ruff.fixAll": true,
   "ruff.lint.enable": true,
-  "ruff.lint.run": "onSave",
-  "ruff.format.args": [
-    "--config",
-    "${workspaceFolder}/backend/pyproject.toml"
-  ],
-  "ruff.lint.args": [
-    "--config",
-    "${workspaceFolder}/backend/pyproject.toml"
-  ],
-  "ruff.path": [
-    "${workspaceFolder}/backend/.venv/bin/ruff"
-  ],
-  "mypy-type-checker.args": [
-    "--config-file=${workspaceFolder}/backend/pyproject.toml"
-  ],
-  "mypy-type-checker.path": [
-    "${workspaceFolder}/backend/.venv/bin/mypy"
-  ],
+  "ruff.configuration": "${workspaceFolder}/backend/pyproject.toml",
+  "ruff.path": ["${workspaceFolder}/backend/.venv/bin/ruff"],
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
@@ -129,12 +105,7 @@
   "typescript.preferences.importModuleSpecifier": "relative",
   "javascript.preferences.importModuleSpecifier": "relative",
   "eslint.enable": true,
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "eslint.workingDirectories": [
     {
       "directory": "frontend",
@@ -156,14 +127,8 @@
     "typescriptreact": "javascript"
   },
   "tailwindCSS.experimental.classRegex": [
-    [
-      "cn\\(([^)]*)\\)",
-      "(?:'|\"|`)([^']*)(?:'|\"|`)"
-    ],
-    [
-      "classNames\\(([^)]*)\\)",
-      "(?:'|\"|`)([^']*)(?:'|\"|`)"
-    ]
+    ["cn\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+    ["classNames\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
   ],
   "css.validate": false,
   "git.enableSmartCommit": true,
@@ -196,46 +161,67 @@
     "editor.tabSize": 2
   },
   "cSpell.words": [
+    "abstractmethod",
+    "addopts",
     "Affilibuster",
+    "aiosqlite",
     "alembic",
+    "Asyncio",
     "asyncpg",
     "autogenerate",
-    "changeprocesscwd",
     "changeme",
+    "changeprocesscwd",
     "classnames",
+    "codegen",
+    "contextlib",
     "datamodel",
+    "datefmt",
     "datetime",
+    "docstrings",
     "dotenv",
     "esbenp",
     "fastapi",
     "fflush",
+    "filterwarnings",
     "healthcheck",
+    "htmlcov",
     "httpx",
     "initdb",
     "isready",
     "lcov",
+    "levelname",
     "mypy",
+    "NOTSET",
     "openapi",
     "passlib",
+    "pathsep",
+    "psycopg",
+    "pycache",
     "pydantic",
+    "pydocstyle",
     "pyproject",
     "pytest",
+    "pyyaml",
+    "qualname",
     "redocly",
+    "repr",
+    "sqlalchemy",
     "strapi",
+    "strptime",
     "tailwindcss",
     "taskipy",
+    "testpaths",
     "tsbuildinfo",
     "tsdk",
     "typescriptreact",
+    "Unraisable",
     "uvicorn",
+    "venv",
+    "virtualenv",
     "worksteal",
     "xdist"
   ],
-  "cSpell.enableFiletypes": [
-    "!python",
-    "!typescript",
-    "!javascript"
-  ],
+  "cSpell.enableFiletypes": ["!python", "!typescript", "!javascript"],
   "yaml.schemas": {
     "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/schemas/v3.0/schema.json": [
       "contracts/*.openapi.yaml",

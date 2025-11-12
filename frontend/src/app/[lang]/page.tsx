@@ -6,16 +6,20 @@
  * Fetches content from Strapi homepage single type
  */
 
-import { getHomepage, getProducts } from '@/lib/client'
-import Link from 'next/link'
-import { setRequestLocale } from 'next-intl/server'
-import { LanguagePrompt } from '@/components/LanguagePrompt'
 import { Button } from '@/components/Button'
 import { Hero } from '@/components/Hero'
+import { JsonLd } from '@/components/JsonLd'
+import { generateOrganizationSchema } from '@/components/SEOHead'
+import { getHomepage, getProducts } from '@/lib/client'
 import type { ApiHomepageHomepageDocument } from '@/lib/generated/types.gen'
 import { _1Enum4 } from '@/lib/generated/types.gen'
-import type { UiFeatureCardEntry, Product, LanguageCode } from '@/lib/types'
+import type { LanguageCode, Product, UiFeatureCardEntry } from '@/lib/types'
 import { SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
+import type { Metadata } from 'next'
+import { setRequestLocale } from 'next-intl/server'
+import Image from 'next/image'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
 
 // Important: Strapi CMS must be running during build for content to be fetched
 // Pages are rendered statically with ISR revalidation
@@ -28,6 +32,72 @@ export function generateStaticParams() {
   return SUPPORTED_LANGUAGE_CODES.map(lang => ({ lang }))
 }
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const resolvedParams = await params
+  const lang = resolvedParams.lang as LanguageCode
+
+  // Validate language code - return 404 metadata for invalid languages
+  if (!SUPPORTED_LANGUAGE_CODES.includes(lang)) {
+    return {
+      title: '404 - Page Not Found',
+      description: 'The page you are looking for could not be found.',
+      robots: 'noindex, nofollow',
+    }
+  }
+
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://localhost:3000'
+
+  // Map language codes to OG locales
+  const ogLocaleMap = {
+    en: 'en_US',
+    it: 'it_IT',
+    he: 'he_IL',
+  } as const
+
+  return {
+    title: 'Affilibuster',
+    description: 'Find the best products with our affiliate platform',
+
+    // Robots meta tag for SEO
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+      },
+    },
+
+    // Hreflang tags for multi-language SEO
+    alternates: {
+      canonical: `${SITE_URL}/${lang}`,
+      languages: {
+        en: `${SITE_URL}/en`,
+        it: `${SITE_URL}/it`,
+        he: `${SITE_URL}/he`,
+        'x-default': `${SITE_URL}/en`,
+      },
+    },
+
+    // Open Graph locale
+    openGraph: {
+      locale: ogLocaleMap[lang],
+      type: 'website',
+      url: `${SITE_URL}/${lang}`,
+      title: 'Affilibuster',
+      description: 'Find the best products with our affiliate platform',
+      images: [
+        {
+          url: `${SITE_URL}/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: 'Affilibuster - Find the best products',
+        },
+      ],
+    },
+  }
+}
+
 export default async function HomePage({ params }: Props) {
   let lang: LanguageCode = 'en' as LanguageCode
   try {
@@ -37,6 +107,11 @@ export default async function HomePage({ params }: Props) {
     }
   } catch (e) {
     console.error('Failed to resolve params:', e)
+  }
+
+  // Validate language code - return 404 for invalid languages
+  if (!SUPPORTED_LANGUAGE_CODES.includes(lang)) {
+    notFound()
   }
 
   // Enable static rendering
@@ -63,9 +138,11 @@ export default async function HomePage({ params }: Props) {
     console.error('Failed to fetch content:', error)
   }
 
+  const organizationSchema = generateOrganizationSchema()
+
   return (
     <>
-      <LanguagePrompt />
+      <JsonLd data={organizationSchema} id="organization-schema" />
 
       {/* Hero Section */}
       <Hero title={homepageData?.heroTitle ?? ''} subtitle={homepageData?.heroSubtitle}>
@@ -76,14 +153,14 @@ export default async function HomePage({ params }: Props) {
               <Link
                 key={index}
                 href={card.linkUrl ?? '/'}
-                className="group bg-primary-700 hover:bg-primary-600 rounded-xl p-6 transition-all duration-300 hover:scale-105"
+                className="group bg-primary-900 hover:bg-primary-800 rounded-xl p-6 transition-all duration-300 hover:scale-105"
               >
                 <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
                   </svg>
                 </div>
-                <h3 className="font-semibold mb-2 text-white">{card.title}</h3>
+                <h2 className="font-semibold mb-2 text-white text-lg">{card.title}</h2>
                 <p className="text-sm text-neutral-200">{card.description}</p>
               </Link>
             ))}
@@ -95,60 +172,71 @@ export default async function HomePage({ params }: Props) {
       {productsList.length > 0 && (
         <section className="py-16 bg-neutral-50 dark:bg-neutral-900">
           <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-3xl font-bold mb-2">{homepageData?.featuredSectionTitle}</h2>
-                <p className="text-neutral-600 dark:text-neutral-400">{homepageData?.featuredSectionSubtitle}</p>
+            {homepageData?.featuredSectionTitle && (
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-3xl font-bold mb-2">{homepageData.featuredSectionTitle}</h2>
+                  {homepageData.featuredSectionSubtitle && (
+                    <p className="text-neutral-600 dark:text-neutral-400">{homepageData.featuredSectionSubtitle}</p>
+                  )}
+                </div>
+                <Link
+                  href={`/${lang}/products`}
+                  className="text-primary-600 hover:text-primary-700 font-semibold flex items-center gap-2"
+                >
+                  {homepageData.seeAllProductsText}
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
               </div>
-              <Link
-                href={`/${lang}/products`}
-                className="text-primary-600 hover:text-primary-700 font-semibold flex items-center gap-2"
-              >
-                {homepageData?.seeAllProductsText}
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {productsList.map((product: Product) => (
-                <Link
-                  key={product.id}
-                  href={`/${lang}/${product.slug}`}
-                  className="group bg-white dark:bg-neutral-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border-2 border-primary-100 dark:border-primary-900 hover:border-tertiary-400 flex flex-col"
-                >
-                  {/* Product Image */}
-                  <div className="relative bg-gradient-to-br from-primary-600 to-primary-800 h-48 flex items-center justify-center">
-                    <svg className="w-20 h-20 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-secondary-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        {homepageData?.featuredBadgeText}
-                      </span>
-                    </div>
-                  </div>
+              {productsList.map((product: Product) => {
+                // Use H2 for products if no section title (proper heading hierarchy)
+                // Use H3 if section title exists (H1 -> H2(section) -> H3(products))
+                const ProductHeading = homepageData?.featuredSectionTitle ? 'h3' : 'h2'
 
-                  {/* Content */}
-                  <div className="p-6 flex flex-col flex-1">
-                    <h3 className="text-xl font-bold mb-2 group-hover:text-primary-600 transition-colors">
-                      {product.title}
-                    </h3>
-                    {product.excerpt ? (
-                      <p className="text-neutral-600 dark:text-neutral-400 line-clamp-2 mb-4">{product.excerpt}</p>
-                    ) : null}
-                    <Button variant="primary" className="w-full mt-auto">
-                      {homepageData?.viewDetailsButtonText}
-                    </Button>
-                  </div>
-                </Link>
-              ))}
+                return (
+                  <Link
+                    key={product.id}
+                    href={`/${lang}/products/${product.slug}`}
+                    className="group bg-white dark:bg-neutral-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border-2 border-primary-100 dark:border-primary-900 hover:border-tertiary-400 flex flex-col"
+                  >
+                    {/* Product Image */}
+                    <div className="relative h-48 bg-gradient-to-br from-primary-600 to-primary-800">
+                      <Image
+                        src="/placeholder.svg"
+                        alt={product.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover opacity-20"
+                        loading="lazy"
+                        data-testid="product-image-home"
+                      />
+                      <div className="absolute top-4 right-4 z-10">
+                        <span className="bg-secondary-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                          {homepageData?.featuredBadgeText}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6 flex flex-col flex-1">
+                      <ProductHeading className="text-xl font-bold mb-2 group-hover:text-primary-600 transition-colors">
+                        {product.title}
+                      </ProductHeading>
+                      {product.excerpt ? (
+                        <p className="text-neutral-600 dark:text-neutral-400 line-clamp-2 mb-4">{product.excerpt}</p>
+                      ) : null}
+                      <Button variant="primary" className="w-full mt-auto">
+                        {homepageData?.viewDetailsButtonText}
+                      </Button>
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
 
             {/* Pagination Info - Only show if CMS template available */}
@@ -168,7 +256,7 @@ export default async function HomePage({ params }: Props) {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-12 text-white">
-              <div className="text-6xl mb-6 opacity-30">"</div>
+              <div className="text-6xl mb-6 opacity-30">&ldquo;</div>
               {homepageData?.testimonialsText && (
                 <blockquote className="text-2xl md:text-3xl font-bold mb-8">{homepageData.testimonialsText}</blockquote>
               )}

@@ -202,37 +202,45 @@ class TestUserPreferencesValidation:
     def test_requires_id(self):
         """Test that id is required."""
         with pytest.raises(ValidationError):
-            UserPreferences(
-                session_id="session-123",
-                selected_currency=CurrencyCode.USD,
-                dismissed_language_prompt=False,
+            UserPreferences.model_validate(
+                {
+                    "session_id": "session-123",
+                    "selected_currency": CurrencyCode.USD,
+                    "dismissed_language_prompt": False,
+                }
             )
 
     def test_requires_session_id(self):
         """Test that session_id is required."""
         with pytest.raises(ValidationError):
-            UserPreferences(
-                id=uuid4(),
-                selected_currency=CurrencyCode.USD,
-                dismissed_language_prompt=False,
+            UserPreferences.model_validate(
+                {
+                    "id": str(uuid4()),
+                    "selected_currency": CurrencyCode.USD,
+                    "dismissed_language_prompt": False,
+                }
             )
 
     def test_requires_selected_currency(self):
         """Test that selected_currency is required."""
         with pytest.raises(ValidationError):
-            UserPreferences(
-                id=uuid4(),
-                session_id="session-123",
-                dismissed_language_prompt=False,
+            UserPreferences.model_validate(
+                {
+                    "id": str(uuid4()),
+                    "session_id": "session-123",
+                    "dismissed_language_prompt": False,
+                }
             )
 
     def test_requires_dismissed_language_prompt(self):
         """Test that dismissed_language_prompt is required."""
         with pytest.raises(ValidationError):
-            UserPreferences(
-                id=uuid4(),
-                session_id="session-123",
-                selected_currency=CurrencyCode.USD,
+            UserPreferences.model_validate(
+                {
+                    "id": str(uuid4()),
+                    "session_id": "session-123",
+                    "selected_currency": CurrencyCode.USD,
+                }
             )
 
     def test_datetime_fields_require_timezone(self):

@@ -254,5 +254,17 @@ describe('LocaleProvider', () => {
       expect(result.current.locale).toBe(CodeEnum.EN)
       expect(result.current.direction).toBe('ltr')
     })
+
+    it('should call default setLocale without throwing when used outside provider', () => {
+      const { result } = renderHook(() => useLocale())
+
+      // Default setLocale is a no-op but should not throw
+      expect(() => {
+        result.current.setLocale('it')
+      }).not.toThrow()
+
+      // Locale should not change since default setLocale is a no-op
+      expect(result.current.locale).toBe(CodeEnum.EN)
+    })
   })
 })

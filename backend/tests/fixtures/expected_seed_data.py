@@ -34,6 +34,7 @@ from affilibuster_backend.domain.entities.generated.models import (
     ApiTermTermDocument,
     Currency,
 )
+from affilibuster_backend.domain.entities.url_redirect import URLRedirect
 
 
 class ExpectedLocale(TypedDict):
@@ -66,6 +67,11 @@ with open(_SEED_DATA_PATH, encoding="utf-8") as f:
 # Extract currencies from JSON using Pydantic model validation
 EXPECTED_CURRENCIES: list[Currency] = [
     Currency.model_validate(currency) for currency in _SEED_DATA["collections"]["currencies"]
+]
+
+# Extract redirects from JSON using Pydantic model validation
+EXPECTED_REDIRECTS: list[URLRedirect] = [
+    URLRedirect.model_validate(redirect) for redirect in _SEED_DATA["collections"]["redirects"]
 ]
 
 # Extract products from JSON using Pydantic model validation
@@ -159,11 +165,15 @@ EXPECTED_LOCALES: list[ExpectedLocale] = [
 EXPECTED_CURRENCY_CODES = [c.code for c in EXPECTED_CURRENCIES]
 EXPECTED_PRODUCT_SLUGS = [p.slug for p in EXPECTED_PRODUCTS]
 EXPECTED_LOCALE_CODES = [loc["code"] for loc in EXPECTED_LOCALES]
+EXPECTED_REDIRECT_FROM_PATHS = [r.from_path for r in EXPECTED_REDIRECTS]
 
 # Counts
 EXPECTED_CURRENCY_COUNT = len(EXPECTED_CURRENCIES)
 EXPECTED_PRODUCT_COUNT = len(EXPECTED_PRODUCTS)
 EXPECTED_LOCALE_COUNT = len(EXPECTED_LOCALES)
+EXPECTED_REDIRECT_COUNT = len(EXPECTED_REDIRECTS)
 EXPECTED_ENGLISH_PRODUCT_COUNT = sum(1 for p in EXPECTED_PRODUCTS if p.locale == "en")
 EXPECTED_ITALIAN_PRODUCT_COUNT = sum(1 for p in EXPECTED_PRODUCTS if p.locale == "it")
 EXPECTED_FEATURED_PRODUCT_COUNT = sum(1 for p in EXPECTED_PRODUCTS if p.featured)
+EXPECTED_301_REDIRECT_COUNT = sum(1 for r in EXPECTED_REDIRECTS if r.status_code == 301)
+EXPECTED_410_REDIRECT_COUNT = sum(1 for r in EXPECTED_REDIRECTS if r.status_code == 410)

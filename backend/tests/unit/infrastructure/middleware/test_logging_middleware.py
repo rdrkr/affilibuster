@@ -13,8 +13,13 @@ import pytest
 from fastapi import FastAPI
 from starlette.requests import Request
 from starlette.testclient import TestClient
+from starlette.types import Receive, Scope, Send
 
 from affilibuster_backend.infrastructure.middleware.request_logging import RequestLoggingMiddleware
+
+
+async def noop_app(scope: Scope, receive: Receive, send: Send) -> None:
+    """No-op ASGI app for testing middleware in isolation."""
 
 
 def create_mock_request(method: str, path: str) -> Request:
@@ -192,7 +197,7 @@ class TestRequestLoggingMiddlewareDirectDispatch:
         from affilibuster_backend.infrastructure.middleware.request_logging import RequestLoggingMiddleware
 
         with caplog.at_level(logging.ERROR):
-            middleware = RequestLoggingMiddleware(app=None)
+            middleware = RequestLoggingMiddleware(app=noop_app)
             request = create_mock_request("GET", "/test-error")
 
             async def failing_call_next(_: Request) -> Never:
@@ -223,7 +228,7 @@ class TestRequestLoggingMiddlewareDirectDispatch:
         """Test middleware dispatch re-raises exception after logging."""
         from affilibuster_backend.infrastructure.middleware.request_logging import RequestLoggingMiddleware
 
-        middleware = RequestLoggingMiddleware(app=None)
+        middleware = RequestLoggingMiddleware(app=noop_app)
         request = create_mock_request("POST", "/reraise-test")
 
         async def failing_call_next(_: Request) -> Never:

@@ -44,11 +44,19 @@ architecture.**
 
 ### Prerequisites
 
-Install Docker for your platform:
+#### Required Software
+
+**Docker** - Install for your platform:
 
 - **macOS**: Docker Desktop or `brew install colima docker docker-compose docker-buildx`
 - **Linux**: `curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh`
 - **Windows**: Download [Docker Desktop](https://www.docker.com/products/docker-desktop)
+
+**mkcert** - For HTTPS development certificates:
+
+- **macOS**: `brew install mkcert`
+- **Linux**: `sudo apt install mkcert` or build from [source](https://github.com/FiloSottile/mkcert)
+- **Windows**: `choco install mkcert` or download from [releases](https://github.com/FiloSottile/mkcert/releases)
 
 ### One-Command Setup ⚡
 
@@ -57,7 +65,7 @@ Install Docker for your platform:
 git clone https://github.com/rdrkr/affilibuster.git
 cd affilibuster
 
-# Complete first-time setup (installs tools, dependencies, and hooks)
+# Complete first-time setup (installs tools, dependencies, certificates, and hooks)
 make setup
 
 # Start all services
@@ -68,14 +76,18 @@ make dev
 
 ### Access Your Applications
 
-| Service           | URL                         | Notes                      |
-|-------------------|-----------------------------|----------------------------|
-| **Frontend**      | http://localhost:3000       | Next.js (English, default) |
-| **Frontend (IT)** | http://localhost:3000/it    | Italian locale             |
-| **Frontend (HE)** | http://localhost:3000/he    | Hebrew locale (RTL)        |
-| **Backend API**   | http://localhost:8000       | FastAPI REST API           |
-| **API Docs**      | http://localhost:8000/docs  | Swagger UI                 |
-| **CMS Admin**     | http://localhost:1337/admin | Strapi admin panel         |
+| Service           | URL                            | Notes                      |
+|-------------------|--------------------------------|----------------------------|
+| **Frontend**      | <https://localhost:3000>       | Next.js (English, default) |
+| **Frontend (IT)** | <https://localhost:3000/it>    | Italian locale             |
+| **Frontend (HE)** | <https://localhost:3000/he>    | Hebrew locale (RTL)        |
+| **Backend API**   | <https://localhost:8000>       | FastAPI REST API           |
+| **API Docs**      | <https://localhost:8000/docs>  | Swagger UI                 |
+| **CMS Admin**     | <https://localhost:1337/admin> | Strapi admin panel         |
+| **Test Runner**   | (Internal)                     | Isolated E2E test executor |
+
+**Note**: All services run on HTTPS with mkcert certificates. Your browser should trust them automatically after running
+`mkcert -install`.
 
 ### Stop Services
 
@@ -153,7 +165,9 @@ affilibuster/                          # Monorepo root
 │   │   ├── styles/                    # CSS modules and themes
 │   │   ├── i18n.ts                    # i18n configuration
 │   │   └── proxy.ts                   # Development proxy
-│   └── tests/                         # Test files (component, e2e, performance)
+│   ├── tests/                         # Test files (component, e2e, performance)
+│   ├── Dockerfile                     # Frontend dev server container
+│   └── Dockerfile.test-runner         # Lightweight Playwright test container
 │
 ├── cms/                               # Strapi 5 headless CMS
 │   ├── config/                        # Strapi configuration files
@@ -356,9 +370,96 @@ make health
 5. **Code Quality**: Use `make lint` and `make format` to maintain standards
 6. **Deployment**: Use `make build` for production builds
 
+### Database Migrations
+
+Affilibuster uses **Alembic** for database schema migrations in the backend.
+
+#### Migration Commands
+
+```bash
+# Run migrations (apply pending migrations)
+cd backend
+uv run task migrate
+
+# Create a new migration (auto-generate from model changes)
+uv run task migrate-create "description of changes"
+
+# View migration history
+uv run task migrate-history
+
+# Check current migration version
+uv run task migrate-current
+
+# Rollback one migration
+uv run task migrate-downgrade
+```
+
+#### How It Works
+
+- **Models First**: Define your SQLAlchemy models in `backend/src/affilibuster_backend/infrastructure/database/models/`
+- **Auto-Generate**: Alembic detects model changes and generates migration files
+- **Version Control**: Migration files in `backend/alembic/versions/` are committed to git
+- **Docker Integration**: Migrations run automatically on `make dev` via `docker-entrypoint.sh`
+
+#### Configuration
+
+- **Migration Config**: `backend/alembic.ini` (required by Alembic)
+- **Task Commands**: Defined in `backend/pyproject.toml` under `[tool.taskipy.tasks]`
+- **Database URL**: Loaded from `affilibuster_backend.config.settings` in `alembic/env.py`
+
+#### Important Notes
+
+- **Never delete migrations** - they're part of your schema history
+- **Always test migrations** before committing (up and down)
+- **Review auto-generated migrations** - Alembic may miss some changes
+- **Docker handles migrations** - no manual `migrate` needed when using `make dev`
+
 ---
 
 ## 🧪 Testing
+
+### Test Philosophy
+
+Affilibuster tests are divided into two distinct categories with different purposes:
+
+#### E2E Tests (Correctness)
+
+- **Purpose**: Verify that features work correctly
+- **NO explicit timeouts** - tests use global timeout (5 minutes)
+- **NO `waitForTimeout()` calls** - wait for elements/states, not arbitrary time
+- **Tests should pass regardless of system load**
+- **Focus on "Does it work?" not "Is it fast?"**
+
+#### Performance Tests (Timing)
+
+- **Purpose**: Verify performance requirements are met
+- **Production builds only** - skip on development builds
+- **Strict timing thresholds** - defined in `tests/config/performance-thresholds.ts`
+- **Network throttling** - simulate real-world conditions (3G)
+- **Focus on "Is it fast enough?"**
+
+### Test Architecture
+
+Affilibuster uses a **dedicated test-runner container** for all Playwright E2E and performance tests, providing:
+
+- **Lightweight Container**: Uses `Dockerfile.test-runner` - only Playwright dependencies, no Next.js build
+- **Resource Isolation**: Tests run in a separate container from the dev server, eliminating resource contention
+- **Dedicated Resources**: 4 CPU cores and 4GB RAM allocated specifically for test execution
+- **Improved Stability**: Webkit tests no longer timeout due to system load from dev server hot-reload/compilation
+- **Better Performance**: Tests can run in parallel without degrading the dev server
+- **Persistent Browser Cache**: Playwright browsers are installed once and cached across test runs
+
+**Architecture**:
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   test-runner   │────▶│    frontend     │────▶│     backend     │
+│ (Playwright)    │     │  (Dev Server)   │     │   (FastAPI)     │
+│  4 CPU / 4GB    │     │   1 CPU         │     │                 │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+Tests execute in `test-runner`, hitting the `frontend` dev server, which calls the `backend` API.
 
 ### Quick Commands
 
@@ -373,6 +474,14 @@ make test-parallel
 make test-backend          # Backend (pytest)
 make test-frontend         # Frontend (Jest)
 make test-cms              # CMS (when custom code added)
+
+# E2E tests with specific browser
+make test-frontend-integration BROWSER=webkit
+make test-frontend-integration BROWSER=chromium
+make test-frontend-integration BROWSER=firefox
+
+# Performance tests
+make test-performance BROWSER=chromium
 
 # Coverage reports
 make coverage-merge        # Merge all module reports
@@ -455,9 +564,9 @@ Affilibuster uses a **layered OpenAPI architecture** with auto-generated types f
 
 ### Interactive Documentation
 
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-- **OpenAPI JSON**: http://localhost:8000/openapi.json
+- **Swagger UI**: <https://localhost:8000/docs>
+- **ReDoc**: <https://localhost:8000/redoc>
+- **OpenAPI JSON**: <https://localhost:8000/openapi.json>
 
 ### OpenAPI Architecture
 

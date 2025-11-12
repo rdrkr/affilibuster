@@ -8,15 +8,15 @@ authors = [{ name = "Affilibuster Team" }]
 requires-python = ">=3.13"
 readme = "../README.md"
 dependencies = [
-  "fastapi==0.121.1",
+  "fastapi==0.122.0",
   "uvicorn[standard]>=0.34.0",
   "sqlalchemy>=2.0.37",
-  "alembic==1.17.1",
+  "alembic==1.17.2",
   "pydantic>=2.12.4",
   "pydantic-settings>=2.12.0",
   "psycopg2-binary>=2.9.10",
-  "asyncpg>=0.30.0",
-  "redis==7.0.1",
+  "asyncpg>=0.31.0",
+  "redis==7.1.0",
   "httpx>=0.28.1",
   "python-jose[cryptography]>=3.3.0",
   "passlib[bcrypt]>=1.7.4",
@@ -36,7 +36,7 @@ dev = [
   "pytest-xdist>=3.6.1",
   "pytest-mock>=3.12.0",
   "aiosqlite>=0.20.0",
-  "ruff>=0.14.4",
+  "ruff>=0.14.6",
   "mypy>=1.14.1",
   "taskipy>=1.14.1",
   "types-pyyaml>=6.0.12.20250915",
@@ -66,6 +66,12 @@ openapi-generate = { cmd = """\
       --custom-file-header "# Copyright (c) 2025 Affilibuster by Ronen Druker." \
       --allow-population-by-field-name \
     """, help = "generates Python models from OpenAPI specification" }
+seed = { cmd = "PYTHONPATH=src python scripts/seed.py", help = "seeds PostgreSQL database with data from seed-data.json" }
+migrate = { cmd = "alembic upgrade head", help = "runs database migrations to latest version" }
+migrate-create = { cmd = "alembic revision --autogenerate -m", help = "creates a new migration (usage: uv run task migrate-create 'description')" }
+migrate-downgrade = { cmd = "alembic downgrade -1", help = "downgrades database by one migration" }
+migrate-history = { cmd = "alembic history", help = "shows migration history" }
+migrate-current = { cmd = "alembic current", help = "shows current migration version" }
 
 [tool.ruff]
 target-version = "py313"
@@ -85,6 +91,12 @@ extend-ignore = [
 ]
 
 [tool.ruff.lint.extend-per-file-ignores]
+"src/affilibuster_backend/infrastructure/dependencies.py" = [
+  "PLC0415", # Lazy imports required to avoid circular dependencies
+]
+"alembic/**/*.py" = [
+  "N999", # Alembic migration files use timestamp-based names
+]
 "tests/**/*.py" = [
   "PLC0415", # `import` should be at the top-level of a file
   "S101", # Use of assert detected,
@@ -106,6 +118,8 @@ extend-ignore = [
   "N815", # mixedCase variable names (for matching API responses)
   "SIM117", # Multiple with statements are clearer in tests
   "SIM105", # contextlib.suppress is less clear in tests
+  "DTZ001", # Naive datetime creation needed for testing timezone handling
+  "DTZ007", # strptime without timezone needed for testing
 ]
 
 [tool.ruff.lint.flake8-builtins]
@@ -139,6 +153,13 @@ exclude = ["generated", ".venv", "venv"]
 explicit_package_bases = true
 namespace_packages = true
 ignore_missing_imports = true
+mypy_path = "src"
+plugins = ["pydantic.mypy"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
 
 [[tool.mypy.overrides]]
 module = "affilibuster_backend.domain.entities.generated.*"
@@ -211,7 +232,7 @@ markers = [
 [tool.coverage.run]
 source = ["src"]
 parallel = true
-concurrency = ["multiprocessing"]
+concurrency = ["multiprocessing", "thread", "greenlet"]
 omit = [
   "*/tests/*",
   "*/test_*.py",

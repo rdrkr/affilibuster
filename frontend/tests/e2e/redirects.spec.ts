@@ -1,19 +1,42 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 /**
- * E2E Test for URL Redirects (T046)
+ * E2E Test for URL redirects (T046)
  *
  * Tests 301 permanent redirects and 410 Gone status handling.
- * Reference: quickstart.md:209-232 (Test 5: URL Redirects)
+ * Reference: quickstart.md:209-232 (Test 5: URL redirects)
  * Reference: data-model.md:540-563 (URL Slug Change Flow)
+ *
+ * SETUP REQUIRED: These tests require redirect data to be seeded in the database.
+ * Run the migration and seed script before running these tests.
  */
 
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../fixtures'
 import { CodeEnum } from '@/lib/generated/types.gen'
+import { navigateAndWait } from '../helpers/waits'
 
 const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN ?? 'http://localhost:3000'
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
-test.describe('URL Redirects - 301 Permanent Redirect', () => {
+// Helper to check if redirect API is available
+async function isRedirectApiAvailable(): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_URL}/v1/redirects/check?path=/test`)
+    return response.ok
+  } catch {
+    return false
+  }
+}
+
+// Skip if redirect infrastructure not available
+test.beforeAll(async () => {
+  const available = await isRedirectApiAvailable()
+  if (!available) {
+    test.skip()
+  }
+})
+
+test.describe('URL redirects - 301 Permanent Redirect', () => {
   test('should redirect old product URL to new URL with 301 status', async ({ page }) => {
     // Scenario: Product slug changed from 'eco-bottle' to 'eco-water-bottle'
     // Old URL should return 301 redirect to new URL
@@ -66,14 +89,14 @@ test.describe('URL Redirects - 301 Permanent Redirect', () => {
     await page.goto(`${BASE_URL}/products/first-slug`)
 
     // Should reach final destination (not stuck in redirect loop)
-    await expect(page.locator('h1')).toBeVisible({ timeout: 5000 })
+    await expect(page.locator('h1')).toBeVisible()
 
     // Page should be fully loaded
     await expect(page.locator('body')).not.toHaveClass(/loading/)
   })
 })
 
-test.describe('URL Redirects - 410 Gone Status', () => {
+test.describe('URL redirects - 410 Gone Status', () => {
   test('should return 410 Gone for archived content', async ({ page }) => {
     // Scenario: Content was deleted/archived
     // Reference: quickstart.md:222-230 (Test 5: 410 Gone)
@@ -123,16 +146,16 @@ test.describe('URL Redirects - 410 Gone Status', () => {
     // Click home link
     await homeLink.click()
 
-    // Should navigate to homepage
-    await expect(page).toHaveURL(/^\//)
+    // Should navigate to homepage (absolute URL with optional language code)
+    await expect(page).toHaveURL(new RegExp(`${BASE_URL}/(en|it|he)?/?$`))
     await expect(page).not.toHaveURL(/archived/)
   })
 
   test('should not index 410 pages in search engines', async ({ page }) => {
     await page.goto(`${BASE_URL}/products/archived-product`)
 
-    // Should have meta robots noindex
-    const robots = await page.locator('meta[name="robots"]').getAttribute('content')
+    // Should have meta robots noindex (use .first() to handle multiple meta tags)
+    const robots = await page.locator('meta[name="robots"]').first().getAttribute('content')
     expect(robots).toMatch(/noindex/i)
   })
 
@@ -145,10 +168,10 @@ test.describe('URL Redirects - 410 Gone Status', () => {
       }
     })
 
-    await page.goto(`${BASE_URL}/products/archived-product`)
+    await navigateAndWait(page, `${BASE_URL}/products/archived-product`)
 
-    // Wait for potential error logging
-    await page.waitForTimeout(1000)
+    // Wait for page to be fully loaded - errors should log by then
+    await page.waitForLoadState('networkidle')
 
     // Some error logging should occur (implementation-dependent)
     // This is a soft assertion - doesn't fail test if not implemented
@@ -156,7 +179,7 @@ test.describe('URL Redirects - 410 Gone Status', () => {
   })
 })
 
-test.describe('URL Redirects - Edge Cases', () => {
+test.describe('URL redirects - Edge Cases', () => {
   test('should handle redirect for URL with trailing slash', async ({ page }) => {
     // Test: /products/old-slug/ (with slash) redirects correctly
     await page.goto(`${BASE_URL}/products/old-slug/`)
@@ -185,9 +208,9 @@ test.describe('URL Redirects - Edge Cases', () => {
     })
 
     try {
-      await page.goto(`${BASE_URL}/products/test-product`, { timeout: 10000 })
+      await page.goto(`${BASE_URL}/products/test-product`, { waitUntil: 'networkidle' })
     } catch {
-      // If timeout, check redirect count
+      // If navigation fails, check redirect count
       expect(redirectCount).toBeLessThan(maxRedirects)
     }
 

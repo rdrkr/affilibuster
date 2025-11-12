@@ -8,6 +8,7 @@ Uses pydantic-settings for validation and type safety.
 
 import os
 from pathlib import Path
+from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -43,6 +44,19 @@ class Settings(BaseSettings):
 
     # Security
     jwt_secret: str
+    jwt_algorithm: str = "HS256"
+    jwt_access_token_expire_minutes: int = 15
+    jwt_refresh_token_expire_days: int = 7
+    jwt_refresh_token_remember_me_expire_days: int = 30
+
+    # Email / SMTP
+    smtp_host: str = "localhost"
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = "noreply@affilibuster.com"
+    smtp_from_name: str = "Affilibuster"
+    smtp_use_tls: bool = True
 
     # CMS Integration - Component fields for URL construction
     cms_protocol: str
@@ -54,6 +68,9 @@ class Settings(BaseSettings):
     # External Services
     exchange_rate_api_key: str
     exchange_rate_api_url: str
+
+    # Backend API
+    backend_protocol: str
 
     # Client
     internal_frontend_host: str
@@ -97,6 +114,8 @@ class Settings(BaseSettings):
         return [
             f"{self.frontend_protocol}://{self.frontend_host}:{self.frontend_port}",
             f"{self.frontend_protocol}://{self.internal_frontend_host}:{self.frontend_port}",
+            # Allow host.docker.internal for Playwright tests from test-runner container
+            f"{self.frontend_protocol}://host.docker.internal:{self.frontend_port}",
         ]
 
     @property
@@ -104,7 +123,34 @@ class Settings(BaseSettings):
         """Check if running in production."""
         return self.app_env.lower() == "production"
 
+    @property
+    def should_use_secure_cookies(self) -> bool:
+        """
+        Determine if secure cookie flag should be enabled.
+
+        Secure cookies require HTTPS protocol. This property checks if the
+        backend protocol is HTTPS, indicating that SSL/TLS is configured.
+
+        Returns:
+            bool: True if HTTPS is configured, False otherwise
+        """
+        return self.backend_protocol.lower() == "https"
+
+    @property
+    def samesite_cookie_policy(self) -> Literal["strict", "none"]:
+        """
+        Determine SameSite cookie policy based on environment.
+
+        SameSite=Strict provides better security but requires same-origin requests.
+        For development and E2E testing (where frontend/backend are on different ports),
+        use None to allow cross-origin AJAX requests (requires Secure=true).
+
+        Returns:
+            Literal["strict", "none"]: "strict" for production, "none" for development/testing
+        """
+        return "strict" if self.is_production else "none"
+
 
 # Global settings instance
 # Settings() loads from environment variables via pydantic-settings
-settings = Settings()  # type: ignore[call-arg]
+settings = Settings()

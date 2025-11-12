@@ -12,7 +12,7 @@ from affilibuster_backend.config import settings
 from affilibuster_backend.domain.repositories.cache_service import ICacheService
 
 
-class RedisCacheService(ICacheService):  # type: ignore[misc]
+class RedisCacheService(ICacheService):
     """
     Redis implementation of ICacheService.
 

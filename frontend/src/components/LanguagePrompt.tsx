@@ -8,20 +8,13 @@
 
 'use client'
 
-import { useEffect, useState } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
-import { getNavigation, getLanguages, detectLanguage, getUserPreferences, updateUserPreferences } from '@/lib/client'
-import { useSession } from '@/hooks/useSession'
-import type { Language } from '@/lib/types'
+import { detectLanguage, getLanguages, getNavigation, getUserPreferences, updateUserPreferences } from '@/lib/client'
+import { useSession } from '@/lib/core/useSession'
+import type { Language, Navigation } from '@/lib/types'
 import { LanguageCode, SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { Button } from './Button'
-
-interface NavigationData {
-  promptTitleTemplate?: string
-  promptMessageTemplate?: string
-  yesButtonTemplate?: string
-  noButtonText?: string
-}
 
 export function LanguagePrompt() {
   const sessionId = useSession()
@@ -30,10 +23,12 @@ export function LanguagePrompt() {
   const [show, setShow] = useState(false)
   const [detectedLang, setDetectedLang] = useState<string | null>(null)
   const [detectedLanguage, setDetectedLanguage] = useState<Language | null>(null)
-  const [navData, setNavData] = useState<NavigationData>({})
+  const [currentLanguage, setCurrentLanguage] = useState<Language | null>(null)
+  const [navData, setNavData] = useState<Navigation | null>(null)
 
   useEffect(() => {
-    if (!sessionId) return
+    // Component can work without session for E2E testing
+    // sessionId is used for preference persistence but not required for display
 
     // Extract current language from pathname
     const pathParts = pathname.split('/').filter(Boolean)
@@ -41,6 +36,14 @@ export function LanguagePrompt() {
     let lang = LanguageCode.EN
     if (firstSegment === LanguageCode.IT) lang = LanguageCode.IT
     else if (firstSegment === LanguageCode.HE) lang = LanguageCode.HE
+
+    // Fetch languages and set current language
+    void getLanguages()
+      .then(languages => {
+        const current = languages.find(l => l.code === lang)
+        setCurrentLanguage(current ?? null)
+      })
+      .catch(console.error)
 
     // Fetch navigation data from CMS
     void getNavigation()
@@ -52,40 +55,44 @@ export function LanguagePrompt() {
       .catch(console.error)
 
     // Check preferences and detect language
-    void getUserPreferences()
-      .then(prefs => {
-        // Don't show if user already dismissed
-        if (!prefs || prefs.dismissedLanguagePrompt) return
+    const checkPreferencesAndDetect = async () => {
+      try {
+        const prefs = sessionId ? await getUserPreferences() : null
+        // Don't show if user already dismissed (only check if session exists)
+        if (prefs?.dismissedLanguagePrompt) return
 
         // Detect language from browser
-        void detectLanguage(navigator.language, navigator.userAgent)
-          .then(async result => {
-            if (!result) return
+        const result = await detectLanguage(navigator.language, navigator.userAgent)
+        if (!result) return
 
-            if (result.shouldPrompt && result.detectedLanguage !== lang) {
-              setDetectedLang(result.detectedLanguage)
+        if (result.shouldPrompt && result.detectedLanguage !== lang) {
+          setDetectedLang(result.detectedLanguage)
 
-              // Get language details
-              const languages = await getLanguages()
-              const detected = languages.find(l => l.code === result.detectedLanguage)
-              setDetectedLanguage(detected ?? null)
-              setShow(true)
-            }
-          })
-          .catch(console.error)
-      })
-      .catch(console.error)
+          // Get language details
+          const languages = await getLanguages()
+          const detected = languages.find(l => l.code === result.detectedLanguage)
+          setDetectedLanguage(detected ?? null)
+          setShow(true)
+        }
+      } catch (error) {
+        console.error('Failed to check preferences and detect language:', error)
+      }
+    }
+
+    void checkPreferencesAndDetect()
   }, [sessionId, pathname])
 
   const handleAccept = async () => {
     if (!detectedLang || !detectedLanguage) return
 
     try {
-      // Update preferences
-      await updateUserPreferences({
-        dismissedLanguagePrompt: true,
-        detectedLanguage: detectedLanguage.code,
-      })
+      // Update preferences only if session exists
+      if (sessionId) {
+        await updateUserPreferences({
+          dismissedLanguagePrompt: true,
+          detectedLanguage: detectedLanguage.code,
+        })
+      }
 
       // Navigate to detected language
       const pathParts = pathname.split('/').filter(Boolean)
@@ -105,7 +112,10 @@ export function LanguagePrompt() {
 
   const handleDismiss = async () => {
     try {
-      await updateUserPreferences({ dismissedLanguagePrompt: true })
+      // Update preferences only if session exists
+      if (sessionId) {
+        await updateUserPreferences({ dismissedLanguagePrompt: true })
+      }
       setShow(false)
     } catch (error) {
       console.error('Failed to dismiss prompt:', error)
@@ -116,7 +126,7 @@ export function LanguagePrompt() {
   if (
     !show ||
     !detectedLanguage ||
-    !navData.promptTitleTemplate ||
+    !navData?.promptTitleTemplate ||
     !navData.promptMessageTemplate ||
     !navData.yesButtonTemplate ||
     !navData.noButtonText
@@ -135,7 +145,10 @@ export function LanguagePrompt() {
       <div className="fixed inset-0 bg-black/50 z-40" aria-hidden="true" />
 
       {/* Modal */}
-      <div className="fixed bottom-0 left-0 right-0 sm:bottom-4 sm:left-auto sm:right-4 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-t-lg sm:rounded-lg shadow-xl p-6 max-w-md sm:max-w-sm z-50 animate-slide-up">
+      <div
+        className="fixed bottom-0 left-0 right-0 sm:bottom-4 sm:left-auto sm:right-4 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-t-lg sm:rounded-lg shadow-xl p-6 max-w-md sm:max-w-sm z-50 animate-slide-up"
+        data-testid="language-prompt"
+      >
         <div className="flex items-start space-x-3">
           <div className="flex-shrink-0">
             <svg className="w-6 h-6 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,13 +162,20 @@ export function LanguagePrompt() {
           </div>
           <div className="flex-1">
             <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">{titleText}</h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">{messageText}</p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">{messageText}</p>
+            {currentLanguage && (
+              <p className="text-xs text-neutral-500 dark:text-neutral-500 mb-4">
+                <span className="font-medium">Current:</span>{' '}
+                <span data-testid="current-language">{currentLanguage.displayName}</span>
+              </p>
+            )}
             <div className="flex flex-col sm:flex-row gap-2">
               <Button
                 variant="secondary"
                 onClick={() => {
                   void handleAccept()
                 }}
+                data-testid={`accept-language-${detectedLanguage.displayName.toLowerCase()}`}
               >
                 {yesButtonText}
               </Button>
@@ -164,6 +184,7 @@ export function LanguagePrompt() {
                 onClick={() => {
                   void handleDismiss()
                 }}
+                data-testid="dismiss-language-prompt"
               >
                 {noButtonText}
               </Button>

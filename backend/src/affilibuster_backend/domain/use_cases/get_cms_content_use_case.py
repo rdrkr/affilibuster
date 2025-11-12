@@ -54,4 +54,4 @@ class GetCMSContentUseCase:
 
         """
         # Return type is enforced by the repository interface
-        return await self._cms.get(path, params, response_model)  # type: ignore[no-any-return]
+        return await self._cms.get(path, params, response_model)

@@ -6,12 +6,13 @@
  */
 import { CodeEnum } from '@/lib/generated/types.gen'
 
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../fixtures'
+import { navigateAndWait } from '../helpers/waits'
 
 test.describe('RTL Layout', () => {
   test('should apply RTL direction for Hebrew pages', async ({ page }) => {
     // Visit Hebrew page
-    await page.goto('/he')
+    await navigateAndWait(page, '/he')
 
     // HTML should have dir="rtl"
     const html = page.locator('html')
@@ -21,17 +22,17 @@ test.describe('RTL Layout', () => {
 
   test('should NOT apply RTL for English or Italian', async ({ page }) => {
     // English
-    await page.goto('/')
+    await navigateAndWait(page, '/')
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
 
     // Italian
-    await page.goto('/it')
+    await navigateAndWait(page, '/it')
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
   })
 
   test('should mirror navigation layout in RTL', async ({ page }) => {
     // Visit Hebrew page
-    await page.goto('/he')
+    await navigateAndWait(page, '/he')
 
     // Navigation should be right-aligned
     const nav = page.locator('nav[data-testid="main-navigation"]')
@@ -45,7 +46,7 @@ test.describe('RTL Layout', () => {
 
   test('should mirror icons in RTL', async ({ page }) => {
     // Visit Hebrew page
-    await page.goto('/he')
+    await navigateAndWait(page, '/he')
 
     // Icons that should be mirrored (arrows, etc.)
     const forwardIcon = page.locator('[data-testid="forward-arrow"]').first()
@@ -62,7 +63,7 @@ test.describe('RTL Layout', () => {
 
   test('should display Hebrew text correctly', async ({ page }) => {
     // Visit Hebrew page
-    await page.goto('/he')
+    await navigateAndWait(page, '/he')
 
     // Should contain Hebrew characters
     const content = await page.textContent('body')
@@ -73,10 +74,10 @@ test.describe('RTL Layout', () => {
 
   test('should preserve RTL on page navigation', async ({ page }) => {
     // Start on Hebrew homepage
-    await page.goto('/he')
+    await navigateAndWait(page, '/he')
 
-    // Navigate to another page
-    await page.locator('a[href*="/he/"]').first().click()
+    // Navigate to products page to verify RTL is preserved
+    await navigateAndWait(page, '/he/products')
 
     // Should still be RTL
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
@@ -85,7 +86,7 @@ test.describe('RTL Layout', () => {
 
   test('should handle mixed LTR content in RTL page', async ({ page }) => {
     // Visit Hebrew page with English product names
-    await page.goto('/he/products')
+    await navigateAndWait(page, '/he/products')
 
     // English text should maintain LTR within RTL context
     const productName = page.locator('[data-testid="product-name"]').first()
@@ -102,7 +103,7 @@ test.describe('RTL Layout', () => {
 
   test('should display prices with correct currency symbol position in RTL', async ({ page }) => {
     // Visit Hebrew page
-    await page.goto('/he/products')
+    await navigateAndWait(page, '/he/products')
 
     // ILS symbol (₪) should appear after amount in Hebrew
     const price = page.locator('[data-testid="price"]').first()

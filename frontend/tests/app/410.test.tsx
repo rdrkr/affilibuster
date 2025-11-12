@@ -7,6 +7,8 @@
 import { render, screen } from '@testing-library/react'
 import GonePage from '@/app/410/page'
 import * as client from '@/lib/client'
+import type { CodeEnum } from '@/lib/generated/types.gen'
+import type { ApiError410Error410Document } from '@/lib/generated/types.gen'
 
 // Mock the client module
 jest.mock('@/lib/client', () => ({
@@ -14,13 +16,19 @@ jest.mock('@/lib/client', () => ({
 }))
 
 describe('410 Gone Page', () => {
-  const mockError410Data = {
+  const mockError410Data: ApiError410Error410Document = {
+    documentId: 'test-410-id',
+    id: 1,
+    entryTitle: '410 Error',
+    title: '410',
     subtitle: 'Page Gone',
     message: 'This page has been permanently removed and is no longer available.',
     ctaText: 'Go to Homepage',
     supportContactMessage: 'If you believe this is an error, please contact support.',
     metaTitle: '410 - Page Gone',
     metaDescription: 'This page has been permanently removed.',
+    locale: 'en' as CodeEnum,
+    publishedAt: '2024-01-01T00:00:00.000Z',
   }
 
   beforeEach(() => {

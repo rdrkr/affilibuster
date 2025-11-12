@@ -5,7 +5,7 @@
  * Reference: research.md:420-440 (Dynamic sitemap generation)
  */
 
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../fixtures'
 
 test.describe('Sitemap', () => {
   test('should generate sitemap.xml', async ({ page }) => {
@@ -20,9 +20,10 @@ test.describe('Sitemap', () => {
   })
 
   test('should include all languages in sitemap', async ({ page }) => {
-    await page.goto('/sitemap.xml')
+    const response = await page.goto('/sitemap.xml')
 
-    const content = await page.content()
+    // Use response.text() to get raw XML content (page.content() returns HTML viewer in WebKit)
+    const content = (await response?.text()) ?? ''
 
     // Should include URLs for all languages
     expect(content).toContain('<loc>')
@@ -32,9 +33,12 @@ test.describe('Sitemap', () => {
   })
 
   test('should include xhtml:link for alternate languages', async ({ page }) => {
-    await page.goto('/sitemap.xml')
+    // Test language-specific sitemap (not the main sitemap.xml)
+    // Next.js MetadataRoute.Sitemap doesn't support xhtml:link
+    const response = await page.goto('/sitemap-en.xml')
 
-    const content = await page.content()
+    // Use response.text() to get raw XML content
+    const content = (await response?.text()) ?? ''
 
     // Should include xhtml:link tags
     expect(content).toContain('xhtml:link')
@@ -43,9 +47,10 @@ test.describe('Sitemap', () => {
   })
 
   test('should include lastmod dates', async ({ page }) => {
-    await page.goto('/sitemap.xml')
+    const response = await page.goto('/sitemap.xml')
 
-    const content = await page.content()
+    // Use response.text() to get raw XML content
+    const content = (await response?.text()) ?? ''
 
     // Should include lastmod tags
     expect(content).toContain('<lastmod>')
@@ -59,9 +64,10 @@ test.describe('Sitemap', () => {
   })
 
   test('should include changefreq and priority', async ({ page }) => {
-    await page.goto('/sitemap.xml')
+    const response = await page.goto('/sitemap.xml')
 
-    const content = await page.content()
+    // Use response.text() to get raw XML content
+    const content = (await response?.text()) ?? ''
 
     // Should include changefreq
     expect(content).toContain('<changefreq>')
@@ -75,7 +81,8 @@ test.describe('Sitemap', () => {
 
     // If site is large enough, should have sitemap index
     if (response?.status() === 200) {
-      const content = await page.content()
+      // Use response.text() to get raw XML content
+      const content = (await response.text()) ?? ''
 
       // Should be sitemapindex format
       expect(content).toContain('<sitemapindex')
@@ -87,31 +94,35 @@ test.describe('Sitemap', () => {
     // English sitemap
     const enResponse = await page.goto('/sitemap-en.xml')
     if (enResponse?.status() === 200) {
-      const enContent = await page.content()
+      // Use response.text() to get raw XML content
+      const enContent = (await enResponse.text()) ?? ''
       expect(enContent).toContain('/en/')
     }
 
     // Italian sitemap
     const itResponse = await page.goto('/sitemap-it.xml')
     if (itResponse?.status() === 200) {
-      const itContent = await page.content()
+      // Use response.text() to get raw XML content
+      const itContent = (await itResponse.text()) ?? ''
       expect(itContent).toContain('/it/')
     }
   })
 
   test('should not include archived content in sitemap', async ({ page }) => {
-    await page.goto('/sitemap.xml')
+    const response = await page.goto('/sitemap.xml')
 
-    const content = await page.content()
+    // Use response.text() to get raw XML content
+    const content = (await response?.text()) ?? ''
 
     // Should not contain archived product URLs
     expect(content).not.toContain('/archived-product')
   })
 
   test('should respect robots.txt noindex directives', async ({ page }) => {
-    await page.goto('/sitemap.xml')
+    const response = await page.goto('/sitemap.xml')
 
-    const content = await page.content()
+    // Use response.text() to get raw XML content
+    const content = (await response?.text()) ?? ''
 
     // Should not include URLs marked as noindex
     // (test pages, admin pages, etc.)

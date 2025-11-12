@@ -4,7 +4,7 @@
 Pytest configuration and fixtures for all tests.
 
 Provides:
-- Async database test client with in-memory SQLite
+- Real PostgreSQL database for integration tests
 - Real Strapi CMS integration (no mocking)
 - Sample test data
 """
@@ -17,16 +17,10 @@ import httpx
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from affilibuster_backend.config import settings
 from affilibuster_backend.infrastructure.cms.strapi_repository_impl import StrapiRepositoryImpl
-from affilibuster_backend.infrastructure.database.config import get_db
-from affilibuster_backend.infrastructure.database.models import Base
 from affilibuster_backend.main import app
-
-# Test database URL (use in-memory SQLite for tests)
-TEST_POSTGRES_URL = "sqlite+aiosqlite:///:memory:"
 
 
 def is_running_in_docker() -> bool:
@@ -46,59 +40,16 @@ def get_strapi_url() -> str:
     return f"{settings.cms_protocol}://{settings.cms_host}:{settings.cms_port}"
 
 
-# Create test engine
-test_engine = create_async_engine(
-    TEST_POSTGRES_URL,
-    echo=False,
-)
-
-# Create test session factory
-TestSessionLocal = async_sessionmaker(
-    test_engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-)
-
-
-async def override_get_db():
-    """Override database dependency for tests."""
-    async with TestSessionLocal() as session:
-        yield session
-
-
-# Override the dependency
-app.dependency_overrides[get_db] = override_get_db
-
-
 @pytest_asyncio.fixture
 async def async_client():
-    """Fixture providing an async HTTP client for API testing."""
-    # Create tables
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    """
+    Fixture providing an async HTTP client for unit testing.
 
-    # Seed test data
-    await seed_test_data()
-
-    # Create client
+    For unit tests - uses the app without real database connections.
+    For integration tests with real database, use integration_client instead.
+    """
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         yield client
-
-    # Drop tables after tests
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-
-
-async def seed_test_data():
-    """
-    Seed the test database with initial data.
-
-    Note: Languages and currencies are managed by Strapi CMS.
-    Backend database only contains app-specific data (user_preferences, url_routes, url_redirects).
-    No seeding required for tests.
-    """
-    # All content (languages, currencies) comes from Strapi
-    # Backend DB only needs app-specific data for real tests
 
 
 @pytest.fixture
@@ -119,13 +70,16 @@ async def wait_for_strapi(strapi_url: str):
     Fixture that waits for Strapi to be healthy before tests run.
 
     Implements retry logic with exponential backoff.
+    Disables SSL verification for self-signed certificates in development.
     """
     max_retries = 30
     retry_delay = 1  # Start with 1 second
+    # Disable SSL verification for self-signed certificates in development
+    verify_ssl = settings.app_env == "production"
 
     for attempt in range(max_retries):
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(verify=verify_ssl) as client:
                 response = await client.get(f"{strapi_url}/_health", timeout=5.0)
                 if response.status_code in (200, 204):
                     yield
@@ -158,14 +112,7 @@ async def integration_app(wait_for_strapi):
 
     initialize_dependencies()
 
-    # Re-apply database override for integration tests that need database
-    # (e.g., preferences routes that store data in PostgreSQL)
-    app.dependency_overrides[get_db] = override_get_db
-
     yield app
-
-    # Clear any overrides after test (for safety)
-    app.dependency_overrides.clear()
 
 
 @pytest_asyncio.fixture
@@ -173,20 +120,12 @@ async def integration_client(integration_app):
     """
     Fixture providing an async HTTP client for real integration tests.
 
-    Uses real Strapi service (no mocking).
-    Creates database tables for tests that need them (e.g., user preferences).
+    Uses real Strapi service and real PostgreSQL database (no mocking).
+    Database is seeded during backend startup via 'uv run task seed'.
     Depends on integration_app to ensure dependencies are reinitialized.
     """
-    # Create database tables
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
     async with AsyncClient(transport=ASGITransport(app=integration_app), base_url="http://backend:8000") as client:
         yield client
-
-    # Drop tables after tests
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
 
 
 @pytest.fixture

@@ -8,23 +8,19 @@ Covers:
 Backend is read-only - mutations should happen through Strapi Admin UI.
 """
 
-from typing import Any
 from unittest.mock import AsyncMock
 
 import pytest
-from pydantic import BaseModel
 
+from affilibuster_backend.domain.entities.generated.models import (
+    AboutGetParametersQuery,
+    LocalesGetResponse,
+    LocalesGetResponseItem,
+)
 from affilibuster_backend.domain.repositories.cms_repository import ICMSRepository
 from affilibuster_backend.domain.use_cases.get_cms_content_use_case import (
     GetCMSContentUseCase,
 )
-
-
-# Mock response model for testing
-class MockResponse(BaseModel):
-    """Mock response model for testing."""
-
-    data: list[Any]
 
 
 @pytest.mark.unit
@@ -36,31 +32,44 @@ class TestGetStrapiContentUseCase:
         """Test that execute() returns data from Strapi."""
         # Arrange
         mock_strapi = AsyncMock(spec=ICMSRepository)
-        mock_response = MockResponse(data=[{"id": 1, "name": "Test"}])
+        mock_response = LocalesGetResponse(
+            root=[
+                LocalesGetResponseItem(
+                    id=1,
+                    document_id="550e8400-e29b-41d4-a716-446655440000",
+                    name="English",
+                    code="en",
+                    created_at="2025-10-30T17:41:47.696Z",
+                    updated_at="2025-10-30T18:23:15.432Z",
+                    published_at="2025-10-30T17:41:47.696Z",
+                    is_default=True,
+                )
+            ]
+        )
         mock_strapi.get.return_value = mock_response
 
         use_case = GetCMSContentUseCase(mock_strapi)
 
         # Act
-        result = await use_case.execute("/test-endpoint", response_model=MockResponse)
+        result = await use_case.execute("/test-endpoint", response_model=LocalesGetResponse)
 
         # Assert
         assert result == mock_response
-        mock_strapi.get.assert_called_once_with("/test-endpoint", None, MockResponse)
+        mock_strapi.get.assert_called_once_with("/test-endpoint", None, LocalesGetResponse)
 
     @pytest.mark.asyncio
     async def test_execute_passes_params_to_strapi(self):
         """Test that execute() passes parameters to Strapi."""
         # Arrange
         mock_strapi = AsyncMock(spec=ICMSRepository)
-        mock_response = MockResponse(data=[])
+        mock_response = LocalesGetResponse(root=[])
         mock_strapi.get.return_value = mock_response
 
         use_case = GetCMSContentUseCase(mock_strapi)
-        params = {"locale": "en", "sort": "createdAt"}
+        params = AboutGetParametersQuery(locale="en")
 
         # Act
-        await use_case.execute("/products", params=params, response_model=MockResponse)
+        await use_case.execute("/about", params=params, response_model=LocalesGetResponse)
 
         # Assert
-        mock_strapi.get.assert_called_once_with("/products", params, MockResponse)
+        mock_strapi.get.assert_called_once_with("/about", params, LocalesGetResponse)

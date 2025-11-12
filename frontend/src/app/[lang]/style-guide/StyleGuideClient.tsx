@@ -11,6 +11,18 @@ import { Dropdown } from '@/components/Dropdown'
 import { Checkbox } from '@/components/Checkbox'
 import { Radio } from '@/components/Radio'
 import { Hero } from '@/components/Hero'
+import { Price } from '@/components/Price'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { ThemeSelector } from '@/components/ThemeSelector'
+import { CurrencySelector } from '@/components/CurrencySelector'
+import {
+  LoginForm,
+  RegisterForm,
+  ForgotPasswordForm,
+  ResetPasswordForm,
+  ResendVerificationForm,
+  ProfileForm,
+} from '@/components/auth'
 import type { LanguageCode } from '@/lib/types'
 
 interface StyleGuideClientProps {
@@ -113,28 +125,92 @@ export default function StyleGuideClient({ lang }: StyleGuideClientProps): React
             </div>
           </div>
 
-          {/* Semantic Colors */}
-          <div>
-            <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-4">Semantic Colors</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { name: 'Success', color: 'success', main: 400 },
-                { name: 'Error', color: 'error', main: 400 },
-                { name: 'Warning', color: 'warning', main: 400 },
-                { name: 'Neutral', color: 'neutral', main: 400 },
-              ].map(semantic => (
-                <div key={semantic.name} className="space-y-2">
+          {/* Success Colors */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-4">
+              Success (Green - Semantic)
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-4">
+              {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map(shade => (
+                <div key={shade} className="space-y-2">
                   <div
-                    className="h-24 rounded-lg border border-neutral-200 dark:border-neutral-700"
+                    className="h-20 rounded-lg border border-neutral-200 dark:border-neutral-700"
                     style={{
-                      backgroundColor: `var(--color-${semantic.color}-${String(semantic.main)})`,
+                      backgroundColor: `var(--color-success-${String(shade)})`,
                     }}
                   />
                   <div className="text-center">
-                    <p className="text-lg font-semibold text-neutral-700 dark:text-neutral-300">{semantic.name}</p>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                      {semantic.color}-{semantic.main}
-                    </p>
+                    <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">{shade}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">success-{shade}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Error Colors */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-4">
+              Error (Red - Semantic)
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-4">
+              {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map(shade => (
+                <div key={shade} className="space-y-2">
+                  <div
+                    className="h-20 rounded-lg border border-neutral-200 dark:border-neutral-700"
+                    style={{
+                      backgroundColor: `var(--color-error-${String(shade)})`,
+                    }}
+                  />
+                  <div className="text-center">
+                    <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">{shade}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">error-{shade}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Warning Colors */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-4">
+              Warning (Yellow - Semantic)
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-4">
+              {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map(shade => (
+                <div key={shade} className="space-y-2">
+                  <div
+                    className="h-20 rounded-lg border border-neutral-200 dark:border-neutral-700"
+                    style={{
+                      backgroundColor: `var(--color-warning-${String(shade)})`,
+                    }}
+                  />
+                  <div className="text-center">
+                    <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">{shade}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">warning-{shade}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Neutral Colors */}
+          <div>
+            <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-4">
+              Neutral (Grayscale - Semantic)
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-4">
+              {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map(shade => (
+                <div key={shade} className="space-y-2">
+                  <div
+                    className="h-20 rounded-lg border border-neutral-200 dark:border-neutral-700"
+                    style={{
+                      backgroundColor: `var(--color-neutral-${String(shade)})`,
+                    }}
+                  />
+                  <div className="text-center">
+                    <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">{shade}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">neutral-{shade}</p>
                   </div>
                 </div>
               ))}
@@ -515,6 +591,418 @@ export default function StyleGuideClient({ lang }: StyleGuideClientProps): React
                     </code>
                   </pre>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Price Component Section */}
+        <section id="price">
+          <h2 className="text-4xl font-bold text-neutral-800 dark:text-neutral-100 mb-8 border-b-4 border-primary-400 pb-4">
+            Price Component
+          </h2>
+          <p className="text-lg text-neutral-600 dark:text-neutral-300 mb-8">
+            Displays prices with currency formatting and optional comparison/discount prices.
+          </p>
+
+          <div className="space-y-8">
+            {/* Basic Price */}
+            <div>
+              <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-6">Basic Price</h3>
+              <div className="bg-white dark:bg-neutral-800 p-8 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-6">
+                <div className="space-y-4">
+                  <Price amount={99.99} currencyCode="USD" />
+                  <Price amount={79.99} currencyCode="EUR" />
+                  <Price amount={299} currencyCode="ILS" />
+                </div>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+                    <code className="text-neutral-700 dark:text-neutral-300">
+                      {`<Price amount={99.99} currencyCode="USD" />
+<Price amount={79.99} currencyCode="EUR" />
+<Price amount={299} currencyCode="ILS" />`}
+                    </code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+
+            {/* Price Variations */}
+            <div>
+              <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-6">Variations</h3>
+              <div className="bg-white dark:bg-neutral-800 p-8 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-6">
+                <div className="space-y-4">
+                  <Price amount={99.99} currencyCode="USD" showCurrencyCode />
+                  <Price amount={99.99} currencyCode="USD" showCurrencyCode={false} />
+                  <Price amount={99.99} currencyCode="USD" className="text-2xl font-bold text-primary-600" />
+                </div>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+                    <code className="text-neutral-700 dark:text-neutral-300">
+                      {`<Price amount={99.99} currencyCode="USD" showCurrencyCode />
+<Price amount={99.99} currencyCode="USD" showCurrencyCode={false} />
+<Price amount={99.99} currencyCode="USD" className="text-2xl font-bold" />`}
+                    </code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Selectors Section */}
+        <section id="selectors">
+          <h2 className="text-4xl font-bold text-neutral-800 dark:text-neutral-100 mb-8 border-b-4 border-secondary-400 pb-4">
+            Selectors & Utilities
+          </h2>
+          <p className="text-lg text-neutral-600 dark:text-neutral-300 mb-8">
+            Interactive UI components for user preferences and site configuration.
+          </p>
+
+          <div className="space-y-8">
+            {/* Language Switcher */}
+            <div>
+              <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-6">Language Switcher</h3>
+              <div className="bg-white dark:bg-neutral-800 p-8 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-6">
+                <div className="flex justify-center">
+                  <LanguageSwitcher />
+                </div>
+                <p className="text-neutral-600 dark:text-neutral-300">
+                  Allows users to switch between supported languages (English, Italian, Hebrew). Automatically detects
+                  current language from URL and updates on selection.
+                </p>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+                    <code className="text-neutral-700 dark:text-neutral-300">{`<LanguageSwitcher />`}</code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+
+            {/* Theme Selector */}
+            <div>
+              <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-6">Theme Selector</h3>
+              <div className="bg-white dark:bg-neutral-800 p-8 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-6">
+                <div className="flex justify-center">
+                  <ThemeSelector />
+                </div>
+                <p className="text-neutral-600 dark:text-neutral-300">
+                  Allows users to switch between light, dark, and system theme modes. Theme preference is saved to
+                  localStorage.
+                </p>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+                    <code className="text-neutral-700 dark:text-neutral-300">{`<ThemeSelector />`}</code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+
+            {/* Currency Selector */}
+            <div>
+              <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-6">Currency Selector</h3>
+              <div className="bg-white dark:bg-neutral-800 p-8 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-6">
+                <div className="flex justify-center">
+                  <CurrencySelector />
+                </div>
+                <p className="text-neutral-600 dark:text-neutral-300">
+                  Allows users to select their preferred currency for price display. Supports USD, EUR, ILS, GBP, CAD,
+                  AUD, JPY, CNY.
+                </p>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+                    <code className="text-neutral-700 dark:text-neutral-300">{`<CurrencySelector />`}</code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Authentication Forms Section */}
+        <section id="auth-forms">
+          <h2 className="text-4xl font-bold text-neutral-800 dark:text-neutral-100 mb-8 border-b-4 border-tertiary-400 pb-4">
+            Authentication Forms
+          </h2>
+          <p className="text-lg text-neutral-600 dark:text-neutral-300 mb-8">
+            Complete set of authentication forms with built-in validation, error handling, and loading states.
+          </p>
+
+          <div className="space-y-12">
+            {/* Login Form */}
+            <div>
+              <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-6">Login Form</h3>
+              <div className="bg-white dark:bg-neutral-800 p-8 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-6">
+                <div className="max-w-md">
+                  <LoginForm
+                    onSuccess={() => {
+                      /* handle success */
+                    }}
+                  />
+                </div>
+                <p className="text-neutral-600 dark:text-neutral-300">
+                  Email/password login with optional &quot;Remember Me&quot; checkbox. Includes validation and error
+                  handling.
+                </p>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+                    <code className="text-neutral-700 dark:text-neutral-300">
+                      {`<LoginForm onSuccess={() => { /* handle success */ }} />`}
+                    </code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+
+            {/* Register Form */}
+            <div>
+              <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-6">Register Form</h3>
+              <div className="bg-white dark:bg-neutral-800 p-8 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-6">
+                <div className="max-w-md">
+                  <RegisterForm
+                    onSuccess={() => {
+                      /* handle success */
+                    }}
+                  />
+                </div>
+                <p className="text-neutral-600 dark:text-neutral-300">
+                  User registration with email, password (with confirmation), and display name. Includes validation for
+                  password strength and matching passwords.
+                </p>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+                    <code className="text-neutral-700 dark:text-neutral-300">
+                      {`<RegisterForm onSuccess={() => { /* handle success */ }} />`}
+                    </code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+
+            {/* Forgot Password Form */}
+            <div>
+              <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-6">
+                Forgot Password Form
+              </h3>
+              <div className="bg-white dark:bg-neutral-800 p-8 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-6">
+                <div className="max-w-md">
+                  <ForgotPasswordForm />
+                </div>
+                <p className="text-neutral-600 dark:text-neutral-300">
+                  Allows users to request a password reset link via email. Simple email input with validation.
+                </p>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+                    <code className="text-neutral-700 dark:text-neutral-300">{`<ForgotPasswordForm />`}</code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+
+            {/* Reset Password Form */}
+            <div>
+              <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-6">
+                Reset Password Form
+              </h3>
+              <div className="bg-white dark:bg-neutral-800 p-8 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-6">
+                <div className="max-w-md">
+                  <ResetPasswordForm token="sample-token" />
+                </div>
+                <p className="text-neutral-600 dark:text-neutral-300">
+                  Allows users to set a new password using a reset token. Requires new password and confirmation.
+                </p>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+                    <code className="text-neutral-700 dark:text-neutral-300">
+                      {`<ResetPasswordForm token="reset-token-from-email" />`}
+                    </code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+
+            {/* Resend Verification Form */}
+            <div>
+              <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-6">
+                Resend Verification Form
+              </h3>
+              <div className="bg-white dark:bg-neutral-800 p-8 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-6">
+                <div className="max-w-md">
+                  <ResendVerificationForm />
+                </div>
+                <p className="text-neutral-600 dark:text-neutral-300">
+                  Allows users to resend email verification link. Simple one-click action (requires authentication).
+                </p>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+                    <code className="text-neutral-700 dark:text-neutral-300">{`<ResendVerificationForm />`}</code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+
+            {/* Profile Form */}
+            <div>
+              <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-6">Profile Form</h3>
+              <div className="bg-white dark:bg-neutral-800 p-8 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-6">
+                <div className="max-w-md">
+                  <ProfileForm
+                    onSuccess={() => {
+                      /* handle success */
+                    }}
+                  />
+                </div>
+                <p className="text-neutral-600 dark:text-neutral-300">
+                  Allows authenticated users to update their profile information (display name, email). Requires
+                  authentication context.
+                </p>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+                    <code className="text-neutral-700 dark:text-neutral-300">
+                      {`<ProfileForm onSuccess={() => { /* handle success */ }} />`}
+                    </code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Layout Components Section */}
+        <section id="layout-components">
+          <h2 className="text-4xl font-bold text-neutral-800 dark:text-neutral-100 mb-8 border-b-4 border-primary-500 pb-4">
+            Layout Components
+          </h2>
+          <p className="text-lg text-neutral-600 dark:text-neutral-300 mb-8">
+            Complex layout components composed of smaller reusable components. These are already visible on this page
+            but shown here for reference and documentation.
+          </p>
+
+          <div className="space-y-12">
+            {/* Navigation Component */}
+            <div>
+              <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-6">
+                Navigation Component
+              </h3>
+              <div className="bg-white dark:bg-neutral-800 p-8 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-6">
+                <p className="text-neutral-600 dark:text-neutral-300">
+                  The Navigation component is a composite layout component that includes the site logo, navigation
+                  links, language switcher, currency selector, theme selector, and authentication UI. It&apos;s
+                  responsive with a mobile menu and integrates with the auth context for user-specific features.
+                </p>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <p className="text-sm text-neutral-700 dark:text-neutral-300 mb-2">
+                    <strong>Key Features:</strong>
+                  </p>
+                  <ul className="list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300 space-y-1">
+                    <li>Responsive design with mobile hamburger menu</li>
+                    <li>Integrates LanguageSwitcher, CurrencySelector, and ThemeSelector</li>
+                    <li>Authentication-aware UI (Login/Register or User dropdown)</li>
+                    <li>Active link highlighting based on current route</li>
+                    <li>Dark mode support</li>
+                    <li>RTL language support</li>
+                  </ul>
+                </div>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+                    <code className="text-neutral-700 dark:text-neutral-300">
+                      {`<Navigation data={navigationData} lang="en" />`}
+                    </code>
+                  </pre>
+                </div>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 italic">
+                  Note: The Navigation component is already visible at the top of this page. It requires CMS data for
+                  labels and configuration.
+                </p>
+              </div>
+            </div>
+
+            {/* Footer Component */}
+            <div>
+              <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-6">Footer Component</h3>
+              <div className="bg-white dark:bg-neutral-800 p-8 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-6">
+                <p className="text-neutral-600 dark:text-neutral-300">
+                  The Footer component provides site-wide footer content including brand description, quick links,
+                  newsletter subscription, social media links, and copyright information. It&apos;s a composite
+                  component built from Button, Input, and other basic components.
+                </p>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <p className="text-sm text-neutral-700 dark:text-neutral-300 mb-2">
+                    <strong>Key Features:</strong>
+                  </p>
+                  <ul className="list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300 space-y-1">
+                    <li>Three-column responsive grid layout</li>
+                    <li>Brand description with logo</li>
+                    <li>Quick navigation links (Privacy, Terms, Contact, About)</li>
+                    <li>Newsletter subscription form with email input and subscribe button</li>
+                    <li>Social media icon links (Twitter, Facebook)</li>
+                    <li>Copyright text with dynamic year</li>
+                    <li>Dark mode support</li>
+                    <li>RTL language support</li>
+                  </ul>
+                </div>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+                    <code className="text-neutral-700 dark:text-neutral-300">
+                      {`<Footer data={footerData} lang="en" />`}
+                    </code>
+                  </pre>
+                </div>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 italic">
+                  Note: The Footer component is already visible at the bottom of this page. It requires CMS data for
+                  labels and content.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Modals & Prompts Section */}
+        <section id="modals-prompts">
+          <h2 className="text-4xl font-bold text-neutral-800 dark:text-neutral-100 mb-8 border-b-4 border-secondary-500 pb-4">
+            Modals & Prompts
+          </h2>
+          <p className="text-lg text-neutral-600 dark:text-neutral-300 mb-8">
+            Modal dialogs and overlay components for user interactions and notifications.
+          </p>
+
+          <div className="space-y-12">
+            {/* Language Prompt Component */}
+            <div>
+              <h3 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-6">Language Prompt</h3>
+              <div className="bg-white dark:bg-neutral-800 p-8 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-6">
+                <p className="text-neutral-600 dark:text-neutral-300">
+                  The LanguagePrompt component is a modal dialog that prompts users to switch to their detected language
+                  based on browser settings. It appears as a slide-up modal with a backdrop and provides accept/dismiss
+                  actions using the Button component.
+                </p>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <p className="text-sm text-neutral-700 dark:text-neutral-300 mb-2">
+                    <strong>Key Features:</strong>
+                  </p>
+                  <ul className="list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300 space-y-1">
+                    <li>Automatically detects user&apos;s browser language</li>
+                    <li>Shows modal only if detected language differs from current page language</li>
+                    <li>Respects user preferences (won&apos;t show again if dismissed)</li>
+                    <li>Slide-up animation from bottom (mobile) or bottom-right corner (desktop)</li>
+                    <li>Semi-transparent backdrop overlay</li>
+                    <li>Uses Button components for accept/dismiss actions</li>
+                    <li>Integrates with user preferences API for persistence</li>
+                    <li>Responsive design (full-width on mobile, fixed width on desktop)</li>
+                    <li>Dark mode support</li>
+                    <li>Language icon SVG</li>
+                  </ul>
+                </div>
+                <div className="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-lg">
+                  <pre className="text-xs overflow-x-auto">
+                    <code className="text-neutral-700 dark:text-neutral-300">{`<LanguagePrompt />`}</code>
+                  </pre>
+                </div>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 italic">
+                  Note: The LanguagePrompt component conditionally renders based on language detection and user
+                  preferences. It requires CMS data for prompt text and labels. To see it in action, visit the site with
+                  a browser language different from the current page language.
+                </p>
               </div>
             </div>
           </div>

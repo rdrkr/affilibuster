@@ -2,52 +2,22 @@
 
 """Unit tests for Strapi repository implementation."""
 
-from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pytest
-from pydantic import BaseModel, RootModel
 
+from affilibuster_backend.domain.entities import CMSAPIError
+from affilibuster_backend.domain.entities.cms_entities import CMSErrorDetails
+from affilibuster_backend.domain.entities.generated.models import (
+    AboutGetParametersQuery,
+    CurrenciesGetResponse,
+    LanguagesDetectPostRequest,
+    LocalesGetResponse,
+)
 from affilibuster_backend.infrastructure.cms.strapi_repository_impl import (
-    CMSAPIError,
     StrapiRepositoryImpl,
 )
-
-
-# Mock response models for testing
-class MockGetResponse(BaseModel):
-    """Mock response model for GET requests."""
-
-    data: dict[str, Any] | list[Any]
-
-
-class MockPostResponse(BaseModel):
-    """Mock response model for POST requests."""
-
-    data: dict[str, Any]
-
-
-class MockListResponse(RootModel[list[dict[str, Any]]]):
-    """Mock response model for list responses."""
-
-    root: list[dict[str, Any]]
-
-
-class MockParamsModel(BaseModel):
-    """Mock parameter model for testing."""
-
-    locale: str
-    pageSize: int | None = None
-
-
-class MockDataModel(BaseModel):
-    """Mock data model for POST/PUT requests."""
-
-    name: str
-    title: str | None = None
-    price: int | None = None
-    invalid: str | None = None  # For testing invalid data
 
 
 @pytest.mark.unit
@@ -64,7 +34,8 @@ class TestCMSAPIError:
 
         assert error.status_code == 404
         assert error.message == "Not Found"
-        assert error.details == {"error": "Resource not found"}
+        assert isinstance(error.details, CMSErrorDetails)
+        assert error.details.message == "Resource not found"
         assert str(error) == "CMS API error (404): Not Found"
 
     def test_initialization_without_details(self):
@@ -73,7 +44,47 @@ class TestCMSAPIError:
 
         assert error.status_code == 500
         assert error.message == "Internal Server Error"
-        assert error.details == {}
+        assert isinstance(error.details, CMSErrorDetails)
+        assert error.details.message is None
+
+    def test_initialization_with_strapi_error_dict(self):
+        """Test CMSAPIError with Strapi-style error dict structure."""
+        error = CMSAPIError(
+            status_code=400,
+            message="Bad Request",
+            details={"error": {"message": "Invalid input", "name": "ValidationError", "status": 400}},
+        )
+
+        assert error.status_code == 400
+        assert isinstance(error.details, CMSErrorDetails)
+        assert error.details.message == "Invalid input"
+        assert error.details.name == "ValidationError"
+        assert error.details.status == 400
+
+    def test_initialization_with_simple_message_dict(self):
+        """Test CMSAPIError with simple message dict."""
+        error = CMSAPIError(
+            status_code=500,
+            message="Server Error",
+            details={"message": "Something went wrong"},
+        )
+
+        assert error.status_code == 500
+        assert isinstance(error.details, CMSErrorDetails)
+        assert error.details.message == "Something went wrong"
+
+    def test_initialization_with_cms_error_details_object(self):
+        """Test CMSAPIError with CMSErrorDetails object directly."""
+        details = CMSErrorDetails(message="Direct error", status=403, name="ForbiddenError")
+        error = CMSAPIError(
+            status_code=403,
+            message="Forbidden",
+            details=details,
+        )
+
+        assert error.status_code == 403
+        assert error.details is details
+        assert error.details.message == "Direct error"
 
 
 @pytest.mark.unit
@@ -158,7 +169,26 @@ class TestGet:
     async def test_get_successful_request(self):
         """Test that get returns data on successful request."""
         mock_response = MagicMock()
-        mock_response.json.return_value = {"data": {"title": "About Us"}}
+        mock_response.json.return_value = {
+            "data": [
+                {
+                    "documentId": "550e8400-e29b-41d4-a716-446655440000",
+                    "id": 1,
+                    "code": "USD",
+                    "name": "US Dollar",
+                    "symbol": "$",
+                    "displayName": "US Dollar ($)",
+                    "decimalPlaces": 2,
+                    "symbolPosition": "before",
+                    "thousandsSeparator": ",",
+                    "decimalSeparator": ".",
+                    "exchangeRate": 1.0,
+                    "sortOrder": 1,
+                    "isActive": True,
+                    "publishedAt": "2025-10-30T17:41:47.696Z",
+                }
+            ]
+        }
         mock_response.raise_for_status = MagicMock()
 
         mock_client = AsyncMock()
@@ -171,11 +201,12 @@ class TestGet:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
-            result = await repo.get("/about", response_model=MockGetResponse)
+            result = await repo.get("/currencies", response_model=CurrenciesGetResponse)
 
-            assert result.data == {"title": "About Us"}
+            assert len(result.data) == 1
+            assert result.data[0].code == "USD"
             mock_client.get.assert_called_once_with(
-                "http://strapi:1337/api/about",
+                "http://strapi:1337/api/currencies",
                 params={},
                 headers={"Authorization": "Bearer test-token"},
             )
@@ -203,11 +234,12 @@ class TestGet:
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token=None)
 
             with pytest.raises(CMSAPIError) as exc_info:
-                await repo.get("/nonexistent", response_model=MockGetResponse)
+                await repo.get("/nonexistent", response_model=CurrenciesGetResponse)
 
             assert exc_info.value.status_code == 404
             assert "GET /nonexistent failed" in exc_info.value.message
-            assert exc_info.value.details == {"error": {"message": "Not found"}}
+            assert isinstance(exc_info.value.details, CMSErrorDetails)
+            assert exc_info.value.details.message == "Not found"
 
     @pytest.mark.asyncio
     async def test_get_raises_strapi_api_error_on_connection_error(self):
@@ -224,7 +256,7 @@ class TestGet:
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token=None)
 
             with pytest.raises(CMSAPIError) as exc_info:
-                await repo.get("/about", response_model=MockGetResponse)
+                await repo.get("/currencies", response_model=CurrenciesGetResponse)
 
             assert exc_info.value.status_code == 502
             assert "Failed to connect to Strapi" in exc_info.value.message
@@ -238,7 +270,26 @@ class TestPost:
     async def test_post_successful_request(self):
         """Test that post returns data on successful request."""
         mock_response = MagicMock()
-        mock_response.json.return_value = {"data": {"id": 1, "name": "New Product"}}
+        mock_response.json.return_value = {
+            "data": [
+                {
+                    "documentId": "550e8400-e29b-41d4-a716-446655440000",
+                    "id": 1,
+                    "code": "USD",
+                    "name": "US Dollar",
+                    "symbol": "$",
+                    "displayName": "US Dollar ($)",
+                    "decimalPlaces": 2,
+                    "symbolPosition": "before",
+                    "thousandsSeparator": ",",
+                    "decimalSeparator": ".",
+                    "exchangeRate": 1.0,
+                    "sortOrder": 1,
+                    "isActive": True,
+                    "publishedAt": "2025-10-30T17:41:47.696Z",
+                }
+            ]
+        }
         mock_response.raise_for_status = MagicMock()
 
         mock_client = AsyncMock()
@@ -251,13 +302,14 @@ class TestPost:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
-            data = MockDataModel(name="New Product", price=100)
-            result = await repo.post("/products", data, response_model=MockPostResponse)
+            data = LanguagesDetectPostRequest(accept_language="en-US,en;q=0.9")
+            result = await repo.post("/languages/detect", data, response_model=CurrenciesGetResponse)
 
-            assert result.data == {"id": 1, "name": "New Product"}
+            assert len(result.data) == 1
+            assert result.data[0].code == "USD"
             mock_client.post.assert_called_once_with(
-                "http://strapi:1337/api/products",
-                json={"name": "New Product", "price": 100},
+                "http://strapi:1337/api/languages/detect",
+                json={"accept_language": "en-US,en;q=0.9"},
                 params={},
                 headers={"Authorization": "Bearer test-token"},
             )
@@ -283,14 +335,15 @@ class TestPost:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token=None)
-            data = MockDataModel(name="Test", invalid="data")
+            data = LanguagesDetectPostRequest(accept_language="invalid")
 
             with pytest.raises(CMSAPIError) as exc_info:
-                await repo.post("/products", data, response_model=MockPostResponse)
+                await repo.post("/languages/detect", data, response_model=CurrenciesGetResponse)
 
             assert exc_info.value.status_code == 400
-            assert "POST /products failed" in exc_info.value.message
-            assert exc_info.value.details == {"error": {"message": "Validation failed"}}
+            assert "POST /languages/detect failed" in exc_info.value.message
+            assert isinstance(exc_info.value.details, CMSErrorDetails)
+            assert exc_info.value.details.message == "Validation failed"
 
     @pytest.mark.asyncio
     async def test_post_raises_strapi_api_error_on_connection_error(self):
@@ -305,10 +358,10 @@ class TestPost:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token=None)
-            data = MockDataModel(name="Test")
+            data = LanguagesDetectPostRequest(accept_language="en-US")
 
             with pytest.raises(CMSAPIError) as exc_info:
-                await repo.post("/products", data, response_model=MockPostResponse)
+                await repo.post("/languages/detect", data, response_model=CurrenciesGetResponse)
 
             assert exc_info.value.status_code == 502
             assert "Failed to connect to Strapi" in exc_info.value.message
@@ -359,12 +412,12 @@ class TestGetEdgeCases:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
-            params = MockParamsModel(locale="en", pageSize=10)
-            _result = await repo.get("/products", params=params, response_model=MockGetResponse)
+            params = AboutGetParametersQuery(locale="en")
+            _result = await repo.get("/about", params=params, response_model=CurrenciesGetResponse)
 
             mock_client.get.assert_called_once_with(
-                "http://strapi:1337/api/products",
-                params={"locale": "en", "pageSize": 10},
+                "http://strapi:1337/api/about",
+                params={"locale": "en"},
                 headers={"Authorization": "Bearer test-token"},
             )
 
@@ -387,7 +440,7 @@ class TestGetEdgeCases:
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
 
             with pytest.raises(ValueError) as exc_info:
-                await repo.get("/products", response_model=None)
+                await repo.get("/currencies", response_model=None)
 
             assert "response_model is required for type-safe operations" in str(exc_info.value)
 
@@ -395,7 +448,18 @@ class TestGetEdgeCases:
     async def test_get_with_root_model_response(self):
         """Test that get handles RootModel response correctly."""
         mock_response = MagicMock()
-        mock_response.json.return_value = [{"id": 1, "name": "Item 1"}]
+        mock_response.json.return_value = [
+            {
+                "id": 1,
+                "documentId": "550e8400-e29b-41d4-a716-446655440000",
+                "name": "English",
+                "code": "en",
+                "createdAt": "2025-10-30T17:41:47.696Z",
+                "updatedAt": "2025-10-30T18:23:15.432Z",
+                "publishedAt": "2025-10-30T17:41:47.696Z",
+                "isDefault": True,
+            }
+        ]
         mock_response.raise_for_status = MagicMock()
 
         mock_client = AsyncMock()
@@ -408,10 +472,11 @@ class TestGetEdgeCases:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
-            result = await repo.get("/items", response_model=MockListResponse)
+            result = await repo.get("/i18n/locales", response_model=LocalesGetResponse)
 
-            assert isinstance(result, MockListResponse)
-            assert result.root == [{"id": 1, "name": "Item 1"}]
+            assert isinstance(result, LocalesGetResponse)
+            assert len(result.root) == 1
+            assert result.root[0].code == "en"
 
 
 @pytest.mark.unit
@@ -422,7 +487,7 @@ class TestPostEdgeCases:
     async def test_post_with_basemodel_data(self):
         """Test that post handles BaseModel data correctly."""
         mock_response = MagicMock()
-        mock_response.json.return_value = {"data": {"id": 1}}
+        mock_response.json.return_value = {"data": []}
         mock_response.raise_for_status = MagicMock()
 
         mock_client = AsyncMock()
@@ -435,8 +500,8 @@ class TestPostEdgeCases:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
-            data_model = MockPostResponse(data={"name": "Test"})
-            _result = await repo.post("/items", data=data_model, response_model=MockPostResponse)
+            data = LanguagesDetectPostRequest(accept_language="en-US,en;q=0.9")
+            _result = await repo.post("/languages/detect", data=data, response_model=CurrenciesGetResponse)
 
             mock_client.post.assert_called_once()
 
@@ -444,7 +509,7 @@ class TestPostEdgeCases:
     async def test_post_with_basemodel_params(self):
         """Test that post handles BaseModel params correctly."""
         mock_response = MagicMock()
-        mock_response.json.return_value = {"data": {"id": 1}}
+        mock_response.json.return_value = {"data": []}
         mock_response.raise_for_status = MagicMock()
 
         mock_client = AsyncMock()
@@ -457,13 +522,15 @@ class TestPostEdgeCases:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
-            params = MockParamsModel(locale="en")
-            data = MockDataModel(name="Test")
-            _result = await repo.post("/items", data=data, params=params, response_model=MockPostResponse)
+            params = AboutGetParametersQuery(locale="en")
+            data = LanguagesDetectPostRequest(accept_language="en-US")
+            _result = await repo.post(
+                "/languages/detect", data=data, params=params, response_model=CurrenciesGetResponse
+            )
 
             mock_client.post.assert_called_once_with(
-                "http://strapi:1337/api/items",
-                json={"name": "Test"},
+                "http://strapi:1337/api/languages/detect",
+                json={"accept_language": "en-US"},
                 params={"locale": "en"},
                 headers={"Authorization": "Bearer test-token"},
             )
@@ -472,7 +539,7 @@ class TestPostEdgeCases:
     async def test_post_with_none_response_model_raises_value_error(self):
         """Test that post raises ValueError when response_model is None."""
         mock_response = MagicMock()
-        mock_response.json.return_value = {"data": {"id": 1}}
+        mock_response.json.return_value = {"data": []}
         mock_response.raise_for_status = MagicMock()
 
         mock_client = AsyncMock()
@@ -485,10 +552,10 @@ class TestPostEdgeCases:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
-            data = MockDataModel(name="Test")
+            data = LanguagesDetectPostRequest(accept_language="en-US")
 
             with pytest.raises(ValueError) as exc_info:
-                await repo.post("/items", data=data, response_model=None)
+                await repo.post("/languages/detect", data=data, response_model=None)
 
             assert "response_model is required for type-safe operations" in str(exc_info.value)
 
@@ -496,7 +563,18 @@ class TestPostEdgeCases:
     async def test_post_with_root_model_response(self):
         """Test that post handles RootModel response correctly."""
         mock_response = MagicMock()
-        mock_response.json.return_value = [{"id": 1, "name": "Item 1"}]
+        mock_response.json.return_value = [
+            {
+                "id": 1,
+                "documentId": "550e8400-e29b-41d4-a716-446655440000",
+                "name": "English",
+                "code": "en",
+                "createdAt": "2025-10-30T17:41:47.696Z",
+                "updatedAt": "2025-10-30T18:23:15.432Z",
+                "publishedAt": "2025-10-30T17:41:47.696Z",
+                "isDefault": True,
+            }
+        ]
         mock_response.raise_for_status = MagicMock()
 
         mock_client = AsyncMock()
@@ -509,8 +587,101 @@ class TestPostEdgeCases:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
-            data = MockDataModel(name="Test")
-            result = await repo.post("/items", data=data, response_model=MockListResponse)
+            data = LanguagesDetectPostRequest(accept_language="en-US")
+            result = await repo.post("/languages/detect", data=data, response_model=LocalesGetResponse)
 
-            assert isinstance(result, MockListResponse)
-            assert result.root == [{"id": 1, "name": "Item 1"}]
+            assert isinstance(result, LocalesGetResponse)
+            assert len(result.root) == 1
+            assert result.root[0].code == "en"
+
+
+@pytest.mark.unit
+class TestSnakeToCamel:
+    """Tests for _snake_to_camel method."""
+
+    def test_snake_to_camel_with_single_word(self):
+        """Test that _snake_to_camel handles single word correctly."""
+        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        result = repo._snake_to_camel("page")
+
+        assert result == "page"
+
+    def test_snake_to_camel_with_multiple_words(self):
+        """Test that _snake_to_camel converts snake_case to camelCase."""
+        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        result = repo._snake_to_camel("page_size")
+
+        assert result == "pageSize"
+
+    def test_snake_to_camel_with_many_words(self):
+        """Test that _snake_to_camel handles multiple underscores."""
+        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        result = repo._snake_to_camel("some_long_variable_name")
+
+        assert result == "someLongVariableName"
+
+
+@pytest.mark.unit
+class TestFlattenParams:
+    """Tests for _flatten_params method."""
+
+    def test_flatten_params_with_simple_dict(self):
+        """Test that _flatten_params handles simple flat dict."""
+        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        params = {"locale": "en", "page_size": 10}
+        result = repo._flatten_params(params)
+
+        assert result == {"locale": "en", "pageSize": 10}
+
+    def test_flatten_params_with_nested_dict(self):
+        """Test that _flatten_params handles nested dicts with bracket notation."""
+        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        params = {"pagination": {"page": 1, "page_size": 25}}
+        result = repo._flatten_params(params)
+
+        assert result == {"pagination[page]": 1, "pagination[pageSize]": 25}
+
+    def test_flatten_params_with_deeply_nested_dict(self):
+        """Test that _flatten_params handles deeply nested dicts."""
+        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        params = {"filters": {"name": {"contains": "test"}}}
+        result = repo._flatten_params(params)
+
+        assert result == {"filters[name][contains]": "test"}
+
+    def test_flatten_params_with_list_of_dicts(self):
+        """Test that _flatten_params handles list of dicts with indexed notation."""
+        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        params = {"populate": [{"fields": ["id", "name"]}, {"fields": ["title"]}]}
+        result = repo._flatten_params(params)
+
+        assert result == {
+            "populate[0][fields]": ["id", "name"],
+            "populate[1][fields]": ["title"],
+        }
+
+    def test_flatten_params_with_none_values(self):
+        """Test that _flatten_params excludes None values."""
+        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        params = {"locale": "en", "page_size": None}
+        result = repo._flatten_params(params)
+
+        assert result == {"locale": "en"}
+        assert "pageSize" not in result
+
+    def test_flatten_params_with_mixed_structure(self):
+        """Test that _flatten_params handles mixed nested structures."""
+        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        params = {
+            "locale": "en",
+            "pagination": {"page": 1, "page_size": 10},
+            "filters": {"category": {"id": 5}},
+        }
+        result = repo._flatten_params(params)
+
+        assert result == {
+            "locale": "en",
+            "pagination[page]": 1,
+            "pagination[pageSize]": 10,
+            "filters[category][id]": 5,
+        }

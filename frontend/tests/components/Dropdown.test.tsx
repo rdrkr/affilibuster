@@ -1,8 +1,7 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { Dropdown, type DropdownItem } from '@/components/Dropdown'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 
 describe('Dropdown Component', () => {
   const mockItems: DropdownItem[] = [
@@ -36,8 +35,8 @@ describe('Dropdown Component', () => {
     const button = screen.getByRole('button')
     fireEvent.click(button)
 
-    expect(screen.getByRole('listbox')).toBeInTheDocument()
-    expect(screen.getAllByRole('option')).toHaveLength(3)
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+    expect(screen.getAllByRole('menuitem')).toHaveLength(3)
   })
 
   it('should close dropdown when clicking backdrop', () => {
@@ -89,8 +88,10 @@ describe('Dropdown Component', () => {
     const button = screen.getByRole('button')
     fireEvent.click(button)
 
-    const selectedOption = screen.getByRole('option', { name: /Option 1/i })
-    expect(selectedOption).toHaveAttribute('aria-selected', 'true')
+    // Verify the selected item has visual styling (aria-selected was removed per ARIA standards)
+    const selectedOption = screen.getByRole('menuitem', { name: /Option 1/i })
+    expect(selectedOption).toHaveClass('bg-primary-50')
+    expect(selectedOption).toHaveClass('font-medium')
   })
 
   it('should handle disabled dropdown', () => {
@@ -220,7 +221,7 @@ describe('Dropdown Component', () => {
   it('should set aria-haspopup', () => {
     render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
     const button = screen.getByRole('button')
-    expect(button).toHaveAttribute('aria-haspopup', 'listbox')
+    expect(button).toHaveAttribute('aria-haspopup', 'menu')
   })
 
   it('should toggle dropdown on multiple clicks', () => {
@@ -228,13 +229,13 @@ describe('Dropdown Component', () => {
     const button = screen.getByRole('button')
 
     fireEvent.click(button)
-    expect(screen.getByRole('listbox')).toBeInTheDocument()
+    expect(screen.getByRole('menu')).toBeInTheDocument()
 
     fireEvent.click(button)
-    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
 
     fireEvent.click(button)
-    expect(screen.getByRole('listbox')).toBeInTheDocument()
+    expect(screen.getByRole('menu')).toBeInTheDocument()
   })
 
   it('should work with numeric values', () => {
@@ -272,5 +273,154 @@ describe('Dropdown Component', () => {
 
     fireEvent.click(button)
     expect(svg?.classList.contains('rotate-180')).toBe(true)
+  })
+
+  describe('keyboard navigation', () => {
+    it('should open dropdown with Enter key', () => {
+      render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+      const button = screen.getByRole('button')
+
+      fireEvent.keyDown(button, { key: 'Enter' })
+      expect(screen.getByRole('menu')).toBeInTheDocument()
+    })
+
+    it('should open dropdown with Space key', () => {
+      render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+      const button = screen.getByRole('button')
+
+      fireEvent.keyDown(button, { key: ' ' })
+      expect(screen.getByRole('menu')).toBeInTheDocument()
+    })
+
+    it('should close dropdown with Escape key', () => {
+      render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+      const button = screen.getByRole('button')
+
+      fireEvent.click(button)
+      expect(screen.getByRole('menu')).toBeInTheDocument()
+
+      fireEvent.keyDown(button, { key: 'Escape' })
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    })
+
+    it('should navigate down with ArrowDown key', () => {
+      render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+      const button = screen.getByRole('button')
+
+      fireEvent.click(button)
+      fireEvent.keyDown(button, { key: 'ArrowDown' })
+
+      const items = screen.getAllByRole('menuitem')
+      expect(items[1]).toHaveClass('ring-2')
+    })
+
+    it('should navigate up with ArrowUp key', () => {
+      render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+      const button = screen.getByRole('button')
+
+      fireEvent.click(button)
+      fireEvent.keyDown(button, { key: 'ArrowDown' })
+      fireEvent.keyDown(button, { key: 'ArrowDown' })
+      fireEvent.keyDown(button, { key: 'ArrowUp' })
+
+      const items = screen.getAllByRole('menuitem')
+      expect(items[1]).toHaveClass('ring-2')
+    })
+
+    it('should select focused item with Enter key', () => {
+      const onChange = jest.fn()
+      render(<Dropdown value="option1" items={mockItems} onChange={onChange} />)
+      const button = screen.getByRole('button')
+
+      fireEvent.click(button)
+      fireEvent.keyDown(button, { key: 'ArrowDown' })
+      fireEvent.keyDown(button, { key: 'Enter' })
+
+      expect(onChange).toHaveBeenCalledWith('option2')
+    })
+
+    it('should select focused item with Space key', () => {
+      const onChange = jest.fn()
+      render(<Dropdown value="option1" items={mockItems} onChange={onChange} />)
+      const button = screen.getByRole('button')
+
+      fireEvent.click(button)
+      fireEvent.keyDown(button, { key: 'ArrowDown' })
+      fireEvent.keyDown(button, { key: ' ' })
+
+      expect(onChange).toHaveBeenCalledWith('option2')
+    })
+
+    it('should jump to first item with Home key', () => {
+      render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+      const button = screen.getByRole('button')
+
+      fireEvent.click(button)
+      fireEvent.keyDown(button, { key: 'ArrowDown' })
+      fireEvent.keyDown(button, { key: 'ArrowDown' })
+      fireEvent.keyDown(button, { key: 'Home' })
+
+      const items = screen.getAllByRole('menuitem')
+      expect(items[0]).toHaveClass('ring-2')
+    })
+
+    it('should jump to last item with End key', () => {
+      render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+      const button = screen.getByRole('button')
+
+      fireEvent.click(button)
+      fireEvent.keyDown(button, { key: 'End' })
+
+      const items = screen.getAllByRole('menuitem')
+      expect(items[2]).toHaveClass('ring-2')
+    })
+
+    it('should close dropdown with Tab key', () => {
+      render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+      const button = screen.getByRole('button')
+
+      fireEvent.click(button)
+      expect(screen.getByRole('menu')).toBeInTheDocument()
+
+      fireEvent.keyDown(button, { key: 'Tab' })
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    })
+
+    it('should not navigate beyond first item', () => {
+      render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+      const button = screen.getByRole('button')
+
+      fireEvent.click(button)
+      fireEvent.keyDown(button, { key: 'ArrowUp' })
+
+      const items = screen.getAllByRole('menuitem')
+      expect(items[0]).toHaveClass('ring-2')
+    })
+
+    it('should not navigate beyond last item', () => {
+      render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+      const button = screen.getByRole('button')
+
+      fireEvent.click(button)
+      fireEvent.keyDown(button, { key: 'End' })
+      fireEvent.keyDown(button, { key: 'ArrowDown' })
+
+      const items = screen.getAllByRole('menuitem')
+      expect(items[2]).toHaveClass('ring-2')
+    })
+
+    it('should handle other keys without action', () => {
+      render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+      const button = screen.getByRole('button')
+
+      fireEvent.click(button)
+      const menuBefore = screen.getByRole('menu')
+
+      // Press a key that doesn't have a handler (covers default case)
+      fireEvent.keyDown(button, { key: 'a' })
+
+      // Menu should still be open
+      expect(screen.getByRole('menu')).toBe(menuBefore)
+    })
   })
 })

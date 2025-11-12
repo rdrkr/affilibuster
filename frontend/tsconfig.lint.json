@@ -37,16 +37,17 @@
     "noPropertyAccessFromIndexSignature": false
   },
   "include": [
-    "next-env.d.ts",
     "*.ts",
     "*.tsx",
     "*.mjs",
     "*.mts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.mjs",
-    "**/*.mts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.mjs",
+    "src/**/*.mts",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
     "../data/**/*.json"
   ],
-  "exclude": [".node", ".next", "node_modules"]
+  "exclude": ["node_modules", ".next", "out", "dist", "build", ".turbo"]
 }

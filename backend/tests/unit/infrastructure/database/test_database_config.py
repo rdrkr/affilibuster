@@ -16,8 +16,8 @@ class TestGetEngine:
     """Tests for get_engine function."""
 
     def setup_method(self):
-        """Reset global engine before each test."""
-        config._async_engine = None
+        """Reset global engines before each test."""
+        config._async_engines.clear()
 
     def test_get_engine_creates_engine_on_first_call(self):
         """Test that get_engine creates a new engine on first call."""
@@ -31,11 +31,14 @@ class TestGetEngine:
                 engine = config.get_engine()
 
                 assert engine == mock_engine
-                mock_create_engine.assert_called_once_with(
-                    "postgresql+asyncpg://user:pass@localhost/db",
-                    echo=False,
-                    pool_pre_ping=True,
-                )
+                # In tests, NullPool is used instead of pool_pre_ping
+                mock_create_engine.assert_called_once()
+                # URL is passed as first positional argument
+                call_args = mock_create_engine.call_args[0]
+                call_kwargs = mock_create_engine.call_args[1]
+                assert call_args[0] == "postgresql+asyncpg://user:pass@localhost/db"
+                assert call_kwargs["echo"] is False
+                assert "poolclass" in call_kwargs  # NullPool is set in test mode
 
     def test_get_engine_returns_cached_engine_on_subsequent_calls(self):
         """Test that get_engine returns cached engine on subsequent calls."""
@@ -58,7 +61,17 @@ class TestGetEngine:
         with patch("affilibuster_backend.infrastructure.database.config.settings") as mock_settings:
             mock_settings.database_url = "postgresql://user:pass@localhost/db"
 
-            with patch("affilibuster_backend.infrastructure.database.config.os.getenv", return_value="true"):
+            with patch("affilibuster_backend.infrastructure.database.config.os.getenv") as mock_getenv:
+                # Return "true" for SQL_ECHO, but also PYTEST_CURRENT_TEST to trigger test mode
+                def getenv_side_effect(key, default=None):
+                    if key == "SQL_ECHO":
+                        return "true"
+                    if key == "PYTEST_CURRENT_TEST":
+                        return "test_value"
+                    return default
+
+                mock_getenv.side_effect = getenv_side_effect
+
                 with patch(
                     "affilibuster_backend.infrastructure.database.config.create_async_engine"
                 ) as mock_create_engine:
@@ -67,11 +80,47 @@ class TestGetEngine:
 
                     _engine = config.get_engine()
 
-                    mock_create_engine.assert_called_once_with(
-                        "postgresql+asyncpg://user:pass@localhost/db",
-                        echo=True,  # SQL_ECHO is enabled
-                        pool_pre_ping=True,
-                    )
+                    mock_create_engine.assert_called_once()
+                    # URL is passed as first positional argument
+                    call_args = mock_create_engine.call_args[0]
+                    call_kwargs = mock_create_engine.call_args[1]
+                    assert call_args[0] == "postgresql+asyncpg://user:pass@localhost/db"
+                    assert call_kwargs["echo"] is True  # SQL_ECHO is enabled
+                    assert "poolclass" in call_kwargs  # NullPool in test mode
+
+    def test_get_engine_production_mode_uses_pool_pre_ping(self):
+        """Test that get_engine uses pool_pre_ping in production mode."""
+        with patch("affilibuster_backend.infrastructure.database.config.settings") as mock_settings:
+            mock_settings.database_url = "postgresql://user:pass@localhost/db"
+
+            with patch("affilibuster_backend.infrastructure.database.config.os.getenv") as mock_getenv:
+                # Simulate production mode: no PYTEST_CURRENT_TEST or PYTEST_XDIST_WORKER
+                def getenv_side_effect(key, default=None):
+                    if key == "SQL_ECHO":
+                        return "false"
+                    # Return None for pytest env vars (production mode)
+                    if key in ("PYTEST_CURRENT_TEST", "PYTEST_XDIST_WORKER"):
+                        return None
+                    return default
+
+                mock_getenv.side_effect = getenv_side_effect
+
+                with patch(
+                    "affilibuster_backend.infrastructure.database.config.create_async_engine"
+                ) as mock_create_engine:
+                    mock_engine = MagicMock()
+                    mock_create_engine.return_value = mock_engine
+
+                    _engine = config.get_engine()
+
+                    mock_create_engine.assert_called_once()
+                    # URL is passed as first positional argument
+                    call_args = mock_create_engine.call_args[0]
+                    call_kwargs = mock_create_engine.call_args[1]
+                    assert call_args[0] == "postgresql+asyncpg://user:pass@localhost/db"
+                    assert call_kwargs["echo"] is False
+                    assert "poolclass" not in call_kwargs  # No NullPool in production
+                    assert call_kwargs["pool_pre_ping"] is True  # pool_pre_ping in production
 
 
 @pytest.mark.unit
@@ -81,9 +130,9 @@ class TestGetSessionFactory:
     """Tests for get_session_factory function."""
 
     def setup_method(self):
-        """Reset global session factory before each test."""
-        config._async_session_local = None
-        config._async_engine = None
+        """Reset global session factories before each test."""
+        config._async_session_factories.clear()
+        config._async_engines.clear()
 
     def test_get_session_factory_creates_factory_on_first_call(self):
         """Test that get_session_factory creates a new factory on first call."""
@@ -139,8 +188,8 @@ class TestGetDbSession:
 
     def setup_method(self):
         """Reset global state before each test."""
-        config._async_session_local = None
-        config._async_engine = None
+        config._async_session_factories.clear()
+        config._async_engines.clear()
 
     @pytest.mark.asyncio
     async def test_get_db_session_yields_session_and_commits(self):
@@ -201,8 +250,8 @@ class TestGetDb:
 
     def setup_method(self):
         """Reset global state before each test."""
-        config._async_session_local = None
-        config._async_engine = None
+        config._async_session_factories.clear()
+        config._async_engines.clear()
 
     @pytest.mark.asyncio
     async def test_get_db_yields_session(self):

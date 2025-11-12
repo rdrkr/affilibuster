@@ -126,12 +126,15 @@ describe('lib/client', () => {
       localStorage.setItem('affilibuster_session_id', mockSessionId)
 
       // Call apiRequest with custom headers in options
-      await apiRequest<GetLanguagesResponses[200]>('/languages', undefined, {
-        headers: {
-          'X-Custom-Header': 'custom-value',
-          'X-Another-Header': 'another-value',
-        },
-      })
+      await apiRequest<GetLanguagesResponses[200]>(
+        { url: '/languages' },
+        {
+          headers: {
+            'X-Custom-Header': 'custom-value',
+            'X-Another-Header': 'another-value',
+          },
+        }
+      )
 
       const headers = (global.fetch as jest.Mock).mock.calls[0][1].headers
       expect(headers['X-Session-Id']).toBe(mockSessionId)
@@ -844,6 +847,52 @@ describe('lib/client', () => {
       expect(url).toContain('/contact')
       // Check that explicit populate value is passed (not wildcard)
       expect(url).toContain('populate=contactCards')
+    })
+  })
+
+  describe('Error Handling', () => {
+    it('should return user-friendly error message for 401 on non-login auth endpoints', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 401,
+        statusText: 'Unauthorized',
+        json: async () => ({}),
+      })
+
+      await expect(apiRequest({ url: '/auth/refresh' }, { method: 'POST' })).rejects.toThrow('Authentication required')
+    })
+
+    it('should return user-friendly error message for 403 Forbidden', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 403,
+        statusText: 'Forbidden',
+        json: async () => ({}),
+      })
+
+      await expect(apiRequest({ url: '/languages' })).rejects.toThrow('Access forbidden')
+    })
+
+    it('should return user-friendly error message for 404 Not Found', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found',
+        json: async () => ({}),
+      })
+
+      await expect(apiRequest({ url: '/languages' as const })).rejects.toThrow('Resource not found')
+    })
+
+    it('should return generic error message for other status codes', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        json: async () => ({}),
+      })
+
+      await expect(apiRequest({ url: '/languages' })).rejects.toThrow('API request failed: Internal Server Error')
     })
   })
 })

@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 /**
- * Root Products Page - Redirects to default locale
+ * Root Products Page - redirects to default locale
  */
 
 import { redirect } from 'next/navigation'

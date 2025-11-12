@@ -2,7 +2,7 @@
 
 'use client'
 
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 
 /**
  * Dropdown item interface
@@ -82,6 +82,14 @@ export interface DropdownProps<T = string> {
    * Custom render function for each item
    */
   renderItem?: (item: DropdownItem<T>, isSelected: boolean) => React.ReactNode
+  /**
+   * Test ID for E2E testing (applied to trigger button)
+   */
+  'data-testid'?: string
+  /**
+   * Base test ID for dropdown items (item value will be appended)
+   */
+  itemTestIdPrefix?: string
 }
 
 /**
@@ -117,14 +125,79 @@ export function Dropdown<T = string>({
   error,
   renderTrigger,
   renderItem,
+  'data-testid': testId,
+  itemTestIdPrefix,
 }: DropdownProps<T>): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false)
+  const [focusedIndex, setFocusedIndex] = useState(0)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const selectedItem = items.find(item => item.value === value)
+  const enabledItems = items.filter(item => !item.disabled)
 
   const handleSelect = (itemValue: T): void => {
     onChange(itemValue)
     setIsOpen(false)
+    triggerRef.current?.focus()
+  }
+
+  // Keyboard navigation
+  const handleKeyDown = (event: React.KeyboardEvent): void => {
+    if (!isOpen) {
+      // Open dropdown with Enter or Space
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        setFocusedIndex(0) // Reset focus when opening
+        setIsOpen(true)
+      }
+      return
+    }
+
+    // Handle keys when dropdown is open
+    switch (event.key) {
+      case 'Escape':
+        event.preventDefault()
+        setIsOpen(false)
+        triggerRef.current?.focus()
+        break
+
+      case 'ArrowDown':
+        event.preventDefault()
+        setFocusedIndex(prev => (prev < enabledItems.length - 1 ? prev + 1 : prev))
+        break
+
+      case 'ArrowUp':
+        event.preventDefault()
+        setFocusedIndex(prev => (prev > 0 ? prev - 1 : prev))
+        break
+
+      case 'Enter':
+      case ' ':
+        event.preventDefault()
+        if (enabledItems[focusedIndex]) {
+          handleSelect(enabledItems[focusedIndex].value)
+        }
+        break
+
+      case 'Home':
+        event.preventDefault()
+        setFocusedIndex(0)
+        break
+
+      case 'End':
+        event.preventDefault()
+        setFocusedIndex(enabledItems.length - 1)
+        break
+
+      case 'Tab':
+        // Close dropdown when tabbing away
+        setIsOpen(false)
+        break
+
+      default:
+        break
+    }
   }
 
   const defaultTriggerContent = selectedItem ? (
@@ -165,10 +238,15 @@ export function Dropdown<T = string>({
 
       {/* Trigger Button */}
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => {
+          if (!isOpen) {
+            setFocusedIndex(0) // Reset focus when opening with click
+          }
           setIsOpen(!isOpen)
         }}
+        onKeyDown={handleKeyDown}
         disabled={disabled}
         className={
           buttonClassName ||
@@ -180,7 +258,8 @@ export function Dropdown<T = string>({
         }
         aria-label={ariaLabel}
         aria-expanded={isOpen}
-        aria-haspopup="listbox"
+        aria-haspopup="menu"
+        data-testid={testId}
       >
         <div className="flex-1 text-left">{renderTrigger ? renderTrigger(selectedItem) : defaultTriggerContent}</div>
         {!renderTrigger && (
@@ -211,11 +290,16 @@ export function Dropdown<T = string>({
 
           {/* Menu */}
           <div
+            ref={menuRef}
             className="absolute right-0 mt-2 min-w-full bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-xl z-20 max-h-60 overflow-y-auto"
-            role="listbox"
+            role="menu"
+            onKeyDown={handleKeyDown}
           >
             {items.map(item => {
               const isSelected = item.value === value
+              const enabledIndex = enabledItems.findIndex(ei => ei.value === item.value)
+              const isFocused = enabledIndex === focusedIndex && !item.disabled
+              const itemTestId = itemTestIdPrefix ? `${itemTestIdPrefix}-${String(item.value)}` : undefined
               return (
                 <button
                   key={String(item.value)}
@@ -228,13 +312,13 @@ export function Dropdown<T = string>({
                     item.disabled
                       ? 'opacity-50 cursor-not-allowed'
                       : 'hover:bg-primary-50 dark:hover:bg-primary-900 cursor-pointer'
-                  } ${
+                  } ${isFocused ? 'bg-tertiary-100 dark:bg-tertiary-900 ring-2 ring-inset ring-tertiary-400' : ''} ${
                     isSelected
                       ? 'bg-primary-50 dark:bg-primary-900 font-medium text-primary-700 dark:text-primary-300'
                       : 'text-neutral-700 dark:text-neutral-200'
                   }`}
-                  role="option"
-                  aria-selected={isSelected}
+                  role="menuitem"
+                  data-testid={itemTestId}
                 >
                   {renderItem ? renderItem(item, isSelected) : defaultItemContent(item, isSelected)}
                 </button>

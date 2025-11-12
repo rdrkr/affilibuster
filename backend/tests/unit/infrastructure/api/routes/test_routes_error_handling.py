@@ -37,7 +37,7 @@ class TestLanguagesRouteErrorHandling:
 
         use_case = AsyncMock()
         use_case.execute.side_effect = Exception("Strapi connection failed")
-        request = LanguagesDetectPostRequest(acceptLanguage="en-US")
+        request = LanguagesDetectPostRequest(accept_language="en-US")
 
         with pytest.raises(HTTPException) as exc_info:
             await detect_language(request, use_case)

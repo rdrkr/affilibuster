@@ -5,7 +5,7 @@
 NPROCS := $(shell sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4)
 MAKEFLAGS += --output-sync=target
 
-.PHONY: help all dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-frontend test-parallel test-all test-backend-fast audit clean clean-coverage coverage-merge coverage-view ci-test install install-backend install-frontend install-cms setup upgrade upgrade-cms upgrade-frontend upgrade-backend ps pre-commit
+.PHONY: help all dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-backend-unit test-backend-integration test-frontend test-frontend-unit test-frontend-integration test-performance test-all-unit test-all-integration test-parallel test-all audit clean clean-coverage coverage-merge coverage-view playwright-report ci-test install install-backend install-frontend install-cms setup upgrade upgrade-cms upgrade-frontend upgrade-backend ps pre-commit
 
 # Default target
 .DEFAULT_GOAL := help
@@ -16,7 +16,7 @@ help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 	@echo ""
 
-all: clean install pre-commit start test ## Run complete workflow: clean, install, pre-commit, build, test
+all: clean setup pre-commit start test ## Run complete workflow
 
 # Linting & Formatting
 
@@ -111,14 +111,32 @@ logs: ## View Docker logs (all services)
 logs-backend: ## View backend logs only
 	@docker compose logs -f backend
 
-test-backend: ## Run backend tests with coverage
+test-backend-unit: ## Run backend unit tests only
+	@bash scripts/test.sh backend-unit
+
+test-backend-integration: ## Run backend integration tests only
+	@bash scripts/test.sh backend-integration
+
+test-backend: ## Run all backend tests (unit + integration)
 	@bash scripts/test.sh backend
 
-test-backend-fast: ## Run backend unit tests only (fast)
-	@bash scripts/test.sh backend-fast
+test-frontend-unit: ## Run frontend unit tests only (Jest)
+	@bash scripts/test.sh frontend-unit
 
-test-frontend: ## Run frontend tests with coverage
+test-frontend-integration: ## Run frontend integration tests only (Playwright E2E)
+	@bash scripts/test.sh frontend-integration $(BROWSER)
+
+test-frontend: ## Run all frontend tests (unit + integration)
 	@bash scripts/test.sh frontend
+
+test-performance: ## Run performance tests only
+	@bash scripts/test.sh performance $(BROWSER)
+
+test-all-unit: ## Run all unit tests (backend + frontend)
+	@bash scripts/test.sh all-unit
+
+test-all-integration: ## Run all integration tests (backend + frontend)
+	@bash scripts/test.sh all-integration
 
 test: ## Run all tests with coverage (shows all errors)
 	@bash scripts/test.sh
@@ -141,6 +159,17 @@ coverage-view: ## Open merged coverage report in browser
 
 clean-coverage: ## Clean all coverage reports
 	@bash scripts/clean.sh coverage
+
+playwright-report: ## View Playwright E2E test report in browser
+	@if [ -d "frontend/playwright-report" ]; then \
+		echo "📊 Starting Playwright report server..."; \
+		echo "   Open http://localhost:$${PLAYWRIGHT_REPORT_PORT:-9323} in your browser"; \
+		echo "   Press Ctrl+C to stop the server"; \
+		docker compose exec test-runner sh -c 'cd /app && npx playwright show-report --port $${PLAYWRIGHT_REPORT_PORT:-9323} --host 0.0.0.0'; \
+	else \
+		echo "❌ No Playwright report found"; \
+		echo "   Run 'make test-frontend' or 'make test' first to generate E2E test reports"; \
+	fi
 
 audit: ## Run Lighthouse performance audits
 	@bash scripts/audit.sh

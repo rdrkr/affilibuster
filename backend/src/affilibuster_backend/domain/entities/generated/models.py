@@ -6,7 +6,116 @@ from enum import Enum
 from typing import Any, Literal, Union
 from uuid import UUID
 
-from pydantic import AnyUrl, AwareDatetime, BaseModel, ConfigDict, EmailStr, Field, RootModel
+from pydantic import AnyUrl, AwareDatetime, BaseModel, ConfigDict, EmailStr, Field, RootModel, SecretStr
+
+
+class Status(Enum):
+    ACTIVE = "active"
+    LOCKED = "locked"
+    DELETED = "deleted"
+
+
+class User(BaseModel):
+    """
+    User account information
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    id: UUID = Field(..., examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    Universally Unique Identifier (UUID) in standard 8-4-4-4-12 hexadecimal format, supporting versions 1-8.
+    """
+    email: EmailStr = Field(..., examples=["user@example.com"])
+    """
+    RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
+    """
+    display_name: str = Field(..., alias="displayName", examples=["John Doe"])
+    email_verified: bool = Field(..., alias="emailVerified", examples=[False])
+    status: Status = Field(..., examples=["active"])
+    created_at: AwareDatetime = Field(..., alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: AwareDatetime = Field(..., alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    last_login_at: AwareDatetime | None = Field(None, alias="lastLoginAt", examples=["2025-11-10T09:15:00Z"])
+
+
+class UserProfile(BaseModel):
+    """
+    User profile information (without password)
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    id: UUID = Field(..., examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    Universally Unique Identifier (UUID) in standard 8-4-4-4-12 hexadecimal format, supporting versions 1-8.
+    """
+    email: EmailStr = Field(..., examples=["user@example.com"])
+    """
+    RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
+    """
+    display_name: str = Field(..., examples=["John Doe"])
+    email_verified: bool = Field(..., examples=[True])
+    created_at: AwareDatetime = Field(..., examples=["2025-11-02T14:30:00Z"])
+    last_login_at: AwareDatetime | None = Field(None, examples=["2025-11-10T09:15:00Z"])
+
+
+class RegisterResponse(BaseModel):
+    """
+    Response after successful registration
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    success: bool = Field(..., examples=[True])
+    user: User
+    verification_token: str | None = Field(None, alias="verificationToken", examples=["abc123def456"])
+    """
+    Email verification token (only in test/dev)
+    """
+    message: str = Field(..., examples=["Registration successful. Please check your email for verification."])
+
+
+class LoginResponse(BaseModel):
+    """
+    Response after successful login
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    success: bool = Field(..., examples=[True])
+    user: User
+    session_token: str = Field(..., alias="sessionToken", examples=["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."])
+    """
+    Session token (also set in HTTP-only cookie)
+    """
+    message: str | None = Field(None, examples=["Login successful"])
+
+
+class RefreshResponse(BaseModel):
+    """
+    Response after successful token refresh
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    success: bool = Field(..., examples=[True])
+    session_token: str = Field(..., alias="sessionToken", examples=["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."])
+    """
+    New access token (also set in HTTP-only cookie)
+    """
+    expires_at: AwareDatetime = Field(..., alias="expiresAt", examples=["2025-11-15T10:00:00Z"])
+    user: User
 
 
 class CurrencyCode(Enum):
@@ -110,6 +219,28 @@ class UpdatePreferences(BaseModel):
     selected_currency: CurrencyCode | None = Field(None, alias="selectedCurrency")
     dismissed_language_prompt: bool | None = Field(None, alias="dismissedLanguagePrompt", examples=[True])
     detected_language: DetectedLanguage2 | None = Field(None, alias="detectedLanguage", examples=["it"])
+
+
+class RedirectCheckResponse(BaseModel):
+    """
+    Response from redirect check endpoint
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    found: bool = Field(..., examples=[True])
+    """
+    Whether a redirect was found for the given source URL
+    """
+    target_url: str | None = Field(None, alias="targetUrl", examples=["/new-page"])
+    """
+    The target URL to redirect to (null if no redirect found)
+    """
+    status_code: int | None = Field(None, alias="statusCode", examples=[301])
+    """
+    HTTP status code for the redirect (301 or 302, null if no redirect found)
+    """
 
 
 class Error(BaseModel):
@@ -418,6 +549,69 @@ class Footer(BaseModel):
     footer_tagline: str | None = Field(None, alias="footerTagline", examples=["Sustainable living starts here"])
     twitter_aria_label: str | None = Field(None, alias="twitterAriaLabel", examples=["Follow us on Twitter"])
     facebook_aria_label: str | None = Field(None, alias="facebookAriaLabel", examples=["Follow us on Facebook"])
+
+
+class AuthVerifyEmailPostRequest(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    token: str = Field(..., examples=["abc123def456"])
+    """
+    Email verification token
+    """
+
+
+class AuthRefreshPostRequest(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    session_token: str = Field(..., alias="sessionToken", examples=["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."])
+    """
+    Session token to refresh
+    """
+
+
+class AuthLogoutPostRequest(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    session_token: str = Field(..., alias="sessionToken", examples=["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."])
+    """
+    Session token to invalidate
+    """
+
+
+class AuthResendVerificationPostRequest(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    user_id: UUID = Field(..., alias="userId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    Universally Unique Identifier (UUID) in standard 8-4-4-4-12 hexadecimal format, supporting versions 1-8.
+    """
+
+
+class RootResponse(BaseModel):
+    """
+    API root endpoint response
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    message: str = Field(..., examples=["Affilibuster API v1.0.0"])
+    status: str = Field(..., examples=["running"])
+
+
+class HealthResponse(BaseModel):
+    """
+    Health check endpoint response
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    status: str = Field(..., examples=["healthy"])
 
 
 class UiFeatureItemEntry(BaseModel):
@@ -1582,6 +1776,101 @@ class ApiTermTermDocument(BaseModel):
     """
 
 
+class AuthRegisterPostRequest(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    email: EmailStr = Field(..., examples=["user@example.com"])
+    password: SecretStr = Field(..., examples=["SecurePassword123!"], min_length=8)
+    display_name: str = Field(..., alias="displayName", examples=["John Doe"], max_length=100, min_length=1)
+
+
+class AuthLoginPostRequest(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    email: EmailStr = Field(..., examples=["user@example.com"])
+    password: SecretStr = Field(..., examples=["SecurePassword123!"])
+    remember_me: bool | None = Field(False, alias="rememberMe", examples=[False])
+
+
+class AuthLogoutPostResponse(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    success: bool | None = Field(None, examples=[True])
+    message: str | None = Field(None, examples=["Logged out successfully"])
+
+
+class AuthVerifyEmailPostResponse(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    success: bool | None = Field(None, examples=[True])
+    message: str | None = Field(None, examples=["Email verified successfully"])
+
+
+class AuthResendVerificationPostResponse(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    success: bool | None = Field(None, examples=[True])
+    message: str | None = Field(None, examples=["Verification email sent"])
+
+
+class AuthForgotPasswordPostRequest(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    email: EmailStr = Field(..., examples=["user@example.com"])
+
+
+class AuthForgotPasswordPostResponse(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    success: bool | None = Field(None, examples=[True])
+    message: str | None = Field(None, examples=["If email exists, password reset link has been sent"])
+
+
+class AuthResetPasswordPostRequest(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    token: str = Field(..., examples=["xyz789abc123"])
+    new_password: SecretStr = Field(..., alias="newPassword", examples=["NewSecurePassword123!"], min_length=8)
+
+
+class AuthResetPasswordPostResponse(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    success: bool | None = Field(None, examples=[True])
+    message: str | None = Field(None, examples=["Password reset successfully"])
+
+
+class AuthProfilePatchRequest(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    display_name: str = Field(..., alias="displayName", examples=["Jane Smith"], max_length=100, min_length=1)
+
+
+class AuthProfileChangePasswordPostRequest(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    current_password: SecretStr = Field(..., alias="currentPassword", examples=["OldPassword123!"])
+    new_password: SecretStr = Field(..., alias="newPassword", examples=["NewPassword123!"], min_length=8)
+
+
+class AuthProfileChangePasswordPostResponse(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    message: str | None = Field(None, examples=["Password changed successfully. Please log in again."])
+
+
 class LanguagesGetResponse(RootModel[list[Language]]):
     model_config = ConfigDict(
         populate_by_name=True,
@@ -1599,6 +1888,10 @@ class LanguagesDetectPostRequest(BaseModel):
     """
     Optional ISO 3166-1 alpha-2 country code from IP geolocation
     """
+
+
+class V1RedirectsCheckGetParametersQuery(BaseModel):
+    source_url: str = Field(..., examples=["/old-page"])
 
 
 class FieldModel(Enum):
@@ -1636,7 +1929,7 @@ class PopulateEnum(Enum):
     LOCALIZATIONS = "localizations"
 
 
-class Status(Enum):
+class Status1(Enum):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -1659,7 +1952,7 @@ class AboutGetParametersQuery(BaseModel):
     """
     Select a locale
     """
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -1821,7 +2114,7 @@ class ContactGetParametersQuery(BaseModel):
     """
     Select a locale
     """
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -2108,7 +2401,7 @@ class CurrenciesGetParametersQuery(BaseModel):
     Sort the result
     """
     populate: str | None = Field(None, examples=["*"])
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -2243,7 +2536,7 @@ class CurrenciesIdGetParametersQuery(BaseModel):
     """
     Sort the result
     """
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -2371,7 +2664,7 @@ class Error404GetParametersQuery(BaseModel):
     """
     Select a locale
     """
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -2487,7 +2780,7 @@ class Error410GetParametersQuery(BaseModel):
     """
     Select a locale
     """
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -2609,7 +2902,7 @@ class FooterGetParametersQuery(BaseModel):
     """
     Select a locale
     """
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -2777,7 +3070,7 @@ class HomepageGetParametersQuery(BaseModel):
     """
     Select a locale
     """
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -2981,7 +3274,7 @@ class NavigationGetParametersQuery(BaseModel):
     """
     Select a locale
     """
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -3176,7 +3469,7 @@ class PrivacyGetParametersQuery(BaseModel):
     """
     Select a locale
     """
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -3439,7 +3732,7 @@ class ProductsGetParametersQuery(BaseModel):
     """
     Select a locale
     """
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -3593,7 +3886,7 @@ class ProductsIdGetParametersQuery(BaseModel):
     """
     Select a locale
     """
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -3733,7 +4026,7 @@ class ProductPageGetParametersQuery(BaseModel):
     """
     Select a locale
     """
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -3862,7 +4155,7 @@ class SystemMessageGetParametersQuery(BaseModel):
     """
     Select a locale
     """
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
@@ -3965,7 +4258,7 @@ class TermGetParametersQuery(BaseModel):
     """
     Select a locale
     """
-    status: Status | None = Field(None, examples=["published"])
+    status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """

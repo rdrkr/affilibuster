@@ -6,11 +6,12 @@
  */
 import { CodeEnum } from '@/lib/generated/types.gen'
 
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../fixtures'
+import { navigateAndWait } from '../helpers/waits'
 
 test.describe('SEO Meta Tags', () => {
   test('should include all required meta tags on homepage', async ({ page }) => {
-    await page.goto('/')
+    await navigateAndWait(page, '/')
 
     // Title
     await expect(page).toHaveTitle(/Affilibuster/)
@@ -32,7 +33,7 @@ test.describe('SEO Meta Tags', () => {
   })
 
   test('should include hreflang tags for multi-language', async ({ page }) => {
-    await page.goto('/')
+    await navigateAndWait(page, '/')
 
     // Should have hreflang for all languages
     const hreflangEn = page.locator('link[rel="alternate"][hreflang="en"]')
@@ -47,7 +48,7 @@ test.describe('SEO Meta Tags', () => {
   })
 
   test('should have correct canonical URL', async ({ page }) => {
-    await page.goto('/')
+    await navigateAndWait(page, '/')
 
     const canonical = page.locator('link[rel="canonical"]')
     await expect(canonical).toHaveCount(1)
@@ -58,11 +59,11 @@ test.describe('SEO Meta Tags', () => {
 
   test('should update meta tags for different pages', async ({ page }) => {
     // Visit homepage
-    await page.goto('/')
+    await navigateAndWait(page, '/en')
     const homeTitle = await page.title()
 
     // Visit about page
-    await page.goto('/about')
+    await navigateAndWait(page, '/en/about')
     const aboutTitle = await page.title()
 
     // Titles should be different
@@ -71,7 +72,7 @@ test.describe('SEO Meta Tags', () => {
 
   test('should include language-specific meta tags', async ({ page }) => {
     // Italian page
-    await page.goto('/it')
+    await navigateAndWait(page, '/it')
 
     const htmlLang = await page.locator('html').getAttribute('lang')
     expect(htmlLang).toBe(CodeEnum.IT)
@@ -82,7 +83,7 @@ test.describe('SEO Meta Tags', () => {
   })
 
   test('should include structured data (JSON-LD)', async ({ page }) => {
-    await page.goto('/')
+    await navigateAndWait(page, '/')
 
     // Should have JSON-LD script tag
     const jsonLd = page.locator('script[type="application/ld+json"]')
@@ -99,21 +100,21 @@ test.describe('SEO Meta Tags', () => {
   })
 
   test('should include robots meta tag', async ({ page }) => {
-    await page.goto('/')
+    await navigateAndWait(page, '/')
 
     const robots = page.locator('meta[name="robots"]')
     await expect(robots).toHaveAttribute('content', /index.*follow/)
   })
 
   test('should include viewport meta tag', async ({ page }) => {
-    await page.goto('/')
+    await navigateAndWait(page, '/')
 
     const viewport = page.locator('meta[name="viewport"]')
     await expect(viewport).toHaveAttribute('content', 'width=device-width, initial-scale=1')
   })
 
   test('should include charset meta tag', async ({ page }) => {
-    await page.goto('/')
+    await navigateAndWait(page, '/')
 
     const charset = page.locator('meta[charset]')
     await expect(charset).toHaveAttribute('charset', 'utf-8')

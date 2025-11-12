@@ -3,10 +3,12 @@
 fail_fast: false
 exclude: |
   (?x)^(
+    \.idea/|
     \.git/|
     \.next/|
     \.pytest_cache/|
     \.venv/|
+    \.specify/|
     __pycache__/|
     alembic/versions/|
     backend/htmlcov/|
@@ -24,7 +26,8 @@ exclude: |
     log\.txt|
     node_modules/|
     package-lock\.json|
-    venv/
+    venv/|
+    test-results/
   )
 repos:
   # Security scanning

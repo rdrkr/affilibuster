@@ -27,6 +27,7 @@ import {
   Checkbox,
   Radio,
   ThemeSelector,
+  JsonLd,
 } from '@/components'
 
 describe('Components Index', () => {
@@ -103,5 +104,9 @@ describe('Components Index', () => {
 
   it('should export ThemeSelector', () => {
     expect(ThemeSelector).toBeDefined()
+  })
+
+  it('should export JsonLd', () => {
+    expect(JsonLd).toBeDefined()
   })
 })

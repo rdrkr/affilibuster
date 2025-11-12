@@ -64,8 +64,8 @@ export function Button({
     'font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-400 disabled:opacity-50 disabled:cursor-not-allowed'
 
   const variantClasses: Record<ButtonVariant, string> = {
-    primary: 'bg-primary-600 hover:bg-primary-700 text-white shadow-sm',
-    secondary: 'bg-secondary-500 hover:bg-secondary-600 text-white shadow-sm',
+    primary: 'bg-primary-800 hover:bg-primary-900 text-white shadow-sm',
+    secondary: 'bg-secondary-800 hover:bg-secondary-900 text-white shadow-sm',
     ghost:
       'bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200',
     danger: 'bg-error-500 hover:bg-error-600 text-white shadow-sm',

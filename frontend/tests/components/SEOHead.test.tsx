@@ -173,6 +173,8 @@ describe('SEOHead', () => {
         offers: {
           '@type': 'Offer',
           availability: 'https://schema.org/InStock',
+          price: '99.99',
+          priceCurrency: 'USD',
         },
       })
     })

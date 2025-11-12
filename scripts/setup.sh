@@ -74,6 +74,7 @@ if [[ "${OS}" = "macos" ]]; then
   install_brew "shfmt"
   install_brew "shellcheck"
   install_brew "checkmake"
+  install_brew "mkcert"
 
   # Python dependency manager and tools
   install_brew "uv"
@@ -85,6 +86,7 @@ else
   install_apt "pre-commit" "pre-commit"
   install_apt "shfmt" "shfmt"
   install_apt "shellcheck" "shellcheck"
+  install_apt "mkcert" "mkcert"
 
   # checkmake (Go binary - install from GitHub releases)
   if ! command -v checkmake >/dev/null 2>&1; then
@@ -115,6 +117,62 @@ else
   else
     echo "  ✅ redocly-cli already installed"
   fi
+fi
+
+echo "🔐 Generating HTTPS certificates for development..."
+
+# Create certs directory if it doesn't exist
+if [[ ! -d "certs" ]]; then
+  mkdir -p certs
+  echo "  ✅ Created certs directory"
+fi
+
+# Generate SSL certificates if they don't exist
+if [[ ! -f "certs/localhost.pem" ]] || [[ ! -f "certs/localhost-key.pem" ]]; then
+  if command -v mkcert >/dev/null 2>&1; then
+    echo "  Installing mkcert root CA (may require sudo password)..."
+    mkcert -install || echo "  ⚠️  Failed to install mkcert CA (continuing anyway)"
+
+    echo "  Generating localhost certificates with Docker hostnames..."
+    cd certs
+    mkcert localhost 127.0.0.1 ::1 backend frontend strapi strapi-proxy || {
+      echo "  ❌ Failed to generate certificates"
+      cd ..
+      exit 1
+    }
+
+    # Rename files to simpler names
+    mv localhost+6.pem localhost.pem 2>/dev/null || true
+    mv localhost+6-key.pem localhost-key.pem 2>/dev/null || true
+    cd ..
+
+    echo "  ✅ SSL certificates generated successfully"
+  else
+    echo "  ⚠️  mkcert not installed - skipping certificate generation"
+    echo "     Run 'brew install mkcert' (macOS) or 'sudo apt install mkcert' (Linux)"
+  fi
+else
+  echo "  ✅ SSL certificates already exist"
+fi
+
+# Copy mkcert root CA if it doesn't exist
+if [[ ! -f "certs/rootCA.pem" ]]; then
+  if command -v mkcert >/dev/null 2>&1; then
+    echo "  Copying mkcert root CA certificate..."
+    CAROOT=$(mkcert -CAROOT)
+    if [[ -f "${CAROOT}/rootCA.pem" ]]; then
+      cp "${CAROOT}/rootCA.pem" certs/rootCA.pem || {
+        echo "  ⚠️  Failed to copy root CA certificate"
+      }
+      echo "  ✅ Root CA certificate copied successfully"
+    else
+      echo "  ⚠️  Root CA certificate not found at ${CAROOT}/rootCA.pem"
+    fi
+  else
+    echo "  ⚠️  mkcert not installed - skipping root CA copy"
+  fi
+else
+  echo "  ✅ Root CA certificate already exists"
 fi
 
 echo "📦 Installing project dependencies..."

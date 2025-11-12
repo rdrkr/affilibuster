@@ -8,15 +8,43 @@
 import { render, screen } from '@testing-library/react'
 import NotFoundPage from '@/app/[lang]/not-found'
 import * as client from '@/lib/client'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { CodeEnum, type ApiError404Error404Document } from '@/lib/generated/types.gen'
+import { useAuth } from '@/lib/auth'
+import { createMockNavigation } from '../helpers/mockFactories'
+
+// Mock next-intl
+jest.mock('next-intl', () => ({
+  NextIntlClientProvider: jest.fn(({ children }: { children: React.ReactNode }): React.ReactNode => children),
+  useLocale: jest.fn((): string => 'en'),
+}))
+
+// Mock next-intl/server
+jest.mock('next-intl/server', () => ({
+  getMessages: jest.fn(() => Promise.resolve({})),
+}))
 
 // Mock the client module
-jest.mock('@/lib/client', () => ({
-  getError404: jest.fn(),
+jest.mock('@/lib/client', () => {
+  const actual = jest.requireActual('@/lib/client')
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return {
+    ...actual,
+    getError404: jest.fn(),
+    getNavigation: jest.fn(),
+  }
+})
+
+// Mock useAuth hook and AuthProvider
+jest.mock('@/lib/auth', () => ({
+  useAuth: jest.fn(),
+  AuthProvider: jest.fn(({ children }: { children: React.ReactNode }): React.ReactNode => children),
 }))
 
 describe('404 Not Found Page', () => {
-  const mockError404Data = {
+  const mockError404Data: ApiError404Error404Document = {
+    documentId: 'test-404-id',
+    id: 1,
+    entryTitle: '404 Error',
     title: 'Page Not Found',
     subtitle: 'Oops! The page you are looking for does not exist.',
     message: 'It might have been moved or deleted.',
@@ -25,11 +53,23 @@ describe('404 Not Found Page', () => {
     content: '<p>Additional help information</p>',
     metaTitle: '404 - Page Not Found',
     metaDescription: 'The requested page could not be found.',
+    locale: CodeEnum.EN,
+    publishedAt: '2024-01-01T00:00:00.000Z',
   }
+
+  const mockNavigationData = createMockNavigation()
 
   beforeEach(() => {
     jest.clearAllMocks()
     ;(client.getError404 as jest.Mock).mockResolvedValue(mockError404Data)
+    ;(client.getNavigation as jest.Mock).mockResolvedValue(mockNavigationData)
+    // Mock useAuth to return not authenticated state
+    ;(useAuth as jest.Mock).mockReturnValue({
+      user: null,
+      isLoading: false,
+      isAuthenticated: false,
+      logout: jest.fn(),
+    })
   })
 
   describe('Normal cases with params', () => {
@@ -71,7 +111,6 @@ describe('404 Not Found Page', () => {
       const component = await NotFoundPage({ params: Promise.resolve({ lang: CodeEnum.IT }) })
       render(component)
 
-      // Button text should be present
       expect(screen.getByText('Back to Home')).toBeInTheDocument()
       // Link should have correct href
       const link = screen.getByRole('link', { name: /Back to Home/i })
@@ -82,7 +121,6 @@ describe('404 Not Found Page', () => {
       const component = await NotFoundPage({ params: Promise.resolve({ lang: CodeEnum.HE }) })
       render(component)
 
-      // Button text should be present
       expect(screen.getByText('Browse Products')).toBeInTheDocument()
       // Link should have correct href
       const link = screen.getByRole('link', { name: /Browse Products/i })
@@ -93,6 +131,7 @@ describe('404 Not Found Page', () => {
       const component = await NotFoundPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
       const { container } = render(component)
 
+      expect(screen.getByText('404')).toBeInTheDocument()
       const htmlContent = container.querySelector('.prose')
       expect(htmlContent).toBeInTheDocument()
       expect(htmlContent?.innerHTML).toContain('Additional help information')
@@ -104,7 +143,6 @@ describe('404 Not Found Page', () => {
       const component = await NotFoundPage({})
       render(component)
 
-      // Should still render the page
       expect(screen.getByText('404')).toBeInTheDocument()
     })
 
@@ -155,7 +193,6 @@ describe('404 Not Found Page', () => {
       const component = await NotFoundPage({ params: rejectingParams })
       render(component)
 
-      // Should still render the page with fallback
       expect(screen.getByText('404')).toBeInTheDocument()
       expect(client.getError404).toHaveBeenCalledWith(CodeEnum.EN)
       expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to resolve params:', expect.any(Error))
@@ -172,7 +209,6 @@ describe('404 Not Found Page', () => {
       const component = await NotFoundPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
       render(component)
 
-      // Should still render basic 404 heading even if CMS fails
       expect(screen.getByText('404')).toBeInTheDocument()
       expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to fetch 404 error page:', expect.any(Error))
 
@@ -185,7 +221,6 @@ describe('404 Not Found Page', () => {
       const component = await NotFoundPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
       render(component)
 
-      // Should render 404 heading even without CMS data
       expect(screen.getByText('404')).toBeInTheDocument()
       // CTA buttons should not render when data is null
       expect(screen.queryByText('Back to Home')).not.toBeInTheDocument()
@@ -197,16 +232,18 @@ describe('404 Not Found Page', () => {
       const component = await NotFoundPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
       const { container } = render(component)
 
+      expect(screen.getByText('404')).toBeInTheDocument()
       const mainDiv = container.firstChild
       expect(mainDiv).toHaveClass('min-h-screen')
       expect(mainDiv).toHaveClass('flex')
-      expect(mainDiv).toHaveClass('items-center')
-      expect(mainDiv).toHaveClass('justify-center')
+      expect(mainDiv).toHaveClass('flex-col')
     })
 
     it('should render gradient text for 404 number', async () => {
       const component = await NotFoundPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
       const { container } = render(component)
+
+      expect(screen.getByText('404')).toBeInTheDocument()
 
       const heading = container.querySelector('.text-6xl')
       expect(heading).toHaveClass('text-transparent')

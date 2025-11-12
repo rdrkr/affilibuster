@@ -3,23 +3,34 @@
 /**
  * Unit tests for Price component
  */
-import { CodeEnum, CurrencyCode, SymbolPositionEnum } from '@/lib/generated/types.gen'
 
 import { render, screen, waitFor } from '@testing-library/react'
 import { Price } from '@/components/Price'
 import * as client from '@/lib/client'
-import { useSession } from '@/hooks/useSession'
+import { useCurrency } from '@/lib/currency/useCurrency'
+import { convertCurrency } from '@/lib/currency/exchange-rates'
+import { CurrencyCode, SymbolPositionEnum } from '@/lib/generated/types.gen'
 
 // Mock dependencies
-jest.mock('@/hooks/useSession')
 jest.mock('@/lib/client', () => ({
   getCurrencies: jest.fn(),
-  getUserPreferences: jest.fn(),
 }))
 
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>
+jest.mock('@/lib/currency/useCurrency', () => ({
+  useCurrency: jest.fn(),
+}))
+
+jest.mock('@/lib/currency/exchange-rates', () => ({
+  convertCurrency: jest.fn(),
+}))
+
+jest.mock('next-intl', () => ({
+  useLocale: jest.fn(() => 'en'),
+}))
+
 const mockGetCurrencies = client.getCurrencies as jest.MockedFunction<typeof client.getCurrencies>
-const mockGetUserPreferences = client.getUserPreferences as jest.MockedFunction<typeof client.getUserPreferences>
+const mockUseCurrency = useCurrency as jest.MockedFunction<typeof useCurrency>
+const mockConvertCurrency = convertCurrency as jest.MockedFunction<typeof convertCurrency>
 
 describe('Price', () => {
   const mockCurrencies = [
@@ -57,23 +68,30 @@ describe('Price', () => {
     },
   ]
 
+  const mockSetCurrency = jest.fn()
+
   beforeEach(() => {
     jest.clearAllMocks()
-    mockUseSession.mockReturnValue('test-session-123')
+
+    // Default mocks
+    mockGetCurrencies.mockResolvedValue(mockCurrencies)
+    mockUseCurrency.mockReturnValue({
+      currency: CurrencyCode.USD,
+      setCurrency: mockSetCurrency,
+    })
+    mockConvertCurrency.mockImplementation((amount, from, to) => {
+      // Simple mock: if same currency, return amount, otherwise apply 0.92 rate for EUR
+      if (from === to) return amount
+      if (to === CurrencyCode.EUR) return amount * 0.92
+      return amount
+    })
   })
 
   describe('loading state', () => {
-    it('should show loading skeleton while fetching data', () => {
-      // Mock promises that never resolve to test loading state
+    it('should show loading skeleton while fetching currencies', () => {
       mockGetCurrencies.mockReturnValue(
         new Promise<never>(() => {
-          // Intentionally empty - testing loading state
-        })
-      )
-
-      mockGetUserPreferences.mockReturnValue(
-        new Promise<never>(() => {
-          // Intentionally empty - testing loading state
+          // Never resolves - testing loading state
         })
       )
 
@@ -83,54 +101,132 @@ describe('Price', () => {
       expect(skeleton).toBeInTheDocument()
     })
 
-    it('should not render actual price while loading', () => {
+    it('should not show price during loading', () => {
       mockGetCurrencies.mockReturnValue(
         new Promise<never>(() => {
-          // Intentionally empty - testing loading state
-        })
-      )
-
-      mockGetUserPreferences.mockReturnValue(
-        new Promise<never>(() => {
-          // Intentionally empty - testing loading state
+          // Never resolves
         })
       )
 
       render(<Price amount={99.99} />)
 
-      expect(screen.queryByText(/99/)).not.toBeInTheDocument()
+      expect(screen.queryByTestId('price')).not.toBeInTheDocument()
     })
   })
 
-  describe('USD formatting', () => {
-    it('should format USD with default settings', async () => {
-      mockGetCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetUserPreferences.mockResolvedValue({
-        id: '1',
-        sessionId: 'test-session',
-        selectedCurrency: CurrencyCode.USD,
-        dismissedLanguagePrompt: false,
-        detectedLanguage: CodeEnum.EN,
-      })
-
-      render(<Price amount={1234.56} />)
+  describe('basic rendering', () => {
+    it('should render price with USD currency', async () => {
+      render(<Price amount={99.99} />)
 
       await waitFor(() => {
-        expect(screen.getByText(/\$1,234\.56/)).toBeInTheDocument()
+        expect(screen.getByTestId('price')).toBeInTheDocument()
+      })
+
+      expect(screen.getByText(/\$99.99/)).toBeInTheDocument()
+    })
+
+    it('should render price with EUR currency when selected', async () => {
+      mockUseCurrency.mockReturnValue({
+        currency: CurrencyCode.EUR,
+        setCurrency: mockSetCurrency,
+      })
+
+      render(<Price amount={100} currencyCode={CurrencyCode.USD} />)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('price')).toBeInTheDocument()
+      })
+
+      // Converted amount should be shown
+      expect(mockConvertCurrency).toHaveBeenCalledWith(100, CurrencyCode.USD, CurrencyCode.EUR)
+    })
+
+    it('should have data-testid attribute for E2E testing', async () => {
+      render(<Price amount={99.99} />)
+
+      await waitFor(() => {
+        const priceElement = screen.getByTestId('price')
+        expect(priceElement).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('currency conversion', () => {
+    it('should convert price to selected currency', async () => {
+      mockUseCurrency.mockReturnValue({
+        currency: CurrencyCode.EUR,
+        setCurrency: mockSetCurrency,
+      })
+
+      render(<Price amount={100} currencyCode={CurrencyCode.USD} />)
+
+      await waitFor(() => {
+        expect(mockConvertCurrency).toHaveBeenCalledWith(100, CurrencyCode.USD, CurrencyCode.EUR)
       })
     })
 
-    it('should show currency code when showCurrencyCode is true', async () => {
-      mockGetCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetUserPreferences.mockResolvedValue({
-        id: '1',
-        sessionId: 'test-session',
-        selectedCurrency: CurrencyCode.USD,
-        dismissedLanguagePrompt: false,
-        detectedLanguage: CodeEnum.EN,
+    it('should not convert if source and target currency are the same', async () => {
+      mockUseCurrency.mockReturnValue({
+        currency: CurrencyCode.USD,
+        setCurrency: mockSetCurrency,
       })
 
-      render(<Price amount={99.99} showCurrencyCode={true} />)
+      render(<Price amount={100} currencyCode={CurrencyCode.USD} />)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('price')).toBeInTheDocument()
+      })
+
+      expect(mockConvertCurrency).toHaveBeenCalledWith(100, CurrencyCode.USD, CurrencyCode.USD)
+    })
+  })
+
+  describe('formatting', () => {
+    it('should format price with currency symbol before amount (USD)', async () => {
+      render(<Price amount={99.99} />)
+
+      await waitFor(() => {
+        const price = screen.getByTestId('price')
+        expect(price.textContent).toMatch(/\$99\.99/)
+      })
+    })
+
+    it('should format price with currency symbol after amount (EUR)', async () => {
+      mockUseCurrency.mockReturnValue({
+        currency: CurrencyCode.EUR,
+        setCurrency: mockSetCurrency,
+      })
+      mockConvertCurrency.mockReturnValue(92)
+
+      render(<Price amount={100} currencyCode={CurrencyCode.USD} />)
+
+      await waitFor(() => {
+        const price = screen.getByTestId('price')
+        // EUR uses AFTER position
+        expect(price.textContent).toMatch(/92,00.*€/)
+      })
+    })
+
+    it('should apply custom decimal separator', async () => {
+      mockUseCurrency.mockReturnValue({
+        currency: CurrencyCode.EUR,
+        setCurrency: mockSetCurrency,
+      })
+      mockConvertCurrency.mockReturnValue(92.5)
+
+      render(<Price amount={100} currencyCode={CurrencyCode.USD} />)
+
+      await waitFor(() => {
+        const price = screen.getByTestId('price')
+        // EUR uses comma as decimal separator
+        expect(price.textContent).toContain('92,50')
+      })
+    })
+  })
+
+  describe('currency code display', () => {
+    it('should show currency code by default', async () => {
+      render(<Price amount={99.99} />)
 
       await waitFor(() => {
         expect(screen.getByText(CurrencyCode.USD)).toBeInTheDocument()
@@ -138,190 +234,117 @@ describe('Price', () => {
     })
 
     it('should hide currency code when showCurrencyCode is false', async () => {
-      mockGetCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetUserPreferences.mockResolvedValue({
-        id: '1',
-        sessionId: 'test-session',
-        selectedCurrency: CurrencyCode.USD,
-        dismissedLanguagePrompt: false,
-        detectedLanguage: CodeEnum.EN,
-      })
-
       render(<Price amount={99.99} showCurrencyCode={false} />)
 
       await waitFor(() => {
+        expect(screen.getByTestId('price')).toBeInTheDocument()
         expect(screen.queryByText(CurrencyCode.USD)).not.toBeInTheDocument()
       })
     })
   })
 
-  describe('EUR formatting', () => {
-    it('should format EUR with symbol after amount', async () => {
-      mockGetCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetUserPreferences.mockResolvedValue({
-        id: '1',
-        sessionId: 'test-session',
-        selectedCurrency: CurrencyCode.EUR,
-        dismissedLanguagePrompt: false,
-        detectedLanguage: CodeEnum.IT,
-      })
-
-      render(<Price amount={1234.56} currencyCode="EUR" />)
+  describe('className prop', () => {
+    it('should apply custom className', async () => {
+      render(<Price amount={99.99} className="custom-class" />)
 
       await waitFor(() => {
-        expect(screen.getByText(/1\.234,56 €/)).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('user preferences', () => {
-    it('should use user preferred currency over prop', async () => {
-      mockGetCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetUserPreferences.mockResolvedValue({
-        id: '1',
-        sessionId: 'test-session',
-        selectedCurrency: CurrencyCode.EUR,
-        dismissedLanguagePrompt: false,
-        detectedLanguage: CodeEnum.EN,
-      })
-
-      render(<Price amount={100} currencyCode="USD" />)
-
-      await waitFor(() => {
-        expect(screen.getByText(/€/)).toBeInTheDocument()
-      })
-    })
-
-    it('should fallback to prop currency when preferences fail', async () => {
-      mockGetCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetUserPreferences.mockRejectedValue(new Error('Network error'))
-
-      render(<Price amount={100} currencyCode="USD" />)
-
-      await waitFor(() => {
-        expect(screen.getByText(/\$/)).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('session handling', () => {
-    it('should wait for session ID before fetching', () => {
-      mockUseSession.mockReturnValue(null)
-
-      render(<Price amount={100} />)
-
-      expect(mockGetCurrencies).not.toHaveBeenCalled()
-      expect(mockGetUserPreferences).not.toHaveBeenCalled()
-    })
-
-    it('should fetch data when session ID becomes available', async () => {
-      mockUseSession.mockReturnValue('test-session-456')
-      mockGetCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetUserPreferences.mockResolvedValue({
-        id: '1',
-        sessionId: 'test-session-456',
-        selectedCurrency: CurrencyCode.USD,
-        dismissedLanguagePrompt: false,
-        detectedLanguage: CodeEnum.EN,
-      })
-
-      render(<Price amount={100} />)
-
-      await waitFor(() => {
-        expect(mockGetCurrencies).toHaveBeenCalled()
-        expect(mockGetUserPreferences).toHaveBeenCalled()
+        const price = screen.getByTestId('price')
+        expect(price).toHaveClass('custom-class')
+        expect(price).toHaveClass('font-medium') // Default class
       })
     })
   })
 
   describe('error handling', () => {
-    it('should show plain amount when currency not found', async () => {
-      mockGetCurrencies.mockResolvedValue([])
-      mockGetUserPreferences.mockResolvedValue({
-        id: '1',
-        sessionId: 'test-session',
-        selectedCurrency: CurrencyCode.USD,
-        dismissedLanguagePrompt: false,
-        detectedLanguage: CodeEnum.EN,
-      })
-
-      render(<Price amount={123.45} />)
-
-      await waitFor(() => {
-        expect(screen.getByText('123.45')).toBeInTheDocument()
-      })
-    })
-
-    it('should handle API errors gracefully', async () => {
+    it('should handle getCurrencies error gracefully', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockGetCurrencies.mockRejectedValue(new Error('API error'))
-      mockGetUserPreferences.mockRejectedValue(new Error('API error'))
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
 
-      render(<Price amount={100} />)
+      render(<Price amount={99.99} />)
 
       await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalled()
+        expect(consoleErrorSpy).toHaveBeenCalled()
       })
 
-      consoleSpy.mockRestore()
+      consoleErrorSpy.mockRestore()
     })
-  })
 
-  describe('custom className', () => {
-    it('should apply custom className', async () => {
-      mockGetCurrencies.mockResolvedValue(mockCurrencies)
-      mockGetUserPreferences.mockResolvedValue({
-        id: '1',
-        sessionId: 'test-session',
-        selectedCurrency: CurrencyCode.USD,
-        dismissedLanguagePrompt: false,
-        detectedLanguage: CodeEnum.EN,
-      })
+    it('should show plain amount if currency not found', async () => {
+      // Return empty array - currencies not found
+      mockGetCurrencies.mockResolvedValue([])
 
-      const { container } = render(<Price amount={100} className="custom-class" />)
+      render(<Price amount={99.99} />)
 
       await waitFor(() => {
-        const span = container.querySelector('.custom-class')
-        expect(span).toBeInTheDocument()
+        expect(screen.getByText('99.99')).toBeInTheDocument()
+      })
+    })
+
+    it('should show plain amount if source currency not found', async () => {
+      render(<Price amount={99.99} currencyCode={'INVALID' as CurrencyCode} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('99.99')).toBeInTheDocument()
+      })
+    })
+
+    it('should show plain amount if target currency not found', async () => {
+      mockUseCurrency.mockReturnValue({
+        currency: 'INVALID' as CurrencyCode,
+        setCurrency: mockSetCurrency,
+      })
+
+      render(<Price amount={99.99} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('99.99')).toBeInTheDocument()
       })
     })
   })
 
   describe('decimal places', () => {
     it('should respect currency decimal places', async () => {
-      const jpyCurrencies = [
-        {
-          documentId: 'jpy-doc-id',
-          id: 1,
-          code: CurrencyCode.JPY,
-          name: 'Japanese Yen',
-          symbol: '¥',
-          displayName: 'Japanese Yen',
-          decimalPlaces: 0,
-          symbolPosition: SymbolPositionEnum.BEFORE as const,
-          thousandsSeparator: ',',
-          decimalSeparator: '.',
-          exchangeRate: 149.5,
-          sortOrder: 1,
-          isActive: true,
-          publishedAt: '2025-01-01T00:00:00.000Z',
-        },
-      ]
-
-      mockGetCurrencies.mockResolvedValue(jpyCurrencies)
-      mockGetUserPreferences.mockResolvedValue({
-        id: '1',
-        sessionId: 'test-session',
-        selectedCurrency: CurrencyCode.JPY,
-        dismissedLanguagePrompt: false,
-        detectedLanguage: CodeEnum.EN, // Change to valid language code
-      })
-
-      render(<Price amount={5000} currencyCode="JPY" />)
+      render(<Price amount={99} />)
 
       await waitFor(() => {
-        expect(screen.getByText(/¥5,000/)).toBeInTheDocument()
-        expect(screen.queryByText(/\./)).not.toBeInTheDocument()
+        const price = screen.getByTestId('price')
+        // USD has 2 decimal places
+        expect(price.textContent).toMatch(/99\.00/)
+      })
+    })
+  })
+
+  describe('component reusability', () => {
+    it('should support multiple Price components on same page', async () => {
+      render(
+        <div>
+          <Price amount={10} data-testid="price-1" />
+          <Price amount={20} data-testid="price-2" />
+        </div>
+      )
+
+      await waitFor(() => {
+        expect(screen.getAllByTestId('price')).toHaveLength(2)
+      })
+    })
+
+    it('should update when useCurrency changes', async () => {
+      const { rerender } = render(<Price amount={100} currencyCode={CurrencyCode.USD} />)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('price')).toBeInTheDocument()
+      })
+
+      // Change currency
+      mockUseCurrency.mockReturnValue({
+        currency: CurrencyCode.EUR,
+        setCurrency: mockSetCurrency,
+      })
+
+      rerender(<Price amount={100} currencyCode={CurrencyCode.USD} />)
+
+      await waitFor(() => {
+        expect(mockConvertCurrency).toHaveBeenCalledWith(100, CurrencyCode.USD, CurrencyCode.EUR)
       })
     })
   })

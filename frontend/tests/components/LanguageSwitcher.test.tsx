@@ -12,14 +12,14 @@ import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import * as client from '@/lib/client'
-import { useRouter, usePathname } from 'next/navigation'
-import { CodeEnum } from '@/lib/generated/types.gen'
-import { CurrencyCode } from '@/lib/types'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { createMockLanguages, createMockNavigation } from '../helpers/mockFactories'
 
 // Mock Next.js navigation hooks
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
   usePathname: jest.fn(),
+  useSearchParams: jest.fn(),
 }))
 
 // Mock languages API
@@ -34,51 +34,22 @@ describe('LanguageSwitcher Component', () => {
     refresh: jest.fn(),
   }
 
-  const mockLanguages = [
-    {
-      code: CodeEnum.EN,
-      displayName: 'English',
-      nativeName: 'English',
-      direction: 'ltr' as const,
-      urlPrefix: '/en',
-      defaultCurrency: CurrencyCode.USD,
-      localeCode: 'en-US',
-      isDefault: true,
-      isActive: true,
-      sortOrder: 1,
-    },
-    {
-      code: CodeEnum.IT,
-      displayName: 'Italian',
-      nativeName: 'Italiano',
-      direction: 'ltr' as const,
-      urlPrefix: '/it',
-      defaultCurrency: CurrencyCode.EUR,
-      localeCode: 'it-IT',
-      isDefault: false,
-      isActive: true,
-      sortOrder: 2,
-    },
-    {
-      code: CodeEnum.HE,
-      displayName: 'Hebrew',
-      nativeName: 'עברית',
-      direction: 'rtl' as const,
-      urlPrefix: '/he',
-      defaultCurrency: CurrencyCode.ILS,
-      localeCode: 'he-IL',
-      isDefault: false,
-      isActive: true,
-      sortOrder: 3,
-    },
-  ]
+  const mockLanguages = createMockLanguages()
+
+  const mockSearchParams = {
+    toString: jest.fn(() => ''),
+  }
 
   beforeEach(() => {
     jest.clearAllMocks()
     ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
     ;(usePathname as jest.Mock).mockReturnValue('/')
+    ;(useSearchParams as jest.Mock).mockReturnValue(mockSearchParams)
+    mockSearchParams.toString.mockReturnValue('') // Default: no query params
     ;(client.getLanguages as jest.Mock).mockResolvedValue(mockLanguages)
-    ;(client.getNavigation as jest.Mock).mockResolvedValue({ languageSelectorAriaLabel: 'Select language' })
+    ;(client.getNavigation as jest.Mock).mockResolvedValue(
+      createMockNavigation({ languageSelectorAriaLabel: 'Select language' })
+    )
   })
 
   it('should render language switcher button', async () => {
@@ -169,7 +140,6 @@ describe('LanguageSwitcher Component', () => {
     // Should navigate to Italian version
     await waitFor(() => {
       expect(mockRouter.push).toHaveBeenCalledWith('/it/products/eco-bottle')
-      expect(mockRouter.refresh).toHaveBeenCalled()
     })
   })
 
@@ -196,7 +166,6 @@ describe('LanguageSwitcher Component', () => {
     // Should navigate to Hebrew version
     await waitFor(() => {
       expect(mockRouter.push).toHaveBeenCalledWith('/he/products/eco-bottle')
-      expect(mockRouter.refresh).toHaveBeenCalled()
     })
   })
 
@@ -223,7 +192,6 @@ describe('LanguageSwitcher Component', () => {
     // Should navigate to English version (change /it to /en)
     await waitFor(() => {
       expect(mockRouter.push).toHaveBeenCalledWith('/en/prodotti/bottiglia')
-      expect(mockRouter.refresh).toHaveBeenCalled()
     })
   })
 
@@ -340,23 +308,8 @@ describe('LanguageSwitcher Component', () => {
     expect(button).toHaveAttribute('aria-expanded', 'true')
   })
 
-  it('should handle edge case where newPath becomes empty string', async () => {
-    // Create a language without urlPrefix to test the fallback path
-    const edgeCaseLanguages = [
-      {
-        code: CodeEnum.EN,
-        displayName: 'English',
-        nativeName: 'English',
-        direction: 'ltr' as const,
-        urlPrefix: '',
-        defaultCurrency: CurrencyCode.USD,
-        localeCode: 'en-US',
-        isDefault: true,
-        isActive: true,
-        sortOrder: 1,
-      },
-    ]
-    ;(client.getLanguages as jest.Mock).mockResolvedValue(edgeCaseLanguages)
+  it('should handle root path language switch with language prefix', async () => {
+    // All languages now have explicit prefixes (/en, /it, /he)
     ;(usePathname as jest.Mock).mockReturnValue('/')
 
     render(<LanguageSwitcher />)
@@ -369,29 +322,22 @@ describe('LanguageSwitcher Component', () => {
     const button = screen.getByRole('button', { name: /select language/i })
     fireEvent.click(button)
 
-    // Click English (which has empty urlPrefix)
-    const englishButtons = screen.getAllByText('English')
-    const lastEnglishButton = englishButtons[englishButtons.length - 1]
-    if (lastEnglishButton) {
-      fireEvent.click(lastEnglishButton)
+    // Click Italian
+    const italianButtons = screen.getAllByText('Italiano')
+    const lastItalianButton = italianButtons[italianButtons.length - 1]
+    if (lastItalianButton) {
+      fireEvent.click(lastItalianButton)
     }
 
-    // Should navigate to '/' when newPath would be empty
+    // Should navigate to /it (root path gets language prefix)
     await waitFor(() => {
-      expect(mockRouter.push).toHaveBeenCalledWith('/')
+      expect(mockRouter.push).toHaveBeenCalledWith('/it')
     })
   })
 
-  it('should handle language without urlPrefix', async () => {
-    // Mock languages with one missing urlPrefix
-    const languagesWithoutPrefix = [
-      ...mockLanguages.slice(0, 2),
-      {
-        ...mockLanguages[2],
-        urlPrefix: undefined,
-      },
-    ]
-    ;(client.getLanguages as jest.Mock).mockResolvedValue(languagesWithoutPrefix)
+  it('should handle language switching with language code in path', async () => {
+    // The new implementation uses language codes directly (/en, /it, /he)
+    // regardless of urlPrefix since all languages have explicit prefixes
     ;(usePathname as jest.Mock).mockReturnValue('/en/products')
 
     render(<LanguageSwitcher />)
@@ -404,16 +350,16 @@ describe('LanguageSwitcher Component', () => {
     const button = screen.getByRole('button', { name: /select language/i })
     fireEvent.click(button)
 
-    // Click Hebrew (which has no urlPrefix in this test)
+    // Click Hebrew
     const hebrewButtons = screen.getAllByText('עברית')
     const lastHebrewButton = hebrewButtons[hebrewButtons.length - 1]
     if (lastHebrewButton) {
       fireEvent.click(lastHebrewButton)
     }
 
-    // Should still navigate (fallback to pathWithoutLang)
+    // Should navigate with Hebrew language code
     await waitFor(() => {
-      expect(mockRouter.push).toHaveBeenCalledWith('/products')
+      expect(mockRouter.push).toHaveBeenCalledWith('/he/products')
     })
   })
 
@@ -443,12 +389,9 @@ describe('LanguageSwitcher Component', () => {
     })
   })
 
-  it('should handle invalid language code defensively', async () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
-
-    // Mock languages array that will be modified mid-flight
-    const mutableLanguages = [...mockLanguages]
-    ;(client.getLanguages as jest.Mock).mockResolvedValue(mutableLanguages)
+  it('should handle language selection correctly', async () => {
+    // Test basic language switching functionality
+    ;(usePathname as jest.Mock).mockReturnValue('/en/about')
 
     render(<LanguageSwitcher />)
 
@@ -460,38 +403,21 @@ describe('LanguageSwitcher Component', () => {
     const button = screen.getByRole('button', { name: /select language/i })
     fireEvent.click(button)
 
-    // Now remove all languages from the array to simulate data corruption
-    // This will cause the find() to return undefined
-    mutableLanguages.length = 0
-
-    // Click a button (Italian) - but the languages array is now empty
+    // Click Italian
     const italianButtons = screen.getAllByText('Italiano')
     const dropdownButton = italianButtons[italianButtons.length - 1]
     if (dropdownButton) {
       fireEvent.click(dropdownButton)
     }
 
-    // The defensive check should have caught this and logged an error
+    // Should navigate to Italian version
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('not found'))
+      expect(mockRouter.push).toHaveBeenCalledWith('/it/about')
     })
-
-    consoleSpy.mockRestore()
   })
 
-  it('should handle empty newPath fallback when urlPrefix is missing', async () => {
-    // Test the edge case where urlPrefix is undefined and pathWithoutLang could theoretically be empty
-    // This is defensive code for edge cases in path manipulation
-    const noPrefixLangs = [
-      {
-        ...mockLanguages[0],
-        urlPrefix: undefined as unknown as string, // Missing urlPrefix
-      },
-    ]
-    ;(client.getLanguages as jest.Mock).mockResolvedValue(noPrefixLangs)
-
-    // Create a mock pathname that when processed results in empty pathWithoutLang
-    // This is a theoretical edge case the defensive code protects against
+  it('should handle empty pathname by adding language prefix', async () => {
+    // When pathname is empty, the new implementation adds language prefix
     ;(usePathname as jest.Mock).mockReturnValue('')
 
     render(<LanguageSwitcher />)
@@ -504,16 +430,81 @@ describe('LanguageSwitcher Component', () => {
     const button = screen.getByRole('button', { name: /select language/i })
     fireEvent.click(button)
 
-    // Click the language
-    const englishButtons = screen.getAllByText('English')
-    const dropdownButton = englishButtons[englishButtons.length - 1]
+    // Click Italian
+    const italianButtons = screen.getAllByText('Italiano')
+    const dropdownButton = italianButtons[italianButtons.length - 1]
     if (dropdownButton) {
       fireEvent.click(dropdownButton)
     }
 
-    // Should use fallback to '/' when newPath is empty
+    // Should navigate to /it (language prefix only)
     await waitFor(() => {
-      expect(mockRouter.push).toHaveBeenCalledWith('/')
+      expect(mockRouter.push).toHaveBeenCalledWith('/it')
     })
+  })
+
+  it('should detect Hebrew language from pathname', async () => {
+    ;(usePathname as jest.Mock).mockReturnValue('/he/products')
+
+    render(<LanguageSwitcher />)
+
+    // Should display Hebrew as current language
+    await waitFor(() => {
+      expect(screen.getByText('עברית')).toBeInTheDocument()
+    })
+  })
+
+  it('should preserve query parameters when changing language', async () => {
+    ;(usePathname as jest.Mock).mockReturnValue('/en/products')
+    mockSearchParams.toString.mockReturnValue('sort=price&filter=eco')
+
+    render(<LanguageSwitcher />)
+
+    await waitFor(() => {
+      expect(screen.getByText('English')).toBeInTheDocument()
+    })
+
+    // Open dropdown
+    const button = screen.getByRole('button', { name: /select language/i })
+    fireEvent.click(button)
+
+    // Click Italian
+    const italianButtons = screen.getAllByText('Italiano')
+    const lastItalianButton = italianButtons[italianButtons.length - 1]
+    if (lastItalianButton) {
+      fireEvent.click(lastItalianButton)
+    }
+
+    // Should navigate with query params preserved
+    await waitFor(() => {
+      expect(mockRouter.push).toHaveBeenCalledWith('/it/products?sort=price&filter=eco')
+    })
+  })
+
+  it('should handle getNavigation failure gracefully', async () => {
+    ;(client.getNavigation as jest.Mock).mockRejectedValue(new Error('Navigation API Error'))
+
+    render(<LanguageSwitcher />)
+
+    // Should still render with default aria-label
+    await waitFor(() => {
+      expect(screen.getByText('English')).toBeInTheDocument()
+    })
+
+    const button = screen.getByRole('button', { name: /select language/i })
+    expect(button).toHaveAttribute('aria-label', 'Select language')
+  })
+
+  it('should use default aria-label when navigation data is missing', async () => {
+    ;(client.getNavigation as jest.Mock).mockResolvedValue(createMockNavigation())
+
+    render(<LanguageSwitcher />)
+
+    await waitFor(() => {
+      expect(screen.getByText('English')).toBeInTheDocument()
+    })
+
+    const button = screen.getByRole('button', { name: /select language/i })
+    expect(button).toHaveAttribute('aria-label', 'Select language')
   })
 })

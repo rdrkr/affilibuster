@@ -47,6 +47,8 @@
       <excludeFolder url="file://$MODULE_DIR$/frontend/src/lib/generated" />
       <excludeFolder url="file://$MODULE_DIR$/backend/src/affilibuster_backend/infrastructure/api/models/generated" />
       <excludeFolder url="file://$MODULE_DIR$/backend/src/affilibuster_backend/domain/entities/generated" />
+      <excludeFolder url="file://$MODULE_DIR$/test-results" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/public" />
     </content>
     <orderEntry type="jdk" jdkName="uv (backend)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
