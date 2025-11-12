@@ -9,6 +9,7 @@
 import Link from 'next/link'
 import { getError404 } from '@/lib/client'
 import { CodeEnum } from '@/lib/generated/types.gen'
+import { Button } from '@/components/Button'
 
 interface Props {
   params?: Promise<{ lang: string }>
@@ -53,20 +54,18 @@ export default async function NotFoundPage({ params }: Props) {
 
         <div className="space-y-4">
           {errorData?.ctaText && (
-            <Link
-              href={`/${lang}`}
-              className="inline-block w-full bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-            >
-              {errorData.ctaText}
+            <Link href={`/${lang}`}>
+              <Button variant="primary" className="w-full bg-gradient-to-r from-primary-600 to-secondary-600">
+                {errorData.ctaText}
+              </Button>
             </Link>
           )}
 
           {errorData?.secondaryCtaText && (
-            <Link
-              href={`/${lang}/products`}
-              className="inline-block w-full bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border-2 border-neutral-200 dark:border-neutral-700 px-8 py-3 rounded-lg font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
-            >
-              {errorData.secondaryCtaText}
+            <Link href={`/${lang}/products`}>
+              <Button variant="ghost" className="w-full">
+                {errorData.secondaryCtaText}
+              </Button>
             </Link>
           )}
 

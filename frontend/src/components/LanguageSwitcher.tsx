@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react'
 import { getLanguages, getNavigation } from '@/lib/client'
 import type { Language } from '@/lib/types'
 import { LanguageCode, DEFAULT_LANGUAGE_CODE } from '@/lib/types'
+import { Dropdown, type DropdownItem } from '@/components/Dropdown'
 
 interface NavigationData {
   languageSelectorAriaLabel?: string
@@ -23,7 +24,6 @@ export function LanguageSwitcher() {
   const router = useRouter()
   const [languages, setLanguages] = useState<Language[] | null>(null)
   const [currentLang, setCurrentLang] = useState(DEFAULT_LANGUAGE_CODE)
-  const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [navData, setNavData] = useState<NavigationData>({})
 
@@ -51,7 +51,7 @@ export function LanguageSwitcher() {
       })
   }, [pathname])
 
-  const handleLanguageChange = (newLang: string) => {
+  const handleLanguageChange = (newLang: LanguageCode) => {
     // Get the path without the language prefix
     const pathParts = pathname.split('/').filter(Boolean)
 
@@ -66,7 +66,7 @@ export function LanguageSwitcher() {
       console.error('Languages not loaded')
       return
     }
-    const language = languages.find(l => l.code === (newLang as LanguageCode))
+    const language = languages.find(l => l.code === newLang)
     if (!language) {
       console.error(`Language ${newLang} not found`)
       return
@@ -91,79 +91,51 @@ export function LanguageSwitcher() {
     // Use router.push for language switching
     router.push(newPath)
     router.refresh() // Refresh to ensure content is reloaded
-    setIsOpen(false)
   }
 
   if (loading || !languages) {
     return <div className="w-32 h-10 bg-primary-700 animate-pulse rounded-lg" />
   }
 
+  const languageItems: DropdownItem<LanguageCode>[] = languages.map(lang => ({
+    value: lang.code,
+    label: lang.nativeName,
+  }))
+
   const currentLanguage = languages.find(l => l.code === currentLang)
 
   return (
-    <div className="relative">
-      <button
-        onClick={() => {
-          setIsOpen(!isOpen)
-        }}
-        className="flex items-center space-x-2 px-4 py-2 bg-primary-700 hover:bg-primary-600 text-white rounded-lg transition-colors shadow-sm whitespace-nowrap"
-        aria-label={navData.languageSelectorAriaLabel ?? ''}
-        aria-expanded={isOpen}
-      >
-        <span className="text-sm font-medium">{currentLanguage?.nativeName}</span>
-        <svg
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => {
-              setIsOpen(false)
-            }}
-            aria-hidden="true"
-          />
-
-          {/* Dropdown */}
-          <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-neutral-800 border border-primary-200 dark:border-primary-700 rounded-lg shadow-xl z-20 overflow-hidden">
-            {languages.map(language => (
-              <button
-                key={language.code}
-                onClick={() => {
-                  handleLanguageChange(language.code)
-                }}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-50 dark:hover:bg-primary-900 transition-colors ${
-                  language.code === currentLang
-                    ? 'bg-primary-50 dark:bg-primary-900 font-medium text-primary-700 dark:text-primary-300'
-                    : 'text-neutral-700 dark:text-neutral-200'
-                }`}
-                dir={language.direction}
-              >
-                <div className="flex items-center justify-between">
-                  <span>{language.nativeName}</span>
-                  {language.code === currentLang && (
-                    <svg className="w-4 h-4 text-secondary-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
-        </>
+    <Dropdown
+      value={currentLang}
+      items={languageItems}
+      onChange={handleLanguageChange}
+      ariaLabel={navData.languageSelectorAriaLabel ?? 'Select language'}
+      buttonClassName="flex items-center space-x-2 px-4 py-2 bg-primary-700 hover:bg-primary-600 text-white rounded-lg transition-colors shadow-sm whitespace-nowrap h-10"
+      renderTrigger={() => (
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">{currentLanguage?.nativeName}</span>
+          <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
       )}
-    </div>
+      renderItem={(item, isSelected) => {
+        const language = languages.find(l => l.code === item.value)
+        return (
+          <div className="flex items-center justify-between" dir={language?.direction}>
+            <span>{item.label}</span>
+            {isSelected && (
+              <svg className="w-4 h-4 text-secondary-500" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
+          </div>
+        )
+      }}
+    />
   )
 }

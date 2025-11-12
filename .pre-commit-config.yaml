@@ -21,6 +21,7 @@ exclude: |
     frontend/coverage/|
     frontend/src/lib/generated/|
     htmlcov/|
+    log\.txt|
     node_modules/|
     package-lock\.json|
     venv/

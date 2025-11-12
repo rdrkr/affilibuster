@@ -283,11 +283,11 @@ describe('LanguageSwitcher Component', () => {
     // Find Hebrew button
     const hebrewButtons = screen.getAllByText('עברית')
     const lastHebrewElement = hebrewButtons[hebrewButtons.length - 1]
-    const hebrewButton = lastHebrewElement ? lastHebrewElement.closest('button') : null
+    const hebrewContainer = lastHebrewElement ? lastHebrewElement.closest('div[dir]') : null
 
-    // Should have dir="rtl"
-    if (hebrewButton) {
-      expect(hebrewButton).toHaveAttribute('dir', 'rtl')
+    // Should have dir="rtl" on the container div
+    if (hebrewContainer) {
+      expect(hebrewContainer).toHaveAttribute('dir', 'rtl')
     }
   })
 

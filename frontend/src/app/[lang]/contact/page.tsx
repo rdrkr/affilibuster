@@ -8,6 +8,7 @@
 import { setRequestLocale } from 'next-intl/server'
 import type { Metadata } from 'next'
 import { getContact } from '@/lib/client'
+import { Card } from '@/components/Card'
 import type { ApiContactContactDocument } from '@/lib/generated/types.gen'
 import { _1Enum2 } from '@/lib/generated/types.gen'
 import type { UiContactCardEntry, LanguageCode } from '@/lib/types'
@@ -95,9 +96,14 @@ export default async function ContactPage({ params }: Props) {
       <div className="container mx-auto px-4 py-16 max-w-5xl">
         <div className="grid md:grid-cols-2 gap-6 mb-12">
           {contactData.contactCards.map((card: UiContactCardEntry, index: number) => (
-            <div
+            <Card
               key={index}
-              className={`bg-white dark:bg-neutral-800 p-8 rounded-xl border shadow-lg hover:shadow-xl transition-shadow ${index % 2 === 0 ? 'border-primary-200 dark:border-primary-700' : 'border-secondary-200 dark:border-secondary-700'}`}
+              variant="info"
+              className={
+                index % 2 === 0
+                  ? 'border-primary-200 dark:border-primary-700'
+                  : 'border-secondary-200 dark:border-secondary-700'
+              }
             >
               <div
                 className={`${index % 2 === 0 ? 'bg-primary-100 dark:bg-primary-900' : 'bg-secondary-100 dark:bg-secondary-900'} w-14 h-14 rounded-xl flex items-center justify-center mb-4`}
@@ -130,11 +136,14 @@ export default async function ContactPage({ params }: Props) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </a>
-            </div>
+            </Card>
           ))}
         </div>
 
-        <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900 dark:to-primary-800 p-8 rounded-2xl border border-primary-200 dark:border-primary-700 mb-8">
+        <Card
+          variant="info"
+          className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900 dark:to-primary-800 border-primary-200 dark:border-primary-700 mb-8"
+        >
           <div className="flex items-start gap-4">
             <div className="bg-secondary-500 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -152,9 +161,12 @@ export default async function ContactPage({ params }: Props) {
               <p className="text-neutral-700 dark:text-neutral-200">{contactData.responseTimeText}</p>
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-gradient-to-br from-secondary-50 to-secondary-100 dark:from-secondary-900 dark:to-secondary-800 p-8 rounded-2xl border border-secondary-200 dark:border-secondary-700">
+        <Card
+          variant="info"
+          className="bg-gradient-to-br from-secondary-50 to-secondary-100 dark:from-secondary-900 dark:to-secondary-800 border-secondary-200 dark:border-secondary-700"
+        >
           <div className="flex items-start gap-4">
             <div className="bg-primary-600 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -172,7 +184,7 @@ export default async function ContactPage({ params }: Props) {
               <p className="text-neutral-700 dark:text-neutral-200">{contactData.officeHoursText}</p>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
     </>
   )

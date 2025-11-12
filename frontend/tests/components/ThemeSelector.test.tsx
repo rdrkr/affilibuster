@@ -113,14 +113,14 @@ describe('ThemeSelector', () => {
   it('should close dropdown when clicking backdrop', async () => {
     render(<ThemeSelector />)
 
-    // Open dropdown
-    const button = screen.getByRole('button')
-    await waitFor(() => fireEvent.click(button))
+    // Wait for component to load and open dropdown
+    const button = await waitFor(() => screen.getByRole('button'))
+    fireEvent.click(button)
 
     // Click backdrop
-    const backdrop = document.querySelector('.fixed.inset-0')
+    const backdrop = await waitFor(() => document.querySelector('.fixed.inset-0'))
     if (backdrop) {
-      await waitFor(() => fireEvent.click(backdrop))
+      fireEvent.click(backdrop)
     }
 
     // Dropdown should close
@@ -132,8 +132,8 @@ describe('ThemeSelector', () => {
   it('should switch to light theme', async () => {
     render(<ThemeSelector />)
 
-    const button = screen.getByRole('button')
-    await waitFor(() => fireEvent.click(button))
+    const button = await waitFor(() => screen.getByRole('button'))
+    fireEvent.click(button)
 
     const lightOption = screen.getByText('Light')
     fireEvent.click(lightOption)
@@ -147,8 +147,8 @@ describe('ThemeSelector', () => {
   it('should switch to dark theme', async () => {
     render(<ThemeSelector />)
 
-    const button = screen.getByRole('button')
-    await waitFor(() => fireEvent.click(button))
+    const button = await waitFor(() => screen.getByRole('button'))
+    fireEvent.click(button)
 
     const darkOption = screen.getByText('Dark')
     fireEvent.click(darkOption)
@@ -164,8 +164,8 @@ describe('ThemeSelector', () => {
 
     render(<ThemeSelector />)
 
-    const button = screen.getByRole('button')
-    await waitFor(() => fireEvent.click(button))
+    const button = await waitFor(() => screen.getByRole('button'))
+    fireEvent.click(button)
 
     const systemOption = screen.getByText('System')
     fireEvent.click(systemOption)
@@ -198,8 +198,8 @@ describe('ThemeSelector', () => {
   it('should close dropdown after selecting theme', async () => {
     render(<ThemeSelector />)
 
-    const button = screen.getByRole('button')
-    await waitFor(() => fireEvent.click(button))
+    const button = await waitFor(() => screen.getByRole('button'))
+    fireEvent.click(button)
 
     const lightOption = screen.getByText('Light')
     fireEvent.click(lightOption)
@@ -214,8 +214,8 @@ describe('ThemeSelector', () => {
 
     render(<ThemeSelector />)
 
-    const button = screen.getByRole('button')
-    await waitFor(() => fireEvent.click(button))
+    const button = await waitFor(() => screen.getByRole('button'))
+    fireEvent.click(button)
 
     // Check that dark option has special styling
     const darkButton = screen.getByText('Dark').closest('button')
@@ -238,7 +238,7 @@ describe('ThemeSelector', () => {
   it('should set aria-expanded correctly', async () => {
     render(<ThemeSelector />)
 
-    const button = screen.getByRole('button')
+    const button = await waitFor(() => screen.getByRole('button'))
 
     await waitFor(() => {
       expect(button.getAttribute('aria-expanded')).toBe('false')

@@ -15,6 +15,7 @@ import { LanguageSwitcher } from './LanguageSwitcher'
 import { CurrencySelector } from './CurrencySelector'
 import { CodeEnum } from '@/lib/generated/types.gen'
 import { ThemeSelector } from './ThemeSelector'
+import { Button } from './Button'
 import { useState } from 'react'
 import type { Navigation as NavigationType } from '@/lib/types'
 
@@ -103,8 +104,10 @@ export function Navigation({ data: navData, lang }: NavigationProps) {
             <ThemeSelector />
 
             {/* Mobile Menu Button */}
-            <button
-              className="md:hidden p-2 rounded-md text-white hover:bg-primary-700"
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden text-white hover:bg-primary-700"
               aria-label={isMobileMenuOpen ? navData.mobileMenuCloseLabel : navData.mobileMenuLabel}
               onClick={() => {
                 setIsMobileMenuOpen(!isMobileMenuOpen)
@@ -113,7 +116,7 @@ export function Navigation({ data: navData, lang }: NavigationProps) {
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
-            </button>
+            </Button>
           </div>
         </div>
 

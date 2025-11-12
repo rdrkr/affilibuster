@@ -9,6 +9,7 @@ import { getProductPage, getProducts } from '@/lib/client'
 import Link from 'next/link'
 import { setRequestLocale } from 'next-intl/server'
 import type { Metadata } from 'next'
+import { Button } from '@/components/Button'
 import type { ApiProductPageProductPageDocument } from '@/lib/generated/types.gen'
 import type { Product } from '@/lib/types'
 import { SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
@@ -138,21 +139,15 @@ export default async function ProductsPage({ params, searchParams }: Props) {
           {/* Pagination - Only show if CMS button labels available */}
           {currentPage > 1 && productsPageData?.previousButton && (
             <div className="mt-12 flex items-center justify-center gap-2">
-              <Link
-                href={`/${lang}/products?page=${(currentPage - 1).toString()}`}
-                className="px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
-              >
-                {productsPageData.previousButton}
+              <Link href={`/${lang}/products?page=${(currentPage - 1).toString()}`}>
+                <Button variant="ghost">{productsPageData.previousButton}</Button>
               </Link>
 
               <span className="text-sm text-neutral-600 dark:text-neutral-400">Page {currentPage}</span>
 
               {products.length === 24 && productsPageData.nextButton && (
-                <Link
-                  href={`/${lang}/products?page=${(currentPage + 1).toString()}`}
-                  className="px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
-                >
-                  {productsPageData.nextButton}
+                <Link href={`/${lang}/products?page=${(currentPage + 1).toString()}`}>
+                  <Button variant="ghost">{productsPageData.nextButton}</Button>
                 </Link>
               )}
             </div>

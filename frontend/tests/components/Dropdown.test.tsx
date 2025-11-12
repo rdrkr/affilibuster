@@ -1,0 +1,276 @@
+// Copyright (c) 2025 Affilibuster by Ronen Druker.
+
+import React from 'react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { Dropdown, type DropdownItem } from '@/components/Dropdown'
+
+describe('Dropdown Component', () => {
+  const mockItems: DropdownItem[] = [
+    { value: 'option1', label: 'Option 1' },
+    { value: 'option2', label: 'Option 2' },
+    { value: 'option3', label: 'Option 3' },
+  ]
+
+  it('should render dropdown trigger button', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+    expect(screen.getByRole('button')).toBeInTheDocument()
+  })
+
+  it('should display selected item label', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+    expect(screen.getByText('Option 1')).toBeInTheDocument()
+  })
+
+  it('should display placeholder when no value selected', () => {
+    render(<Dropdown value="" items={mockItems} onChange={jest.fn()} placeholder="Choose option" />)
+    expect(screen.getByText('Choose option')).toBeInTheDocument()
+  })
+
+  it('should render with label', () => {
+    render(<Dropdown label="Select Option" value="option1" items={mockItems} onChange={jest.fn()} />)
+    expect(screen.getByText('Select Option')).toBeInTheDocument()
+  })
+
+  it('should open dropdown when clicking trigger', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+    const button = screen.getByRole('button')
+    fireEvent.click(button)
+
+    expect(screen.getByRole('listbox')).toBeInTheDocument()
+    expect(screen.getAllByRole('option')).toHaveLength(3)
+  })
+
+  it('should close dropdown when clicking backdrop', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+    const button = screen.getByRole('button')
+    fireEvent.click(button)
+
+    const backdrop = document.querySelector('.fixed.inset-0')
+    expect(backdrop).toBeInTheDocument()
+
+    if (backdrop) {
+      fireEvent.click(backdrop)
+    }
+
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+  })
+
+  it('should call onChange when selecting an item', () => {
+    const handleChange = jest.fn()
+    render(<Dropdown value="option1" items={mockItems} onChange={handleChange} />)
+
+    const button = screen.getByRole('button')
+    fireEvent.click(button)
+
+    const option2 = screen.getByText('Option 2')
+    fireEvent.click(option2)
+
+    expect(handleChange).toHaveBeenCalledWith('option2')
+  })
+
+  it('should close dropdown after selecting item', async () => {
+    const handleChange = jest.fn()
+    render(<Dropdown value="option1" items={mockItems} onChange={handleChange} />)
+
+    const button = screen.getByRole('button')
+    fireEvent.click(button)
+
+    const option2 = screen.getByText('Option 2')
+    fireEvent.click(option2)
+
+    await waitFor(() => {
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+    })
+  })
+
+  it('should show checkmark on selected item', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+
+    const button = screen.getByRole('button')
+    fireEvent.click(button)
+
+    const selectedOption = screen.getByRole('option', { name: /Option 1/i })
+    expect(selectedOption).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('should handle disabled dropdown', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} disabled />)
+    const button = screen.getByRole('button')
+
+    expect(button).toBeDisabled()
+    fireEvent.click(button)
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+  })
+
+  it('should handle disabled items', () => {
+    const itemsWithDisabled: DropdownItem[] = [
+      { value: 'option1', label: 'Option 1' },
+      { value: 'option2', label: 'Option 2', disabled: true },
+      { value: 'option3', label: 'Option 3' },
+    ]
+
+    const handleChange = jest.fn()
+    render(<Dropdown value="option1" items={itemsWithDisabled} onChange={handleChange} />)
+
+    const button = screen.getByRole('button')
+    fireEvent.click(button)
+
+    const disabledOption = screen.getByText('Option 2').closest('button')
+    expect(disabledOption).toBeDisabled()
+
+    if (disabledOption) {
+      fireEvent.click(disabledOption)
+    }
+    expect(handleChange).not.toHaveBeenCalled()
+  })
+
+  it('should display error message', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} error="Please select a valid option" />)
+    expect(screen.getByText('Please select a valid option')).toBeInTheDocument()
+  })
+
+  it('should apply error styles when error is present', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} error="Error" />)
+    const button = screen.getByRole('button')
+    expect(button.className).toContain('border-error-500')
+  })
+
+  it('should render items with icons', () => {
+    const itemsWithIcons: DropdownItem[] = [
+      { value: 'option1', label: 'Option 1', icon: <span data-testid="icon-1">🔥</span> },
+      { value: 'option2', label: 'Option 2', icon: <span data-testid="icon-2">⭐</span> },
+    ]
+
+    render(<Dropdown value="option1" items={itemsWithIcons} onChange={jest.fn()} />)
+    expect(screen.getByTestId('icon-1')).toBeInTheDocument()
+
+    const button = screen.getByRole('button')
+    fireEvent.click(button)
+
+    expect(screen.getByTestId('icon-2')).toBeInTheDocument()
+  })
+
+  it('should render items with descriptions', () => {
+    const itemsWithDescriptions: DropdownItem[] = [
+      { value: 'option1', label: 'Option 1', description: 'First option' },
+      { value: 'option2', label: 'Option 2', description: 'Second option' },
+    ]
+
+    render(<Dropdown value="option1" items={itemsWithDescriptions} onChange={jest.fn()} />)
+
+    const button = screen.getByRole('button')
+    fireEvent.click(button)
+
+    expect(screen.getByText('First option')).toBeInTheDocument()
+    expect(screen.getByText('Second option')).toBeInTheDocument()
+  })
+
+  it('should use custom renderTrigger', () => {
+    const renderTrigger = (selectedItem: DropdownItem | undefined) => (
+      <span data-testid="custom-trigger">Custom: {selectedItem?.label}</span>
+    )
+
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} renderTrigger={renderTrigger} />)
+    expect(screen.getByTestId('custom-trigger')).toHaveTextContent('Custom: Option 1')
+  })
+
+  it('should use custom renderItem', () => {
+    const renderItem = (item: DropdownItem) => <span data-testid={`custom-${item.value}`}>{item.label}</span>
+
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} renderItem={renderItem} />)
+
+    const button = screen.getByRole('button')
+    fireEvent.click(button)
+
+    expect(screen.getByTestId('custom-option1')).toBeInTheDocument()
+    expect(screen.getByTestId('custom-option2')).toBeInTheDocument()
+    expect(screen.getByTestId('custom-option3')).toBeInTheDocument()
+  })
+
+  it('should apply custom buttonClassName', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} buttonClassName="custom-button-class" />)
+    const button = screen.getByRole('button')
+    expect(button.className).toContain('custom-button-class')
+  })
+
+  it('should apply custom className to container', () => {
+    const { container } = render(
+      <Dropdown value="option1" items={mockItems} onChange={jest.fn()} className="custom-container-class" />
+    )
+    const wrapper = container.firstChild as HTMLElement
+    expect(wrapper.className).toContain('custom-container-class')
+  })
+
+  it('should set aria-label when provided', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} ariaLabel="Select country" />)
+    const button = screen.getByRole('button')
+    expect(button).toHaveAttribute('aria-label', 'Select country')
+  })
+
+  it('should set aria-expanded correctly', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+    const button = screen.getByRole('button')
+
+    expect(button).toHaveAttribute('aria-expanded', 'false')
+
+    fireEvent.click(button)
+    expect(button).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('should set aria-haspopup', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+    const button = screen.getByRole('button')
+    expect(button).toHaveAttribute('aria-haspopup', 'listbox')
+  })
+
+  it('should toggle dropdown on multiple clicks', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+    const button = screen.getByRole('button')
+
+    fireEvent.click(button)
+    expect(screen.getByRole('listbox')).toBeInTheDocument()
+
+    fireEvent.click(button)
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+
+    fireEvent.click(button)
+    expect(screen.getByRole('listbox')).toBeInTheDocument()
+  })
+
+  it('should work with numeric values', () => {
+    const numericItems: DropdownItem<number>[] = [
+      { value: 1, label: 'One' },
+      { value: 2, label: 'Two' },
+      { value: 3, label: 'Three' },
+    ]
+
+    const handleChange = jest.fn()
+    render(<Dropdown<number> value={1} items={numericItems} onChange={handleChange} />)
+
+    const button = screen.getByRole('button')
+    fireEvent.click(button)
+
+    const option2 = screen.getByText('Two')
+    fireEvent.click(option2)
+
+    expect(handleChange).toHaveBeenCalledWith(2)
+  })
+
+  it('should show dropdown arrow icon', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+    const button = screen.getByRole('button')
+    const svg = button.querySelector('svg')
+    expect(svg).toBeInTheDocument()
+  })
+
+  it('should rotate arrow when dropdown is open', () => {
+    render(<Dropdown value="option1" items={mockItems} onChange={jest.fn()} />)
+    const button = screen.getByRole('button')
+    const svg = button.querySelector('svg')
+
+    expect(svg?.classList.contains('rotate-180')).toBe(false)
+
+    fireEvent.click(button)
+    expect(svg?.classList.contains('rotate-180')).toBe(true)
+  })
+})

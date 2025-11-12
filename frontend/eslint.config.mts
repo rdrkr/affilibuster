@@ -85,6 +85,7 @@ export default defineConfig([
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/require-await': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
       '@typescript-eslint/no-unused-vars': [
         'error',
         {

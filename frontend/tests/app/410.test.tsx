@@ -53,8 +53,10 @@ describe('410 Gone Page', () => {
     const component = await GonePage()
     render(component)
 
-    const link = screen.getByText('Go to Homepage')
-    expect(link).toBeInTheDocument()
+    // Button text should be present
+    expect(screen.getByText('Go to Homepage')).toBeInTheDocument()
+    // Link should have correct href
+    const link = screen.getByRole('link', { name: /Go to Homepage/i })
     expect(link).toHaveAttribute('href', '/')
   })
 

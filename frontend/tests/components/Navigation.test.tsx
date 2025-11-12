@@ -295,8 +295,8 @@ describe('Navigation', () => {
       const openButton = screen.getByLabelText('Open menu')
       fireEvent.click(openButton)
 
-      // Verify mobile menu panel is visible
-      const mobilePanel = container.querySelector('.md\\:hidden.bg-white')
+      // Verify mobile menu panel is visible - look for the specific div container
+      const mobilePanel = container.querySelector('div.md\\:hidden.bg-white.dark\\:bg-neutral-800')
       expect(mobilePanel).toBeInTheDocument()
 
       // Find mobile menu link (there should be 2 "Home" links now - desktop and mobile)
@@ -309,7 +309,7 @@ describe('Navigation', () => {
       }
 
       // Menu should close - mobile panel should be gone
-      const closedPanel = container.querySelector('.md\\:hidden.bg-white')
+      const closedPanel = container.querySelector('div.md\\:hidden.bg-white.dark\\:bg-neutral-800')
       expect(closedPanel).not.toBeInTheDocument()
     })
 

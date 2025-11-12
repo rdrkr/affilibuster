@@ -37,6 +37,8 @@ const customJestConfig: Config = {
     '!src/i18n.ts',
     '!src/i18n/**',
     '!src/config/**',
+    // Style guide is documentation/demo, not production code
+    '!src/app/**/style-guide/**',
   ],
   coverageThreshold: {
     global: {

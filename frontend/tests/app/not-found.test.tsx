@@ -71,8 +71,10 @@ describe('404 Not Found Page', () => {
       const component = await NotFoundPage({ params: Promise.resolve({ lang: CodeEnum.IT }) })
       render(component)
 
-      const link = screen.getByText('Back to Home')
-      expect(link).toBeInTheDocument()
+      // Button text should be present
+      expect(screen.getByText('Back to Home')).toBeInTheDocument()
+      // Link should have correct href
+      const link = screen.getByRole('link', { name: /Back to Home/i })
       expect(link).toHaveAttribute('href', '/it')
     })
 
@@ -80,8 +82,10 @@ describe('404 Not Found Page', () => {
       const component = await NotFoundPage({ params: Promise.resolve({ lang: CodeEnum.HE }) })
       render(component)
 
-      const link = screen.getByText('Browse Products')
-      expect(link).toBeInTheDocument()
+      // Button text should be present
+      expect(screen.getByText('Browse Products')).toBeInTheDocument()
+      // Link should have correct href
+      const link = screen.getByRole('link', { name: /Browse Products/i })
       expect(link).toHaveAttribute('href', '/he/products')
     })
 

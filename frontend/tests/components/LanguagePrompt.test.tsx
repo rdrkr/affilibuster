@@ -427,13 +427,15 @@ describe('LanguagePrompt Component', () => {
       expect(screen.getByText(/Switch to Italiano\?/)).toBeInTheDocument()
     })
 
-    // Yes button should have primary styling
+    // Yes button should have secondary variant styling (from Button component)
     const yesButton = screen.getByText(/Yes, switch to Italiano/)
-    expect(yesButton).toHaveClass('bg-secondary-600')
+    expect(yesButton).toHaveClass('bg-secondary-500')
+    expect(yesButton).toHaveClass('hover:bg-secondary-600')
 
-    // No button should have secondary styling
+    // No button should have ghost variant styling (from Button component)
     const noButton = screen.getByText(/No thanks/)
-    expect(noButton).toHaveClass('bg-neutral-200')
+    expect(noButton).toHaveClass('bg-white')
+    expect(noButton).toHaveClass('hover:bg-neutral-50')
   })
 
   it('should handle getNavigation error gracefully', async () => {

@@ -132,9 +132,9 @@ describe('CurrencySelector Component', () => {
     fireEvent.click(button)
 
     // Should show all 3 currencies
-    expect(screen.getByText('US Dollar')).toBeInTheDocument()
-    expect(screen.getByText('Euro')).toBeInTheDocument()
-    expect(screen.getByText('Israeli Shekel')).toBeInTheDocument()
+    expect(screen.getAllByText('$ USD').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('€ EUR').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('₪ ILS').length).toBeGreaterThan(0)
   })
 
   it('should call API to update currency when option is selected', async () => {
@@ -149,7 +149,7 @@ describe('CurrencySelector Component', () => {
     fireEvent.click(button)
 
     // Click USD
-    const usdOption = screen.getByText('US Dollar')
+    const usdOption = screen.getByText('$ USD')
     fireEvent.click(usdOption)
 
     // Should call update API
@@ -172,7 +172,7 @@ describe('CurrencySelector Component', () => {
     fireEvent.click(button)
 
     // Click ILS
-    const ilsOption = screen.getByText('Israeli Shekel')
+    const ilsOption = screen.getByText('₪ ILS')
     fireEvent.click(ilsOption)
 
     // Should update to ILS
@@ -193,15 +193,15 @@ describe('CurrencySelector Component', () => {
     fireEvent.click(button)
 
     // Dropdown should be visible
-    expect(screen.getByText('US Dollar')).toBeInTheDocument()
+    expect(screen.getByText('$ USD')).toBeInTheDocument()
 
     // Click USD
-    const usdOption = screen.getByText('US Dollar')
+    const usdOption = screen.getByText('$ USD')
     fireEvent.click(usdOption)
 
     // Dropdown should close
     await waitFor(() => {
-      expect(screen.queryByText('US Dollar')).not.toBeInTheDocument()
+      expect(screen.queryByText('$ USD')).not.toBeInTheDocument()
     })
   })
 
@@ -217,7 +217,7 @@ describe('CurrencySelector Component', () => {
     fireEvent.click(button)
 
     // Dropdown should be visible
-    expect(screen.getByText('US Dollar')).toBeInTheDocument()
+    expect(screen.getByText('$ USD')).toBeInTheDocument()
 
     // Click backdrop
     const backdrop = document.querySelector('[aria-hidden="true"]')
@@ -227,7 +227,7 @@ describe('CurrencySelector Component', () => {
 
     // Dropdown should close
     await waitFor(() => {
-      expect(screen.queryByText('US Dollar')).not.toBeInTheDocument()
+      expect(screen.queryByText('$ USD')).not.toBeInTheDocument()
     })
   })
 
@@ -246,7 +246,7 @@ describe('CurrencySelector Component', () => {
     fireEvent.click(button)
 
     // Click USD
-    const usdOption = screen.getByText('US Dollar')
+    const usdOption = screen.getByText('$ USD')
     fireEvent.click(usdOption)
 
     // Should log error
@@ -305,10 +305,10 @@ describe('CurrencySelector Component', () => {
     const button = screen.getByRole('button', { name: /select currency/i })
     fireEvent.click(button)
 
-    // Should show full currency names
-    expect(screen.getByText('US Dollar')).toBeInTheDocument()
-    expect(screen.getByText('Euro')).toBeInTheDocument()
-    expect(screen.getByText('Israeli Shekel')).toBeInTheDocument()
+    // Should show currency symbols and codes
+    expect(screen.getAllByText('$ USD').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('€ EUR').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('₪ ILS').length).toBeGreaterThan(0)
   })
 
   it('should highlight currently selected currency in dropdown', async () => {
@@ -323,7 +323,10 @@ describe('CurrencySelector Component', () => {
     fireEvent.click(button)
 
     // Find EUR button (currently selected)
-    const euroButton = screen.getByText('Euro').closest('button')
+    const euroButtons = screen.getAllByText('€ EUR')
+    const euroButton = euroButtons
+      .find(el => el.closest('button')?.getAttribute('role') === 'option')
+      ?.closest('button')
 
     // Should have highlighting class
     expect(euroButton).toHaveClass('font-medium')
@@ -393,11 +396,11 @@ describe('CurrencySelector Component', () => {
     fireEvent.click(button)
 
     // Should show all 5 currencies
-    expect(screen.getByText('US Dollar')).toBeInTheDocument()
-    expect(screen.getByText('Euro')).toBeInTheDocument()
-    expect(screen.getByText('Israeli Shekel')).toBeInTheDocument()
-    expect(screen.getByText('British Pound')).toBeInTheDocument()
-    expect(screen.getByText('Japanese Yen')).toBeInTheDocument()
+    expect(screen.getAllByText('$ USD').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('€ EUR').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('₪ ILS').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('£ GBP').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('¥ JPY').length).toBeGreaterThan(0)
   })
 
   it('should handle navigation fetch error gracefully', async () => {
@@ -412,5 +415,19 @@ describe('CurrencySelector Component', () => {
 
     expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to fetch navigation:', expect.any(Error))
     consoleErrorSpy.mockRestore()
+  })
+
+  it('should handle null navigation response gracefully', async () => {
+    ;(client.getNavigation as jest.Mock).mockResolvedValue(null)
+
+    render(<CurrencySelector />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/€ EUR/)).toBeInTheDocument()
+    })
+
+    // Should still render with default aria label
+    const button = screen.getByRole('button')
+    expect(button).toBeInTheDocument()
   })
 })

@@ -8,6 +8,8 @@
 import { setRequestLocale } from 'next-intl/server'
 import type { Metadata } from 'next'
 import { getAbout } from '@/lib/client'
+import { Card } from '@/components/Card'
+import { Hero } from '@/components/Hero'
 import type { ApiAboutAboutDocument } from '@/lib/generated/types.gen'
 import { _1Enum } from '@/lib/generated/types.gen'
 import type { UiFeatureItemEntry, LanguageCode } from '@/lib/types'
@@ -73,26 +75,7 @@ export default async function AboutPage({ params }: Props) {
   return (
     <>
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary-800 via-primary-700 to-primary-900 text-white py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            {aboutData.heroTitle && (
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                {aboutData.heroTitle.split('**').map((part: string, i: number) =>
-                  i % 2 === 1 ? (
-                    <span key={i} className="text-secondary-400">
-                      {part}
-                    </span>
-                  ) : (
-                    part
-                  )
-                )}
-              </h1>
-            )}
-            {aboutData.heroSubtitle && <p className="text-xl text-neutral-200">{aboutData.heroSubtitle}</p>}
-          </div>
-        </div>
-      </section>
+      <Hero title={aboutData.heroTitle} subtitle={aboutData.heroSubtitle} size="medium" />
 
       {/* Content Section */}
       <div className="container mx-auto px-4 py-16 max-w-4xl">
@@ -118,10 +101,7 @@ export default async function AboutPage({ params }: Props) {
               </h2>
               <div className="grid md:grid-cols-2 gap-6 my-8 not-prose">
                 {aboutData.featuresList.map((feature: UiFeatureItemEntry, index: number) => (
-                  <div
-                    key={index}
-                    className="bg-white dark:bg-neutral-800 p-6 rounded-xl border border-primary-200 dark:border-primary-700 shadow-sm"
-                  >
+                  <Card key={index} variant="info" className="border-primary-200 dark:border-primary-700">
                     <div className="bg-primary-100 dark:bg-primary-900 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
                       <svg className="w-6 h-6 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
                         <path
@@ -133,7 +113,7 @@ export default async function AboutPage({ params }: Props) {
                     </div>
                     <h3 className="text-lg font-bold mb-2 text-neutral-900 dark:text-white">{feature.title}</h3>
                     <p className="text-neutral-600 dark:text-neutral-400">{feature.description}</p>
-                  </div>
+                  </Card>
                 ))}
               </div>
             </>
@@ -145,7 +125,10 @@ export default async function AboutPage({ params }: Props) {
           <p className="text-lg text-neutral-700 dark:text-neutral-300 mb-8">{aboutData.techStackDescription}</p>
 
           {aboutData.ctaTitle && (
-            <div className="bg-gradient-to-br from-secondary-50 to-secondary-100 dark:from-secondary-900 dark:to-secondary-800 p-8 rounded-2xl my-8 border border-secondary-200 dark:border-secondary-700">
+            <Card
+              variant="info"
+              className="bg-gradient-to-br from-secondary-50 to-secondary-100 dark:from-secondary-900 dark:to-secondary-800 border-secondary-200 dark:border-secondary-700 my-8"
+            >
               <h2 className="text-2xl font-bold mb-4 text-neutral-900 dark:text-white">{aboutData.ctaTitle}</h2>
               {aboutData.ctaText && (
                 <p
@@ -153,7 +136,7 @@ export default async function AboutPage({ params }: Props) {
                   dangerouslySetInnerHTML={{ __html: aboutData.ctaText }}
                 />
               )}
-            </div>
+            </Card>
           )}
         </div>
       </div>

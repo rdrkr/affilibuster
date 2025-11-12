@@ -18,6 +18,15 @@ import {
   Price,
   LocaleProvider,
   useLocale,
+  Hero,
+  Button,
+  Card,
+  Input,
+  Textarea,
+  Dropdown,
+  Checkbox,
+  Radio,
+  ThemeSelector,
 } from '@/components'
 
 describe('Components Index', () => {
@@ -58,5 +67,41 @@ describe('Components Index', () => {
   it('should export LocaleProvider and useLocale', () => {
     expect(LocaleProvider).toBeDefined()
     expect(useLocale).toBeDefined()
+  })
+
+  it('should export Hero', () => {
+    expect(Hero).toBeDefined()
+  })
+
+  it('should export Button', () => {
+    expect(Button).toBeDefined()
+  })
+
+  it('should export Card', () => {
+    expect(Card).toBeDefined()
+  })
+
+  it('should export Input', () => {
+    expect(Input).toBeDefined()
+  })
+
+  it('should export Textarea', () => {
+    expect(Textarea).toBeDefined()
+  })
+
+  it('should export Dropdown', () => {
+    expect(Dropdown).toBeDefined()
+  })
+
+  it('should export Checkbox', () => {
+    expect(Checkbox).toBeDefined()
+  })
+
+  it('should export Radio', () => {
+    expect(Radio).toBeDefined()
+  })
+
+  it('should export ThemeSelector', () => {
+    expect(ThemeSelector).toBeDefined()
   })
 })

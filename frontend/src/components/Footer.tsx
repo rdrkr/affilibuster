@@ -12,6 +12,8 @@
 import Link from 'next/link'
 import type { Footer as FooterType } from '@/lib/types'
 import { LanguageCode, SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
+import { Button } from './Button'
+import { Input } from './Input'
 
 interface FooterProps {
   data: FooterType | null
@@ -37,7 +39,7 @@ export function Footer({ data: footerData, lang }: FooterProps) {
 
   return (
     <footer className="bg-primary-900 text-white mt-auto">
-      <div className="container mx-auto px-4 md:px-8 py-12 md:py-16">
+      <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {/* About */}
           <div className="flex flex-col">
@@ -109,15 +111,16 @@ export function Footer({ data: footerData, lang }: FooterProps) {
           <div className="flex flex-col">
             <h3 className="text-lg font-semibold mb-4">{footerData.newsletterTitle}</h3>
             <p className="text-neutral-300 text-sm mb-4">{footerData.newsletterDescription}</p>
-            <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-4">
-              <input
+            <div className="flex gap-2">
+              <Input
                 type="email"
                 placeholder={footerData.emailPlaceholder}
-                className="flex-1 min-w-50 px-4 py-2 rounded-lg bg-primary-800 border border-primary-700 text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-tertiary-400 focus:border-tertiary-400 transition-all"
+                className="flex-1 min-w-0 bg-white dark:bg-primary-800 border-neutral-300 dark:border-primary-700 !text-neutral-900 dark:!text-white placeholder:text-neutral-400"
+                aria-label={footerData.emailPlaceholder}
               />
-              <button className="bg-secondary-500 hover:bg-secondary-600 px-6 py-2 rounded-lg transition-colors font-semibold whitespace-nowrap">
+              <Button variant="secondary" className="whitespace-nowrap shrink-0">
                 {footerData.subscribeButton}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

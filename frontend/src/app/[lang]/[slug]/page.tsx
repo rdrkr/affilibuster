@@ -10,6 +10,7 @@ import { getProducts, getNavigation } from '@/lib/client'
 import { generateContentMetadata, SEOHead } from '@/components/SEOHead'
 import { notFound } from 'next/navigation'
 import { setRequestLocale } from 'next-intl/server'
+import { Button } from '@/components/Button'
 import type { Product, ContentResponse } from '@/lib/types'
 import { transformProductToContent } from '@/lib/transformers'
 import { getLanguageCodes } from '@/config/languages'
@@ -162,12 +163,10 @@ export default async function ContentPage({ params }: { params: Promise<{ lang: 
               <h2 className="text-lg font-semibold mb-4">{navData.availableInOtherLanguagesLabel}</h2>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(content.translations).map(([lang, url]) => (
-                  <a
-                    key={lang}
-                    href={url}
-                    className="px-4 py-2 bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors"
-                  >
-                    {lang.toUpperCase()}
+                  <a key={lang} href={url}>
+                    <Button variant="ghost" size="sm">
+                      {lang.toUpperCase()}
+                    </Button>
                   </a>
                 ))}
               </div>

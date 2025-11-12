@@ -214,5 +214,15 @@ describe('Footer', () => {
       const termsLink = screen.getByText('Terms of Service')
       expect(termsLink).toHaveAttribute('href', '/he/terms')
     })
+
+    it('should handle unsupported language code with empty prefix', () => {
+      ;(usePathname as jest.Mock).mockReturnValue('/fr/products')
+
+      render(<Footer data={mockFooterData} lang="fr" />)
+
+      const privacyLink = screen.getByText('Privacy Policy')
+      // Unsupported language should not have language prefix
+      expect(privacyLink).toHaveAttribute('href', '/privacy')
+    })
   })
 })

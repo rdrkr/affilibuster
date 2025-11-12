@@ -10,6 +10,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getError410 } from '@/lib/client'
+import { Button } from '@/components/Button'
 
 /**
  * Generate metadata for 410 error page
@@ -60,11 +61,8 @@ export default async function GonePage() {
 
         <div className="space-y-4">
           {errorData?.ctaText && (
-            <Link
-              href="/"
-              className="inline-block bg-secondary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-secondary-700 transition-colors"
-            >
-              {errorData.ctaText}
+            <Link href="/">
+              <Button variant="secondary">{errorData.ctaText}</Button>
             </Link>
           )}
 

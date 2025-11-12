@@ -14,6 +14,7 @@ import { getNavigation, getLanguages, detectLanguage, getUserPreferences, update
 import { useSession } from '@/hooks/useSession'
 import type { Language } from '@/lib/types'
 import { LanguageCode, SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
+import { Button } from './Button'
 
 interface NavigationData {
   promptTitleTemplate?: string
@@ -150,22 +151,22 @@ export function LanguagePrompt() {
             <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">{titleText}</h3>
             <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">{messageText}</p>
             <div className="flex flex-col sm:flex-row gap-2">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() => {
                   void handleAccept()
                 }}
-                className="px-4 py-2 bg-secondary-600 text-white rounded-md hover:bg-secondary-700 transition-colors font-medium"
               >
                 {yesButtonText}
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={() => {
                   void handleDismiss()
                 }}
-                className="px-4 py-2 bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors"
               >
                 {noButtonText}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
