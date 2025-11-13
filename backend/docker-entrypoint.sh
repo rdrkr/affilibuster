@@ -22,7 +22,7 @@ uv run task openapi-generate
 wait_for_db() {
   echo "  ⏳ Waiting for PostgreSQL to be ready..."
   # shellcheck disable=SC2154
-  until pg_isready -h "${POSTGRES_HOST}" -U "${POSTGRES_USER}" -d "${POSTGRES_CMS_NAME}"; do
+  until pg_isready -h "${POSTGRES_HOST}" -p "${POSTGRES_PORT}" -U "${POSTGRES_USER}" -d "${POSTGRES_CMS_NAME}"; do
     echo "    PostgreSQL not ready, waiting..."
     sleep 2
   done

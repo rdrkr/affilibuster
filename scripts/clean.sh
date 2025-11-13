@@ -5,15 +5,23 @@ set -e
 
 echo "🧹 Cleaning up..."
 
+# Get the Docker Compose project name (defaults to directory name)
+PROJECT_NAME="${COMPOSE_PROJECT_NAME:-$(basename "$(pwd)")}"
+echo "  📦 Project: ${PROJECT_NAME}"
+
 echo "  🐳 Stopping Docker services..."
 docker compose down -v
 
-echo "  🖼️ Removing Docker images..."
-docker rmi -f \
-  affilibuster-strapi:latest \
-  affilibuster-frontend:latest \
-  affilibuster-backend:latest \
-  2>/dev/null || true
+echo "  🖼️ Removing Docker images for this worktree..."
+# Get list of images created by this docker-compose project
+IMAGES=$(docker compose images -q 2>/dev/null | sort -u)
+if [[ -n "${IMAGES}" ]]; then
+  # shellcheck disable=SC2086
+  docker rmi -f ${IMAGES} 2>/dev/null || true
+  echo "    ✓ Removed project-specific images"
+else
+  echo "    ℹ️ No project images found"
+fi
 
 echo "  🗑️ Removing cms artifacts..."
 cd cms && npm run --silent clean && cd ..
