@@ -11,7 +11,7 @@ echo "  🔐 Loading environment variables..."
 . /app/.env
 
 echo "  🔄 Installing dependencies (including dev)..."
-uv sync --quiet --all-extras
+uv sync --quiet
 #shellcheck disable=SC1091
 . .venv/bin/activate
 
@@ -22,7 +22,7 @@ uv run task openapi-generate
 wait_for_db() {
   echo "  ⏳ Waiting for PostgreSQL to be ready..."
   # shellcheck disable=SC2154
-  until pg_isready -h "${POSTGRES_HOST}" -p "${POSTGRES_PORT}" -U "${POSTGRES_USER}" -d "${POSTGRES_CMS_NAME}"; do
+  until pg_isready -h "${POSTGRES_HOST}" -p "${POSTGRES_PORT}" -U "${POSTGRES_USER}" -d "${POSTGRES_DB}"; do
     echo "    PostgreSQL not ready, waiting..."
     sleep 2
   done
@@ -33,16 +33,12 @@ wait_for_db() {
 wait_for_db
 
 # Run database migrations
-if [ "${SKIP_MIGRATIONS:-0}" = "1" ]; then
-  echo "  ⏭️  Skipping database migrations (SKIP_MIGRATIONS=1)"
-else
-  echo "  📋 Running database migrations..."
-  # shellcheck disable=SC2154
-  PYTHONPATH=/app/src:${PYTHONPATH} alembic upgrade head || {
-    echo "❌️ Database migrations failed"
-    exit 1
-  }
-fi
+echo "  📋 Running database migrations..."
+# shellcheck disable=SC2154
+PYTHONPATH=/app/src:${PYTHONPATH} alembic upgrade head || {
+  echo "❌️ Database migrations failed"
+  exit 1
+}
 
 # Seed database with initial data
 echo "  🌱 Seeding database..."

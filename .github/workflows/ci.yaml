@@ -4,7 +4,7 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ] #, "claude/**" ]
+    branches: ['main'] #, "claude/**" ]
   workflow_dispatch:
 
 concurrency:
@@ -12,9 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PYTHON_VERSION: "3.13"
-  NODE_VERSION: "22"
-  UV_VERSION: "0.5.15"
+  PYTHON_VERSION: '3.13'
+  NODE_VERSION: '22'
+  UV_VERSION: '0.5.15'
 
 jobs:
   ci:
@@ -96,8 +96,6 @@ jobs:
           fi
 
           echo "✅ All required configuration is defined"
-          echo ""
-          echo "📝 Note: STRAPI_API_TOKEN will be generated at runtime by Strapi service"
         env:
           POSTGRES_USER: ${{ vars.POSTGRES_USER || secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
@@ -126,8 +124,7 @@ jobs:
           POSTGRES_PORT=${{ vars.POSTGRES_PORT }}
           POSTGRES_USER=${{ vars.POSTGRES_USER }}
           POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_BACKEND_NAME=${{ vars.POSTGRES_BACKEND_NAME }}
-          POSTGRES_CMS_NAME=${{ vars.POSTGRES_CMS_NAME }}
+          POSTGRES_DB=${{ vars.POSTGRES_DB }}
           POSTGRES_SSL=${{ vars.POSTGRES_SSL }}
           POSTGRES_SSL_REJECT_UNAUTHORIZED=${{ vars.POSTGRES_SSL_REJECT_UNAUTHORIZED }}
 
@@ -146,9 +143,6 @@ jobs:
           CMS_URL_PROD=${{ vars.CMS_URL_PROD }}
           CMS_URL_DEV=${{ vars.CMS_URL_DEV }}
 
-          # STRAPI_API_TOKEN is generated at runtime by Strapi service
-          # Using placeholder for CI - will be generated when Strapi starts
-          STRAPI_API_TOKEN=ci-placeholder-token-will-be-generated-by-strapi
           ADMIN_JWT_SECRET=${{ secrets.ADMIN_JWT_SECRET }}
           API_TOKEN_SALT=${{ secrets.API_TOKEN_SALT }}
           API_TOKEN_ENCRYPTION_KEY=${{ secrets.API_TOKEN_ENCRYPTION_KEY }}
@@ -170,8 +164,6 @@ jobs:
           BACKEND_URL_DEV=${{ vars.BACKEND_URL_DEV }}
 
           JWT_SECRET=${{ secrets.JWT_SECRET }}
-          EXCHANGE_RATE_API_KEY=${{ secrets.EXCHANGE_RATE_API_KEY }}
-          EXCHANGE_RATE_API_URL=${{ vars.EXCHANGE_RATE_API_URL }}
 
           # ======================================
           # FRONTEND (Next.js)

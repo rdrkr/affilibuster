@@ -5,25 +5,19 @@ services:
     build:
       context: .
       dockerfile_inline: |
-        FROM postgres:17-alpine
+        FROM postgres:18-alpine
         RUN cat > /docker-entrypoint-initdb.d/init-db.sh <<'EOF'
         set -e
-        # Create both databases from the default postgres database
-        psql -v ON_ERROR_STOP=1 --username "$$POSTGRES_USER" --dbname "postgres" <<-EOSQL
-            CREATE DATABASE "$$POSTGRES_BACKEND_NAME";
-            CREATE DATABASE "$$POSTGRES_CMS_NAME";
-            GRANT ALL PRIVILEGES ON DATABASE "$$POSTGRES_BACKEND_NAME" TO "$$POSTGRES_USER";
-            GRANT ALL PRIVILEGES ON DATABASE "$$POSTGRES_CMS_NAME" TO "$$POSTGRES_USER";
+        # Create single database
+        psql -v ON_ERROR_STOP=1 --username "$$POSTGRES_USER" --dbname "$$POSTGRES_DB" <<-EOSQL
+            CREATE DATABASE "$$POSTGRES_DB";
+            GRANT ALL PRIVILEGES ON DATABASE "$$POSTGRES_DB" TO "$$POSTGRES_USER";
         EOSQL
-        # Add extensions to backend database
-        psql -v ON_ERROR_STOP=1 --username "$$POSTGRES_USER" --dbname "$$POSTGRES_BACKEND_NAME" <<-EOSQL
+        # Add UUID extension to the database
+        psql -v ON_ERROR_STOP=1 --username "$$POSTGRES_USER" --dbname "$$POSTGRES_DB" <<-EOSQL
             CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
         EOSQL
-        # Add extensions to CMS database
-        psql -v ON_ERROR_STOP=1 --username "$$POSTGRES_USER" --dbname "$$POSTGRES_CMS_NAME" <<-EOSQL
-            CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-        EOSQL
-        echo "Databases initialized successfully!"
+        echo "Database initialized successfully!"
         EOF
         RUN chmod +x /docker-entrypoint-initdb.d/init-db.sh
     restart: on-failure:2
@@ -32,13 +26,15 @@ services:
     environment:
       # Tell PostgreSQL to listen on custom port (defaults to 5432)
       PGPORT: ${POSTGRES_PORT}
+      # Pass POSTGRES_DB to init script
+      POSTGRES_DB: ${POSTGRES_DB}
     command: postgres -p ${POSTGRES_PORT}
     ports:
       - '${POSTGRES_PORT}:${POSTGRES_PORT}'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ 'CMD-SHELL', 'pg_isready -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_BACKEND_NAME}' ]
+      test: ['CMD-SHELL', 'pg_isready -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
       interval: 5s
       timeout: 10s
       retries: 50
@@ -54,7 +50,7 @@ services:
     volumes:
       - redis_data:/data
     healthcheck:
-      test: [ 'CMD', 'redis-cli', '-p', '${REDIS_PORT}', 'ping' ]
+      test: ['CMD', 'redis-cli', '-p', '${REDIS_PORT}', 'ping']
       interval: 5s
       timeout: 10s
       retries: 50
@@ -81,7 +77,7 @@ services:
       - strapi_uploads:/app/public/uploads
     healthcheck:
       # noinspection HttpUrlsUsage
-      test: [ "CMD", "curl", "-f", "http://${CMS_HOST}:${CMS_PORT}/admin" ]
+      test: ['CMD', 'curl', '-f', 'http://${CMS_HOST}:${CMS_PORT}/admin']
       interval: 5s
       timeout: 10s
       retries: 50
@@ -124,7 +120,7 @@ services:
     volumes:
       - ./certs:/etc/nginx/certs:ro
     healthcheck:
-      test: [ "CMD", "curl", "-fk", "${CMS_PROTOCOL}://${CMS_HOST}:${CMS_PORT}/admin" ]
+      test: ['CMD', 'curl', '-fk', '${CMS_PROTOCOL}://${CMS_HOST}:${CMS_PORT}/admin']
       interval: 5s
       timeout: 10s
       retries: 50
@@ -155,7 +151,7 @@ services:
       - backend_venv:/app/.venv
       - ./certs:/certs:ro
     healthcheck:
-      test: [ 'CMD', 'curl', '-fk', '${BACKEND_PROTOCOL}://${BACKEND_HOST}:${BACKEND_PORT}/health' ]
+      test: ['CMD', 'curl', '-fk', '${BACKEND_PROTOCOL}://${BACKEND_HOST}:${BACKEND_PORT}/health']
       interval: 5s
       timeout: 10s
       retries: 50
@@ -185,7 +181,37 @@ services:
       - ./.env:/app/.env
       - ./certs:/certs:ro
     healthcheck:
-      test: [ 'CMD', 'curl', '-fk', '${FRONTEND_PROTOCOL}://${FRONTEND_HOST}:${FRONTEND_PORT}' ]
+      test: ['CMD', 'curl', '-fk', '${FRONTEND_PROTOCOL}://${FRONTEND_HOST}:${FRONTEND_PORT}']
+      interval: 5s
+      timeout: 10s
+      retries: 50
+
+  ecopicks:
+    build:
+      context: ./ecopicks
+      dockerfile: Dockerfile
+      args:
+        ECOPICKS_PORT: ${ECOPICKS_PORT}
+    restart: on-failure:2
+    depends_on:
+      backend:
+        condition: service_healthy
+    env_file: # Load environment variables from .env file at build time
+      - .env
+    environment:
+      # Next.js respects PORT env var for custom listen port
+      PORT: ${ECOPICKS_PORT}
+      NEXT_SERVER_SIDE_API_URL: '${BACKEND_PROTOCOL}://${INTERNAL_BACKEND_HOST}:${BACKEND_PORT}/v1'
+    ports:
+      - '${ECOPICKS_PORT}:${ECOPICKS_PORT}'
+    volumes:
+      - ./ecopicks:/app
+      - ./contracts:/contracts
+      - ./data:/data
+      - ./.env:/app/.env
+      - ./certs:/certs:ro
+    healthcheck:
+      test: ['CMD', 'curl', '-fk', '${ECOPICKS_PROTOCOL}://${ECOPICKS_HOST}:${ECOPICKS_PORT}']
       interval: 5s
       timeout: 10s
       retries: 50
@@ -215,13 +241,13 @@ services:
       - ./certs:/certs:ro
     # Enable host.docker.internal for accessing host network (where frontend is exposed)
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     # Recommended Playwright Docker settings
     ipc: host # Prevents Chromium from running out of memory
     init: true # Avoids zombie processes
     # Override entrypoint to prevent running frontend dev server
-    entrypoint: [ ]
-    command: [ 'tail', '-f', '/dev/null' ]
+    entrypoint: []
+    command: ['tail', '-f', '/dev/null']
 
 volumes:
   postgres_data:

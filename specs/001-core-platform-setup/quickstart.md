@@ -105,6 +105,7 @@ npm run develop
 **Objective**: Verify browser language detection and prompt display
 
 **Steps**:
+
 1. Set browser language to Italian (Chrome: Settings → Languages → Add Italian, move to top)
 2. Open new incognito window
 3. Navigate to `http://localhost:3000`
@@ -125,6 +126,7 @@ npm run develop
 **Objective**: Verify language switcher component works across all languages
 
 **Steps**:
+
 1. Navigate to `http://localhost:3000/products/eco-bottle`
 2. Locate language selector in navigation
 3. Click language selector
@@ -150,6 +152,7 @@ npm run develop
 **Objective**: Verify currency selector and cross-language persistence
 
 **Steps**:
+
 1. Navigate to `http://localhost:3000/it` (Italian site)
 2. Find a product page with prices
 3. **✅ Verify**: Prices display in EUR (default for Italian): "27,50 €"
@@ -172,20 +175,26 @@ npm run develop
 **Objective**: Verify SEO requirements (hreflang, canonical, schema)
 
 **Steps**:
+
 1. Navigate to `http://localhost:3000/it/prodotti/bottiglia-eco`
 2. Right-click → "View Page Source"
 3. **✅ Verify**: `<html lang="it">`
 4. **✅ Verify**: hreflang tags present:
+
    ```html
    <link rel="alternate" hreflang="x-default" href="http://localhost:3000/products/eco-bottle" />
    <link rel="alternate" hreflang="it" href="http://localhost:3000/it/prodotti/bottiglia-eco" />
    <link rel="alternate" hreflang="he" href="http://localhost:3000/he/products/eco-bottle" />
    ```
+
 5. **✅ Verify**: Canonical URL points to current page:
+
    ```html
    <link rel="canonical" href="http://localhost:3000/it/prodotti/bottiglia-eco" />
    ```
+
 6. **✅ Verify**: Schema markup in Italian (JSON-LD):
+
    ```json
    {
      "@context": "https://schema.org",
@@ -194,7 +203,9 @@ npm run develop
      "inLanguage": "it"
    }
    ```
+
 7. **✅ Verify**: Meta tags in Italian:
+
    ```html
    <title>Bottiglia Ecologica | Affilibuster</title>
    <meta name="description" content="..." />
@@ -209,6 +220,7 @@ npm run develop
 **Objective**: Verify redirect handling for slug changes and content deletion
 
 **Steps - 301 Redirect (Slug Change)**:
+
 1. In CMS (`http://localhost:1337/admin`), login as admin
 2. Navigate to Content → Products → "Eco Bottle"
 3. Change English slug from `eco-bottle` to `eco-water-bottle`
@@ -218,6 +230,7 @@ npm run develop
 7. **✅ Verify**: Content displays correctly at new URL
 
 **Steps - 410 Gone (Content Deletion)**:
+
 1. In CMS, find a test product (e.g., "Test Product IT")
 2. Note its Italian URL: `/it/prodotti/test-product`
 3. Delete the Italian version only (keep English)
@@ -236,6 +249,7 @@ npm run develop
 **Objective**: Verify fallback when translation missing
 
 **Steps**:
+
 1. In CMS, create a new product: "New Eco Gadget"
 2. Publish ONLY English version (don't translate to Italian or Hebrew)
 3. Navigate to English: `http://localhost:3000/products/new-eco-gadget`
@@ -275,6 +289,7 @@ lighthouse http://localhost:3000/he --output html --output-path ./reports/lighth
 ```
 
 **✅ Verify for ALL languages**:
+
 - Performance score: **>90**
 - Accessibility score: **>90**
 - Best Practices score: **>90**
@@ -344,26 +359,31 @@ curl -X PUT http://localhost:8000/v1/user/preferences \
 ## Troubleshooting
 
 ### Issue: Language prompt not showing
+
 - **Check**: Browser language settings (must be it or he, not en)
 - **Check**: Session storage for `dismissedLanguagePrompt` (clear if true)
 - **Check**: URL (prompt only shows on root domain, not /it or /he)
 
 ### Issue: RTL layout not working for Hebrew
+
 - **Check**: HTML source for `dir="rtl"` attribute
 - **Check**: Tailwind RTL plugin installed (`npm ls tailwindcss-rtl`)
 - **Check**: Browser DevTools → Elements → `<html>` tag
 
 ### Issue: Currency not persisting
+
 - **Check**: Redis running (`redis-cli ping` should return `PONG`)
 - **Check**: API response includes `expiresAt` field (30 days from now)
 - **Check**: Browser cookies/session storage
 
 ### Issue: hreflang tags missing
+
 - **Check**: Content exists in all languages (query CMS)
 - **Check**: `alternateUrls` field in API response
 - **Check**: Next.js `Head` component rendering logic
 
 ### Issue: 404 instead of 410 on deleted content
+
 - **Check**: URLRedirect table has entry with `statusCode = 410`
 - **Check**: API `/content/{lang}/{slug}` returns 410 (not 404)
 - **Check**: Next.js custom error page for 410 status

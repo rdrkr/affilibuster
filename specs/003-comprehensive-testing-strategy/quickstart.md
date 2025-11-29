@@ -19,6 +19,7 @@ make test
 ```
 
 This runs:
+
 1. Backend tests (pytest)
 2. Frontend tests (Jest)
 3. CMS tests (when implemented)
@@ -61,6 +62,7 @@ make test-all
 Runs all tests in parallel and merges coverage reports into a single unified report.
 
 **View merged coverage**:
+
 ```bash
 make coverage-view
 ```
@@ -90,6 +92,7 @@ open backend/htmlcov/index.html
 **Threshold**: 80% minimum (enforced)
 
 **What's measured**:
+
 - Line coverage
 - Branch coverage
 - Function coverage
@@ -106,6 +109,7 @@ open frontend/coverage/index.html
 **Threshold**: 80% minimum (enforced)
 
 **What's measured**:
+
 - Line coverage
 - Branch coverage
 - Function coverage
@@ -550,12 +554,14 @@ View merged coverage at: `https://codecov.io/gh/your-org/affilibuster`
 ### Tests Fail with "Module Not Found"
 
 **Backend**:
+
 ```bash
 cd backend
 uv sync
 ```
 
 **Frontend**:
+
 ```bash
 cd frontend
 npm install
@@ -564,6 +570,7 @@ npm install
 ### Coverage Below 80%
 
 **Identify uncovered lines**:
+
 ```bash
 # Backend
 make test-backend
@@ -580,6 +587,7 @@ Then write tests for red (uncovered) lines.
 ### Tests Hang or Timeout
 
 **Backend**: Check for deadlocks in database tests
+
 ```python
 # Increase timeout
 @pytest.mark.asyncio
@@ -588,6 +596,7 @@ async def test_slow_operation():
 ```
 
 **Frontend**: Check for unresolved promises
+
 ```typescript
 // Ensure waitFor completes
 await waitFor(() => expect(element).toBeInTheDocument(), {
@@ -598,6 +607,7 @@ await waitFor(() => expect(element).toBeInTheDocument(), {
 ### Parallel Test Failures (Pass Individually, Fail in Parallel)
 
 **Backend**: Use unique identifiers
+
 ```python
 import uuid
 
@@ -607,6 +617,7 @@ def test_with_shared_resource(redis_client):
 ```
 
 **Frontend**: Reset mocks between tests
+
 ```typescript
 beforeEach(() => {
   jest.clearAllMocks();
@@ -616,6 +627,7 @@ beforeEach(() => {
 ### Coverage Merge Fails
 
 **Check lcov installation**:
+
 ```bash
 # macOS
 brew install lcov
@@ -625,6 +637,7 @@ sudo apt-get install lcov
 ```
 
 **Verify coverage files exist**:
+
 ```bash
 ls -l backend/coverage.lcov
 ls -l frontend/coverage/lcov.info

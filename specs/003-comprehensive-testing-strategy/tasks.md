@@ -8,6 +8,7 @@
 This document defines the implementation tasks for establishing comprehensive testing infrastructure across the Affilibuster monorepo. Tasks are organized by user story to enable independent implementation and validation.
 
 **Key User Stories**:
+
 1. **US1**: Run all tests with a single command (`make test`)
 2. **US2**: See coverage reports for all modules
 3. **US3**: Tests fail if coverage drops below 80%
@@ -33,6 +34,7 @@ This document defines the implementation tasks for establishing comprehensive te
 - [X] T006 Verify Docker services are running: docker-compose ps (backend requires PostgreSQL/Redis)
 
 **Validation**:
+
 - [X] lcov command available: `which lcov`
 - [X] pytest-xdist installed: `cd backend && python -c "import xdist"`
 - [X] tsd and type-coverage installed: `cd shared && npm list tsd type-coverage`
@@ -58,6 +60,7 @@ This document defines the implementation tasks for establishing comprehensive te
 - [X] T012 [US3] Verify coverage threshold enforcement: cd backend && pytest (should fail if < 80%)
 
 **Validation**:
+
 - [X] backend/pytest.ini contains `--cov-fail-under=80`
 - [X] backend/pytest.ini contains `-n auto` and `--dist worksteal`
 - [X] backend/pytest.ini contains `--cov-report=lcov`
@@ -87,6 +90,7 @@ This document defines the implementation tasks for establishing comprehensive te
 - [X] T018 [US3] Verify coverage enforcement: cd frontend && npm test -- --coverage (should fail if < 80%)
 
 **Validation**:
+
 - [X] frontend/jest.config.js contains `coverageReporters: ['lcov', 'json', 'html', 'text']`
 - [X] frontend/jest.config.js contains `maxWorkers: '50%'` and `cache: true`
 - [X] frontend/jest.config.js has 80% thresholds (all four: branches, functions, lines, statements)
@@ -115,6 +119,7 @@ This document defines the implementation tasks for establishing comprehensive te
 - [X] T024 [US3] Verify type coverage: cd shared && npm run type-coverage (should report >= 95%)
 
 **Validation**:
+
 - [X] shared/package.json has all three test scripts (test, type-check, type-coverage)
 - [X] shared/types/api.test-d.ts exists with type assertions
 - [X] Running `cd shared && npm test` executes tsd type tests
@@ -145,6 +150,7 @@ This document defines the implementation tasks for establishing comprehensive te
 - [X] T032 [US1] Test unified execution: make test (should run all three modules sequentially)
 
 **Validation**:
+
 - [X] root Makefile has NPROCS and MAKEFLAGS variables
 - [X] root Makefile has test-backend, test-frontend, test-shared targets
 - [X] root Makefile test target runs all three modules
@@ -172,6 +178,7 @@ This document defines the implementation tasks for establishing comprehensive te
 - [X] T036 [US1] Verify all module coverage reports generated correctly with parallel execution
 
 **Validation**:
+
 - [X] root Makefile has test-parallel target with -j3 flag
 - [X] Running `make test-parallel` executes modules concurrently (visible in output)
 - [X] Total execution time < 2 minutes (target: 1-2 minutes)
@@ -200,6 +207,7 @@ This document defines the implementation tasks for establishing comprehensive te
 - [X] T043 [US2] Verify merged report includes all modules: open coverage-merged/html/index.html
 
 **Validation**:
+
 - [X] scripts/merge-coverage.sh exists and is executable
 - [X] root Makefile has coverage-merge, coverage-view, and test-all targets
 - [X] Running `make test-all` generates coverage-merged/html/index.html
@@ -227,6 +235,7 @@ This document defines the implementation tasks for establishing comprehensive te
 - [X] T048 [US4] Verify marker functionality: cd backend && pytest -m "not slow" (should skip slow tests)
 
 **Validation**:
+
 - [X] root Makefile has test-backend-fast target with -m "unit" flag
 - [X] Running `make test-backend-fast` completes in ~30 seconds
 - [X] Backend tests can be filtered by marker (unit, integration, contract, performance, slow)
@@ -253,6 +262,7 @@ This document defines the implementation tasks for establishing comprehensive te
 - [X] T055 Verify quickstart.md accuracy: follow all commands in quickstart.md and verify they work
 
 **Validation**:
+
 - [X] cms/tests directory structure exists (deferred - no custom code yet)
 - [X] cms/jest.config.js exists (future-ready)
 - [X] root Makefile has test-cms target that handles "no tests yet" gracefully
@@ -282,6 +292,7 @@ This document defines the implementation tasks for establishing comprehensive te
 - [X] T063 Document any deviations from original spec in plan.md
 
 **Validation**:
+
 - [X] All Must Have success criteria from spec.md are met
 - [X] Test execution time < 5 minutes (target: 1-2 minutes) - achieved ~20 seconds
 - [X] All modules report >= 80% coverage (backend, frontend) or >= 95% type coverage (shared) - enforced
@@ -318,6 +329,7 @@ Phase 10 (Validation) ← Must be last
 ```
 
 **Parallel Opportunities**:
+
 - Phases 2, 3, 4 can be executed in parallel after Phase 1
 - Phase 9 tasks (T049-T055) can be executed in parallel
 - Tasks marked [P] within each phase can be executed in parallel
@@ -331,6 +343,7 @@ Phase 10 (Validation) ← Must be last
 **Goal**: Basic unified test execution
 
 **Deliverable**:
+
 - `make test` runs backend, frontend, and shared tests sequentially
 - Backend enforces 80% coverage
 - Frontend enforces 80% coverage
@@ -343,6 +356,7 @@ Phase 10 (Validation) ← Must be last
 **Goal**: Performance optimization and unified reporting
 
 **Deliverable**:
+
 - `make test-parallel` runs tests concurrently (1-2 minutes)
 - `make test-all` generates merged coverage report
 
@@ -353,6 +367,7 @@ Phase 10 (Validation) ← Must be last
 **Goal**: Advanced features and polish
 
 **Deliverable**:
+
 - Test category execution (unit, integration, etc.)
 - Documentation and CMS preparation
 - Full validation
@@ -368,6 +383,7 @@ Phase 10 (Validation) ← Must be last
 **Total Tasks**: 63
 
 **By Phase**:
+
 - Phase 1 (Setup): 6 tasks
 - Phase 2 (Backend): 6 tasks
 - Phase 3 (Frontend): 6 tasks
@@ -380,6 +396,7 @@ Phase 10 (Validation) ← Must be last
 - Phase 10 (Validation): 8 tasks
 
 **By User Story**:
+
 - US1 (Unified execution): 12 tasks (T025-T036)
 - US2 (Coverage reports): 13 tasks (T007-T009, T013-T015, T019-T021, T037-T043)
 - US3 (Enforce 80%): 9 tasks (T007, T010-T012, T016, T018, T023-T024, T058)

@@ -34,21 +34,35 @@ if TYPE_CHECKING:
         PasswordResetTokenRepository,
     )
 
-# Singleton instances (created once at startup)
-_cms_repo: ICMSRepository | None = None
+
+class _DependencyContainer:
+    """Container for singleton dependency instances."""
+
+    def __init__(self) -> None:
+        """Initialize container with None values."""
+        self.cms_repo: ICMSRepository | None = None
 
 
-def initialize_dependencies() -> None:
-    """Initialize singleton instances. Call this at app startup."""
-    global _cms_repo  # noqa: PLW0603
-    _cms_repo = StrapiRepositoryImpl()
+# Singleton container instance
+_container = _DependencyContainer()
+
+
+def initialize_dependencies(strapi_api_token: str) -> None:
+    """
+    Initialize singleton instances. Call this at app startup.
+
+    Args:
+        strapi_api_token: API token for Strapi CMS authentication (loaded from database)
+
+    """
+    _container.cms_repo = StrapiRepositoryImpl(api_token=strapi_api_token)
 
 
 def get_cms_repo() -> ICMSRepository:
     """Provide Strapi repository instance."""
-    if _cms_repo is None:
+    if _container.cms_repo is None:
         raise RuntimeError("Dependencies not initialized. Call initialize_dependencies() at startup.")
-    return _cms_repo
+    return _container.cms_repo
 
 
 def get_cms_content_use_case(

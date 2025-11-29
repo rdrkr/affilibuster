@@ -47,24 +47,24 @@ class TestInitializeDependencies:
         # Clear any existing instances
         import affilibuster_backend.infrastructure.dependencies as deps
 
-        deps._cms_repo = None
+        deps._container.cms_repo = None
 
         # Initialize
-        initialize_dependencies()
+        initialize_dependencies(strapi_api_token="test-token-123")
 
         # Verify instances were created
-        assert deps._cms_repo is not None
+        assert deps._container.cms_repo is not None
 
     def test_initialize_dependencies_creates_correct_types(self):
         """Test initialize_dependencies creates correct instance types."""
         import affilibuster_backend.infrastructure.dependencies as deps
 
-        deps._cms_repo = None
+        deps._container.cms_repo = None
 
-        initialize_dependencies()
+        initialize_dependencies(strapi_api_token="test-token-123")
 
         # Verify types
-        assert isinstance(deps._cms_repo, ICMSRepository)
+        assert isinstance(deps._container.cms_repo, ICMSRepository)
 
 
 @pytest.mark.unit
@@ -76,8 +76,8 @@ class TestGetStrapiRepo:
         """Test get_cms_repo returns instance when initialized."""
         import affilibuster_backend.infrastructure.dependencies as deps
 
-        deps._cms_repo = None
-        initialize_dependencies()
+        deps._container.cms_repo = None
+        initialize_dependencies(strapi_api_token="test-token-123")
 
         repo = get_cms_repo()
         assert repo is not None
@@ -88,7 +88,7 @@ class TestGetStrapiRepo:
         import affilibuster_backend.infrastructure.dependencies as deps
 
         # Clear the singleton
-        deps._cms_repo = None
+        deps._container.cms_repo = None
 
         with pytest.raises(RuntimeError, match="Dependencies not initialized"):
             get_cms_repo()
@@ -97,8 +97,8 @@ class TestGetStrapiRepo:
         """Test get_cms_repo returns the same singleton instance."""
         import affilibuster_backend.infrastructure.dependencies as deps
 
-        deps._cms_repo = None
-        initialize_dependencies()
+        deps._container.cms_repo = None
+        initialize_dependencies(strapi_api_token="test-token-123")
 
         repo1 = get_cms_repo()
         repo2 = get_cms_repo()
@@ -112,7 +112,7 @@ class TestDependencyGetters:
 
     def test_get_cms_content_use_case_returns_instance(self):
         """Test get_cms_content_use_case returns use case instance."""
-        initialize_dependencies()
+        initialize_dependencies(strapi_api_token="test-token-123")
         repo = get_cms_repo()
 
         use_case = get_cms_content_use_case(cms_repo=repo)

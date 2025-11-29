@@ -77,10 +77,11 @@ make dev
 ### Access Your Applications
 
 | Service           | URL                            | Notes                      |
-|-------------------|--------------------------------|----------------------------|
+| ----------------- | ------------------------------ | -------------------------- |
 | **Frontend**      | <https://localhost:3000>       | Next.js (English, default) |
 | **Frontend (IT)** | <https://localhost:3000/it>    | Italian locale             |
 | **Frontend (HE)** | <https://localhost:3000/he>    | Hebrew locale (RTL)        |
+| **Ecopicks**      | <https://localhost:3001>       | Next.js Affiliate Site     |
 | **Backend API**   | <https://localhost:8000>       | FastAPI REST API           |
 | **API Docs**      | <https://localhost:8000/docs>  | Swagger UI                 |
 | **CMS Admin**     | <https://localhost:1337/admin> | Strapi admin panel         |
@@ -146,7 +147,7 @@ affilibuster/                          # Monorepo root
 │           ├── domain/                # Domain layer tests
 │           └── infrastructure/        # Infrastructure layer tests
 │
-├── frontend/                          # Next.js 16 frontend
+├── frontend/                          # Next.js 16 frontend (Main Platform)
 │   ├── src/
 │   │   ├── app/                       # Next.js App Router pages
 │   │   │   ├── [lang]/                # Language-specific routes
@@ -167,6 +168,15 @@ affilibuster/                          # Monorepo root
 │   │   └── proxy.ts                   # Development proxy
 │   ├── tests/                         # Test files (component, e2e, performance)
 │   ├── Dockerfile                     # Frontend dev server container
+│   └── Dockerfile.test-runner         # Lightweight Playwright test container
+│
+├── ecopicks/                          # Next.js 16 affiliate site (Ecopicks)
+│   ├── src/
+│   │   ├── app/                       # Next.js App Router pages
+│   │   ├── components/                # React components
+│   │   ├── lib/                       # Utilities
+│   │   └── styles/                    # Global styles
+│   ├── Dockerfile                     # Ecopicks dev server container
 │   └── Dockerfile.test-runner         # Lightweight Playwright test container
 │
 ├── cms/                               # Strapi 5 headless CMS
@@ -222,7 +232,7 @@ affilibuster/                          # Monorepo root
 
 ### 🛠️ Technology Stack
 
-- **Frontend**: Next.js 16, React 19, TypeScript 5.7+, Tailwind CSS 4, next-intl
+- **Frontend & Ecopicks**: Next.js 16, React 19, TypeScript 5.7+, Tailwind CSS 4, next-intl
 - **Backend**: FastAPI 0.120+, Python 3.13+, PostgreSQL 15+, Redis, Alembic
 - **CMS**: Strapi 5+, PostgreSQL 15+, i18n plugin
 - **Infrastructure**: Docker & Docker Compose
@@ -355,6 +365,7 @@ make restart
 # View logs
 make logs                # All services
 make logs-backend        # Backend only
+make logs-ecopicks       # Ecopicks only
 
 # Check service status
 make ps
@@ -473,6 +484,7 @@ make test-parallel
 # Individual modules
 make test-backend          # Backend (pytest)
 make test-frontend         # Frontend (Jest)
+make test-ecopicks         # Ecopicks (Jest)
 make test-cms              # CMS (when custom code added)
 
 # E2E tests with specific browser
@@ -744,6 +756,7 @@ For a complete list of all dependencies, please see:
 
 - Backend: [`backend/pyproject.toml`](backend/pyproject.toml)
 - Frontend: [`frontend/package.json`](frontend/package.json)
+- Ecopicks: [`ecopicks/package.json`](ecopicks/package.json)
 - CMS: [`cms/package.json`](cms/package.json)
 
 We are grateful to all the maintainers and contributors of these projects. Without their dedication and hard work,

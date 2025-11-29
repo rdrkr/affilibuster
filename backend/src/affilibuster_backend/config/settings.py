@@ -13,11 +13,41 @@ from typing import Literal
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+def _get_env_file_path() -> str:
+    """
+    Determine the correct .env file path based on execution environment.
+
+    Returns:
+        str: Path to .env file
+    """
+    # Allow explicit override via ENV_FILE environment variable
+    if env_override := os.environ.get("ENV_FILE"):
+        return env_override
+
+    # Check if running in Docker
+    is_docker = Path("/.dockerenv").exists() or os.environ.get("DOCKER_ENV") == "true"
+
+    if is_docker:
+        # Docker: Use /app/.env
+        return "/app/.env"
+
+    # Local development: Look for .env in repository root
+    # This file is 3 levels deep: backend/src/affilibuster_backend/config/settings.py
+    repo_root = Path(__file__).parent.parent.parent.parent.parent
+    env_file = repo_root / ".env"
+
+    if env_file.exists():
+        return str(env_file)
+
+    # Fallback to Docker path (will fail if not in Docker, which is expected)
+    return "/app/.env"
+
+
 class Settings(BaseSettings):
     """Application settings with environment variable support."""
 
     model_config = SettingsConfigDict(
-        env_file="/app/.env",
+        env_file=_get_env_file_path(),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
@@ -29,7 +59,7 @@ class Settings(BaseSettings):
     postgres_port: int
     postgres_user: str
     postgres_password: str
-    postgres_backend_name: str
+    postgres_db: str
 
     # Redis - Component fields for URL construction
     redis_protocol: str
@@ -63,25 +93,25 @@ class Settings(BaseSettings):
     internal_cms_host: str = ""
     cms_host: str
     cms_port: int
-    strapi_api_token: str
-
-    # External Services
-    exchange_rate_api_key: str
-    exchange_rate_api_url: str
+    # NOTE: strapi_api_token is loaded from database at startup, not from env vars
 
     # Backend API
     backend_protocol: str
 
-    # Client
+    # Clients
     internal_frontend_host: str
     frontend_protocol: str
     frontend_host: str
     frontend_port: int
+    internal_ecopicks_host: str
+    ecopicks_protocol: str
+    ecopicks_host: str
+    ecopicks_port: int
 
     @property
     def database_url(self) -> str:
         """Construct database URL from components."""
-        return f"{self.postgres_protocol}://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_backend_name}"
+        return f"{self.postgres_protocol}://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
 
     @property
     def redis_url(self) -> str:
@@ -114,8 +144,11 @@ class Settings(BaseSettings):
         return [
             f"{self.frontend_protocol}://{self.frontend_host}:{self.frontend_port}",
             f"{self.frontend_protocol}://{self.internal_frontend_host}:{self.frontend_port}",
+            f"{self.ecopicks_protocol}://{self.internal_ecopicks_host}:{self.ecopicks_port}",
+            f"{self.ecopicks_protocol}://{self.ecopicks_host}:{self.ecopicks_port}",
             # Allow host.docker.internal for Playwright tests from test-runner container
             f"{self.frontend_protocol}://host.docker.internal:{self.frontend_port}",
+            f"{self.ecopicks_protocol}://host.docker.internal:{self.ecopicks_port}",
         ]
 
     @property

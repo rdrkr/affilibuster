@@ -17,6 +17,7 @@ This guide provides a quickstart for using the authentication system in the Affi
 ## Overview
 
 The frontend authentication system provides:
+
 - Complete auth UI components (Login, Register, Password Reset, Email Verification, Profile Management)
 - Auth context and hooks for managing authentication state
 - Type-safe API client for auth operations
@@ -71,6 +72,7 @@ export default function LoginPage() {
 ```
 
 **Props**:
+
 - `onSuccess?: () => void` - Called after successful login
 - `onRegisterClick?: () => void` - Called when "Sign Up" link is clicked
 - `onForgotPasswordClick?: () => void` - Called when "Forgot Password" link is clicked
@@ -99,6 +101,7 @@ export default function RegisterPage() {
 ```
 
 **Props**:
+
 - `onSuccess?: () => void` - Called after successful registration
 - `onLoginClick?: () => void` - Called when "Log In" link is clicked
 
@@ -148,6 +151,7 @@ export default function ResetPasswordPage({
 ```
 
 **Props**:
+
 - `token: string` - Reset token from email (required)
 - `onSuccess?: () => void` - Called after successful password reset
 - `onLoginClick?: () => void` - Called when "Log In" link is clicked
@@ -226,12 +230,14 @@ export function MyComponent() {
 ```
 
 **Available Properties**:
+
 - `user: User | null` - Current authenticated user
 - `isLoading: boolean` - Whether auth state is being loaded
 - `isAuthenticated: boolean` - Whether user is authenticated
 - `error: string | null` - Current error message
 
 **Available Methods**:
+
 - `login(email, password, rememberMe?)` - Log in user
 - `register(email, password, displayName)` - Register new user
 - `logout()` - Log out current user
@@ -419,12 +425,14 @@ export function Layout({ children }) {
 ```
 
 When authenticated, shows:
+
 - User dropdown with display name
 - Profile link
 - Settings link
 - Log out button
 
 When not authenticated, shows:
+
 - Log In button
 - Sign Up button
 
@@ -597,6 +605,7 @@ const response = await authApi.updateProfile({
 ```
 
 All API functions:
+
 - Use cookie-based authentication (credentials: 'include')
 - Return strongly typed responses
 - Throw errors with meaningful messages
@@ -646,6 +655,7 @@ frontend/src/
 ## Support
 
 For issues or questions:
+
 - Check existing tests in `tests/components/auth/` for examples
 - Review component props and types in source files
 - See CLAUDE.md for project-wide guidelines

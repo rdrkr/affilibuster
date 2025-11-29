@@ -45,6 +45,12 @@ lint-typescript: ## Lint and fix TypeScript/JavaScript (ESLint)
 lint-shell: ## Lint shell scripts (shellcheck - check only, no auto-fix)
 	@bash scripts/lint.sh shell
 
+lint-ecopicks: ## Lint and fix Ecopicks code (ESLint)
+	@bash scripts/lint.sh ecopicks
+
+lint-ecopicks-check: ## Check Ecopicks linting without fixing
+	@bash scripts/lint.sh ecopicks check
+
 # All linters
 lint-check: ## Check all linting without fixing
 	@bash scripts/lint.sh all check
@@ -63,6 +69,12 @@ format-typescript: ## Format TypeScript/JavaScript (Prettier)
 
 format-typescript-check: ## Check TypeScript/JavaScript formatting without making changes
 	@bash scripts/format.sh typescript check
+
+format-ecopicks: ## Format Ecopicks code (Prettier)
+	@bash scripts/format.sh ecopicks
+
+format-ecopicks-check: ## Check Ecopicks formatting without making changes
+	@bash scripts/format.sh ecopicks check
 
 format-shell: ## Format shell scripts (shfmt)
 	@bash scripts/format.sh shell
@@ -92,7 +104,7 @@ build: format lint ## Build frontend (with linting and formatting)
 
 start: ## Start Docker services only
 	@echo "🚀 Starting Docker services..."
-	@docker compose up -d frontend
+	@docker compose up -d frontend ecopicks
 	@echo "✅ Services started."
 
 stop: ## Stop all Docker services
@@ -110,6 +122,9 @@ logs: ## View Docker logs (all services)
 
 logs-backend: ## View backend logs only
 	@docker compose logs -f backend
+
+logs-ecopicks: ## View ecopicks logs only
+	@docker compose logs -f ecopicks
 
 test-backend-unit: ## Run backend unit tests only
 	@bash scripts/test.sh backend-unit
@@ -129,13 +144,22 @@ test-frontend-integration: ## Run frontend integration tests only (Playwright E2
 test-frontend: ## Run all frontend tests (unit + integration)
 	@bash scripts/test.sh frontend
 
+test-ecopicks-unit: ## Run ecopicks unit tests only (Jest)
+	@bash scripts/test.sh ecopicks-unit
+
+test-ecopicks-integration: ## Run ecopicks integration tests only (Playwright E2E)
+	@bash scripts/test.sh ecopicks-integration $(BROWSER)
+
+test-ecopicks: ## Run all ecopicks tests (unit + integration)
+	@bash scripts/test.sh ecopicks
+
 test-performance: ## Run performance tests only
 	@bash scripts/test.sh performance $(BROWSER)
 
-test-all-unit: ## Run all unit tests (backend + frontend)
+test-all-unit: ## Run all unit tests (backend + frontend + ecopicks)
 	@bash scripts/test.sh all-unit
 
-test-all-integration: ## Run all integration tests (backend + frontend)
+test-all-integration: ## Run all integration tests (backend + frontend + ecopicks)
 	@bash scripts/test.sh all-integration
 
 test: ## Run all tests with coverage (shows all errors)
@@ -176,17 +200,21 @@ audit: ## Run Lighthouse performance audits
 
 install-backend: ## Install backend dependencies
 	@echo "📦 Installing backend dependencies..."
-	@cd backend && uv sync --all-extras
+	@cd backend && uv sync
 
 install-frontend: ## Install frontend dependencies
 	@echo "📦 Installing frontend dependencies..."
-	@cd frontend && npm install --include=optional
+	@cd frontend && npm install
+
+install-ecopicks: ## Install ecopicks dependencies
+	@echo "📦 Installing ecopicks dependencies..."
+	@cd ecopicks && npm install
 
 install-cms: ## Install CMS dependencies
 	@echo "📦 Installing CMS dependencies..."
-	@cd cms && npm install --include=optional
+	@cd cms && npm install
 
-install: install-backend install-frontend install-cms ## Install all dependencies (backend + frontend + CMS)
+install: install-backend install-frontend install-ecopicks install-cms ## Install all dependencies
 	@echo "✅ All dependencies installed"
 
 setup: ## Complete development environment setup (installs all tools and dependencies)
@@ -200,6 +228,9 @@ upgrade-cms: ## Update CMS dependencies only
 
 upgrade-frontend: ## Update frontend dependencies only
 	@./scripts/upgrade.sh frontend
+
+upgrade-ecopicks: ## Update ecopicks dependencies only
+	@./scripts/upgrade.sh ecopicks
 
 upgrade-backend: ## Update backend dependencies only
 	@./scripts/upgrade.sh backend

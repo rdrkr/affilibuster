@@ -97,7 +97,7 @@ class TestStrapiRepositoryInitialization:
             mock_settings.strapi_url = "http://strapi:1337"
             mock_settings.strapi_api_token = "test-token"
 
-            repo = StrapiRepositoryImpl()
+            repo = StrapiRepositoryImpl(api_token="test-token")
 
             assert repo.base_url == "http://strapi:1337"
             assert repo.api_token == "test-token"
@@ -129,7 +129,7 @@ class TestGetHeaders:
             mock_settings.strapi_url = "http://strapi:1337"
             mock_settings.strapi_api_token = ""  # Empty string
 
-            repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+            repo = StrapiRepositoryImpl(api_token="", base_url="http://strapi:1337")
             headers = repo._get_headers()
 
             assert headers == {}
@@ -141,21 +141,21 @@ class TestBuildUrl:
 
     def test_build_url_with_api_prefix(self):
         """Test that _build_url handles path that already starts with /api/."""
-        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
         url = repo._build_url("/api/about")
 
         assert url == "http://strapi:1337/api/about"
 
     def test_build_url_with_slash_prefix(self):
         """Test that _build_url adds /api prefix to path starting with /."""
-        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
         url = repo._build_url("/about")
 
         assert url == "http://strapi:1337/api/about"
 
     def test_build_url_without_slash_prefix(self):
         """Test that _build_url adds /api/ prefix to path without leading slash."""
-        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
         url = repo._build_url("about")
 
         assert url == "http://strapi:1337/api/about"
@@ -231,7 +231,7 @@ class TestGet:
             "affilibuster_backend.infrastructure.cms.strapi_repository_impl.httpx.AsyncClient",
             return_value=mock_client,
         ):
-            repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token=None)
+            repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
 
             with pytest.raises(CMSAPIError) as exc_info:
                 await repo.get("/nonexistent", response_model=CurrenciesGetResponse)
@@ -253,7 +253,7 @@ class TestGet:
             "affilibuster_backend.infrastructure.cms.strapi_repository_impl.httpx.AsyncClient",
             return_value=mock_client,
         ):
-            repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token=None)
+            repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
 
             with pytest.raises(CMSAPIError) as exc_info:
                 await repo.get("/currencies", response_model=CurrenciesGetResponse)
@@ -334,7 +334,7 @@ class TestPost:
             "affilibuster_backend.infrastructure.cms.strapi_repository_impl.httpx.AsyncClient",
             return_value=mock_client,
         ):
-            repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token=None)
+            repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
             data = LanguagesDetectPostRequest(accept_language="invalid")
 
             with pytest.raises(CMSAPIError) as exc_info:
@@ -357,7 +357,7 @@ class TestPost:
             "affilibuster_backend.infrastructure.cms.strapi_repository_impl.httpx.AsyncClient",
             return_value=mock_client,
         ):
-            repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token=None)
+            repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
             data = LanguagesDetectPostRequest(accept_language="en-US")
 
             with pytest.raises(CMSAPIError) as exc_info:
@@ -601,21 +601,21 @@ class TestSnakeToCamel:
 
     def test_snake_to_camel_with_single_word(self):
         """Test that _snake_to_camel handles single word correctly."""
-        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
         result = repo._snake_to_camel("page")
 
         assert result == "page"
 
     def test_snake_to_camel_with_multiple_words(self):
         """Test that _snake_to_camel converts snake_case to camelCase."""
-        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
         result = repo._snake_to_camel("page_size")
 
         assert result == "pageSize"
 
     def test_snake_to_camel_with_many_words(self):
         """Test that _snake_to_camel handles multiple underscores."""
-        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
         result = repo._snake_to_camel("some_long_variable_name")
 
         assert result == "someLongVariableName"
@@ -627,7 +627,7 @@ class TestFlattenParams:
 
     def test_flatten_params_with_simple_dict(self):
         """Test that _flatten_params handles simple flat dict."""
-        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
         params = {"locale": "en", "page_size": 10}
         result = repo._flatten_params(params)
 
@@ -635,7 +635,7 @@ class TestFlattenParams:
 
     def test_flatten_params_with_nested_dict(self):
         """Test that _flatten_params handles nested dicts with bracket notation."""
-        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
         params = {"pagination": {"page": 1, "page_size": 25}}
         result = repo._flatten_params(params)
 
@@ -643,7 +643,7 @@ class TestFlattenParams:
 
     def test_flatten_params_with_deeply_nested_dict(self):
         """Test that _flatten_params handles deeply nested dicts."""
-        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
         params = {"filters": {"name": {"contains": "test"}}}
         result = repo._flatten_params(params)
 
@@ -651,7 +651,7 @@ class TestFlattenParams:
 
     def test_flatten_params_with_list_of_dicts(self):
         """Test that _flatten_params handles list of dicts with indexed notation."""
-        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
         params = {"populate": [{"fields": ["id", "name"]}, {"fields": ["title"]}]}
         result = repo._flatten_params(params)
 
@@ -662,7 +662,7 @@ class TestFlattenParams:
 
     def test_flatten_params_with_none_values(self):
         """Test that _flatten_params excludes None values."""
-        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
         params = {"locale": "en", "page_size": None}
         result = repo._flatten_params(params)
 
@@ -671,7 +671,7 @@ class TestFlattenParams:
 
     def test_flatten_params_with_mixed_structure(self):
         """Test that _flatten_params handles mixed nested structures."""
-        repo = StrapiRepositoryImpl(base_url="http://strapi:1337")
+        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
         params = {
             "locale": "en",
             "pagination": {"page": 1, "page_size": 10},

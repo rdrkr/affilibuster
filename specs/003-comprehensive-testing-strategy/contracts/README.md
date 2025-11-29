@@ -17,6 +17,7 @@ These contracts define the exact configuration that will be implemented in the i
 **File**: `pytest-config.ini`
 **Target**: `backend/pytest.ini`
 **Changes**:
+
 - ✅ Add `-n auto` for parallel execution
 - ✅ Add `--dist worksteal` for load balancing
 - ✅ Add `--cov-report=lcov` for coverage merging
@@ -28,6 +29,7 @@ These contracts define the exact configuration that will be implemented in the i
 **File**: `jest-frontend-config.js`
 **Target**: `frontend/jest.config.js`
 **Changes**:
+
 - ✅ Add `lcov` to `coverageReporters`
 - ✅ Add `maxWorkers: '50%'` for performance
 - ✅ Add `cache: true` for faster reruns
@@ -39,6 +41,7 @@ These contracts define the exact configuration that will be implemented in the i
 **Target**: `cms/jest.config.js`
 **Status**: TO BE CREATED when custom Strapi code is added
 **Changes**:
+
 - Configure Jest for Node environment (not jsdom)
 - Exclude Strapi boilerplate from coverage
 - Set lower coverage threshold (60%) with justification
@@ -49,6 +52,7 @@ These contracts define the exact configuration that will be implemented in the i
 **File**: `shared-package.json`
 **Target**: `shared/package.json`
 **Changes**:
+
 - ✅ Add `test` script (tsd)
 - ✅ Add `type-check` script (tsc --noEmit)
 - ✅ Add `type-coverage` script (95% minimum)
@@ -59,6 +63,7 @@ These contracts define the exact configuration that will be implemented in the i
 **File**: `Makefile-test-targets`
 **Target**: Root `Makefile`
 **Changes**:
+
 - ✅ Add CPU core detection
 - ✅ Add `--output-sync=target` flag
 - ✅ Add individual test targets (backend, frontend, cms, shared)
@@ -73,6 +78,7 @@ These contracts define the exact configuration that will be implemented in the i
 **File**: `merge-coverage.sh`
 **Target**: `scripts/merge-coverage.sh`
 **Changes**:
+
 - ✅ Create new script for merging LCOV reports
 - ✅ Check for lcov installation
 - ✅ Find all module coverage files
@@ -84,6 +90,7 @@ These contracts define the exact configuration that will be implemented in the i
 **File**: `backend-pyproject.toml`
 **Target**: `backend/pyproject.toml`
 **Changes**:
+
 - ✅ Add `pytest-xdist>=3.6.1` for parallel execution
 
 ## Implementation Order

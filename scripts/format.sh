@@ -37,6 +37,19 @@ format_typescript() {
   fi
 }
 
+# Format Ecopicks
+format_ecopicks() {
+  if [[ "${CHECK_ONLY}" = "check" ]]; then
+    echo "  ✨ Checking Ecopicks formatting..."
+    cd ecopicks && npm run format
+    cd ..
+  else
+    echo "  ✨ Formatting Ecopicks..."
+    cd ecopicks && npm run format:fix
+    cd ..
+  fi
+}
+
 # Format Shell scripts
 format_shell() {
   if command -v shfmt >/dev/null 2>&1; then
@@ -89,6 +102,9 @@ python)
 typescript)
   format_typescript
   ;;
+ecopicks)
+  format_ecopicks
+  ;;
 shell)
   format_shell
   ;;
@@ -98,11 +114,12 @@ makefile)
 all)
   format_python
   format_typescript
+  format_ecopicks
   format_shell
   format_makefile
   ;;
 *)
-  echo "Usage: $0 {python|typescript|shell|makefile|all} [check]"
+  echo "Usage: $0 {python|typescript|ecopicks|shell|makefile|all} [check]"
   exit 1
   ;;
 esac

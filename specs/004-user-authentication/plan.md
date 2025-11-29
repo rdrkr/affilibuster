@@ -11,38 +11,41 @@ Implement a comprehensive user authentication system supporting email/password r
 
 **Language/Version**: Python 3.13+ (backend), TypeScript 5.7+ (frontend)
 **Primary Dependencies**:
-  - Backend: FastAPI 0.120+, SQLAlchemy 2.0+, passlib (bcrypt), python-jose (JWT), python-multipart, authlib (OAuth 2.0 with PKCE)
-  - Frontend: Next.js 16, React 19, custom auth hooks with PKCE support
+
+- Backend: FastAPI 0.120+, SQLAlchemy 2.0+, passlib (bcrypt), python-jose (JWT), python-multipart, authlib (OAuth 2.0 with PKCE)
+- Frontend: Next.js 16, React 19, custom auth hooks with PKCE support
 **Storage**: PostgreSQL 15+ (user accounts, sessions, tokens)
 **Testing**: pytest with asyncio (backend), Jest + React Testing Library (frontend), Playwright (E2E)
 **Target Platform**: Web application (Linux server, browser clients)
 **Project Type**: Web (backend + frontend)
 **Performance Goals**:
-  - Login latency <500ms p95
-  - Token validation <50ms p95
-  - Support 100+ concurrent auth requests/second
+- Login latency <500ms p95
+- Token validation <50ms p95
+- Support 100+ concurrent auth requests/second
 **Constraints**:
-  - Must use secure HTTP-only cookies for session management
-  - Must hash passwords with bcrypt (cost 12)
-  - Must implement rate limiting (5 login attempts per 15 minutes)
-  - Must maintain 100% backend test coverage
+- Must use secure HTTP-only cookies for session management
+- Must hash passwords with bcrypt (cost 12)
+- Must implement rate limiting (5 login attempts per 15 minutes)
+- Must maintain 100% backend test coverage
 **Scale/Scope**:
-  - Expected: 10,000+ registered users at launch
-  - 8 new database tables
-  - 15+ new backend API endpoints
-  - 5+ frontend components and hooks
-  - Complete OAuth integration for 2 providers
+- Expected: 10,000+ registered users at launch
+- 8 new database tables
+- 15+ new backend API endpoints
+- 5+ frontend components and hooks
+- Complete OAuth integration for 2 providers
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
 ### ✅ I. Clean Architecture
+
 - **Compliance**: Domain layer (User, UserSession entities, AuthRepository interfaces, authentication use cases) will be independent of frameworks
 - **Verification**: Use cases will not import FastAPI, SQLAlchemy, or external services directly
 - **Status**: PASS - Plan adheres to Clean Architecture with clear layer separation
 
 ### ✅ II. SOLID Principles
+
 - **S (Single Responsibility)**: Each use case handles one auth operation (RegisterUser, LoginUser, ResetPassword, etc.)
 - **O (Open/Closed)**: AuthRepository interface allows swapping implementations; OAuth provider strategy pattern
 - **L (Liskov Substitution)**: All repository implementations are substitutable
@@ -51,12 +54,14 @@ Implement a comprehensive user authentication system supporting email/password r
 - **Status**: PASS - Design follows all SOLID principles
 
 ### ✅ III. Strongly Typed
+
 - **Backend**: Use Pydantic models for request/response schemas, SQLAlchemy models for DB entities
 - **Frontend**: Generate TypeScript types from OpenAPI spec for API contracts
 - **Type Safety**: All functions and methods will have explicit type annotations
 - **Status**: PASS - Strong typing enforced throughout backend and frontend
 
 ### ✅ IV. Test-First Development (TDD)
+
 - **Approach**: Write tests for each use case BEFORE implementation
 - **Process**: Red (failing test) → Green (minimal implementation) → Refactor
 - **Coverage Target**: 100% backend, 15% minimum frontend
@@ -64,18 +69,21 @@ Implement a comprehensive user authentication system supporting email/password r
 - **Status**: PASS - TDD workflow will be followed strictly
 
 ### ✅ V. Modular & Reusable Architecture
+
 - **Design**: Generic authentication module usable across multiple affiliate sites
 - **Configuration**: Site-specific settings (OAuth keys, email templates) in config files
 - **Reusability**: Authentication can be extracted as a standalone module
 - **Status**: PASS - Authentication system is generic and configurable
 
 ### ✅ VI. Integration Testing Priority
+
 - **Coverage**: Integration tests for all API endpoints, authentication flows, OAuth flows
 - **Critical Flows**: Registration → verification → login → profile update → logout
 - **Inter-module**: Test integration between auth system and existing user_preferences
 - **Status**: PASS - Comprehensive integration tests planned
 
 ### ✅ VII. API-First Design
+
 - **Approach**: OpenAPI spec will be written first, implementation follows spec
 - **Contract**: All endpoints defined in `contracts/template.openapi.yaml`
 - **Security Schemes**: OAuth 2.0 with PKCE flow configured in OpenAPI spec (authorizationCode with PKCE)
@@ -84,6 +92,7 @@ Implement a comprehensive user authentication system supporting email/password r
 - **Status**: PASS - API-first approach will be followed with OAuth 2.0 PKCE security
 
 ### ✅ VIII. Performance & SEO Standards
+
 - **Performance**: Token validation <50ms, login <500ms, no blocking operations
 - **Caching**: Redis for session token validation caching
 - **SEO**: No direct SEO impact, but enables user-generated content (reviews) which benefits SEO
@@ -313,6 +322,7 @@ contracts/
 **Decision**: Use JWT (JSON Web Tokens) stored in secure HTTP-only cookies for session management.
 
 **Rationale**:
+
 - HTTP-only cookies prevent XSS attacks (JavaScript cannot access tokens)
 - Secure flag ensures tokens only sent over HTTPS
 - JWT allows stateless authentication (no database lookup per request)
@@ -320,11 +330,13 @@ contracts/
 - Industry standard with mature libraries (python-jose, PyJWT)
 
 **Alternatives Considered**:
+
 - **Session-based (server-side)**: Requires database lookup on every request, harder to scale
 - **Local Storage JWT**: Vulnerable to XSS attacks
 - **OAuth only**: Limits auth options, not all users have social accounts
 
 **Implementation**:
+
 - Access token: 15-minute expiration, stored in HTTP-only cookie
 - Refresh token: 7-day expiration (or 30 days with "Remember Me"), stored in HTTP-only cookie
 - Token contains: user_id, email, verification_status, issued_at, expires_at
@@ -335,6 +347,7 @@ contracts/
 **Decision**: Use bcrypt algorithm with cost factor 12 for password hashing.
 
 **Rationale**:
+
 - Industry standard for password hashing
 - Adaptive algorithm (cost factor increases security over time)
 - Cost factor 12 balances security and performance (~250ms per hash)
@@ -342,11 +355,13 @@ contracts/
 - Resistant to rainbow table and GPU-based attacks
 
 **Alternatives Considered**:
+
 - **Argon2**: More modern, but bcrypt is proven and widely supported
 - **scrypt**: Good alternative, but bcrypt has better Python library support
 - **PBKDF2**: Less resistant to GPU attacks than bcrypt
 
 **Implementation**:
+
 - Use `passlib` library with bcrypt backend
 - Default cost factor: 12
 - Automatic salt generation
@@ -357,12 +372,14 @@ contracts/
 **Decision**: Create EmailService interface with SMTP implementation, allowing future providers.
 
 **Rationale**:
+
 - Follows Dependency Inversion principle
 - Easy to swap email providers (SendGrid, AWS SES, etc.) without changing use cases
 - SMTP sufficient for MVP, can add specialized providers later
 - Testable with mock email service
 
 **Implementation**:
+
 - EmailService interface defines send_email() method
 - SMTPEmailService implements with Python smtplib
 - Email templates use Jinja2 for HTML rendering
@@ -373,6 +390,7 @@ contracts/
 **Decision**: Use `authlib` library for OAuth 2.0 with PKCE (Proof Key for Code Exchange) integration with Google and Facebook.
 
 **Rationale**:
+
 - Official OAuth 2.0 library for Python with built-in PKCE support
 - PKCE eliminates need to store client secrets in frontend (critical security improvement)
 - Supports multiple providers with consistent interface
@@ -381,6 +399,7 @@ contracts/
 - PKCE required by OAuth 2.0 Security Best Current Practice (RFC 8252)
 
 **Implementation**:
+
 - **PKCE Flow**:
   1. Frontend generates code_verifier (cryptographically random string)
   2. Frontend creates code_challenge = BASE64URL(SHA256(code_verifier))
@@ -397,12 +416,14 @@ contracts/
 **Decision**: Implement rate limiting using Redis with sliding window algorithm.
 
 **Rationale**:
+
 - Prevents brute force attacks on login/registration
 - Sliding window more accurate than fixed window
 - Redis provides fast, distributed rate limiting
 - Can scale across multiple backend instances
 
 **Implementation**:
+
 - Key: `ratelimit:{ip}:{endpoint}`
 - Limit: 5 attempts per 15 minutes for login
 - Limit: 3 attempts per hour for registration per IP
@@ -413,12 +434,14 @@ contracts/
 **Decision**: Normalize authentication tables, use soft deletes for users, keep audit log forever.
 
 **Rationale**:
+
 - Normalization reduces data redundancy
 - Soft delete allows account recovery and prevents email reuse fraud
 - Audit log required for security compliance and incident response
 - Clear separation between active data and historical data
 
 **Key Tables**:
+
 - `users`: Core user data with `deleted_at` for soft deletes
 - `user_sessions`: Active sessions with expiration
 - `password_reset_tokens`: Single-use tokens with expiration
@@ -433,12 +456,14 @@ contracts/
 **Decision**: Use React Context for auth state with custom hooks for API operations.
 
 **Rationale**:
+
 - Built-in React solution, no external dependencies
 - Custom hooks encapsulate auth logic for reusability
 - Context provides global auth state across components
 - Follows existing frontend patterns in the project
 
 **Implementation**:
+
 - AuthContext provides: user, isAuthenticated, isLoading
 - useAuth hook: Access auth state and methods
 - useLogin, useRegister hooks: API mutation hooks with loading/error states
@@ -449,11 +474,13 @@ contracts/
 **Decision**: Return generic error messages for authentication failures to prevent user enumeration.
 
 **Rationale**:
+
 - Security best practice: don't reveal if email exists
 - Prevents attacker from identifying valid accounts
 - Applies to login, password reset, registration
 
 **Implementation**:
+
 - Login failure: "Invalid email or password" (don't specify which)
 - Password reset: "If the email exists, a reset link was sent" (always success message)
 - Registration with existing email: "Email already registered" (OK to reveal, user is trying to register)
@@ -463,12 +490,14 @@ contracts/
 **Decision**: Comprehensive testing at all levels following TDD.
 
 **Test Levels**:
+
 - **Unit Tests**: All use cases, entities, security utilities (100% coverage target)
 - **Integration Tests**: All API endpoints, complete auth flows (registration → verification → login → logout)
 - **E2E Tests**: Critical user journeys with Playwright (login, registration, password reset)
 - **Contract Tests**: Validate API responses match OpenAPI spec
 
 **Mocking Strategy**:
+
 - Unit tests: Mock repositories, email service, external dependencies
 - Integration tests: Use test database (SQLite or Postgres), mock external OAuth APIs
 - E2E tests: Use staging environment with real database
@@ -478,6 +507,7 @@ contracts/
 **Decision**: Implement core authentication (registration, login, logout) first, then add features iteratively.
 
 **Phase 1 (MVP - P1)**:
+
 - User registration with email/password
 - Login/logout with JWT
 - Email verification
@@ -486,11 +516,13 @@ contracts/
 - Link user_preferences to authenticated users
 
 **Phase 2 (P2)**:
+
 - Wish list functionality
 - Social login (Google)
 - Enhanced profile management (change email, delete account)
 
 **Phase 3 (P3)**:
+
 - Facebook OAuth
 - Two-factor authentication (2FA)
 - Advanced audit logging
@@ -504,12 +536,14 @@ contracts/
 **Current State**: `user_preferences` table tracks anonymous session preferences (language, currency) by `session_id`. The `user_id` field exists but is nullable and unused.
 
 **Integration Approach**:
+
 - When user registers or logs in for the first time, link existing session preferences to user account
 - Update `user_id` field in `user_preferences` table during authentication
 - On subsequent logins, load user preferences from account (not just session)
 - Synchronize preferences across devices for authenticated users
 
 **Migration Strategy**:
+
 - Anonymous users continue using session-based preferences
 - Upon authentication, migrate session preferences to user account
 - If user already has saved preferences, session preferences are discarded (user account preferences take precedence)
@@ -519,6 +553,7 @@ contracts/
 **Current State**: Backend generates Python models from OpenAPI spec; frontend generates TypeScript types.
 
 **Integration Approach**:
+
 - Add authentication endpoints to `contracts/template.openapi.yaml`
 - Define request/response schemas for all auth operations
 - Add securitySchemes for Bearer JWT authentication
@@ -526,6 +561,7 @@ contracts/
 - Regenerate types after spec changes
 
 **Affected Endpoints**:
+
 - All new `/api/auth/*` endpoints
 - All new `/api/profile/*` endpoints
 - Update existing endpoints that will support authenticated users
@@ -536,12 +572,14 @@ contracts/
 **Current State**: Header has language selector and currency selector.
 
 **Integration Approach**:
+
 - Add user menu dropdown when authenticated (shows user name, profile link, logout)
 - Show "Login" and "Sign Up" buttons when not authenticated
 - Display user avatar or initials in authenticated state
 - Add loading state while checking authentication
 
 **Implementation**:
+
 - Wrap Header in AuthContext to access auth state
 - Use `useAuth()` hook to get current user
 - Conditionally render based on `isAuthenticated` flag
@@ -551,6 +589,7 @@ contracts/
 **Decision**: Keep authentication completely separate from Strapi.
 
 **Rationale**:
+
 - Strapi manages content, not end-user accounts
 - Backend API handles all authentication
 - No need for Strapi Users & Permissions plugin for this use case
@@ -561,12 +600,14 @@ contracts/
 **Current State**: Redis used for caching CMS content and user preferences.
 
 **Integration Approach**:
+
 - Cache validated JWT tokens for fast authentication checks (5-minute TTL)
 - Cache rate limit counters (15-minute TTL)
 - Cache user profile data for authenticated users (10-minute TTL)
 - Invalidate cache on user profile updates, password changes, or logout
 
 **Cache Keys**:
+
 - `auth:token:{token_hash}` → user_id (for token validation)
 - `auth:ratelimit:{ip}:{endpoint}` → attempt count
 - `auth:user:{user_id}` → user profile object
@@ -597,6 +638,7 @@ contracts/
 ## Database Schema
 
 ### Tables to Create
+
 - users (id, email, hashed_password, display_name, email_verified, created_at, updated_at, deleted_at)
 - user_sessions (id, user_id, token_hash, expires_at, remember_me, created_at)
 - password_reset_tokens (id, user_id, token, expires_at, used, created_at)
@@ -607,9 +649,11 @@ contracts/
 - audit_logs (id, user_id, event_type, ip_address, user_agent, success, created_at)
 
 **Table to Modify**:
+
 - user_preferences: Add foreign key constraint on user_id → users.id
 
 **Indexes to Create**:
+
 - users: (email UNIQUE), (deleted_at)
 - user_sessions: (token_hash UNIQUE), (user_id), (expires_at)
 - password_reset_tokens: (token UNIQUE), (user_id), (expires_at)
@@ -621,6 +665,7 @@ contracts/
 ### Rollback Plan
 
 If issues arise:
+
 1. Drop authentication tables from database (since not in production)
 2. Remove authentication routes from API
 3. Restore previous user_preferences behavior (session-only)

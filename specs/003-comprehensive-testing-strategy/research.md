@@ -24,6 +24,7 @@ This document consolidates research findings for implementing unified testing in
 ### Rationale
 
 The Affilibuster CMS currently contains only **54 lines of Strapi boilerplate code**:
+
 - All files use `createCoreController()` and `createCoreService()` factory functions
 - Zero custom business logic
 - Testing framework code provides no value
@@ -34,6 +35,7 @@ The Affilibuster CMS currently contains only **54 lines of Strapi boilerplate co
 ### What Should Be Tested
 
 **✅ Test When Implemented:**
+
 - Custom controllers with business logic
 - Custom services beyond CRUD
 - Lifecycle hooks with data transformations
@@ -43,6 +45,7 @@ The Affilibuster CMS currently contains only **54 lines of Strapi boilerplate co
 - Authorization logic
 
 **❌ Don't Test:**
+
 - Default CRUD operations (framework-tested)
 - Content type schemas (configuration, not code)
 - Database connections (Strapi infrastructure)
@@ -67,6 +70,7 @@ npm install --save-dev jest supertest sqlite3
 ```
 
 **Directory Structure:**
+
 ```
 cms/
 ├── tests/
@@ -139,6 +143,7 @@ npx type-coverage --at-least 95
 ```
 
 **Secondary Metrics**:
+
 - Type test count (how many type scenarios tested)
 - Compilation success (tsc --noEmit)
 - Zero TypeScript errors
@@ -168,6 +173,7 @@ npx type-coverage --at-least 95
 ```
 
 **Coverage Reporting Strategy**:
+
 - Type Safety Coverage: 95%+ (via type-coverage)
 - Type Tests: All exported types tested (via tsd)
 - Compilation: Zero errors (via tsc)
@@ -204,17 +210,17 @@ MAKEFLAGS += --output-sync=target
 
 # Individual test targets
 test-backend:
-	@docker-compose exec -T backend pytest -n auto --cov=src --cov-report=lcov
+ @docker-compose exec -T backend pytest -n auto --cov=src --cov-report=lcov
 
 test-frontend:
-	@cd frontend && npm test -- --coverage --coverageReporters=lcov
+ @cd frontend && npm test -- --coverage --coverageReporters=lcov
 
 test-cms:
-	@cd cms && npm test -- --coverage --coverageReporters=lcov
+ @cd cms && npm test -- --coverage --coverageReporters=lcov
 
 # Parallel execution
 test-parallel:
-	@$(MAKE) -j3 test-backend test-frontend test-cms
+ @$(MAKE) -j3 test-backend test-frontend test-cms
 
 # With coverage merging
 test-all: test-parallel coverage-merge
@@ -253,6 +259,7 @@ lcov -a backend/coverage.lcov \
 | Change-based testing (CI) | 77% (45min → 10min) | Real-world monorepo |
 
 **Backend (pytest.ini):**
+
 ```ini
 [pytest]
 addopts =
@@ -262,6 +269,7 @@ addopts =
 ```
 
 **Frontend (jest.config.js):**
+
 ```javascript
 {
   maxWorkers: '50%',   // Use 50% of CPU cores
@@ -285,6 +293,7 @@ addopts =
 ### Decision
 
 **Implement multi-level parallelization**:
+
 1. Add pytest-xdist to backend/pyproject.toml
 2. Update Makefile with parallel test targets
 3. Configure LCOV output for all modules
@@ -332,6 +341,7 @@ addopts =
 ### Alternative 1: 80% Coverage for All Modules
 
 **Rejected** because:
+
 - CMS has only boilerplate code (nothing to test)
 - Shared module is types-only (no runtime code)
 - Would require testing framework code (waste of effort)
@@ -342,6 +352,7 @@ addopts =
 **Considered**: Mocha, Vitest, Playwright for different modules
 
 **Rejected** because:
+
 - pytest and Jest are already configured and working
 - No compelling reason to introduce new tools
 - Consistency is valuable in monorepos
@@ -352,6 +363,7 @@ addopts =
 **Considered**: Advanced monorepo tools with distributed caching
 
 **Deferred** because:
+
 - Current approach achieves <5 minute target
 - Adds complexity and learning curve
 - Can be added later if needed
@@ -362,6 +374,7 @@ addopts =
 **Considered**: Use Zod schemas for both types and runtime validation
 
 **Deferred** because:
+
 - Types are currently generated from OpenAPI (single source of truth)
 - Adds maintenance overhead
 - Type testing with tsd is sufficient for now
@@ -371,7 +384,7 @@ addopts =
 
 ## 6. Open Questions Resolution
 
-### From spec.md Open Questions:
+### From spec.md Open Questions
 
 **Q1: Should CMS module tests be required for initial release?**
 
@@ -406,6 +419,7 @@ addopts =
 **Action Required**: Need to increase from 50% to 80% and write additional tests
 
 **Mitigation**:
+
 - Phase implementation: Update threshold gradually
 - Focus on untested modules first
 - Prioritize business logic over infrastructure code
@@ -419,6 +433,7 @@ addopts =
 **Action Required**: Verify current coverage and write tests for gaps
 
 **Mitigation**:
+
 - Frontend structure is component-based (easier to test)
 - React Testing Library makes component tests straightforward
 - E2E tests with Playwright can cover user flows
@@ -432,6 +447,7 @@ addopts =
 **Expected**: 1-2 minutes with parallelization
 
 **Mitigation**: If tests become slow, implement:
+
 - Change-based testing (only test affected modules)
 - Test splitting across CI jobs
 - Caching strategies (Turborepo/Nx)
@@ -451,12 +467,14 @@ addopts =
 ### New Dependencies Required
 
 **Backend**:
+
 ```toml
 # backend/pyproject.toml [tool.poetry.group.dev.dependencies]
 pytest-xdist = "^3.6.1"  # For parallel test execution
 ```
 
 **Shared**:
+
 ```json
 // shared/package.json
 {
@@ -468,6 +486,7 @@ pytest-xdist = "^3.6.1"  # For parallel test execution
 ```
 
 **System** (for coverage merging):
+
 ```bash
 # macOS
 brew install lcov
@@ -512,6 +531,7 @@ Based on research findings, Phase 1 (Design & Contracts) should produce:
 ### data-model.md
 
 **Contents**:
+
 - Test configuration entities (pytest markers, Jest config, coverage thresholds)
 - Test infrastructure entities (test helpers, fixtures, mock data)
 - Coverage report entities (LCOV format, HTML reports, merged reports)
@@ -521,6 +541,7 @@ Based on research findings, Phase 1 (Design & Contracts) should produce:
 **API Contracts**: None required (testing infrastructure, not API features)
 
 **Configuration Contracts**:
+
 - `pytest.ini` updates (coverage thresholds, markers, parallelism)
 - `jest.config.js` updates (coverage reporters, thresholds)
 - `Makefile` test targets (signatures, parallel execution)
@@ -529,6 +550,7 @@ Based on research findings, Phase 1 (Design & Contracts) should produce:
 ### quickstart.md
 
 **Developer Quickstart**:
+
 - How to run tests (`make test`, `make test-parallel`)
 - How to run individual module tests
 - How to view coverage reports

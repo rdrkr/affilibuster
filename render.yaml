@@ -1,0 +1,255 @@
+# Copyright (c) 2025 Affilibuster by Ronen Druker.
+
+# Affilibuster - Render Blueprint (Infrastructure as Code)
+# =========================================================
+# This file defines all Render services for Affilibuster production environment.
+# Deploy by connecting this repo to Render Dashboard and selecting this Blueprint.
+#
+# Documentation: https://docs.render.com/infrastructure-as-code
+
+databases:
+  # PostgreSQL - Single database shared by backend and CMS
+  - name: affilibuster-production-postgres
+    plan: basic-256mb
+    region: frankfurt
+    databaseName: affilibuster_db
+    user: affilibuster_user
+    ipAllowList: [] # Allow all IPs (adjust for production)
+
+services:
+  # =========================================================
+  # REDIS - Cache and Session Store (Key-Value)
+  # =========================================================
+  - type: keyvalue
+    name: affilibuster-production-redis
+    plan: starter
+    region: frankfurt
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
+
+  # =========================================================
+  # STRAPI CMS - Content Management System
+  # =========================================================
+  - type: web
+    name: affilibuster-production-cms
+    runtime: node
+    region: frankfurt
+    plan: starter
+    rootDir: cms
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /admin
+    autoDeploy: true
+    envVars:
+      # Node Environment
+      - key: NODE_ENV
+        value: production
+
+      # Database Configuration (auto-populated from postgres instance)
+      - key: POSTGRES_PROTOCOL
+        value: postgresql
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: affilibuster-production-postgres
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: affilibuster-production-postgres
+          property: port
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: affilibuster-production-postgres
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: affilibuster-production-postgres
+          property: password
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: affilibuster-production-postgres
+          property: database
+      - key: POSTGRES_SSL
+        value: 'true'
+      - key: POSTGRES_SSL_REJECT_UNAUTHORIZED
+        value: 'true'
+
+      # CMS Configuration
+      - key: CMS_PROTOCOL
+        value: https
+      - key: CMS_PORT
+        value: 443
+      - key: CMS_HOST
+        value: affilibuster-production-cms.onrender.com
+      - key: INTERNAL_CMS_HOST
+        value: affilibuster-production-cms
+
+      # Security Keys
+      - key: ENCRYPTION_KEY
+        generateValue: true # Makes tokens permanently viewable in admin panel
+      - key: ADMIN_JWT_SECRET
+        generateValue: true
+      - key: API_TOKEN_SALT
+        generateValue: true
+      - key: API_TOKEN_ENCRYPTION_KEY
+        generateValue: true
+      - key: TRANSFER_TOKEN_SALT
+        generateValue: true
+      - key: APP_KEYS
+        generateValue: true
+
+  # =========================================================
+  # BACKEND API - FastAPI Application
+  # =========================================================
+  - type: web
+    name: affilibuster-production-backend
+    runtime: python
+    region: frankfurt
+    plan: starter
+    rootDir: backend
+    buildCommand: pip install uv && uv sync --frozen
+    startCommand: PYTHONPATH=src uv run uvicorn affilibuster_backend.main:app --host 0.0.0.0 --port 10000
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # Application Configuration
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: 'false'
+      - key: LOG_LEVEL
+        value: INFO
+
+      # Database Configuration (auto-populated from postgres instance)
+      - key: POSTGRES_PROTOCOL
+        value: postgresql
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: affilibuster-production-postgres
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: affilibuster-production-postgres
+          property: port
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: affilibuster-production-postgres
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: affilibuster-production-postgres
+          property: password
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: affilibuster-production-postgres
+          property: database
+      - key: POSTGRES_SSL
+        value: 'true'
+      - key: POSTGRES_SSL_REJECT_UNAUTHORIZED
+        value: 'true'
+
+      # Redis Configuration (auto-populated from Key-Value instance)
+      - key: REDIS_PROTOCOL
+        value: redis
+      - key: REDIS_HOST
+        fromService:
+          type: keyvalue
+          name: affilibuster-production-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: keyvalue
+          name: affilibuster-production-redis
+          property: port
+      - key: REDIS_TTL_PREFERENCES
+        value: 2592000 # 30 days in seconds
+
+      # CMS Configuration (creates dependency: Backend waits for CMS)
+      - key: CMS_PROTOCOL
+        value: https
+      - key: CMS_HOST
+        fromService:
+          type: web
+          name: affilibuster-production-cms
+          property: host
+      - key: CMS_PORT
+        value: 443
+      - key: INTERNAL_CMS_HOST
+        fromService:
+          type: web
+          name: affilibuster-production-cms
+          property: host
+
+      # Backend Configuration (self-reference, no dependency created)
+      - key: BACKEND_PROTOCOL
+        value: https
+      - key: BACKEND_PORT
+        value: 443
+      - key: BACKEND_HOST
+        value: affilibuster-production-backend.onrender.com
+      - key: INTERNAL_BACKEND_HOST
+        value: affilibuster-production-backend
+
+      # Frontend Configuration
+      - key: FRONTEND_PROTOCOL
+        value: https
+      - key: FRONTEND_HOST
+        value: affilibuster-production-ecopicks.onrender.com
+      - key: FRONTEND_PORT
+        value: 443
+      - key: INTERNAL_FRONTEND_HOST
+        value: affilibuster-production-ecopicks
+
+      - key: ECOPICKS_PROTOCOL
+        value: https
+      - key: ECOPICKS_HOST
+        value: affilibuster-production-ecopicks.onrender.com
+      - key: ECOPICKS_PORT
+        value: 443
+      - key: INTERNAL_ECOPICKS_HOST
+        value: affilibuster-production-ecopicks
+
+      # Security
+      - key: JWT_SECRET
+        generateValue: true
+
+  # =========================================================
+  # ECOPICKS - Next.js Frontend (Primary Affiliate Site)
+  # =========================================================
+  - type: web
+    name: affilibuster-production-ecopicks
+    runtime: node
+    region: frankfurt
+    plan: starter
+    rootDir: ecopicks
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      # Node Environment
+      - key: NODE_ENV
+        value: production
+
+      # Ecopicks Configuration
+      - key: ECOPICKS_PROTOCOL
+        value: https
+      - key: ECOPICKS_PORT
+        value: 443
+      - key: ECOPICKS_HOST
+        value: affilibuster-production-ecopicks.onrender.com
+      - key: INTERNAL_ECOPICKS_HOST
+        value: affilibuster-production-ecopicks
+
+      # API URLs (creates dependency: Ecopicks waits for Backend)
+      - key: NEXT_PUBLIC_API_URL
+        value: https://${BACKEND_HOST}/v1
+      - key: NEXT_SERVER_SIDE_API_URL
+        fromService:
+          type: web
+          name: affilibuster-production-backend
+          property: host
+        # Note: Prepend https:// and append /v1 in application code
+
+      # Security
+      - key: REVALIDATE_SECRET
+        generateValue: true # Auto-generate random secret

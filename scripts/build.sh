@@ -20,7 +20,10 @@ CMS_URL="${CMS_PROTOCOL}://${CMS_HOST}:${CMS_PORT}"
 # shellcheck disable=SC2154
 BACKEND_URL="${BACKEND_PROTOCOL}://${BACKEND_HOST}:${BACKEND_PORT}"
 # shellcheck disable=SC2154
+# shellcheck disable=SC2154
 FRONTEND_URL="${FRONTEND_PROTOCOL}://${FRONTEND_HOST}:${FRONTEND_PORT}"
+# shellcheck disable=SC2154
+ECOPICKS_URL="${FRONTEND_PROTOCOL}://${FRONTEND_HOST}:${ECOPICKS_PORT}"
 
 # Parse arguments
 BUILD_FLAG=""
@@ -70,13 +73,15 @@ echo "🔍 Checking for existing instances..."
 # shellcheck disable=SC2154
 kill_port "${FRONTEND_PORT}" # Frontend
 # shellcheck disable=SC2154
+kill_port "${ECOPICKS_PORT}" # Ecopicks
+# shellcheck disable=SC2154
 kill_port "${BACKEND_PORT}" # Backend
 # shellcheck disable=SC2154
 kill_port "${CMS_PORT}" # Strapi
 
 # Start all services via frontend (docker compose dependency chain handles startup order)
 # shellcheck disable=SC2248
-docker compose up ${BUILD_FLAG} -d frontend
+docker compose up ${BUILD_FLAG} -d frontend ecopicks
 
 echo ""
 echo "✅ Services started (containers initializing, may take 30-60 seconds)!"
@@ -84,6 +89,7 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "📍 Access your applications:"
 echo "  🌐 Frontend:       ${FRONTEND_URL}"
+echo "  🌿 Ecopicks:       ${ECOPICKS_URL}"
 echo "  🔌 Backend API:    ${BACKEND_URL}"
 echo "  📚 API Docs:       ${BACKEND_URL}/docs"
 echo "  🎨 CMS Admin:      ${CMS_URL}/admin"
@@ -100,6 +106,8 @@ echo "  - Backend API:     Running (port ${BACKEND_PORT})"
 echo "  - Strapi CMS:      Running (port ${CMS_PORT})"
 # shellcheck disable=SC2154
 echo "  - Frontend:        Running (port ${FRONTEND_PORT})"
+# shellcheck disable=SC2154
+echo "  - Ecopicks:        Running (port ${ECOPICKS_PORT})"
 echo ""
 echo "💡 Tips:"
 echo "  - View logs: docker compose logs -f [service]"

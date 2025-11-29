@@ -17,7 +17,7 @@ COPY playwright.config.ts ./
 COPY tsconfig.json ./
 
 # Install project dependencies (Playwright is already in the base image)
-RUN npm install --include=optional
+RUN npm install
 
 # Keep container running for on-demand test execution
 # Tests are run via: docker compose exec test-runner sh -c "npm run test:e2e"

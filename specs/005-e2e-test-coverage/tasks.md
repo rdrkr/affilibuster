@@ -5,11 +5,13 @@
 ## Phase 1: Add Test IDs to Existing Components (Quick Wins)
 
 ### Task 1.1: Add Test IDs to CurrencySelector
+
 **File**: `frontend/src/components/CurrencySelector.tsx`
 **Test Impact**: Fixes 15 failing tests
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Add `data-testid="currency-selector"` to Dropdown button (line ~108)
 - [ ] Add `data-testid="currency-option-{code}"` to each currency option in renderItem
 - [ ] Run `npm test -- CurrencySelector` to verify unit tests still pass
@@ -21,11 +23,13 @@
 ---
 
 ### Task 1.2: Add Test IDs to LanguageSwitcher
+
 **File**: `frontend/src/components/LanguageSwitcher.tsx`
 **Test Impact**: Fixes 13 failing tests
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Add `data-testid="language-selector"` to Dropdown button (line ~108)
 - [ ] Add `data-testid="language-option-{code}"` to each language option in renderItem
 - [ ] Run `npm test -- LanguageSwitcher` to verify unit tests still pass
@@ -37,11 +41,13 @@
 ---
 
 ### Task 1.3: Add Test IDs to 404 Not Found Page
+
 **File**: `frontend/src/app/[lang]/not-found.tsx`
 **Test Impact**: Fixes 12 failing tests
 **Estimated Time**: 20 minutes
 
 **Subtasks**:
+
 - [ ] Add `data-testid="404-page"` to main container div (line ~40)
 - [ ] Add `data-testid="404-home-link"` to home link/button (line ~57)
 - [ ] Run E2E test: `npx playwright test 404-localization --project=chromium`
@@ -52,11 +58,13 @@
 ---
 
 ### Task 1.4: Investigate and Add Breadcrumb Test IDs
+
 **Files**: TBD (needs investigation)
 **Test Impact**: Fixes 2-5 failing tests
 **Estimated Time**: 45 minutes
 
 **Subtasks**:
+
 - [ ] Search codebase for breadcrumb component: `grep -r "breadcrumb" frontend/src/components`
 - [ ] If found: Add `data-testid="breadcrumb"` to container, `data-testid="breadcrumb-home"` to home link
 - [ ] If not found: Check if tests are correct or if breadcrumb needs to be created
@@ -70,11 +78,13 @@
 ---
 
 ### Task 1.5: Add Test IDs to Price Display
+
 **Files**: Product components (needs investigation)
 **Test Impact**: Fixes 2 failing tests
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Locate price display in product listing/detail pages
 - [ ] Search for price rendering: `grep -r "price" frontend/src/components`
 - [ ] Add `data-testid="price"` to price display element
@@ -86,11 +96,13 @@
 ---
 
 ### Task 1.6: Investigate 410 Gone Page
+
 **File**: TBD (needs investigation)
 **Test Impact**: Fixes 3 failing tests (if page exists)
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Search for 410 page: `find frontend/src/app -name "*410*" -o -name "*gone*"`
 - [ ] Check E2E tests: `grep -r "410" frontend/tests/e2e`
 - [ ] If 410 page exists: Add `data-testid="410-page"` and `data-testid="410-home-link"`
@@ -106,10 +118,12 @@
 ### Task 2.1: Implement Language Detection Prompt
 
 #### Task 2.1.1: Write Unit Tests for Language Detection Hook
+
 **File**: `frontend/src/hooks/useLanguageDetection.test.ts` (NEW)
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Create test file with describe block for `useLanguageDetection`
 - [ ] Test: Detects browser language from navigator.language
 - [ ] Test: Returns shouldShow=false if browser lang matches site lang
@@ -124,10 +138,12 @@
 ---
 
 #### Task 2.1.2: Implement Language Detection Hook
+
 **File**: `frontend/src/hooks/useLanguageDetection.ts` (NEW)
 **Estimated Time**: 45 minutes
 
 **Subtasks**:
+
 - [ ] Create hook that detects browser language using `navigator.language`
 - [ ] Check localStorage for `dismissedLanguagePrompt` key
 - [ ] Map browser language to supported LanguageCode (en, it, he)
@@ -141,10 +157,12 @@
 ---
 
 #### Task 2.1.3: Write Unit Tests for LanguagePrompt Component
+
 **File**: `frontend/src/components/LanguagePrompt.test.tsx` (NEW)
 **Estimated Time**: 45 minutes
 
 **Subtasks**:
+
 - [ ] Create test file with describe block for `LanguagePrompt`
 - [ ] Test: Renders with correct test ID `language-prompt`
 - [ ] Test: Shows detected language name (e.g., "Italiano")
@@ -163,10 +181,12 @@
 ---
 
 #### Task 2.1.4: Implement LanguagePrompt Component
+
 **File**: `frontend/src/components/LanguagePrompt.tsx` (NEW)
 **Estimated Time**: 60 minutes
 
 **Subtasks**:
+
 - [ ] Create component with props: `{ detectedLanguage, detectedLanguageName, onAccept, onDismiss }`
 - [ ] Render modal/banner with language prompt message
 - [ ] Add accept button with `data-testid="accept-language-{code}"`
@@ -183,10 +203,12 @@
 ---
 
 #### Task 2.1.5: Integrate LanguagePrompt into Layout
+
 **File**: `frontend/src/app/[lang]/layout.tsx`
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Import `useLanguageDetection` hook and `LanguagePrompt` component
 - [ ] Call hook to get `shouldShow` and `detectedLanguage`
 - [ ] Render `<LanguagePrompt />` conditionally based on `shouldShow`
@@ -200,10 +222,12 @@
 ---
 
 #### Task 2.1.6: Add LanguagePrompt to Style Guide
+
 **File**: `frontend/src/app/[lang]/style-guide/StyleGuideClient.tsx`
 **Estimated Time**: 20 minutes
 
 **Subtasks**:
+
 - [ ] Import LanguagePrompt component
 - [ ] Add new section "Language Detection Prompt"
 - [ ] Show example with `shouldShow=true`, detected language
@@ -219,10 +243,12 @@
 ### Task 2.2: Implement Related Products Section
 
 #### Task 2.2.1: Write Unit Tests for useRelatedProducts Hook
+
 **File**: `frontend/src/hooks/useRelatedProducts.test.ts` (NEW)
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Create test file with describe block for `useRelatedProducts`
 - [ ] Test: Fetches related products from API
 - [ ] Test: Returns loading state while fetching
@@ -237,10 +263,12 @@
 ---
 
 #### Task 2.2.2: Implement useRelatedProducts Hook
+
 **File**: `frontend/src/hooks/useRelatedProducts.ts` (NEW)
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Create hook that calls API: `/products/{id}/related` or filters by category
 - [ ] Return: `{ products, loading, error }`
 - [ ] Use React Query or SWR for caching (if available)
@@ -253,10 +281,12 @@
 ---
 
 #### Task 2.2.3: Write Unit Tests for RelatedProducts Component
+
 **File**: `frontend/src/components/RelatedProducts.test.tsx` (NEW)
 **Estimated Time**: 45 minutes
 
 **Subtasks**:
+
 - [ ] Create test file with describe block for `RelatedProducts`
 - [ ] Test: Renders with test ID `related-products`
 - [ ] Test: Each product has test ID `related-product`
@@ -273,10 +303,12 @@
 ---
 
 #### Task 2.2.4: Implement RelatedProducts Component
+
 **File**: `frontend/src/components/RelatedProducts.tsx` (NEW)
 **Estimated Time**: 60 minutes
 
 **Subtasks**:
+
 - [ ] Create component with props: `{ currentProductId, category?, maxResults? }`
 - [ ] Use `useRelatedProducts` hook to fetch data
 - [ ] Render grid of product cards with test IDs
@@ -292,10 +324,12 @@
 ---
 
 #### Task 2.2.5: Add Backend Endpoint (if needed)
+
 **File**: `backend/src/infrastructure/api/routes/products.py`
 **Estimated Time**: 45 minutes (skip if frontend filtering is sufficient)
 
 **Subtasks**:
+
 - [ ] Add route: `GET /products/{id}/related`
 - [ ] Implement logic: Match by category, tags, price range
 - [ ] Limit to max 6 results
@@ -309,10 +343,12 @@
 ---
 
 #### Task 2.2.6: Integrate RelatedProducts into Product Page
+
 **File**: Product detail page (needs investigation)
 **Estimated Time**: 20 minutes
 
 **Subtasks**:
+
 - [ ] Locate product detail page template
 - [ ] Import and add `<RelatedProducts currentProductId={productId} />`
 - [ ] Position below product details section
@@ -324,10 +360,12 @@
 ---
 
 #### Task 2.2.7: Add RelatedProducts to Style Guide
+
 **File**: `frontend/src/app/[lang]/style-guide/StyleGuideClient.tsx`
 **Estimated Time**: 20 minutes
 
 **Subtasks**:
+
 - [ ] Import RelatedProducts component
 - [ ] Add section "Related Products"
 - [ ] Show example with mock products
@@ -341,10 +379,12 @@
 ### Task 2.3: Implement Pagination Component
 
 #### Task 2.3.1: Write Unit Tests for Pagination Component
+
 **File**: `frontend/src/components/Pagination.test.tsx` (NEW)
 **Estimated Time**: 45 minutes
 
 **Subtasks**:
+
 - [ ] Create test file with describe block for `Pagination`
 - [ ] Test: Renders page numbers with test IDs `pagination-page-{N}`
 - [ ] Test: Next button has test ID `pagination-next`
@@ -362,10 +402,12 @@
 ---
 
 #### Task 2.3.2: Implement Pagination Component
+
 **File**: `frontend/src/components/Pagination.tsx` (NEW)
 **Estimated Time**: 60 minutes
 
 **Subtasks**:
+
 - [ ] Create component with props: `{ currentPage, totalPages, onPageChange }`
 - [ ] Render page number buttons (show 5 at a time with ellipsis)
 - [ ] Add prev/next buttons with disabled states
@@ -380,10 +422,12 @@
 ---
 
 #### Task 2.3.3: Integrate Pagination into Product Listing
+
 **File**: Product listing page (needs investigation)
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Locate product listing page
 - [ ] Add URL search param handling: `?page=2`
 - [ ] Calculate totalPages from product count
@@ -397,10 +441,12 @@
 ---
 
 #### Task 2.3.4: Add Pagination to Style Guide
+
 **File**: `frontend/src/app/[lang]/style-guide/StyleGuideClient.tsx`
 **Estimated Time**: 15 minutes
 
 **Subtasks**:
+
 - [ ] Import Pagination component
 - [ ] Add section "Pagination"
 - [ ] Show examples with different page counts
@@ -414,10 +460,12 @@
 ### Task 2.4: Implement Category Filter
 
 #### Task 2.4.1: Write Unit Tests for CategoryFilter Component
+
 **File**: `frontend/src/components/CategoryFilter.test.tsx` (NEW)
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Create test file with describe block for `CategoryFilter`
 - [ ] Test: Renders with test ID `category-filter`
 - [ ] Test: Each category has test ID `category-{slug}`
@@ -432,10 +480,12 @@
 ---
 
 #### Task 2.4.2: Implement CategoryFilter Component
+
 **File**: `frontend/src/components/CategoryFilter.tsx` (NEW)
 **Estimated Time**: 45 minutes
 
 **Subtasks**:
+
 - [ ] Create component with props: `{ categories, selectedCategory?, onCategoryChange }`
 - [ ] Render dropdown with all categories
 - [ ] Add "All Categories" option (null value)
@@ -449,10 +499,12 @@
 ---
 
 #### Task 2.4.3: Integrate CategoryFilter into Product Listing
+
 **File**: Product listing page
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Add URL search param handling: `?category=electronics`
 - [ ] Fetch categories from API or CMS
 - [ ] Add `<CategoryFilter />` above product grid
@@ -465,10 +517,12 @@
 ---
 
 #### Task 2.4.4: Add CategoryFilter to Style Guide
+
 **File**: `frontend/src/app/[lang]/style-guide/StyleGuideClient.tsx`
 **Estimated Time**: 15 minutes
 
 **Subtasks**:
+
 - [ ] Import CategoryFilter component
 - [ ] Add section "Category Filter"
 - [ ] Show example with mock categories
@@ -482,9 +536,11 @@
 ## Phase 3: Polish and Edge Cases
 
 ### Task 3.1: Run Full E2E Test Suite
+
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Run: `npm run test:e2e` (all browsers)
 - [ ] Verify: 108/108 tests passing
 - [ ] Check for any browser-specific failures
@@ -495,9 +551,11 @@
 ---
 
 ### Task 3.2: Verify Test Coverage
+
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Run: `npm test -- --coverage`
 - [ ] Verify: 100% coverage (lines, branches, functions, statements)
 - [ ] Add tests for any uncovered branches
@@ -508,9 +566,11 @@
 ---
 
 ### Task 3.3: Accessibility Audit
+
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Run E2E accessibility tests: `npx playwright test test_a11y --project=chromium`
 - [ ] Fix any WCAG 2.1 AA violations
 - [ ] Check aria labels on all new components
@@ -521,9 +581,11 @@
 ---
 
 ### Task 3.4: Performance Testing
+
 **Estimated Time**: 30 minutes
 
 **Subtasks**:
+
 - [ ] Run Lighthouse audit on key pages
 - [ ] Verify: >90 performance score maintained
 - [ ] Check bundle size impact: `npm run build`
@@ -534,9 +596,11 @@
 ---
 
 ### Task 3.5: Final Style Guide Verification
+
 **Estimated Time**: 20 minutes
 
 **Subtasks**:
+
 - [ ] Visit `/en/style-guide` in browser
 - [ ] Verify all new components appear correctly
 - [ ] Check code snippets render properly
@@ -548,9 +612,11 @@
 ---
 
 ### Task 3.6: Documentation and Cleanup
+
 **Estimated Time**: 20 minutes
 
 **Subtasks**:
+
 - [ ] Update CLAUDE.md if any new patterns were established
 - [ ] Remove any console.logs or debug code
 - [ ] Format all code: `npm run format`
@@ -564,6 +630,7 @@
 ## Progress Tracking
 
 ### Phase 1: Add Test IDs
+
 - [ ] Task 1.1: CurrencySelector test IDs
 - [ ] Task 1.2: LanguageSwitcher test IDs
 - [ ] Task 1.3: 404 page test IDs
@@ -574,6 +641,7 @@
 **Target**: 80/108 tests passing (74%)
 
 ### Phase 2: Implement Features
+
 - [ ] Task 2.1: Language Detection Prompt (6 tasks)
 - [ ] Task 2.2: Related Products (7 tasks)
 - [ ] Task 2.3: Pagination (4 tasks)
@@ -582,6 +650,7 @@
 **Target**: 100/108 tests passing (93%)
 
 ### Phase 3: Polish
+
 - [ ] Task 3.1: Full E2E test suite
 - [ ] Task 3.2: Test coverage verification
 - [ ] Task 3.3: Accessibility audit

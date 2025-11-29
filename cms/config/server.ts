@@ -33,14 +33,20 @@ interface ServerConfig {
 export default ({ env }: { env: StrapiEnv }): ServerConfig => {
   // Strapi runs on HTTP internally; Nginx proxy handles HTTPS termination
   const protocol = env('CMS_PROTOCOL', 'http')
+  const host = env('CMS_HOST')
+  const port = env.int('CMS_PORT')
+
+  // Build URL without port for HTTPS on standard port (443) to avoid redirect issues
+  const portSuffix = protocol === 'https' && port === 443 ? '' : `:${port.toString()}`
+
   const config: ServerConfig = {
     host: env('HOST', '0.0.0.0'),
-    port: env.int('CMS_PORT'),
+    port: port,
     app: {
       keys: env.array('APP_KEYS'),
     },
-    // External URL (through proxy) uses HTTPS, but Strapi itself runs on HTTP
-    url: `${protocol}://${env('CMS_HOST')}:${env('CMS_PORT')}`,
+    // External URL - no port suffix for HTTPS on 443 (Render's public URL)
+    url: `${protocol}://${host}${portSuffix}`,
   }
 
   // Note: Strapi does not natively support SSL.

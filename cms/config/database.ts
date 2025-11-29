@@ -23,7 +23,7 @@ export default ({ env }: { env: StrapiEnv }) => ({
     connection: {
       host: env('POSTGRES_HOST'),
       port: env.int('POSTGRES_PORT'),
-      database: env('POSTGRES_CMS_NAME'),
+      database: env('POSTGRES_DB'),
       user: env('POSTGRES_USER'),
       password: env('POSTGRES_PASSWORD'),
       ssl: env.bool('POSTGRES_SSL') && {

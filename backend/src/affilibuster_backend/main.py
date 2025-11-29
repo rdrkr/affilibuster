@@ -55,6 +55,10 @@ from affilibuster_backend.infrastructure.api.routes import (
     term,
 )
 
+# Import database session and repositories
+from affilibuster_backend.infrastructure.database.config import get_db_session
+from affilibuster_backend.infrastructure.database.repositories import ConfigRepository
+
 # Import dependency injection setup
 from affilibuster_backend.infrastructure.dependencies import initialize_dependencies
 
@@ -82,7 +86,7 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     Application lifespan handler.
 
     Startup:
-    - Run database migrations (Alembic)
+    - Load Strapi API token from database
     - Initialize dependencies
 
     Shutdown:
@@ -94,13 +98,29 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
     Args:
         _app: FastAPI application instance (unused, required by FastAPI signature).
+
+    Raises:
+        RuntimeError: If Strapi API token not found in database.
     """
     # Startup
     logger.info("🚀 Starting Affilibuster API...")
 
+    # Load Strapi API token from database
+    logger.info("🔑 Loading Strapi API token from database...")
+    async with get_db_session() as session:
+        config_repo = ConfigRepository(session)
+        strapi_api_token = await config_repo.get_value("strapi_api_token")
+
+        if not strapi_api_token:
+            raise RuntimeError(
+                "Strapi API token not found in database. Ensure CMS has started and generated the token."
+            )
+
+    logger.info("✅ Strapi API token loaded successfully")
+
     # Initialize dependencies
     logger.info("📦 Initializing dependencies...")
-    initialize_dependencies()
+    initialize_dependencies(strapi_api_token)
 
     logger.info("✅ Affilibuster API started successfully")
 

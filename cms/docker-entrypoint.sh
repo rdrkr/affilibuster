@@ -10,7 +10,7 @@ echo "  🔐 Loading environment variables..."
 . /app/.env
 
 echo "  📦 Installing dependencies..."
-npm install --silent --include=optional
+npm install --silent
 
 echo "🚀 Starting Strapi CMS in development mode..."
 npm run dev

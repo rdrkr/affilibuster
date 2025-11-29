@@ -60,8 +60,10 @@ def strapi_url():
 
 @pytest.fixture
 def strapi_token():
-    """Fixture providing Strapi API token from settings."""
-    return settings.strapi_api_token
+    """Fixture providing Strapi API token for tests."""
+    # For integration tests, use a test token
+    # Real token is loaded from database at runtime
+    return "test-strapi-api-token-for-integration-tests"
 
 
 @pytest_asyncio.fixture
@@ -96,21 +98,20 @@ async def wait_for_strapi(strapi_url: str):
 @pytest.fixture
 async def real_cms_repository(strapi_url, strapi_token):
     """Fixture providing a real Strapi repository client."""
-    return StrapiRepositoryImpl(base_url=strapi_url, api_token=strapi_token)
+    return StrapiRepositoryImpl(api_token=strapi_token, base_url=strapi_url)
 
 
 @pytest_asyncio.fixture
-async def integration_app(wait_for_strapi):
+async def integration_app(wait_for_strapi, strapi_token):
     """
     Fixture providing the app with real Strapi repository (no mocking).
 
     Uses the real Strapi service instead of mocks for true integration testing.
     """
-    # Reinitialize dependencies to pick up fresh settings
-    # This ensures we use the latest token from .env
+    # Reinitialize dependencies with test token
     from affilibuster_backend.infrastructure.dependencies import initialize_dependencies
 
-    initialize_dependencies()
+    initialize_dependencies(strapi_api_token=strapi_token)
 
     yield app
 

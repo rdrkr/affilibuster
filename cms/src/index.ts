@@ -11,7 +11,6 @@
  */
 
 import type { Core } from '@strapi/types'
-import * as fs from 'fs'
 import { seedDatabase } from './seed'
 
 interface BootstrapContext {
@@ -39,6 +38,15 @@ interface TokenCreateResult {
   id: number
   accessKey: string
   expiresAt?: string | Date
+}
+
+interface ApiConfigEntity {
+  id: number
+  key: string
+  value: string
+  description?: string
+  createdAt?: string | Date
+  updatedAt?: string | Date
 }
 
 /**
@@ -135,8 +143,8 @@ async function seedDatabaseWrapper(strapi: Core.Strapi): Promise<void> {
  * Generate API token for backend authentication.
  *
  * Checks for existing valid token first, only creates new one if needed.
- * Creates a token with full-access permissions for backend service.
- * Token expires after 30 days and is automatically written to .env file.
+ * Creates a read-only token for backend service (principle of least privilege).
+ * Token expires after 30 days and is automatically stored in shared database.
  *
  * @param strapi - Strapi core instance for accessing API token services
  */
@@ -160,7 +168,7 @@ async function generateApiToken(strapi: Core.Strapi): Promise<void> {
 
       // Check if token is still valid (not expired)
       const isExpired = existingToken.expiresAt !== undefined && new Date(existingToken.expiresAt) < now
-      const isValid = existingToken.type === 'full-access' && !isExpired
+      const isValid = existingToken.type === 'read-only' && !isExpired
 
       if (isValid) {
         console.log(`✅ Valid API token already exists (ID: ${existingToken.id.toString()})`)
@@ -188,8 +196,8 @@ async function generateApiToken(strapi: Core.Strapi): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const result = (await tokenService.create({
       name: tokenName,
-      description: 'Auto-generated token for backend service authentication',
-      type: 'full-access',
+      description: 'Auto-generated read-only token for backend service authentication',
+      type: 'read-only',
       lifespan: lifespanMillis,
     })) as TokenCreateResult
 
@@ -201,43 +209,43 @@ async function generateApiToken(strapi: Core.Strapi): Promise<void> {
       console.log('   📅 Expires at:', result.expiresAt.toString())
     }
 
-    // Update .env file with new token if it exists
-    const envPath = '/app/.env'
-
-    console.log(`   🔍 Checking for .env file at: ${envPath}`)
-    console.log(`   📁 File exists: ${fs.existsSync(envPath).toString()}`)
-
+    // Store token in database for backend service to access
+    console.log('   💾 Storing token in database...')
     try {
-      if (fs.existsSync(envPath)) {
-        console.log('   📝 Reading .env file...')
-        let envContent = fs.readFileSync(envPath, 'utf-8')
+      // Check if token config already exists in database
+      const existingConfig = (await strapi.db.query('api::api-config.api-config').findOne({
+        where: { key: 'strapi_api_token' },
+      })) as ApiConfigEntity | null
 
-        // Check if STRAPI_API_TOKEN already exists and replace it, or add it
-        const tokenPattern = /^STRAPI_API_TOKEN=.*/m
-        if (tokenPattern.test(envContent)) {
-          console.log('   🔄 Replacing existing STRAPI_API_TOKEN...')
-          envContent = envContent.replace(tokenPattern, `STRAPI_API_TOKEN=${tokenString}`)
-        } else {
-          console.log('   ➕ Adding STRAPI_API_TOKEN to .env...')
-          // Append token to end of file with newline if needed
-          if (!envContent.endsWith('\n')) {
-            envContent += '\n'
-          }
-          envContent += `STRAPI_API_TOKEN=${tokenString}\n`
-        }
-
-        console.log('   💾 Writing updated .env file...')
-        fs.writeFileSync(envPath, envContent, 'utf-8')
-        console.log('   ✅ Updated .env file with new token')
+      if (existingConfig) {
+        // Update existing token
+        await strapi.db.query('api::api-config.api-config').update({
+          where: { id: existingConfig.id },
+          data: {
+            value: tokenString,
+            description: 'Auto-generated read-only token for backend service authentication',
+            updatedAt: new Date(),
+          },
+        })
+        console.log('   ✅ Updated token in database')
       } else {
-        console.log('   ⚠️  .env file not found at /app/.env')
+        // Create new token entry
+        await strapi.db.query('api::api-config.api-config').create({
+          data: {
+            key: 'strapi_api_token',
+            value: tokenString,
+            description: 'Auto-generated read-only token for backend service authentication',
+          },
+        })
+        console.log('   ✅ Stored token in database')
       }
-    } catch (envError: unknown) {
-      const envErrorMsg = envError instanceof Error ? envError.message : String(envError)
-      console.warn(`   ⚠️  Could not update .env file: ${envErrorMsg}`)
+    } catch (dbError: unknown) {
+      const dbErrorMsg = dbError instanceof Error ? dbError.message : String(dbError)
+      console.error(`   ❌ Failed to store token in database: ${dbErrorMsg}`)
+      throw dbError
     }
 
-    console.log(`✅ API token created (length: ${tokenString.length.toString()})`)
+    console.log(`✅ API token created and stored in database (length: ${tokenString.length.toString()})`)
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error)
     console.error(`⚠️  Failed to create API token: ${message}`)

@@ -68,7 +68,6 @@ coverage.xml
 pytestdebug.log
 
 # Package Managers
-# uv.lock is committed for reproducible builds in Docker and CI (backend only)
 .venv/
 venv/
 ENV/
@@ -95,7 +94,7 @@ celerybeat.pid
 alembic/versions/*.pyc
 
 ###################
-# Node.js / Frontend / CMS
+# Node.js / Frontend / CMS / EcoPicks
 ###################
 node_modules/
 npm-debug.log*
@@ -103,8 +102,6 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
-package-lock.json
-yarn.lock
 
 # Dependency directories
 jspm_packages/
@@ -195,6 +192,10 @@ backend/.pytest_cache/
 # Frontend Coverage (Jest)
 frontend/coverage/
 frontend/.nyc_output/
+
+# EcoPicks Coverage (Jest)
+ecopicks/coverage/
+ecopicks/.nyc_output/
 
 # Merged Coverage Reports
 coverage-merged/
@@ -353,9 +354,11 @@ docs/_build/
 #contracts/affilibuster.openapi.yaml
 #cms/types/
 #frontend/src/lib/generated/
+#ecopicks/src/lib/generated/
 
 openapi-ts-error-*.log
 
 .fake
 /cms/core
 /frontend/core
+/ecopicks/core

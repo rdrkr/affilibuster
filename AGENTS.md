@@ -778,11 +778,11 @@ async def get_new(
   return transform_response(data)
 ```
 
-2. **Define response model** in route file or `domain/entities/`
+1. **Define response model** in route file or `domain/entities/`
 
-3. **Add helper transformation** to normalize Strapi response
+2. **Add helper transformation** to normalize Strapi response
 
-4. **Write comprehensive tests** in `tests/unit/`
+3. **Write comprehensive tests** in `tests/unit/`
 
 ### Adding New Frontend Components
 

@@ -12,6 +12,7 @@ Establish unified testing infrastructure across all Affilibuster modules (backen
 ## Technical Context
 
 ### Backend Module
+
 **Language/Version**: Python 3.13
 **Testing Framework**: pytest 8.3.4, pytest-asyncio 0.24.0, pytest-cov 6.0.0
 **Current Coverage**: 50% minimum (needs upgrade to 80%)
@@ -19,6 +20,7 @@ Establish unified testing infrastructure across all Affilibuster modules (backen
 **Test Markers**: unit, integration, contract, performance, slow, requires_db, requires_redis
 
 ### Frontend Module
+
 **Language/Version**: TypeScript 5.7.3 / JavaScript (Node.js >=20.0.0)
 **Testing Framework**: Jest 30.2.0, @testing-library/react 16.1.0, Playwright 1.49.1
 **Current Coverage**: 80% threshold already configured (branches, functions, lines, statements)
@@ -26,6 +28,7 @@ Establish unified testing infrastructure across all Affilibuster modules (backen
 **E2E Testing**: Playwright for end-to-end tests
 
 ### CMS Module
+
 **Language/Version**: Node.js >=20.0.0, TypeScript 5.7.3
 **Framework**: Strapi 5.28.0
 **Testing Framework**: NEEDS CLARIFICATION (Strapi best practices)
@@ -33,12 +36,14 @@ Establish unified testing infrastructure across all Affilibuster modules (backen
 **Test Strategy**: NEEDS CLARIFICATION (minimal API/plugin testing vs full coverage)
 
 ### Shared Module
+
 **Language/Version**: TypeScript 5.3.0
 **Purpose**: Type definitions and contracts
 **Testing Framework**: NEEDS CLARIFICATION (if needed - type validation tests)
 **Coverage Target**: NEEDS CLARIFICATION (types-only packages may not need traditional tests)
 
 ### Project-Wide Context
+
 **Project Type**: Web application (monorepo with backend API, frontend Next.js, CMS, shared types)
 **Storage**: PostgreSQL, Redis
 **Target Platform**: Docker containers (Linux), web browsers
@@ -51,34 +56,42 @@ Establish unified testing infrastructure across all Affilibuster modules (backen
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
 ### I. Clean Architecture ✅
+
 **Status**: PASS - Testing infrastructure does not impact architecture layers
 **Rationale**: Test code is separate from business logic and doesn't introduce framework dependencies into core layers. Tests validate architectural boundaries rather than violate them.
 
 ### II. SOLID Principles ✅
+
 **Status**: PASS - Testing is orthogonal to SOLID principles
 **Rationale**: Test infrastructure doesn't affect the SOLID compliance of production code. Proper testing actually helps enforce SOLID principles by making violations more apparent.
 
 ### III. Test-First Development (NON-NEGOTIABLE) ✅
+
 **Status**: PASS - This feature directly supports TDD workflow
 **Rationale**: Establishing robust test infrastructure with enforced coverage is a prerequisite for effective TDD. This feature enables the constitution's TDD requirement by providing the tooling and standards.
 
 ### IV. Modular & Reusable Architecture ✅
+
 **Status**: PASS - Supports testing of reusable components
 **Rationale**: Standardized test infrastructure across modules enables consistent testing of shared components. Integration tests will validate that modular components work together correctly.
 
 ### V. Integration Testing Priority ✅
+
 **Status**: PASS - Explicitly includes integration test infrastructure
 **Rationale**: Backend already has integration tests in tests/integration/. Frontend has e2e tests. This feature ensures all modules have proper integration test support and they're run consistently.
 
 ### VI. API-First Design ✅
+
 **Status**: PASS - Contract tests validate API designs
 **Rationale**: Backend has contract tests (tests/contract/) that validate API schemas. This feature ensures these contract tests are run reliably and meet coverage standards.
 
 ### VII. Performance & SEO Standards ✅
+
 **Status**: PASS - Includes performance testing
 **Rationale**: Backend has performance tests (tests/performance/). Frontend has performance tests. This feature ensures performance tests are integrated into standard test runs and don't regress.
 
 ### Code Review Gates ✅
+
 **Status**: PASS - Directly implements test coverage validation gate
 **Rationale**: This feature enforces the constitution's minimum 80% test coverage requirement automatically. Tests will fail if coverage drops below threshold, blocking merges.
 
@@ -91,34 +104,42 @@ Establish unified testing infrastructure across all Affilibuster modules (backen
 *Re-evaluated after Phase 1 design completion (research.md, data-model.md, contracts/, quickstart.md)*
 
 ### I. Clean Architecture ✅
+
 **Status**: PASS (reconfirmed)
 **Changes**: None - Testing infrastructure remains separate from business logic layers
 
 ### II. SOLID Principles ✅
+
 **Status**: PASS (reconfirmed)
 **Changes**: None - Configuration changes don't affect SOLID compliance
 
 ### III. Test-First Development ✅
+
 **Status**: PASS (reconfirmed)
 **Changes**: Infrastructure strengthened - 80% coverage enforcement enables better TDD
 
 ### IV. Modular & Reusable Architecture ✅
+
 **Status**: PASS (reconfirmed)
 **Changes**: None - Testing supports module reusability validation
 
 ### V. Integration Testing Priority ✅
+
 **Status**: PASS (reconfirmed)
 **Changes**: Strengthened - Parallel execution includes integration tests, test markers clearly defined
 
 ### VI. API-First Design ✅
+
 **Status**: PASS (reconfirmed)
 **Changes**: Strengthened - Contract tests explicitly configured in pytest.ini markers
 
 ### VII. Performance & SEO Standards ✅
+
 **Status**: PASS (reconfirmed)
 **Changes**: Strengthened - Performance tests integrated into standard test suite with markers
 
 ### Code Review Gates ✅
+
 **Status**: PASS (reconfirmed)
 **Changes**: Strengthened - Automated 80% coverage enforcement in CI/CD
 

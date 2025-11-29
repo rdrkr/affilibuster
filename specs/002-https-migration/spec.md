@@ -16,6 +16,7 @@ Migrate the entire Affilibuster application stack (CMS, backend, frontend) from 
 ### Problem Statement
 
 Currently, the application runs on HTTP in development, which:
+
 - Prevents secure cookie flags from working (`secure=False` is explicitly set)
 - Creates a mismatch between development and production environments
 - Blocks testing of security-critical features (cookie security, CORS policies, mixed content)
@@ -44,9 +45,9 @@ Currently, the application runs on HTTP in development, which:
 | ID | Requirement | Priority | Acceptance Criteria |
 |----|-------------|----------|---------------------|
 | FR-001 | Generate trusted SSL certificates for localhost using mkcert | Must Have | Certificates generated and trusted by system |
-| FR-002 | Frontend accessible via https://localhost:3000 | Must Have | Browser shows secure connection, no warnings |
-| FR-003 | Backend API accessible via https://localhost:8000 | Must Have | API docs at https://localhost:8000/docs work |
-| FR-004 | CMS accessible via https://localhost:1337 | Must Have | Admin panel loads without errors |
+| FR-002 | Frontend accessible via <https://localhost:3000> | Must Have | Browser shows secure connection, no warnings |
+| FR-003 | Backend API accessible via <https://localhost:8000> | Must Have | API docs at <https://localhost:8000/docs> work |
+| FR-004 | CMS accessible via <https://localhost:1337> | Must Have | Admin panel loads without errors |
 | FR-005 | Cookies set with `secure=true` flag | Must Have | Inspecting cookies shows secure flag enabled |
 | FR-006 | Environment variables support both HTTP and HTTPS | Must Have | Protocol configurable via env vars |
 | FR-007 | Docker Compose mounts certificates into containers | Must Have | Containers have access to SSL certificates |
@@ -135,12 +136,12 @@ Browser (HTTPS) → Frontend:3000 (HTTPS) → Backend:8000 (HTTPS) → Strapi:13
 
 **Tasks**:
 
-7. **T007**: Update `.env.dev.example` with HTTPS protocol variables
+1. **T007**: Update `.env.dev.example` with HTTPS protocol variables
    - `FRONTEND_PROTOCOL=https`
    - `BACKEND_PROTOCOL=https`
    - `CMS_PROTOCOL=https`
-8. **T008**: Update local `.env` file with HTTPS protocols
-9. **T009**: Add certificate path variables to `.env.dev.example`
+2. **T008**: Update local `.env` file with HTTPS protocols
+3. **T009**: Add certificate path variables to `.env.dev.example`
    - `SSL_CERT_PATH=/certs/localhost.pem`
    - `SSL_KEY_PATH=/certs/localhost-key.pem`
 
@@ -148,76 +149,76 @@ Browser (HTTPS) → Frontend:3000 (HTTPS) → Backend:8000 (HTTPS) → Strapi:13
 
 **Tasks**:
 
-10. **T010**: Add certificate volume mounts to `docker-compose.yaml`
+1. **T010**: Add certificate volume mounts to `docker-compose.yaml`
     - Mount `/certs` to frontend container
     - Mount `/certs` to backend container
     - Mount `/certs` to CMS container
-11. **T011**: Update frontend healthcheck to use HTTPS with `-k` flag
-12. **T012**: Update backend healthcheck to use HTTPS with `-k` flag
-13. **T013**: Update CMS healthcheck to use HTTPS with `-k` flag
+2. **T011**: Update frontend healthcheck to use HTTPS with `-k` flag
+3. **T012**: Update backend healthcheck to use HTTPS with `-k` flag
+4. **T013**: Update CMS healthcheck to use HTTPS with `-k` flag
 
 ### Phase 4: Backend (FastAPI) Configuration
 
 **Tasks**:
 
-14. **T014**: Update `backend/src/affilibuster_backend/config/settings.py`
+1. **T014**: Update `backend/src/affilibuster_backend/config/settings.py`
     - Add `should_use_secure_cookies` property based on `backend_protocol`
-15. **T015**: Update `backend/src/affilibuster_backend/infrastructure/api/routes/auth.py`
+2. **T015**: Update `backend/src/affilibuster_backend/infrastructure/api/routes/auth.py`
     - Replace hardcoded `secure=False` with dynamic value from settings (line 327)
     - Replace hardcoded `secure=False` with dynamic value from settings (line 482)
-16. **T016**: Update `backend/Dockerfile` to accept SSL environment variables
-17. **T017**: Update backend startup command in `docker-compose.yaml`
+3. **T016**: Update `backend/Dockerfile` to accept SSL environment variables
+4. **T017**: Update backend startup command in `docker-compose.yaml`
     - Add `--ssl-keyfile` and `--ssl-certfile` flags to uvicorn
 
 ### Phase 5: Frontend (Next.js) Configuration
 
 **Tasks**:
 
-18. **T018**: Create `frontend/server.ts` custom HTTPS server
+1. **T018**: Create `frontend/server.ts` custom HTTPS server
     - Import `https` module
     - Load SSL certificates
     - Create HTTPS server with Next.js request handler
-19. **T019**: Update `frontend/package.json` dev script
+2. **T019**: Update `frontend/package.json` dev script
     - Change from `next dev` to `tsx server.ts`
-20. **T020**: Add `tsx` dev dependency to frontend
+3. **T020**: Add `tsx` dev dependency to frontend
     - Run: `npm install --save-dev tsx`
-21. **T021**: Update `frontend/next.config.ts` if needed
+4. **T021**: Update `frontend/next.config.ts` if needed
     - Verify image optimization uses HTTPS protocol from env
 
 ### Phase 6: CMS (Strapi) Configuration
 
 **Tasks**:
 
-22. **T022**: Update `cms/config/server.ts`
+1. **T022**: Update `cms/config/server.ts`
     - Add SSL configuration object when protocol is HTTPS
     - Reference certificate paths from environment variables
-23. **T023**: Update Strapi startup in `docker-compose.yaml` if needed
+2. **T023**: Update Strapi startup in `docker-compose.yaml` if needed
     - Ensure environment variables passed correctly
 
 ### Phase 7: Testing & Validation
 
 **Tasks**:
 
-24. **T024**: Test backend API with HTTPS
-    - Access https://localhost:8000/docs
+1. **T024**: Test backend API with HTTPS
+    - Access <https://localhost:8000/docs>
     - Verify no certificate warnings
     - Test health endpoint
-25. **T025**: Test frontend with HTTPS
-    - Access https://localhost:3000
+2. **T025**: Test frontend with HTTPS
+    - Access <https://localhost:3000>
     - Verify no mixed content warnings
     - Test navigation and API calls
-26. **T026**: Test CMS with HTTPS
-    - Access https://localhost:1337/admin
+3. **T026**: Test CMS with HTTPS
+    - Access <https://localhost:1337/admin>
     - Verify admin login works
     - Test content creation
-27. **T027**: Verify secure cookies in browser DevTools
+4. **T027**: Verify secure cookies in browser DevTools
     - Inspect cookies after login
     - Confirm `secure` flag is true
-28. **T028**: Run backend test suite
+5. **T028**: Run backend test suite
     - `make test-backend` should pass
-29. **T029**: Run frontend test suite
+6. **T029**: Run frontend test suite
     - `make test-frontend` should pass
-30. **T030**: Run E2E tests with Playwright
+7. **T030**: Run E2E tests with Playwright
     - Update Playwright config if needed for self-signed certs
     - All auth flows should pass
 
@@ -225,19 +226,19 @@ Browser (HTTPS) → Frontend:3000 (HTTPS) → Backend:8000 (HTTPS) → Strapi:13
 
 **Tasks**:
 
-31. **T031**: Update `README.md` with HTTPS setup instructions
+1. **T031**: Update `README.md` with HTTPS setup instructions
     - Add mkcert installation to prerequisites
     - Document certificate generation steps
     - Update service URLs to HTTPS
-32. **T032**: Update `CLAUDE.md` with HTTPS configuration
+2. **T032**: Update `CLAUDE.md` with HTTPS configuration
     - Add to "Environment Configuration" section
     - Document certificate paths
     - Add troubleshooting section
-33. **T033**: Create `docs/HTTPS_SETUP.md` detailed guide
+3. **T033**: Create `docs/HTTPS_SETUP.md` detailed guide
     - Step-by-step mkcert setup for each OS
     - Certificate renewal instructions
     - Troubleshooting common issues
-34. **T034**: Update `.env.dev.example` comments
+4. **T034**: Update `.env.dev.example` comments
     - Clarify protocol options (http/https)
     - Note certificate requirements for HTTPS
 
@@ -263,9 +264,9 @@ Browser (HTTPS) → Frontend:3000 (HTTPS) → Backend:8000 (HTTPS) → Strapi:13
 
 ### Manual Testing Checklist
 
-- [ ] Frontend loads without warnings at https://localhost:3000
-- [ ] Backend API docs accessible at https://localhost:8000/docs
-- [ ] CMS admin panel accessible at https://localhost:1337/admin
+- [ ] Frontend loads without warnings at <https://localhost:3000>
+- [ ] Backend API docs accessible at <https://localhost:8000/docs>
+- [ ] CMS admin panel accessible at <https://localhost:1337/admin>
 - [ ] Login flow works end-to-end
 - [ ] Cookies show `secure=true` in DevTools
 - [ ] No mixed content warnings in browser console
@@ -373,6 +374,7 @@ If issues arise:
 ### File Changes Summary
 
 **New Files**:
+
 - `certs/.gitkeep`
 - `certs/localhost.pem` (gitignored)
 - `certs/localhost-key.pem` (gitignored)
@@ -380,6 +382,7 @@ If issues arise:
 - `docs/HTTPS_SETUP.md`
 
 **Modified Files**:
+
 - `.env`
 - `.env.dev.example`
 - `.gitignore`

@@ -13,6 +13,7 @@
 **All Tasks Complete** - Core platform setup is fully implemented.
 
 **Completed Highlights**:
+
 - ✅ Multi-language infrastructure (English, Italian, Hebrew with RTL)
 - ✅ Currency selection and conversion system
 - ✅ SEO hreflang tags and sitemaps
@@ -25,6 +26,7 @@
 - ✅ URL redirect handling (301/410) in frontend middleware (T145)
 
 ## Execution Flow (main)
+
 ```
 1. Parse user description from Input
    → ✅ Feature description provided
@@ -46,6 +48,7 @@
 ---
 
 ## ⚡ Quick Guidelines
+
 - ✅ Focus on WHAT users need and WHY
 - ❌ Avoid HOW to implement (no tech stack, APIs, code structure)
 - 👥 Written for business stakeholders, not developers
@@ -55,6 +58,7 @@
 ## User Scenarios & Testing *(mandatory)*
 
 ### Primary User Story
+
 As a visitor to the eco-friendly affiliate website, I want to access content in my preferred language (English, Italian, or Hebrew) with proper formatting and cultural conventions, so that I can comfortably browse products and make informed purchasing decisions regardless of my location or language preference.
 
 ### Acceptance Scenarios
@@ -89,6 +93,7 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 ### Functional Requirements
 
 #### Multi-Language Support
+
 - **FR-001**: System MUST support content delivery in three languages: English (primary at e.g. affilibuster.com), Italian (at e.g. affilibuster.com/it), and Hebrew (at e.g. affilibuster.com/he)
 - **FR-002**: System MUST detect user's browser language or location preference when they access the root domain (e.g. affilibuster.com)
 - **FR-003**: System MUST display a non-intrusive prompt asking if the user wants to switch to their detected language version when it differs from English, in case the user lands on a page whose language is different than the detected language. The prompt should be triggered only upon user interaction with the page (e.g., scroll, mouse movement, click) and only once per session.
@@ -99,6 +104,7 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 - **FR-008**: System MUST fall back to English content when content in the selected language is unavailable while maintaining the UI in the selected language version
 
 #### Localization & Formatting
+
 - **FR-009**: System MUST format dates according to the selected language's locale conventions (DD/MM/YYYY for Italian/Hebrew, MM/DD/YYYY for English)
 - **FR-010**: System MUST format numbers with appropriate thousands separators and decimal points per locale
 - **FR-011**: System MUST provide a currency selector allowing users to choose their preferred currency for price display
@@ -108,6 +114,7 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 - **FR-015**: System MUST handle timezone display appropriately for international audiences
 
 #### SEO & Discoverability
+
 - **FR-016**: System MUST generate hreflang meta tags for all pages indicating available language versions (x-default for e.g. affilibuster.com, it for e.g. affilibuster.com/it, he for e.g. affilibuster.com/he)
 - **FR-017**: System MUST create SEO-friendly, human-readable URLs with language path prefixes: root domain for English (e.g. affilibuster.com/products/), /it/ for Italian (e.g. affilibuster.com/it/prodotti/), /he/ for Hebrew (e.g. affilibuster.com/he/products/). The URLs slugs are always customizable by the admin
 - **FR-018**: System MUST allow customization of URL slugs per language for optimal SEO. In case a slug gets changed, the system MUST automatically create 301 redirects from the old URL to the new one at the time of slug update. If a page/language version is removed, the system MUST automatically create a 410 status code response for that URL at the time of deletion.
@@ -116,6 +123,7 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 - **FR-021**: System MUST include language-specific schema markup for rich snippets in the appropriate language
 
 #### Content Management
+
 - **FR-022**: Content editors MUST be able to create and manage content in all three languages through a single interface
 - **FR-023**: System MUST clearly indicate which language versions of content exist and which are missing
 - **FR-024**: System MUST allow partial translations at both page level (some pages in all languages, others English-only) and field level (within a single page, some fields translated while others fall back to English)
@@ -123,6 +131,7 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 - **FR-026**: System MUST preserve content relationships (e.g., product-to-category) across language versions and their respective URL structures
 
 #### Platform Foundation
+
 - **FR-027**: System MUST deliver pages with Largest Contentful Paint (LCP) under 2.5 seconds and total page load (window.onload) under 3 seconds on 3G connections across all language versions
 - **FR-028**: System MUST achieve Lighthouse performance score above 90 for all language versions
 - **FR-029**: System MUST support static HTML generation where feasible for optimal performance
@@ -130,12 +139,14 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 - **FR-031**: System MUST inline critical CSS to optimize initial page load for all languages
 
 #### API & Integration
+
 - **FR-032**: System MUST expose a REST API that accepts language parameters for all content requests
 - **FR-033**: System MUST provide API versioning from the start to support future changes
 - **FR-034**: System MUST return appropriate HTTP headers for language content negotiation and currency preferences
 - **FR-035**: System MUST support CORS for potential future frontend deployments on different domains
 
 #### Accessibility & Standards
+
 - **FR-036**: System MUST include proper lang attributes on HTML elements for each language version
 - **FR-037**: System MUST support screen readers in all three languages
 - **FR-038**: System MUST meet WCAG 2.1 AA accessibility standards across all language versions
@@ -153,15 +164,18 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 ---
 
 ## Review & Acceptance Checklist
+
 *GATE: Automated checks run during main() execution*
 
 ### Content Quality
+
 - [x] No implementation details (languages, frameworks, APIs)
 - [x] Focused on user value and business needs
 - [x] Written for non-technical stakeholders
 - [x] All mandatory sections completed
 
 ### Requirement Completeness
+
 - [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
@@ -171,6 +185,7 @@ As a visitor to the eco-friendly affiliate website, I want to access content in 
 ---
 
 ## Execution Status
+
 *Updated by main() during processing*
 
 - [x] User description parsed

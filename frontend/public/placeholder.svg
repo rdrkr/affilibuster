@@ -1,35 +1,3 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
-  <rect width="400" height="400" fill="#f3f4f6"/>
-  <g transform="translate(200, 200)">
-    <!-- Package/Box Icon -->
-    <path d="M -60 -40 L 0 -70 L 60 -40 L 60 40 L 0 70 L -60 40 Z"
-          fill="none"
-          stroke="#9ca3af"
-          stroke-width="3"
-          stroke-linejoin="round"/>
-    <path d="M -60 -40 L 0 -10 L 60 -40"
-          fill="none"
-          stroke="#9ca3af"
-          stroke-width="3"
-          stroke-linejoin="round"/>
-    <path d="M 0 -10 L 0 70"
-          fill="none"
-          stroke="#9ca3af"
-          stroke-width="3"/>
-    <!-- Decorative lines on box -->
-    <line x1="-30" y1="0" x2="-30" y2="50"
-          stroke="#d1d5db"
-          stroke-width="2"/>
-    <line x1="30" y1="0" x2="30" y2="50"
-          stroke="#d1d5db"
-          stroke-width="2"/>
-  </g>
-  <!-- "Product Image" text -->
-  <text x="200" y="320"
-        font-family="system-ui, -apple-system, sans-serif"
-        font-size="16"
-        fill="#9ca3af"
-        text-anchor="middle">
-    Product Image
-  </text>
-</svg>
+version https://git-lfs.github.com/spec/v1
+oid sha256:55ee4c96d77d777086107c9f00c64e1e149662130a0d115ced70dcac6678e686
+size 1111

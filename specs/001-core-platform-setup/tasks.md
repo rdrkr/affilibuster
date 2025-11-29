@@ -6,6 +6,7 @@
 ## Execution Summary
 
 This task list implements a multi-language affiliate platform with:
+
 - **Frontend**: Next.js 14 (App Router) with next-intl, Tailwind CSS (RTL support)
 - **Backend**: FastAPI with SQLAlchemy, Pydantic validation
 - **CMS**: Strapi with i18n plugin
@@ -20,6 +21,7 @@ This task list implements a multi-language affiliate platform with:
 ## How to Use This Task List
 
 Each task includes:
+
 - **File path**: Where to implement the code
 - **→ Reference**: Specific sections in design documents (format: `file:lines` or `file:section`)
 - **→ Validation**: How to verify the task is complete
@@ -132,14 +134,14 @@ Each task includes:
 - [X] **T015** Configure CORS middleware
       - **Path**: backend/src/main.py
       - **→ Reference**: research.md:70 (FastAPI middleware for CORS), plan.md:69-71
-      - **Allow**: http://localhost:3000, http://localhost:1337, production domains
+      - **Allow**: <http://localhost:3000>, <http://localhost:1337>, production domains
       - **→ Validation**: Frontend can fetch backend API without CORS errors
 
 - [X] **T016** Setup OpenAPI documentation route
       - **Path**: backend/src/main.py
       - **→ Reference**: research.md:53 (OpenAPI Integration: automatic schema generation)
       - **Routes**: /docs (Swagger UI), /redoc (ReDoc), /openapi.json
-      - **→ Validation**: Visit http://localhost:8000/docs shows interactive API docs
+      - **→ Validation**: Visit <http://localhost:8000/docs> shows interactive API docs
 
 - [X] **T017** [P] Initialize pytest configuration
       - **Path**: backend/pytest.ini
@@ -988,7 +990,7 @@ Each task includes:
 - [X] **T136** Connect frontend to backend API (environment variables)
       - **Path**: frontend/.env.local
       - **→ Reference**: plan.md:136 (Frontend ↔ Backend content fetching)
-      - **Config**: NEXT_PUBLIC_API_URL=http://localhost:8000/v1 (dev), production URL for prod
+      - **Config**: NEXT_PUBLIC_API_URL=<http://localhost:8000/v1> (dev), production URL for prod
       - **→ Validation**: Frontend API clients can reach backend
 
 - [X] **T137** Implement session ID generation middleware
@@ -1012,7 +1014,7 @@ Each task includes:
 - [X] **T140** Configure CORS for all services
       - **Path**: backend/src/main.py (extend T015)
       - **→ Reference**: research.md:70 (CORS middleware), plan.md:271 (CORS_ORIGINS config)
-      - **Config**: Add CMS origin (http://localhost:1337), frontend origin, production domains
+      - **Config**: Add CMS origin (<http://localhost:1337>), frontend origin, production domains
       - **→ Validation**: CMS and frontend can call backend without CORS errors
 
 - [X] **T141** Implement request logging middleware
@@ -1067,7 +1069,7 @@ Each task includes:
       - **Path**: frontend/src/lib/seo/schema.ts (part of T147)
       - **→ Reference**: plan.md:198 (Organization schema)
       - **Generate**: JSON-LD with @type: Organization, name, logo, sameAs social links
-      - **→ Validation**: Schema validates at https://validator.schema.org
+      - **→ Validation**: Schema validates at <https://validator.schema.org>
 
 - [X] **T148** Create sitemap generation API route
       - **Path**: frontend/src/app/api/sitemap-[lang].xml/route.ts
@@ -1126,7 +1128,7 @@ Each task includes:
 - [X] **T154** Run Lighthouse audits (>90 score) for all languages
       - **Path**: scripts/lighthouse-audit.sh
       - **→ Reference**: plan.md:79, 193-196 (Lighthouse >90 score plan)
-      - **Test**: lighthouse http://localhost:3000, http://localhost:3000/it, http://localhost:3000/he
+      - **Test**: lighthouse <http://localhost:3000>, <http://localhost:3000/it>, <http://localhost:3000/he>
       - **→ Validation**: Performance, Accessibility, Best Practices, SEO all >90 for all 3 languages
 
 - [X] **T154A** [P] Run API performance benchmarks
@@ -1164,6 +1166,7 @@ Each task includes:
 ## Dependencies
 
 ### Critical Path
+
 1. **Setup** (T001-T025) → Everything
 2. **Tests** (T021-T050) → Implementation (T051-T151)
 3. **Migrations** (T051-T058) → Models (T065-T071) → Repositories (T079-T086)
@@ -1172,6 +1175,7 @@ Each task includes:
 6. **Core** (T051-T135) → Integration (T136-T151) → Polish (T151-T162)
 
 ### Blocking Dependencies
+
 - T008 (PostgreSQL) blocks T011 (Alembic), T051-T058 (Migrations)
 - T020A-T020C (Seed data) block T021-T028 (Contract tests need data)
 - T051-T058 (Migrations) block T065-T071 (Models)
@@ -1187,7 +1191,9 @@ Each task includes:
 ## Parallel Execution Examples
 
 ### Example 1: Contract Tests (T021-T028)
+
 All contract tests can run in parallel as they test different endpoints:
+
 ```bash
 # Run 8 contract tests simultaneously
 pytest backend/tests/contract/test_languages_api.py \
@@ -1202,7 +1208,9 @@ pytest backend/tests/contract/test_languages_api.py \
 ```
 
 ### Example 2: Entity Creation (T058-T064)
+
 All domain entities can be created in parallel:
+
 ```bash
 # Create 7 entity files in parallel
 parallel ::: \
@@ -1216,7 +1224,9 @@ parallel ::: \
 ```
 
 ### Example 3: Frontend Components (T109-T118)
+
 All components are independent and can be built in parallel:
+
 ```bash
 # Launch 10 component tasks in parallel
 # Each developer takes 2-3 components

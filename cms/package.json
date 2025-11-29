@@ -5,7 +5,7 @@
   "description": "Affiliate platform CMS",
   "scripts": {
     "strapi": "strapi",
-    "openapi:generate": "strapi openapi generate --output ../contracts/strapi.openapi.yaml && npx tsx ./scripts/merge-openapi.ts && npx @redocly/cli lint /contracts/strapi.openapi.yaml && npx @redocly/cli lint /contracts/affilibuster.openapi.yaml",
+    "openapi:generate": "mkdir -p public/uploads && strapi openapi generate --output ../contracts/strapi.openapi.yaml && npx tsx ./scripts/merge-openapi.ts && npx @redocly/cli lint ../contracts/strapi.openapi.yaml && npx @redocly/cli lint ../contracts/affilibuster.openapi.yaml",
     "type-check": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint --max-warnings 0 . && npm run type-check",
     "lint:fix": "eslint --fix --max-warnings 0 . && npm run type-check",
@@ -17,7 +17,6 @@
     "prebuild": "npm run preflight",
     "build": "strapi build",
     "clean": "rm -rf coverage node_modules build .tmp .strapi dist",
-    "prestart": "npm run build",
     "start": "strapi start"
   },
   "dependencies": {
@@ -26,12 +25,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.30.2",
-    "styled-components": "^6.1.19"
-  },
-  "overrides": {
-    "zod": "3.26.0-canary.20250708T225111"
-  },
-  "devDependencies": {
+    "styled-components": "^6.1.19",
     "@eslint/js": "^9.39.1",
     "@redocly/cli": "^2.12.0",
     "@types/js-yaml": "^4.0.9",
@@ -48,6 +42,9 @@
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.4"
+  },
+  "overrides": {
+    "zod": "3.26.0-canary.20250708T225111"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

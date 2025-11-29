@@ -18,8 +18,7 @@ ENV PATH="/root/.local/bin:$PATH"
 COPY pyproject.toml uv.lock ./
 
 # Install dependencies including dev (--no-install-project means don't build affilibuster-backend itself)
-# --all-extras ensures optional dev dependencies are installed for testing
-RUN /root/.local/bin/uv sync --frozen --no-install-project --all-extras
+RUN /root/.local/bin/uv sync --frozen --no-install-project
 
 # Copy application code
 COPY . .

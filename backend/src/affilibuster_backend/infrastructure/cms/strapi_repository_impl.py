@@ -33,17 +33,17 @@ class StrapiRepositoryImpl(ICMSRepository):
     - Error handling and reporting
     """
 
-    def __init__(self, base_url: str | None = None, api_token: str | None = None) -> None:
+    def __init__(self, api_token: str, base_url: str | None = None) -> None:
         """
         Initialize Strapi repository.
 
         Args:
+            api_token: Strapi API token (loaded from database)
             base_url: Strapi base URL (defaults to settings.strapi_url)
-            api_token: Strapi API token (defaults to settings.strapi_api_token)
 
         """
         self.base_url = base_url or settings.strapi_url
-        self.api_token = api_token or settings.strapi_api_token
+        self.api_token = api_token
         self.timeout = 30.0
         # Disable SSL verification for self-signed certificates in development
         self.verify_ssl = settings.app_env == "production"

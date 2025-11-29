@@ -20,6 +20,7 @@
 **TDD Approach**: Write tests FIRST, then implement entities
 
 **Subtasks**:
+
 1. Write tests for `User` entity (test_user.py)
    - Test user creation with valid data
    - Test email validation
@@ -37,6 +38,7 @@
 8. Implement `EmailVerificationToken` entity
 
 **Acceptance Criteria**:
+
 - [x] All entity tests pass (100% coverage)
 - [x] Entities have no external dependencies (framework-independent)
 - [x] **Explicit type hints on ALL methods, attributes, and parameters** (strongly typed)
@@ -45,6 +47,7 @@
 - [x] Use type-safe value objects (e.g., Email, HashedPassword) instead of primitive strings where appropriate
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/domain/entities/user.py` (NEW)
 - `backend/src/affilibuster_backend/domain/entities/user_session.py` (NEW)
 - `backend/src/affilibuster_backend/domain/entities/password_reset_token.py` (NEW)
@@ -63,6 +66,7 @@
 **Dependencies**: Task 1.1
 
 **Subtasks**:
+
 1. Define `UserRepository` interface
    - Methods: create, get_by_id, get_by_email, update, soft_delete
 2. Define `SessionRepository` interface
@@ -71,6 +75,7 @@
    - Methods: create, get_by_token, mark_used/verified, cleanup_expired
 
 **Acceptance Criteria**:
+
 - [x] All repository interfaces defined with abstract methods
 - [x] **Explicit type hints for ALL method parameters and return values** (strongly typed)
 - [x] Return types use domain entities, not primitives or dicts
@@ -79,6 +84,7 @@
 - [x] Interfaces pass mypy strict type checking
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/domain/repositories/user_repository.py` (NEW)
 - `backend/src/affilibuster_backend/domain/repositories/session_repository.py` (NEW)
 - `backend/src/affilibuster_backend/domain/repositories/token_repository.py` (NEW)
@@ -94,6 +100,7 @@
 **TDD Approach**: Write tests FIRST
 
 **Subtasks**:
+
 1. Write tests for `PasswordHasher` (test_password_hasher.py)
    - Test hash_password returns bcrypt hash
    - Test verify_password with correct password
@@ -109,6 +116,7 @@
 4. Implement `TokenGenerator` using python-jose
 
 **Acceptance Criteria**:
+
 - [x] All security tests pass (100% coverage)
 - [x] **All methods have explicit type annotations** (input/output strongly typed)
 - [x] Bcrypt cost factor set to 12
@@ -118,6 +126,7 @@
 - [x] Code passes mypy strict type checking
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/infrastructure/security/password_hasher.py` (NEW)
 - `backend/src/affilibuster_backend/infrastructure/security/token_generator.py` (NEW)
 - `backend/tests/unit/infrastructure/security/test_password_hasher.py` (NEW)
@@ -133,6 +142,7 @@
 **Dependencies**: Task 1.1 (domain entities)
 
 **Subtasks**:
+
 1. Create `UserModel` SQLAlchemy model
    - Map to `users` table with all required columns
    - Use SQLAlchemy 2.0 mapped_column style with type annotations
@@ -142,14 +152,16 @@
 5. Update `UserPreferencesModel` to add foreign key relationship to `UserModel`
 
 **Acceptance Criteria**:
+
 - [x] **All columns use SQLAlchemy 2.0 Mapped[] type annotations** (strongly typed)
 - [x] Proper type annotations using SQLAlchemy 2.0 style (mapped_column, Mapped)
 - [x] Relationships defined with proper typing (User → Sessions, User → Preferences)
-- [x] __repr__ methods for debugging
+- [x] **repr** methods for debugging
 - [x] Models can be imported and instantiated
 - [x] Models pass mypy strict type checking
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/infrastructure/database/models/user.py` (NEW)
 - `backend/src/affilibuster_backend/infrastructure/database/models/user_session.py` (NEW)
 - `backend/src/affilibuster_backend/infrastructure/database/models/password_reset_token.py` (NEW)
@@ -168,6 +180,7 @@
 **TDD Approach**: Write integration tests FIRST
 
 **Subtasks**:
+
 1. Write integration tests for `UserRepositoryImpl`
    - Test create user
    - Test get user by email
@@ -181,6 +194,7 @@
 6. Implement `TokenRepositoryImpl`
 
 **Acceptance Criteria**:
+
 - [x] All repository integration tests pass
 - [x] Repositories implement domain interfaces with **full type compliance**
 - [x] **All methods have explicit type annotations** matching interface signatures
@@ -191,6 +205,7 @@
 - [x] Code passes mypy strict type checking
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/infrastructure/database/repositories/user_repository_impl.py` (NEW)
 - `backend/src/affilibuster_backend/infrastructure/database/repositories/session_repository_impl.py` (NEW)
 - `backend/src/affilibuster_backend/infrastructure/database/repositories/token_repository_impl.py` (NEW)
@@ -209,6 +224,7 @@
 **TDD Approach**: Write unit tests FIRST
 
 **Subtasks**:
+
 1. Write tests for `RegisterUserUseCase` (test_register_user_use_case.py)
    - Test successful registration (email, password, display name)
    - Test registration with existing email (should fail)
@@ -226,12 +242,14 @@
    - Return user entity
 
 **Acceptance Criteria**:
+
 - [x] All use case unit tests pass (mocked dependencies)
 - [x] Use case has no direct dependencies on frameworks
 - [x] Proper error handling with domain exceptions
 - [x] Business logic validation before repository calls
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/domain/use_cases/auth/register_user_use_case.py` (NEW)
 - `backend/tests/unit/domain/use_cases/auth/test_register_user_use_case.py` (NEW)
 
@@ -246,6 +264,7 @@
 **TDD Approach**: Write unit tests FIRST
 
 **Subtasks**:
+
 1. Write tests for `LoginUserUseCase`
    - Test successful login with valid credentials
    - Test login failure with wrong password
@@ -263,12 +282,14 @@
    - Return tokens and user data
 
 **Acceptance Criteria**:
+
 - [x] All use case unit tests pass
 - [x] Generic error messages (don't reveal if email exists)
 - [x] Rate limiting check (return error if exceeded)
 - [x] Session created with proper expiration
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/domain/use_cases/auth/login_user_use_case.py` (NEW)
 - `backend/tests/unit/domain/use_cases/auth/test_login_user_use_case.py` (NEW)
 
@@ -283,6 +304,7 @@
 **TDD Approach**: Write unit tests FIRST
 
 **Subtasks**:
+
 1. Write tests for `LogoutUserUseCase`
    - Test logout invalidates current session
    - Test logout clears tokens
@@ -293,11 +315,13 @@
 4. Implement `RefreshSessionUseCase`
 
 **Acceptance Criteria**:
+
 - [x] All use case tests pass
 - [x] Session properly deleted from database
 - [x] New access token issued on refresh
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/domain/use_cases/auth/logout_user_use_case.py` (NEW)
 - `backend/src/affilibuster_backend/domain/use_cases/auth/refresh_session_use_case.py` (NEW)
 - `backend/tests/unit/domain/use_cases/auth/test_logout_user_use_case.py` (NEW)
@@ -314,6 +338,7 @@
 **TDD Approach**: Write unit tests with mocks
 
 **Subtasks**:
+
 1. Define `EmailService` interface
    - Method: send_email(to, subject, html_body, text_body)
 2. Write tests for `SMTPEmailService`
@@ -328,6 +353,7 @@
 5. Create template rendering utility
 
 **Acceptance Criteria**:
+
 - [x] EmailService interface defined
 - [x] SMTP implementation with error handling
 - [x] HTML and plain text email templates
@@ -335,6 +361,7 @@
 - [x] Tests pass with mocked SMTP
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/infrastructure/email/email_service.py` (NEW)
 - `backend/src/affilibuster_backend/infrastructure/email/smtp_email_service.py` (NEW)
 - `backend/src/affilibuster_backend/infrastructure/email/templates/verification_email.html` (NEW)
@@ -352,6 +379,7 @@
 **Dependencies**: Task 1.7, Task 1.8, Task 1.9
 
 **Subtasks**:
+
 1. Add security schemes to OpenAPI spec:
    - bearerAuth (JWT for regular auth)
    - OAuth2AuthorizationCodePKCE (for Google/Facebook social login with PKCE)
@@ -371,6 +399,7 @@
 10. Regenerate backend types
 
 **Acceptance Criteria**:
+
 - [x] All auth endpoints documented in OpenAPI spec
 - [x] **Request/response schemas use strongly typed Pydantic models** (no generic objects)
 - [x] Security requirements specified (bearerAuth for JWT, OAuth2AuthorizationCodePKCE for social login)
@@ -380,6 +409,7 @@
 - [x] Generated TypeScript types will be used by frontend (type safety across stack)
 
 **Files Changed**:
+
 - `contracts/template.openapi.yaml` (MODIFIED)
 - `backend/src/affilibuster_backend/domain/entities/generated/models.py` (REGENERATED)
 
@@ -394,6 +424,7 @@
 **TDD Approach**: Write integration tests FIRST
 
 **Subtasks**:
+
 1. Write integration test for POST `/api/auth/register`
    - Test successful registration (201 Created)
    - Test duplicate email (409 Conflict)
@@ -408,6 +439,7 @@
 3. Add route to FastAPI app
 
 **Acceptance Criteria**:
+
 - [x] Integration tests pass
 - [x] Endpoint follows OpenAPI spec
 - [x] Proper HTTP status codes
@@ -415,6 +447,7 @@
 - [x] Rate limiting applied
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/infrastructure/api/routes/auth.py` (NEW)
 - `backend/tests/integration/infrastructure/api/routes/test_auth_routes.py` (NEW)
 - `backend/src/affilibuster_backend/infrastructure/api/main.py` (MODIFIED - add auth routes)
@@ -430,6 +463,7 @@
 **TDD Approach**: Write integration tests FIRST
 
 **Subtasks**:
+
 1. Write integration test for POST `/api/auth/login`
    - Test successful login (200 OK, returns tokens)
    - Test wrong password (401 Unauthorized)
@@ -444,12 +478,14 @@
 3. Add rate limiting middleware
 
 **Acceptance Criteria**:
+
 - [x] Integration tests pass
 - [x] Tokens stored in secure HTTP-only cookies
 - [x] Rate limiting works (5 attempts per 15 min)
 - [x] Generic error messages
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/infrastructure/api/routes/auth.py` (MODIFIED)
 - `backend/src/affilibuster_backend/infrastructure/api/middleware/rate_limiter.py` (NEW)
 - `backend/tests/integration/infrastructure/api/routes/test_auth_routes.py` (MODIFIED)
@@ -465,6 +501,7 @@
 **TDD Approach**: Write integration tests FIRST
 
 **Subtasks**:
+
 1. Write integration test for POST `/api/auth/logout`
    - Test logout with valid token
    - Test cookies are cleared
@@ -475,11 +512,13 @@
 4. Implement refresh route
 
 **Acceptance Criteria**:
+
 - [x] Integration tests pass
 - [x] Logout clears cookies
 - [x] Refresh issues new access token
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/infrastructure/api/routes/auth.py` (MODIFIED)
 - `backend/tests/integration/infrastructure/api/routes/test_auth_routes.py` (MODIFIED)
 
@@ -494,6 +533,7 @@
 **TDD Approach**: Write tests FIRST
 
 **Subtasks**:
+
 1. Write tests for `get_current_user` dependency
    - Test with valid JWT token
    - Test with expired token (401 Unauthorized)
@@ -509,12 +549,14 @@
 5. Update `dependencies.py` with auth dependencies
 
 **Acceptance Criteria**:
+
 - [x] All middleware tests pass
 - [x] Token verification works with JWT
 - [x] Proper HTTP 401 errors for invalid tokens
 - [x] Can be used as FastAPI dependency
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/infrastructure/api/dependencies/auth_dependencies.py` (NEW)
 - `backend/tests/unit/infrastructure/api/dependencies/test_auth_dependencies.py` (NEW)
 - `backend/src/affilibuster_backend/infrastructure/dependencies.py` (MODIFIED)
@@ -530,6 +572,7 @@
 **TDD Approach**: Write unit tests FIRST
 
 **Subtasks**:
+
 1. Write tests for `VerifyEmailUseCase`
    - Test successful verification with valid token
    - Test expired token (reject)
@@ -545,11 +588,13 @@
 4. Implement `ResendVerificationEmailUseCase`
 
 **Acceptance Criteria**:
+
 - [x] All use case tests pass
 - [x] Token is single-use
 - [x] Expired tokens rejected
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/domain/use_cases/auth/verify_email_use_case.py` (NEW)
 - `backend/src/affilibuster_backend/domain/use_cases/auth/resend_verification_email_use_case.py` (NEW)
 - `backend/tests/unit/domain/use_cases/auth/test_verify_email_use_case.py` (NEW)
@@ -566,6 +611,7 @@
 **TDD Approach**: Write unit tests FIRST
 
 **Subtasks**:
+
 1. Write tests for `RequestPasswordResetUseCase`
    - Test with valid email (send reset email)
    - Test with non-existent email (still return success for security)
@@ -579,12 +625,14 @@
 4. Implement `ResetPasswordUseCase`
 
 **Acceptance Criteria**:
+
 - [x] All use case tests pass
 - [x] Generic success messages (don't reveal if email exists)
 - [x] Token single-use with 1-hour expiration
 - [x] Sessions invalidated on password reset
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/domain/use_cases/auth/request_password_reset_use_case.py` (NEW)
 - `backend/src/affilibuster_backend/domain/use_cases/auth/reset_password_use_case.py` (NEW)
 - `backend/tests/unit/domain/use_cases/auth/test_request_password_reset_use_case.py` (NEW)
@@ -601,6 +649,7 @@
 **TDD Approach**: Write integration tests FIRST
 
 **Subtasks**:
+
 1. Write integration test for GET `/api/auth/verify-email?token=xxx`
 2. Implement verify email endpoint
 3. Write integration test for POST `/api/auth/resend-verification`
@@ -611,12 +660,14 @@
 8. Implement reset password endpoint
 
 **Acceptance Criteria**:
+
 - [x] All integration tests pass
 - [x] Endpoints follow OpenAPI spec
 - [x] Proper error handling
 - [x] Email sending mocked in tests
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/infrastructure/api/routes/auth.py` (MODIFIED)
 - `backend/tests/integration/infrastructure/api/routes/test_auth_routes.py` (MODIFIED)
 
@@ -631,6 +682,7 @@
 **TDD Approach**: Write tests FIRST
 
 **Subtasks**:
+
 1. Write use case tests for `GetUserProfileUseCase`
 2. Implement `GetUserProfileUseCase`
 3. Write use case tests for `UpdateProfileUseCase` (change name)
@@ -643,12 +695,14 @@
 10. Implement POST `/api/profile/change-password` (requires auth)
 
 **Acceptance Criteria**:
+
 - [x] All tests pass
 - [x] Endpoints require authentication
 - [x] Password not returned in profile response
 - [x] Change password requires current password
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/domain/use_cases/profile/get_user_profile_use_case.py` (NEW)
 - `backend/src/affilibuster_backend/domain/use_cases/profile/update_profile_use_case.py` (NEW)
 - `backend/src/affilibuster_backend/domain/use_cases/profile/change_password_use_case.py` (NEW)
@@ -665,6 +719,7 @@
 **Dependencies**: Task 1.8, Task 1.19
 
 **Subtasks**:
+
 1. Write use case test for `MigratePreferencesToUserUseCase`
    - Test anonymous preferences migrated to user on first login
    - Test existing user preferences not overwritten
@@ -674,11 +729,13 @@
 5. Update preferences endpoints to use user_id from JWT if authenticated
 
 **Acceptance Criteria**:
+
 - [x] Anonymous preferences migrated on login
 - [x] Authenticated user preferences sync across devices
 - [x] Session preferences still work for anonymous users
 
 **Files Changed**:
+
 - `backend/src/affilibuster_backend/domain/use_cases/preferences/migrate_preferences_to_user_use_case.py` (NEW)
 - `backend/src/affilibuster_backend/domain/use_cases/auth/login_user_use_case.py` (MODIFIED)
 - `backend/src/affilibuster_backend/domain/use_cases/update_user_preferences_use_case.py` (MODIFIED)
@@ -694,6 +751,7 @@
 **Dependencies**: Task 1.13, Task 1.14
 
 **Subtasks**:
+
 1. Create `AuthContext` (user state, isAuthenticated, isLoading)
 2. Create `AuthProvider` component
 3. Implement `useAuth` hook (access context)
@@ -704,6 +762,7 @@
 8. Wrap app in `AuthProvider`
 
 **Acceptance Criteria**:
+
 - [x] All hook tests pass
 - [x] Auth state available globally
 - [x] Loading states handled
@@ -711,6 +770,7 @@
 - [x] Tokens managed automatically
 
 **Files Changed**:
+
 - `frontend/src/lib/authContext.tsx` (NEW)
 - `frontend/src/hooks/useAuth.ts` (NEW)
 - `frontend/src/hooks/useLogin.ts` (NEW)
@@ -729,6 +789,7 @@
 **Dependencies**: Task 1.21
 
 **Subtasks**:
+
 1. Create `LoginForm` component
    - Email input
    - Password input
@@ -744,6 +805,7 @@
 8. Handle error messages from API
 
 **Acceptance Criteria**:
+
 - [x] All component tests pass
 - [x] Forms have proper validation
 - [x] Loading states shown during submission
@@ -751,6 +813,7 @@
 - [x] Success redirects to homepage or previous page
 
 **Files Changed**:
+
 - `frontend/src/components/auth/LoginForm.tsx` (NEW)
 - `frontend/src/components/auth/RegisterForm.tsx` (NEW)
 - `frontend/src/app/[lang]/auth/login/page.tsx` (NEW)
@@ -767,6 +830,7 @@
 **Dependencies**: Task 1.21
 
 **Subtasks**:
+
 1. Create `ForgotPasswordForm` component
 2. Create forgot password page `/[lang]/auth/forgot-password`
 3. Create `ResetPasswordForm` component
@@ -774,12 +838,14 @@
 5. Write tests for both components
 
 **Acceptance Criteria**:
+
 - [x] All component tests pass
 - [x] Token extracted from URL query
 - [x] Success/error messages displayed
 - [x] Redirect to login after successful reset
 
 **Files Changed**:
+
 - `frontend/src/components/auth/ForgotPasswordForm.tsx` (NEW)
 - `frontend/src/components/auth/ResetPasswordForm.tsx` (NEW)
 - `frontend/src/app/[lang]/auth/forgot-password/page.tsx` (NEW)
@@ -796,6 +862,7 @@
 **Dependencies**: Task 1.21
 
 **Subtasks**:
+
 1. Create email verification page `/[lang]/auth/verify-email?token=xxx`
    - Extract token from URL
    - Call verify endpoint on mount
@@ -805,12 +872,14 @@
 3. Write tests
 
 **Acceptance Criteria**:
+
 - [x] Tests pass
 - [x] Token verified on page load
 - [x] Success message shown
 - [x] Redirect to login or homepage after verification
 
 **Files Changed**:
+
 - `frontend/src/app/[lang]/auth/verify-email/page.tsx` (NEW)
 - `frontend/tests/e2e/email-verification.spec.ts` (NEW)
 
@@ -823,12 +892,14 @@
 **Dependencies**: Task 1.21
 
 **Subtasks**:
+
 1. ✅ Create `ProfileForm` component (update display name and email)
 2. ✅ Add `updateProfile` API function with PATCH `/auth/profile`
 3. ✅ Add `UpdateProfileRequest` and `UpdateProfileResponse` types
 4. ✅ Write comprehensive tests with 100% coverage (8 tests)
 
 **Acceptance Criteria**:
+
 - [x] All tests pass (8 tests, 100% coverage)
 - [x] Profile form validates email format and required fields
 - [x] Profile form pre-fills with current user data
@@ -836,6 +907,7 @@
 - [x] Success/error messaging implemented
 
 **Files Changed**:
+
 - `frontend/src/components/auth/ProfileForm.tsx` (NEW)
 - `frontend/tests/components/auth/ProfileForm.test.tsx` (NEW)
 - `frontend/src/components/auth/index.ts` (MODIFIED - added ProfileForm export)
@@ -851,6 +923,7 @@
 **Dependencies**: Task 1.21
 
 **Subtasks**:
+
 1. ✅ Update `Navigation` component to use `useAuth` hook
 2. ✅ Show "Login" and "Sign Up" buttons when not authenticated
 3. ✅ Show user menu dropdown when authenticated
@@ -863,12 +936,14 @@
 6. ✅ Click-outside-to-close dropdown functionality
 
 **Acceptance Criteria**:
+
 - [x] Tests pass (14 new tests, 100% coverage)
 - [x] Conditional rendering based on auth state
 - [x] Logout works from dropdown
 - [x] Responsive design maintained
 
 **Files Changed**:
+
 - `frontend/src/components/Navigation.tsx` (MODIFIED - added auth UI)
 - `frontend/tests/components/Navigation.test.tsx` (MODIFIED - added 14 auth tests)
 
@@ -881,6 +956,7 @@
 **Dependencies**: All previous tasks
 
 **Subtasks**:
+
 1. ✅ Write E2E test for registration flow
    - Visit register page
    - Fill form
@@ -906,12 +982,14 @@
 **Note**: E2E tests created and data-testid attributes added to all auth components. Tests will pass once auth pages are created.
 
 **Acceptance Criteria**:
+
 - [x] All E2E test files created
 - [x] Tests run in Playwright
 - [x] Complete user journeys covered
 - [x] data-testid attributes added to LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ResendVerificationForm, Navigation
 
 **Files Changed**:
+
 - `frontend/tests/e2e/auth-flow.spec.ts` (NEW)
 - `frontend/tests/e2e/password-reset.spec.ts` (NEW)
 - `frontend/tests/e2e/profile-flow.spec.ts` (NEW)
@@ -932,6 +1010,7 @@
 **Dependencies**: All previous tasks
 
 **Subtasks**:
+
 1. ✅ Write `quickstart-frontend.md` for frontend authentication system
    - ✅ How to use auth components (LoginForm, RegisterForm, etc.)
    - ✅ How to use the useAuth hook
@@ -943,12 +1022,14 @@
 3. ✅ Document common patterns (conditional rendering, error handling, etc.)
 
 **Acceptance Criteria**:
+
 - [x] Quickstart guide is complete and accurate
 - [x] Examples can be copy-pasted and work
 - [x] Covers frontend usage comprehensively
 - [x] Includes testing patterns and mocking examples
 
 **Files Changed**:
+
 - `specs/004-user-authentication/quickstart-frontend.md` (NEW)
 
 ---
@@ -966,6 +1047,7 @@
 ### Task 2.2: Social Login - Google OAuth 2.0 with PKCE
 
 **Implementation Details**:
+
 - Frontend generates code_verifier and code_challenge (S256)
 - Backend handles OAuth callback with code_verifier validation
 - PKCE eliminates need for client secret in frontend
@@ -996,6 +1078,7 @@
 ### Task 3.1: Facebook OAuth 2.0 with PKCE
 
 **Implementation Details**:
+
 - Similar to Google OAuth but with Facebook provider
 - Same PKCE flow for security
 - Store Facebook OAuth tokens encrypted
@@ -1071,6 +1154,7 @@ make test
 ## Rollback Plan
 
 If issues are discovered:
+
 1. Do NOT merge to main until all issues resolved
 2. Can drop authentication tables from database (since not in production, can recreate)
 3. Can revert code changes: `git revert <commit>`

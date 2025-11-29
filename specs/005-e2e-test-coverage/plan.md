@@ -5,6 +5,7 @@
 ## Summary
 
 Fix 54 failing E2E tests (out of 108 total, 50% pass rate) by:
+
 1. Fixing URL routing bugs in product navigation
 2. Implementing Next.js sitemap generation using official API
 3. Fixing accessibility violations (WCAG 2.1 AA)
@@ -24,24 +25,27 @@ This will achieve 100% E2E test pass rate (108/108 tests passing) while maintain
 **Target Platform**: Web application (responsive, mobile-first)
 **Performance Goals**: Maintain <3s page load on 3G, no degradation from new features
 **Constraints**:
-  - Must maintain 100% test coverage
-  - All components must support i18n (en, it, he) and RTL
-  - Must use Tailwind design tokens only
-  - All new components must appear in style guide
+
+- Must maintain 100% test coverage
+- All components must support i18n (en, it, he) and RTL
+- Must use Tailwind design tokens only
+- All new components must appear in style guide
 **Scale/Scope**:
-  - 9-12 test ID additions (non-breaking changes)
-  - 4-5 new components (LanguagePrompt, RelatedProducts, Pagination, CategoryFilter)
-  - 2-3 new backend API endpoints (if needed for related products/filtering)
-  - Estimated 8-12 hours total
+- 9-12 test ID additions (non-breaking changes)
+- 4-5 new components (LanguagePrompt, RelatedProducts, Pagination, CategoryFilter)
+- 2-3 new backend API endpoints (if needed for related products/filtering)
+- Estimated 8-12 hours total
 
 ## Constitution Check
 
 ### ✅ I. Clean Architecture
+
 - **Compliance**: Frontend components use hooks for data fetching, no direct backend coupling
 - **Verification**: Components receive data via props, hooks handle API calls
 - **Status**: PASS - Frontend follows component-based architecture with clear separation
 
 ### ✅ II. SOLID Principles
+
 - **S (Single Responsibility)**: Each component has one clear purpose (e.g., LanguagePrompt handles only language detection UI)
 - **O (Open/Closed)**: Components accept props for customization, closed to modification
 - **L (Liskov Substitution)**: React component composition allows substitution
@@ -50,6 +54,7 @@ This will achieve 100% E2E test pass rate (108/108 tests passing) while maintain
 - **Status**: PASS - Design follows SOLID principles
 
 ### ✅ III. Strongly Typed
+
 - **Frontend**: All components, hooks, and utils have explicit TypeScript types
 - **Props**: All component props defined with TypeScript interfaces
 - **API Responses**: Use generated types from OpenAPI spec
@@ -57,6 +62,7 @@ This will achieve 100% E2E test pass rate (108/108 tests passing) while maintain
 - **Status**: PASS - Strong typing enforced throughout
 
 ### ✅ IV. Test-First Development (TDD)
+
 - **Approach**: Write unit tests for new components BEFORE implementation
 - **Process**: Red (failing test) → Green (minimal implementation) → Refactor
 - **Coverage Target**: 100% (lines, branches, functions, statements)
@@ -64,24 +70,28 @@ This will achieve 100% E2E test pass rate (108/108 tests passing) while maintain
 - **Status**: PASS - E2E tests are already written (TDD by default), unit tests will follow TDD
 
 ### ✅ V. Modular & Reusable Architecture
+
 - **Design**: All new components are generic and reusable
 - **Style Guide**: All components registered in `/[lang]/style-guide`
 - **Configuration**: Language/category data comes from CMS/API, not hard-coded
 - **Status**: PASS - Components follow DRY and reusability principles
 
 ### ✅ VI. Integration Testing Priority
+
 - **Coverage**: E2E tests cover integration between components and API
 - **Critical Flows**: Language switching, product navigation, filtering
 - **Component Integration**: Tests verify components work together correctly
 - **Status**: PASS - E2E tests provide comprehensive integration testing
 
 ### ✅ VII. API-First Design
+
 - **Approach**: Use existing API endpoints where possible
 - **New Endpoints**: Define in OpenAPI spec before implementation (if needed)
 - **Contract**: Follow existing API patterns in `contracts/template.openapi.yaml`
 - **Status**: PASS - API-first approach for any new backend needs
 
 ### ✅ VIII. Performance & SEO Standards
+
 - **Performance**: No new blocking operations, maintain <3s page load
 - **Optimization**: Lazy load components where appropriate
 - **SEO**: Related products improve internal linking (SEO benefit)
@@ -95,10 +105,11 @@ This will achieve 100% E2E test pass rate (108/108 tests passing) while maintain
 **Estimated Time**: 1-2 hours
 **Expected Outcome**: 61/108 tests passing (56% pass rate)
 
-#### Root Cause:
+#### Root Cause
+
 Tests expect URLs like `/products/:slug` and `/:lang/products` but the application may have incorrect routing configuration.
 
-#### Tasks:
+#### Tasks
 
 1. **Investigate product routing structure**
    - Check `src/app/[lang]/[slug]/page.tsx` dynamic route
@@ -135,11 +146,12 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 **Estimated Time**: 1-2 hours
 **Expected Outcome**: 66/108 tests passing (61% pass rate)
 
-#### Reference:
-- Next.js Docs: https://nextjs.org/docs/app/api-reference/functions/generate-sitemaps
+#### Reference
+
+- Next.js Docs: <https://nextjs.org/docs/app/api-reference/functions/generate-sitemaps>
 - Test Suite: `sitemap.spec.ts`
 
-#### Tasks:
+#### Tasks
 
 1. **Create `sitemap.ts` route handler**
    - Location: `src/app/sitemap.ts`
@@ -172,7 +184,7 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 
 #### Test Suite: `schema-markup.spec.ts`
 
-#### Tasks:
+#### Tasks
 
 1. **Create `SchemaMarkup.tsx` component**
    - Generic component to render JSON-LD script tags
@@ -212,7 +224,7 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 
 #### Test Suite: `seo-meta.spec.ts`
 
-#### Tasks:
+#### Tasks
 
 1. **Implement hreflang tags** for multi-language support
    - Add to all pages via Next.js Metadata API
@@ -244,7 +256,7 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 
 #### Test Suite: `redirects.spec.ts`
 
-#### Tasks:
+#### Tasks
 
 1. **Create redirect mapping system**
    - Add `url_redirects` table to database (if needed)
@@ -278,7 +290,7 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 
 #### Test Suite: `test_a11y.spec.ts`
 
-#### Tasks:
+#### Tasks
 
 1. **Run axe-core scan** on failing pages
    - Homepage (en, it, he)
@@ -312,7 +324,7 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 
 #### Test Suite: `performance.spec.ts`
 
-#### Tasks:
+#### Tasks
 
 1. **Optimize page load time** (<2 seconds target)
    - Reduce JavaScript bundle size
@@ -351,7 +363,7 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 
 #### Test Suites: `currency-selection.spec.ts`, `language-detection.spec.ts`
 
-#### Tasks:
+#### Tasks
 
 1. **Implement language detection with prompt**
    - Create `useLanguageDetection` hook to detect browser language
@@ -390,7 +402,7 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 
 #### Test Suites: `404-localization.spec.ts`, `rtl-layout.spec.ts`
 
-#### Tasks:
+#### Tasks
 
 1. **Fix 404 page title metadata** (3 tests)
    - Next.js limitation: metadata in `not-found.tsx` not applied
@@ -417,7 +429,7 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 **Estimated Time**: 1 hour
 **Expected Outcome**: 108/108 tests passing (100% pass rate)
 
-#### Tasks:
+#### Tasks
 
 1. **Run full E2E test suite** across all browsers
    - Chromium (primary)
@@ -448,18 +460,21 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 ## Testing Strategy
 
 ### Unit Tests (TDD - Write First)
+
 - All new components must have unit tests written BEFORE implementation
 - Test all props, states, and user interactions
 - Mock API calls and external dependencies
 - Achieve 100% coverage (lines, branches, functions, statements)
 
 ### E2E Tests (Already Exist - Guide Implementation)
+
 - E2E tests already exist and are failing
 - Use failing tests to guide implementation requirements
 - Run tests frequently during development to verify progress
 - Final verification: All 108 tests passing in all 5 browsers
 
 ### Integration Tests
+
 - Test component integration (e.g., LanguagePrompt with LanguageSwitcher)
 - Test API integration (e.g., RelatedProducts with backend API)
 - Test routing and navigation flows
@@ -495,9 +510,11 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 ## Dependencies
 
 ### External Dependencies
+
 - None required (all features use existing dependencies)
 
 ### Internal Dependencies
+
 - Existing API endpoints for products, languages, currencies
 - May need new endpoints for related products and category filtering
 - CMS content types for categories (may already exist in Strapi)

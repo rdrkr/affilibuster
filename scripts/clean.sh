@@ -32,6 +32,9 @@ cd backend && uv run --quiet task clean && cd ..
 echo "  🗑️ Removing frontend artifacts..."
 cd frontend && npm run --silent clean && cd ..
 
+echo "  🗑️ Removing ecopicks artifacts..."
+cd ecopicks && npm run --silent clean && cd ..
+
 echo "  🗑️ Removing build artifacts..."
 rm -rf .playwright-mcp || true
 rm -rf coverage coverage-merged || true

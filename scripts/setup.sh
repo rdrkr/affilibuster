@@ -75,6 +75,7 @@ if [[ "${OS}" = "macos" ]]; then
   install_brew "shellcheck"
   install_brew "checkmake"
   install_brew "mkcert"
+  install_brew "git-lfs"
 
   # Python dependency manager and tools
   install_brew "uv"
@@ -87,6 +88,7 @@ else
   install_apt "shfmt" "shfmt"
   install_apt "shellcheck" "shellcheck"
   install_apt "mkcert" "mkcert"
+  install_apt "git-lfs" "git-lfs"
 
   # checkmake (Go binary - install from GitHub releases)
   if ! command -v checkmake >/dev/null 2>&1; then
@@ -180,19 +182,25 @@ echo "📦 Installing project dependencies..."
 # Install CMS dependencies
 echo "  🧰 Installing cms dependencies..."
 cd cms
-npm install --silent --include=optional
+npm install --silent
 cd ..
 
 # Install backend dependencies
 echo "  🧰 Installing backend dependencies..."
 cd backend
-uv sync --quiet --all-extras
+uv sync --quiet
 cd ..
 
 # Install frontend dependencies
 echo "  🧰 Installing frontend dependencies..."
 cd frontend
-npm install --silent --include=optional
+npm install --silent
+cd ..
+
+# Install ecopicks dependencies
+echo "  🧰 Installing ecopicks dependencies..."
+cd ecopicks
+npm install --silent
 cd ..
 
 echo "📦 Installing pre-commit hooks..."
@@ -201,6 +209,15 @@ if command -v pre-commit >/dev/null 2>&1; then
   echo "  ✅ Pre-commit hooks installed"
 else
   echo "  ❌ pre-commit not installed"
+  exit 1
+fi
+
+echo "📦 Initializing Git LFS..."
+if command -v git-lfs >/dev/null 2>&1; then
+  git lfs install >/dev/null
+  echo "  ✅ Git LFS initialized"
+else
+  echo "  ❌ git-lfs not installed"
   exit 1
 fi
 

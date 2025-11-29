@@ -10,7 +10,7 @@ echo "  🔐 Loading environment variables..."
 . /app/.env
 
 echo "  📦 Installing frontend dependencies and generating client..."
-npm install --silent --include=optional
+npm install --silent
 
 echo "🚀 Starting frontend in development mode..."
 npm run dev

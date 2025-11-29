@@ -24,11 +24,11 @@ requirements documented in:
 ## Feature Specifications Summary
 
 | Spec                                               | Feature                              | Status         | Progress | Tasks        | Notes                                            |
-|----------------------------------------------------|--------------------------------------|----------------|----------|--------------|--------------------------------------------------|
-| [001](./specs/001-core-platform-setup/)            | Core Platform Setup & Multi-Language | ✅ Complete     | 100%     | 184/184      | All tasks complete including URL redirects       |
-| [002](./specs/002-https-migration/)                | HTTPS Migration for All Components   | ✅ Complete     | 100%     | 34/34        | Automated mkcert setup, OpenAPI models migration |
-| [003](./specs/003-comprehensive-testing-strategy/) | Comprehensive Testing Strategy       | ✅ Complete     | 100%     | 63/63        | Exceeded 80% target with 100% coverage           |
-| [004](./specs/004-user-authentication/)            | User Authentication & Login          | ✅ Complete     | 100%     | Phase 1 done | Backend + Frontend + 100% test coverage          |
+| -------------------------------------------------- | ------------------------------------ | -------------- | -------- | ------------ | ------------------------------------------------ |
+| [001](./specs/001-core-platform-setup/)            | Core Platform Setup & Multi-Language | ✅ Complete    | 100%     | 184/184      | All tasks complete including URL redirects       |
+| [002](./specs/002-https-migration/)                | HTTPS Migration for All Components   | ✅ Complete    | 100%     | 34/34        | Automated mkcert setup, OpenAPI models migration |
+| [003](./specs/003-comprehensive-testing-strategy/) | Comprehensive Testing Strategy       | ✅ Complete    | 100%     | 63/63        | Exceeded 80% target with 100% coverage           |
+| [004](./specs/004-user-authentication/)            | User Authentication & Login          | ✅ Complete    | 100%     | Phase 1 done | Backend + Frontend + 100% test coverage          |
 | [005](./specs/005-e2e-test-coverage/)              | E2E Test Coverage Completion         | 🟡 In Progress | 77%      | 83/108 tests | 25 tests skipped for unimplemented features      |
 
 ---
@@ -284,9 +284,9 @@ Prices are stored in single currency only.
 - [x] Alembic migration infrastructure configured
 - [x] Initial migration created for auth tables
 - [x] All use cases (register, login, logout, refresh, verify email, resend verification, reset password, profile
-  management, change password)
+      management, change password)
 - [x] All API routes (`/auth/register`, `/auth/login`, `/auth/logout`, `/auth/refresh`, `/auth/verify-email`,
-  `/auth/resend-verification`, `/auth/forgot-password`, `/auth/reset-password`, `/profile`, `/profile/change-password`)
+      `/auth/resend-verification`, `/auth/forgot-password`, `/auth/reset-password`, `/profile`, `/profile/change-password`)
 - [x] SMTP email service with HTML templates
 - [x] Authentication middleware (`get_current_user`, `get_current_verified_user`)
 - [x] Preferences migration to authenticated users
@@ -296,9 +296,9 @@ Prices are stored in single currency only.
 
 - [x] Auth context, hooks (`useAuth`, `useLogin`, `useRegister`, `useLogout`)
 - [x] All auth components (LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ProfileForm,
-  ResendVerificationForm)
+      ResendVerificationForm)
 - [x] All auth pages (`/[lang]/login`, `/[lang]/register`, `/[lang]/profile`, `/[lang]/forgot-password`,
-  `/[lang]/reset-password`, `/[lang]/verify-email`, `/[lang]/resend-verification`)
+      `/[lang]/reset-password`, `/[lang]/verify-email`, `/[lang]/resend-verification`)
 - [x] Auth-aware navigation with user menu
 - [x] E2E tests for all flows (ready to run)
 - [x] data-testid attributes on all interactive elements
@@ -757,7 +757,6 @@ protocol.
 
 **Missing**:
 
-- [ ] Automated deployment to staging environment
 - [ ] Automated deployment to production environment
 - [ ] Deployment rollback mechanism
 - [ ] Blue-green or canary deployments
@@ -862,7 +861,7 @@ protocol.
 ## Version History
 
 | Version | Date       | Changes                                                                                                                  |
-|---------|------------|--------------------------------------------------------------------------------------------------------------------------|
+| ------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
 | 1.4.0   | 2025-11-24 | Completed spec 002 (HTTPS Migration), automated mkcert setup, migrated to OpenAPI models, updated all docs               |
 | 1.3.0   | 2025-11-24 | Added spec 002 (HTTPS Migration), updated Security & Compliance section 11.0, added to critical priorities               |
 | 1.2.0   | 2025-11-21 | Completed spec 001 (T145 URL redirects), updated 5.2 to Complete status                                                  |

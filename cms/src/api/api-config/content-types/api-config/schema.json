@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "api_config",
+  "info": {
+    "singularName": "api-config",
+    "pluralName": "api-configs",
+    "displayName": "API Configuration",
+    "description": "Shared configuration values accessible by multiple services"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "key": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "maxLength": 255
+    },
+    "value": {
+      "type": "text",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    }
+  }
+}

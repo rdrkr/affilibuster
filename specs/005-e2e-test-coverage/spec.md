@@ -47,11 +47,13 @@ These components exist and work correctly but lack test IDs for E2E test selecto
 These are features that tests expect but don't exist in the codebase:
 
 #### 2.1 Language Detection Prompt (Medium Priority)
+
 **Test IDs**: `language-prompt`, `dismiss-language-prompt`, `accept-language-italian`
 **References**: 3+ tests in `language-detection.spec.ts`
 **User Story**: As a visitor with a non-English browser language, I want to be prompted to switch to my preferred language so that I can read content in my native language.
 
 **Acceptance Scenarios**:
+
 1. **Given** I visit the site with an Italian browser language setting, **When** the homepage loads, **Then** I see a prompt offering to switch to Italian
 2. **Given** I see the language prompt, **When** I click "Accept" for Italian, **Then** I am redirected to `/it` and the prompt dismisses
 3. **Given** I see the language prompt, **When** I click "Dismiss", **Then** the prompt disappears and my choice is remembered (localStorage)
@@ -59,42 +61,50 @@ These are features that tests expect but don't exist in the codebase:
 5. **Given** I am already viewing the Italian version, **When** I reload the page, **Then** no language prompt appears
 
 #### 2.2 Related Products Section (Medium Priority)
+
 **Test IDs**: `related-products`, `related-product`
 **References**: 3+ tests in `content-navigation.spec.ts`
 **User Story**: As a user viewing a product, I want to see related or similar products so that I can discover alternatives and make informed decisions.
 
 **Acceptance Scenarios**:
+
 1. **Given** I am viewing a product page, **When** the page loads, **Then** I see a "Related Products" section with at least 3 similar products
 2. **Given** I see related products, **When** each product displays, **Then** it shows thumbnail, name, price, and link
 3. **Given** I click on a related product, **When** the product page loads, **Then** I see that product's details and its own related products
 
 #### 2.3 Pagination Component (Low Priority)
+
 **Test IDs**: `pagination-next`, `pagination-prev`, `pagination-page-N`
 **References**: 2+ tests in `content-navigation.spec.ts`
 **User Story**: As a user browsing product listings, I want to navigate through multiple pages of results so that I can view all available products without overwhelming my browser.
 
 **Acceptance Scenarios**:
+
 1. **Given** I am on a product listing page with >20 products, **When** the page loads, **Then** I see pagination controls showing page numbers and next/previous buttons
 2. **Given** I am on page 1, **When** I click "Next", **Then** I navigate to page 2 and the URL updates to include `?page=2`
 3. **Given** I am on page 2, **When** I click "Previous", **Then** I navigate back to page 1
 4. **Given** I am on the last page, **When** the page loads, **Then** the "Next" button is disabled
 
 #### 2.4 Category Filter (Medium Priority)
+
 **Test IDs**: `category-filter`, `category-electronics`, `category-[name]`
 **References**: 2+ tests in `content-navigation.spec.ts`
 **User Story**: As a user browsing products, I want to filter by category so that I can quickly find products in my area of interest.
 
 **Acceptance Scenarios**:
+
 1. **Given** I am on the products page, **When** the page loads, **Then** I see a category filter dropdown with all available categories
 2. **Given** I open the category filter, **When** I select "Electronics", **Then** the product list updates to show only electronics and the URL includes `?category=electronics`
 3. **Given** I have a category filter applied, **When** I select "All Categories", **Then** the filter is cleared and all products are shown
 
 #### 2.5 Dropdown Menu Test IDs (Low Priority)
+
 **Test IDs**: `language-option-it`, `language-option-he`, `currency-option-EUR`, `currency-option-GBP`
 **References**: 4+ tests across multiple spec files
 **User Story**: As a test engineer, I need individual dropdown menu items to be identifiable so that E2E tests can verify selection behavior.
 
 **Acceptance Scenarios**:
+
 1. **Given** dropdowns are opened, **When** menu items render, **Then** each option has a `data-testid` based on its value (e.g., `language-option-it` for Italian)
 
 ## Success Criteria
@@ -140,14 +150,17 @@ These are features that tests expect but don't exist in the codebase:
 ## Risk Assessment
 
 **Low Risk**:
+
 - Adding test IDs is non-breaking and straightforward
 - Components follow established patterns in the codebase
 
 **Medium Risk**:
+
 - Related products requires product relationship logic (category/tag based)
 - Category filtering may need backend API changes
 
 **Mitigation**:
+
 - Test-first approach ensures no regressions
 - Incremental implementation allows validation at each step
 - Use existing Strapi content types where possible

@@ -198,6 +198,7 @@ As a security-conscious user, I want to enable two-factor authentication on my a
 ### Functional Requirements
 
 #### User Registration
+
 - **FR-001**: System MUST allow users to register with email address, password, and display name
 - **FR-002**: System MUST validate email addresses for proper format before accepting registration
 - **FR-003**: System MUST enforce password complexity requirements (minimum 8 characters, at least one letter and one number)
@@ -209,6 +210,7 @@ As a security-conscious user, I want to enable two-factor authentication on my a
 - **FR-009**: System MUST generate unique verification tokens with 24-hour expiration for email verification
 
 #### User Login
+
 - **FR-010**: System MUST allow users to log in using their registered email address and password
 - **FR-011**: System MUST create a secure session token (JWT or similar) upon successful authentication
 - **FR-012**: System MUST set secure HTTP-only cookies for session management
@@ -220,6 +222,7 @@ As a security-conscious user, I want to enable two-factor authentication on my a
 - **FR-018**: System MUST log all authentication events (login, logout, failed attempts) for security auditing
 
 #### Session Management
+
 - **FR-019**: System MUST maintain user session state across page navigations
 - **FR-020**: System MUST allow users to manually log out, which invalidates their current session
 - **FR-021**: System MUST expire sessions after 7 days of inactivity for standard sessions
@@ -228,6 +231,7 @@ As a security-conscious user, I want to enable two-factor authentication on my a
 - **FR-024**: System MUST refresh session tokens before expiration to maintain seamless user experience
 
 #### Password Management
+
 - **FR-025**: System MUST provide a "Forgot Password" flow that sends a reset link to the user's registered email
 - **FR-026**: System MUST generate single-use password reset tokens with 1-hour expiration
 - **FR-027**: System MUST allow users to reset their password using a valid reset token and new password
@@ -237,6 +241,7 @@ As a security-conscious user, I want to enable two-factor authentication on my a
 - **FR-031**: System MUST send a notification email when a password is changed
 
 #### Email Verification
+
 - **FR-032**: System MUST mark new user accounts as "unverified" by default
 - **FR-033**: System MUST allow unverified users to browse and use basic features
 - **FR-034**: System MUST restrict certain features (saving wish lists, leaving reviews) to verified users only
@@ -245,6 +250,7 @@ As a security-conscious user, I want to enable two-factor authentication on my a
 - **FR-037**: System MUST invalidate the verification token after successful verification
 
 #### User Profile Management
+
 - **FR-038**: System MUST provide an endpoint to retrieve the authenticated user's profile information
 - **FR-039**: System MUST allow users to update their display name
 - **FR-040**: System MUST allow users to change their email address with re-verification required
@@ -254,12 +260,14 @@ As a security-conscious user, I want to enable two-factor authentication on my a
 - **FR-044**: System MUST display account registration date and verification status in profile
 
 #### Preference Persistence
+
 - **FR-045**: System MUST link authenticated users to the existing user_preferences table via user_id
 - **FR-046**: System MUST migrate anonymous session preferences to user account upon first login after registration
 - **FR-047**: System MUST synchronize user preferences across all devices where the user is logged in
 - **FR-048**: System MUST apply user account preferences as the default when logging in from a new device
 
 #### Social Login (OAuth 2.0 with PKCE)
+
 - **FR-049**: System MUST support OAuth 2.0 with PKCE (Proof Key for Code Exchange) authentication flow for Google login
 - **FR-050**: System MUST support OAuth 2.0 with PKCE authentication flow for Facebook login
 - **FR-051**: System MUST generate and validate PKCE code verifier and code challenge for all OAuth flows
@@ -271,6 +279,7 @@ As a security-conscious user, I want to enable two-factor authentication on my a
 - **FR-057**: System MUST allow users to disconnect social login providers if a password is set
 
 #### Wish List / Saved Products
+
 - **FR-058**: System MUST allow authenticated verified users to save products to a wish list
 - **FR-059**: System MUST persist saved products across sessions and devices
 - **FR-060**: System MUST allow users to view their complete wish list on a dedicated page
@@ -279,6 +288,7 @@ As a security-conscious user, I want to enable two-factor authentication on my a
 - **FR-063**: System MUST prompt unauthenticated users to log in when attempting to save a product
 
 #### Two-Factor Authentication (2FA)
+
 - **FR-064**: System MUST support TOTP (Time-based One-Time Password) for 2FA using authenticator apps
 - **FR-065**: System MUST generate and display QR codes for easy authenticator app setup
 - **FR-066**: System MUST generate and display backup codes when 2FA is enabled
@@ -290,6 +300,7 @@ As a security-conscious user, I want to enable two-factor authentication on my a
 ### Non-Functional Requirements
 
 #### Security
+
 - **NFR-001**: All authentication endpoints MUST use HTTPS only
 - **NFR-002**: Session tokens MUST be cryptographically secure random values
 - **NFR-003**: Passwords MUST be hashed with bcrypt (cost factor 12) or Argon2
@@ -300,23 +311,27 @@ As a security-conscious user, I want to enable two-factor authentication on my a
 - **NFR-008**: OAuth tokens MUST be encrypted at rest in the database
 
 #### Performance
+
 - **NFR-009**: Login requests MUST complete within 500ms under normal load
 - **NFR-010**: Registration MUST complete within 1 second excluding email sending
 - **NFR-011**: Token validation MUST complete within 50ms
 - **NFR-012**: The authentication system MUST support at least 100 concurrent logins per second
 
 #### Availability
+
 - **NFR-013**: Authentication service MUST have 99.9% uptime
 - **NFR-014**: Failed authentication attempts MUST not impact service availability
 - **NFR-015**: Database connection failures MUST be handled gracefully with appropriate retries
 
 #### Compliance
+
 - **NFR-016**: System MUST comply with GDPR requirements for user data handling
 - **NFR-017**: System MUST allow users to export their personal data
 - **NFR-018**: System MUST allow users to request complete account deletion
 - **NFR-019**: System MUST obtain explicit consent for storing authentication cookies
 
 #### Type Safety & Strong Typing
+
 - **NFR-020**: All backend API request/response schemas MUST use Pydantic models with explicit type annotations
 - **NFR-021**: All backend database models MUST use SQLAlchemy 2.0+ mapped columns with type annotations
 - **NFR-022**: All backend functions and methods MUST have explicit type hints for parameters and return values

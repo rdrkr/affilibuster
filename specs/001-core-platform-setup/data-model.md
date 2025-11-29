@@ -29,12 +29,14 @@ interface Language {
 ```
 
 **Business Rules**:
+
 - Exactly one language must have `isDefault = true`
 - English (code: 'en') must be the default language
 - `urlPrefix` must be empty string for default language
 - Hebrew must have `direction = 'rtl'`, all others `'ltr'`
 
 **Sample Data**:
+
 ```json
 [
   {
@@ -98,6 +100,7 @@ type ContentStatus = 'draft' | 'published' | 'archived';
 ```
 
 **Business Rules**:
+
 - Cannot delete content with status 'published' (must archive first)
 - `createdAt` and `createdBy` are immutable
 - `updatedAt` and `updatedBy` update automatically on any change
@@ -138,12 +141,14 @@ interface ContentVersion {
 ```
 
 **Business Rules**:
+
 - `slug` must be unique per `(contentId, languageCode)` combination
 - If `isPublished = true`, `publishedAt` must be set
 - `translations` must not include self-reference (can't link to own languageCode)
 - When content is archived, all associated `ContentVersion` records set `isPublished = false`
 
 **Sample Data**:
+
 ```json
 {
   "id": "cv-123",
@@ -206,6 +211,7 @@ interface URLRedirect {
 ```
 
 **Business Rules**:
+
 - `path` must be globally unique (across all languages)
 - Only one URLRoute can have `isPrimary = true` per ContentVersion
 - When slug changes:
@@ -218,6 +224,7 @@ interface URLRedirect {
 - `redirects` are immutable (append-only audit log)
 
 **Sample Data**:
+
 ```json
 {
   "id": "url-789",
@@ -272,11 +279,13 @@ type CurrencyCode = 'USD' | 'EUR' | 'ILS' | 'GBP' | 'CAD' | 'AUD' | 'JPY' | 'CNY
 ```
 
 **Business Rules**:
+
 - `code` must be valid ISO 4217 currency code
 - At least one currency must have `isActive = true`
 - `decimalPlaces` must be 0-3 (99.9% of currencies)
 
 **Sample Data**:
+
 ```json
 [
   {
@@ -340,6 +349,7 @@ interface UserPreferences {
 ```
 
 **Business Rules**:
+
 - `expiresAt` must be > `updatedAt`
 - `sessionId` is required (generated on first visit)
 - `userId` takes precedence over `sessionId` if both exist (logged-in user)
@@ -347,6 +357,7 @@ interface UserPreferences {
 - When language prompt dismissed, `dismissedLanguagePrompt = true` for session only
 
 **Sample Data**:
+
 ```json
 {
   "id": "pref-001",
@@ -387,11 +398,13 @@ interface Locale {
 ```
 
 **Business Rules**:
+
 - `code` must be valid IETF BCP 47 locale code
 - Each active Language must have at least one active Locale
 - `firstDayOfWeek` must be 0-6 (Sunday = 0, Monday = 1, etc.)
 
 **Sample Data**:
+
 ```json
 [
   {
@@ -520,6 +533,7 @@ ContentVersion (N) ──< translations >── (N) ContentVersion
 ```
 
 **Business Logic**:
+
 1. **Draft → Published**:
    - Set `Content.status = 'published'`
    - Set all associated `ContentVersion.isPublished = true`
@@ -547,6 +561,7 @@ ContentVersion (N) ──< translations >── (N) ContentVersion
 ```
 
 **Business Logic**:
+
 1. Admin updates `ContentVersion.slug` (e.g., "eco-bottle" → "eco-water-bottle")
 2. System creates new `URLRoute`:
    - `path = "/products/eco-water-bottle"`
@@ -713,6 +728,7 @@ This data model provides:
 6. **Audit Trail**: Immutable redirect history, created/updated timestamps
 
 **Key Design Decisions**:
+
 - ✅ Clean Architecture: Entities are framework-agnostic
 - ✅ SOLID: Single responsibility per entity
 - ✅ Performance: Denormalized `translations` field for fast lookups

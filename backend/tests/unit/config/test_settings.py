@@ -119,7 +119,7 @@ class TestSettingsConfiguration:
         assert settings.postgres_port is not None
         assert settings.postgres_user is not None
         assert settings.postgres_password is not None
-        assert settings.postgres_backend_name is not None
+        assert settings.postgres_db is not None
 
     def test_settings_redis_components(self):
         """Test Settings has all Redis URL components."""
@@ -134,7 +134,6 @@ class TestSettingsConfiguration:
         assert settings.cms_protocol is not None
         assert settings.cms_host is not None
         assert settings.cms_port is not None
-        assert settings.strapi_api_token is not None
 
     def test_settings_jwt_secret(self):
         """Test Settings has JWT secret configured."""

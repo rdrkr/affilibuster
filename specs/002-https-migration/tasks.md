@@ -55,9 +55,9 @@
 
 ## Phase 7: Testing & Validation (7 tasks)
 
-- [ ] **T024**: Test backend API with HTTPS (https://localhost:8000/docs)
-- [ ] **T025**: Test frontend with HTTPS (https://localhost:3000)
-- [ ] **T026**: Test CMS with HTTPS (https://localhost:1337/admin)
+- [ ] **T024**: Test backend API with HTTPS (<https://localhost:8000/docs>)
+- [ ] **T025**: Test frontend with HTTPS (<https://localhost:3000>)
+- [ ] **T026**: Test CMS with HTTPS (<https://localhost:1337/admin>)
 - [ ] **T027**: Verify secure cookies in browser DevTools
 - [ ] **T028**: Run backend test suite (`make test-backend`)
 - [ ] **T029**: Run frontend test suite (`make test-frontend`)
@@ -116,6 +116,7 @@ Cookie `secure` flag automatically adjusts based on `BACKEND_PROTOCOL`.
 ### File Changes Summary
 
 **New Files**:
+
 - `certs/.gitkeep`
 - `certs/.gitignore`
 - `certs/localhost.pem` (gitignored, auto-generated)
@@ -125,6 +126,7 @@ Cookie `secure` flag automatically adjusts based on `BACKEND_PROTOCOL`.
 - `specs/002-https-migration/tasks.md`
 
 **Modified Files**:
+
 - `.env` (HTTPS protocols, SSL paths)
 - `.env.dev.example` (HTTPS protocols, SSL paths)
 - `.env.prod.example` (HTTPS protocols, SSL paths, INTERNAL_*_HOST)
