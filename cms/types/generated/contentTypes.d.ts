@@ -377,8 +377,8 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
 export interface ApiAboutAbout extends Struct.SingleTypeSchema {
   collectionName: 'abouts'
   info: {
-    description: 'About page featuring company mission, features, tech stack, and call-to-action sections with full rich text support and i18n localization'
-    displayName: 'About'
+    description: 'Composable about page with dynamic sections: hero, story, values, team grid'
+    displayName: 'About Us Page'
     pluralName: 'abouts'
     singularName: 'about'
   }
@@ -391,99 +391,33 @@ export interface ApiAboutAbout extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
-    content: Schema.Attribute.RichText &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    ctaText: Schema.Attribute.RichText &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    ctaTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    entryTitle: Schema.Attribute.String & Schema.Attribute.Required
-    featuresList: Schema.Attribute.Component<'ui.feature-item', true> &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    featuresTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    heroSubtitle: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    heroTitle: Schema.Attribute.String &
+    entryTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'About Us Page'>
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::about.about'>
+    publishedAt: Schema.Attribute.DateTime
+    sections: Schema.Attribute.DynamicZone<
+      [
+        'sections.hero',
+        'sections.team-grid',
+        'markers.start-horizontal-layout-marker',
+        'markers.end-horizontal-layout-marker',
+        'elements.text-block',
+        'sections.brand-features-section',
+      ]
+    > &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    locale: Schema.Attribute.String
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::about.about'>
-    metaDescription: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160
-      }>
-    metaKeywords: Schema.Attribute.JSON &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    metaTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60
-      }>
-    missionContent: Schema.Attribute.RichText &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    missionTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    publishedAt: Schema.Attribute.DateTime
-    techStackDescription: Schema.Attribute.RichText &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    techStackTitle: Schema.Attribute.String &
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -505,6 +439,14 @@ export interface ApiApiConfigApiConfig extends Struct.CollectionTypeSchema {
   options: {
     draftAndPublish: false
   }
+  pluginOptions: {
+    'content-manager': {
+      visible: false
+    }
+    'content-type-builder': {
+      visible: false
+    }
+  }
   attributes: {
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
@@ -524,13 +466,13 @@ export interface ApiApiConfigApiConfig extends Struct.CollectionTypeSchema {
   }
 }
 
-export interface ApiContactContact extends Struct.SingleTypeSchema {
-  collectionName: 'contacts'
+export interface ApiAuthPageAuthPage extends Struct.SingleTypeSchema {
+  collectionName: 'auth_pages'
   info: {
-    description: 'Contact page with hero section, contact cards for multiple departments, response time information, office hours, department-specific email addresses'
-    displayName: 'Contact'
-    pluralName: 'contacts'
-    singularName: 'contact'
+    description: 'UI labels for login and signup pages including form fields, buttons, and social auth options'
+    displayName: 'Auth Page'
+    pluralName: 'auth-pages'
+    singularName: 'auth-page'
   }
   options: {
     draftAndPublish: true
@@ -541,19 +483,7 @@ export interface ApiContactContact extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
-    businessEmail: Schema.Attribute.Email &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    contactCards: Schema.Attribute.Component<'ui.contact-card', true> &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    content: Schema.Attribute.RichText &
+    appleButton: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -561,20 +491,403 @@ export interface ApiContactContact extends Struct.SingleTypeSchema {
       }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    entryTitle: Schema.Attribute.String & Schema.Attribute.Required
-    generalInquiriesEmail: Schema.Attribute.Email &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    heroSubtitle: Schema.Attribute.Text &
+    emailLabel: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    heroTitle: Schema.Attribute.String &
+    emailPlaceholder: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    entryTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'Auth Page'>
+    forgotPasswordLink: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    googleButton: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    haveAccountText: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::auth-page.auth-page'>
+    loginButton: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    loginLinkText: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    loginSubtitle: Schema.Attribute.Text &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    loginTitle: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    nameLabel: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    namePlaceholder: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    noAccountText: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    orDividerText: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    passwordLabel: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    passwordPlaceholder: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    privacyLinkText: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    publishedAt: Schema.Attribute.DateTime
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    signupButton: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    signupLinkText: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    signupSubtitle: Schema.Attribute.Text &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    signupTitle: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    termsCheckboxText: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    termsLinkText: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
+  collectionName: 'authors'
+  info: {
+    description: 'Blog post authors with profile information, bio, social links, and their published articles'
+    displayName: 'Author'
+    pluralName: 'authors'
+    singularName: 'author'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    bio: Schema.Attribute.RichText &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    blogPosts: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'>
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    email: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    github: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    instagram: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    linkedin: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::author.author'>
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    profilePicture: Schema.Attribute.Media<'images'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    publishedAt: Schema.Attribute.DateTime
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    slug: Schema.Attribute.UID<'name'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    twitter: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    website: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+  }
+}
+
+export interface ApiBlogPostTagBlogPostTag extends Struct.CollectionTypeSchema {
+  collectionName: 'blog_post_tags'
+  info: {
+    displayName: 'Blog Post Tag'
+    pluralName: 'blog-post-tags'
+    singularName: 'blog-post-tag'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::blog-post-tag.blog-post-tag'>
+    posts: Schema.Attribute.Relation<'manyToMany', 'api::blog-post.blog-post'>
+    publishedAt: Schema.Attribute.DateTime
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    tag: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    tagId: Schema.Attribute.UID &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
+  collectionName: 'blog_posts'
+  info: {
+    description: 'Blog posts with title, content, featured image, author, tags, and SEO metadata'
+    displayName: 'Blog Post'
+    pluralName: 'blog-posts'
+    singularName: 'blog-post'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    author: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>
+    content: Schema.Attribute.Component<'elements.text-block', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    featuredImage: Schema.Attribute.Media<'images'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'>
+    publishedAt: Schema.Attribute.DateTime
+    publishedDate: Schema.Attribute.DateTime & Schema.Attribute.Required
+    readArticleLabel: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    readTime: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    slug: Schema.Attribute.UID &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    tags: Schema.Attribute.Relation<'manyToMany', 'api::blog-post-tag.blog-post-tag'>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiBlogBlog extends Struct.SingleTypeSchema {
+  collectionName: 'blogs'
+  info: {
+    description: 'Blog listing page with title, description, category filters, and UI labels'
+    displayName: 'Blog Page'
+    pluralName: 'blogs'
+    singularName: 'blog'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    blogPosts: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'>
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    entryTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'Blog Page'>
+    featuredBlogPosts: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'>
+    header: Schema.Attribute.Component<'elements.header', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -582,78 +895,125 @@ export interface ApiContactContact extends Struct.SingleTypeSchema {
         }
       }>
     locale: Schema.Attribute.String
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::contact.contact'>
-    metaDescription: Schema.Attribute.Text &
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::blog.blog'>
+    pagination: Schema.Attribute.Component<'call-to-actions.pagination-cta', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160
-      }>
-    metaKeywords: Schema.Attribute.JSON &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    metaTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60
-      }>
-    officeHoursMessage: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    officeHoursText: Schema.Attribute.RichText &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    officeHoursTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    privacyEmail: Schema.Attribute.Email &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
         }
       }>
     publishedAt: Schema.Attribute.DateTime
-    responseTimeMessage: Schema.Attribute.Text &
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    responseTimeText: Schema.Attribute.RichText &
+    tagFilters: Schema.Attribute.Relation<'oneToMany', 'api::blog-post-tag.blog-post-tag'>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiContactUsContactUs extends Struct.SingleTypeSchema {
+  collectionName: 'contact_us'
+  info: {
+    description: 'Contact us page with title, tabs, form labels, and contact information cards'
+    displayName: 'Contact Us Page'
+    pluralName: 'contacts-us'
+    singularName: 'contact-us'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    contactTabLabel: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    responseTimeTitle: Schema.Attribute.String &
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    emailLabel: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    supportEmail: Schema.Attribute.Email &
+    emailPlaceholder: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
-          localized: false
+          localized: true
+        }
+      }>
+    entryTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'Contact Us Page'>
+    faqTabLabel: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::contact-us.contact-us'>
+    messageLabel: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    messagePlaceholder: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    nameLabel: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    namePlaceholder: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    publishedAt: Schema.Attribute.DateTime
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    submitButton: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    subtitle: Schema.Attribute.Text &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    title: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
         }
       }>
     updatedAt: Schema.Attribute.DateTime
@@ -672,10 +1032,20 @@ export interface ApiCurrencyCurrency extends Struct.CollectionTypeSchema {
   options: {
     draftAndPublish: true
   }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
   attributes: {
     code: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }> &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 3
         minLength: 3
@@ -684,6 +1054,11 @@ export interface ApiCurrencyCurrency extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     decimalPlaces: Schema.Attribute.Integer &
       Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }> &
       Schema.Attribute.SetMinMax<
         {
           max: 8
@@ -694,27 +1069,64 @@ export interface ApiCurrencyCurrency extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<2>
     decimalSeparator: Schema.Attribute.String &
       Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }> &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 1
       }> &
       Schema.Attribute.DefaultTo<'.'>
-    displayName: Schema.Attribute.String & Schema.Attribute.Required
-    exchangeRate: Schema.Attribute.Decimal & Schema.Attribute.Required & Schema.Attribute.DefaultTo<1>
-    isActive: Schema.Attribute.Boolean & Schema.Attribute.Required & Schema.Attribute.DefaultTo<true>
-    locale: Schema.Attribute.String & Schema.Attribute.Private
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::currency.currency'> & Schema.Attribute.Private
-    name: Schema.Attribute.String & Schema.Attribute.Required
+    exchangeRate: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }> &
+      Schema.Attribute.DefaultTo<1>
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::currency.currency'>
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
     publishedAt: Schema.Attribute.DateTime
-    sortOrder: Schema.Attribute.Integer & Schema.Attribute.Required & Schema.Attribute.DefaultTo<0>
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     symbol: Schema.Attribute.String &
       Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }> &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 5
       }>
     symbolPosition: Schema.Attribute.Enumeration<['before', 'after']> &
       Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }> &
       Schema.Attribute.DefaultTo<'before'>
     thousandsSeparator: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }> &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 1
       }> &
@@ -741,7 +1153,8 @@ export interface ApiError404Error404 extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
-    content: Schema.Attribute.RichText &
+    content: Schema.Attribute.Component<'elements.text-block', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -749,57 +1162,14 @@ export interface ApiError404Error404 extends Struct.SingleTypeSchema {
       }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    ctaText: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.DefaultTo<'Go to Homepage'>
-    entryTitle: Schema.Attribute.String & Schema.Attribute.Required
+    entryTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'Error 404: Page Not Found'>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::error-404.error-404'>
-    message: Schema.Attribute.Text &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    metaDescription: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160
-      }>
-    metaTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60
-      }>
     publishedAt: Schema.Attribute.DateTime
-    secondaryCtaText: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.DefaultTo<'Browse Products'>
-    subtitle: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    title: Schema.Attribute.String &
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -828,7 +1198,8 @@ export interface ApiError410Error410 extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
-    content: Schema.Attribute.RichText &
+    content: Schema.Attribute.Component<'elements.text-block', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -836,50 +1207,79 @@ export interface ApiError410Error410 extends Struct.SingleTypeSchema {
       }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    ctaText: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.DefaultTo<'Go to Homepage'>
-    entryTitle: Schema.Attribute.String & Schema.Attribute.Required
+    entryTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'Error 410: Page Gone'>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::error-410.error-410'>
-    message: Schema.Attribute.Text &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    metaDescription: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160
-      }>
-    metaTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60
-      }>
     publishedAt: Schema.Attribute.DateTime
-    subtitle: Schema.Attribute.String &
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    supportContactMessage: Schema.Attribute.String &
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiFaqFaq extends Struct.SingleTypeSchema {
+  collectionName: 'faqs'
+  info: {
+    description: 'Frequently Asked Questions page with title, description, and FAQ items organized by categories'
+    displayName: 'FAQ Page'
+    pluralName: 'faqs'
+    singularName: 'faq'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    contactButtonText: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }> &
+      Schema.Attribute.DefaultTo<'Contact Us'>
+    contactPrompt: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }> &
+      Schema.Attribute.DefaultTo<"Didn't find what you're looking for?">
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    description: Schema.Attribute.RichText &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    entryTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'FAQ Page'>
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::faq.faq'>
+    publishedAt: Schema.Attribute.DateTime
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    subtitle: Schema.Attribute.Text &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -900,7 +1300,7 @@ export interface ApiError410Error410 extends Struct.SingleTypeSchema {
 export interface ApiFooterFooter extends Struct.SingleTypeSchema {
   collectionName: 'footer'
   info: {
-    description: 'Global footer with brand description, newsletter signup section, quick links labels, copyright text, social media aria labels, and localized link labels'
+    description: 'Global footer with brand description, section headers (Shop, About, Support), all navigation links, newsletter signup, copyright text, tagline, and bottom bar links'
     displayName: 'Footer'
     pluralName: 'footers'
     singularName: 'footer'
@@ -914,26 +1314,21 @@ export interface ApiFooterFooter extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
-    aboutUsLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    brandDescription: Schema.Attribute.RichText &
+    columns: Schema.Attribute.DynamicZone<
+      [
+        'elements.text-block',
+        'call-to-actions.newsletter-signup-cta',
+        'markers.start-horizontal-layout-marker',
+        'markers.end-horizontal-layout-marker',
+      ]
+    > &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    contactLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    copyrightText: Schema.Attribute.String &
+    copyrightsLabel: Schema.Attribute.Component<'elements.label', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -942,71 +1337,22 @@ export interface ApiFooterFooter extends Struct.SingleTypeSchema {
       }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    emailPlaceholder: Schema.Attribute.String &
+    entryTitle: Schema.Attribute.String &
       Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    entryTitle: Schema.Attribute.String & Schema.Attribute.Required
-    facebookAriaLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    footerTagline: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'Footer'>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::footer.footer'>
-    newsletterDescription: Schema.Attribute.Text &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    newsletterTitle: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    privacyPolicyLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
     publishedAt: Schema.Attribute.DateTime
-    quickLinksTitle: Schema.Attribute.String &
+    quickLinks: Schema.Attribute.Component<'elements.button', true> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    subscribeButton: Schema.Attribute.String &
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    termsOfServiceLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    twitterAriaLabel: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -1020,7 +1366,7 @@ export interface ApiFooterFooter extends Struct.SingleTypeSchema {
 export interface ApiHomepageHomepage extends Struct.SingleTypeSchema {
   collectionName: 'homepages'
   info: {
-    description: 'Homepage with hero section, featured products showcase, testimonials, trust cards, feature list, product browsing labels, and SEO metadata'
+    description: 'Composable homepage with dynamic sections: hero, featured products, category grid, feature grid, blog teaser, two-column content, and newsletter signup'
     displayName: 'Homepage'
     pluralName: 'homepages'
     singularName: 'homepage'
@@ -1034,136 +1380,36 @@ export interface ApiHomepageHomepage extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
-    allProductsLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    entryTitle: Schema.Attribute.String & Schema.Attribute.Required
-    featureCards: Schema.Attribute.Component<'ui.feature-card', true> &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    featuredBadgeText: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.DefaultTo<'Featured'>
-    featuredProductsDescription: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    featuredProductsTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    featuredSectionSubtitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    featuredSectionTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    heroContent: Schema.Attribute.RichText &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    heroSubtitle: Schema.Attribute.Text &
+    entryTitle: Schema.Attribute.String &
       Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    heroTitle: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'Homepage'>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::homepage.homepage'>
-    metaDescription: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160
-      }>
-    metaKeywords: Schema.Attribute.JSON &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    metaTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60
-      }>
     publishedAt: Schema.Attribute.DateTime
-    seeAllProductsText: Schema.Attribute.String &
+    sections: Schema.Attribute.DynamicZone<
+      [
+        'sections.hero',
+        'sections.featured-products',
+        'sections.category-grid',
+        'sections.blog-teaser',
+        'markers.start-horizontal-layout-marker',
+        'markers.end-horizontal-layout-marker',
+        'elements.text-block',
+        'call-to-actions.newsletter-signup-cta',
+        'sections.brand-features-section',
+      ]
+    > &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    showingProductsTemplate: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    testimonialAuthor: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    testimonialRole: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    testimonialsText: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    testimonialsTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    trustCards: Schema.Attribute.Component<'ui.trust-card', true> &
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -1171,26 +1417,13 @@ export interface ApiHomepageHomepage extends Struct.SingleTypeSchema {
       }>
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    viewDetailsButtonText: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.DefaultTo<'View Details'>
-    whyChooseUsTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
   }
 }
 
 export interface ApiNavigationNavigation extends Struct.SingleTypeSchema {
   collectionName: 'navigation'
   info: {
-    description: 'Global navigation menu labels, brand name, theme and language selectors, language switch prompt messages, social media labels, site-wide SEO metadata, and all UI labels'
+    description: 'Top menu bar navigation: main menu links, search functionality, theme selector, language selector, and UI labels for the navbar'
     displayName: 'Navigation'
     pluralName: 'navigations'
     singularName: 'navigation'
@@ -1204,33 +1437,21 @@ export interface ApiNavigationNavigation extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
-    aboutLabel: Schema.Attribute.String &
+    aboutButton: Schema.Attribute.Component<'elements.button', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    availableInOtherLanguagesLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    brandName: Schema.Attribute.String &
+    blogButton: Schema.Attribute.Component<'elements.button', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    browseProductsButton: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    contactLabel: Schema.Attribute.String &
+    brandButton: Schema.Attribute.Component<'elements.button', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -1239,39 +1460,19 @@ export interface ApiNavigationNavigation extends Struct.SingleTypeSchema {
       }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    currencySelectorAriaLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    currencySelectorLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    entryTitle: Schema.Attribute.String & Schema.Attribute.Required
-    facebookLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    homeLabel: Schema.Attribute.String &
+    entryTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'Navigation'>
+    homeButton: Schema.Attribute.Component<'elements.button', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    languageSelectorAriaLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    languageSelectorLabel: Schema.Attribute.String &
+    languageMenu: Schema.Attribute.Component<'menus.language-selector', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -1279,66 +1480,51 @@ export interface ApiNavigationNavigation extends Struct.SingleTypeSchema {
       }>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::navigation.navigation'>
-    mobileMenuCloseAriaLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    mobileMenuCloseLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    mobileMenuLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    noButtonText: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    productsLabel: Schema.Attribute.String &
+    loginButton: Schema.Attribute.Component<'elements.button', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    promptMessageTemplate: Schema.Attribute.Text &
+    mobileMenuButton: Schema.Attribute.Component<'menus.mobile-menu', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    promptTitleTemplate: Schema.Attribute.String &
+    productsMenu: Schema.Attribute.Component<'menus.product-categories-selector', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     publishedAt: Schema.Attribute.DateTime
-    siteDescription: Schema.Attribute.Text &
+    searchMenu: Schema.Attribute.Component<'menus.search-menu', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160
       }>
-    siteKeywords: Schema.Attribute.JSON &
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    siteDescription: Schema.Attribute.String &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     siteTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -1346,38 +1532,10 @@ export interface ApiNavigationNavigation extends Struct.SingleTypeSchema {
       }> &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 60
-      }>
-    themeDarkLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    themeLightLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    themeSelectorAriaLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    themeSelectorLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    themeSystemLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    twitterLabel: Schema.Attribute.String &
+      }> &
+      Schema.Attribute.DefaultTo<'TheGreenBrother'>
+    themeMenu: Schema.Attribute.Component<'menus.theme-selector', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -1385,12 +1543,6 @@ export interface ApiNavigationNavigation extends Struct.SingleTypeSchema {
       }>
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    yesButtonTemplate: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
   }
 }
 
@@ -1398,7 +1550,7 @@ export interface ApiPrivacyPrivacy extends Struct.SingleTypeSchema {
   collectionName: 'privacies'
   info: {
     description: 'Privacy policy page with rich text content, last updated timestamp, custom update label, and SEO metadata (title, description, keywords)'
-    displayName: 'Privacy'
+    displayName: 'Privacy Policy Page'
     pluralName: 'privacies'
     singularName: 'privacy'
   }
@@ -1411,16 +1563,12 @@ export interface ApiPrivacyPrivacy extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
-    content: Schema.Attribute.RichText &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    entryTitle: Schema.Attribute.String & Schema.Attribute.Required
+    entryTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'Privacy Policy Page'>
     lastUpdated: Schema.Attribute.DateTime &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -1435,32 +1583,8 @@ export interface ApiPrivacyPrivacy extends Struct.SingleTypeSchema {
       }>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::privacy.privacy'>
-    metaDescription: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160
-      }>
-    metaKeywords: Schema.Attribute.JSON &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    metaTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60
-      }>
     publishedAt: Schema.Attribute.DateTime
-    title: Schema.Attribute.String &
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -1472,13 +1596,13 @@ export interface ApiPrivacyPrivacy extends Struct.SingleTypeSchema {
   }
 }
 
-export interface ApiProductPageProductPage extends Struct.SingleTypeSchema {
-  collectionName: 'product_pages'
+export interface ApiProductCategoriesPageProductCategoriesPage extends Struct.SingleTypeSchema {
+  collectionName: 'product_categories_pages'
   info: {
-    description: 'Products listing page with pagination configuration, empty state messaging, item count settings, navigation labels, count templates, and SEO metadata'
-    displayName: 'Products'
-    pluralName: 'product-pages'
-    singularName: 'product-page'
+    description: 'Product categories listing page with pagination configuration, empty state messaging, item count settings, navigation labels, count templates, and SEO metadata'
+    displayName: 'Product Categories Page'
+    pluralName: 'product-categories-pages'
+    singularName: 'product-categories-page'
   }
   options: {
     draftAndPublish: true
@@ -1489,15 +1613,26 @@ export interface ApiProductPageProductPage extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
-    createdAt: Schema.Attribute.DateTime
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    description: Schema.Attribute.RichText &
+    allCategoriesLabel: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
-      }>
-    entryTitle: Schema.Attribute.String & Schema.Attribute.Required
+      }> &
+      Schema.Attribute.DefaultTo<'All Categories'>
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    entryTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'Product Categories Page'>
+    filterLabel: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }> &
+      Schema.Attribute.DefaultTo<'Filter by category'>
     itemsPerPage: Schema.Attribute.Integer &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -1506,31 +1641,7 @@ export interface ApiProductPageProductPage extends Struct.SingleTypeSchema {
       }> &
       Schema.Attribute.DefaultTo<12>
     locale: Schema.Attribute.String
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::product-page.product-page'>
-    metaDescription: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160
-      }>
-    metaKeywords: Schema.Attribute.JSON &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    metaTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60
-      }>
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::product-categories-page.product-categories-page'>
     nextButton: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -1556,7 +1667,22 @@ export interface ApiProductPageProductPage extends Struct.SingleTypeSchema {
           localized: true
         }
       }>
+    productCategories: Schema.Attribute.Relation<'oneToMany', 'api::product-category.product-category'>
     publishedAt: Schema.Attribute.DateTime
+    resultsCountTemplate: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }> &
+      Schema.Attribute.DefaultTo<'{count} Products'>
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     showingText: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -1564,13 +1690,104 @@ export interface ApiProductPageProductPage extends Struct.SingleTypeSchema {
         }
       }> &
       Schema.Attribute.DefaultTo<'Showing {count} of {total}'>
-    subtitle: Schema.Attribute.Text &
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiProductCategoryProductCategory extends Struct.CollectionTypeSchema {
+  collectionName: 'product_categories'
+  info: {
+    description: 'Product category with name, description, image, and relation to products. Used for navigation dropdown and product organization.'
+    displayName: 'Product Category'
+    pluralName: 'product-categories'
+    singularName: 'product-category'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    content: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    title: Schema.Attribute.String &
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    image: Schema.Attribute.Media<'images'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::product-category.product-category'>
+    products: Schema.Attribute.Relation<'oneToMany', 'api::product.product'>
+    publishedAt: Schema.Attribute.DateTime
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    slug: Schema.Attribute.UID &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiProductTagProductTag extends Struct.CollectionTypeSchema {
+  collectionName: 'product_tags'
+  info: {
+    displayName: 'Product Tag'
+    pluralName: 'product-tags'
+    singularName: 'product-tag'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::product-tag.product-tag'>
+    products: Schema.Attribute.Relation<'manyToMany', 'api::product.product'>
+    publishedAt: Schema.Attribute.DateTime
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    tag: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    tagId: Schema.Attribute.UID &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -1599,19 +1816,15 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     }
   }
   attributes: {
-    affiliateUrl: Schema.Attribute.String &
+    affiliateButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
-          localized: false
+          localized: true
         }
       }>
-    category: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    content: Schema.Attribute.RichText &
+    category: Schema.Attribute.Relation<'manyToOne', 'api::product-category.product-category'>
+    content: Schema.Attribute.Component<'elements.text-block', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -1620,99 +1833,58 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
       }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    currency: Schema.Attribute.Enumeration<['USD', 'EUR', 'GBP', 'ILS', 'CAD', 'AUD', 'JPY', 'CNY']> &
+    currency: Schema.Attribute.Relation<'manyToOne', 'api::currency.currency'>
+    images: Schema.Attribute.Media<'images', true> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false
         }
-      }> &
-      Schema.Attribute.DefaultTo<'USD'>
-    description: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
       }>
-    excerpt: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    featured: Schema.Attribute.Boolean &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }> &
-      Schema.Attribute.DefaultTo<false>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::product.product'>
-    metaDescription: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160
-      }>
-    metaKeywords: Schema.Attribute.JSON &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    metaTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60
-      }>
     price: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false
         }
       }>
     publishedAt: Schema.Attribute.DateTime
-    slug: Schema.Attribute.UID<'title'> &
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    title: Schema.Attribute.String &
+    slug: Schema.Attribute.UID &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    translationStatus: Schema.Attribute.Enumeration<['complete', 'partial', 'missing', 'pending']> &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.DefaultTo<'complete'>
+    tags: Schema.Attribute.Relation<'manyToMany', 'api::product-tag.product-tag'>
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    viewDetailsLabel: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
   }
 }
 
-export interface ApiSystemMessageSystemMessage extends Struct.SingleTypeSchema {
-  collectionName: 'system_messages'
+export interface ApiProfileProfile extends Struct.SingleTypeSchema {
+  collectionName: 'profiles'
   info: {
-    description: 'System-wide UI messages including error notifications (unknown, network, unexpected), translation unavailability notices with localized titles and messages'
-    displayName: 'System'
-    pluralName: 'system-messages'
-    singularName: 'system-message'
+    description: 'UI labels for profile, edit profile, wishlist, currency, and account deletion pages'
+    displayName: 'Profile Page'
+    pluralName: 'profiles'
+    singularName: 'profile'
   }
   options: {
     draftAndPublish: true
@@ -1723,40 +1895,215 @@ export interface ApiSystemMessageSystemMessage extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
+    cancelButton: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    confirmButton: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    entryTitle: Schema.Attribute.String & Schema.Attribute.Required
+    currencyDescription: Schema.Attribute.Text &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    currencyTitle: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    deleteAccountTitle: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    deleteAccountWarning: Schema.Attribute.Text &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    deleteButton: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    editProfileTitle: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    emailLabel: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    entryTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'Profile Page'>
     locale: Schema.Attribute.String
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::system-message.system-message'>
-    networkErrorMessage: Schema.Attribute.String &
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::profile.profile'>
+    logoutButton: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    nameLabel: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    passwordLabel: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    profileTitle: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     publishedAt: Schema.Attribute.DateTime
-    translationNotAvailableMessage: Schema.Attribute.Text &
+    saveButton: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    translationNotAvailableTitle: Schema.Attribute.String &
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    unexpectedErrorMessage: Schema.Attribute.String &
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    wishlistEmptyMessage: Schema.Attribute.Text &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    unknownErrorMessage: Schema.Attribute.String &
+    wishlistTitle: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
+        }
+      }>
+  }
+}
+
+export interface ApiTeamMemberTeamMember extends Struct.CollectionTypeSchema {
+  collectionName: 'team_members'
+  info: {
+    displayName: 'Team Member'
+    pluralName: 'team-members'
+    singularName: 'team-member'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    bio: Schema.Attribute.RichText &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    email: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    github: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    instagram: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    linkedin: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::team-member.team-member'>
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    profilePicture: Schema.Attribute.Media<'images'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    publishedAt: Schema.Attribute.DateTime
+    role: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    slug: Schema.Attribute.UID<'name'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    twitter: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
         }
       }>
     updatedAt: Schema.Attribute.DateTime
@@ -1768,7 +2115,7 @@ export interface ApiTermTerm extends Struct.SingleTypeSchema {
   collectionName: 'terms'
   info: {
     description: 'Terms of service page with rich text content, last updated timestamp, custom update label, and SEO metadata (title, description, keywords)'
-    displayName: 'Terms'
+    displayName: 'Terms of Service Page'
     pluralName: 'terms'
     singularName: 'term'
   }
@@ -1781,16 +2128,12 @@ export interface ApiTermTerm extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
-    content: Schema.Attribute.RichText &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    entryTitle: Schema.Attribute.String & Schema.Attribute.Required
+    entryTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'Terms and Conditions Page'>
     lastUpdated: Schema.Attribute.DateTime &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -1805,33 +2148,57 @@ export interface ApiTermTerm extends Struct.SingleTypeSchema {
       }>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::term.term'>
-    metaDescription: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160
-      }>
-    metaKeywords: Schema.Attribute.JSON &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    metaTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60
-      }>
     publishedAt: Schema.Attribute.DateTime
-    title: Schema.Attribute.String &
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiThemeTheme extends Struct.CollectionTypeSchema {
+  collectionName: 'themes'
+  info: {
+    displayName: 'Theme'
+    pluralName: 'themes'
+    singularName: 'theme'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    content: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::theme.theme'>
+    publishedAt: Schema.Attribute.DateTime
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    themeId: Schema.Attribute.UID &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -2045,8 +2412,8 @@ export interface PluginUploadFile extends Struct.CollectionTypeSchema {
     }
   }
   attributes: {
-    alternativeText: Schema.Attribute.String
-    caption: Schema.Attribute.String
+    alternativeText: Schema.Attribute.Text
+    caption: Schema.Attribute.Text
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     ext: Schema.Attribute.String
@@ -2064,7 +2431,7 @@ export interface PluginUploadFile extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'plugin::upload.file'> & Schema.Attribute.Private
     mime: Schema.Attribute.String & Schema.Attribute.Required
     name: Schema.Attribute.String & Schema.Attribute.Required
-    previewUrl: Schema.Attribute.String
+    previewUrl: Schema.Attribute.Text
     provider: Schema.Attribute.String & Schema.Attribute.Required
     provider_metadata: Schema.Attribute.JSON
     publishedAt: Schema.Attribute.DateTime
@@ -2072,7 +2439,7 @@ export interface PluginUploadFile extends Struct.CollectionTypeSchema {
     size: Schema.Attribute.Decimal & Schema.Attribute.Required
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    url: Schema.Attribute.String & Schema.Attribute.Required
+    url: Schema.Attribute.Text & Schema.Attribute.Required
     width: Schema.Attribute.Integer
   }
 }
@@ -2133,18 +2500,28 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser
       'api::about.about': ApiAboutAbout
       'api::api-config.api-config': ApiApiConfigApiConfig
-      'api::contact.contact': ApiContactContact
+      'api::auth-page.auth-page': ApiAuthPageAuthPage
+      'api::author.author': ApiAuthorAuthor
+      'api::blog-post-tag.blog-post-tag': ApiBlogPostTagBlogPostTag
+      'api::blog-post.blog-post': ApiBlogPostBlogPost
+      'api::blog.blog': ApiBlogBlog
+      'api::contact-us.contact-us': ApiContactUsContactUs
       'api::currency.currency': ApiCurrencyCurrency
       'api::error-404.error-404': ApiError404Error404
       'api::error-410.error-410': ApiError410Error410
+      'api::faq.faq': ApiFaqFaq
       'api::footer.footer': ApiFooterFooter
       'api::homepage.homepage': ApiHomepageHomepage
       'api::navigation.navigation': ApiNavigationNavigation
       'api::privacy.privacy': ApiPrivacyPrivacy
-      'api::product-page.product-page': ApiProductPageProductPage
+      'api::product-categories-page.product-categories-page': ApiProductCategoriesPageProductCategoriesPage
+      'api::product-category.product-category': ApiProductCategoryProductCategory
+      'api::product-tag.product-tag': ApiProductTagProductTag
       'api::product.product': ApiProductProduct
-      'api::system-message.system-message': ApiSystemMessageSystemMessage
+      'api::profile.profile': ApiProfileProfile
+      'api::team-member.team-member': ApiTeamMemberTeamMember
       'api::term.term': ApiTermTerm
+      'api::theme.theme': ApiThemeTheme
       'plugin::content-releases.release': PluginContentReleasesRelease
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction
       'plugin::i18n.locale': PluginI18NLocale

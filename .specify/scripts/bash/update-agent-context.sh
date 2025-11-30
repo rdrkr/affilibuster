@@ -237,7 +237,7 @@ get_project_structure() {
     local project_type="$1"
 
     if [[ "$project_type" == *"web"* ]]; then
-        echo "backend/\\nfrontend/\\ntests/"
+        echo "backend/\\nthe-green-brother/\\ntests/"
     else
         echo "src/\\ntests/"
     fi

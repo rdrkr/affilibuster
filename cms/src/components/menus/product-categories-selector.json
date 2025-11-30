@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_menus_product_categories_selectors",
+  "info": {
+    "displayName": "Products Menu",
+    "icon": "apps"
+  },
+  "options": {},
+  "attributes": {
+    "menuButton": {
+      "type": "component",
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
+    "productCategories": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product-category.product-category"
+    }
+  },
+  "config": {}
+}

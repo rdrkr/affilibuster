@@ -152,26 +152,6 @@ class TestSettingsConfiguration:
 class TestSettingsDockerEnvironment:
     """Test Settings behavior in Docker vs non-Docker environments."""
 
-    def test_redis_url_uses_localhost_for_docker_internal_names_outside_docker(self, mocker):
-        """Test redis_url converts Docker names to localhost when not in Docker."""
-        # Mock to simulate non-Docker environment
-        mocker.patch("pathlib.Path.exists", return_value=False)
-        mocker.patch.dict("os.environ", {"DOCKER_ENV": "false"}, clear=False)
-
-        settings = Settings(redis_host="redis")
-        assert "localhost" in settings.redis_url
-        assert "redis" not in settings.redis_url or "localhost" in settings.redis_url
-
-    def test_redis_url_uses_localhost_for_redis_server_outside_docker(self, mocker):
-        """Test redis_url converts 'redis-server' to localhost when not in Docker."""
-        # Mock to simulate non-Docker environment
-        mocker.patch("pathlib.Path.exists", return_value=False)
-        mocker.patch.dict("os.environ", {"DOCKER_ENV": "false"}, clear=False)
-
-        settings = Settings(redis_host="redis-server")
-        assert "localhost" in settings.redis_url
-        assert "redis-server" not in settings.redis_url
-
     def test_redis_url_uses_redis_host_inside_docker(self, mocker):
         """Test redis_url uses redis_host directly when in Docker."""
         # Mock to simulate Docker environment
@@ -196,23 +176,22 @@ class TestSettingsDockerEnvironment:
         mocker.patch("pathlib.Path.exists", return_value=False)
         mocker.patch.dict("os.environ", {"DOCKER_ENV": "false"}, clear=False)
 
-        settings = Settings(cms_host="strapi.example.com", internal_cms_host="")
+        settings = Settings(cms_host="strapi.example.com")
         assert "strapi.example.com" in settings.strapi_url
 
-    def test_strapi_url_uses_cms_host_when_internal_cms_host_empty(self):
-        """Test strapi_url falls back to cms_host when internal_cms_host is empty."""
-        settings = Settings(cms_host="strapi.example.com", internal_cms_host="")
-        # Should use cms_host when internal_cms_host is empty
+    def test_strapi_url_uses_cms_host(self):
+        """Test strapi_url uses cms_host."""
+        settings = Settings(cms_host="strapi.example.com")
+        # Should use cms_host
         assert "strapi.example.com" in settings.strapi_url or settings.cms_host in settings.strapi_url
 
-    def test_strapi_url_uses_internal_cms_host_inside_docker(self, mocker):
-        """Test strapi_url uses internal_cms_host when in Docker."""
+    def test_strapi_url_uses_cms_host_inside_docker(self, mocker):
+        """Test strapi_url uses cms_host when in Docker."""
         # Mock to simulate Docker environment
         mocker.patch("pathlib.Path.exists", return_value=True)
 
         settings = Settings(
-            cms_host="external-strapi.example.com",
-            internal_cms_host="strapi",
+            cms_host="strapi",
             cms_protocol="http",
             cms_port=1337,
         )

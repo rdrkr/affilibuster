@@ -42,27 +42,27 @@ Currently, the application runs on HTTP in development, which:
 
 ### Functional Requirements
 
-| ID | Requirement | Priority | Acceptance Criteria |
-|----|-------------|----------|---------------------|
-| FR-001 | Generate trusted SSL certificates for localhost using mkcert | Must Have | Certificates generated and trusted by system |
-| FR-002 | Frontend accessible via <https://localhost:3000> | Must Have | Browser shows secure connection, no warnings |
-| FR-003 | Backend API accessible via <https://localhost:8000> | Must Have | API docs at <https://localhost:8000/docs> work |
-| FR-004 | CMS accessible via <https://localhost:1337> | Must Have | Admin panel loads without errors |
-| FR-005 | Cookies set with `secure=true` flag | Must Have | Inspecting cookies shows secure flag enabled |
-| FR-006 | Environment variables support both HTTP and HTTPS | Must Have | Protocol configurable via env vars |
-| FR-007 | Docker Compose mounts certificates into containers | Must Have | Containers have access to SSL certificates |
-| FR-008 | Health checks use HTTPS protocol | Must Have | Docker healthchecks pass with HTTPS |
-| FR-009 | All cross-service communication uses HTTPS | Must Have | No mixed content warnings |
-| FR-010 | Documentation updated with HTTPS setup instructions | Must Have | New developers can set up HTTPS following docs |
+| ID     | Requirement                                                  | Priority  | Acceptance Criteria                            |
+| ------ | ------------------------------------------------------------ | --------- | ---------------------------------------------- |
+| FR-001 | Generate trusted SSL certificates for localhost using mkcert | Must Have | Certificates generated and trusted by system   |
+| FR-002 | Frontend accessible via <https://localhost:3000>             | Must Have | Browser shows secure connection, no warnings   |
+| FR-003 | Backend API accessible via <https://localhost:8000>          | Must Have | API docs at <https://localhost:8000/docs> work |
+| FR-004 | CMS accessible via <https://localhost:1337>                  | Must Have | Admin panel loads without errors               |
+| FR-005 | Cookies set with `secure=true` flag                          | Must Have | Inspecting cookies shows secure flag enabled   |
+| FR-006 | Environment variables support both HTTP and HTTPS            | Must Have | Protocol configurable via env vars             |
+| FR-007 | Docker Compose mounts certificates into containers           | Must Have | Containers have access to SSL certificates     |
+| FR-008 | Health checks use HTTPS protocol                             | Must Have | Docker healthchecks pass with HTTPS            |
+| FR-009 | All cross-service communication uses HTTPS                   | Must Have | No mixed content warnings                      |
+| FR-010 | Documentation updated with HTTPS setup instructions          | Must Have | New developers can set up HTTPS following docs |
 
 ### Non-Functional Requirements
 
-| ID | Requirement | Target | Measurement |
-|----|-------------|--------|-------------|
-| NFR-001 | No performance degradation | <5% overhead | Page load time comparison |
-| NFR-002 | Zero downtime during migration | N/A | All services start successfully |
-| NFR-003 | Backward compatibility with existing .env files | N/A | Old .env files work with protocol override |
-| NFR-004 | Certificate renewal process documented | N/A | Clear renewal instructions in docs |
+| ID      | Requirement                                     | Target       | Measurement                                |
+| ------- | ----------------------------------------------- | ------------ | ------------------------------------------ |
+| NFR-001 | No performance degradation                      | <5% overhead | Page load time comparison                  |
+| NFR-002 | Zero downtime during migration                  | N/A          | All services start successfully            |
+| NFR-003 | Backward compatibility with existing .env files | N/A          | Old .env files work with protocol override |
+| NFR-004 | Certificate renewal process documented          | N/A          | Clear renewal instructions in docs         |
 
 ### Technical Constraints
 
@@ -77,16 +77,19 @@ Currently, the application runs on HTTP in development, which:
 ### System Components Affected
 
 1. **Frontend (Next.js)**
+
    - Custom HTTPS server required for development
    - Environment variable updates
    - Image optimization proxy configuration
 
 2. **Backend (FastAPI)**
+
    - Uvicorn SSL configuration
    - Cookie security flag updates
    - Settings configuration for protocol detection
 
 3. **CMS (Strapi)**
+
    - Server SSL configuration
    - Protocol environment variable
 
@@ -137,7 +140,7 @@ Browser (HTTPS) → Frontend:3000 (HTTPS) → Backend:8000 (HTTPS) → Strapi:13
 **Tasks**:
 
 1. **T007**: Update `.env.dev.example` with HTTPS protocol variables
-   - `FRONTEND_PROTOCOL=https`
+   - `THE_GREEN_BROTHER_PROTOCOL=https`
    - `BACKEND_PROTOCOL=https`
    - `CMS_PROTOCOL=https`
 2. **T008**: Update local `.env` file with HTTPS protocols
@@ -150,9 +153,9 @@ Browser (HTTPS) → Frontend:3000 (HTTPS) → Backend:8000 (HTTPS) → Strapi:13
 **Tasks**:
 
 1. **T010**: Add certificate volume mounts to `docker-compose.yaml`
-    - Mount `/certs` to frontend container
-    - Mount `/certs` to backend container
-    - Mount `/certs` to CMS container
+   - Mount `/certs` to frontend container
+   - Mount `/certs` to backend container
+   - Mount `/certs` to CMS container
 2. **T011**: Update frontend healthcheck to use HTTPS with `-k` flag
 3. **T012**: Update backend healthcheck to use HTTPS with `-k` flag
 4. **T013**: Update CMS healthcheck to use HTTPS with `-k` flag
@@ -162,85 +165,85 @@ Browser (HTTPS) → Frontend:3000 (HTTPS) → Backend:8000 (HTTPS) → Strapi:13
 **Tasks**:
 
 1. **T014**: Update `backend/src/affilibuster_backend/config/settings.py`
-    - Add `should_use_secure_cookies` property based on `backend_protocol`
+   - Add `should_use_secure_cookies` property based on `backend_protocol`
 2. **T015**: Update `backend/src/affilibuster_backend/infrastructure/api/routes/auth.py`
-    - Replace hardcoded `secure=False` with dynamic value from settings (line 327)
-    - Replace hardcoded `secure=False` with dynamic value from settings (line 482)
+   - Replace hardcoded `secure=False` with dynamic value from settings (line 327)
+   - Replace hardcoded `secure=False` with dynamic value from settings (line 482)
 3. **T016**: Update `backend/Dockerfile` to accept SSL environment variables
 4. **T017**: Update backend startup command in `docker-compose.yaml`
-    - Add `--ssl-keyfile` and `--ssl-certfile` flags to uvicorn
+   - Add `--ssl-keyfile` and `--ssl-certfile` flags to uvicorn
 
 ### Phase 5: Frontend (Next.js) Configuration
 
 **Tasks**:
 
 1. **T018**: Create `frontend/server.ts` custom HTTPS server
-    - Import `https` module
-    - Load SSL certificates
-    - Create HTTPS server with Next.js request handler
+   - Import `https` module
+   - Load SSL certificates
+   - Create HTTPS server with Next.js request handler
 2. **T019**: Update `frontend/package.json` dev script
-    - Change from `next dev` to `tsx server.ts`
+   - Change from `next dev` to `tsx server.ts`
 3. **T020**: Add `tsx` dev dependency to frontend
-    - Run: `npm install --save-dev tsx`
+   - Run: `npm install --save-dev tsx`
 4. **T021**: Update `frontend/next.config.ts` if needed
-    - Verify image optimization uses HTTPS protocol from env
+   - Verify image optimization uses HTTPS protocol from env
 
 ### Phase 6: CMS (Strapi) Configuration
 
 **Tasks**:
 
 1. **T022**: Update `cms/config/server.ts`
-    - Add SSL configuration object when protocol is HTTPS
-    - Reference certificate paths from environment variables
+   - Add SSL configuration object when protocol is HTTPS
+   - Reference certificate paths from environment variables
 2. **T023**: Update Strapi startup in `docker-compose.yaml` if needed
-    - Ensure environment variables passed correctly
+   - Ensure environment variables passed correctly
 
 ### Phase 7: Testing & Validation
 
 **Tasks**:
 
 1. **T024**: Test backend API with HTTPS
-    - Access <https://localhost:8000/docs>
-    - Verify no certificate warnings
-    - Test health endpoint
+   - Access <https://localhost:8000/docs>
+   - Verify no certificate warnings
+   - Test health endpoint
 2. **T025**: Test frontend with HTTPS
-    - Access <https://localhost:3000>
-    - Verify no mixed content warnings
-    - Test navigation and API calls
+   - Access <https://localhost:3000>
+   - Verify no mixed content warnings
+   - Test navigation and API calls
 3. **T026**: Test CMS with HTTPS
-    - Access <https://localhost:1337/admin>
-    - Verify admin login works
-    - Test content creation
+   - Access <https://localhost:1337/admin>
+   - Verify admin login works
+   - Test content creation
 4. **T027**: Verify secure cookies in browser DevTools
-    - Inspect cookies after login
-    - Confirm `secure` flag is true
+   - Inspect cookies after login
+   - Confirm `secure` flag is true
 5. **T028**: Run backend test suite
-    - `make test-backend` should pass
+   - `make test-backend` should pass
 6. **T029**: Run frontend test suite
-    - `make test-frontend` should pass
+   - `make test-frontend` should pass
 7. **T030**: Run E2E tests with Playwright
-    - Update Playwright config if needed for self-signed certs
-    - All auth flows should pass
+   - Update Playwright config if needed for self-signed certs
+   - All auth flows should pass
 
 ### Phase 8: Documentation
 
 **Tasks**:
 
 1. **T031**: Update `README.md` with HTTPS setup instructions
-    - Add mkcert installation to prerequisites
-    - Document certificate generation steps
-    - Update service URLs to HTTPS
+   - Add mkcert installation to prerequisites
+   - Document certificate generation steps
+   - Update service URLs to HTTPS
 2. **T032**: Update `CLAUDE.md` with HTTPS configuration
-    - Add to "Environment Configuration" section
-    - Document certificate paths
-    - Add troubleshooting section
+   - Add to "Environment Configuration" section
+   - Document certificate paths
+   - Add troubleshooting section
 3. **T033**: Create `docs/HTTPS_SETUP.md` detailed guide
-    - Step-by-step mkcert setup for each OS
-    - Certificate renewal instructions
-    - Troubleshooting common issues
+   - Step-by-step mkcert setup for each OS
+   - Certificate renewal instructions
+   - Troubleshooting common issues
 4. **T034**: Update `.env.dev.example` comments
-    - Clarify protocol options (http/https)
-    - Note certificate requirements for HTTPS
+   - Clarify protocol options (http/https)
+   - Note certificate requirements for HTTPS
 
 ## Testing Strategy
 
@@ -278,15 +281,18 @@ Browser (HTTPS) → Frontend:3000 (HTTPS) → Backend:8000 (HTTPS) → Strapi:13
 ### Rollout Phases
 
 1. **Development Environment** (Immediate)
+
    - Update local development setup to HTTPS
    - Test with development team
 
 2. **CI/CD Pipeline** (After local validation)
+
    - Update GitHub Actions to install mkcert
    - Generate certificates in CI environment
    - Run tests with HTTPS configuration
 
 3. **Staging Environment** (After CI/CD)
+
    - Deploy HTTPS configuration to staging
    - Run full regression test suite
 
@@ -325,13 +331,13 @@ If issues arise:
 
 ## Risks & Mitigation
 
-| Risk | Probability | Impact | Mitigation |
-|------|------------|--------|------------|
-| Certificate trust issues on some systems | Medium | High | Document mkcert troubleshooting, provide alternative self-signed cert instructions |
-| Performance degradation | Low | Medium | Benchmark before/after, optimize if needed |
-| E2E tests fail with HTTPS | Medium | High | Update Playwright config to accept self-signed certs |
-| Cross-platform certificate issues | Medium | Medium | Test on macOS, Linux, Windows; document OS-specific steps |
-| Developer onboarding friction | Medium | Low | Clear documentation, automated setup script |
+| Risk                                     | Probability | Impact | Mitigation                                                                         |
+| ---------------------------------------- | ----------- | ------ | ---------------------------------------------------------------------------------- |
+| Certificate trust issues on some systems | Medium      | High   | Document mkcert troubleshooting, provide alternative self-signed cert instructions |
+| Performance degradation                  | Low         | Medium | Benchmark before/after, optimize if needed                                         |
+| E2E tests fail with HTTPS                | Medium      | High   | Update Playwright config to accept self-signed certs                               |
+| Cross-platform certificate issues        | Medium      | Medium | Test on macOS, Linux, Windows; document OS-specific steps                          |
+| Developer onboarding friction            | Medium      | Low    | Clear documentation, automated setup script                                        |
 
 ## Metrics & Monitoring
 

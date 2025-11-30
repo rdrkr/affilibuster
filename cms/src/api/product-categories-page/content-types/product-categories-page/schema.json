@@ -1,0 +1,120 @@
+{
+  "kind": "singleType",
+  "collectionName": "product_categories_pages",
+  "info": {
+    "singularName": "product-categories-page",
+    "pluralName": "product-categories-pages",
+    "displayName": "Product Categories Page",
+    "description": "Product categories listing page with pagination configuration, empty state messaging, item count settings, navigation labels, count templates, and SEO metadata"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "entryTitle": {
+      "type": "string",
+      "private": true,
+      "default": "Product Categories Page",
+      "required": true
+    },
+    "itemsPerPage": {
+      "type": "integer",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "default": 12
+    },
+    "previousButton": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "nextButton": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "noProductsMessage": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "showingText": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": "Showing {count} of {total}"
+    },
+    "pageText": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": "Page {current} of {total}"
+    },
+    "filterLabel": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": "Filter by category"
+    },
+    "allCategoriesLabel": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": "All Categories"
+    },
+    "resultsCountTemplate": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": "{count} Products"
+    },
+    "productCategories": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product-category.product-category"
+    },
+    "seoMetadata": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.seo-metadata",
+      "repeatable": false,
+      "required": true
+    }
+  }
+}

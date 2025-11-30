@@ -8,19 +8,20 @@ services:
         FROM postgres:18-alpine
         RUN cat > /docker-entrypoint-initdb.d/init-db.sh <<'EOF'
         set -e
-        # Create single database
+        # Check if database exists, create only if it doesn't
         psql -v ON_ERROR_STOP=1 --username "$$POSTGRES_USER" --dbname "$$POSTGRES_DB" <<-EOSQL
-            CREATE DATABASE "$$POSTGRES_DB";
+            SELECT 'CREATE DATABASE "$$POSTGRES_DB"'
+            WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$$POSTGRES_DB')\gexec
             GRANT ALL PRIVILEGES ON DATABASE "$$POSTGRES_DB" TO "$$POSTGRES_USER";
         EOSQL
-        # Add UUID extension to the database
+        # Add UUID extension to the database (IF NOT EXISTS already handles re-runs)
         psql -v ON_ERROR_STOP=1 --username "$$POSTGRES_USER" --dbname "$$POSTGRES_DB" <<-EOSQL
             CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
         EOSQL
         echo "Database initialized successfully!"
         EOF
         RUN chmod +x /docker-entrypoint-initdb.d/init-db.sh
-    restart: on-failure:2
+    restart: 'no'
     env_file: # Load environment variables from .env file at build time
       - .env
     environment:
@@ -32,6 +33,7 @@ services:
     ports:
       - '${POSTGRES_PORT}:${POSTGRES_PORT}'
     volumes:
+      - postgres_lib:/var/lib/postgresql
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
@@ -41,7 +43,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    restart: on-failure:2
+    restart: 'no'
     env_file: # Load environment variables from .env file at build time
       - .env
     command: redis-server --port ${REDIS_PORT}
@@ -61,26 +63,29 @@ services:
       dockerfile: Dockerfile
       args:
         CMS_PORT: ${CMS_PORT}
-    restart: on-failure:2
+    restart: 'no'
     depends_on:
       postgres:
         condition: service_healthy
     env_file: # Load environment variables from .env file at build time
       - .env
+    environment:
+      NODE_EXTRA_CA_CERTS: '' # keep empty to disable, TLS certificates are handled by the proxy
+      POSTGRES_HOST: ${INTERNAL_POSTGRES_HOST}
     expose:
       - '${CMS_PORT}'
     volumes:
       - ./cms:/app
       - ./contracts:/contracts
       - ./data:/data
-      - ./.env:/app/.env
-      - strapi_uploads:/app/public/uploads
+      - ./.copyright-header.txt:/.copyright-header.txt:ro
     healthcheck:
+      # Uses /api/health endpoint which checks entrypoint script completion (including seed import)
       # noinspection HttpUrlsUsage
-      test: ['CMD', 'curl', '-f', 'http://${CMS_HOST}:${CMS_PORT}/admin']
+      test: ['CMD', 'curl', '-f', 'http://${CMS_HOST}:${CMS_PORT}/api/health']
       interval: 5s
       timeout: 10s
-      retries: 50
+      retries: 120 # 5s * 120 = 600s (~10 minutes) to allow enough time for Strapi to boot
 
   strapi-proxy:
     build:
@@ -109,7 +114,7 @@ services:
 
         # Use custom entrypoint
         ENTRYPOINT ["/docker-entrypoint.sh"]
-    restart: on-failure:2
+    restart: 'no'
     depends_on:
       strapi:
         condition: service_healthy
@@ -119,8 +124,10 @@ services:
       - '${CMS_PORT}:${CMS_PORT}'
     volumes:
       - ./certs:/etc/nginx/certs:ro
+      - nginx_cache:/var/cache/nginx
+      - nginx_run:/var/run
     healthcheck:
-      test: ['CMD', 'curl', '-fk', '${CMS_PROTOCOL}://${CMS_HOST}:${CMS_PORT}/admin']
+      test: ['CMD', 'curl', '-fk', '${CMS_PROTOCOL}://${CMS_HOST}:${CMS_PORT}/api/health']
       interval: 5s
       timeout: 10s
       retries: 50
@@ -131,7 +138,7 @@ services:
       dockerfile: Dockerfile
       args:
         BACKEND_PORT: ${BACKEND_PORT}
-    restart: on-failure:2
+    restart: 'no'
     depends_on:
       postgres:
         condition: service_healthy
@@ -141,13 +148,16 @@ services:
         condition: service_healthy
     env_file: # Load environment variables from .env file at build time
       - .env
+    environment:
+      POSTGRES_HOST: ${INTERNAL_POSTGRES_HOST}
+      REDIS_HOST: ${INTERNAL_REDIS_HOST}
+      CMS_HOST: ${INTERNAL_CMS_HOST}
     ports:
       - '${BACKEND_PORT}:${BACKEND_PORT}'
     volumes:
       - ./backend:/app
       - ./contracts:/contracts
       - ./data:/data
-      - ./.env:/app/.env
       - backend_venv:/app/.venv
       - ./certs:/certs:ro
     healthcheck:
@@ -156,13 +166,13 @@ services:
       timeout: 10s
       retries: 50
 
-  frontend:
+  the-green-brother:
     build:
-      context: ./frontend
+      context: ./the-green-brother
       dockerfile: Dockerfile
       args:
-        FRONTEND_PORT: ${FRONTEND_PORT}
-    restart: on-failure:2
+        THE_GREEN_BROTHER_PORT: ${THE_GREEN_BROTHER_PORT}
+    restart: 'no'
     depends_on:
       backend:
         condition: service_healthy
@@ -170,74 +180,44 @@ services:
       - .env
     environment:
       # Next.js respects PORT env var for custom listen port
-      PORT: ${FRONTEND_PORT}
+      PORT: ${THE_GREEN_BROTHER_PORT}
       NEXT_SERVER_SIDE_API_URL: '${BACKEND_PROTOCOL}://${INTERNAL_BACKEND_HOST}:${BACKEND_PORT}/v1'
     ports:
-      - '${FRONTEND_PORT}:${FRONTEND_PORT}'
+      - '${THE_GREEN_BROTHER_PORT}:${THE_GREEN_BROTHER_PORT}'
     volumes:
-      - ./frontend:/app
+      - ./the-green-brother:/app
       - ./contracts:/contracts
       - ./data:/data
-      - ./.env:/app/.env
       - ./certs:/certs:ro
+      - .env:/app/.env
     healthcheck:
-      test: ['CMD', 'curl', '-fk', '${FRONTEND_PROTOCOL}://${FRONTEND_HOST}:${FRONTEND_PORT}']
-      interval: 5s
-      timeout: 10s
-      retries: 50
-
-  ecopicks:
-    build:
-      context: ./ecopicks
-      dockerfile: Dockerfile
-      args:
-        ECOPICKS_PORT: ${ECOPICKS_PORT}
-    restart: on-failure:2
-    depends_on:
-      backend:
-        condition: service_healthy
-    env_file: # Load environment variables from .env file at build time
-      - .env
-    environment:
-      # Next.js respects PORT env var for custom listen port
-      PORT: ${ECOPICKS_PORT}
-      NEXT_SERVER_SIDE_API_URL: '${BACKEND_PROTOCOL}://${INTERNAL_BACKEND_HOST}:${BACKEND_PORT}/v1'
-    ports:
-      - '${ECOPICKS_PORT}:${ECOPICKS_PORT}'
-    volumes:
-      - ./ecopicks:/app
-      - ./contracts:/contracts
-      - ./data:/data
-      - ./.env:/app/.env
-      - ./certs:/certs:ro
-    healthcheck:
-      test: ['CMD', 'curl', '-fk', '${ECOPICKS_PROTOCOL}://${ECOPICKS_HOST}:${ECOPICKS_PORT}']
+      test:
+        ['CMD', 'curl', '-fk', '${THE_GREEN_BROTHER_PROTOCOL}://${THE_GREEN_BROTHER_HOST}:${THE_GREEN_BROTHER_PORT}']
       interval: 5s
       timeout: 10s
       retries: 50
 
   test-runner:
     build:
-      context: ./frontend
+      context: ./the-green-brother
       dockerfile: Dockerfile.test-runner
     restart: 'no'
     depends_on:
-      frontend:
+      the-green-brother:
         condition: service_healthy
     env_file:
       - .env
     environment:
       # Point to frontend via host.docker.internal (like accessing from host browser)
-      PLAYWRIGHT_BASE_URL: 'https://host.docker.internal:${FRONTEND_PORT}'
+      PLAYWRIGHT_BASE_URL: 'https://host.docker.internal:${THE_GREEN_BROTHER_PORT}'
       # Disable dev server startup in tests
       SKIP_WEBSERVER: '1'
     ports:
       - '${PLAYWRIGHT_REPORT_PORT}:${PLAYWRIGHT_REPORT_PORT}'
     volumes:
-      - ./frontend:/app
+      - ./the-green-brother:/app
       - ./contracts:/contracts
       - ./data:/data
-      - ./.env:/app/.env
       - ./certs:/certs:ro
     # Enable host.docker.internal for accessing host network (where frontend is exposed)
     extra_hosts:
@@ -250,7 +230,9 @@ services:
     command: ['tail', '-f', '/dev/null']
 
 volumes:
+  postgres_lib:
   postgres_data:
   redis_data:
-  strapi_uploads:
   backend_venv:
+  nginx_cache:
+  nginx_run:

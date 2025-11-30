@@ -62,19 +62,18 @@ class StrapiRepositoryImpl(ICMSRepository):
             path = f"/api{path}" if path.startswith("/") else f"/api/{path}"
         return f"{self.base_url}{path}"
 
-    def _snake_to_camel(self, snake_str: str) -> str:
+    def _to_camel_case(self, snake_str: str) -> str:
         """
-        Convert snake_case to camelCase.
+        Convert snake_case string to camelCase.
 
         Args:
-            snake_str: String in snake_case format
+            snake_str: String in snake_case format (e.g., "page_size")
 
         Returns:
-            String in camelCase format
+            String in camelCase format (e.g., "pageSize")
 
         """
         components = snake_str.split("_")
-        # Keep first component lowercase, capitalize the rest
         return components[0] + "".join(x.title() for x in components[1:])
 
     def _flatten_params(self, params: dict[str, Any], parent_key: str = "") -> dict[str, Any]:
@@ -83,8 +82,6 @@ class StrapiRepositoryImpl(ICMSRepository):
 
         Converts {"pagination": {"page": 1, "page_size": 2}} to
         {"pagination[page]": 1, "pagination[pageSize]": 2}
-
-        Note: Pydantic models use snake_case (page_size) but Strapi expects camelCase (pageSize)
 
         Args:
             params: Nested parameter dict
@@ -96,9 +93,10 @@ class StrapiRepositoryImpl(ICMSRepository):
         """
         flat: dict[str, Any] = {}
         for key, value in params.items():
-            # Convert snake_case keys to camelCase for Strapi
-            camel_key = self._snake_to_camel(key)
+            # Convert snake_case to camelCase
+            camel_key = self._to_camel_case(key)
             new_key = f"{parent_key}[{camel_key}]" if parent_key else camel_key
+
             if isinstance(value, dict):
                 flat.update(self._flatten_params(value, new_key))
             elif isinstance(value, list) and value and isinstance(value[0], dict):
@@ -139,15 +137,19 @@ class StrapiRepositoryImpl(ICMSRepository):
         query_params: dict[str, Any] = {}
         if params is not None:
             nested_params = params.model_dump(mode="json", exclude_none=True)
+            logger.debug("[STRAPI] After model_dump: %s", nested_params)
             query_params = self._flatten_params(nested_params)
+            logger.debug("[STRAPI] After flatten (to be sent): %s", query_params)
 
+        logger.debug("[STRAPI] Final URL: %s, params: %s", url, query_params)
         try:
             async with httpx.AsyncClient(timeout=self.timeout, verify=self.verify_ssl) as client:
                 response = await client.get(url, params=query_params, headers=headers)
                 response.raise_for_status()
                 data = response.json()
 
-                # response_model is required for type safety
+                # Deserialize JSON response into strongly-typed Pydantic models
+                # This enforces schema validation - unknown fields are forbidden
                 if response_model is None:
                     msg = "response_model is required for type-safe operations"
                     raise ValueError(msg)
@@ -157,6 +159,7 @@ class StrapiRepositoryImpl(ICMSRepository):
                     return cast("T", response_model(root=data))
                 return cast("T", response_model(**data))
         except httpx.HTTPStatusError as e:
+            logger.exception("Strapi HTTP error: %s - %s", e.response.status_code, e.response.text)
             raise CMSAPIError(
                 status_code=e.response.status_code,
                 message=f"GET {path} failed",
@@ -209,7 +212,8 @@ class StrapiRepositoryImpl(ICMSRepository):
                 response.raise_for_status()
                 response_data = response.json()
 
-                # response_model is required for type safety
+                # Deserialize JSON response into strongly-typed Pydantic models
+                # This enforces schema validation - unknown fields are forbidden
                 if response_model is None:
                     msg = "response_model is required for type-safe operations"
                     raise ValueError(msg)

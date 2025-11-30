@@ -4,14 +4,13 @@
  * CMS Bootstrap Lifecycle
  * Runs on Strapi startup to:
  * - Create missing i18n locales (Italian, Hebrew)
- * - Generate API token for backend authentication (first run only)
+ * - Generate full-access API token for backend authentication
  * - Configure permissions and default access
  *
  * Reference: T131 (Configure Strapi i18n plugin)
  */
 
 import type { Core } from '@strapi/types'
-import { seedDatabase } from './seed'
 
 interface BootstrapContext {
   strapi: Core.Strapi
@@ -23,30 +22,21 @@ interface LocaleData {
   name: string
 }
 
+interface ApiConfig {
+  id: number
+  documentId: string
+  key: string
+  value: string
+  description?: string
+}
+
 interface ApiToken {
   id: number
   name: string
   description?: string
   type: string
-  accessKey?: string
-  expiresAt?: string | Date
-  createdAt?: string | Date
-  updatedAt?: string | Date
-}
-
-interface TokenCreateResult {
-  id: number
   accessKey: string
-  expiresAt?: string | Date
-}
-
-interface ApiConfigEntity {
-  id: number
-  key: string
-  value: string
-  description?: string
-  createdAt?: string | Date
-  updatedAt?: string | Date
+  lifespan: number | null
 }
 
 /**
@@ -54,7 +44,6 @@ interface ApiConfigEntity {
  *
  * Checks for existing locales and only creates missing ones (idempotent).
  * Supports English, Italian, and Hebrew locales matching the platform configuration.
- *
  * @param strapi - Strapi core instance for accessing plugins and services
  */
 async function createMissingLocales(strapi: Core.Strapi): Promise<void> {
@@ -118,138 +107,70 @@ async function createMissingLocales(strapi: Core.Strapi): Promise<void> {
 }
 
 /**
- * Seed the database with initial content using Strapi's internal APIs.
+ * Create full-access API token for backend authentication.
  *
- * Populates currencies, products, and single types (navigation, footer, etc.) in 3 locales.
- * This is a wrapper around the main seeding function from seed.ts.
- * Note: The standalone HTTP-based version remains at cms/scripts/seed.ts for manual use.
- *
- * @param strapi - Strapi core instance for accessing document and database services
+ * Creates a permanent full-access API token named "Backend API" if it doesn't exist.
+ * The backend reads this token from the database to authenticate with Strapi CMS.
+ * @param strapi - Strapi core instance for accessing services
  */
-async function seedDatabaseWrapper(strapi: Core.Strapi): Promise<void> {
+async function createBackendApiToken(strapi: Core.Strapi): Promise<void> {
   try {
-    console.log('📦 Running database seeding...')
-    await seedDatabase(strapi)
-    console.log('✅ Database seeding completed successfully')
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error)
-    console.error(`❌️ Database seeding error: ${message}`)
+    console.log('🔑 Checking for backend API token...')
 
-    throw error
-  }
-}
+    // Check if plaintext token exists in api_config
+    const existingConfig = (await strapi.query('api::api-config.api-config').findOne({
+      where: { key: 'strapi_api_token' },
+    })) as ApiConfig | null
 
-/**
- * Generate API token for backend authentication.
- *
- * Checks for existing valid token first, only creates new one if needed.
- * Creates a read-only token for backend service (principle of least privilege).
- * Token expires after 30 days and is automatically stored in shared database.
- *
- * @param strapi - Strapi core instance for accessing API token services
- */
-async function generateApiToken(strapi: Core.Strapi): Promise<void> {
-  try {
-    console.log('🔐 Checking API token for backend service...')
-
-    const tokenName = 'Backend Service Token'
-    const tokenService = strapi.service('admin::api-token')
-    const TOKEN_LIFESPAN_DAYS = 30
-    const lifespanMillis = TOKEN_LIFESPAN_DAYS * 24 * 60 * 60 * 1000
-
-    // Check if a valid, non-expired token already exists
-    const existingTokens = (await strapi.query('admin::api-token').findMany({
-      where: { name: tokenName },
-    })) as ApiToken[]
-
-    const existingToken = existingTokens[0] ?? null
-    if (existingToken) {
-      const now = new Date()
-
-      // Check if token is still valid (not expired)
-      const isExpired = existingToken.expiresAt !== undefined && new Date(existingToken.expiresAt) < now
-      const isValid = existingToken.type === 'full-access' && !isExpired
-
-      if (isValid) {
-        console.log(`✅ Valid API token already exists (ID: ${existingToken.id.toString()})`)
-        if (existingToken.expiresAt !== undefined) {
-          const expiresAt = new Date(existingToken.expiresAt)
-          const daysRemaining = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-          console.log(`   Expires in ${daysRemaining.toString()} days (${expiresAt.toISOString()})`)
-        }
-        console.log('   Skipping token generation - using existing token\n')
-        return
-      }
-
-      // Token is invalid or expired - delete it
-      console.log(
-        `   Found ${isExpired ? 'expired' : 'invalid'} token (ID: ${existingToken.id.toString()}), deleting...`
-      )
-      await strapi.query('admin::api-token').delete({ where: { id: existingToken.id } })
-      console.log(`   🗑️  Deleted old token`)
+    if (existingConfig) {
+      console.log('   ✅ Backend API token already exists')
+      return
     }
 
-    console.log('📝 Generating new API token using Strapi service...')
-    console.log(`   Token will expire in ${TOKEN_LIFESPAN_DAYS.toString()} days`)
+    // Check if API token exists in Strapi (without plaintext in api_config)
+    const existingTokens = (await strapi
+      .query('admin::api-token')
+      .findMany({ where: { name: 'Backend API', type: 'full-access' } })) as ApiToken[]
 
-    // Create token using Strapi's service (handles salting and hashing automatically)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const result = (await tokenService.create({
-      name: tokenName,
-      description: 'Auto-generated full-access token for backend service authentication',
+    // If token exists but not in api_config, delete and recreate to get plaintext
+    if (existingTokens.length > 0) {
+      console.log('   🔄 Recreating backend API token to capture plaintext...')
+      for (const token of existingTokens) {
+        await strapi.query('admin::api-token').delete({ where: { id: token.id } })
+      }
+    }
+
+    console.log('   Creating new backend API token...')
+
+    // Use Strapi's API token service to properly create the token with encryption
+    const tokenService = strapi.service('admin::api-token') as {
+      create: (data: Partial<ApiToken> & { permissions: unknown[] }) => Promise<ApiToken>
+    }
+    const token = await tokenService.create({
+      name: 'Backend API',
+      description: 'Full-access token for backend API authentication',
       type: 'full-access',
-      lifespan: lifespanMillis,
-    })) as TokenCreateResult
+      lifespan: null, // Never expires
+      permissions: [],
+    })
 
-    // Extract the actual token from the accessKey property
-    const tokenString = result.accessKey
+    const plaintextToken = token.accessKey
+    console.log('   ✅ Backend API token created successfully')
 
-    console.log('   ✅ Generated token (length: ' + tokenString.length.toString() + ' chars)')
-    if (result.expiresAt !== undefined) {
-      console.log('   📅 Expires at:', result.expiresAt.toString())
-    }
-
-    // Store token in database for backend service to access
-    console.log('   💾 Storing token in database...')
-    try {
-      // Check if token config already exists in database
-      const existingConfig = (await strapi.db.query('api::api-config.api-config').findOne({
-        where: { key: 'strapi_api_token' },
-      })) as ApiConfigEntity | null
-
-      if (existingConfig) {
-        // Update existing token
-        await strapi.db.query('api::api-config.api-config').update({
-          where: { id: existingConfig.id },
-          data: {
-            value: tokenString,
-            description: 'Auto-generated read-only token for backend service authentication',
-            updatedAt: new Date(),
-          },
-        })
-        console.log('   ✅ Updated token in database')
-      } else {
-        // Create new token entry
-        await strapi.db.query('api::api-config.api-config').create({
-          data: {
-            key: 'strapi_api_token',
-            value: tokenString,
-            description: 'Auto-generated read-only token for backend service authentication',
-          },
-        })
-        console.log('   ✅ Stored token in database')
-      }
-    } catch (dbError: unknown) {
-      const dbErrorMsg = dbError instanceof Error ? dbError.message : String(dbError)
-      console.error(`   ❌ Failed to store token in database: ${dbErrorMsg}`)
-      throw dbError
-    }
-
-    console.log(`✅ API token created and stored in database (length: ${tokenString.length.toString()})`)
+    // Store the plaintext token in api_config for backend to read
+    // NOTE: Strapi stores a HASHED version in strapi_api_tokens.access_key,
+    // but we need the PLAINTEXT version for API calls
+    await strapi.query('api::api-config.api-config').create({
+      data: {
+        key: 'strapi_api_token',
+        value: plaintextToken,
+        description: 'Backend API authentication token (plaintext)',
+      },
+    })
+    console.log('   ✅ Stored plaintext token in api_config for backend')
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error)
-    console.error(`⚠️  Failed to create API token: ${message}`)
-
+    console.error(`   ❌ Failed to create backend API token: ${message}`)
     throw error
   }
 }
@@ -266,9 +187,8 @@ export default {
    *
    * Performs initial CMS setup including:
    * - Creating missing i18n locales (Italian, Hebrew)
-   * - Generating API token for backend authentication
+   * - Creating full-access API token for backend authentication
    * - Seeding database with initial content
-   *
    * @param root0 - Bootstrap context object
    * @param root0.strapi - Strapi core instance
    */
@@ -276,14 +196,8 @@ export default {
     console.log('🚀 Running Strapi bootstrap...')
 
     try {
-      // Phase 1: Create missing i18n locales
       await createMissingLocales(strapi)
-
-      // Phase 2: Generate API token if needed
-      await generateApiToken(strapi)
-
-      // Phase 3: Seed database with initial content if needed
-      await seedDatabaseWrapper(strapi)
+      await createBackendApiToken(strapi)
 
       console.log('✅ Bootstrap completed successfully')
     } catch (error: unknown) {

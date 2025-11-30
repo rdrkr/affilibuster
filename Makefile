@@ -5,7 +5,7 @@
 NPROCS := $(shell sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4)
 MAKEFLAGS += --output-sync=target
 
-.PHONY: help all dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-backend-unit test-backend-integration test-frontend test-frontend-unit test-frontend-integration test-performance test-all-unit test-all-integration test-parallel test-all audit clean clean-coverage coverage-merge coverage-view playwright-report ci-test install install-backend install-frontend install-cms setup upgrade upgrade-cms upgrade-frontend upgrade-backend ps pre-commit
+.PHONY: help all all-fast dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-backend-unit test-backend-integration test-the-green-brother test-the-green-brother-unit test-performance test-all-unit test-all-integration test-parallel test-fast test-all audit clean clean-coverage coverage-merge coverage-view playwright-report ci-test install install-backend install-cms setup upgrade upgrade-cms upgrade-backend ps pre-commit export import export-docker import-docker
 
 # Default target
 .DEFAULT_GOAL := help
@@ -17,6 +17,8 @@ help: ## Show this help message
 	@echo ""
 
 all: clean setup pre-commit start test ## Run complete workflow
+
+all-fast: clean setup pre-commit start test-fast ## Run complete workflow with faster tests (backend + the-green-brother unit only)
 
 # Linting & Formatting
 
@@ -45,12 +47,6 @@ lint-typescript: ## Lint and fix TypeScript/JavaScript (ESLint)
 lint-shell: ## Lint shell scripts (shellcheck - check only, no auto-fix)
 	@bash scripts/lint.sh shell
 
-lint-ecopicks: ## Lint and fix Ecopicks code (ESLint)
-	@bash scripts/lint.sh ecopicks
-
-lint-ecopicks-check: ## Check Ecopicks linting without fixing
-	@bash scripts/lint.sh ecopicks check
-
 # All linters
 lint-check: ## Check all linting without fixing
 	@bash scripts/lint.sh all check
@@ -69,12 +65,6 @@ format-typescript: ## Format TypeScript/JavaScript (Prettier)
 
 format-typescript-check: ## Check TypeScript/JavaScript formatting without making changes
 	@bash scripts/format.sh typescript check
-
-format-ecopicks: ## Format Ecopicks code (Prettier)
-	@bash scripts/format.sh ecopicks
-
-format-ecopicks-check: ## Check Ecopicks formatting without making changes
-	@bash scripts/format.sh ecopicks check
 
 format-shell: ## Format shell scripts (shfmt)
 	@bash scripts/format.sh shell
@@ -99,13 +89,11 @@ dev: format lint ## Start all services
 	@./scripts/build.sh
 	@docker compose logs -f 2>&1 | "./scripts/log.sh"
 
-build: format lint ## Build frontend (with linting and formatting)
+build: format lint ## Build (with linting and formatting)
 	@./scripts/build.sh --build
 
 start: ## Start Docker services only
-	@echo "🚀 Starting Docker services..."
-	@docker compose up -d frontend ecopicks
-	@echo "✅ Services started."
+	@./scripts/build.sh
 
 stop: ## Stop all Docker services
 	@echo "🛑 Stopping Docker services..."
@@ -123,8 +111,8 @@ logs: ## View Docker logs (all services)
 logs-backend: ## View backend logs only
 	@docker compose logs -f backend
 
-logs-ecopicks: ## View ecopicks logs only
-	@docker compose logs -f ecopicks
+logs-the-green-brother: ## View the-green-brother logs only
+	@docker compose logs -f the-green-brother
 
 test-backend-unit: ## Run backend unit tests only
 	@bash scripts/test.sh backend-unit
@@ -135,31 +123,22 @@ test-backend-integration: ## Run backend integration tests only
 test-backend: ## Run all backend tests (unit + integration)
 	@bash scripts/test.sh backend
 
-test-frontend-unit: ## Run frontend unit tests only (Jest)
-	@bash scripts/test.sh frontend-unit
+test-the-green-brother-unit: ## Run the-green-brother unit tests only (Jest)
+	@bash scripts/test.sh the-green-brother-unit
 
-test-frontend-integration: ## Run frontend integration tests only (Playwright E2E)
-	@bash scripts/test.sh frontend-integration $(BROWSER)
+test-the-green-brother-integration: ## Run the-green-brother integration tests only (Playwright E2E)
+	@bash scripts/test.sh the-green-brother-integration $(BROWSER)
 
-test-frontend: ## Run all frontend tests (unit + integration)
-	@bash scripts/test.sh frontend
-
-test-ecopicks-unit: ## Run ecopicks unit tests only (Jest)
-	@bash scripts/test.sh ecopicks-unit
-
-test-ecopicks-integration: ## Run ecopicks integration tests only (Playwright E2E)
-	@bash scripts/test.sh ecopicks-integration $(BROWSER)
-
-test-ecopicks: ## Run all ecopicks tests (unit + integration)
-	@bash scripts/test.sh ecopicks
+test-the-green-brother: ## Run all the-green-brother tests (unit + integration)
+	@bash scripts/test.sh the-green-brother
 
 test-performance: ## Run performance tests only
 	@bash scripts/test.sh performance $(BROWSER)
 
-test-all-unit: ## Run all unit tests (backend + frontend + ecopicks)
+test-all-unit: ## Run all unit tests (backend + the-green-brother)
 	@bash scripts/test.sh all-unit
 
-test-all-integration: ## Run all integration tests (backend + frontend + ecopicks)
+test-all-integration: ## Run all integration tests (backend + the-green-brother)
 	@bash scripts/test.sh all-integration
 
 test: ## Run all tests with coverage (shows all errors)
@@ -167,6 +146,12 @@ test: ## Run all tests with coverage (shows all errors)
 
 test-parallel: ## Run all tests in parallel (FAST)
 	@bash scripts/test.sh parallel
+
+test-fast: ## Run fast tests only (backend + the-green-brother unit)
+	@echo "🧪 Running fast tests (backend + the-green-brother unit)..."
+	@$(MAKE) test-backend
+	@$(MAKE) test-the-green-brother-unit
+	@echo "✅ Fast tests complete"
 
 test-all: ## Run all tests + merge coverage
 	@bash scripts/test.sh merge
@@ -185,14 +170,14 @@ clean-coverage: ## Clean all coverage reports
 	@bash scripts/clean.sh coverage
 
 playwright-report: ## View Playwright E2E test report in browser
-	@if [ -d "frontend/playwright-report" ]; then \
+	@if [ -d "the-green-brother/playwright-report" ]; then \
 		echo "📊 Starting Playwright report server..."; \
 		echo "   Open http://localhost:$${PLAYWRIGHT_REPORT_PORT:-9323} in your browser"; \
 		echo "   Press Ctrl+C to stop the server"; \
 		docker compose exec test-runner sh -c 'cd /app && npx playwright show-report --port $${PLAYWRIGHT_REPORT_PORT:-9323} --host 0.0.0.0'; \
 	else \
 		echo "❌ No Playwright report found"; \
-		echo "   Run 'make test-frontend' or 'make test' first to generate E2E test reports"; \
+		echo "   Run 'make test-the-green-brother' or 'make test' first to generate E2E test reports"; \
 	fi
 
 audit: ## Run Lighthouse performance audits
@@ -202,19 +187,15 @@ install-backend: ## Install backend dependencies
 	@echo "📦 Installing backend dependencies..."
 	@cd backend && uv sync
 
-install-frontend: ## Install frontend dependencies
-	@echo "📦 Installing frontend dependencies..."
-	@cd frontend && npm install
-
-install-ecopicks: ## Install ecopicks dependencies
-	@echo "📦 Installing ecopicks dependencies..."
-	@cd ecopicks && npm install
+install-the-green-brother: ## Install the-green-brother dependencies
+	@echo "📦 Installing the-green-brother dependencies..."
+	@cd the-green-brother && npm install
 
 install-cms: ## Install CMS dependencies
 	@echo "📦 Installing CMS dependencies..."
 	@cd cms && npm install
 
-install: install-backend install-frontend install-ecopicks install-cms ## Install all dependencies
+install: install-backend install-the-green-brother install-cms ## Install all dependencies
 	@echo "✅ All dependencies installed"
 
 setup: ## Complete development environment setup (installs all tools and dependencies)
@@ -226,11 +207,8 @@ upgrade: ## Update all dependencies to latest
 upgrade-cms: ## Update CMS dependencies only
 	@./scripts/upgrade.sh cms
 
-upgrade-frontend: ## Update frontend dependencies only
-	@./scripts/upgrade.sh frontend
-
-upgrade-ecopicks: ## Update ecopicks dependencies only
-	@./scripts/upgrade.sh ecopicks
+upgrade-the-green-brother: ## Update the-green-brother dependencies only
+	@./scripts/upgrade.sh the-green-brother
 
 upgrade-backend: ## Update backend dependencies only
 	@./scripts/upgrade.sh backend
@@ -240,3 +218,27 @@ clean: ## Clean up containers, volumes, and all build artifacts (zero state)
 
 ps: ## Show running containers
 	@docker compose ps
+
+export: ## Export strapi cms data (local)
+	@echo "💽 Exporting strapi cms data (local)..."
+	@cd cms && npm run data:export
+	@echo "✅ Strapi cms data exported"
+
+import: ## Import strapi cms data (local)
+	@echo "💽 Importing strapi cms data (local)..."
+	@tar -cf data/export.tar -C "data" assets entities schemas configuration links metadata.json
+	@cd cms && npm run data:import -- --force --file "../data/export.tar"
+	@rm data/export.tar
+	@echo "✅ Strapi cms data imported"
+
+export-docker: ## Export strapi cms data (via Docker)
+	@echo "💽 Exporting strapi cms data (Docker)..."
+	@docker compose exec strapi sh -c 'npm run data:export'
+	@echo "✅ Strapi cms data exported"
+
+import-docker: ## Import strapi cms data (via Docker)
+	@echo "💽 Importing strapi cms data (Docker)..."
+	@tar -cf data/export.tar -C "data" assets entities schemas configuration links metadata.json
+	@docker compose exec strapi sh -c 'npm run data:import -- --force --file "/data/export.tar"'
+	@rm data/export.tar
+	@echo "✅ Strapi cms data imported"

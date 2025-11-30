@@ -30,7 +30,7 @@ This will achieve 100% E2E test pass rate (108/108 tests passing) while maintain
 - All components must support i18n (en, it, he) and RTL
 - Must use Tailwind design tokens only
 - All new components must appear in style guide
-**Scale/Scope**:
+  **Scale/Scope**:
 - 9-12 test ID additions (non-breaking changes)
 - 4-5 new components (LanguagePrompt, RelatedProducts, Pagination, CategoryFilter)
 - 2-3 new backend API endpoints (if needed for related products/filtering)
@@ -112,26 +112,31 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 #### Tasks
 
 1. **Investigate product routing structure**
+
    - Check `src/app/[lang]/[slug]/page.tsx` dynamic route
    - Verify slug resolution logic matches tests
    - Check if product URLs should be `/:lang/:slug` or `/:lang/products/:slug`
 
 2. **Fix product detail page routing**
+
    - Ensure `/en/smart-fitness-watch` resolves correctly (not `/en/products/smart-fitness-watch`)
    - Update dynamic route handler if needed
    - Verify slug-to-product mapping works
 
 3. **Fix products listing page**
+
    - Ensure `/en/products` route exists and works
    - Add pagination support (`?page=2`)
    - Add category filter support (`?category=electronics`)
 
 4. **Fix breadcrumb navigation**
+
    - Ensure breadcrumb test IDs exist: `breadcrumb`, `breadcrumb-home`
    - Verify breadcrumb appears on product pages
    - Test navigation back to homepage
 
 5. **Add missing test IDs**
+
    - `data-testid="product-title"` on product detail page
    - `data-testid="product-card"` on product listings
    - `data-testid="category-filter"` and `data-testid="category-electronics"`
@@ -154,11 +159,13 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 #### Tasks
 
 1. **Create `sitemap.ts` route handler**
+
    - Location: `src/app/sitemap.ts`
    - Implement `generateSitemaps()` function to return language-specific sitemaps
    - Return sitemap index with links to language-specific sitemaps
 
 2. **Implement sitemap generation logic**
+
    - Fetch all products, pages, and routes from CMS
    - Generate URLs for all languages (en, it, he)
    - Include `<xhtml:link>` tags for alternate languages (hreflang)
@@ -166,11 +173,13 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
    - Add `lastmod` timestamps
 
 3. **Generate language-specific sitemaps**
+
    - `/sitemap/en.xml` - All English URLs
    - `/sitemap/it.xml` - All Italian URLs
    - `/sitemap/he.xml` - All Hebrew URLs
 
 4. **Sitemap index for large sites**
+
    - Generate `/sitemap_index.xml` if needed (>50,000 URLs)
    - Link to individual language sitemaps
 
@@ -187,30 +196,36 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 #### Tasks
 
 1. **Create `SchemaMarkup.tsx` component**
+
    - Generic component to render JSON-LD script tags
    - Accept schema object as prop
    - Add to `<head>` via Next.js Metadata API or Script component
 
 2. **Implement Organization schema** (homepage)
+
    - Organization name, logo, social profiles
    - Contact information
    - Same-as links (Twitter, Facebook)
 
 3. **Implement Product schema** (product pages)
+
    - Product name, description, image
    - Offers with multiple currencies
    - AggregateRating if reviews exist
    - Brand, SKU, availability
 
 4. **Implement BreadcrumbList schema** (all pages)
+
    - Breadcrumb navigation for SEO
    - Position-based hierarchy
 
 5. **Implement WebPage schema** (content pages)
+
    - WebPage type with speakable property
    - Main entity references
 
 6. **Implement Article schema** (blog/content pages)
+
    - Article metadata (author, publish date, headline)
    - Publisher information
 
@@ -227,23 +242,28 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 #### Tasks
 
 1. **Implement hreflang tags** for multi-language support
+
    - Add to all pages via Next.js Metadata API
    - Include all language variants (en, it, he)
    - Include x-default for default language
 
 2. **Fix canonical URLs**
+
    - Ensure canonical URL matches current language
-   - Format: `https://affilibuster.com/{lang}/{path}`
+   - Format: `https://thegreenbrother.com/{lang}/{path}`
 
 3. **Add language-specific meta tags**
+
    - og:locale for current language
    - og:locale:alternate for other languages
 
 4. **Ensure robots meta tag** on all pages
+
    - index, follow for normal pages
    - noindex, nofollow for error pages (404, 410)
 
 5. **Verify structured data (JSON-LD)** from Phase 3
+
    - Ensure JSON-LD renders in `<head>`
 
 6. **Run seo-meta.spec.ts to verify** all 6 tests pass
@@ -259,23 +279,27 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 #### Tasks
 
 1. **Create redirect mapping system**
+
    - Add `url_redirects` table to database (if needed)
    - Store old URL → new URL mappings
    - Include redirect type (301, 302, 410)
 
 2. **Implement 301 permanent redirects**
+
    - Create Next.js middleware for redirect handling
    - Check incoming URL against redirect mappings
    - Return 301 status with Location header
    - Maintain language context during redirects
 
 3. **Create 410 Gone page**
+
    - Similar to 404 page but different status code
    - Create `src/app/[lang]/gone.tsx` or use middleware
    - Fetch 410 error content from CMS
    - Add test IDs: `gone-page`, `gone-home-link`
 
 4. **Backend API for redirect rules**
+
    - Add `/api/redirects/{old_url}` endpoint
    - Return new URL and redirect type
    - Update OpenAPI spec
@@ -293,11 +317,13 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 #### Tasks
 
 1. **Run axe-core scan** on failing pages
+
    - Homepage (en, it, he)
    - Product pages
    - Identify specific violations
 
 2. **Fix common accessibility issues**
+
    - Missing ARIA labels on interactive elements
    - Improper heading hierarchy
    - Insufficient color contrast
@@ -305,11 +331,13 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
    - Keyboard navigation issues
 
 3. **Verify Language Switcher accessibility**
+
    - Ensure keyboard accessible (Tab, Enter, Arrow keys)
    - Proper ARIA attributes (aria-label, aria-expanded, aria-haspopup)
    - Focus management
 
 4. **Verify heading hierarchy** (h1 → h2 → h3)
+
    - Only one h1 per page
    - No skipped levels
    - Proper semantic structure
@@ -327,28 +355,33 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 #### Tasks
 
 1. **Optimize page load time** (<2 seconds target)
+
    - Reduce JavaScript bundle size
    - Implement code splitting for routes
    - Remove unused dependencies
    - Enable compression (gzip/brotli)
 
 2. **Implement lazy loading for images** below the fold
+
    - Use Next.js `<Image>` component with `loading="lazy"`
    - Add `priority` prop to above-the-fold images
    - Implement blur placeholders (LQIP)
 
 3. **Optimize JavaScript bundling**
+
    - Analyze bundle with `next/bundle-analyzer`
    - Code split large components
    - Dynamic imports for heavy features
    - Tree shaking for unused code
 
 4. **Implement font optimization**
+
    - Use `next/font` for font loading
    - Preload critical fonts
    - Use font-display: swap
 
 5. **Minimize Time to Interactive (TTI)**
+
    - Defer non-critical JavaScript
    - Reduce main thread blocking
    - Optimize third-party scripts
@@ -366,28 +399,33 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 #### Tasks
 
 1. **Implement language detection with prompt**
+
    - Create `useLanguageDetection` hook to detect browser language
    - Show prompt when browser lang ≠ site lang
    - Save dismissal preference to localStorage
    - Add test IDs: `language-prompt`, `accept-language-{code}`, `dismiss-language-prompt`
 
 2. **Fix currency selection persistence**
+
    - Save currency choice to localStorage/cookies
    - Persist across page navigation
    - Restore on page reload
 
 3. **Implement currency-based formatting**
+
    - Format prices according to selected currency locale
    - USD: $1,234.56
    - EUR: 1.234,56 €
    - ILS: ₪1,234.56
 
 4. **Set default currency based on language**
+
    - English → USD
    - Italian → EUR
    - Hebrew → ILS
 
 5. **Convert prices when currency changes**
+
    - Fetch exchange rates from API
    - Apply conversion to all displayed prices
    - Update dynamically without page reload
@@ -405,18 +443,21 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 #### Tasks
 
 1. **Fix 404 page title metadata** (3 tests)
+
    - Next.js limitation: metadata in `not-found.tsx` not applied
    - Workaround: Set metadata in layout that calls `notFound()`
    - OR: Update tests to not expect title (document limitation)
    - OR: Use client-side `useEffect` to set document.title
 
 2. **Fix RTL navigation mirroring** (1 test)
+
    - Ensure navigation elements mirror for Hebrew (RTL)
    - Use `dir="rtl"` on `<html>` tag
    - Verify Tailwind RTL utilities work correctly
    - Test menu alignment, flex direction reversal
 
 3. **Fix 404 homepage navigation** (from earlier test failure)
+
    - Test expected `/` but got `/en`
    - Update 404 home link to use just `/` (redirect middleware should handle)
    - OR: Update test to expect `/en`
@@ -432,21 +473,25 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 #### Tasks
 
 1. **Run full E2E test suite** across all browsers
+
    - Chromium (primary)
    - Firefox, WebKit, Mobile Chrome, Mobile Safari
    - Identify any browser-specific failures
 
 2. **Fix any remaining failures**
+
    - Review test output for edge cases
    - Fix configuration issues
    - Adjust tests if needed (document why)
 
 3. **Verify 100% unit test coverage maintained**
+
    - Run `npm test -- --coverage`
    - Ensure all new components have 100% coverage
    - No decrease in coverage from new features
 
 4. **Update style guide** with all new components
+
    - Ensure all components documented
    - Add usage examples and code snippets
    - Test style guide page renders correctly
@@ -500,12 +545,12 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 
 ## Risks and Mitigation
 
-| Risk | Impact | Probability | Mitigation |
-|------|--------|-------------|------------|
-| Backend API changes needed | Medium | Medium | Define API contracts in OpenAPI first, implement backend in parallel |
-| Test flakiness in new E2E tests | Medium | Low | Use Playwright best practices, add explicit waits, use stable selectors |
-| Performance impact from new components | Low | Low | Lazy load components, optimize bundle size, run performance tests |
-| Missing test coverage edge cases | Medium | Low | Strict TDD approach, review coverage reports, add tests for edge cases |
+| Risk                                   | Impact | Probability | Mitigation                                                              |
+| -------------------------------------- | ------ | ----------- | ----------------------------------------------------------------------- |
+| Backend API changes needed             | Medium | Medium      | Define API contracts in OpenAPI first, implement backend in parallel    |
+| Test flakiness in new E2E tests        | Medium | Low         | Use Playwright best practices, add explicit waits, use stable selectors |
+| Performance impact from new components | Low    | Low         | Lazy load components, optimize bundle size, run performance tests       |
+| Missing test coverage edge cases       | Medium | Low         | Strict TDD approach, review coverage reports, add tests for edge cases  |
 
 ## Dependencies
 
@@ -521,18 +566,18 @@ Tests expect URLs like `/products/:slug` and `/:lang/products` but the applicati
 
 ## Timeline
 
-| Phase | Focus Area | Duration | Cumulative | Tests Fixed |
-|-------|-----------|----------|------------|-------------|
-| Phase 1 | URL Routing Bugs | 1-2 hours | 1-2 hours | 7 tests → 61/108 (56%) |
-| Phase 2 | Sitemap Generation | 1-2 hours | 2-4 hours | 5 tests → 66/108 (61%) |
-| Phase 3 | Schema.org Markup | 2-3 hours | 4-7 hours | 7 tests → 73/108 (68%) |
-| Phase 4 | SEO Meta Tags | 1-2 hours | 5-9 hours | 6 tests → 79/108 (73%) |
-| Phase 5 | Redirects & 410 Pages | 2-3 hours | 7-12 hours | 5 tests → 84/108 (78%) |
-| Phase 6 | Accessibility Fixes | 2-3 hours | 9-15 hours | 5 tests → 89/108 (82%) |
-| Phase 7 | Performance Optimization | 2-3 hours | 11-18 hours | 5 tests → 94/108 (87%) |
-| Phase 8 | Currency & Language | 2-3 hours | 13-21 hours | 8 tests → 102/108 (94%) |
-| Phase 9 | 404 Metadata & RTL | 1-2 hours | 14-23 hours | 4 tests → 106/108 (98%) |
-| Phase 10 | Final Polish | 1 hour | 15-24 hours | 2 tests → 108/108 (100%) |
+| Phase    | Focus Area               | Duration  | Cumulative  | Tests Fixed              |
+| -------- | ------------------------ | --------- | ----------- | ------------------------ |
+| Phase 1  | URL Routing Bugs         | 1-2 hours | 1-2 hours   | 7 tests → 61/108 (56%)   |
+| Phase 2  | Sitemap Generation       | 1-2 hours | 2-4 hours   | 5 tests → 66/108 (61%)   |
+| Phase 3  | Schema.org Markup        | 2-3 hours | 4-7 hours   | 7 tests → 73/108 (68%)   |
+| Phase 4  | SEO Meta Tags            | 1-2 hours | 5-9 hours   | 6 tests → 79/108 (73%)   |
+| Phase 5  | Redirects & 410 Pages    | 2-3 hours | 7-12 hours  | 5 tests → 84/108 (78%)   |
+| Phase 6  | Accessibility Fixes      | 2-3 hours | 9-15 hours  | 5 tests → 89/108 (82%)   |
+| Phase 7  | Performance Optimization | 2-3 hours | 11-18 hours | 5 tests → 94/108 (87%)   |
+| Phase 8  | Currency & Language      | 2-3 hours | 13-21 hours | 8 tests → 102/108 (94%)  |
+| Phase 9  | 404 Metadata & RTL       | 1-2 hours | 14-23 hours | 4 tests → 106/108 (98%)  |
+| Phase 10 | Final Polish             | 1 hour    | 15-24 hours | 2 tests → 108/108 (100%) |
 
 **Total Estimated Time**: 15-24 hours of focused development
 

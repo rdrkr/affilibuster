@@ -1,5 +1,7 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
+import type { StrapiEnv } from './types'
+
 /**
  * Strapi plugins configuration
  * Reference: T131 (Configure Strapi i18n plugin)
@@ -11,10 +13,11 @@
  *
  * Enables and configures the i18n plugin with support for English, Italian, and Hebrew locales.
  * GraphQL plugin is disabled but configuration is preserved for future use.
- *
+ * @param env - Strapi environment variables
+ * @param env.env - Strapi environment variables
  * @returns Plugins configuration object with i18n and GraphQL settings
  */
-export default () => ({
+export default ({ env }: { env: StrapiEnv }) => ({
   // i18n plugin configuration
   i18n: {
     enabled: true,
@@ -25,16 +28,28 @@ export default () => ({
       locales: ['en', 'it', 'he'],
     },
   },
-
-  // GraphQL plugin (optional, useful for content queries)
-  graphql: {
-    enabled: false,
+  'strapi-plugin-nested-populator': {
     config: {
-      endpoint: '/graphql',
-      shadowCRUD: true,
-      playgroundAlways: false,
-      depthLimit: 7,
-      amountLimit: 100,
+      enabled: true,
+      defaultDepth: 8,
     },
   },
+  // Cloudinary upload provider - only enabled in production
+  // In development, Strapi uses the default local filesystem provider
+  ...(env('NODE_ENV') === 'production' && {
+    upload: {
+      config: {
+        provider: 'cloudinary',
+        providerOptions: {
+          cloud_name: env('CLOUDINARY_NAME'),
+          api_key: env('CLOUDINARY_KEY'),
+          api_secret: env('CLOUDINARY_SECRET'),
+        },
+        actionOptions: {
+          upload: {},
+          delete: {},
+        },
+      },
+    },
+  }),
 })

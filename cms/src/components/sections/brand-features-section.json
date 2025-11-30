@@ -1,0 +1,185 @@
+{
+  "collectionName": "components_sections_brand_features_sections",
+  "info": {
+    "displayName": "Brand Features Section",
+    "icon": "command"
+  },
+  "options": {},
+  "attributes": {
+    "showHeader": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "headerIcon": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "showHeader"
+            },
+            true
+          ]
+        }
+      }
+    },
+    "headerText": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "showHeader"
+            },
+            true
+          ]
+        }
+      }
+    },
+    "headerAriaDescription": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "showHeader"
+            },
+            true
+          ]
+        }
+      }
+    },
+    "subheaderIcon": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "showHeader"
+            },
+            true
+          ]
+        }
+      }
+    },
+    "subheaderText": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "showHeader"
+            },
+            true
+          ]
+        }
+      }
+    },
+    "subheaderAriaDescription": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "showHeader"
+            },
+            true
+          ]
+        }
+      }
+    },
+    "headerAlignment": {
+      "type": "enumeration",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "showHeader"
+            },
+            true
+          ]
+        }
+      },
+      "required": false,
+      "default": "language-direction",
+      "enum": ["center", "language-direction"]
+    },
+    "learnMoreButtonIcon": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "showHeader"
+            },
+            true
+          ]
+        }
+      }
+    },
+    "learnMoreButtonText": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "showHeader"
+            },
+            true
+          ]
+        }
+      }
+    },
+    "learnMoreButtonUrl": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "showHeader"
+            },
+            true
+          ]
+        }
+      }
+    },
+    "learnMoreButtonOpenInNewTab": {
+      "type": "boolean",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "showHeader"
+            },
+            true
+          ]
+        }
+      },
+      "required": false,
+      "default": false
+    },
+    "learnMoreButtonAriaDescription": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "showHeader"
+            },
+            true
+          ]
+        }
+      }
+    },
+    "features": {
+      "type": "component",
+      "component": "elements.header",
+      "repeatable": true,
+      "required": true,
+      "min": 1,
+      "max": 4
+    }
+  },
+  "config": {}
+}

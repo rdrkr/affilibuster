@@ -4,7 +4,7 @@
   "info": {
     "singularName": "privacy",
     "pluralName": "privacies",
-    "displayName": "Privacy",
+    "displayName": "Privacy Policy Page",
     "description": "Privacy policy page with rich text content, last updated timestamp, custom update label, and SEO metadata (title, description, keywords)"
   },
   "options": {
@@ -18,57 +18,15 @@
   "attributes": {
     "entryTitle": {
       "type": "string",
+      "private": true,
+      "default": "Privacy Policy Page",
       "required": true
-    },
-    "title": {
-      "type": "string",
-      "required": true,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
     },
     "lastUpdated": {
       "type": "datetime",
       "pluginOptions": {
         "i18n": {
           "localized": false
-        }
-      }
-    },
-    "content": {
-      "type": "richtext",
-      "required": true,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "metaTitle": {
-      "type": "string",
-      "maxLength": 60,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "metaDescription": {
-      "type": "text",
-      "maxLength": 160,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "metaKeywords": {
-      "type": "json",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
         }
       }
     },
@@ -79,6 +37,17 @@
           "localized": true
         }
       }
+    },
+    "seoMetadata": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.seo-metadata",
+      "repeatable": false,
+      "required": true
     }
   }
 }

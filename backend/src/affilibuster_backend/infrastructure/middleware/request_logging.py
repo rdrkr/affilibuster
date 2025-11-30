@@ -40,6 +40,22 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         client_host = request.client.host if request.client else "unknown"
         user_agent = request.headers.get("user-agent", "unknown")
 
+        # Log request details
+        logger.debug(
+            "Request: %s %s - Client: %s - User-Agent: %s",
+            method,
+            path,
+            client_host,
+            user_agent,
+            extra={
+                "method": method,
+                "path": path,
+                "client_host": client_host,
+                "user_agent": user_agent,
+                "headers": dict(request.headers),
+            },
+        )
+
         # Process request
         try:
             response = await call_next(request)
@@ -72,7 +88,24 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             # Calculate duration
             duration_ms = int((time.time() - start_time) * 1000)
 
-            # Log successful request
+            # Log successful request as debug
+            logger.debug(
+                "Response: %s %s - Status: %d - Duration: %dms",
+                method,
+                path,
+                status_code,
+                duration_ms,
+                extra={
+                    "method": method,
+                    "path": path,
+                    "status_code": status_code,
+                    "duration_ms": duration_ms,
+                    "client_host": client_host,
+                    "user_agent": user_agent,
+                },
+            )
+
+            # Log successful request as info (access log)
             logger.info(
                 "%s %s - %d - %dms",
                 method,

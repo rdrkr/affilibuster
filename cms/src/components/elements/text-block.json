@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_elements_text_blocks",
+  "info": {
+    "displayName": "Text Block",
+    "icon": "file"
+  },
+  "options": {},
+  "attributes": {
+    "header": {
+      "type": "component",
+      "component": "elements.header",
+      "repeatable": false,
+      "required": false
+    },
+    "content": {
+      "type": "richtext",
+      "required": false
+    }
+  },
+  "config": {}
+}

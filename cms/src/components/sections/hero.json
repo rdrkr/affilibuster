@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_sections_heroes",
+  "info": {
+    "displayName": "Hero Section",
+    "icon": "picture",
+    "description": "Hero banner with title, subtitle, CTA, and background image"
+  },
+  "options": {},
+  "attributes": {
+    "header": {
+      "type": "component",
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
+    },
+    "exploreButton": {
+      "type": "component",
+      "component": "elements.button",
+      "repeatable": false
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "variant": {
+      "type": "enumeration",
+      "required": true,
+      "enum": ["text-above-background", "text-over-background", "text-below-background"]
+    }
+  }
+}

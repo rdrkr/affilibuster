@@ -12,7 +12,7 @@ import pytest
 
 from affilibuster_backend.domain.entities.generated.models import RedirectCheckResponse
 from affilibuster_backend.domain.entities.url_redirect import URLRedirect
-from affilibuster_backend.domain.use_cases.get_url_redirect_use_case import GetURLRedirectUseCase
+from affilibuster_backend.domain.use_cases.cms.get_url_redirect_use_case import GetURLRedirectUseCase
 from affilibuster_backend.infrastructure.api.routes.redirects import check_redirect
 
 

@@ -155,7 +155,7 @@ export function Navigation({ data: navData, lang }: NavigationProps) {
           </Link>
 
           {/* Main Navigation */}
-          <div className="hidden md:flex items-center space-x-1 rtl:space-x-reverse">
+          <div className="hidden md:flex items-center space-x-3 rtl:space-x-reverse">
             {navLinks.map(link => {
               const fullHref = `${langPrefix}${link.href}`
               const isActive = pathname === fullHref
@@ -185,7 +185,7 @@ export function Navigation({ data: navData, lang }: NavigationProps) {
             {/* Authentication UI */}
             {isLoading ? (
               // Loading skeleton
-              <div className="flex items-center space-x-2" data-testid="auth-loading">
+              <div className="flex items-center space-x-3" data-testid="auth-loading">
                 <div className="w-16 h-8 bg-primary-800 rounded animate-pulse" />
                 <div className="w-16 h-8 bg-primary-800 rounded animate-pulse" />
               </div>

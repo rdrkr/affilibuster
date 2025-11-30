@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_call_to_actions_newsletter_signup_ctas",
+  "info": {
+    "displayName": "Newsletter Signup CTA",
+    "icon": "play"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "required": true
+    },
+    "emailPlaceholder": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "submitButton": {
+      "type": "component",
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    }
+  },
+  "config": {}
+}

@@ -86,9 +86,9 @@
       "problemMatcher": []
     },
     {
-      "label": "test: Frontend",
+      "label": "test: TheGreenBrother",
       "type": "shell",
-      "command": "make test-frontend",
+      "command": "make test-the-green-brother",
       "group": "test",
       "problemMatcher": []
     },
@@ -291,9 +291,9 @@
       "problemMatcher": []
     },
     {
-      "label": "install: Frontend",
+      "label": "install: TheGreenBrother",
       "type": "shell",
-      "command": "make install-frontend",
+      "command": "make install-the-green-brother",
       "problemMatcher": []
     },
     {
@@ -321,9 +321,9 @@
       "problemMatcher": []
     },
     {
-      "label": "upgrade: Frontend",
+      "label": "upgrade: TheGreenBrother",
       "type": "shell",
-      "command": "make upgrade-frontend",
+      "command": "make upgrade-the-green-brother",
       "problemMatcher": []
     },
     {
@@ -351,10 +351,10 @@
       "problemMatcher": []
     },
     {
-      "label": "frontend: Dev Server",
+      "label": "the-green-brother: Dev Server",
       "type": "npm",
       "script": "dev",
-      "path": "frontend/",
+      "path": "the-green-brother/",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -362,98 +362,98 @@
       }
     },
     {
-      "label": "frontend: Build",
+      "label": "the-green-brother: Build",
       "type": "npm",
       "script": "build",
-      "path": "frontend/",
+      "path": "the-green-brother/",
       "problemMatcher": []
     },
     {
-      "label": "frontend: Start Production",
+      "label": "the-green-brother: Start Production",
       "type": "npm",
       "script": "start",
-      "path": "frontend/",
+      "path": "the-green-brother/",
       "problemMatcher": []
     },
     {
-      "label": "frontend: Lint",
+      "label": "the-green-brother: Lint",
       "type": "npm",
       "script": "lint",
-      "path": "frontend/",
+      "path": "the-green-brother/",
       "problemMatcher": "$eslint-compact"
     },
     {
-      "label": "frontend: Lint Fix",
+      "label": "the-green-brother: Lint Fix",
       "type": "npm",
       "script": "lint:fix",
-      "path": "frontend/",
+      "path": "the-green-brother/",
       "problemMatcher": "$eslint-compact"
     },
     {
-      "label": "frontend: Format Check",
+      "label": "the-green-brother: Format Check",
       "type": "npm",
       "script": "format",
-      "path": "frontend/",
+      "path": "the-green-brother/",
       "problemMatcher": []
     },
     {
-      "label": "frontend: Format Fix",
+      "label": "the-green-brother: Format Fix",
       "type": "npm",
       "script": "format:fix",
-      "path": "frontend/",
+      "path": "the-green-brother/",
       "problemMatcher": []
     },
     {
-      "label": "frontend: Type Check",
+      "label": "the-green-brother: Type Check",
       "type": "npm",
       "script": "type-check",
-      "path": "frontend/",
+      "path": "the-green-brother/",
       "problemMatcher": "$tsc"
     },
     {
-      "label": "frontend: Test",
+      "label": "the-green-brother: Test",
       "type": "npm",
       "script": "test",
-      "path": "frontend/",
+      "path": "the-green-brother/",
       "group": "test",
       "problemMatcher": []
     },
     {
-      "label": "frontend: Test Watch",
+      "label": "the-green-brother: Test Watch",
       "type": "npm",
       "script": "test:watch",
-      "path": "frontend/",
+      "path": "the-green-brother/",
       "group": "test",
       "isBackground": true,
       "problemMatcher": []
     },
     {
-      "label": "frontend: Test E2E",
+      "label": "the-green-brother: Test E2E",
       "type": "npm",
       "script": "test:e2e",
-      "path": "frontend/",
+      "path": "the-green-brother/",
       "group": "test",
       "problemMatcher": []
     },
     {
-      "label": "frontend: Generate OpenAPI Types",
+      "label": "the-green-brother: Generate OpenAPI Types",
       "type": "npm",
       "script": "openapi:generate",
-      "path": "frontend/",
+      "path": "the-green-brother/",
       "problemMatcher": []
     },
     {
-      "label": "frontend: Preflight Checks",
+      "label": "the-green-brother: Preflight Checks",
       "type": "npm",
       "script": "preflight",
-      "path": "frontend/",
+      "path": "the-green-brother/",
       "problemMatcher": []
     },
     {
-      "label": "frontend: Clean",
+      "label": "the-green-brother: Clean",
       "type": "npm",
       "script": "clean",
-      "path": "frontend/",
+      "path": "the-green-brother/",
       "problemMatcher": []
     },
     {
@@ -666,15 +666,15 @@
       "problemMatcher": []
     },
     {
-      "label": "tools: ESLint Frontend",
+      "label": "tools: ESLint TheGreenBrother",
       "type": "shell",
-      "command": "cd frontend && npx eslint .",
+      "command": "cd the-green-brother && npx eslint .",
       "problemMatcher": "$eslint-compact"
     },
     {
-      "label": "tools: ESLint Frontend Fix",
+      "label": "tools: ESLint TheGreenBrother Fix",
       "type": "shell",
-      "command": "cd frontend && npx eslint . --fix",
+      "command": "cd the-green-brother && npx eslint . --fix",
       "problemMatcher": "$eslint-compact"
     },
     {
@@ -690,9 +690,9 @@
       "problemMatcher": "$eslint-compact"
     },
     {
-      "label": "tools: Prettier Frontend",
+      "label": "tools: Prettier TheGreenBrother",
       "type": "shell",
-      "command": "cd frontend && npx prettier --write .",
+      "command": "cd the-green-brother && npx prettier --write .",
       "problemMatcher": []
     },
     {

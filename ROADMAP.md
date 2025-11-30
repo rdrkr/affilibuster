@@ -2,8 +2,8 @@
 
 # Affilibuster Product Roadmap
 
-**Last Updated**: 2025-11-24
-**Version**: 1.4.0
+**Last Updated**: 2025-12-15
+**Version**: 1.5.0
 
 This document outlines missing features and capabilities identified through comprehensive code analysis against
 requirements documented in:
@@ -28,8 +28,9 @@ requirements documented in:
 | [001](./specs/001-core-platform-setup/)            | Core Platform Setup & Multi-Language | ✅ Complete    | 100%     | 184/184      | All tasks complete including URL redirects       |
 | [002](./specs/002-https-migration/)                | HTTPS Migration for All Components   | ✅ Complete    | 100%     | 34/34        | Automated mkcert setup, OpenAPI models migration |
 | [003](./specs/003-comprehensive-testing-strategy/) | Comprehensive Testing Strategy       | ✅ Complete    | 100%     | 63/63        | Exceeded 80% target with 100% coverage           |
-| [004](./specs/004-user-authentication/)            | User Authentication & Login          | ✅ Complete    | 100%     | Phase 1 done | Backend + Frontend + 100% test coverage          |
+| [004](./specs/004-user-authentication/)            | User Authentication & Login          | ✅ Complete    | 100%     | Phase 1 done | Backend + TheGreenBrother + 100% test coverage   |
 | [005](./specs/005-e2e-test-coverage/)              | E2E Test Coverage Completion         | 🟡 In Progress | 77%      | 83/108 tests | 25 tests skipped for unimplemented features      |
+| [007](./specs/007-production-security/)            | Production Security Hardening        | 🔴 Not Started | 0%       | 0/17 tasks   | Rate limiting, 2FA, CORS, security headers       |
 
 ---
 
@@ -271,7 +272,7 @@ Prices are stored in single currency only.
 
 ### 4.3 User Authentication & Login - ✅ Complete
 
-**Current State**: Phase 1 implementation complete (100%). Backend + Frontend fully implemented with 100% test coverage.
+**Current State**: Phase 1 implementation complete (100%). Backend + TheGreenBrother fully implemented with 100% test coverage.
 
 **Completed** ✅ (Phase 1 - Tasks 1.1-1.27):
 
@@ -292,7 +293,7 @@ Prices are stored in single currency only.
 - [x] Preferences migration to authenticated users
 - [x] 761 backend tests passing with **100% coverage**
 
-**Frontend** (100%):
+**TheGreenBrother** (100%):
 
 - [x] Auth context, hooks (`useAuth`, `useLogin`, `useRegister`, `useLogout`)
 - [x] All auth components (LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ProfileForm,
@@ -362,7 +363,7 @@ integration.
 - [x] Repository interface and SQLAlchemy implementation
 - [x] GetURLRedirect use case
 - [x] API endpoint `/v1/redirects/check`
-- [x] Frontend proxy integration for 301/410 handling
+- [x] TheGreenBrother proxy integration for 301/410 handling
 - [x] Unit and integration tests
 - [x] Path normalization for consistent lookups
 
@@ -493,7 +494,7 @@ integration.
 
 ### 7.1 Test Coverage - 🟡 Partial
 
-**Current State**: Backend at 100%, Frontend at 15%, CMS has no tests.
+**Current State**: Backend at 100%, TheGreenBrother at 15%, CMS has no tests.
 
 **Missing**:
 
@@ -680,7 +681,28 @@ integration.
 
 ## 11. Security & Compliance
 
-### 11.0 HTTPS Migration - ✅ Complete
+### 11.0 Production Security Hardening - 🔴 Not Started
+
+**Current State**: Basic security in place (HTTPS, CORS, bearer token auth), but missing production-grade controls.
+
+**Specification**: [007-production-security](./specs/007-production-security/)
+
+**Missing**:
+
+- [ ] Rate limiting for Strapi admin login (prevent brute force)
+- [ ] Two-factor authentication (2FA) for Strapi admin users
+- [ ] Rate limiting for backend API endpoints (prevent DDoS and abuse)
+- [ ] Request size limits for backend API
+- [ ] Security headers for TheGreenBrother (HSTS, X-Frame-Options, CSP, etc.)
+- [ ] Security event logging and monitoring
+- [ ] Automated security testing in CI/CD
+- [ ] Security runbook and incident response documentation
+
+**Priority**: High
+**Impact**: Critical for production deployment and protecting against attacks
+**Reference**: Spec 007, ROADMAP Section 11 (Security & Compliance)
+
+### 11.1 HTTPS Migration - ✅ Complete
 
 **Current State**: Application runs on HTTPS in development and production. Cookie secure flags dynamically set based on
 protocol.
@@ -811,18 +833,19 @@ protocol.
 
 ### Critical (Must Have for Production)
 
-1. **User Authentication Backend** (Frontend complete, backend blocking user features)
-2. Reviews & Ratings System
-3. Category System & Category Pages
-4. Product Search Functionality
-5. Smart Filters
-6. Currency Conversion (actual conversion, not just display)
-7. Schema Markup Enhancement (reviews, product details, BreadcrumbList)
-8. Test Coverage Increase (Frontend to 80%, CMS implementation)
-9. Google Analytics Integration
-10. GDPR Compliance Features
-11. Accessibility WCAG 2.1 AA Compliance
-12. Image Optimization (WebP, lazy loading)
+1. **Production Security Hardening** (Rate limiting, 2FA, security headers) - [Spec 007](./specs/007-production-security/)
+2. **User Authentication Backend** (TheGreenBrother complete, backend blocking user features)
+3. Reviews & Ratings System
+4. Category System & Category Pages
+5. Product Search Functionality
+6. Smart Filters
+7. Currency Conversion (actual conversion, not just display)
+8. Schema Markup Enhancement (reviews, product details, BreadcrumbList)
+9. Test Coverage Increase (TheGreenBrother to 80%, CMS implementation)
+10. Google Analytics Integration
+11. GDPR Compliance Features
+12. Accessibility WCAG 2.1 AA Compliance
+13. Image Optimization (WebP, lazy loading)
 
 ### High Priority (Should Have Soon)
 
@@ -862,6 +885,7 @@ protocol.
 
 | Version | Date       | Changes                                                                                                                  |
 | ------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| 1.5.0   | 2025-12-15 | Added spec 007 (Production Security Hardening), added Section 11.0, updated critical priorities                          |
 | 1.4.0   | 2025-11-24 | Completed spec 002 (HTTPS Migration), automated mkcert setup, migrated to OpenAPI models, updated all docs               |
 | 1.3.0   | 2025-11-24 | Added spec 002 (HTTPS Migration), updated Security & Compliance section 11.0, added to critical priorities               |
 | 1.2.0   | 2025-11-21 | Completed spec 001 (T145 URL redirects), updated 5.2 to Complete status                                                  |

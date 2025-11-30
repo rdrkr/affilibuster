@@ -35,8 +35,6 @@ def get_strapi_url() -> str:
     In Docker: Uses internal hostname from settings (strapi:1337)
     Locally: Uses localhost:1337
     """
-    if is_running_in_docker():
-        return f"{settings.cms_protocol}://{settings.internal_cms_host}:{settings.cms_port}"
     return f"{settings.cms_protocol}://{settings.cms_host}:{settings.cms_port}"
 
 
@@ -74,25 +72,36 @@ async def strapi_token():
 
 
 @pytest_asyncio.fixture
-async def wait_for_strapi(strapi_url: str):
+async def wait_for_strapi(strapi_url: str, strapi_token: str):
     """
-    Fixture that waits for Strapi to be healthy before tests run.
+    Fixture that waits for Strapi to be healthy and seed data to be imported before tests run.
 
     Implements retry logic with exponential backoff.
     Disables SSL verification for self-signed certificates in development.
     """
-    max_retries = 30
-    retry_delay = 1  # Start with 1 second
-    # Disable SSL verification for self-signed certificates in development
+    max_retries = 60
+    retry_delay = 2
     verify_ssl = settings.app_env == "production"
 
     for attempt in range(max_retries):
         try:
             async with httpx.AsyncClient(verify=verify_ssl) as client:
-                response = await client.get(f"{strapi_url}/_health", timeout=5.0)
-                if response.status_code in (200, 204):
-                    yield
-                    return
+                health_response = await client.get(f"{strapi_url}/_health", timeout=5.0)
+                if health_response.status_code not in (200, 204):
+                    await asyncio.sleep(retry_delay)
+                    continue
+
+                navigation_response = await client.get(
+                    f"{strapi_url}/api/navigation",
+                    headers={"Authorization": f"Bearer {strapi_token}"},
+                    params={"locale": "en"},
+                    timeout=5.0,
+                )
+                if navigation_response.status_code == 200:
+                    data = navigation_response.json()
+                    if data and "data" in data:
+                        yield
+                        return
         except (httpx.ConnectError, httpx.ReadError, httpx.TimeoutException):
             pass
 

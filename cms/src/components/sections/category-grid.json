@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_sections_category_grids",
+  "info": {
+    "displayName": "Categories Section",
+    "icon": "apps",
+    "description": "Grid of product categories with icons"
+  },
+  "options": {},
+  "attributes": {
+    "header": {
+      "type": "component",
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
+    },
+    "categories": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product-category.product-category"
+    }
+  }
+}

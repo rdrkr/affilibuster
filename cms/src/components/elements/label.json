@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_elements_labels",
+  "info": {
+    "displayName": "Label",
+    "icon": "italic"
+  },
+  "options": {},
+  "attributes": {
+    "icon": {
+      "type": "string"
+    },
+    "iconPosition": {
+      "type": "enumeration",
+      "required": true,
+      "default": "before_text",
+      "enum": ["before_text", "after_text"]
+    },
+    "text": {
+      "type": "string",
+      "required": true
+    },
+    "ariaDescription": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "config": {}
+}

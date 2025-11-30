@@ -20,10 +20,7 @@ CMS_URL="${CMS_PROTOCOL}://${CMS_HOST}:${CMS_PORT}"
 # shellcheck disable=SC2154
 BACKEND_URL="${BACKEND_PROTOCOL}://${BACKEND_HOST}:${BACKEND_PORT}"
 # shellcheck disable=SC2154
-# shellcheck disable=SC2154
-FRONTEND_URL="${FRONTEND_PROTOCOL}://${FRONTEND_HOST}:${FRONTEND_PORT}"
-# shellcheck disable=SC2154
-ECOPICKS_URL="${FRONTEND_PROTOCOL}://${FRONTEND_HOST}:${ECOPICKS_PORT}"
+THE_GREEN_BROTHER_URL="${THE_GREEN_BROTHER_PROTOCOL}://${THE_GREEN_BROTHER_HOST}:${THE_GREEN_BROTHER_PORT}"
 
 # Parse arguments
 BUILD_FLAG=""
@@ -71,25 +68,32 @@ kill_port() {
 # Kill existing instances on our ports
 echo "🔍 Checking for existing instances..."
 # shellcheck disable=SC2154
-kill_port "${FRONTEND_PORT}" # Frontend
-# shellcheck disable=SC2154
-kill_port "${ECOPICKS_PORT}" # Ecopicks
+kill_port "${THE_GREEN_BROTHER_PORT}" # TheGreenBrother
 # shellcheck disable=SC2154
 kill_port "${BACKEND_PORT}" # Backend
 # shellcheck disable=SC2154
 kill_port "${CMS_PORT}" # Strapi
 
-# Start all services via frontend (docker compose dependency chain handles startup order)
-# shellcheck disable=SC2248
-docker compose up ${BUILD_FLAG} -d frontend ecopicks
+# Start all services via the-green-brother (docker compose dependency chain handles startup order)
+# HTTPS mode (default): strapi-proxy runs for SSL termination
+# HTTP mode (CI): uses docker-compose.ci.yaml override to bypass strapi-proxy
+COMPOSE_FILES="-f docker-compose.yaml"
+if [[ "${CMS_PROTOCOL}" == "https" ]]; then
+  echo "🔒 HTTPS mode - using strapi-proxy for SSL termination"
+else
+  COMPOSE_FILES="${COMPOSE_FILES} -f docker-compose.ci.yaml"
+  echo "🔓 HTTP mode - connecting directly to strapi (no SSL proxy)"
+fi
+
+# shellcheck disable=SC2248,SC2086
+docker compose ${COMPOSE_FILES} up ${BUILD_FLAG} -d the-green-brother
 
 echo ""
 echo "✅ Services started (containers initializing, may take 30-60 seconds)!"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "📍 Access your applications:"
-echo "  🌐 Frontend:       ${FRONTEND_URL}"
-echo "  🌿 Ecopicks:       ${ECOPICKS_URL}"
+echo "  🌿 TheGreenBrother:       ${THE_GREEN_BROTHER_URL}"
 echo "  🔌 Backend API:    ${BACKEND_URL}"
 echo "  📚 API Docs:       ${BACKEND_URL}/docs"
 echo "  🎨 CMS Admin:      ${CMS_URL}/admin"
@@ -105,9 +109,7 @@ echo "  - Backend API:     Running (port ${BACKEND_PORT})"
 # shellcheck disable=SC2154
 echo "  - Strapi CMS:      Running (port ${CMS_PORT})"
 # shellcheck disable=SC2154
-echo "  - Frontend:        Running (port ${FRONTEND_PORT})"
-# shellcheck disable=SC2154
-echo "  - Ecopicks:        Running (port ${ECOPICKS_PORT})"
+echo "  - TheGreenBrother:        Running (port ${THE_GREEN_BROTHER_PORT})"
 echo ""
 echo "💡 Tips:"
 echo "  - View logs: docker compose logs -f [service]"

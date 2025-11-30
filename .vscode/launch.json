@@ -2,40 +2,40 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Frontend: Debug Server-Side",
+      "name": "TheGreenBrother: Debug Server-Side",
       "type": "node-terminal",
       "request": "launch",
       "command": "npm run dev",
-      "cwd": "${workspaceFolder}/frontend",
+      "cwd": "${workspaceFolder}/the-green-brother",
       "presentation": {
-        "group": "frontend",
+        "group": "the-green-brother",
         "order": 1
       }
     },
     {
-      "name": "Frontend: Debug Client-Side",
+      "name": "TheGreenBrother: Debug Client-Side",
       "type": "chrome",
       "request": "launch",
       "url": "https://localhost:3000",
-      "webRoot": "${workspaceFolder}/frontend",
+      "webRoot": "${workspaceFolder}/the-green-brother",
       "presentation": {
-        "group": "frontend",
+        "group": "the-green-brother",
         "order": 2
       }
     },
     {
-      "name": "Frontend: Debug Full Stack",
+      "name": "TheGreenBrother: Debug Full Stack",
       "type": "node-terminal",
       "request": "launch",
       "command": "npm run dev",
-      "cwd": "${workspaceFolder}/frontend",
+      "cwd": "${workspaceFolder}/the-green-brother",
       "serverReadyAction": {
         "pattern": "- Local:.+(https?://.+)",
         "uriFormat": "%s",
         "action": "debugWithChrome"
       },
       "presentation": {
-        "group": "frontend",
+        "group": "the-green-brother",
         "order": 3
       }
     },
@@ -44,14 +44,7 @@
       "type": "debugpy",
       "request": "launch",
       "module": "uvicorn",
-      "args": [
-        "affilibuster_backend.main:app",
-        "--reload",
-        "--port",
-        "8000",
-        "--host",
-        "0.0.0.0"
-      ],
+      "args": ["affilibuster_backend.main:app", "--reload", "--port", "8000", "--host", "0.0.0.0"],
       "cwd": "${workspaceFolder}/backend/src",
       "env": {
         "PYTHONPATH": "${workspaceFolder}/backend/src"
@@ -68,11 +61,7 @@
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
-      "args": [
-        "${file}",
-        "-v",
-        "--no-cov"
-      ],
+      "args": ["${file}", "-v", "--no-cov"],
       "cwd": "${workspaceFolder}/backend",
       "console": "integratedTerminal",
       "justMyCode": false,
@@ -86,11 +75,7 @@
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
-      "args": [
-        "tests",
-        "-v",
-        "--no-cov"
-      ],
+      "args": ["tests", "-v", "--no-cov"],
       "cwd": "${workspaceFolder}/backend",
       "console": "integratedTerminal",
       "justMyCode": false,
@@ -122,58 +107,43 @@
       }
     },
     {
-      "name": "Frontend: Debug Jest Tests",
+      "name": "TheGreenBrother: Debug Jest Tests",
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "run",
-        "test",
-        "--",
-        "--runInBand",
-        "--no-coverage"
-      ],
-      "cwd": "${workspaceFolder}/frontend",
+      "runtimeArgs": ["run", "test", "--", "--runInBand", "--no-coverage"],
+      "cwd": "${workspaceFolder}/the-green-brother",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "presentation": {
-        "group": "frontend-tests",
+        "group": "the-green-brother-tests",
         "order": 1
       }
     },
     {
-      "name": "Frontend: Debug Current Jest Test",
+      "name": "TheGreenBrother: Debug Current Jest Test",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/frontend/node_modules/.bin/jest",
-      "args": [
-        "${fileBasenameNoExtension}",
-        "--runInBand",
-        "--no-coverage"
-      ],
-      "cwd": "${workspaceFolder}/frontend",
+      "program": "${workspaceFolder}/the-green-brother/node_modules/.bin/jest",
+      "args": ["${fileBasenameNoExtension}", "--runInBand", "--no-coverage"],
+      "cwd": "${workspaceFolder}/the-green-brother",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "presentation": {
-        "group": "frontend-tests",
+        "group": "the-green-brother-tests",
         "order": 2
       }
     },
     {
-      "name": "Frontend: Debug Playwright Tests",
+      "name": "TheGreenBrother: Debug Playwright Tests",
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "run",
-        "test:e2e",
-        "--",
-        "--headed"
-      ],
-      "cwd": "${workspaceFolder}/frontend",
+      "runtimeArgs": ["run", "test:e2e", "--", "--headed"],
+      "cwd": "${workspaceFolder}/the-green-brother",
       "console": "integratedTerminal",
       "presentation": {
-        "group": "frontend-tests",
+        "group": "the-green-brother-tests",
         "order": 3
       }
     },
@@ -191,20 +161,17 @@
   ],
   "compounds": [
     {
-      "name": "Full Stack: Frontend + Backend",
-      "configurations": [
-        "Frontend: Debug Server-Side",
-        "Backend: Debug FastAPI Server"
-      ],
+      "name": "Full Stack: TheGreenBrother + Backend",
+      "configurations": ["TheGreenBrother: Debug Server-Side", "Backend: Debug FastAPI Server"],
       "presentation": {
         "group": "compounds",
         "order": 1
       }
     },
     {
-      "name": "Full Stack: All Services (Frontend + Backend + CMS)",
+      "name": "Full Stack: All Services (TheGreenBrother + Backend + CMS)",
       "configurations": [
-        "Frontend: Debug Server-Side",
+        "TheGreenBrother: Debug Server-Side",
         "Backend: Debug FastAPI Server",
         "CMS: Debug Strapi Server"
       ],

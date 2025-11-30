@@ -37,6 +37,8 @@ class ConfigRepository:
             Configuration value if found, None otherwise
 
         """
+        # Always read from api_config table (no special case for strapi_api_token anymore)
+        # The CMS bootstrap stores the plaintext token there
         stmt = select(ApiConfigModel.value).where(ApiConfigModel.key == key)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()

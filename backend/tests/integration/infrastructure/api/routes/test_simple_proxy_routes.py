@@ -5,7 +5,6 @@ Integration tests for Strapi proxy routes with real Strapi service.
 
 Tests the following routes against a real Strapi instance:
 - about
-- components
 - contact
 - error_404
 - error_410
@@ -14,8 +13,7 @@ Tests the following routes against a real Strapi instance:
 - homepage
 - navigation
 - privacy
-- product_page
-- system_message
+- product_categories_page
 - term
 
 Tests verify successful data retrieval and response structure from real Strapi,
@@ -27,17 +25,14 @@ from httpx import AsyncClient
 
 from affilibuster_backend.domain.entities.generated.models import (
     AboutGetResponse,
-    ComponentsGetResponse,
-    ContactGetResponse,
+    ContactUsGetResponse,
     Error404GetResponse,
     Error410GetResponse,
-    FilesGetResponse,
     FooterGetResponse,
     HomepageGetResponse,
     NavigationGetResponse,
     PrivacyGetResponse,
-    ProductPageGetResponse,
-    SystemMessageGetResponse,
+    ProductCategoriesPageGetResponse,
     TermGetResponse,
 )
 
@@ -50,7 +45,7 @@ class TestAboutRoute:
 
     async def test_about_get_returns_200(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
         """Test GET /about returns 200 with real Strapi data."""
-        response = await integration_client.get("/v1/about")
+        response = await integration_client.get("/v1/about?customPopulate=nested")
         assert response.status_code == 200
         data = AboutGetResponse(**response.json())
         assert data.data is not None
@@ -59,28 +54,14 @@ class TestAboutRoute:
 @pytest.mark.integration
 @pytest.mark.asyncio
 @pytest.mark.slow
-class TestComponentsRoute:
-    """Test /components route with real Strapi integration."""
-
-    async def test_components_get_returns_200(self, integration_client: AsyncClient) -> None:
-        """Test GET /components returns 200."""
-        response = await integration_client.get("/v1/components")
-        assert response.status_code == 200
-        data = ComponentsGetResponse(**response.json())
-        assert isinstance(data.data, list)
-
-
-@pytest.mark.integration
-@pytest.mark.asyncio
-@pytest.mark.slow
 class TestContactRoute:
-    """Test /contact route with real Strapi integration."""
+    """Test /contact-us route with real Strapi integration."""
 
     async def test_contact_get_returns_200(self, integration_client: AsyncClient) -> None:
-        """Test GET /contact returns 200."""
-        response = await integration_client.get("/v1/contact")
+        """Test GET /contact-us returns 200."""
+        response = await integration_client.get("/v1/contact-us?customPopulate=nested")
         assert response.status_code == 200
-        data = ContactGetResponse(**response.json())
+        data = ContactUsGetResponse(**response.json())
         assert data.data is not None
 
 
@@ -92,7 +73,7 @@ class TestError404Route:
 
     async def test_error_404_get_returns_200(self, integration_client: AsyncClient) -> None:
         """Test GET /error-404 returns 200."""
-        response = await integration_client.get("/v1/error-404")
+        response = await integration_client.get("/v1/error-404?customPopulate=nested")
         assert response.status_code == 200
         data = Error404GetResponse(**response.json())
         assert data.data is not None
@@ -106,27 +87,13 @@ class TestError410Route:
 
     async def test_error_410_get_returns_200(self, integration_client: AsyncClient) -> None:
         """Test GET /error-410 returns 200."""
-        response = await integration_client.get("/v1/error-410")
+        response = await integration_client.get("/v1/error-410?customPopulate=nested")
         assert response.status_code == 200
         data = Error410GetResponse(**response.json())
         assert data.data is not None
 
 
 @pytest.mark.integration
-@pytest.mark.asyncio
-@pytest.mark.slow
-class TestFilesRoute:
-    """Test /files route with real Strapi integration."""
-
-    async def test_files_get_returns_200(self, integration_client: AsyncClient) -> None:
-        """Test GET /files returns 200."""
-        response = await integration_client.get("/v1/files")
-        assert response.status_code == 200
-        data = FilesGetResponse(response.json())
-        # Note: Strapi upload/files endpoint returns an array, not an object
-        assert isinstance(data.root, list)
-
-
 @pytest.mark.integration
 @pytest.mark.asyncio
 @pytest.mark.slow
@@ -135,7 +102,7 @@ class TestFooterRoute:
 
     async def test_footer_get_returns_200(self, integration_client: AsyncClient) -> None:
         """Test GET /footer returns 200."""
-        response = await integration_client.get("/v1/footer")
+        response = await integration_client.get("/v1/footer?customPopulate=nested")
         assert response.status_code == 200
         data = FooterGetResponse(**response.json())
         assert data.data is not None
@@ -149,7 +116,7 @@ class TestHomepageRoute:
 
     async def test_homepage_get_returns_200(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
         """Test GET /homepage returns 200 with real Strapi data."""
-        response = await integration_client.get("/v1/homepage")
+        response = await integration_client.get("/v1/homepage?customPopulate=nested")
         assert response.status_code == 200
         data = HomepageGetResponse(**response.json())
         assert data.data is not None
@@ -163,7 +130,7 @@ class TestNavigationRoute:
 
     async def test_navigation_get_returns_200(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
         """Test GET /navigation returns 200 with real Strapi data."""
-        response = await integration_client.get("/v1/navigation")
+        response = await integration_client.get("/v1/navigation?customPopulate=nested&locale=en")
         assert response.status_code == 200
         data = NavigationGetResponse(**response.json())
         assert data.data is not None
@@ -177,7 +144,7 @@ class TestPrivacyRoute:
 
     async def test_privacy_get_returns_200(self, integration_client: AsyncClient) -> None:
         """Test GET /privacy returns 200."""
-        response = await integration_client.get("/v1/privacy")
+        response = await integration_client.get("/v1/privacy?customPopulate=nested")
         assert response.status_code == 200
         data = PrivacyGetResponse(**response.json())
         assert data.data is not None
@@ -187,27 +154,13 @@ class TestPrivacyRoute:
 @pytest.mark.asyncio
 @pytest.mark.slow
 class TestProductPageRoute:
-    """Test /product-page route with real Strapi integration."""
+    """Test /product-categories-page route with real Strapi integration."""
 
     async def test_product_page_get_returns_200(self, integration_client: AsyncClient) -> None:
-        """Test GET /product-page returns 200."""
-        response = await integration_client.get("/v1/product-page")
+        """Test GET /product-categories-page returns 200."""
+        response = await integration_client.get("/v1/product-categories-page?customPopulate=nested")
         assert response.status_code == 200
-        data = ProductPageGetResponse(**response.json())
-        assert data.data is not None
-
-
-@pytest.mark.integration
-@pytest.mark.asyncio
-@pytest.mark.slow
-class TestSystemMessageRoute:
-    """Test /system-message route with real Strapi integration."""
-
-    async def test_system_message_get_returns_200(self, integration_client: AsyncClient) -> None:
-        """Test GET /system-message returns 200."""
-        response = await integration_client.get("/v1/system-message")
-        assert response.status_code == 200
-        data = SystemMessageGetResponse(**response.json())
+        data = ProductCategoriesPageGetResponse(**response.json())
         assert data.data is not None
 
 
@@ -219,7 +172,7 @@ class TestTermRoute:
 
     async def test_term_get_returns_200(self, integration_client: AsyncClient) -> None:
         """Test GET /term returns 200."""
-        response = await integration_client.get("/v1/term")
+        response = await integration_client.get("/v1/term?customPopulate=nested")
         assert response.status_code == 200
         data = TermGetResponse(**response.json())
         assert data.data is not None

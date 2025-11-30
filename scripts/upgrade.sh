@@ -8,8 +8,7 @@
 # Usage:
 #   ./scripts/upgrade.sh              # Upgrade all dependencies
 #   ./scripts/upgrade.sh cms          # Upgrade CMS only
-#   ./scripts/upgrade.sh frontend     # Upgrade frontend only
-#   ./scripts/upgrade.sh ecopicks     # Upgrade ecopicks only
+#   ./scripts/upgrade.sh the-green-brother     # Upgrade the-green-brother only
 #   ./scripts/upgrade.sh backend      # Upgrade backend only
 ##
 
@@ -26,32 +25,27 @@ TARGET="${1:-all}"
 
 # Determine which components to upgrade
 UPGRADE_CMS=false
-UPGRADE_FRONTEND=false
-UPGRADE_ECOPICKS=false
+UPGRADE_THE_GREEN_BROTHER=false
 UPGRADE_BACKEND=false
 
 case "${TARGET}" in
 cms)
   UPGRADE_CMS=true
   ;;
-frontend)
-  UPGRADE_FRONTEND=true
-  ;;
-ecopicks)
-  UPGRADE_ECOPICKS=true
+the-green-brother)
+  UPGRADE_THE_GREEN_BROTHER=true
   ;;
 backend)
   UPGRADE_BACKEND=true
   ;;
 all)
   UPGRADE_CMS=true
-  UPGRADE_FRONTEND=true
-  UPGRADE_ECOPICKS=true
+  UPGRADE_THE_GREEN_BROTHER=true
   UPGRADE_BACKEND=true
   ;;
 *)
   echo "❌ Unknown target: ${TARGET}"
-  echo "Valid targets: cms, frontend, ecopicks, backend, all"
+  echo "Valid targets: cms, the-green-brother, backend, all"
   exit 1
   ;;
 esac
@@ -67,7 +61,7 @@ if [[ "${UPGRADE_CMS}" = true ]]; then
   docker compose exec strapi sh -c "
     # Clean previous build to avoid stale compilation issues
     echo '  🧹 Cleaning previous builds...'
-    rm -rf dist build node_modules/.vite node_modules/.esbuild
+    rm -rf dist build node_modules
 
     # Update dependencies
     echo '  📥 Updating CMS dependencies...'
@@ -86,14 +80,14 @@ if [[ "${UPGRADE_CMS}" = true ]]; then
   echo ""
 fi
 
-# === Frontend Upgrade ===
-if [[ "${UPGRADE_FRONTEND}" = true ]]; then
-  echo -e "${BLUE}📦 Upgrading Frontend (Next.js)...${NC}"
+# === TheGreenBrother Upgrade ===
+if [[ "${UPGRADE_THE_GREEN_BROTHER}" = true ]]; then
+  echo -e "${BLUE}📦 Upgrading TheGreenBrother (Next.js)...${NC}"
 
-  # Run upgrade inside Frontend container (has correct Node version)
-  docker compose exec frontend sh -c "
+  # Run upgrade inside TheGreenBrother container (has correct Node version)
+  docker compose exec the-green-brother sh -c "
     # Update dependencies
-    echo '  📥 Updating frontend dependencies...'
+    echo '  📥 Updating the-green-brother dependencies...'
     npm update || true
 
     # Clean Next.js cache
@@ -101,26 +95,7 @@ if [[ "${UPGRADE_FRONTEND}" = true ]]; then
     rm -rf .next
   "
 
-  echo -e "${GREEN}✅ Frontend upgrade complete${NC}"
-  echo ""
-fi
-
-# === Ecopicks Upgrade ===
-if [[ "${UPGRADE_ECOPICKS}" = true ]]; then
-  echo -e "${BLUE}📦 Upgrading Ecopicks (Next.js)...${NC}"
-
-  # Run upgrade inside Ecopicks container (has correct Node version)
-  docker compose exec ecopicks sh -c "
-    # Update dependencies
-    echo '  📥 Updating ecopicks dependencies...'
-    npm update || true
-
-    # Clean Next.js cache
-    echo '  🧹 Clearing Next.js cache...'
-    rm -rf .next
-  "
-
-  echo -e "${GREEN}✅ Ecopicks upgrade complete${NC}"
+  echo -e "${GREEN}✅ TheGreenBrother upgrade complete${NC}"
   echo ""
 fi
 

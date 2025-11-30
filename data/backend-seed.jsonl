@@ -1,0 +1,17 @@
+# Backend Seed Data (JSONL Format)
+#
+# This file contains URL redirects for the backend database.
+# Each line is a JSON object representing a single redirect.
+#
+# Format: {"from_path": str, "to_path": str | null, "status_code": int, "reason": str | null}
+#
+# Example 301 redirect:
+# {"from_path":"/old-product","to_path":"/products/new-product","status_code":301,"reason":"Product renamed"}
+#
+# Example 410 Gone:
+# {"from_path":"/discontinued","to_path":null,"status_code":410,"reason":"Product discontinued"}
+
+{"from_path":"/old-page","to_path":"/new-page","status_code":301,"reason":"page_moved"}
+{"from_path":"/legacy-product","to_path":"/en/products/premium-wireless-earbuds","status_code":301,"reason":"slug_changed"}
+{"from_path":"/deleted-content","to_path":null,"status_code":410,"reason":"content_deleted"}
+{"from_path":"/old-about","to_path":"/en/about","status_code":301,"reason":"page_moved"}

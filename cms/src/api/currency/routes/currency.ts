@@ -1,7 +1,6 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 import { factories } from '@strapi/strapi'
+import { getProductionOnlyConfig } from '../../../utils/route-config'
 
-export default factories.createCoreRouter('api::currency.currency', {
-  only: ['find', 'findOne'],
-})
+export default factories.createCoreRouter('api::currency.currency', getProductionOnlyConfig(['find', 'findOne']))

@@ -1,0 +1,40 @@
+# Copyright (c) 2025 Affilibuster by Ronen Druker.
+
+# Docker Compose Override for CI/CD (HTTP mode)
+# ==============================================
+# This override file is used in CI environments where:
+# - No SSL certificates are available
+# - Services communicate via HTTP instead of HTTPS
+#
+# Usage: docker compose -f docker-compose.yaml -f docker-compose.ci.yaml up -d
+#
+# Changes from base docker-compose.yaml:
+# - Disables strapi-proxy (Nginx SSL termination) with replicas: 0
+# - Backend depends_on override replaces strapi-proxy with strapi
+
+services:
+  # Disable strapi-proxy in CI (no SSL certs available)
+  # Using replicas: 0 instead of profiles to keep service defined but not running
+  strapi-proxy:
+    deploy:
+      replicas: 0
+
+  # Override backend to depend on strapi directly, not strapi-proxy
+  # Note: Docker Compose merges depends_on, so we need the strapi-proxy
+  # service to exist (even with 0 replicas) to avoid 'undefined service' error
+  backend:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      strapi:
+        condition: service_healthy
+      strapi-proxy:
+        condition: service_started
+        required: false
+
+  # Expose Strapi ports to host in HTTP mode (since proxy is disabled)
+  strapi:
+    ports:
+      - '${CMS_PORT}:${CMS_PORT}'

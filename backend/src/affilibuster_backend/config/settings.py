@@ -84,71 +84,47 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
-    smtp_from: str = "noreply@affilibuster.com"
+    smtp_from: str = "noreply@thegreenbrother.com"
     smtp_from_name: str = "Affilibuster"
     smtp_use_tls: bool = True
 
     # CMS Integration - Component fields for URL construction
     cms_protocol: str
-    internal_cms_host: str = ""
     cms_host: str
     cms_port: int
-    # NOTE: strapi_api_token is loaded from database at startup, not from env vars
 
     # Backend API
     backend_protocol: str
 
     # Clients
-    internal_frontend_host: str
-    frontend_protocol: str
-    frontend_host: str
-    frontend_port: int
-    internal_ecopicks_host: str
-    ecopicks_protocol: str
-    ecopicks_host: str
-    ecopicks_port: int
+    internal_the_green_brother_host: str
+    the_green_brother_protocol: str
+    the_green_brother_host: str
+    the_green_brother_port: int
 
     @property
     def database_url(self) -> str:
-        """Construct database URL from components."""
+        """Construct PostgreSQL database URL from components."""
         return f"{self.postgres_protocol}://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
 
     @property
     def redis_url(self) -> str:
         """Construct Redis URL from components."""
-        # When running locally (not in Docker), use localhost instead of Docker internal hostname
-        is_docker = Path("/.dockerenv").exists() or os.environ.get("DOCKER_ENV") == "true"
-
-        if is_docker:
-            host = self.redis_host
-        else:
-            # Running locally - use localhost if redis_host is a Docker internal name
-            host = "localhost" if self.redis_host in ("redis", "redis-server") else self.redis_host
-
-        return f"{self.redis_protocol}://{host}:{self.redis_port}"
+        return f"{self.redis_protocol}://{self.redis_host}:{self.redis_port}"
 
     @property
     def strapi_url(self) -> str:
         """Construct Strapi/CMS URL from components."""
-        # Only use internal host when running inside Docker
-        is_docker = Path("/.dockerenv").exists() or os.environ.get("DOCKER_ENV") == "true"
-
-        if is_docker and self.internal_cms_host != "":
-            return f"{self.cms_protocol}://{self.internal_cms_host}:{self.cms_port}"
-
         return f"{self.cms_protocol}://{self.cms_host}:{self.cms_port}"
 
     @property
     def cors_origins_list(self) -> list[str]:
         """Parse CORS origins from comma-separated string."""
         return [
-            f"{self.frontend_protocol}://{self.frontend_host}:{self.frontend_port}",
-            f"{self.frontend_protocol}://{self.internal_frontend_host}:{self.frontend_port}",
-            f"{self.ecopicks_protocol}://{self.internal_ecopicks_host}:{self.ecopicks_port}",
-            f"{self.ecopicks_protocol}://{self.ecopicks_host}:{self.ecopicks_port}",
+            f"{self.the_green_brother_protocol}://{self.internal_the_green_brother_host}:{self.the_green_brother_port}",
+            f"{self.the_green_brother_protocol}://{self.the_green_brother_host}:{self.the_green_brother_port}",
             # Allow host.docker.internal for Playwright tests from test-runner container
-            f"{self.frontend_protocol}://host.docker.internal:{self.frontend_port}",
-            f"{self.ecopicks_protocol}://host.docker.internal:{self.ecopicks_port}",
+            f"{self.the_green_brother_protocol}://host.docker.internal:{self.the_green_brother_port}",
         ]
 
     @property

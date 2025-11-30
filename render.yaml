@@ -37,12 +37,14 @@ projects:
             name: affilibuster-production-cms
             runtime: node
             region: frankfurt
-            plan: starter
+            plan: standard
             rootDir: cms
             buildCommand: npm install && npm run build
             startCommand: npm run start
-            healthCheckPath: /admin
+            healthCheckPath: /api/health
             autoDeploy: true
+            domains:
+              - cms.thegreenbrother.com
             envVars:
               # Node Environment
               - key: NODE_ENV
@@ -82,13 +84,11 @@ projects:
               - key: CMS_PORT
                 value: 443
               - key: CMS_HOST
-                value: affilibuster-production-cms.onrender.com
+                value: cms.thegreenbrother.com
               - key: INTERNAL_CMS_HOST
                 value: affilibuster-production-cms
 
               # Security Keys
-              - key: ENCRYPTION_KEY
-                generateValue: true # Makes tokens permanently viewable in admin panel
               - key: ADMIN_JWT_SECRET
                 generateValue: true
               - key: API_TOKEN_SALT
@@ -100,18 +100,27 @@ projects:
               - key: APP_KEYS
                 generateValue: true
 
+              # Cloudinary Configuration (for CMS image uploads)
+              - key: CLOUDINARY_NAME
+                sync: false # Set in Render dashboard
+              - key: CLOUDINARY_KEY
+                sync: false # Set in Render dashboard
+              - key: CLOUDINARY_SECRET
+                sync: false # Set in Render dashboard
+
           # =========================================================
           # BACKEND API - FastAPI Application
           # =========================================================
-          - type: web
+          # Private service: Only accessible within Render's private network.
+          # the-green-brother accesses via internal hostname.
+          - type: pserv
             name: affilibuster-production-backend
             runtime: python
             region: frankfurt
             plan: starter
             rootDir: backend
-            buildCommand: pip install uv && uv sync --frozen
+            buildCommand: pip install uv && uv sync --frozen && uv run alembic upgrade head
             startCommand: PYTHONPATH=src uv run uvicorn affilibuster_backend.main:app --host 0.0.0.0 --port 10000
-            healthCheckPath: /health
             autoDeploy: true
             envVars:
               # Application Configuration
@@ -168,91 +177,93 @@ projects:
 
               # CMS Configuration (creates dependency: Backend waits for CMS)
               - key: CMS_PROTOCOL
-                value: https
+                value: http
               - key: CMS_HOST
-                fromService:
-                  type: web
-                  name: affilibuster-production-cms
-                  property: host
+                value: affilibuster-production-cms
               - key: CMS_PORT
-                value: 443
+                value: 10000
               - key: INTERNAL_CMS_HOST
                 fromService:
                   type: web
                   name: affilibuster-production-cms
                   property: host
 
-              # Backend Configuration (self-reference, no dependency created)
+              # Backend Configuration (self-reference for internal use)
               - key: BACKEND_PROTOCOL
-                value: https
+                value: http
               - key: BACKEND_PORT
-                value: 443
+                value: 10000
               - key: BACKEND_HOST
-                value: affilibuster-production-backend.onrender.com
+                fromService:
+                  type: pserv
+                  name: affilibuster-production-backend
+                  property: host
               - key: INTERNAL_BACKEND_HOST
-                value: affilibuster-production-backend
+                fromService:
+                  type: pserv
+                  name: affilibuster-production-backend
+                  property: host
 
-              # Frontend Configuration
-              - key: FRONTEND_PROTOCOL
+              - key: THE_GREEN_BROTHER_PROTOCOL
                 value: https
-              - key: FRONTEND_HOST
-                value: affilibuster-production-ecopicks.onrender.com
-              - key: FRONTEND_PORT
+              - key: THE_GREEN_BROTHER_HOST
+                value: thegreenbrother.com
+              - key: THE_GREEN_BROTHER_PORT
                 value: 443
-              - key: INTERNAL_FRONTEND_HOST
-                value: affilibuster-production-ecopicks
-
-              - key: ECOPICKS_PROTOCOL
-                value: https
-              - key: ECOPICKS_HOST
-                value: affilibuster-production-ecopicks.onrender.com
-              - key: ECOPICKS_PORT
-                value: 443
-              - key: INTERNAL_ECOPICKS_HOST
-                value: affilibuster-production-ecopicks
+              - key: INTERNAL_THE_GREEN_BROTHER_HOST
+                value: affilibuster-production-the-green-brother
 
               # Security
               - key: JWT_SECRET
                 generateValue: true
 
           # =========================================================
-          # ECOPICKS - Next.js Frontend (Primary Affiliate Site)
+          # THE_GREEN_BROTHER - Next.js TheGreenBrother (Primary Affiliate Site)
           # =========================================================
           - type: web
-            name: affilibuster-production-ecopicks
+            name: affilibuster-production-the-green-brother
             runtime: node
             region: frankfurt
-            plan: starter
-            rootDir: ecopicks
+            plan: standard
+            rootDir: the-green-brother
             buildCommand: npm install && npm run build
             startCommand: npm run start
-            healthCheckPath: /
+            healthCheckPath: /api/health
             autoDeploy: true
+            domains:
+              - thegreenbrother.com
+              - www.thegreenbrother.com
             envVars:
               # Node Environment
               - key: NODE_ENV
                 value: production
 
-              # Ecopicks Configuration
-              - key: ECOPICKS_PROTOCOL
+              # CMS Configuration (for Next.js image optimization - needs PUBLIC hostname)
+              - key: CMS_PROTOCOL
                 value: https
-              - key: ECOPICKS_PORT
+              - key: CMS_HOST
+                value: cms.thegreenbrother.com
+              - key: CMS_PORT
+                value: '443'
+
+              # TheGreenBrother Configuration
+              - key: THE_GREEN_BROTHER_PROTOCOL
+                value: https
+              - key: THE_GREEN_BROTHER_PORT
                 value: 443
-              - key: ECOPICKS_HOST
-                value: affilibuster-production-ecopicks.onrender.com
-              - key: INTERNAL_ECOPICKS_HOST
-                value: affilibuster-production-ecopicks
+              - key: THE_GREEN_BROTHER_HOST
+                value: thegreenbrother.com
+              - key: INTERNAL_THE_GREEN_BROTHER_HOST
+                value: affilibuster-production-the-green-brother
 
-              # API URLs (creates dependency: Ecopicks waits for Backend)
+              # API URLs (creates dependency: TheGreenBrother waits for Backend)
               - key: NEXT_PUBLIC_API_URL
-                value: https://${BACKEND_HOST}/v1
+                value: http://affilibuster-production-backend:10000/v1
               - key: NEXT_SERVER_SIDE_API_URL
-                fromService:
-                  type: web
-                  name: affilibuster-production-backend
-                  property: host
-                # Note: Prepend https:// and append /v1 in application code
+                value: http://affilibuster-production-backend:10000/v1
+              - key: NEXT_PUBLIC_CMS_URL
+                value: https://cms.thegreenbrother.com
 
-              # Security
+                # Security
               - key: REVALIDATE_SECRET
                 generateValue: true # Auto-generate random secret

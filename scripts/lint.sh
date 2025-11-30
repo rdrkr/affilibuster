@@ -31,8 +31,8 @@ lint_python() {
 # Lint TypeScript/JavaScript
 lint_typescript() {
   if [[ "${ACTION}" = "check" ]]; then
-    echo "  📋 Checking TypeScript (Frontend ESLint)..."
-    cd frontend
+    echo "  📋 Checking TypeScript (TheGreenBrother ESLint)..."
+    cd the-green-brother
     npm install --silent || LINT_FAILED=$?
     npm run lint || LINT_FAILED=$?
     cd ..
@@ -43,31 +43,14 @@ lint_typescript() {
     npm run lint || LINT_FAILED=$?
     cd ..
   else
-    echo "  🔧 Fixing TypeScript (Frontend)..."
-    cd frontend
+    echo "  🔧 Fixing TypeScript (TheGreenBrother ESLint)..."
+    cd the-green-brother
     npm install --silent || LINT_FAILED=$?
     npm run lint:fix || LINT_FAILED=$?
     cd ..
 
     echo "  🔧 Fixing TypeScript (CMS)..."
     cd cms
-    npm install --silent || LINT_FAILED=$?
-    npm run lint:fix || LINT_FAILED=$?
-    cd ..
-  fi
-}
-
-# Lint Ecopicks
-lint_ecopicks() {
-  if [[ "${ACTION}" = "check" ]]; then
-    echo "  📋 Checking Ecopicks (ESLint)..."
-    cd ecopicks
-    npm install --silent || LINT_FAILED=$?
-    npm run lint || LINT_FAILED=$?
-    cd ..
-  else
-    echo "  🔧 Fixing Ecopicks (ESLint)..."
-    cd ecopicks
     npm install --silent || LINT_FAILED=$?
     npm run lint:fix || LINT_FAILED=$?
     cd ..
@@ -113,10 +96,6 @@ typescript)
   lint_typescript
   ;;
 
-ecopicks)
-  lint_ecopicks
-  ;;
-
 shell)
   lint_shell
   ;;
@@ -124,12 +103,11 @@ shell)
 all)
   lint_python
   lint_typescript
-  lint_ecopicks
   lint_shell
   ;;
 
 *)
-  echo "Usage: $0 {python|typescript|ecopicks|shell|all} [check]"
+  echo "Usage: $0 {python|typescript|shell|all} [check]"
   echo ""
   echo "Examples:"
   echo "  $0 python              # Fix Python linting issues"

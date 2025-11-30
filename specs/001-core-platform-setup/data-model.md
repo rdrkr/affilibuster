@@ -15,16 +15,16 @@ Represents a supported language configuration.
 
 ```typescript
 interface Language {
-  code: LanguageCode;        // 'en' | 'it' | 'he'
-  displayName: string;       // 'English', 'Italiano', 'עברית'
-  nativeName: string;        // 'English', 'Italiano', 'עברית'
-  direction: 'ltr' | 'rtl';
-  urlPrefix: string;         // '' (root for English) | '/it' | '/he'
-  defaultCurrency: CurrencyCode;
-  localeCode: string;        // 'en-US', 'it-IT', 'he-IL'
-  isDefault: boolean;
-  isActive: boolean;
-  sortOrder: number;
+  code: LanguageCode // 'en' | 'it' | 'he'
+  displayName: string // 'English', 'Italiano', 'עברית'
+  nativeName: string // 'English', 'Italiano', 'עברית'
+  direction: 'ltr' | 'rtl'
+  urlPrefix: string // '' (root for English) | '/it' | '/he'
+  defaultCurrency: CurrencyCode
+  localeCode: string // 'en-US', 'it-IT', 'he-IL'
+  isDefault: boolean
+  isActive: boolean
+  sortOrder: number
 }
 ```
 
@@ -86,17 +86,17 @@ Base entity for all content types (pages, products, articles).
 
 ```typescript
 interface Content {
-  id: string;                // UUID
-  type: ContentType;         // 'page' | 'product' | 'article'
-  status: ContentStatus;     // 'draft' | 'published' | 'archived'
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy: string;         // User ID
-  updatedBy: string;         // User ID
+  id: string // UUID
+  type: ContentType // 'page' | 'product' | 'article'
+  status: ContentStatus // 'draft' | 'published' | 'archived'
+  createdAt: Date
+  updatedAt: Date
+  createdBy: string // User ID
+  updatedBy: string // User ID
 }
 
-type ContentType = 'page' | 'product' | 'article';
-type ContentStatus = 'draft' | 'published' | 'archived';
+type ContentType = 'page' | 'product' | 'article'
+type ContentStatus = 'draft' | 'published' | 'archived'
 ```
 
 **Business Rules**:
@@ -113,30 +113,30 @@ Language-specific version of content.
 
 ```typescript
 interface ContentVersion {
-  id: string;                // UUID
-  contentId: string;         // FK to Content
-  languageCode: LanguageCode;
-  title: string;
-  slug: string;              // URL-safe slug, customizable per language
-  body: string;              // Rich text content (HTML or JSON)
-  excerpt?: string;          // Short description
+  id: string // UUID
+  contentId: string // FK to Content
+  languageCode: LanguageCode
+  title: string
+  slug: string // URL-safe slug, customizable per language
+  body: string // Rich text content (HTML or JSON)
+  excerpt?: string // Short description
 
   // SEO Fields
-  metaTitle?: string;
-  metaDescription?: string;
-  metaKeywords?: string[];
-  customSchema?: object;     // Custom JSON-LD schema markup
+  metaTitle?: string
+  metaDescription?: string
+  metaKeywords?: string[]
+  customSchema?: object // Custom JSON-LD schema markup
 
   // Publishing
-  isPublished: boolean;
-  publishedAt?: Date;
+  isPublished: boolean
+  publishedAt?: Date
 
   // Translations (linked content versions in other languages)
-  translations: Record<LanguageCode, string>; // { it: contentVersionId, he: contentVersionId }
+  translations: Record<LanguageCode, string> // { it: contentVersionId, he: contentVersionId }
 
   // Audit
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date
+  updatedAt: Date
 }
 ```
 
@@ -178,35 +178,35 @@ SEO-optimized URL routing with redirect management.
 
 ```typescript
 interface URLRoute {
-  id: string;                // UUID
-  contentVersionId: string;  // FK to ContentVersion
-  languageCode: LanguageCode;
-  path: string;              // Full path: '/products/eco-bottle' or '/it/prodotti/bottiglia-eco'
-  slug: string;              // Last segment: 'eco-bottle'
+  id: string // UUID
+  contentVersionId: string // FK to ContentVersion
+  languageCode: LanguageCode
+  path: string // Full path: '/products/eco-bottle' or '/it/prodotti/bottiglia-eco'
+  slug: string // Last segment: 'eco-bottle'
 
   // URL Status
-  isActive: boolean;
-  isPrimary: boolean;        // True for current/canonical URL
+  isActive: boolean
+  isPrimary: boolean // True for current/canonical URL
 
   // Redirects
-  redirects: URLRedirect[];
+  redirects: URLRedirect[]
 
   // SEO
-  canonicalUrl: string;      // Self-reference for primary URL
-  alternateUrls: Record<LanguageCode, string>; // For hreflang tags
+  canonicalUrl: string // Self-reference for primary URL
+  alternateUrls: Record<LanguageCode, string> // For hreflang tags
 
   // Audit
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date
+  updatedAt: Date
 }
 
 interface URLRedirect {
-  fromPath: string;
-  toPrimaryUrlId: string;    // FK to URLRoute (primary URL)
-  statusCode: 301 | 410;
-  createdAt: Date;
-  createdBy: string;         // User ID who triggered redirect
-  reason?: string;           // "slug_changed" | "content_deleted" | "manual"
+  fromPath: string
+  toPrimaryUrlId: string // FK to URLRoute (primary URL)
+  statusCode: 301 | 410
+  createdAt: Date
+  createdBy: string // User ID who triggered redirect
+  reason?: string // "slug_changed" | "content_deleted" | "manual"
 }
 ```
 
@@ -244,10 +244,10 @@ interface URLRedirect {
       "reason": "slug_changed"
     }
   ],
-  "canonicalUrl": "https://affilibuster.com/products/eco-water-bottle",
+  "canonicalUrl": "https://thegreenbrother.com/products/eco-water-bottle",
   "alternateUrls": {
-    "it": "https://affilibuster.com/it/prodotti/bottiglia-eco",
-    "he": "https://affilibuster.com/he/products/eco-water-bottle"
+    "it": "https://thegreenbrother.com/it/prodotti/bottiglia-eco",
+    "he": "https://thegreenbrother.com/he/products/eco-water-bottle"
   }
 }
 ```
@@ -260,22 +260,22 @@ Supported currency configuration.
 
 ```typescript
 interface Currency {
-  code: CurrencyCode;        // ISO 4217: 'USD' | 'EUR' | 'ILS' | ...
-  name: string;              // 'US Dollar', 'Euro', 'Israeli Shekel'
-  symbol: string;            // '$', '€', '₪'
-  decimalPlaces: number;     // Typically 2, but 0 for JPY, 3 for KWD
-  symbolPosition: 'before' | 'after';
+  code: CurrencyCode // ISO 4217: 'USD' | 'EUR' | 'ILS' | ...
+  name: string // 'US Dollar', 'Euro', 'Israeli Shekel'
+  symbol: string // '$', '€', '₪'
+  decimalPlaces: number // Typically 2, but 0 for JPY, 3 for KWD
+  symbolPosition: 'before' | 'after'
 
   // Locale-specific formatting
-  thousandsSeparator: string; // ',', '.', ' '
-  decimalSeparator: string;   // '.', ','
+  thousandsSeparator: string // ',', '.', ' '
+  decimalSeparator: string // '.', ','
 
   // Metadata
-  isActive: boolean;
-  sortOrder: number;
+  isActive: boolean
+  sortOrder: number
 }
 
-type CurrencyCode = 'USD' | 'EUR' | 'ILS' | 'GBP' | 'CAD' | 'AUD' | 'JPY' | 'CNY' | string;
+type CurrencyCode = 'USD' | 'EUR' | 'ILS' | 'GBP' | 'CAD' | 'AUD' | 'JPY' | 'CNY' | string
 ```
 
 **Business Rules**:
@@ -332,19 +332,19 @@ Stores user preferences for language prompts and currency selection.
 
 ```typescript
 interface UserPreferences {
-  id: string;                // UUID
-  sessionId: string;         // For anonymous users
-  userId?: string;           // For logged-in users (future)
+  id: string // UUID
+  sessionId: string // For anonymous users
+  userId?: string // For logged-in users (future)
 
   // Preferences
-  selectedCurrency: CurrencyCode;
-  dismissedLanguagePrompt: boolean;
-  detectedLanguage?: LanguageCode;
+  selectedCurrency: CurrencyCode
+  dismissedLanguagePrompt: boolean
+  detectedLanguage?: LanguageCode
 
   // Audit
-  createdAt: Date;
-  updatedAt: Date;
-  expiresAt: Date;           // TTL for cache (30 days from last update)
+  createdAt: Date
+  updatedAt: Date
+  expiresAt: Date // TTL for cache (30 days from last update)
 }
 ```
 
@@ -380,20 +380,20 @@ Cultural and regional formatting settings.
 
 ```typescript
 interface Locale {
-  code: string;              // IETF BCP 47: 'en-US', 'it-IT', 'he-IL'
-  languageCode: LanguageCode;
-  countryCode: string;       // ISO 3166-1 alpha-2: 'US', 'IT', 'IL'
+  code: string // IETF BCP 47: 'en-US', 'it-IT', 'he-IL'
+  languageCode: LanguageCode
+  countryCode: string // ISO 3166-1 alpha-2: 'US', 'IT', 'IL'
 
   // Display Names
-  displayName: string;       // 'English (United States)'
+  displayName: string // 'English (United States)'
 
   // Formatting
-  dateFormat: string;        // 'MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD'
-  timeFormat: '12h' | '24h';
-  firstDayOfWeek: number;    // 0 (Sunday) - 6 (Saturday)
+  dateFormat: string // 'MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD'
+  timeFormat: '12h' | '24h'
+  firstDayOfWeek: number // 0 (Sunday) - 6 (Saturday)
 
   // Metadata
-  isActive: boolean;
+  isActive: boolean
 }
 ```
 
@@ -469,29 +469,35 @@ ContentVersion (N) ──< translations >── (N) ContentVersion
 ### Relationship Details
 
 1. **Language → ContentVersion** (1:N)
+
    - One language has many content versions
    - ContentVersion.languageCode → Language.code
 
 2. **Content → ContentVersion** (1:N)
+
    - One content item has multiple language versions
    - ContentVersion.contentId → Content.id
    - Cascade delete: When Content deleted, all ContentVersions deleted
 
 3. **ContentVersion → URLRoute** (1:1 primary, 1:N historical)
+
    - Each content version has one PRIMARY URLRoute
    - Each content version may have multiple historical URLRoutes (old slugs)
    - URLRoute.contentVersionId → ContentVersion.id
 
 4. **URLRoute → URLRedirect** (1:N)
+
    - One URL can have multiple redirects (historical slug changes)
    - URLRedirect.toPrimaryUrlId → URLRoute.id
 
 5. **ContentVersion → ContentVersion** (N:N via translations field)
+
    - Content versions link to their translations in other languages
    - Self-referential relationship via `translations` JSON field
    - No hard FK constraint (allows partial translations)
 
 6. **Currency → UserPreferences** (1:N)
+
    - One currency can be selected by many users
    - UserPreferences.selectedCurrency → Currency.code
 
@@ -503,21 +509,21 @@ ContentVersion (N) ──< translations >── (N) ContentVersion
 
 ## Validation Rules Summary
 
-| Entity | Field | Rule |
-|--------|-------|------|
-| Language | code | Must be one of: 'en', 'it', 'he' |
-| Language | isDefault | Exactly one language must be default |
-| Language | urlPrefix | Empty string for default language, unique for others |
-| ContentVersion | slug | Unique per (contentId, languageCode) |
-| ContentVersion | isPublished | If true, publishedAt must be set |
-| URLRoute | path | Globally unique across all languages |
-| URLRoute | isPrimary | Only one primary URL per ContentVersion |
-| URLRedirect | fromPath | Cannot equal URLRoute.path (no self-redirects) |
-| URLRedirect | statusCode | Must be 301 or 410 |
-| UserPreferences | expiresAt | Must be > createdAt |
-| Currency | code | Must be valid ISO 4217 code |
-| Locale | code | Must be valid IETF BCP 47 code |
-| Locale | firstDayOfWeek | Must be 0-6 |
+| Entity          | Field          | Rule                                                 |
+| --------------- | -------------- | ---------------------------------------------------- |
+| Language        | code           | Must be one of: 'en', 'it', 'he'                     |
+| Language        | isDefault      | Exactly one language must be default                 |
+| Language        | urlPrefix      | Empty string for default language, unique for others |
+| ContentVersion  | slug           | Unique per (contentId, languageCode)                 |
+| ContentVersion  | isPublished    | If true, publishedAt must be set                     |
+| URLRoute        | path           | Globally unique across all languages                 |
+| URLRoute        | isPrimary      | Only one primary URL per ContentVersion              |
+| URLRedirect     | fromPath       | Cannot equal URLRoute.path (no self-redirects)       |
+| URLRedirect     | statusCode     | Must be 301 or 410                                   |
+| UserPreferences | expiresAt      | Must be > createdAt                                  |
+| Currency        | code           | Must be valid ISO 4217 code                          |
+| Locale          | code           | Must be valid IETF BCP 47 code                       |
+| Locale          | firstDayOfWeek | Must be 0-6                                          |
 
 ---
 
@@ -535,12 +541,14 @@ ContentVersion (N) ──< translations >── (N) ContentVersion
 **Business Logic**:
 
 1. **Draft → Published**:
+
    - Set `Content.status = 'published'`
    - Set all associated `ContentVersion.isPublished = true`
    - Set `ContentVersion.publishedAt = now()`
    - URLRoutes become active
 
 2. **Published → Archived**:
+
    - Set `Content.status = 'archived'`
    - Set all `ContentVersion.isPublished = false`
    - URLRoutes `isActive = false`

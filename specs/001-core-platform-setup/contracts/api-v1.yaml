@@ -1,7 +1,5 @@
 # Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-
-
 openapi: 3.1.0
 info:
   title: Affilibuster Multi-Language Platform API
@@ -11,10 +9,10 @@ info:
     Features include localized content delivery, currency management, and user preference tracking.
   contact:
     name: Affilibuster API Support
-    email: api@affilibuster.com
+    email: api@thegreenbrother.com
 
 servers:
-  - url: https://api.affilibuster.com/v1
+  - url: https://api.thegreenbrother.com/v1
     description: Production
   - url: http://localhost:8000/v1
     description: Local development
@@ -106,13 +104,13 @@ paths:
               properties:
                 acceptLanguage:
                   type: string
-                  example: "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7"
+                  example: 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7'
                 userAgent:
                   type: string
-                  example: "Mozilla/5.0 ..."
+                  example: 'Mozilla/5.0 ...'
                 countryCode:
                   type: string
-                  example: "IT"
+                  example: 'IT'
                   description: Optional ISO 3166-1 alpha-2 country code from IP geolocation
               required:
                 - acceptLanguage
@@ -158,13 +156,13 @@ paths:
                   example: 29.99
                 fromCurrency:
                   type: string
-                  example: "USD"
+                  example: 'USD'
                 toCurrency:
                   type: string
-                  example: "EUR"
+                  example: 'EUR'
                 locale:
                   type: string
-                  example: "it-IT"
+                  example: 'it-IT'
                   description: Optional locale for formatting (defaults to target currency's locale)
               required:
                 - amount
@@ -190,13 +188,13 @@ paths:
           required: true
           schema:
             type: string
-            example: "sess-abc123def456"
+            example: 'sess-abc123def456'
         - name: X-User-Id
           in: header
           required: false
           schema:
             type: string
-            example: "user-789xyz"
+            example: 'user-789xyz'
       responses:
         '200':
           description: User preferences
@@ -245,7 +243,7 @@ components:
       schema:
         type: string
         enum: [en, it, he]
-        example: "it"
+        example: 'it'
 
     Slug:
       name: slug
@@ -255,7 +253,7 @@ components:
       schema:
         type: string
         pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
-        example: "eco-water-bottle"
+        example: 'eco-water-bottle'
 
     Page:
       name: page
@@ -283,26 +281,26 @@ components:
         code:
           type: string
           enum: [en, it, he]
-          example: "it"
+          example: 'it'
         displayName:
           type: string
-          example: "Italian"
+          example: 'Italian'
         nativeName:
           type: string
-          example: "Italiano"
+          example: 'Italiano'
         direction:
           type: string
           enum: [ltr, rtl]
-          example: "ltr"
+          example: 'ltr'
         urlPrefix:
           type: string
-          example: "/it"
+          example: '/it'
         defaultCurrency:
           type: string
-          example: "EUR"
+          example: 'EUR'
         localeCode:
           type: string
-          example: "it-IT"
+          example: 'it-IT'
         isDefault:
           type: boolean
           example: false
@@ -322,7 +320,7 @@ components:
         detectedLanguage:
           type: string
           enum: [en, it, he]
-          example: "it"
+          example: 'it'
         confidence:
           type: number
           format: float
@@ -336,7 +334,7 @@ components:
         suggestedUrl:
           type: string
           format: uri
-          example: "https://affilibuster.com/it/products/eco-bottle"
+          example: 'https://thegreenbrother.com/it/products/eco-bottle'
       required:
         - detectedLanguage
         - confidence
@@ -348,13 +346,13 @@ components:
         code:
           type: string
           pattern: '^[A-Z]{3}$'
-          example: "EUR"
+          example: 'EUR'
         name:
           type: string
-          example: "Euro"
+          example: 'Euro'
         symbol:
           type: string
-          example: "€"
+          example: '€'
         decimalPlaces:
           type: integer
           minimum: 0
@@ -363,13 +361,13 @@ components:
         symbolPosition:
           type: string
           enum: [before, after]
-          example: "after"
+          example: 'after'
         thousandsSeparator:
           type: string
-          example: "."
+          example: '.'
         decimalSeparator:
           type: string
-          example: ","
+          example: ','
       required:
         - code
         - name
@@ -386,10 +384,10 @@ components:
           example: 27.50
         currency:
           type: string
-          example: "EUR"
+          example: 'EUR'
         formatted:
           type: string
-          example: "27,50 €"
+          example: '27,50 €'
         exchangeRate:
           type: number
           format: double
@@ -406,28 +404,28 @@ components:
         id:
           type: string
           format: uuid
-          example: "c-456"
+          example: 'c-456'
         type:
           type: string
           enum: [page, product, article]
-          example: "product"
+          example: 'product'
         languageCode:
           type: string
           enum: [en, it, he]
-          example: "it"
+          example: 'it'
         title:
           type: string
-          example: "Bottiglia Ecologica"
+          example: 'Bottiglia Ecologica'
         slug:
           type: string
-          example: "bottiglia-ecologica"
+          example: 'bottiglia-ecologica'
         body:
           type: string
           description: HTML or JSON content
-          example: "<p>Bottiglia riutilizzabile...</p>"
+          example: '<p>Bottiglia riutilizzabile...</p>'
         excerpt:
           type: string
-          example: "Bottiglia sostenibile in acciaio inossidabile"
+          example: 'Bottiglia sostenibile in acciaio inossidabile'
         seo:
           $ref: '#/components/schemas/SEOMetadata'
         url:
@@ -435,7 +433,7 @@ components:
         publishedAt:
           type: string
           format: date-time
-          example: "2025-10-01T00:00:00Z"
+          example: '2025-10-01T00:00:00Z'
         translations:
           type: object
           description: Available translations
@@ -443,8 +441,8 @@ components:
             type: string
             format: uri
           example:
-            en: "https://affilibuster.com/products/eco-bottle"
-            he: "https://affilibuster.com/he/products/eco-bottle"
+            en: 'https://thegreenbrother.com/products/eco-bottle'
+            he: 'https://thegreenbrother.com/he/products/eco-bottle'
       required:
         - id
         - type
@@ -460,32 +458,32 @@ components:
       properties:
         metaTitle:
           type: string
-          example: "Bottiglia Ecologica | Affilibuster"
+          example: 'Bottiglia Ecologica | Affilibuster'
         metaDescription:
           type: string
-          example: "Acquista bottiglie riutilizzabili sostenibili"
+          example: 'Acquista bottiglie riutilizzabili sostenibili'
         metaKeywords:
           type: array
           items:
             type: string
-          example: ["bottiglia", "ecologica", "sostenibile"]
+          example: ['bottiglia', 'ecologica', 'sostenibile']
         customSchema:
           type: object
           description: Custom JSON-LD schema
           example:
-            "@type": "Product"
-            "name": "Bottiglia Ecologica"
+            '@type': 'Product'
+            'name': 'Bottiglia Ecologica'
 
     URLData:
       type: object
       properties:
         path:
           type: string
-          example: "/it/prodotti/bottiglia-ecologica"
+          example: '/it/prodotti/bottiglia-ecologica'
         canonical:
           type: string
           format: uri
-          example: "https://affilibuster.com/it/prodotti/bottiglia-ecologica"
+          example: 'https://thegreenbrother.com/it/prodotti/bottiglia-ecologica'
         alternates:
           type: object
           description: hreflang alternate URLs
@@ -493,9 +491,9 @@ components:
             type: string
             format: uri
           example:
-            x-default: "https://affilibuster.com/products/eco-bottle"
-            it: "https://affilibuster.com/it/prodotti/bottiglia-ecologica"
-            he: "https://affilibuster.com/he/products/eco-bottle"
+            x-default: 'https://thegreenbrother.com/products/eco-bottle'
+            it: 'https://thegreenbrother.com/it/prodotti/bottiglia-ecologica'
+            he: 'https://thegreenbrother.com/he/products/eco-bottle'
       required:
         - path
         - canonical
@@ -571,22 +569,22 @@ components:
           format: uuid
         sessionId:
           type: string
-          example: "sess-abc123"
+          example: 'sess-abc123'
         selectedCurrency:
           type: string
           pattern: '^[A-Z]{3}$'
-          example: "EUR"
+          example: 'EUR'
         dismissedLanguagePrompt:
           type: boolean
           example: true
         detectedLanguage:
           type: string
           enum: [en, it, he]
-          example: "it"
+          example: 'it'
         expiresAt:
           type: string
           format: date-time
-          example: "2025-11-03T15:30:00Z"
+          example: '2025-11-03T15:30:00Z'
       required:
         - id
         - sessionId
@@ -599,27 +597,27 @@ components:
         selectedCurrency:
           type: string
           pattern: '^[A-Z]{3}$'
-          example: "USD"
+          example: 'USD'
         dismissedLanguagePrompt:
           type: boolean
           example: true
         detectedLanguage:
           type: string
           enum: [en, it, he]
-          example: "it"
+          example: 'it'
 
     Error:
       type: object
       properties:
         error:
           type: string
-          example: "Not Found"
+          example: 'Not Found'
         message:
           type: string
           example: "Content with slug 'invalid-slug' not found for language 'it'"
         code:
           type: string
-          example: "CONTENT_NOT_FOUND"
+          example: 'CONTENT_NOT_FOUND'
         timestamp:
           type: string
           format: date-time

@@ -10,24 +10,21 @@ exclude: |
     \.venv/|
     \.specify/|
     __pycache__/|
-    alembic/versions/|
     backend/htmlcov/|
     backend/src/affilibuster_backend/domain/entities/generated/|
     build/|
     cms/build/|
     cms/types/|
-    contracts/affilibuster.openapi.yaml|
-    contracts/strapi.openapi.yaml|
     coverage/|
     dist/|
-    frontend/coverage/|
-    frontend/src/lib/generated/|
-    ecopicks/src/lib/generated/|
+    the-green-brother/coverage/|
+    the-green-brother/src/lib/generated/|
     htmlcov/|
     log\.txt|
     node_modules/|
     package-lock\.json|
     venv/|
+    temp/
     test-results/
   )
 repos:
@@ -51,6 +48,11 @@ repos:
           - '|#|'
           - --use-current-year
           - --detect-license-in-X-top-lines=3
+        exclude: |
+          (?x)^(
+            contracts/affilibuster.openapi.yaml|
+            contracts/strapi.openapi.yaml
+          )
 
   # Copyright header enforcement - TypeScript, JavaScript
   - repo: https://github.com/Lucas-C/pre-commit-hooks
@@ -75,14 +77,38 @@ repos:
         name: Trim trailing whitespace
       - id: end-of-file-fixer
         name: Fix end of file
+        exclude: |
+          (?x)^(
+            data/assets/|
+            data/configuration/|
+            data/entities/|
+            data/links/|
+            data/schemas/|
+            data/metadata\.json
+          )
       - id: check-yaml
         name: Check YAML
+        exclude: |
+          (?x)^(
+            contracts/affilibuster.openapi.yaml|
+            contracts/strapi.openapi.yaml
+          )
       - id: check-json
         name: Check JSON
+        exclude: |
+          (?x)^(
+            data/assets/|
+            data/configuration/|
+            data/entities/|
+            data/links/|
+            data\.schemas/|
+            data/metadata\.json
+          )
       - id: check-toml
         name: Check TOML
       - id: check-xml
         name: Check XML
+        exclude: .*\.svg$
       - id: detect-private-key
         name: Detect private keys
       - id: check-merge-conflict

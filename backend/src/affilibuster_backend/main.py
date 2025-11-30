@@ -14,6 +14,7 @@ from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from typing import Any
 
+import httpx
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,28 +33,15 @@ from affilibuster_backend.infrastructure.api.openapi_loader import openapi_contr
 
 # Import routers
 from affilibuster_backend.infrastructure.api.routes import (
-    about,
     auth,
-    components,
-    contact,
-    currencies,
-    error_404,
-    error_410,
-    files,
-    footer,
-    homepage,
     languages,
-    locales,
-    navigation,
     preferences,
-    privacy,
-    product_page,
-    products,
     profile,
     redirects,
-    system_message,
-    term,
 )
+
+# Import centralized CMS routes
+from affilibuster_backend.infrastructure.api.routes.generated.cms_routes import get_all_cms_routers
 
 # Import database session and repositories
 from affilibuster_backend.infrastructure.database.config import get_db_session
@@ -117,6 +105,25 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
             )
 
     logger.info("✅ Strapi API token loaded successfully")
+
+    # Sanity check: Verify Strapi connectivity and authentication
+    logger.info("🔌 Verifying Strapi connectivity and authentication...")
+
+    try:
+        async with httpx.AsyncClient(verify=settings.app_env == "production") as client:
+            response = await client.get(
+                f"{settings.strapi_url}/api/health",
+                headers={"Authorization": f"Bearer {strapi_api_token}"},
+                timeout=5.0,
+            )
+            response.raise_for_status()
+            logger.info("✅ Strapi connection verified successfully")
+    except httpx.HTTPStatusError as e:
+        logger.exception("❌ Strapi authentication failed: %s", e.response.text)
+        raise RuntimeError(f"Failed to authenticate with Strapi: {e.response.status_code} {e.response.text}") from e
+    except httpx.RequestError as e:
+        logger.exception("❌ Failed to connect to Strapi")
+        raise RuntimeError(f"Failed to connect to Strapi: {e!s}") from e
 
     # Initialize dependencies
     logger.info("📦 Initializing dependencies...")
@@ -241,37 +248,23 @@ app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(ErrorHandlingMiddleware)
 
 # Register routers (most specific prefixes first, least specific last)
+
+# Custom routers with special logic (NOT pure CMS proxies)
 app.include_router(auth.router)
 app.include_router(profile.router)
 app.include_router(languages.router)
-app.include_router(currencies.router)
-app.include_router(products.router)
 app.include_router(preferences.router)
 app.include_router(redirects.router)
 
-# Single-type routers (no prefix - must be last)
-app.include_router(about.router)
-app.include_router(contact.router)
-app.include_router(error_404.router)
-app.include_router(error_410.router)
-app.include_router(footer.router)
-app.include_router(homepage.router)
-app.include_router(navigation.router)
-app.include_router(privacy.router)
-app.include_router(product_page.router)
-app.include_router(system_message.router)
-app.include_router(term.router)
-
-# System/meta routers (no prefix - must be absolutely last to avoid conflicts)
-app.include_router(components.router)
-app.include_router(files.router)
-app.include_router(locales.router)
+# Centralized CMS proxy routers (auto-generated from configs)
+for cms_router in get_all_cms_routers():
+    app.include_router(cms_router)
 
 
 @app.get("/", include_in_schema=False)
 async def root() -> RootResponse:
     """Root endpoint."""
-    return RootResponse(message="Affilibuster API v1.0.0", status="running")
+    return RootResponse(message=f"{app.title} v{app.version}", status="running")
 
 
 @app.get("/health")

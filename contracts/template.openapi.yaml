@@ -15,15 +15,15 @@ info:
     Service APIs (preferences, language detection) are defined here.
   contact:
     name: Affilibuster API Support
-    email: api@affilibuster.com
+    email: api@thegreenbrother.com
   license:
     name: Proprietary
-    url: https://affilibuster.com/license
+    url: https://thegreenbrother.com/license
 
 servers:
   - url: http://localhost:8000
     description: Local development server
-  - url: https://api.affilibuster.com
+  - url: https://api.thegreenbrother.com
     description: Production server
 
 tags:
@@ -43,7 +43,7 @@ paths:
       operationId: registerUser
       summary: Register a new user
       description: Creates a new user account with email and password
-      tags: [ auth ]
+      tags: [auth]
       requestBody:
         required: true
         content:
@@ -94,7 +94,7 @@ paths:
       operationId: loginUser
       summary: Login with email and password
       description: Authenticates user and returns JWT tokens
-      tags: [ auth ]
+      tags: [auth]
       requestBody:
         required: true
         content:
@@ -147,9 +147,9 @@ paths:
       operationId: logoutUser
       summary: Logout current user
       description: Invalidates current session and clears cookies
-      tags: [ auth ]
+      tags: [auth]
       security:
-        - UserAuth: [ ]
+        - UserAuth: []
       responses:
         '200':
           description: Logout successful
@@ -176,9 +176,9 @@ paths:
       operationId: refreshToken
       summary: Refresh access token
       description: Issues a new access token using refresh token
-      tags: [ auth ]
+      tags: [auth]
       security:
-        - UserAuth: [ ]
+        - UserAuth: []
       responses:
         '200':
           description: Token refreshed successfully
@@ -203,7 +203,7 @@ paths:
       operationId: verifyEmail
       summary: Verify email address
       description: Verifies user email with token from verification email
-      tags: [ auth ]
+      tags: [auth]
       requestBody:
         required: true
         content:
@@ -236,9 +236,9 @@ paths:
       operationId: resendVerification
       summary: Resend verification email
       description: Sends a new verification email to user
-      tags: [ auth ]
+      tags: [auth]
       security:
-        - UserAuth: [ ]
+        - UserAuth: []
       responses:
         '200':
           description: Verification email sent
@@ -271,7 +271,7 @@ paths:
       operationId: forgotPassword
       summary: Request password reset
       description: Sends password reset email (always returns success for security)
-      tags: [ auth ]
+      tags: [auth]
       requestBody:
         required: true
         content:
@@ -311,7 +311,7 @@ paths:
       operationId: resetPassword
       summary: Reset password with token
       description: Resets password using token from reset email
-      tags: [ auth ]
+      tags: [auth]
       requestBody:
         required: true
         content:
@@ -363,9 +363,9 @@ paths:
       operationId: getUserProfile
       summary: Get current user profile
       description: Retrieves authenticated user's profile information
-      tags: [ auth ]
+      tags: [auth]
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       responses:
         '200':
           description: Profile retrieved successfully
@@ -383,9 +383,9 @@ paths:
       operationId: updateUserProfile
       summary: Update user profile
       description: Updates authenticated user's display name
-      tags: [ auth ]
+      tags: [auth]
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -425,9 +425,9 @@ paths:
       operationId: changePassword
       summary: Change password
       description: Changes authenticated user's password (requires current password)
-      tags: [ auth ]
+      tags: [auth]
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -476,7 +476,7 @@ paths:
       operationId: getLanguages
       summary: Get all supported languages
       description: Returns list of active languages with metadata
-      tags: [ languages ]
+      tags: [languages]
       responses:
         '200':
           description: Languages list
@@ -498,7 +498,7 @@ paths:
       operationId: detectLanguage
       summary: Detect user's preferred language
       description: Analyzes Accept-Language header and user-agent to determine preferred language
-      tags: [ languages ]
+      tags: [languages]
       requestBody:
         required: true
         content:
@@ -538,7 +538,7 @@ paths:
       operationId: getUserPreferences
       summary: Get user preferences
       description: Retrieves user preferences by session ID or user ID
-      tags: [ preferences ]
+      tags: [preferences]
       parameters:
         - name: X-Session-Id
           in: header
@@ -570,7 +570,7 @@ paths:
       operationId: updateUserPreferences
       summary: Update user preferences
       description: Creates or updates user preferences
-      tags: [ preferences ]
+      tags: [preferences]
       parameters:
         - name: X-Session-Id
           in: header
@@ -597,7 +597,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /v1/redirects/check:
+  /redirects/check:
     get:
       operationId: checkRedirect
       summary: Check if a URL has a redirect
@@ -692,7 +692,7 @@ components:
           example: false
         status:
           type: string
-          enum: [ active, locked, deleted ]
+          enum: [active, locked, deleted]
           example: 'active'
         createdAt:
           type: string
@@ -821,15 +821,16 @@ components:
 
     CurrencyCode:
       type: string
-      enum: [ USD, EUR, GBP, ILS, CAD, AUD, JPY, CNY ]
+      enum: [USD, EUR, GBP, ILS, CAD, AUD, JPY, CNY]
       description: ISO 4217 currency codes
       example: 'USD'
+
     Language:
       type: object
       properties:
         code:
           type: string
-          enum: [ en, it, he ]
+          enum: [en, it, he]
           example: 'it'
         displayName:
           type: string
@@ -837,9 +838,13 @@ components:
         nativeName:
           type: string
           example: 'Italiano'
+        flag:
+          type: string
+          description: 'Flag emoji for the language (e.g. 🇬🇧, 🇮🇹, 🇮🇱)'
+          example: '🇮🇹'
         direction:
           type: string
-          enum: [ ltr, rtl ]
+          enum: [ltr, rtl]
           example: 'ltr'
         urlPrefix:
           type: string
@@ -856,6 +861,7 @@ components:
         - code
         - displayName
         - nativeName
+        - flag
         - direction
         - urlPrefix
         - defaultCurrency
@@ -867,7 +873,7 @@ components:
       properties:
         detectedLanguage:
           type: string
-          enum: [ en, it, he ]
+          enum: [en, it, he]
           example: 'it'
         confidence:
           type: number
@@ -882,7 +888,7 @@ components:
         suggestedUrl:
           type: string
           format: uri
-          example: 'https://affilibuster.com/it/products/eco-bottle'
+          example: 'https://thegreenbrother.com/it/products/eco-bottle'
       required:
         - detectedLanguage
         - confidence
@@ -908,7 +914,7 @@ components:
           example: true
         detectedLanguage:
           type: string
-          enum: [ en, it, he ]
+          enum: [en, it, he]
           example: 'it'
         createdAt:
           type: string
@@ -940,7 +946,7 @@ components:
           example: true
         detectedLanguage:
           type: string
-          enum: [ en, it, he ]
+          enum: [en, it, he]
           example: 'it'
 
     RedirectCheckResponse:
@@ -986,423 +992,6 @@ components:
         - message
         - code
         - timestamp
-
-    SEOMetadata:
-      type: object
-      description: SEO metadata for content
-      properties:
-        title:
-          type: string
-          example: 'Eco Bottle | Affilibuster'
-        description:
-          type: string
-          example: 'Buy sustainable reusable bottles'
-        keywords:
-          type: array
-          items:
-            type: string
-          example: [ 'bottle', 'eco', 'sustainable' ]
-        canonicalUrl:
-          type: string
-          example: 'https://affilibuster.com/products/eco-bottle'
-
-    URLData:
-      type: object
-      description: URL information with alternates
-      properties:
-        path:
-          type: string
-          example: '/products/eco-bottle'
-        languagePrefix:
-          type: string
-          example: ''
-        current:
-          type: string
-          example: 'https://affilibuster.com/products/eco-bottle'
-        canonical:
-          type: string
-          example: 'https://affilibuster.com/products/eco-bottle'
-        alternates:
-          type: object
-          additionalProperties:
-            type: string
-          example:
-            x-default: 'https://affilibuster.com/products/eco-bottle'
-            it: 'https://affilibuster.com/it/prodotti/bottiglia-ecologica'
-            he: 'https://affilibuster.com/he/products/eco-bottle'
-      required:
-        - path
-        - languagePrefix
-        - current
-        - canonical
-        - alternates
-
-    ContentSummary:
-      type: object
-      description: Brief content summary for list views
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: '550e8400-e29b-41d4-a716-446655440000'
-        type:
-          type: string
-          enum: [ page, product, article ]
-          example: 'product'
-        language:
-          type: string
-          example: 'en'
-        title:
-          type: string
-          example: 'Eco Bottle'
-        slug:
-          type: string
-          example: 'eco-bottle'
-        excerpt:
-          type: string
-          example: 'Sustainable stainless steel bottle'
-        url:
-          type: string
-          example: 'https://affilibuster.com/products/eco-bottle'
-        status:
-          type: string
-          example: 'published'
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-10-15T10:30:00Z'
-        publishedAt:
-          type: string
-          format: date-time
-          example: '2025-10-01T00:00:00Z'
-      required:
-        - id
-        - type
-        - language
-        - title
-        - slug
-        - url
-        - status
-        - updatedAt
-
-    Pagination:
-      type: object
-      description: Pagination metadata
-      properties:
-        page:
-          type: integer
-          example: 1
-        pageSize:
-          type: integer
-          example: 20
-        totalItems:
-          type: integer
-          example: 150
-        totalPages:
-          type: integer
-          example: 8
-        hasNext:
-          type: boolean
-          example: true
-        hasPrevious:
-          type: boolean
-          example: false
-      required:
-        - page
-        - pageSize
-        - totalItems
-        - totalPages
-        - hasNext
-        - hasPrevious
-
-    ContentResponse:
-      type: object
-      description: Full content response with all details
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: '550e8400-e29b-41d4-a716-446655440000'
-        type:
-          type: string
-          enum: [ page, product, article ]
-          example: 'product'
-        language:
-          type: string
-          example: 'en'
-        title:
-          type: string
-          example: 'Eco Bottle'
-        slug:
-          type: string
-          example: 'eco-bottle'
-        content:
-          type: string
-          example: '<p>Reusable water bottle...</p>'
-        excerpt:
-          type: string
-          example: 'Sustainable stainless steel bottle'
-        seo:
-          $ref: '#/components/schemas/SEOMetadata'
-        urls:
-          $ref: '#/components/schemas/URLData'
-        status:
-          type: string
-          example: 'published'
-        fallbackUsed:
-          type: boolean
-          example: false
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-10-01T08:00:00Z'
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-10-15T10:30:00Z'
-        publishedAt:
-          type: string
-          format: date-time
-          example: '2025-10-01T00:00:00Z'
-        translations:
-          type: object
-          additionalProperties:
-            type: string
-          example:
-            it: 'https://affilibuster.com/it/prodotti/bottiglia-ecologica'
-            he: 'https://affilibuster.com/he/products/eco-bottle'
-      required:
-        - id
-        - type
-        - language
-        - title
-        - slug
-        - content
-        - seo
-        - urls
-        - status
-        - createdAt
-        - updatedAt
-
-    ContentListResponse:
-      type: object
-      description: Paginated content list response
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContentSummary'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-      required:
-        - data
-        - pagination
-
-    Currency:
-      type: object
-      description: Currency configuration and metadata
-      properties:
-        documentId:
-          type: string
-          format: uuid
-          description: The document ID, represented by a UUID
-        id:
-          type: number
-          description: Internal ID
-        code:
-          type: string
-          minLength: 3
-          maxLength: 3
-          description: ISO 4217 currency code (e.g., USD, EUR, ILS)
-          example: 'USD'
-        name:
-          type: string
-          description: Full currency name
-          example: 'US Dollar'
-        symbol:
-          type: string
-          description: Currency symbol
-          example: '$'
-        displayName:
-          type: string
-          description: Display name for UI
-          example: 'USD ($)'
-        decimalPlaces:
-          type: integer
-          minimum: 0
-          maximum: 8
-          default: 2
-          description: Number of decimal places for amounts
-        symbolPosition:
-          type: string
-          enum: [ before, after ]
-          default: before
-          description: Whether symbol appears before or after amount
-        thousandsSeparator:
-          type: string
-          default: ','
-          description: Thousands separator character
-        decimalSeparator:
-          type: string
-          default: '.'
-          description: Decimal separator character
-        exchangeRate:
-          type: number
-          default: 1
-          description: Exchange rate relative to base currency
-        sortOrder:
-          type: integer
-          default: 0
-          description: Display order in currency lists
-        isActive:
-          type: boolean
-          default: true
-          description: Whether currency is currently available
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-        publishedAt:
-          type: string
-          format: date-time
-      required:
-        - documentId
-        - id
-        - code
-        - name
-        - symbol
-        - displayName
-        - decimalPlaces
-        - symbolPosition
-        - thousandsSeparator
-        - decimalSeparator
-        - exchangeRate
-        - sortOrder
-        - isActive
-        - publishedAt
-
-    Navigation:
-      type: object
-      description: Navigation menu configuration
-      properties:
-        brandName:
-          type: string
-          example: 'Affilibuster'
-        homeLabel:
-          type: string
-          example: 'Home'
-        productsLabel:
-          type: string
-          example: 'Products'
-        aboutLabel:
-          type: string
-          example: 'About'
-        contactLabel:
-          type: string
-          example: 'Contact'
-        languageSelectorLabel:
-          type: string
-          example: 'Language'
-        currencySelectorLabel:
-          type: string
-          example: 'Currency'
-        themeSelectorLabel:
-          type: string
-          example: 'Theme'
-        themeLightLabel:
-          type: string
-          example: 'Light'
-        themeDarkLabel:
-          type: string
-          example: 'Dark'
-        themeSystemLabel:
-          type: string
-          example: 'System'
-        mobileMenuLabel:
-          type: string
-          example: 'Menu'
-        mobileMenuCloseLabel:
-          type: string
-          example: 'Close'
-        twitterLabel:
-          type: string
-          example: 'Twitter'
-        facebookLabel:
-          type: string
-          example: 'Facebook'
-        currencySelectorAriaLabel:
-          type: string
-          example: 'Select currency'
-        languageSelectorAriaLabel:
-          type: string
-          example: 'Select language'
-        themeSelectorAriaLabel:
-          type: string
-          example: 'Select theme'
-        browseProductsButton:
-          type: string
-          example: 'Browse Products'
-        promptTitleTemplate:
-          type: string
-          example: 'Language Preference'
-        promptMessageTemplate:
-          type: string
-          example: 'Would you like to switch to {language}?'
-        yesButtonTemplate:
-          type: string
-          example: 'Yes'
-        noButtonText:
-          type: string
-          example: 'No'
-
-    Footer:
-      type: object
-      description: Footer content and links
-      properties:
-        brandDescription:
-          type: string
-          example: 'High-quality sustainable products for modern living'
-        quickLinksTitle:
-          type: string
-          example: 'Quick Links'
-        privacyPolicyLabel:
-          type: string
-          example: 'Privacy Policy'
-        termsOfServiceLabel:
-          type: string
-          example: 'Terms of Service'
-        contactLabel:
-          type: string
-          example: 'Contact'
-        aboutUsLabel:
-          type: string
-          example: 'About Us'
-        newsletterTitle:
-          type: string
-          example: 'Newsletter'
-        newsletterDescription:
-          type: string
-          example: 'Subscribe to get updates'
-        subscribeButton:
-          type: string
-          example: 'Subscribe'
-        emailPlaceholder:
-          type: string
-          example: 'your@email.com'
-        copyrightText:
-          type: string
-          example: 'Affilibuster. All rights reserved.'
-        footerTagline:
-          type: string
-          example: 'Sustainable living starts here'
-        twitterAriaLabel:
-          type: string
-          example: 'Follow us on Twitter'
-        facebookAriaLabel:
-          type: string
-          example: 'Follow us on Facebook'
 
     AuthVerifyEmailPostRequest:
       type: object
@@ -1489,4 +1078,4 @@ components:
       description: JWT token for authenticated users (alias for bearerAuth)
 
 security:
-  - SessionAuth: [ ]
+  - SessionAuth: []

@@ -21,6 +21,7 @@ Use **next-intl** for internationalization with Next.js 14 App Router
 ### Alternatives Considered
 
 - **next-i18next**:
+
   - Pros: Mature, widely adopted, proven at scale
   - Cons: Primarily designed for Pages Router, requires workarounds for App Router
   - Verdict: Not ideal for App Router-first architecture
@@ -62,6 +63,7 @@ Use **FastAPI** for the backend API layer
 ### Alternatives Considered
 
 - **Django + Django REST Framework**:
+
   - Pros: Mature ecosystem, admin panel, ORM
   - Cons: Heavier framework, more opinionated, slower for API-only workloads
   - Verdict: Overkill for API-first architecture; admin panel not needed (using Strapi CMS)
@@ -102,6 +104,7 @@ Use **Strapi's native i18n plugin** with customizations for partial translations
 ### Alternatives Considered
 
 - **Custom Implementation (separate collections per language)**:
+
   - Pros: Full control over data structure
   - Cons: Complex to maintain, no admin UI support, manual relationship management
   - Verdict: Reinventing the wheel, high maintenance burden
@@ -145,6 +148,7 @@ Use **Tailwind CSS with RTL plugin** for right-to-left Hebrew layouts
 ### Alternatives Considered
 
 - **CSS-in-JS (styled-components/emotion)**:
+
   - Pros: Dynamic styling, programmatic control
   - Cons: Runtime overhead, harder to optimize, less performant than Tailwind
   - Verdict: Performance penalty not acceptable for <3s load time target
@@ -191,11 +195,12 @@ Implement **hreflang tags with x-default** + **language-specific sitemaps** + **
 ### Alternatives Considered
 
 - **Single sitemap with all languages**:
+
   - Pros: Simpler to maintain
   - Cons: Harder for search engines to parse language signals, less efficient crawling
   - Verdict: Not optimal for SEO
 
-- **Language subdomains (it.affilibuster.com)**:
+- **Language subdomains (it.thegreenbrother.com)**:
   - Pros: Clear separation, easier CDN configuration
   - Cons: Requires SSL certs per subdomain, more complex DNS, splits domain authority
   - Verdict: URL paths (/it, /he) are simpler and maintain domain authority
@@ -240,6 +245,7 @@ Use **Intl.NumberFormat** (native JavaScript API) for currency formatting
 ### Alternatives Considered
 
 - **dinero.js**:
+
   - Pros: Precise arithmetic (avoids floating point errors), money object abstraction
   - Cons: 8KB bundle size, overkill for display-only formatting
   - Verdict: Unnecessary for this use case (no complex calculations)
@@ -260,7 +266,7 @@ Use **Intl.NumberFormat** (native JavaScript API) for currency formatting
       currency: currency,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(amount);
+    }).format(amount)
   }
   ```
 
@@ -293,11 +299,13 @@ Use **Redis with session-based keys** for currency and language preferences
 ### Alternatives Considered
 
 - **Browser localStorage only**:
+
   - Pros: No server required, instant access
   - Cons: Lost on device change, can't be read server-side for SSR
   - Verdict: Not sufficient for SSR/SSG pages
 
 - **PostgreSQL session table**:
+
   - Pros: Persistent, relational data
   - Cons: Slower than Redis, unnecessary persistence for ephemeral preferences
   - Verdict: Overkill for short-term session data
@@ -350,11 +358,13 @@ Use **SSG (Static Site Generation) for most pages** + **ISR (Incremental Static 
 ### Alternatives Considered
 
 - **Full SSG (rebuild on every change)**:
+
   - Pros: Always fresh, simplest mental model
   - Cons: Long build times as content grows, unnecessary rebuilds for unchanged pages
   - Verdict: Not scalable for 100+ pages per language
 
 - **Client-Side Rendering (CSR)**:
+
   - Pros: Always fresh, no build step
   - Cons: SEO issues, slower initial load, poor Lighthouse scores
   - Verdict: Violates <3s load time and SEO requirements
@@ -370,10 +380,10 @@ Use **SSG (Static Site Generation) for most pages** + **ISR (Incremental Static 
 
   ```tsx
   // Static pages (e.g., language switcher, footer)
-  export const dynamic = 'force-static';
+  export const dynamic = 'force-static'
 
   // CMS content pages (e.g., products, blog)
-  export const revalidate = 60; // ISR with 60s revalidation
+  export const revalidate = 60 // ISR with 60s revalidation
   ```
 
 - Use `generateStaticParams` to pre-generate common pages at build time

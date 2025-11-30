@@ -157,23 +157,49 @@ class TestLifespan:
     async def test_lifespan_initializes_dependencies_on_startup(self):
         """Test lifespan initializes dependencies during startup."""
         # Arrange
-        mock_app = Mock(spec=FastAPI)
 
-        with patch("affilibuster_backend.main.initialize_dependencies") as mock_init:
-            # Act
-            async with lifespan(mock_app):
-                # Assert - initialization called during startup
-                mock_init.assert_called_once()
+        mock_app = Mock(spec=FastAPI)
+        mock_session = AsyncMock()
+        mock_repo = AsyncMock()
+        mock_repo.get_value.return_value = "test-token"
+
+        # Mock successful Strapi connection
+        mock_response = AsyncMock()
+        mock_response.raise_for_status = Mock()
+
+        with patch("affilibuster_backend.main.get_db_session") as mock_get_session:
+            mock_get_session.return_value.__aenter__.return_value = mock_session
+            with patch("affilibuster_backend.main.ConfigRepository", return_value=mock_repo):
+                with patch("affilibuster_backend.main.httpx.AsyncClient") as mock_client:
+                    mock_client.return_value.__aenter__.return_value.get = AsyncMock(return_value=mock_response)
+                    with patch("affilibuster_backend.main.initialize_dependencies") as mock_init:
+                        # Act
+                        async with lifespan(mock_app):
+                            # Assert - initialization called during startup with token
+                            mock_init.assert_called_once_with("test-token")
 
     async def test_lifespan_completes_shutdown_successfully(self):
         """Test lifespan completes shutdown phase successfully."""
         # Arrange
-        mock_app = Mock(spec=FastAPI)
 
-        with patch("affilibuster_backend.main.initialize_dependencies"):
-            # Act & Assert - should not raise any exceptions
-            async with lifespan(mock_app):
-                pass  # Startup phase
+        mock_app = Mock(spec=FastAPI)
+        mock_session = AsyncMock()
+        mock_repo = AsyncMock()
+        mock_repo.get_value.return_value = "test-token"
+
+        # Mock successful Strapi connection
+        mock_response = AsyncMock()
+        mock_response.raise_for_status = Mock()
+
+        with patch("affilibuster_backend.main.get_db_session") as mock_get_session:
+            mock_get_session.return_value.__aenter__.return_value = mock_session
+            with patch("affilibuster_backend.main.ConfigRepository", return_value=mock_repo):
+                with patch("affilibuster_backend.main.httpx.AsyncClient") as mock_client:
+                    mock_client.return_value.__aenter__.return_value.get = AsyncMock(return_value=mock_response)
+                    with patch("affilibuster_backend.main.initialize_dependencies"):
+                        # Act & Assert - should not raise any exceptions
+                        async with lifespan(mock_app):
+                            pass  # Startup phase
 
     async def test_lifespan_raises_error_when_token_missing(self):
         """Test lifespan raises RuntimeError when Strapi token is missing."""
@@ -190,3 +216,54 @@ class TestLifespan:
                 with pytest.raises(RuntimeError, match="Strapi API token not found"):
                     async with lifespan(mock_app):
                         pass
+
+    async def test_lifespan_raises_error_on_strapi_auth_failure(self):
+        """Test lifespan raises RuntimeError when Strapi authentication fails (HTTPStatusError)."""
+        # Arrange
+        import httpx
+
+        mock_app = Mock(spec=FastAPI)
+        mock_session = AsyncMock()
+        mock_repo = AsyncMock()
+        mock_repo.get_value.return_value = "test-token"
+
+        # Mock HTTPStatusError (401 Unauthorized)
+        mock_response = Mock()
+        mock_response.status_code = 401
+        mock_response.text = "Unauthorized"
+        http_error = httpx.HTTPStatusError("Authentication failed", request=Mock(), response=mock_response)
+
+        with patch("affilibuster_backend.main.get_db_session") as mock_get_session:
+            mock_get_session.return_value.__aenter__.return_value = mock_session
+            with patch("affilibuster_backend.main.ConfigRepository", return_value=mock_repo):
+                with patch("affilibuster_backend.main.httpx.AsyncClient") as mock_client:
+                    mock_client.return_value.__aenter__.return_value.get = AsyncMock(side_effect=http_error)
+
+                    # Act & Assert - should cover lines 134-136
+                    with pytest.raises(RuntimeError, match="Failed to authenticate with Strapi: 401"):
+                        async with lifespan(mock_app):
+                            pass
+
+    async def test_lifespan_raises_error_on_strapi_connection_failure(self):
+        """Test lifespan raises RuntimeError when Strapi connection fails (RequestError)."""
+        # Arrange
+        import httpx
+
+        mock_app = Mock(spec=FastAPI)
+        mock_session = AsyncMock()
+        mock_repo = AsyncMock()
+        mock_repo.get_value.return_value = "test-token"
+
+        # Mock RequestError (connection refused)
+        connection_error = httpx.ConnectError("Connection refused")
+
+        with patch("affilibuster_backend.main.get_db_session") as mock_get_session:
+            mock_get_session.return_value.__aenter__.return_value = mock_session
+            with patch("affilibuster_backend.main.ConfigRepository", return_value=mock_repo):
+                with patch("affilibuster_backend.main.httpx.AsyncClient") as mock_client:
+                    mock_client.return_value.__aenter__.return_value.get = AsyncMock(side_effect=connection_error)
+
+                    # Act & Assert - should cover lines 137-139
+                    with pytest.raises(RuntimeError, match="Failed to connect to Strapi"):
+                        async with lifespan(mock_app):
+                            pass

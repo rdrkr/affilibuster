@@ -12,7 +12,6 @@ import type { StrapiEnv } from './types'
  *
  * Sets up PostgreSQL connection with host, port, credentials, SSL configuration,
  * and connection pool settings for optimal performance.
- *
  * @param root0 - Configuration object
  * @param root0.env - Strapi environment configuration helper for accessing environment variables
  * @returns Database configuration object with connection settings

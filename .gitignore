@@ -94,7 +94,7 @@ celerybeat.pid
 alembic/versions/*.pyc
 
 ###################
-# Node.js / Frontend / CMS / EcoPicks
+# Node.js / TheGreenBrother / CMS / TheGreenBrother
 ###################
 node_modules/
 npm-debug.log*
@@ -167,6 +167,7 @@ cms/.strapi/
 cms/.tmp/
 cms/build/
 cms/dist/
+cms/public/
 
 # TailwindCSS
 .tailwindcss-*
@@ -189,13 +190,9 @@ backend/coverage.xml
 backend/coverage.lcov
 backend/.pytest_cache/
 
-# Frontend Coverage (Jest)
-frontend/coverage/
-frontend/.nyc_output/
-
-# EcoPicks Coverage (Jest)
-ecopicks/coverage/
-ecopicks/.nyc_output/
+# TheGreenBrother Coverage (Jest)
+the-green-brother/coverage/
+the-green-brother/.nyc_output/
 
 # Merged Coverage Reports
 coverage-merged/
@@ -353,12 +350,11 @@ docs/_build/
 #contracts/strapi.openapi.yaml
 #contracts/affilibuster.openapi.yaml
 #cms/types/
-#frontend/src/lib/generated/
-#ecopicks/src/lib/generated/
+#the-green-brother/src/lib/generated/
 
 openapi-ts-error-*.log
 
 .fake
+frontend/
 /cms/core
-/frontend/core
-/ecopicks/core
+/the-green-brother/core

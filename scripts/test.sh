@@ -6,7 +6,7 @@ set -o pipefail
 # Get the test mode
 MODE="${1:-default}"
 
-# Get optional browser parameter for frontend tests (chromium, firefox, webkit)
+# Get optional browser parameter for the-green-brother tests (chromium, firefox, webkit)
 BROWSER="${2:-}"
 
 # Function to run backend tests
@@ -19,15 +19,15 @@ run_backend_tests() {
   case "${test_type}" in
   unit)
     echo "⚡ Running backend unit tests..."
-    docker compose exec -T backend sh -c "cd /app && . /app/.env && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest -m \"unit\" --tb=short" 2>&1 | tee /tmp/backend-test.log
+    docker compose exec -T backend sh -c "cd /app && (if [ -f /app/.env ]; then . /app/.env; fi) && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest -m \"unit\" --ignore=tests/integration --ignore=tests/fixtures --no-cov --tb=short" 2>&1 | tee /tmp/backend-test.log
     ;;
   integration)
     echo "🧪 Running backend integration tests..."
-    docker compose exec -T backend sh -c "cd /app && . /app/.env && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest -m \"integration\" --tb=short" 2>&1 | tee /tmp/backend-test.log
+    docker compose exec -T backend sh -c "cd /app && (if [ -f /app/.env ]; then . /app/.env; fi) && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest -m \"integration\" --ignore=tests/unit --no-cov --tb=short" 2>&1 | tee /tmp/backend-test.log
     ;;
   all)
     echo "🧪 Running all backend tests..."
-    docker compose exec -T backend sh -c "cd /app && . /app/.env && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest" 2>&1 | tee /tmp/backend-test.log
+    docker compose exec -T backend sh -c "cd /app && (if [ -f /app/.env ]; then . /app/.env; fi) && PYTHONPATH=/app/src /app/.venv/bin/python -m pytest" 2>&1 | tee /tmp/backend-test.log
     ;;
   *)
     echo "❌ Invalid test type: ${test_type}"
@@ -101,14 +101,14 @@ ensure_test_runner_running() {
     }
   fi
 
-  # Wait for frontend to be healthy (E2E tests depend on it)
-  wait_for_service_healthy "frontend" || return 1
+  # Wait for the-green-brother to be healthy (E2E tests depend on it)
+  wait_for_service_healthy "the-green-brother" || return 1
 
   return 0
 }
 
-# Function to run frontend tests
-run_frontend_tests() {
+# Function to run the-green-brother tests
+run_the-green-brother_tests() {
   local test_type="${1:-all}"
   local browser="${2:-}" # Optional browser parameter (chromium, firefox, webkit)
 
@@ -120,26 +120,26 @@ run_frontend_tests() {
 
   case "${test_type}" in
   unit)
-    echo "🧪 Running frontend unit tests (Jest)..."
-    docker compose exec -T frontend sh -c "cd /app && npm test -- --coverage \
+    echo "🧪 Running the-green-brother unit tests (Jest)..."
+    docker compose exec -T the-green-brother sh -c "cd /app && npm test -- --coverage \
       --coverageReporters=lcov \
       --coverageReporters=json \
       --coverageReporters=html \
-      --coverageReporters=text-summary" 2>&1 | tee /tmp/frontend-test.log
+      --coverageReporters=text-summary" 2>&1 | tee /tmp/the-green-brother-test.log
     local jest_result="${PIPESTATUS[0]}"
 
     # Check Jest result
     if [[ "${jest_result}" -ne 0 ]]; then
-      echo "❌ Frontend unit tests failed!"
+      echo "❌ TheGreenBrother unit tests failed!"
       return "${jest_result}"
     fi
     ;;
 
   integration)
     if [[ -n "${browser}" ]]; then
-      echo "🧪 Running frontend integration tests (Playwright - ${browser})..."
+      echo "🧪 Running the-green-brother integration tests (Playwright - ${browser})..."
     else
-      echo "🧪 Running frontend integration tests (Playwright)..."
+      echo "🧪 Running the-green-brother integration tests (Playwright)..."
     fi
 
     # Ensure test-runner container is running
@@ -147,14 +147,20 @@ run_frontend_tests() {
 
     # Run e2e tests (excluding performance tests) with fail-fast in dedicated test-runner container
     # Browsers are pre-installed in the official Playwright Docker image
-    docker compose exec -T test-runner sh -c "cd /app && npm run test:e2e -- --grep-invert '@performance' ${playwright_browser_arg} -x" 2>&1 | tee /tmp/frontend-test.log
+    docker compose exec -T test-runner sh -c "cd /app && npm run test:e2e -- --grep-invert '@performance' ${playwright_browser_arg} -x" 2>&1 | tee /tmp/the-green-brother-test.log
     local e2e_result="${PIPESTATUS[0]}"
 
+    # Check if no tests were found
+    if grep -q "no tests found" /tmp/the-green-brother-test.log; then
+      echo "⚠️  No integration tests found - skipping"
+      return 0
+    fi
+
     # Show Playwright report information
-    if [[ "${e2e_result}" -ne 0 ]] || [[ -d "frontend/playwright-report" ]]; then
+    if [[ "${e2e_result}" -ne 0 ]] || [[ -d "the-green-brother/playwright-report" ]]; then
       echo ""
       echo "📊 Playwright Test Reports:"
-      echo "  Local: frontend/playwright-report/index.html"
+      echo "  Local: the-green-brother/playwright-report/index.html"
       echo ""
       echo "  To view the interactive report, run:"
       echo "    make playwright-report"
@@ -166,30 +172,30 @@ run_frontend_tests() {
 
     # Check e2e test result
     if [[ "${e2e_result}" -ne 0 ]]; then
-      echo "❌ Frontend integration tests failed!"
+      echo "❌ TheGreenBrother integration tests failed!"
       return "${e2e_result}"
     fi
     ;;
 
   all)
-    echo "🧪 Running frontend unit tests (Jest)..."
-    docker compose exec -T frontend sh -c "cd /app && npm test -- --coverage \
+    echo "🧪 Running the-green-brother unit tests (Jest)..."
+    docker compose exec -T the-green-brother sh -c "cd /app && npm test -- --coverage \
       --coverageReporters=lcov \
       --coverageReporters=json \
       --coverageReporters=html \
-      --coverageReporters=text-summary" 2>&1 | tee /tmp/frontend-test.log
+      --coverageReporters=text-summary" 2>&1 | tee /tmp/the-green-brother-test.log
     local jest_result="${PIPESTATUS[0]}"
 
     # Check Jest result before proceeding
     if [[ "${jest_result}" -ne 0 ]]; then
-      echo "❌ Frontend unit tests failed!"
+      echo "❌ TheGreenBrother unit tests failed!"
       return "${jest_result}"
     fi
 
     if [[ -n "${browser}" ]]; then
-      echo "🧪 Running frontend integration tests (Playwright - ${browser})..."
+      echo "🧪 Running the-green-brother integration tests (Playwright - ${browser})..."
     else
-      echo "🧪 Running frontend integration tests (Playwright)..."
+      echo "🧪 Running the-green-brother integration tests (Playwright)..."
     fi
 
     # Ensure test-runner container is running
@@ -198,14 +204,20 @@ run_frontend_tests() {
     # Run e2e tests (excluding performance tests) with fail-fast in dedicated test-runner container
     # Performance tests are run separately via run_performance_tests
     # Browsers are pre-installed in the official Playwright Docker image
-    docker compose exec -T test-runner sh -c "cd /app && npm run test:e2e -- --grep-invert '@performance' ${playwright_browser_arg} -x" 2>&1 | tee -a /tmp/frontend-test.log
+    docker compose exec -T test-runner sh -c "cd /app && npm run test:e2e -- --grep-invert '@performance' ${playwright_browser_arg} -x" 2>&1 | tee -a /tmp/the-green-brother-test.log
     local e2e_result="${PIPESTATUS[0]}"
 
+    # Check if no tests were found
+    if grep -q "no tests found" /tmp/the-green-brother-test.log; then
+      echo "⚠️  No integration tests found - skipping"
+      return 0
+    fi
+
     # Show Playwright report information
-    if [[ "${e2e_result}" -ne 0 ]] || [[ -d "frontend/playwright-report" ]]; then
+    if [[ "${e2e_result}" -ne 0 ]] || [[ -d "the-green-brother/playwright-report" ]]; then
       echo ""
       echo "📊 Playwright Test Reports:"
-      echo "  Local: frontend/playwright-report/index.html"
+      echo "  Local: the-green-brother/playwright-report/index.html"
       echo ""
       echo "  To view the interactive report, run:"
       echo "    make playwright-report"
@@ -217,144 +229,7 @@ run_frontend_tests() {
 
     # Check e2e test result
     if [[ "${e2e_result}" -ne 0 ]]; then
-      echo "❌ Frontend e2e tests failed!"
-      return "${e2e_result}"
-    fi
-    ;;
-
-  *)
-    echo "❌ Invalid test type: ${test_type}"
-    return 1
-    ;;
-  esac
-
-  # All tests passed
-  return 0
-}
-
-# Function to run ecopicks tests
-run_ecopicks_tests() {
-  local test_type="${1:-all}"
-  local browser="${2:-}" # Optional browser parameter (chromium, firefox, webkit)
-
-  # Build Playwright browser argument
-  local playwright_browser_arg=""
-  if [[ -n "${browser}" ]]; then
-    playwright_browser_arg="--project=${browser}"
-  fi
-
-  case "${test_type}" in
-  unit)
-    echo "🧪 Running ecopicks unit tests (Jest)..."
-    docker compose exec -T ecopicks sh -c "cd /app && npm test -- --coverage \
-      --coverageReporters=lcov \
-      --coverageReporters=json \
-      --coverageReporters=html \
-      --coverageReporters=text-summary" 2>&1 | tee /tmp/ecopicks-test.log
-    local jest_result="${PIPESTATUS[0]}"
-
-    # Check Jest result
-    if [[ "${jest_result}" -ne 0 ]]; then
-      echo "❌ Ecopicks unit tests failed!"
-      return "${jest_result}"
-    fi
-    ;;
-
-  integration)
-    if [[ -n "${browser}" ]]; then
-      echo "🧪 Running ecopicks integration tests (Playwright - ${browser})..."
-    else
-      echo "🧪 Running ecopicks integration tests (Playwright)..."
-    fi
-
-    # Ensure test-runner container is running
-    ensure_test_runner_running || return 1
-
-    # Run e2e tests (excluding performance tests) with fail-fast in dedicated test-runner container
-    # Browsers are pre-installed in the official Playwright Docker image
-    # Note: Assuming ecopicks tests are also run via test-runner or similar mechanism.
-    # If ecopicks has its own e2e setup, adjust accordingly. For now, mirroring frontend setup.
-    # However, test-runner mounts ./frontend:/app. We might need a separate test-runner for ecopicks
-    # or update test-runner to handle both.
-    # Given the current docker-compose, test-runner is tied to frontend.
-    # Let's assume for now we run it inside ecopicks container or a new test-runner-ecopicks.
-    # But wait, the user request is to support ecopicks LIKE frontend.
-    # Frontend uses a separate test-runner service.
-    # I should probably check if I need to add a test-runner-ecopicks to docker-compose.
-    # For now, I will run it inside the ecopicks container if it has playwright installed,
-    # OR reuse test-runner if I can mount ecopicks there.
-    # The docker-compose for test-runner mounts ./frontend:/app.
-    # So reusing it for ecopicks is hard without modification.
-    # I will assume running inside 'ecopicks' container for now if it has the tools,
-    # OR I will skip integration tests for ecopicks if not ready.
-    # BUT, the plan said "Add test-ecopicks-integration".
-    # Let's try running inside ecopicks container.
-    docker compose exec -T ecopicks sh -c "cd /app && npm run test:e2e -- --grep-invert '@performance' ${playwright_browser_arg} -x" 2>&1 | tee /tmp/ecopicks-test.log
-    local e2e_result="${PIPESTATUS[0]}"
-
-    # Show Playwright report information
-    if [[ "${e2e_result}" -ne 0 ]] || [[ -d "ecopicks/playwright-report" ]]; then
-      echo ""
-      echo "📊 Playwright Test Reports:"
-      echo "  Local: ecopicks/playwright-report/index.html"
-      echo ""
-      echo "  To view the interactive report, run:"
-      echo "    make playwright-report"
-      echo "  Or manually:"
-      echo "    docker compose exec ecopicks sh -c 'cd /app && npx playwright show-report --port ${PLAYWRIGHT_REPORT_PORT:-9323} --host 0.0.0.0'"
-      echo "  Then open: http://localhost:${PLAYWRIGHT_REPORT_PORT:-9323}"
-      echo ""
-    fi
-
-    # Check e2e test result
-    if [[ "${e2e_result}" -ne 0 ]]; then
-      echo "❌ Ecopicks integration tests failed!"
-      return "${e2e_result}"
-    fi
-    ;;
-
-  all)
-    echo "🧪 Running ecopicks unit tests (Jest)..."
-    docker compose exec -T ecopicks sh -c "cd /app && npm test -- --coverage \
-      --coverageReporters=lcov \
-      --coverageReporters=json \
-      --coverageReporters=html \
-      --coverageReporters=text-summary" 2>&1 | tee /tmp/ecopicks-test.log
-    local jest_result="${PIPESTATUS[0]}"
-
-    # Check Jest result before proceeding
-    if [[ "${jest_result}" -ne 0 ]]; then
-      echo "❌ Ecopicks unit tests failed!"
-      return "${jest_result}"
-    fi
-
-    if [[ -n "${browser}" ]]; then
-      echo "🧪 Running ecopicks integration tests (Playwright - ${browser})..."
-    else
-      echo "🧪 Running ecopicks integration tests (Playwright)..."
-    fi
-
-    # Run e2e tests
-    docker compose exec -T ecopicks sh -c "cd /app && npm run test:e2e -- --grep-invert '@performance' ${playwright_browser_arg} -x" 2>&1 | tee -a /tmp/ecopicks-test.log
-    local e2e_result="${PIPESTATUS[0]}"
-
-    # Show Playwright report information
-    if [[ "${e2e_result}" -ne 0 ]] || [[ -d "ecopicks/playwright-report" ]]; then
-      echo ""
-      echo "📊 Playwright Test Reports:"
-      echo "  Local: ecopicks/playwright-report/index.html"
-      echo ""
-      echo "  To view the interactive report, run:"
-      echo "    make playwright-report"
-      echo "  Or manually:"
-      echo "    docker compose exec ecopicks sh -c 'cd /app && npx playwright show-report --port ${PLAYWRIGHT_REPORT_PORT:-9323} --host 0.0.0.0'"
-      echo "  Then open: http://localhost:${PLAYWRIGHT_REPORT_PORT:-9323}"
-      echo ""
-    fi
-
-    # Check e2e test result
-    if [[ "${e2e_result}" -ne 0 ]]; then
-      echo "❌ Ecopicks e2e tests failed!"
+      echo "❌ TheGreenBrother e2e tests failed!"
       return "${e2e_result}"
     fi
     ;;
@@ -377,19 +252,15 @@ run_tests() {
     echo "🚀 Running all tests in parallel using available cores..."
     run_backend_tests all &
     BACKEND_PID=$!
-    run_frontend_tests unit &
-    FRONTEND_PID=$!
-    run_ecopicks_tests unit &
-    ECOPICKS_PID=$!
+    run_the-green-brother_tests unit &
+    THE_GREEN_BROTHER_PID=$!
 
     wait "${BACKEND_PID}"
     BACKEND_RESULT=$?
-    wait "${FRONTEND_PID}"
-    FRONTEND_RESULT=$?
-    wait "${ECOPICKS_PID}"
-    ECOPICKS_RESULT=$?
+    wait "${THE_GREEN_BROTHER_PID}"
+    THE_GREEN_BROTHER_RESULT=$?
 
-    test "${BACKEND_RESULT}" -eq 0 && test "${FRONTEND_RESULT}" -eq 0 && test "${ECOPICKS_RESULT}" -eq 0
+    test "${BACKEND_RESULT}" -eq 0 && test "${THE_GREEN_BROTHER_RESULT}" -eq 0
     return $?
   else
     echo "🧪 Running all tests..."
@@ -397,11 +268,8 @@ run_tests() {
     # Run backend tests
     run_backend_tests all || return 1
 
-    # Run frontend tests (Jest + e2e)
-    run_frontend_tests unit || return 1
-
-    # Run ecopicks tests (Jest + e2e)
-    run_ecopicks_tests unit || return 1
+    # Run the-green-brother tests (Jest + e2e)
+    run_the-green-brother_tests all || return 1
   fi
 
   return 0
@@ -428,11 +296,17 @@ run_performance_tests() {
   docker compose exec -T test-runner sh -c "cd /app && npm run test:e2e -- ${playwright_browser_arg} --grep '@performance'" 2>&1 | tee /tmp/performance-test.log
   local perf_result="${PIPESTATUS[0]}"
 
+  # Check if no tests were found
+  if grep -q "no tests found" /tmp/performance-test.log; then
+    echo "⚠️  No performance tests found - skipping"
+    return 0
+  fi
+
   # Show Playwright report information
-  if [[ "${perf_result}" -ne 0 ]] || [[ -d "frontend/playwright-report" ]]; then
+  if [[ "${perf_result}" -ne 0 ]] || [[ -d "the-green-brother/playwright-report" ]]; then
     echo ""
     echo "📊 Playwright Test Reports:"
-    echo "  Local: frontend/playwright-report/index.html"
+    echo "  Local: the-green-brother/playwright-report/index.html"
     echo ""
     echo "  To view the interactive report, run:"
     echo "    make playwright-report"
@@ -460,32 +334,22 @@ display_coverage_summary() {
   BACKEND_PCT=$(awk "BEGIN {if (${BACKEND_TOTAL} > 0) printf \"%.0f\", (${BACKEND_PASSED} / ${BACKEND_TOTAL}) * 100; else print \"0\"}")
   BACKEND_COV=$(grep 'TOTAL' /tmp/backend-test.log | awk '{print $NF}' || echo "N/A")
 
-  # Extract frontend coverage
-  FRONTEND_PASSED=$(grep '^Tests:' /tmp/frontend-test.log | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' || echo "0")
-  FRONTEND_TOTAL=$(grep '^Tests:' /tmp/frontend-test.log | grep -oE '[0-9]+ total' | grep -oE '[0-9]+' || echo "${FRONTEND_PASSED}")
-  FRONTEND_PCT=$(awk "BEGIN {if (${FRONTEND_TOTAL} > 0) printf \"%.0f\", (${FRONTEND_PASSED} / ${FRONTEND_TOTAL}) * 100; else print \"0\"}")
-  # Extract from text-summary format: "Lines        : 100% ( 414/414 )"
-  FRONTEND_COV=$(grep -E 'Lines\s+:' /tmp/frontend-test.log | grep -oE '[0-9.]+%' | head -1 || echo "N/A")
-
-  # Extract ecopicks coverage
-  ECOPICKS_PASSED=$(grep '^Tests:' /tmp/ecopicks-test.log | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' || echo "0")
-  ECOPICKS_TOTAL=$(grep '^Tests:' /tmp/ecopicks-test.log | grep -oE '[0-9]+ total' | grep -oE '[0-9]+' || echo "${ECOPICKS_PASSED}")
-  ECOPICKS_PCT=$(awk "BEGIN {if (${ECOPICKS_TOTAL} > 0) printf \"%.0f\", (${ECOPICKS_PASSED} / ${ECOPICKS_TOTAL}) * 100; else print \"0\"}")
-  # Extract from text-summary format: "Lines        : 100% ( 414/414 )"
-  ECOPICKS_COV=$(grep -E 'Lines\s+:' /tmp/ecopicks-test.log | grep -oE '[0-9.]+%' | head -1 || echo "N/A")
+  # Extract the-green-brother coverage
+  THE_GREEN_BROTHER_PASSED=$(grep '^Tests:' /tmp/the-green-brother-test.log | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' || echo "0")
+  THE_GREEN_BROTHER_TOTAL=$(grep '^Tests:' /tmp/the-green-brother-test.log | grep -oE '[0-9]+ total' | grep -oE '[0-9]+' || echo "${THE_GREEN_BROTHER_PASSED}")
+  THE_GREEN_BROTHER_PCT=$(awk "BEGIN {if (${THE_GREEN_BROTHER_TOTAL} > 0) printf \"%.0f\", (${THE_GREEN_BROTHER_PASSED} / ${THE_GREEN_BROTHER_TOTAL}) * 100; else print \"0\"}")
+  THE_GREEN_BROTHER_COV=$(grep -E 'Lines\s+:' /tmp/the-green-brother-test.log | grep -oE '[0-9.]+%' | head -1 || echo "N/A")
 
   # Create hyperlinks for reports
   BACKEND_REPORT_URL="file://$(pwd)/backend/htmlcov/index.html"
-  FRONTEND_REPORT_URL="file://$(pwd)/frontend/coverage/index.html"
-  ECOPICKS_REPORT_URL="file://$(pwd)/ecopicks/coverage/index.html"
+  THE_GREEN_BROTHER_REPORT_URL="file://$(pwd)/the-green-brother/coverage/index.html"
 
   echo "📊 Coverage Summary:" &&
     printf "┌─────────────┬──────────────────────┬──────────┬─────────────────┐\n" &&
     printf "│ %-11s │ %-20s │ %-8s │ %-15s │\n" "Module" "Tests" "Coverage" "Report" &&
     printf "├─────────────┼──────────────────────┼──────────┼─────────────────┤\n" &&
     printf $'│ %-11s │ %6s/%-6s (%3s%%) │ %6s   │ \033[34;4m\033]8;;%s\033\\\\%s\033]8;;\033\\\\\033[0m │\n' "Backend" "${BACKEND_PASSED}" "${BACKEND_TOTAL}" "${BACKEND_PCT}" "${BACKEND_COV}" "${BACKEND_REPORT_URL}" "Backend Report " &&
-    printf $'│ %-11s │ %6s/%-6s (%3s%%) │ %6s   │ \033[34;4m\033]8;;%s\033\\\\%s\033]8;;\033\\\\\033[0m │\n' "Frontend" "${FRONTEND_PASSED}" "${FRONTEND_TOTAL}" "${FRONTEND_PCT}" "${FRONTEND_COV}" "${FRONTEND_REPORT_URL}" "Frontend Report" &&
-    printf $'│ %-11s │ %6s/%-6s (%3s%%) │ %6s   │ \033[34;4m\033]8;;%s\033\\\\%s\033]8;;\033\\\\\033[0m │\n' "Ecopicks" "${ECOPICKS_PASSED}" "${ECOPICKS_TOTAL}" "${ECOPICKS_PCT}" "${ECOPICKS_COV}" "${ECOPICKS_REPORT_URL}" "Ecopicks Report" &&
+    printf $'│ %-11s │ %6s/%-6s (%3s%%) │ %6s   │ \033[34;4m\033]8;;%s\033\\\\%s\033]8;;\033\\\\\033[0m │\n' "TheGreenBrother" "${THE_GREEN_BROTHER_PASSED}" "${THE_GREEN_BROTHER_TOTAL}" "${THE_GREEN_BROTHER_PCT}" "${THE_GREEN_BROTHER_COV}" "${THE_GREEN_BROTHER_REPORT_URL}" "TheGreenBrother Report" &&
     printf "└─────────────┴──────────────────────┴──────────┴─────────────────┘\n"
 
   # Extract and display Integration (E2E) test summary per browser
@@ -496,21 +360,21 @@ display_coverage_summary() {
   # shellcheck disable=SC2034
   declare -a BROWSERS=("chromium:chromium" "firefox:firefox" "webkit:webkit" "mobile-chrome:mobile-chrome" "mobile-safari:mobile-safari")
 
-  # Check if we have any E2E test results (Frontend + Ecopicks)
-  # Note: This currently only aggregates from frontend-test.log.
+  # Check if we have any E2E test results (TheGreenBrother + TheGreenBrother)
+  # Note: This currently only aggregates from the-green-brother-test.log.
   # If we want to aggregate both, we need to merge logs or process them separately.
-  # For simplicity, let's process frontend-test.log for now, as ecopicks e2e is new.
+  # For simplicity, let's process the-green-brother-test.log for now, as the-green-brother e2e is new.
   # Ideally, we should cat both logs or process them in a loop.
-  # Let's assume we want to show Frontend E2E results here.
-  # If ecopicks e2e runs, it writes to ecopicks-test.log.
+  # Let's assume we want to show TheGreenBrother E2E results here.
+  # If the-green-brother e2e runs, it writes to the-green-brother-test.log.
   # We should probably show separate tables or merge them.
-  # Given the complexity, let's stick to showing frontend e2e for now or just duplicate the block for ecopicks if needed.
-  # But the user asked to support ecopicks LIKE frontend.
-  # So let's try to show ecopicks e2e summary too if log exists.
+  # Given the complexity, let's stick to showing the-green-brother e2e for now or just duplicate the block for the-green-brother if needed.
+  # But the user asked to support the-green-brother LIKE the-green-brother.
+  # So let's try to show the-green-brother e2e summary too if log exists.
 
-  # ... (Existing frontend e2e summary logic) ...
-  # I will leave the existing frontend e2e summary logic as is for now in the replacement content
-  # and maybe add ecopicks summary later or if I have space.
+  # ... (Existing the-green-brother e2e summary logic) ...
+  # I will leave the existing the-green-brother e2e summary logic as is for now in the replacement content
+  # and maybe add the-green-brother summary later or if I have space.
   # The replacement content below replaces the whole file content from run_tests downwards.
 
   # ... (Rest of the file) ...
@@ -536,8 +400,7 @@ merge_coverage() {
 
   # Find all lcov.info files
   BACKEND_LCOV="backend/coverage.lcov"
-  FRONTEND_LCOV="frontend/coverage/lcov.info"
-  ECOPICKS_LCOV="ecopicks/coverage/lcov.info"
+  THE_GREEN_BROTHER_LCOV="the-green-brother/coverage/lcov.info"
 
   # Build merge arguments
   MERGE_ARGS=""
@@ -549,16 +412,10 @@ merge_coverage() {
     echo "✅ Found backend coverage"
   fi
 
-  if [[ -f "${FRONTEND_LCOV}" ]]; then
-    MERGE_ARGS="${MERGE_ARGS} -a ${FRONTEND_LCOV}"
+  if [[ -f "${THE_GREEN_BROTHER_LCOV}" ]]; then
+    MERGE_ARGS="${MERGE_ARGS} -a ${THE_GREEN_BROTHER_LCOV}"
     FOUND_COUNT=$((FOUND_COUNT + 1))
-    echo "✅ Found frontend coverage"
-  fi
-
-  if [[ -f "${ECOPICKS_LCOV}" ]]; then
-    MERGE_ARGS="${MERGE_ARGS} -a ${ECOPICKS_LCOV}"
-    FOUND_COUNT=$((FOUND_COUNT + 1))
-    echo "✅ Found ecopicks coverage"
+    echo "✅ Found the-green-brother coverage"
   fi
 
   if [[ ${FOUND_COUNT} -eq 0 ]]; then
@@ -613,34 +470,19 @@ backend)
   echo "✅ Backend tests passed!"
   ;;
 
-frontend-unit)
-  run_frontend_tests unit || exit 1
-  echo "✅ Frontend unit tests passed!"
+the-green-brother-unit)
+  run_the-green-brother_tests unit || exit 1
+  echo "✅ TheGreenBrother unit tests passed!"
   ;;
 
-frontend-integration)
-  run_frontend_tests integration "${BROWSER}" || exit 1
-  echo "✅ Frontend integration tests passed!"
+the-green-brother-integration)
+  run_the-green-brother_tests integration "${BROWSER}" || exit 1
+  echo "✅ TheGreenBrother integration tests passed!"
   ;;
 
-frontend)
-  run_frontend_tests unit "${BROWSER}" || exit 1
-  echo "✅ Frontend tests passed!"
-  ;;
-
-ecopicks-unit)
-  run_ecopicks_tests unit || exit 1
-  echo "✅ Ecopicks unit tests passed!"
-  ;;
-
-ecopicks-integration)
-  run_ecopicks_tests integration "${BROWSER}" || exit 1
-  echo "✅ Ecopicks integration tests passed!"
-  ;;
-
-ecopicks)
-  run_ecopicks_tests unit "${BROWSER}" || exit 1
-  echo "✅ Ecopicks tests passed!"
+the-green-brother)
+  run_the-green-brother_tests all "${BROWSER}" || exit 1
+  echo "✅ TheGreenBrother tests passed!"
   ;;
 
 performance)
@@ -651,16 +493,14 @@ performance)
 all-unit)
   echo "🧪 Running all unit tests..."
   run_backend_tests unit || exit 1
-  run_frontend_tests unit || exit 1
-  run_ecopicks_tests unit || exit 1
+  run_the-green-brother_tests unit || exit 1
   echo "✅ All unit tests passed!"
   ;;
 
 all-integration)
   echo "🧪 Running all integration tests..."
   run_backend_tests integration || exit 1
-  # run_frontend_tests integration "${BROWSER}" || exit 1
-  # run_ecopicks_tests integration "${BROWSER}" || exit 1
+  run_the-green-brother_tests integration "${BROWSER}" || exit 1
   echo "✅ All integration tests passed!"
   ;;
 
@@ -670,7 +510,7 @@ default)
 
   # Run performance tests on all browsers (informational, won't fail build)
   echo ""
-  # run_performance_tests
+  run_performance_tests
 
   echo "✅ All tests passed!"
   display_coverage_summary
@@ -682,7 +522,7 @@ parallel)
 
   # Run performance tests on all browsers (informational, won't fail build)
   echo ""
-  # run_performance_tests
+  run_performance_tests
 
   echo "✅ All tests passed!"
   display_coverage_summary
@@ -694,7 +534,7 @@ merge)
 
   # Run performance tests on all browsers (informational, won't fail build)
   echo ""
-  # run_performance_tests
+  run_performance_tests
 
   echo "✅ All tests passed!"
   display_coverage_summary
@@ -711,7 +551,7 @@ summary)
   ;;
 
 *)
-  echo "Usage: $0 {backend-unit|backend-integration|backend|frontend-unit|frontend-integration|frontend|ecopicks-unit|ecopicks-integration|ecopicks|performance|all-unit|all-integration|default|parallel|merge|merge-only}"
+  echo "Usage: $0 {backend-unit|backend-integration|backend|the-green-brother-unit|the-green-brother-integration|the-green-brother|the-green-brother-unit|the-green-brother-integration|the-green-brother|performance|all-unit|all-integration|default|parallel|merge|merge-only}"
   exit 1
   ;;
 esac

@@ -20,7 +20,12 @@ from affilibuster_backend.domain.entities import (
     Error,
     UpdatePreferences,
 )
-from affilibuster_backend.domain.entities.generated.models import CurrenciesGetResponse, CurrencyCode, UserPreferences
+from affilibuster_backend.domain.entities.generated.models import (
+    CurrenciesGetParametersQuery,
+    CurrenciesGetResponse,
+    CurrencyCode,
+    UserPreferences,
+)
 from affilibuster_backend.infrastructure.dependencies import (
     GetCMSContentUseCaseDep,
     GetUserPreferencesUseCaseDep,
@@ -41,18 +46,18 @@ async def validate_currency_code(
     """
     Validate that a currency code exists in Strapi.
 
-    Returns True if the currency code is valid and active, False otherwise.
+    Returns True if the currency code is valid, False otherwise.
     """
     try:
+        # Pass customPopulate=nested to get complete currency data with seoMetadata
+        # Required by OpenAPI spec for all CMS collection endpoints
+        params = CurrenciesGetParametersQuery(customPopulate="nested")
         currency_data = await use_case.execute(
             "/currencies",
+            params=params,
             response_model=CurrenciesGetResponse,
         )
-
-        # Check if currency code exists and is active
-        # currency_data is a Pydantic CurrenciesGetResponse model with a 'data' field
-        # Compare enum value with currency code string from Strapi
-        return any(curr.code == code.value and curr.is_active for curr in currency_data.data)
+        return any(curr.code == code.value for curr in currency_data.data)
     except Exception:  # noqa: BLE001
         # On any error (network, parsing, CMS unavailable), we can't validate, so return False
         return False

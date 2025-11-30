@@ -137,7 +137,7 @@ if [[ ! -f "certs/localhost.pem" ]] || [[ ! -f "certs/localhost-key.pem" ]]; the
 
     echo "  Generating localhost certificates with Docker hostnames..."
     cd certs
-    mkcert localhost 127.0.0.1 ::1 backend frontend strapi strapi-proxy || {
+    mkcert localhost 127.0.0.1 ::1 backend the-green-brother strapi strapi-proxy || {
       echo "  ❌ Failed to generate certificates"
       cd ..
       exit 1
@@ -191,15 +191,9 @@ cd backend
 uv sync --quiet
 cd ..
 
-# Install frontend dependencies
-echo "  🧰 Installing frontend dependencies..."
-cd frontend
-npm install --silent
-cd ..
-
-# Install ecopicks dependencies
-echo "  🧰 Installing ecopicks dependencies..."
-cd ecopicks
+# Install the-green-brother dependencies
+echo "  🧰 Installing the-green-brother dependencies..."
+cd the-green-brother
 npm install --silent
 cd ..
 

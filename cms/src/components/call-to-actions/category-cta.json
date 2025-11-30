@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_call_to_actions_category_ctas",
+  "info": {
+    "displayName": "Category CTA",
+    "icon": "database"
+  },
+  "options": {},
+  "attributes": {
+    "button": {
+      "type": "component",
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
+    "category": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::product-category.product-category"
+    }
+  },
+  "config": {}
+}

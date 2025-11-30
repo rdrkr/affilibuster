@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_call_to_actions_pagination_ctas",
+  "info": {
+    "displayName": "Pagination CTA",
+    "icon": "dashboard"
+  },
+  "options": {},
+  "attributes": {
+    "previousButton": {
+      "type": "component",
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
+    "itemsPerPage": {
+      "type": "integer",
+      "required": true
+    },
+    "nextButton": {
+      "type": "component",
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
+    "noItemsFound": {
+      "type": "component",
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
+    }
+  },
+  "config": {}
+}

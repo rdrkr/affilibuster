@@ -25,7 +25,6 @@ interface ServerConfig {
  *
  * Sets up the server binding address, port, application encryption keys,
  * and constructs the public URL for the CMS. Adds SSL configuration when HTTPS is enabled.
- *
  * @param root0 - Configuration object
  * @param root0.env - Strapi environment configuration helper for accessing environment variables
  * @returns Server configuration object with host, port, app keys, URL, and optional SSL

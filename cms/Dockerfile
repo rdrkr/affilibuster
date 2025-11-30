@@ -1,6 +1,6 @@
 # Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-FROM node:22.21-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 

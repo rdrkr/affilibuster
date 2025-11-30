@@ -18,77 +18,31 @@
   "attributes": {
     "entryTitle": {
       "type": "string",
+      "private": true,
+      "default": "Error 410: Page Gone",
       "required": true
     },
-    "title": {
-      "type": "string",
-      "required": true,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "subtitle": {
-      "type": "string",
-      "required": true,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "message": {
-      "type": "text",
-      "required": true,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "ctaText": {
-      "type": "string",
-      "default": "Go to Homepage",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "supportContactMessage": {
-      "type": "string",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
     "content": {
-      "type": "richtext",
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
+      },
+      "component": "elements.text-block",
+      "repeatable": false,
+      "required": true
     },
-    "metaTitle": {
-      "type": "string",
-      "maxLength": 60,
+    "seoMetadata": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
-    },
-    "metaDescription": {
-      "type": "text",
-      "maxLength": 160,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
+      },
+      "component": "elements.seo-metadata",
+      "repeatable": false,
+      "required": true
     }
   }
 }

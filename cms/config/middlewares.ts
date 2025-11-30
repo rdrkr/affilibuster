@@ -14,7 +14,16 @@ export default [
         useDefaults: true,
         directives: {
           'connect-src': ["'self'", 'https:'],
-          'img-src': ["'self'", 'data:', 'blob:', 'dl.airtable.com'],
+          'img-src': [
+            "'self'",
+            'data:',
+            'blob:',
+            'dl.airtable.com',
+            'res.cloudinary.com',
+            'thegreenbrother.com',
+            'www.thegreenbrother.com',
+            'affilibuster-production-the-green-brother.onrender.com',
+          ],
           'media-src': ["'self'", 'data:', 'blob:'],
           upgradeInsecureRequests: null,
         },

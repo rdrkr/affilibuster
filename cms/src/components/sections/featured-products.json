@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_sections_featured_products",
+  "info": {
+    "displayName": "Featured Products Section",
+    "icon": "shoppingCart",
+    "description": "Section displaying featured products with header and view all link"
+  },
+  "options": {},
+  "attributes": {
+    "header": {
+      "type": "component",
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
+    },
+    "products": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product"
+    },
+    "viewAllButton": {
+      "type": "component",
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    }
+  }
+}

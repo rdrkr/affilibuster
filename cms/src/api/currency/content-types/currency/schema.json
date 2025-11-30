@@ -10,30 +10,50 @@
   "options": {
     "draftAndPublish": true
   },
-  "pluginOptions": {},
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
   "attributes": {
     "code": {
       "type": "string",
-      "required": true,
-      "unique": true,
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
       "minLength": 3,
-      "maxLength": 3
+      "maxLength": 3,
+      "required": true,
+      "unique": true
     },
     "name": {
       "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
       "required": true
     },
     "symbol": {
       "type": "string",
-      "required": true,
-      "maxLength": 5
-    },
-    "displayName": {
-      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "maxLength": 5,
       "required": true
     },
     "decimalPlaces": {
       "type": "integer",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
       "required": true,
       "default": 2,
       "min": 0,
@@ -41,34 +61,55 @@
     },
     "symbolPosition": {
       "type": "enumeration",
-      "enum": ["before", "after"],
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
       "required": true,
-      "default": "before"
+      "default": "before",
+      "enum": ["before", "after"]
     },
     "thousandsSeparator": {
       "type": "string",
-      "maxLength": 1,
-      "default": ","
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": ",",
+      "maxLength": 1
     },
     "decimalSeparator": {
       "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": ".",
       "maxLength": 1,
-      "required": true,
-      "default": "."
+      "required": true
     },
     "exchangeRate": {
       "type": "decimal",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
       "required": true,
       "default": 1
     },
-    "sortOrder": {
-      "type": "integer",
-      "required": true,
-      "default": 0
-    },
-    "isActive": {
-      "type": "boolean",
-      "default": true,
+    "seoMetadata": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.seo-metadata",
+      "repeatable": false,
       "required": true
     }
   }

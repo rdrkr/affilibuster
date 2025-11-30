@@ -18,10 +18,9 @@ To regenerate models after spec changes:
 """
 
 # Re-export union types for CMS repository type safety
-from .cms_entities import CMSAPIError, CMSRequest, CMSResponse
-
 # Re-export authentication domain entities
 from .email_verification_token import EmailVerificationToken
+from .generated.cms_entities import CMSAPIError, CMSRequest, CMSResponse
 
 # Re-export all auto-generated models from OpenAPI spec
 # noinspection PyUnusedImports

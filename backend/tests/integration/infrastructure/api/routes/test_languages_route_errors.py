@@ -13,7 +13,7 @@ import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient
 
-from affilibuster_backend.domain.use_cases.get_cms_content_use_case import GetCMSContentUseCase
+from affilibuster_backend.domain.use_cases.cms.get_cms_content_use_case import GetCMSContentUseCase
 from affilibuster_backend.infrastructure.dependencies import get_cms_content_use_case
 
 

@@ -8,12 +8,11 @@ import httpx
 import pytest
 
 from affilibuster_backend.domain.entities import CMSAPIError
-from affilibuster_backend.domain.entities.cms_entities import CMSErrorDetails
+from affilibuster_backend.domain.entities.generated.cms_entities import CMSErrorDetails, LocalesResponse
 from affilibuster_backend.domain.entities.generated.models import (
     AboutGetParametersQuery,
     CurrenciesGetResponse,
     LanguagesDetectPostRequest,
-    LocalesGetResponse,
 )
 from affilibuster_backend.infrastructure.cms.strapi_repository_impl import (
     StrapiRepositoryImpl,
@@ -177,15 +176,17 @@ class TestGet:
                     "code": "USD",
                     "name": "US Dollar",
                     "symbol": "$",
-                    "displayName": "US Dollar ($)",
                     "decimalPlaces": 2,
                     "symbolPosition": "before",
                     "thousandsSeparator": ",",
                     "decimalSeparator": ".",
                     "exchangeRate": 1.0,
-                    "sortOrder": 1,
-                    "isActive": True,
                     "publishedAt": "2025-10-30T17:41:47.696Z",
+                    "seoMetadata": {
+                        "metaTitle": "US Dollar",
+                        "metaDescription": "United States Dollar currency",
+                        "metaKeywords": ["USD", "dollar", "currency"],
+                    },
                 }
             ]
         }
@@ -278,15 +279,17 @@ class TestPost:
                     "code": "USD",
                     "name": "US Dollar",
                     "symbol": "$",
-                    "displayName": "US Dollar ($)",
                     "decimalPlaces": 2,
                     "symbolPosition": "before",
                     "thousandsSeparator": ",",
                     "decimalSeparator": ".",
                     "exchangeRate": 1.0,
-                    "sortOrder": 1,
-                    "isActive": True,
                     "publishedAt": "2025-10-30T17:41:47.696Z",
+                    "seoMetadata": {
+                        "metaTitle": "US Dollar",
+                        "metaDescription": "United States Dollar currency",
+                        "metaKeywords": ["USD", "dollar", "currency"],
+                    },
                 }
             ]
         }
@@ -412,12 +415,12 @@ class TestGetEdgeCases:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
-            params = AboutGetParametersQuery(locale="en")
+            params = AboutGetParametersQuery(locale="en", customPopulate="nested")
             _result = await repo.get("/about", params=params, response_model=CurrenciesGetResponse)
 
             mock_client.get.assert_called_once_with(
                 "http://strapi:1337/api/about",
-                params={"locale": "en"},
+                params={"locale": "en", "customPopulate": "nested"},
                 headers={"Authorization": "Bearer test-token"},
             )
 
@@ -472,9 +475,9 @@ class TestGetEdgeCases:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
-            result = await repo.get("/i18n/locales", response_model=LocalesGetResponse)
+            result = await repo.get("/i18n/locales", response_model=LocalesResponse)
 
-            assert isinstance(result, LocalesGetResponse)
+            assert isinstance(result, LocalesResponse)
             assert len(result.root) == 1
             assert result.root[0].code == "en"
 
@@ -522,7 +525,7 @@ class TestPostEdgeCases:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
-            params = AboutGetParametersQuery(locale="en")
+            params = AboutGetParametersQuery(locale="en", customPopulate="nested")
             data = LanguagesDetectPostRequest(accept_language="en-US")
             _result = await repo.post(
                 "/languages/detect", data=data, params=params, response_model=CurrenciesGetResponse
@@ -531,7 +534,7 @@ class TestPostEdgeCases:
             mock_client.post.assert_called_once_with(
                 "http://strapi:1337/api/languages/detect",
                 json={"accept_language": "en-US"},
-                params={"locale": "en"},
+                params={"locale": "en", "custom_populate": "nested"},
                 headers={"Authorization": "Bearer test-token"},
             )
 
@@ -588,37 +591,11 @@ class TestPostEdgeCases:
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
             data = LanguagesDetectPostRequest(accept_language="en-US")
-            result = await repo.post("/languages/detect", data=data, response_model=LocalesGetResponse)
+            result = await repo.post("/languages/detect", data=data, response_model=LocalesResponse)
 
-            assert isinstance(result, LocalesGetResponse)
+            assert isinstance(result, LocalesResponse)
             assert len(result.root) == 1
             assert result.root[0].code == "en"
-
-
-@pytest.mark.unit
-class TestSnakeToCamel:
-    """Tests for _snake_to_camel method."""
-
-    def test_snake_to_camel_with_single_word(self):
-        """Test that _snake_to_camel handles single word correctly."""
-        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
-        result = repo._snake_to_camel("page")
-
-        assert result == "page"
-
-    def test_snake_to_camel_with_multiple_words(self):
-        """Test that _snake_to_camel converts snake_case to camelCase."""
-        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
-        result = repo._snake_to_camel("page_size")
-
-        assert result == "pageSize"
-
-    def test_snake_to_camel_with_many_words(self):
-        """Test that _snake_to_camel handles multiple underscores."""
-        repo = StrapiRepositoryImpl(api_token="test-token", base_url="http://strapi:1337")
-        result = repo._snake_to_camel("some_long_variable_name")
-
-        assert result == "someLongVariableName"
 
 
 @pytest.mark.unit

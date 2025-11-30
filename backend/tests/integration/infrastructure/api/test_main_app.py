@@ -223,7 +223,7 @@ class TestOpenAPIEndpoints:
         assert "text/html" in response.headers.get("content-type", "")
 
 
-@pytest.mark.unit
+@pytest.mark.integration
 class TestCustomOpenAPI:
     """Test custom OpenAPI schema generation."""
 

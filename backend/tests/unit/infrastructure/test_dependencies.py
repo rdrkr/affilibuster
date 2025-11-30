@@ -18,10 +18,12 @@ from affilibuster_backend.domain.repositories.email_verification_token_repositor
 from affilibuster_backend.domain.repositories.password_reset_token_repository import IPasswordResetTokenRepository
 from affilibuster_backend.domain.repositories.preferences_repository import IUserPreferencesRepository
 from affilibuster_backend.domain.repositories.url_redirect_repository import IURLRedirectRepository
-from affilibuster_backend.domain.use_cases.get_cms_content_use_case import GetCMSContentUseCase
-from affilibuster_backend.domain.use_cases.get_url_redirect_use_case import GetURLRedirectUseCase
-from affilibuster_backend.domain.use_cases.get_user_preferences_use_case import GetUserPreferencesUseCase
-from affilibuster_backend.domain.use_cases.update_user_preferences_use_case import UpdateUserPreferencesUseCase
+from affilibuster_backend.domain.use_cases.cms.get_cms_content_use_case import GetCMSContentUseCase
+from affilibuster_backend.domain.use_cases.cms.get_url_redirect_use_case import GetURLRedirectUseCase
+from affilibuster_backend.domain.use_cases.preferences.get_user_preferences_use_case import GetUserPreferencesUseCase
+from affilibuster_backend.domain.use_cases.preferences.update_user_preferences_use_case import (
+    UpdateUserPreferencesUseCase,
+)
 from affilibuster_backend.infrastructure.dependencies import (
     get_cache_service,
     get_cms_content_use_case,

@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_elements_seo_metadata",
+  "info": {
+    "displayName": "SEO Metadata",
+    "icon": "alien"
+  },
+  "options": {},
+  "attributes": {
+    "metaTitle": {
+      "type": "string",
+      "required": false
+    },
+    "metaDescription": {
+      "type": "string"
+    },
+    "metaKeywords": {
+      "type": "json"
+    }
+  },
+  "config": {}
+}

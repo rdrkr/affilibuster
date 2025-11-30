@@ -8,7 +8,6 @@
 /**
  * Strapi environment variable accessor with type-safe methods
  * Used in config files to read environment variables with defaults
- *
  * @example
  * const host = env('HOST', 'localhost')
  * const port = env.int('PORT', 3000)

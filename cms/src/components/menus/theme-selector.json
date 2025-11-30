@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_menus_theme_selectors",
+  "info": {
+    "displayName": "Theme Menu",
+    "icon": "sun"
+  },
+  "options": {},
+  "attributes": {
+    "menuButton": {
+      "type": "component",
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
+    "themes": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::theme.theme"
+    }
+  },
+  "config": {}
+}

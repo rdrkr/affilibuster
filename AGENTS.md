@@ -9,8 +9,8 @@ a multi-language, SEO-optimized platform that can serve as a foundation for mult
 
 ### Key Characteristics
 
-- **Architecture**: BFF (Backend for Frontend) pattern - `Frontend (Next.js) → Backend API (FastAPI) → Strapi CMS`
-  - **FRONTEND NEVER TALKS TO STRAPI DIRECTLY** - All content flows through the backend API
+- **Architecture**: BFF (Backend for TheGreenBrother) pattern - `TheGreenBrother (Next.js) → Backend API (FastAPI) → Strapi CMS`
+  - **THE_GREEN_BROTHER NEVER TALKS TO STRAPI DIRECTLY** - All content flows through the backend API
 - **Languages**: English (default), Italian, Hebrew (RTL support)
 - **Performance**: Lighthouse scores >90, <3s load times on 3G
 - **Testing**: 100% test coverage (backend AND frontend - non-negotiable)
@@ -19,7 +19,7 @@ a multi-language, SEO-optimized platform that can serve as a foundation for mult
 
 ## Technology Stack
 
-### Frontend
+### TheGreenBrother
 
 - **Framework**: Next.js 16 (App Router, SSG/ISR)
 - **Language**: TypeScript 5.7+ (strict mode)
@@ -162,7 +162,7 @@ a multi-language, SEO-optimized platform that can serve as a foundation for mult
 ### 13. Test Coverage Requirements (100% NON-NEGOTIABLE)
 
 - **Backend**: 100% minimum coverage (lines, branches, functions, statements)
-- **Frontend**: 100% minimum coverage (lines, branches, functions, statements)
+- **TheGreenBrother**: 100% minimum coverage (lines, branches, functions, statements)
 - **Non-Negotiable**: All new code must maintain or improve coverage - no exceptions
 - **No Merges Without Coverage**: Code without 100% test coverage will not be merged or committed
 - **Comprehensive Testing**: Tests must cover:
@@ -203,13 +203,13 @@ E2E tests verify **correctness**, not timing. Performance tests verify **timing*
 
 **Rationale**: Separating correctness from performance prevents flaky tests in resource-constrained environments (Docker, CI) and provides clear debugging signals - you know immediately if the issue is "it doesn't work" vs "it's too slow".
 
-See `frontend/tests/README.md` for complete guidelines and migration instructions.
+See `the-green-brother/tests/README.md` for complete guidelines and migration instructions.
 
 ### 15. Theme-First Styling (Mandatory CSS Variable Usage)
 
 - **FORBIDDEN**: Hardcoded color values (hex, rgb, hsl, named colors) in component styles or Tailwind classes
 - **MANDATORY**: All colors MUST use Tailwind utility classes that reference theme.css variables
-- **Centralized Theme**: All color definitions live in `frontend/src/styles/theme.css` using CSS custom properties
+- **Centralized Theme**: All color definitions live in `the-green-brother/src/styles/theme.css` using CSS custom properties
 - **Available Color Palettes**:
   - `primary-*` (Green - Catppuccin Mocha): 50-900 scale
   - `secondary-*` (Peach): 50-900 scale
@@ -265,7 +265,7 @@ See `frontend/tests/README.md` for complete guidelines and migration instruction
 - **No Co-Located Tests**: Test files live in `tests/` directory, never in `src/`
 - **Clear Separation**: Distinguish between framework-level utilities and domain logic
 
-#### Frontend Organization Rules
+#### TheGreenBrother Organization Rules
 
 **Components** (`src/components/`):
 
@@ -323,6 +323,21 @@ See `frontend/tests/README.md` for complete guidelines and migration instruction
 - Enforces Clean Architecture principles
 - Maintains test-source alignment
 
+### 18. Frontend Reference Architecture (Mandatory for All Frontend Apps)
+
+- **MANDATORY**: Use the `frontend` package as the canonical reference for all frontend applications
+- **Applies to**: `the-green-brother` and any future frontend applications in the monorepo
+- **Scope**: Architecture patterns, coding paradigms, idioms, file organization, and component structure
+- **Identical Structure**: `frontend` and `the-green-brother` share identical structure, patterns, and conventions
+- **When creating new frontends**: Copy `frontend` package structure and patterns as the starting point
+- **When making changes to `the-green-brother`**: Ensure patterns, file organization, and idioms align with those in `frontend`
+- **Reference First**: Before implementing new patterns in any frontend, check if `frontend` already has an established approach
+- **Rationale**:
+  - Maintains consistency across frontend applications
+  - Enables code reuse and knowledge transfer between projects
+  - Simplifies onboarding for developers familiar with any one frontend
+  - Provides a stable reference implementation for architectural decisions
+
 ## Project Structure
 
 ```
@@ -342,7 +357,7 @@ affilibuster/
 │   │   └── config/            # Settings & configuration
 │   ├── tests/                 # Comprehensive test suite
 │   └── alembic/               # Database migrations
-├── frontend/                  # Next.js frontend
+├── the-green-brother/                  # Next.js frontend (TheGreenBrother)
 │   ├── src/
 │   │   ├── app/[lang]/        # Language-specific routes
 │   │   ├── components/        # React components
@@ -402,14 +417,14 @@ Layer 1: Strapi Content    → Layer 2: Backend Services
 
 1. **CMS Startup**: Generates `strapi.openapi.yaml` from content types
 2. **Backend Startup**: Merges specs → generates Python models
-3. **Frontend Startup**: Generates TypeScript types from merged spec
+3. **TheGreenBrother Startup**: Generates TypeScript types from merged spec
 
 ### Important Notes
 
 - **Always regenerate after spec changes**: Types must stay in sync
 - **Commit generated code**: Generated types are version controlled
 - **External references**: Backend spec uses `$ref: './strapi.openapi.yaml#/...'`
-- **Type safety**: Frontend TypeScript and backend Python types match
+- **Type safety**: TheGreenBrother TypeScript and backend Python types match
 
 ## Development Commands
 
@@ -455,10 +470,10 @@ ruff check . --fix
 ruff format .
 ```
 
-### Frontend Development
+### TheGreenBrother Development
 
 ```bash
-cd frontend
+cd the-green-brother
 
 # Install dependencies
 npm install
@@ -491,8 +506,8 @@ make test
 # Backend tests only
 make test-backend
 
-# Frontend tests only
-make test-frontend
+# TheGreenBrother tests only
+make test-the-green-brother
 
 # With coverage
 make test              # Includes coverage by default
@@ -522,7 +537,7 @@ make lint-openapi
 ### Coverage Requirements
 
 - **Backend**: 100% minimum (lines, branches, functions, statements)
-- **Frontend**: 100% minimum (lines, branches, functions, statements)
+- **TheGreenBrother**: 100% minimum (lines, branches, functions, statements)
 - **Non-Negotiable**: All code must achieve 100% coverage - no exceptions
 - **Quality Mandate**: Coverage must be meaningful, testing actual behavior and edge cases
 
@@ -566,7 +581,7 @@ async def test_get_languages_with_cache(mocker):
 - **Import Order**: Enforced by Ruff
 - **Naming**: snake_case for functions/variables, PascalCase for classes
 
-### TypeScript/JavaScript (Frontend & CMS)
+### TypeScript/JavaScript (TheGreenBrother & CMS)
 
 - **Formatter**: Prettier
 - **Linter**: ESLint with typescript-eslint
@@ -708,7 +723,7 @@ SSL_KEY_PATH=./certs/localhost-key.pem
 
 Certificates are mounted into Docker containers and read by:
 
-- **Frontend**: Custom HTTPS server (`frontend/server.ts`)
+- **TheGreenBrother**: Custom HTTPS server (`the-green-brother/server.ts`)
 - **Backend**: Uvicorn with `--ssl-keyfile` and `--ssl-certfile` flags
 - **CMS**: Strapi server configuration (`cms/config/server.ts`)
 
@@ -718,7 +733,7 @@ Certificates are mounted into Docker containers and read by:
 
 ```bash
 # Protocol Configuration (all services use HTTPS)
-FRONTEND_PROTOCOL=https
+THE_GREEN_BROTHER_PROTOCOL=https
 BACKEND_PROTOCOL=https
 CMS_PROTOCOL=https
 
@@ -734,7 +749,7 @@ REDIS_HOST=redis
 STRAPI_URL=https://strapi:1337
 STRAPI_API_TOKEN=your-token
 
-# Frontend
+# TheGreenBrother
 NEXT_PUBLIC_API_URL=https://localhost:8000/v1
 
 # CMS
@@ -749,12 +764,12 @@ To switch protocols, update all three protocol variables in `.env`:
 
 ```bash
 # For HTTPS (default)
-FRONTEND_PROTOCOL=https
+THE_GREEN_BROTHER_PROTOCOL=https
 BACKEND_PROTOCOL=https
 CMS_PROTOCOL=https
 
 # For HTTP (if needed for debugging)
-FRONTEND_PROTOCOL=http
+THE_GREEN_BROTHER_PROTOCOL=http
 BACKEND_PROTOCOL=http
 CMS_PROTOCOL=http
 ```
@@ -784,7 +799,7 @@ async def get_new(
 
 3. **Write comprehensive tests** in `tests/unit/`
 
-### Adding New Frontend Components
+### Adding New TheGreenBrother Components
 
 1. **Check Style Guide First**: Review `/[lang]/style-guide` to ensure component doesn't already exist
 2. **Create component** in `src/components/` (or `src/components/auth/` for auth components)
@@ -820,7 +835,7 @@ redocly lint contracts/template.openapi.yaml
 ## Useful Links
 
 - **Backend API Docs**: <https://localhost:8000/docs>
-- **Frontend**: <https://localhost:3000>
+- **TheGreenBrother**: <https://localhost:3000>
 - **Style Guide**: <https://localhost:3000/en/style-guide> (design system & reusable components)
 - **CMS Admin**: <https://localhost:1337/admin>
 - **Constitution**: `.specify/memory/constitution.md`

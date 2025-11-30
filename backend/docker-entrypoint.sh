@@ -6,9 +6,11 @@ set -e
 echo "🚀 Backend startup script..."
 cd /app || exit 1
 
-echo "  🔐 Loading environment variables..."
-#shellcheck disable=SC1091
-. /app/.env
+if [ -f /app/.env ]; then
+  echo "  🔐 Loading environment variables..."
+  #shellcheck disable=SC1091
+  . /app/.env
+fi
 
 echo "  🔄 Installing dependencies (including dev)..."
 uv sync --quiet
@@ -17,6 +19,9 @@ uv sync --quiet
 
 echo "  🔧 Generating Python models from OpenAPI specification..."
 uv run task openapi-generate
+
+echo "  📝 Generating CMS API code..."
+uv run task generate-cms-api
 
 # Function to wait for database
 wait_for_db() {
@@ -40,12 +45,17 @@ uv run alembic upgrade head || {
   exit 1
 }
 
-# Seed database with initial data
-echo "  🌱 Seeding database..."
-uv run task seed || {
-  echo "❌️ Database seeding failed"
-  exit 1
-}
+# Seed database with initial data (required in non-production)
+#shellcheck disable=SC2154
+if [ "${NODE_ENV}" = "production" ]; then
+  echo "  ⏭️  Skipping database seeding (production environment)"
+else
+  echo "  🌱 Seeding database..."
+  uv run task seed || {
+    echo "❌️ Database seeding failed"
+    exit 1
+  }
+fi
 
 echo "✅ Backend startup complete, starting application..."
 

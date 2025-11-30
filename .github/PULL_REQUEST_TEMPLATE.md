@@ -20,7 +20,7 @@
 
 - [ ] **Tests added/updated** for new/changed functionality
 - [ ] **All tests passing** (`make test`)
-- [ ] **Coverage requirements met** (80% backend/frontend, 95% shared types, 60% CMS)
+- [ ] **Coverage requirements met** (80% backend/the-green-brother, 95% shared types, 60% CMS)
 
 ```bash
 # Verify tests pass
@@ -34,6 +34,7 @@ make coverage-view
 ### Test Details
 
 <!-- Describe the tests added/updated -->
+
 - Unit tests:
 - Integration tests:
 - Contract tests:
@@ -62,7 +63,7 @@ make coverage-view
 - [ ] Contract tests added for new endpoints
 - [ ] Performance tested for new queries
 
-### Frontend Specific
+### TheGreenBrother Specific
 
 - [ ] Component tests added/updated
 - [ ] Responsive design verified (mobile, tablet, desktop)
@@ -89,7 +90,9 @@ make coverage-view
 ---
 
 **Deployment Notes:**
+
 <!-- Any special deployment considerations, environment variables, etc. -->
 
 **Rollback Plan:**
+
 <!-- How to rollback if issues are discovered after deployment -->

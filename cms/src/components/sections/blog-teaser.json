@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_sections_blog_teasers",
+  "info": {
+    "displayName": "Blog Teaser Section",
+    "icon": "gift",
+    "description": "Section displaying blog post previews in grid"
+  },
+  "options": {},
+  "attributes": {
+    "header": {
+      "type": "component",
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
+    },
+    "blog_posts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::blog-post.blog-post"
+    }
+  }
+}

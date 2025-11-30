@@ -1,25 +1,35 @@
 <!-- Copyright (c) 2025 Affilibuster by Ronen Druker. -->
 
-# Affilibuster - Multi-Language Affiliate Platform
+<!-- markdownlint-disable-next-line MD041 MD033 -->
+<div align="center">
+  <!-- markdownlint-disable-next-line MD033 -->
+  <img src="the-green-brother/public/icons/brand.svg" alt="Affilibuster Brand Icon" width="120" height="120" />
+</div>
 
-<!--suppress HtmlDeprecatedAttribute -->
+<!-- markdownlint-disable-next-line MD033 -->
+<h1 align="center">Affilibuster - A Basic Affiliation Platform</h1>
+
+<!-- markdownlint-disable-next-line MD033 -->
 <div align="center">
 
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
-[![Python 3.13+](https://img.shields.io/badge/python-3.13%2B-blue)](https://www.python.org/)
-[![Node.js 22+](https://img.shields.io/badge/node.js-22%2B-green)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/typescript-5.7%2B-blue)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/react-19%2B-blue)](https://reactjs.org/)
-[![Next.js 16+](https://img.shields.io/badge/next.js-16%2B-black)](https://nextjs.org/)
-[![FastAPI](https://img.shields.io/badge/fastapi-0.120%2B-teal)](https://fastapi.tiangolo.com/)
-[![Strapi 5+](https://img.shields.io/badge/strapi-5%2B-purple)](https://strapi.io/)
+[![Python 3.13+](https://img.shields.io/badge/python-3.13%2B-3776AB)](https://www.python.org/)
+[![Node.js 22+](https://img.shields.io/badge/node.js-22%2B-339933)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/typescript-5.7%2B-3178C6)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/react-19%2B-61DAFB)](https://reactjs.org/)
+[![Next.js 16+](https://img.shields.io/badge/next.js-16%2B-000000)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/fastapi-0.120%2B-009688)](https://fastapi.tiangolo.com/)
+[![Strapi 5+](https://img.shields.io/badge/strapi-5%2B-4945FF)](https://strapi.io/)
 [![PostgreSQL](https://img.shields.io/badge/postgresql-15%2B-336791)](https://www.postgresql.org/)
-[![Docker](https://img.shields.io/badge/docker-ready-blue)](https://www.docker.com/)
+[![Docker](https://img.shields.io/badge/docker-ready-2496ED)](https://www.docker.com/)
 
 **A modern, production-ready affiliate platform with multi-language support, performance optimization, and clean
 architecture.**
 
-[Features](#-features) • [Architecture](#-architecture) • [Quick Start](#-quick-start) • [Development](#-development) • [Testing](#-testing)
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable-next-line MD013 -->
+[Features](#-features) • [Architecture](#️-architecture) • [Quick Start](#-quick-start) • [Development](#️-development) • [Testing](#-testing)
+<!-- prettier-ignore-end -->
 
 </div>
 
@@ -76,16 +86,12 @@ make dev
 
 ### Access Your Applications
 
-| Service           | URL                            | Notes                      |
-| ----------------- | ------------------------------ | -------------------------- |
-| **Frontend**      | <https://localhost:3000>       | Next.js (English, default) |
-| **Frontend (IT)** | <https://localhost:3000/it>    | Italian locale             |
-| **Frontend (HE)** | <https://localhost:3000/he>    | Hebrew locale (RTL)        |
-| **Ecopicks**      | <https://localhost:3001>       | Next.js Affiliate Site     |
-| **Backend API**   | <https://localhost:8000>       | FastAPI REST API           |
-| **API Docs**      | <https://localhost:8000/docs>  | Swagger UI                 |
-| **CMS Admin**     | <https://localhost:1337/admin> | Strapi admin panel         |
-| **Test Runner**   | (Internal)                     | Isolated E2E test executor |
+| Service             | URL                            | Notes                  |
+| ------------------- | ------------------------------ | ---------------------- |
+| **TheGreenBrother** | <https://localhost:3001>       | Next.js Affiliate Site |
+| **Backend API**     | <https://localhost:8000>       | FastAPI REST API       |
+| **API Docs**        | <https://localhost:8000/docs>  | Swagger UI             |
+| **CMS Admin**       | <https://localhost:1337/admin> | Strapi admin panel     |
 
 **Note**: All services run on HTTPS with mkcert certificates. Your browser should trust them automatically after running
 `mkcert -install`.
@@ -103,136 +109,137 @@ make stop
 ### System Design
 
 Affilibuster follows a **single source of truth** architecture where all content originates from Strapi CMS and flows
-through the backend to the frontend:
+through the backend to the TheGreenBrother frontend:
 
-```
-Frontend (Next.js 16, React 19, TypeScript)
-  ↓ (API calls only)
-Backend API (FastAPI, Python 3.13)
-  ↓ (syncs from)
-Strapi CMS (Headless, PostgreSQL)
+<!-- prettier-ignore -->
+```markdown
+TheGreenBrother (Next.js 16, React 19, TypeScript)
+      ↓         (API calls only)
+  Backend API   (FastAPI, Python 3.13)
+      ↓         (syncs from)
+  Strapi CMS    (Headless, PostgreSQL)
 ```
 
-**Key Rule**: Frontend NEVER talks to Strapi directly. All content flows through the backend API.
+**Key Rule**: TheGreenBrother NEVER talks to Strapi directly. All content flows through the backend API.
 
 ### Project Structure
 
-```
-affilibuster/                          # Monorepo root
-├── backend/                           # FastAPI backend
-│   ├── src/affilibuster_backend/
-│   │   ├── config/                    # Configuration & settings
-│   │   ├── domain/                    # Business logic (Clean Architecture)
-│   │   │   ├── entities/              # Domain models
-│   │   │   ├── repositories/          # Repository interfaces
-│   │   │   └── use_cases/             # Business logic
-│   │   ├── infrastructure/            # External integrations
-│   │   │   ├── api/                   # FastAPI routes, models, middleware
-│   │   │   │   └── routes/            # API endpoints
-│   │   │   ├── cache/                 # Redis implementation
-│   │   │   ├── cms/                   # Strapi HTTP client
-│   │   │   ├── database/              # SQLAlchemy setup & models
-│   │   │   │   ├── alembic/           # Database migrations
-│   │   │   │   ├── models/            # Database models
-│   │   │   │   └── repositories/      # Repository implementations
-│   │   │   ├── middleware/            # Custom middleware
-│   │   │   └── dependencies.py        # Dependency injection
-│   │   └── main.py                    # Application entry point
-│   └── tests/
-│       ├── fixtures/                  # Test data and helpers
-│       ├── integration/               # Integration tests
-│       │   └── infrastructure/        # Infrastructure integration tests
-│       └── unit/                      # Unit tests
-│           ├── config/                # Configuration tests
-│           ├── domain/                # Domain layer tests
-│           └── infrastructure/        # Infrastructure layer tests
+<!-- prettier-ignore -->
+```markdown
+affilibuster/                        # Monorepo root
+├── backend/                         # FastAPI backend
+│ ├── src/affilibuster_backend/
+│ │ ├── config/                      # Configuration & settings
+│ │ ├── domain/                      # Business logic (Clean Architecture)
+│ │ │ ├── entities/                  # Domain models
+│ │ │ ├── repositories/              # Repository interfaces
+│ │ │ ├── services/                  # Domain services
+│ │ │ └── use_cases/                 # Business logic
+│ │ ├── infrastructure/              # External integrations
+│ │ │ ├── api/                       # FastAPI routes, models, middleware
+│ │ │ │ └── routes/                  # API endpoints
+│ │ │ ├── cache/                     # Redis implementation
+│ │ │ ├── cms/                       # Strapi HTTP client
+│ │ │ ├── database/                  # SQLAlchemy setup & models
+│ │ │ │ ├── alembic/                 # Database migrations
+│ │ │ │ ├── models/                  # Database models
+│ │ │ │ └── repositories/            # Repository implementations
+│ │ │ ├── email/                     # Email service integration
+│ │ │ ├── middleware/                # Custom middleware
+│ │ │ └── dependencies.py            # Dependency injection
+│ │ └── main.py                      # Application entry point
+│ └── tests/
+│ ├── fixtures/                      # Test data and helpers
+│ ├── integration/                   # Integration tests
+│ │ └── infrastructure/              # Infrastructure integration tests
+│ └── unit/                          # Unit tests
+│ ├── config/                        # Configuration tests
+│ ├── domain/                        # Domain layer tests
+│ └── infrastructure/                # Infrastructure layer tests
 │
-├── frontend/                          # Next.js 16 frontend (Main Platform)
-│   ├── src/
-│   │   ├── app/                       # Next.js App Router pages
-│   │   │   ├── [lang]/                # Language-specific routes
-│   │   │   │   ├── [slug]/            # Dynamic product pages
-│   │   │   │   ├── about/             # About page
-│   │   │   │   ├── contact/           # Contact page
-│   │   │   │   ├── privacy/           # Privacy policy
-│   │   │   │   ├── products/          # Products listing
-│   │   │   │   └── terms/             # Terms of service
-│   │   │   ├── api/                   # API routes (sitemaps)
-│   │   │   └── globals.css            # Global styles
-│   │   ├── components/                # React components
-│   │   ├── hooks/                     # Custom React hooks
-│   │   ├── i18n/                      # Internationalization config
-│   │   ├── lib/                       # Utilities, API clients, transformers
-│   │   ├── styles/                    # CSS modules and themes
-│   │   ├── i18n.ts                    # i18n configuration
-│   │   └── proxy.ts                   # Development proxy
-│   ├── tests/                         # Test files (component, e2e, performance)
-│   ├── Dockerfile                     # Frontend dev server container
-│   └── Dockerfile.test-runner         # Lightweight Playwright test container
+├── the-green-brother/               # Next.js 16 affiliate site (TheGreenBrother)
+│ ├── src/
+│ │ ├── app/                         # Next.js App Router pages
+│ │ ├── components/                  # React components
+│ │ │ ├── about/                     # About page components
+│ │ │ ├── call-to-actions/           # CTA components (Newsletter, etc.)
+│ │ │ ├── elements/                  # Shared UI elements (Header, Label, TextBlock, etc.)
+│ │ │ ├── footer/                    # Footer components
+│ │ │ ├── homepage/                  # Homepage composition (HomeSections)
+│ │ │ ├── layout/                    # Layout components
+│ │ │ ├── menus/                     # Menu components (Language, Search, Theme)
+│ │ │ ├── navigation/                # Navigation (Navbar, MobileMenu)
+│ │ │ └── sections/                  # Reusable section components (Hero, FeaturedProducts, etc.)
+│ │ ├── lib/                         # Utilities, API clients, hooks (feature-based subdirs)
+│ │ ├── i18n/                        # Internationalization configuration
+│ │ └── styles/                      # Global styles and theme
+│ ├── Dockerfile                     # TheGreenBrother dev server container
+│ └── Dockerfile.test-runner         # Lightweight Playwright test container
 │
-├── ecopicks/                          # Next.js 16 affiliate site (Ecopicks)
-│   ├── src/
-│   │   ├── app/                       # Next.js App Router pages
-│   │   ├── components/                # React components
-│   │   ├── lib/                       # Utilities
-│   │   └── styles/                    # Global styles
-│   ├── Dockerfile                     # Ecopicks dev server container
-│   └── Dockerfile.test-runner         # Lightweight Playwright test container
+├── cms/                             # Strapi 5 headless CMS
+│ ├── config/                        # Strapi configuration files
+│ ├── src/
+│ │ ├── api/                         # Content types (25+ types including:)
+│ │ │ ├── about/                     # About page content
+│ │ │ ├── author/                    # Blog authors
+│ │ │ ├── blog/                      # Blog listing page
+│ │ │ ├── blog-post/                 # Blog posts
+│ │ │ ├── blog-post-tag/             # Blog post tags
+│ │ │ ├── contact-us/                # Contact page content
+│ │ │ ├── currency/                  # Currency configuration
+│ │ │ ├── footer/                    # Footer content
+│ │ │ ├── homepage/                  # Homepage content
+│ │ │ ├── navigation/                # Navigation structure
+│ │ │ ├── product/                   # Product content type
+│ │ │ ├── product-category/          # Product categories
+│ │ │ ├── product-tag/               # Product tags
+│ │ │ ├── team-member/               # Team members
+│ │ │ └── [+11 more types]           # FAQ, Privacy, Terms, Error pages, etc.
+│ │ ├── components/                  # UI component schemas
+│ │ ├── index.ts                     # Strapi entry point
+│ │ └── utils/                       # Utility functions
+│ └── scripts/                       # Build and utility scripts
 │
-├── cms/                               # Strapi 5 headless CMS
-│   ├── config/                        # Strapi configuration files
-│   ├── src/
-│   │   ├── api/                       # Custom content types and APIs
-│   │   │   ├── about/                 # About page content
-│   │   │   ├── contact/               # Contact page content
-│   │   │   ├── currency/              # Currency configuration
-│   │   │   ├── footer/                # Footer content
-│   │   │   ├── homepage/              # Homepage content
-│   │   │   ├── navigation/            # Navigation structure
-│   │   │   ├── product/               # Product content type
-│   │   │   └── [other content types]  # Additional content types
-│   │   ├── components/                # UI component schemas
-│   │   ├── index.ts                   # Strapi entry point
-│   │   └── seed.ts                    # Database seeding script
-│   └── scripts/                       # Build and utility scripts
+├── contracts/                       # OpenAPI specifications (source of truth)
+│ └── template.openapi.yaml          # Backend API specification (version controlled)
+│                                    # Note: strapi.openapi.yaml and affilibuster.openapi.yaml are
+│                                    # generated at runtime by CMS and Backend respectively
 │
-├── contracts/                         # OpenAPI specifications (source of truth)
-│   ├── template.openapi.yaml          # Backend API specification
-│   ├── strapi.openapi.yaml            # Strapi content types (auto-generated)
-│   └── affilibuster.openapi.yaml      # Merged specification (auto-generated)
+├── specs/                           # Feature specifications & designs
+├── scripts/                         # Development & deployment scripts
+│ ├── audit.sh                       # Security audit
+│ ├── build.sh                       # Build all services
+│ ├── clean.sh                       # Clean build artifacts
+│ ├── format.sh                      # Format code
+│ ├── lint.sh                        # Lint code
+│ ├── setup.sh                       # Development setup
+│ ├── test.sh                        # Run tests
+│ └── upgrade.sh                     # Upgrade dependencies
 │
-├── specs/                             # Feature specifications & designs
-├── scripts/                           # Development & deployment scripts
-│   ├── audit.sh                       # Security audit
-│   ├── build.sh                       # Build all services
-│   ├── clean.sh                       # Clean build artifacts
-│   ├── format.sh                      # Format code
-│   ├── lint.sh                        # Lint code
-│   ├── setup.sh                       # Development setup
-│   ├── test.sh                        # Run tests
-│   └── upgrade.sh                     # Upgrade dependencies
+├── .specify/                        # SpecKit project configuration
+│ ├── memory/constitution.md         # Project constitution & principles
+│ ├── scripts/                       # SpecKit automation scripts
+│ └── templates/                     # Documentation templates
 │
-├── .specify/                          # SpecKit project configuration
-│   ├── memory/constitution.md         # Project constitution & principles
-│   ├── scripts/                       # SpecKit automation scripts
-│   └── templates/                     # Documentation templates
+├── .claude/                         # Claude AI configuration
+│ └── commands/                      # Custom AI commands
 │
-├── .claude/                           # Claude AI configuration
-│   └── commands/                       # Custom AI commands
+├── data/                            # Static data files
+│ ├── assets/                        # Uploaded media assets
+│ ├── backend-seed.jsonl             # Backend seed data
+│ ├── configuration/                 # Configuration exports
+│ ├── entities/                      # Entity data exports
+│ └── links/                         # Link data
 │
-├── data/                              # Static data files
-│   └── seed-data.json                 # Initial data for seeding
+├── docs/                            # Project documentation
+│ └── eco-friendly-affiliate-website-prd.md
 │
-├── docs/                              # Project documentation
-│   └── eco-friendly-affiliate-website-prd.md
-│
-└── docker-compose.yaml                # Local development environment
-
+└── docker-compose.yaml              # Local development environment
 ```
 
 ### 🛠️ Technology Stack
 
-- **Frontend & Ecopicks**: Next.js 16, React 19, TypeScript 5.7+, Tailwind CSS 4, next-intl
+- **TheGreenBrother**: Next.js 16, React 19, TypeScript 5.7+, Tailwind CSS 4, next-intl
 - **Backend**: FastAPI 0.120+, Python 3.13+, PostgreSQL 15+, Redis, Alembic
 - **CMS**: Strapi 5+, PostgreSQL 15+, i18n plugin
 - **Infrastructure**: Docker & Docker Compose
@@ -241,8 +248,7 @@ affilibuster/                          # Monorepo root
 
 ## 🎯 Design Principles
 
-The project follows these core principles documented in [
-`.specify/memory/constitution.md`](.specify/memory/constitution.md):
+The project follows these core principles documented in [`.specify/memory/constitution.md`](.specify/memory/constitution.md):
 
 - **Clean Architecture**: Business logic isolated from framework dependencies
 - **SOLID Principles**: Single responsibility, open/closed, Liskov substitution, interface segregation, dependency
@@ -260,65 +266,66 @@ The project follows these core principles documented in [
 Affilibuster implements **Clean Architecture** with strict dependency rules to ensure business logic remains isolated
 from external concerns:
 
-```
-┌─────────────────────────────────────────────────────┐
-│                Frameworks & Drivers                 │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │
-│  │ Next.js     │  │ FastAPI     │  │ Strapi      │  │
-│  │ React       │  │ PostgreSQL  │  │ Redis       │  │
-│  └─────────────┘  └─────────────┘  └─────────────┘  │
-└─────────────────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────┐
-│                 Interface Adapters                  │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │
-│  │ Routes      │  │ Controllers │  │Repositories │  │
-│  │ Views       │  │ Presenters  │  │ Gateways    │  │
-│  └─────────────┘  └─────────────┘  └─────────────┘  │
-└─────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────┐
-│                      Use Cases                      │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │
-│  │ Business    │  │ Application │  │ Domain      │  │
-│  │ Rules       │  │ Services    │  │ Logic       │  │
-│  └─────────────┘  └─────────────┘  └─────────────┘  │
-└─────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────┐
-│                        Entities                     │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │
-│  │ Product     │  │ User        │  │ Language    │  │
-│  │ Currency    │  │ Locale      │  │ Config      │  │
-│  └─────────────┘  └─────────────┘  └─────────────┘  │
-└─────────────────────────────────────────────────────┘
+<!-- prettier-ignore -->
+```markdown
+┌─────────────────────────────────────────────────┐
+│              Frameworks & Drivers               │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ │
+│ │   Next.js   │ │   FastAPI   │ │   Strapi    │ │
+│ │    React    │ │ PostgreSQL  │ │    Redis    │ │
+│ └─────────────┘ └─────────────┘ └─────────────┘ │
+└─────────────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────┐
+│               Interface Adapters                │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ │
+│ │   Routes    │ │ Controllers │ │Repositories │ │
+│ │   Views     │ │ Presenters  │ │ Gateways    │ │
+│ └─────────────┘ └─────────────┘ └─────────────┘ │
+└─────────────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────┐
+│                    Use Cases                    │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ │
+│ │   Business  │ │ Application │ │   Domain    │ │
+│ │    Rules    │ │  Services   │ │   Logic     │ │
+│ └─────────────┘ └─────────────┘ └─────────────┘ │
+└─────────────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────┐
+│                     Entities                    │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ │
+│ │   Product   │ │     User    │ │  Language   │ │
+│ │   Currency  │ │    Locale   │ │   Config    │ │
+│ └─────────────┘ └─────────────┘ └─────────────┘ │
+└─────────────────────────────────────────────────┘
 ```
 
 #### Layer Responsibilities
 
-**Entities (Innermost Circle)**
+##### **Entities (Innermost Circle)**
 
 - Core business objects and enterprise-wide business rules
 - Pure domain models with no framework dependencies
 - Examples: `Product`, `User`, `Language`, `Currency` entities
 
-**Use Cases**
+##### **Use Cases**
 
 - Application-specific business rules
 - Orchestrate data flow between entities and interface adapters
 - Contain the application's use case logic
 
-**Interface Adapters**
+##### **Interface Adapters**
 
 - Convert data from/to external formats
 - Presenters, controllers, repositories, gateways
 - Interface between use cases and frameworks
 - Examples: FastAPI routes, React components, repository implementations
 
-**Frameworks & Drivers (Outermost Circle)**
+##### **Frameworks & Drivers (Outermost Circle)**
 
 - UI frameworks, databases, external APIs
 - All technical infrastructure details
@@ -328,7 +335,8 @@ from external concerns:
 
 **Critical Rule**: Dependencies point **inward only** - outer layers depend on inner layers, never the reverse:
 
-```
+<!-- prettier-ignore -->
+```markdown
 Frameworks → Interface Adapters → Use Cases → Entities
 ```
 
@@ -350,7 +358,7 @@ make help
 # Complete first-time setup
 make setup
 
-# Start all services (Docker + Frontend + CMS)
+# Start all services (Docker + TheGreenBrother + Backend + CMS)
 make dev
 
 # Start only Docker services
@@ -365,7 +373,7 @@ make restart
 # View logs
 make logs                # All services
 make logs-backend        # Backend only
-make logs-ecopicks       # Ecopicks only
+make logs-the-green-brother       # TheGreenBrother only
 
 # Check service status
 make ps
@@ -462,15 +470,16 @@ Affilibuster uses a **dedicated test-runner container** for all Playwright E2E a
 
 **Architecture**:
 
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   test-runner   │────▶│    frontend     │────▶│     backend     │
-│ (Playwright)    │     │  (Dev Server)   │     │   (FastAPI)     │
-│  4 CPU / 4GB    │     │   1 CPU         │     │                 │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
+<!-- prettier-ignore -->
+```markdown
+┌─────────────────┐     ┌───────────────────┐     ┌─────────────┐
+│   test-runner   │────▶│ the-green-brother │────▶│   backend   │
+│   (Playwright)  │     │   (Dev Server)    │     │  (FastAPI)  │
+│   4 CPU / 4GB   │     │      1 CPU        │     │             │
+└─────────────────┘     └───────────────────┘     └─────────────┘
 ```
 
-Tests execute in `test-runner`, hitting the `frontend` dev server, which calls the `backend` API.
+Tests execute in `test-runner`, hitting the `the-green-brother` dev server, which calls the `backend` API.
 
 ### Quick Commands
 
@@ -483,14 +492,13 @@ make test-parallel
 
 # Individual modules
 make test-backend          # Backend (pytest)
-make test-frontend         # Frontend (Jest)
-make test-ecopicks         # Ecopicks (Jest)
+make test-the-green-brother         # TheGreenBrother (Jest)
 make test-cms              # CMS (when custom code added)
 
 # E2E tests with specific browser
-make test-frontend-integration BROWSER=webkit
-make test-frontend-integration BROWSER=chromium
-make test-frontend-integration BROWSER=firefox
+make test-the-green-brother-integration BROWSER=webkit
+make test-the-green-brother-integration BROWSER=chromium
+make test-the-green-brother-integration BROWSER=firefox
 
 # Performance tests
 make test-performance BROWSER=chromium
@@ -504,7 +512,10 @@ make coverage-view         # Open merged HTML report
 
 ## 🎨 Code Quality
 
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable-next-line MD024 -->
 ### Quick Commands
+<!-- prettier-ignore-end -->
 
 ```bash
 # Check code style
@@ -538,33 +549,33 @@ Affilibuster uses a **layered OpenAPI architecture** with auto-generated types f
 
 #### Layered Specification System
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                    OpenAPI Specifications                    │
-├──────────────────────────┬───────────────────────────────────┤
-│ Layer 1: Strapi Content  │ Layer 2: Backend Services         │
-├──────────────────────────┼───────────────────────────────────┤
-│ • Product                │ • Currencies API                  │
-│ • Homepage               │ • Preferences API                 │
-│ • Navigation             │ • Language Detection              │
-│ • Pages                  │ • Content Proxy Endpoints         │
-│ (i18n, rich fields)      │ (extends Strapi types)            │
-└──────────────────────────┴───────────────────────────────────┘
-         │                              │
-         │ references via $ref          │
-         └──────────────────────────────┘
-                      │
-         ┌────────────┴────────────┐
-         │                         │
-         ▼                         ▼
-   Code Generators         Code Generators
-   @hey-api/openapi-ts    datamodel-code-generator
-         │                         │
-         ▼                         ▼
-   TypeScript Types      Python Pydantic Models
-   generated/            backend/src/
-                         infrastructure/api/
-                         generated/
+<!-- prettier-ignore -->
+```markdown
+┌──────────────────────────────────────────────────────────┐
+│ OpenAPI Specifications                                   │
+├──────────────────────────┬───────────────────────────────┤
+│ Layer 1: Strapi Content  │ Layer 2: Backend Services     │
+├──────────────────────────┼───────────────────────────────┤
+│ • Product                │ • Currencies API              │
+│ • Homepage               │ • Preferences API             │
+│ • Navigation             │ • Language Detection          │
+│ • Pages                  │ • Content Proxy Endpoints     │
+│ (i18n, rich fields)      │ (extends Strapi types)        │
+└──────────────────────────┴───────────────────────────────┘
+            │                             │
+            │     references via $ref     │
+            └─────────────────────────────┘
+                           │
+              ┌────────────┴────────────┐
+              │                         │
+              ▼                         ▼
+       Code Generators            Code Generators
+     @hey-api/openapi-ts       datamodel-code-generator
+              │                         │
+              ▼                         ▼
+      TypeScript Types         Python Pydantic Models
+          generated/                backend/src/
+                            infrastructure/api/generated/
 ```
 
 #### Specification Files
@@ -579,14 +590,6 @@ Affilibuster uses a **layered OpenAPI architecture** with auto-generated types f
 - **Swagger UI**: <https://localhost:8000/docs>
 - **ReDoc**: <https://localhost:8000/redoc>
 - **OpenAPI JSON**: <https://localhost:8000/openapi.json>
-
-### OpenAPI Architecture
-
-Affilibuster uses a **layered OpenAPI architecture** with auto-generated types:
-
-- **Layer 1**: Strapi content schemas (auto-generated)
-- **Layer 2**: Backend API contracts (extends Strapi types)
-- **Generated Code**: TypeScript and Python models from merged spec
 
 ### Key Commands
 
@@ -613,9 +616,10 @@ All user-facing content originates from Strapi CMS, ensuring consistency and sca
 
 ### Adding New Languages
 
-1. Update `cms/scripts/seed.ts` with new language seeding
-2. Run `make seed` or let it happen automatically on startup
-3. **Zero backend code changes required**
+1. Add new locale in Strapi admin panel
+2. Update `backend/scripts/seed.py` with new language seeding data
+3. Run `make seed` or let it happen automatically on startup
+4. **Zero backend code changes required**
 
 ---
 
@@ -683,7 +687,7 @@ maintainers of the following projects:
 - **[Passlib](https://passlib.readthedocs.io/)** ([BSD](https://github.com/glic3rinu/passlib/blob/master/LICENSE)) -
   Password hashing library
 
-### Frontend Dependencies (TypeScript/JavaScript)
+### TheGreenBrother Dependencies (TypeScript/JavaScript)
 
 - **[TypeScript](https://www.typescriptlang.org/)
   ** ([Apache 2.0](https://github.com/microsoft/TypeScript/blob/main/LICENSE.txt)) - Typed superset of JavaScript
@@ -755,8 +759,7 @@ maintainers of the following projects:
 For a complete list of all dependencies, please see:
 
 - Backend: [`backend/pyproject.toml`](backend/pyproject.toml)
-- Frontend: [`frontend/package.json`](frontend/package.json)
-- Ecopicks: [`ecopicks/package.json`](ecopicks/package.json)
+- TheGreenBrother: [`the-green-brother/package.json`](the-green-brother/package.json)
 - CMS: [`cms/package.json`](cms/package.json)
 
 We are grateful to all the maintainers and contributors of these projects. Without their dedication and hard work,
@@ -764,6 +767,7 @@ Affilibuster would not be possible. Thank you! 🙏
 
 ---
 
+<!-- markdownlint-disable-next-line MD033 -->
 <div align="center">
 
 Made with ❤️ by the Affilibuster Team

@@ -1,0 +1,41 @@
+{
+  "collectionName": "components_menus_search_menus",
+  "info": {
+    "displayName": "Search Menu",
+    "icon": "search"
+  },
+  "options": {},
+  "attributes": {
+    "menuButton": {
+      "type": "component",
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
+    "textBoxPlaceholderLabel": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "recentSearchesLabel": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "nowTrendingLabel": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "viewAllResultsButton": {
+      "type": "component",
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    }
+  },
+  "config": {}
+}

@@ -16,83 +16,47 @@
     }
   },
   "attributes": {
-    "title": {
-      "type": "string",
-      "required": true,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
     "slug": {
       "type": "uid",
-      "targetField": "title",
-      "required": true,
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
-    },
-    "description": {
-      "type": "text",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
+      },
+      "required": true
     },
     "content": {
-      "type": "richtext",
-      "required": true,
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
+      },
+      "component": "elements.text-block",
+      "repeatable": false,
+      "required": true
     },
-    "excerpt": {
-      "type": "text",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "metaTitle": {
-      "type": "string",
-      "maxLength": 60,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "metaDescription": {
-      "type": "text",
-      "maxLength": 160,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "metaKeywords": {
-      "type": "json",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "affiliateUrl": {
-      "type": "string",
+    "images": {
+      "type": "media",
       "pluginOptions": {
         "i18n": {
           "localized": false
         }
-      }
+      },
+      "multiple": true,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "affiliateButton": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
     },
     "price": {
       "type": "decimal",
@@ -100,45 +64,47 @@
         "i18n": {
           "localized": false
         }
-      }
+      },
+      "required": true
     },
     "currency": {
-      "type": "enumeration",
-      "enum": ["USD", "EUR", "GBP", "ILS", "CAD", "AUD", "JPY", "CNY"],
-      "default": "USD",
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      }
-    },
-    "featured": {
-      "type": "boolean",
-      "default": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      }
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::currency.currency"
     },
     "category": {
-      "type": "string",
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      }
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product-category.product-category",
+      "inversedBy": "products"
     },
-    "translationStatus": {
-      "type": "enumeration",
-      "enum": ["complete", "partial", "missing", "pending"],
-      "default": "complete",
-      "required": true,
+    "tags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::product-tag.product-tag",
+      "mappedBy": "products"
+    },
+    "viewDetailsLabel": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
+      },
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "seoMetadata": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.seo-metadata",
+      "repeatable": false,
+      "required": true
     }
   }
 }

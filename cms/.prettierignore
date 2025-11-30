@@ -13,6 +13,8 @@ node_modules/
 public/
 types/
 package-lock.json
+coverage
+core
 
 # Environment and config
 .env*

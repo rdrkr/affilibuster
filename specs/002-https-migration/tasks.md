@@ -83,7 +83,7 @@
 
 ### Environment & Configuration
 
-- [x] **Updated `.env.prod.example`**: Aligned with `.env.dev.example` changes (SSL paths, INTERNAL_*_HOST variables)
+- [x] **Updated `.env.prod.example`**: Aligned with `.env.dev.example` changes (SSL paths, INTERNAL\_\*\_HOST variables)
 - [x] **Automated setup**: Added mkcert installation and certificate generation to `make setup`
 
 ## Implementation Notes
@@ -101,12 +101,12 @@ To switch between HTTP and HTTPS, update three variables in `.env`:
 
 ```bash
 # For HTTPS (default)
-FRONTEND_PROTOCOL=https
+THE_GREEN_BROTHER_PROTOCOL=https
 BACKEND_PROTOCOL=https
 CMS_PROTOCOL=https
 
 # For HTTP (debugging only)
-FRONTEND_PROTOCOL=http
+THE_GREEN_BROTHER_PROTOCOL=http
 BACKEND_PROTOCOL=http
 CMS_PROTOCOL=http
 ```
@@ -129,7 +129,7 @@ Cookie `secure` flag automatically adjusts based on `BACKEND_PROTOCOL`.
 
 - `.env` (HTTPS protocols, SSL paths)
 - `.env.dev.example` (HTTPS protocols, SSL paths)
-- `.env.prod.example` (HTTPS protocols, SSL paths, INTERNAL_*_HOST)
+- `.env.prod.example` (HTTPS protocols, SSL paths, INTERNAL\_\*\_HOST)
 - `.gitignore` (covered by certs/.gitignore)
 - `docker-compose.yaml` (volume mounts, healthchecks)
 - `backend/src/affilibuster_backend/config/settings.py` (backend_protocol, should_use_secure_cookies)

@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_elements_headers",
+  "info": {
+    "displayName": "Header",
+    "icon": "bulletList"
+  },
+  "options": {},
+  "attributes": {
+    "header": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "subheader": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": false
+    },
+    "alignment": {
+      "type": "enumeration",
+      "required": true,
+      "default": "language-direction",
+      "enum": ["center", "language-direction"]
+    }
+  },
+  "config": {}
+}

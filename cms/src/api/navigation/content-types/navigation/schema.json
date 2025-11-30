@@ -5,7 +5,7 @@
     "singularName": "navigation",
     "pluralName": "navigations",
     "displayName": "Navigation",
-    "description": "Global navigation menu labels, brand name, theme and language selectors, language switch prompt messages, social media labels, site-wide SEO metadata, and all UI labels"
+    "description": "Top menu bar navigation: main menu links, search functionality, theme selector, language selector, and UI labels for the navbar"
   },
   "options": {
     "draftAndPublish": true
@@ -18,261 +18,150 @@
   "attributes": {
     "entryTitle": {
       "type": "string",
+      "private": true,
+      "default": "Navigation",
       "required": true
-    },
-    "brandName": {
-      "type": "string",
-      "required": true,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "homeLabel": {
-      "type": "string",
-      "required": true,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "productsLabel": {
-      "type": "string",
-      "required": true,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "aboutLabel": {
-      "type": "string",
-      "required": true,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "contactLabel": {
-      "type": "string",
-      "required": true,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "languageSelectorLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "currencySelectorLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "themeSelectorLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "themeLightLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "themeDarkLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "themeSystemLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "mobileMenuLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "twitterLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "facebookLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "browseProductsButton": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "promptTitleTemplate": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "promptMessageTemplate": {
-      "type": "text",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "yesButtonTemplate": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "noButtonText": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "mobileMenuCloseLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "currencySelectorAriaLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "languageSelectorAriaLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "themeSelectorAriaLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "availableInOtherLanguagesLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "mobileMenuCloseAriaLabel": {
-      "type": "string",
-      "required": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
     },
     "siteTitle": {
       "type": "string",
-      "required": false,
-      "maxLength": 60,
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
+      },
+      "default": "TheGreenBrother",
+      "maxLength": 60,
+      "required": true
     },
     "siteDescription": {
-      "type": "text",
-      "required": false,
-      "maxLength": 160,
+      "type": "string",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
+      },
+      "required": true
     },
-    "siteKeywords": {
-      "type": "json",
-      "required": false,
+    "brandButton": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
+      },
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
+    "homeButton": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
+    "productsMenu": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "menus.product-categories-selector",
+      "repeatable": false,
+      "required": true
+    },
+    "blogButton": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
+    "aboutButton": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
+    "searchMenu": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "menus.search-menu",
+      "repeatable": false,
+      "required": true
+    },
+    "themeMenu": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "menus.theme-selector",
+      "repeatable": false,
+      "required": true
+    },
+    "languageMenu": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "menus.language-selector",
+      "repeatable": false,
+      "required": true
+    },
+    "loginButton": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
+    "mobileMenuButton": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "menus.mobile-menu",
+      "repeatable": false,
+      "required": true
+    },
+    "seoMetadata": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.seo-metadata",
+      "repeatable": false,
+      "required": true
     }
   }
 }

@@ -28,7 +28,7 @@ fi
 
 # Find all lcov.info files
 BACKEND_LCOV="$ROOT_DIR/backend/coverage.lcov"
-FRONTEND_LCOV="$ROOT_DIR/frontend/coverage/lcov.info"
+THE_GREEN_BROTHER_LCOV="$ROOT_DIR/frontend/coverage/lcov.info"
 CMS_LCOV="$ROOT_DIR/cms/coverage/lcov.info"
 
 # Build merge arguments
@@ -41,8 +41,8 @@ if [ -f "$BACKEND_LCOV" ]; then
   echo "✅ Found backend coverage"
 fi
 
-if [ -f "$FRONTEND_LCOV" ]; then
-  MERGE_ARGS="$MERGE_ARGS -a $FRONTEND_LCOV"
+if [ -f "$THE_GREEN_BROTHER_LCOV" ]; then
+  MERGE_ARGS="$MERGE_ARGS -a $THE_GREEN_BROTHER_LCOV"
   FOUND_COUNT=$((FOUND_COUNT + 1))
   echo "✅ Found frontend coverage"
 fi

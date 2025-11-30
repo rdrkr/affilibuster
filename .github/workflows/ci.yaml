@@ -4,7 +4,7 @@ name: CI
 
 on:
   push:
-    branches: ['main'] #, "claude/**" ]
+    branches: ['main', 'develop'] #, "claude/**" ]
   workflow_dispatch:
 
 concurrency:
@@ -121,6 +121,7 @@ jobs:
           # ======================================
           POSTGRES_PROTOCOL=${{ vars.POSTGRES_PROTOCOL }}
           POSTGRES_HOST=${{ vars.POSTGRES_HOST }}
+          INTERNAL_POSTGRES_HOST=${{ vars.INTERNAL_POSTGRES_HOST }}
           POSTGRES_PORT=${{ vars.POSTGRES_PORT }}
           POSTGRES_USER=${{ vars.POSTGRES_USER }}
           POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
@@ -130,6 +131,7 @@ jobs:
 
           REDIS_PROTOCOL=${{ vars.REDIS_PROTOCOL }}
           REDIS_HOST=${{ vars.REDIS_HOST }}
+          INTERNAL_REDIS_HOST=${{ vars.INTERNAL_REDIS_HOST }}
           REDIS_PORT=${{ vars.REDIS_PORT }}
           REDIS_TTL_PREFERENCES=${{ vars.REDIS_TTL_PREFERENCES }}
 
@@ -143,6 +145,16 @@ jobs:
           CMS_URL_PROD=${{ vars.CMS_URL_PROD }}
           CMS_URL_DEV=${{ vars.CMS_URL_DEV }}
 
+          # SSL Certificate Paths (for Docker HTTPS)
+          SSL_CERT_PATH=${{ vars.SSL_CERT_PATH }}
+          SSL_KEY_PATH=${{ vars.SSL_KEY_PATH }}
+
+          # Cloudinary Configuration (for CMS image uploads)
+          CLOUDINARY_NAME=${{ secrets.CLOUDINARY_NAME }}
+          CLOUDINARY_KEY=${{ secrets.CLOUDINARY_KEY }}
+          CLOUDINARY_SECRET=${{ secrets.CLOUDINARY_SECRET }}
+
+          # Security Keys
           ADMIN_JWT_SECRET=${{ secrets.ADMIN_JWT_SECRET }}
           API_TOKEN_SALT=${{ secrets.API_TOKEN_SALT }}
           API_TOKEN_ENCRYPTION_KEY=${{ secrets.API_TOKEN_ENCRYPTION_KEY }}
@@ -166,16 +178,19 @@ jobs:
           JWT_SECRET=${{ secrets.JWT_SECRET }}
 
           # ======================================
-          # FRONTEND (Next.js)
+          # THE_GREEN_BROTHER (Next.js)
           # ======================================
           NODE_ENV=${{ vars.NODE_ENV }}
+          NODE_EXTRA_CA_CERTS=${{ vars.NODE_EXTRA_CA_CERTS }}
           NEXT_TELEMETRY_DISABLED=${{ vars.NEXT_TELEMETRY_DISABLED }}
 
-          FRONTEND_PROTOCOL=${{ vars.FRONTEND_PROTOCOL }}
-          FRONTEND_PORT=${{ vars.FRONTEND_PORT }}
-          FRONTEND_HOST=${{ vars.FRONTEND_HOST }}
-          INTERNAL_FRONTEND_HOST=${{ vars.INTERNAL_FRONTEND_HOST }}
+          THE_GREEN_BROTHER_PROTOCOL=${{ vars.THE_GREEN_BROTHER_PROTOCOL }}
+          THE_GREEN_BROTHER_PORT=${{ vars.THE_GREEN_BROTHER_PORT }}
+          THE_GREEN_BROTHER_HOST=${{ vars.THE_GREEN_BROTHER_HOST }}
+          INTERNAL_THE_GREEN_BROTHER_HOST=${{ vars.INTERNAL_THE_GREEN_BROTHER_HOST }}
           NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_SERVER_SIDE_API_URL=${{ vars.NEXT_SERVER_SIDE_API_URL }}
+          NEXT_PUBLIC_CMS_URL=${{ vars.NEXT_PUBLIC_CMS_URL }}
           PLAYWRIGHT_REPORT_PORT=${{ vars.PLAYWRIGHT_REPORT_PORT }}
           REVALIDATE_SECRET=${{ secrets.REVALIDATE_SECRET }}
           NEXT_PUBLIC_GA_ID=
@@ -229,12 +244,12 @@ jobs:
           path: backend/htmlcov/
           if-no-files-found: ignore
 
-      - name: Upload frontend coverage
+      - name: Upload the-green-brother coverage
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-coverage
-          path: frontend/coverage/
+          name: the-green-brother-coverage
+          path: the-green-brother/coverage/
           if-no-files-found: ignore
 
       - name: Upload merged coverage

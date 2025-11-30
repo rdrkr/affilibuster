@@ -9,12 +9,14 @@ Architecture: Clean architecture pattern with use cases and dependency injection
 All language data comes from Strapi's built-in i18n plugin (/api/i18n/locales).
 """
 
+import pycountry
 from fastapi import APIRouter, HTTPException
 
 from affilibuster_backend.domain.entities import (
     DetectedLanguage,
     Language,
 )
+from affilibuster_backend.domain.entities.generated.cms_entities import LocalesResponse
 from affilibuster_backend.domain.entities.generated.models import (
     Code,
     CurrencyCode,
@@ -22,7 +24,6 @@ from affilibuster_backend.domain.entities.generated.models import (
     Direction,
     LanguagesDetectPostRequest,
     LanguagesGetResponse,
-    LocalesGetResponse,
 )
 from affilibuster_backend.infrastructure.dependencies import GetCMSContentUseCaseDep
 
@@ -33,37 +34,80 @@ LANGUAGE_DETECTION_CONFIDENCE_THRESHOLD = 0.9
 
 
 async def transform_strapi_locales_to_languages(
-    locale_data: LocalesGetResponse,
+    locale_data: LocalesResponse,
 ) -> list[Language]:
     """
     Transform Strapi locale data to Language model format.
 
     Maps Strapi locales: { id, name, code, isDefault }
-    To Language format: { code, displayName, nativeName, direction, urlPrefix, defaultCurrency, localeCode, isDefault }
+    To Language format: { code, displayName, nativeName, flag,
+    direction, urlPrefix, defaultCurrency, localeCode, isDefault }
+
+    Uses pycountry for dynamic language/country lookups.
     """
     # LocalesGetResponse is a RootModel - access .root to get the list
     locales = locale_data.root
 
-    # Map string codes to Code enum
-    code_map = {
-        "en": Code.EN,
-        "it": Code.IT,
-        "he": Code.HE,
+    # Map language codes to country codes for flag emojis
+    # Language code -> Country code (ISO 3166-1 alpha-2)
+    language_to_country = {
+        "en": "GB",  # English -> UK
+        "it": "IT",  # Italian -> Italy
+        "he": "IL",  # Hebrew -> Israel
     }
+
+    # RTL languages
+    rtl_languages = {"he", "ar", "fa", "ur"}
+
+    # Currency mapping by language code
+    currency_by_language = {
+        "it": CurrencyCode.EUR,
+        "he": CurrencyCode.ILS,
+    }
+
+    def get_flag_emoji(country_code: str) -> str:
+        """Convert ISO 3166-1 alpha-2 country code to flag emoji."""
+        return "".join(chr(0x1F1E6 + ord(c) - ord("A")) for c in country_code.upper())
+
+    def get_native_name(lang_code: str) -> str:
+        """Get native language name from pycountry."""
+        try:
+            lang = pycountry.languages.get(alpha_2=lang_code)
+            if lang:
+                # Return name - pycountry doesn't have native names
+                return str(lang.name)
+        except (LookupError, AttributeError):
+            pass
+        return lang_code.upper()
 
     languages = []
     for locale in locales:
         # Access Pydantic model attributes (use snake_case field names)
         code_str = locale.code
-        code_enum = code_map.get(code_str, Code.EN)  # Default to EN if unknown
+
+        # Convert string code to Code enum - use uppercase for enum lookup
+        try:
+            code_enum = Code[code_str.upper()]
+        except KeyError:
+            code_enum = Code.EN  # Default to EN if unknown
+
+        # Get country code for flag emoji
+        country_code = language_to_country.get(code_str, code_str.upper())
+
+        # Get flag emoji using pycountry country lookup
+        flag = get_flag_emoji(country_code)
+
+        # Get native name - use pycountry or Strapi name
+        native_name = get_native_name(code_str)
 
         lang = Language(
             code=code_enum,
             display_name=locale.name,
-            native_name=locale.name,  # Fallback to name
-            direction=Direction.RTL if code_enum == Code.HE else Direction.LTR,  # Hebrew is RTL
+            native_name=native_name,
+            flag=flag,
+            direction=Direction.RTL if code_str in rtl_languages else Direction.LTR,
             url_prefix=f"/{code_str}",
-            default_currency=CurrencyCode.EUR if code_enum == Code.IT else CurrencyCode.USD,
+            default_currency=currency_by_language.get(code_str, CurrencyCode.USD),
             locale_code=code_str,
             is_default=locale.is_default,
         )
@@ -82,10 +126,7 @@ async def get_languages(
     Returns list of configured locales sorted by language code.
     """
     try:
-        locale_data = await use_case.execute(
-            "/i18n/locales",
-            response_model=LocalesGetResponse,
-        )
+        locale_data = await use_case.execute("/i18n/locales", response_model=LocalesResponse)
 
         # Transform to Language model format
         return LanguagesGetResponse(root=await transform_strapi_locales_to_languages(locale_data))
@@ -119,10 +160,7 @@ async def detect_language(
                     browser_languages.append(lang)
 
         # Get available languages from Strapi
-        locale_data = await use_case.execute(
-            "/i18n/locales",
-            response_model=LocalesGetResponse,
-        )
+        locale_data = await use_case.execute("/i18n/locales", response_model=LocalesResponse)
         languages = await transform_strapi_locales_to_languages(locale_data)
         available_codes = {lang.code.value for lang in languages}
 
