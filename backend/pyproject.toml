@@ -46,6 +46,7 @@ clean = { cmd = """\
     find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true && \
     find . -type f -name '*.pyc' -delete 2>/dev/null || true && \
     find . -type f -name '*.pyo' -delete 2>/dev/null || true && \
+    find . -type f -name '.coverage*' -delete 2>/dev/null || true && \
     rm -rf .pytest_cache .coverage htmlcov .mypy_cache || true && \
     rm -rf coverage.lcov coverage.xml venv .venv || true \
     """, help = "removes Python cache files, coverage files, and build artifacts" }
@@ -172,6 +173,7 @@ check_untyped_defs = true
 [tool.pytest.ini_options]
 # Test discovery
 testpaths = ["tests"]
+pythonpath = ["src"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]

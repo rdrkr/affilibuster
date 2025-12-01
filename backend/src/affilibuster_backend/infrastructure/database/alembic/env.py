@@ -2,11 +2,11 @@
 
 """Alembic migration environment setup."""
 
+from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from affilibuster_backend.config import settings
 from affilibuster_backend.infrastructure.database.models import Base
-from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

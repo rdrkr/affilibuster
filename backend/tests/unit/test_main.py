@@ -174,4 +174,19 @@ class TestLifespan:
             # Act & Assert - should not raise any exceptions
             async with lifespan(mock_app):
                 pass  # Startup phase
-            # Shutdown phase completes here
+
+    async def test_lifespan_raises_error_when_token_missing(self):
+        """Test lifespan raises RuntimeError when Strapi token is missing."""
+        # Arrange
+        mock_app = Mock(spec=FastAPI)
+        mock_session = AsyncMock()
+        mock_repo = AsyncMock()
+        mock_repo.get_value.return_value = None
+
+        with patch("affilibuster_backend.main.get_db_session") as mock_get_session:
+            mock_get_session.return_value.__aenter__.return_value = mock_session
+            with patch("affilibuster_backend.main.ConfigRepository", return_value=mock_repo):
+                # Act & Assert
+                with pytest.raises(RuntimeError, match="Strapi API token not found"):
+                    async with lifespan(mock_app):
+                        pass

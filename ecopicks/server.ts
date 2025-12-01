@@ -14,7 +14,7 @@
  *   - Environment variables: ECOPICKS_PROTOCOL, ECOPICKS_PORT
  */
 
-import { readFileSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 import { createServer as createHttpServer } from 'http'
 import { createServer as createHttpsServer } from 'https'
 import next from 'next'
@@ -37,11 +37,15 @@ const app = next({ dev, hostname, port })
 const handle = app.getRequestHandler()
 
 void app.prepare().then(() => {
-  if (protocol === 'https') {
+  const keyPath = join(__dirname, '..', 'certs', 'localhost-key.pem')
+  const certPath = join(__dirname, '..', 'certs', 'localhost.pem')
+  const hasCerts = existsSync(keyPath) && existsSync(certPath)
+
+  if (protocol === 'https' && hasCerts) {
     // HTTPS server for secure development
     const httpsOptions = {
-      key: readFileSync(join(__dirname, '..', 'certs', 'localhost-key.pem')),
-      cert: readFileSync(join(__dirname, '..', 'certs', 'localhost.pem')),
+      key: readFileSync(keyPath),
+      cert: readFileSync(certPath),
     }
 
     createHttpsServer(httpsOptions, (req, res) => {
@@ -58,7 +62,12 @@ void app.prepare().then(() => {
       console.log(`> Ready on https://${bindHost}:${String(port)} (accessible via https://${hostname}:${String(port)})`)
     })
   } else {
-    // HTTP server for non-secure development
+    if (protocol === 'https' && !hasCerts) {
+      console.warn('⚠️  HTTPS protocol requested but certificates not found. Falling back to HTTP.')
+      console.warn('    Expected certs at:', certPath)
+    }
+
+    // HTTP server for non-secure development or production (where SSL is terminated by proxy/platform)
     createHttpServer((req, res) => {
       void (async () => {
         try {

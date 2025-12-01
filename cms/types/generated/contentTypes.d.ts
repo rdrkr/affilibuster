@@ -494,6 +494,36 @@ export interface ApiAboutAbout extends Struct.SingleTypeSchema {
   }
 }
 
+export interface ApiApiConfigApiConfig extends Struct.CollectionTypeSchema {
+  collectionName: 'api_config'
+  info: {
+    description: 'Shared configuration values accessible by multiple services'
+    displayName: 'API Configuration'
+    pluralName: 'api-configs'
+    singularName: 'api-config'
+  }
+  options: {
+    draftAndPublish: false
+  }
+  attributes: {
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    description: Schema.Attribute.Text
+    key: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255
+      }>
+    locale: Schema.Attribute.String & Schema.Attribute.Private
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::api-config.api-config'> & Schema.Attribute.Private
+    publishedAt: Schema.Attribute.DateTime
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    value: Schema.Attribute.Text & Schema.Attribute.Required
+  }
+}
+
 export interface ApiContactContact extends Struct.SingleTypeSchema {
   collectionName: 'contacts'
   info: {
@@ -2102,6 +2132,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission
       'admin::user': AdminUser
       'api::about.about': ApiAboutAbout
+      'api::api-config.api-config': ApiApiConfigApiConfig
       'api::contact.contact': ApiContactContact
       'api::currency.currency': ApiCurrencyCurrency
       'api::error-404.error-404': ApiError404Error404

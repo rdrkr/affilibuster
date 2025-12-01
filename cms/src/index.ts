@@ -168,7 +168,7 @@ async function generateApiToken(strapi: Core.Strapi): Promise<void> {
 
       // Check if token is still valid (not expired)
       const isExpired = existingToken.expiresAt !== undefined && new Date(existingToken.expiresAt) < now
-      const isValid = existingToken.type === 'read-only' && !isExpired
+      const isValid = existingToken.type === 'full-access' && !isExpired
 
       if (isValid) {
         console.log(`✅ Valid API token already exists (ID: ${existingToken.id.toString()})`)
@@ -196,8 +196,8 @@ async function generateApiToken(strapi: Core.Strapi): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const result = (await tokenService.create({
       name: tokenName,
-      description: 'Auto-generated read-only token for backend service authentication',
-      type: 'read-only',
+      description: 'Auto-generated full-access token for backend service authentication',
+      type: 'full-access',
       lifespan: lifespanMillis,
     })) as TokenCreateResult
 

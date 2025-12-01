@@ -58,12 +58,19 @@ def strapi_url():
     return get_strapi_url()
 
 
-@pytest.fixture
-def strapi_token():
+@pytest_asyncio.fixture
+async def strapi_token():
     """Fixture providing Strapi API token for tests."""
-    # For integration tests, use a test token
-    # Real token is loaded from database at runtime
-    return "test-strapi-api-token-for-integration-tests"
+    # Fetch token from database
+    from affilibuster_backend.infrastructure.database.config import get_db_session
+    from affilibuster_backend.infrastructure.database.repositories.config_repository import ConfigRepository
+
+    async with get_db_session() as session:
+        repo = ConfigRepository(session)
+        token = await repo.get_value("strapi_api_token")
+        if not token:
+            raise RuntimeError("Strapi API token not found in database for tests")
+        return token
 
 
 @pytest_asyncio.fixture
