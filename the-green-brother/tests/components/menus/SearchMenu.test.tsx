@@ -20,10 +20,51 @@ jest.mock('next/image', () => ({
 
 // Mock the CMS element components
 jest.mock('@/components/elements', () => ({
+  CMSIcon: function MockCMSIcon({ icon, size }: { icon?: string; size?: string }) {
+    return (
+      <span data-testid="mock-icon" data-icon={icon} data-size={size}>
+        {icon}
+      </span>
+    )
+  },
   CMSText: function MockCMSText({ text }: { text?: string }) {
     return <span data-testid="mock-text">{text}</span>
   },
-  resolveIcon: (icon: string | undefined) => (icon ? { value: icon, type: 'material' } : null),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ButtonAction: function MockButtonAction(props: any) {
+    const { children, data, onClick, className } = props
+    const ariaLabel = props['aria-label'] ?? data?.label?.ariaDescription
+    // If no children, render icon and text from data.label
+    const content =
+      children ??
+      (data?.label && (
+        <>
+          {data.label.icon && (
+            <span data-testid="mock-icon" data-icon={data.label.icon}>
+              {data.label.icon}
+            </span>
+          )}
+          {data.label.text && <span data-testid="mock-text">{data.label.text}</span>}
+        </>
+      ))
+    return (
+      <button onClick={onClick} className={className} aria-label={ariaLabel}>
+        {content}
+      </button>
+    )
+  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ButtonLink: function MockButtonLink(props: any) {
+    const { children, data, className } = props
+    const ariaLabel = props['aria-label'] ?? data?.label?.ariaDescription
+    // If no children, render text from data.label
+    const content = children ?? (data?.label && <span data-testid="mock-text">{data.label.text}</span>)
+    return (
+      <a href={data?.url} className={className} aria-label={ariaLabel}>
+        {content}
+      </a>
+    )
+  },
 }))
 
 describe('SearchMenu', () => {

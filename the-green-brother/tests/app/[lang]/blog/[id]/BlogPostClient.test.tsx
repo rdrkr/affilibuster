@@ -201,4 +201,59 @@ describe('BlogPostClient', () => {
 
     expect(screen.queryByText('Technology')).not.toBeInTheDocument()
   })
+
+  it('should handle tag with missing tag.text', () => {
+    const postWithNullTagText = {
+      ...mockPost,
+      tags: [{ tag: { text: undefined } }],
+    } as unknown as ApiBlogPostBlogPostDocument
+
+    render(<BlogPostClient post={postWithNullTagText} lang={CodeEnum.EN} />)
+
+    // Should not crash, breadcrumb title still renders
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Test Blog Post')
+  })
+
+  it('should handle tag with null tag object', () => {
+    const postWithNullTag = {
+      ...mockPost,
+      tags: [{ tag: null }],
+    } as unknown as ApiBlogPostBlogPostDocument
+
+    render(<BlogPostClient post={postWithNullTag} lang={CodeEnum.EN} />)
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Test Blog Post')
+  })
+
+  it('should handle missing content.header.header.text', () => {
+    const postMissingHeaderText = {
+      ...mockPost,
+      content: {
+        header: {
+          header: { text: undefined },
+          subheader: { text: 'Has subheader' },
+        },
+        content: '<p>Content</p>',
+      },
+    } as unknown as ApiBlogPostBlogPostDocument
+
+    render(<BlogPostClient post={postMissingHeaderText} lang={CodeEnum.EN} />)
+
+    // Should render without crashing, using empty string fallback
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
+  })
+
+  it('should handle missing content.header', () => {
+    const postMissingHeader = {
+      ...mockPost,
+      content: {
+        header: undefined,
+        content: '<p>Content</p>',
+      },
+    } as unknown as ApiBlogPostBlogPostDocument
+
+    render(<BlogPostClient post={postMissingHeader} lang={CodeEnum.EN} />)
+
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
+  })
 })

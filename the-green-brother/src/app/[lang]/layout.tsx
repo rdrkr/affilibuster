@@ -59,7 +59,7 @@ async function LocaleLayout({ children, params }: Props) {
           </main>
           <Footer lang={lang} direction={direction} />
         </div>
-        <BackToTopButton />
+        <BackToTopButton direction={direction} />
       </div>
     </NextIntlClientProvider>
   )

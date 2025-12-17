@@ -8,14 +8,13 @@
  * All content comes from CMS - no hardcoded strings.
  */
 
-import Link from 'next/link'
 import type { ReactNode } from 'react'
 
-import { Button, CMSText, Label } from '@/components/elements'
+import { ButtonLink, CMSText, Label, TextBlock } from '@/components/elements'
 import { DynamicZone } from '@/components/layout/DynamicZone'
 import { getFooter } from '@/lib/content/api'
 import type { ApiFooterFooterDocument } from '@/lib/generated/types.gen'
-import { CodeEnum, DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
+import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
 
 /**
  * Union type for footer column components with their discriminators.
@@ -26,25 +25,6 @@ interface FooterProps {
   lang?: string
   /** Text direction for RTL support */
   direction: DirectionEnum
-}
-
-/**
- * Parse markdown links in text and return array of link objects.
- * @param text - Text containing markdown links like [text](url)
- * @returns Array of parsed link objects
- */
-function parseMarkdownLinks(text: string): { text: string; url: string }[] {
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
-  const links: { text: string; url: string }[] = []
-  let match
-
-  while ((match = linkRegex.exec(text)) !== null) {
-    if (match[1] && match[2]) {
-      links.push({ text: match[1], url: match[2] })
-    }
-  }
-
-  return links
 }
 
 /**
@@ -64,58 +44,18 @@ export default async function Footer({ lang = CodeEnum.EN, direction }: FooterPr
 
   const { columns, copyrightsLabel, quickLinks } = footerData
 
-  const currentYear = new Date().getFullYear()
-  const copyrightText = copyrightsLabel.text.replace('{year}', currentYear.toString())
   const isRTL = direction === DirectionEnum.RTL
 
   /**
    * Render a single column based on its component type.
    * @param column - Footer column with __component discriminator
    * @param index - Index for fallback key
-   * @param isFirstColumn - Whether this is the first column (brand column)
    * @returns JSX element for the column
    */
-  const renderColumn = (column: FooterColumn, index: number, isFirstColumn: boolean): ReactNode => {
+  const renderColumn = (column: FooterColumn, index: number): ReactNode => {
     switch (column.__component) {
       case 'elements.text-block': {
-        // Parse markdown links from content
-        const links = column.content ? parseMarkdownLinks(column.content) : []
-
-        return (
-          <div key={column.id ?? index}>
-            {/* Header with optional icon */}
-            {column.header?.header && (
-              <Label
-                data={column.header.header}
-                as="h5"
-                iconSize={isFirstColumn ? 'lg' : 'md'}
-                className="mb-4 font-bold text-text-main-dark"
-                direction={direction}
-              />
-            )}
-
-            {/* Render as links if markdown links found, otherwise as plain text */}
-            {links.length > 0 ? (
-              <ul className="space-y-2 text-text-secondary-dark">
-                {links.map((link, linkIndex) => (
-                  <li key={linkIndex}>
-                    <Link
-                      href={link.url}
-                      className={`
-                      transition-colors
-                      hover:text-text-main-dark
-                    `}
-                    >
-                      {link.text}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            ) : column.content ? (
-              <p className="text-text-secondary-dark">{column.content}</p>
-            ) : null}
-          </div>
-        )
+        return <TextBlock key={column.id ?? index} data={column} direction={direction} />
       }
 
       case 'call-to-actions.newsletter-signup-cta':
@@ -140,19 +80,22 @@ export default async function Footer({ lang = CodeEnum.EN, direction }: FooterPr
     <footer className="mt-20">
       <div
         className={`
-        mx-auto max-w-7xl border-t border-subtle-dark px-4 pt-12 pb-8
+        mx-auto max-w-7xl px-4 pb-8
         sm:px-6
         lg:px-8
       `}
       >
-        <div className="space-y-8">
+        {/* Content wrapper with top separator */}
+        <div className="space-y-8 border-t border-subtle-dark">
           <DynamicZone
             sections={columns}
             renderSection={column => {
               const index = columns.indexOf(column)
-              return renderColumn(column, index, index === 0)
+              return renderColumn(column, index)
             }}
             direction={direction}
+            verticalAlignment="top"
+            horizontalGroupSpacing="pt-12"
           />
         </div>
         <div
@@ -162,16 +105,9 @@ export default async function Footer({ lang = CodeEnum.EN, direction }: FooterPr
             md:flex-row ${isRTL ? 'md:flex-row-reverse' : ''}
           `}
         >
-          <Label
-            data={{
-              text: copyrightText,
-              ariaDescription: 'Copyright notice',
-              id: 0,
-              iconPosition: isRTL ? IconPositionEnum.AFTER_TEXT : IconPositionEnum.BEFORE_TEXT,
-            }}
-            className="text-text-secondary-dark"
-            direction={direction}
-          />
+          {(() => {
+            return <Label data={copyrightsLabel} className="text-text-secondary-dark" direction={direction} />
+          })()}
           <div
             className={`
             mt-4 flex gap-6
@@ -179,7 +115,7 @@ export default async function Footer({ lang = CodeEnum.EN, direction }: FooterPr
           `}
           >
             {quickLinks.map((link, index) => (
-              <Button
+              <ButtonLink
                 key={link.id ?? index}
                 data={link}
                 variant="link"

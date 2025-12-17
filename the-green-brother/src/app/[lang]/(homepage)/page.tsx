@@ -1,5 +1,6 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
+import { HomeSections } from '@/components/homepage'
 import { getBlogPosts, getHomepage, getProductCategories, getProducts } from '@/lib/client'
 import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
@@ -39,15 +40,21 @@ async function HomePage({ params }: { params: Promise<{ lang: CodeEnum }> }) {
   const currentLanguage = languages?.find(l => l.code === lang)
   const direction = currentLanguage?.direction ?? DirectionEnum.LTR
 
+  if (!homepageData) {
+    return null
+  }
+
   // Pass data to client component
   return (
-    <HomeClient
-      homepageData={homepageData}
-      products={productsResponse?.data ?? []}
-      categories={categoriesResponse?.data ?? []}
-      blogPosts={blogPostsResponse?.data ?? []}
-      direction={direction}
-    />
+    <HomeClient>
+      <HomeSections
+        sections={homepageData.sections}
+        products={productsResponse?.data ?? []}
+        categories={categoriesResponse?.data ?? []}
+        blogPosts={blogPostsResponse?.data ?? []}
+        direction={direction}
+      />
+    </HomeClient>
   )
 }
 

@@ -8,8 +8,6 @@
  * Uses Header composite for section title.
  */
 
-'use client'
-
 import Link from 'next/link'
 
 import { CMSIcon, CMSImage, Header } from '@/components/elements'
@@ -44,14 +42,7 @@ export function TeamSection({ data, direction }: TeamSectionProps) {
 
   return (
     <section aria-label={header.header?.ariaDescription ?? ''}>
-      <Header
-        data={header}
-        level={2}
-        className="mb-12"
-        headerClassName="text-3xl text-white"
-        subheaderClassName="mx-auto max-w-2xl text-lg text-text-secondary-dark"
-        direction={direction}
-      />
+      <Header data={header} level={2} direction={direction} />
 
       <div
         className={`

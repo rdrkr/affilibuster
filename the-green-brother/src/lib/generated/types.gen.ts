@@ -248,7 +248,7 @@ export type ApiAboutAboutDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -357,7 +357,7 @@ export type ApiAuthPageAuthPageDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -504,7 +504,7 @@ export type PluginUploadFileDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -614,6 +614,10 @@ export type ElementsLabelEntry = {
 export type ElementsHeaderEntry = {
     alignment: AlignmentEnum;
     /**
+     * A boolean field
+     */
+    promoteHeaderIcon: boolean | null;
+    /**
      * A component field
      */
     header?: ElementsLabelEntry;
@@ -632,7 +636,7 @@ export type ApiAuthorAuthorDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -731,7 +735,7 @@ export type ApiBlogPostTagBlogPostTagDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A UID field
      */
@@ -798,7 +802,7 @@ export type ApiBlogPostBlogPostDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A UID field
      */
@@ -927,7 +931,7 @@ export type ApiBlogBlogDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -1002,7 +1006,7 @@ export type ApiContactUsContactUsDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -1101,7 +1105,7 @@ export type ApiCurrencyCurrencyDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -1185,7 +1189,7 @@ export type ApiError404Error404Document = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -1244,7 +1248,7 @@ export type ApiError410Error410Document = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -1303,7 +1307,7 @@ export type ApiFaqFaqDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -1378,7 +1382,7 @@ export type ApiFooterFooterDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -1465,7 +1469,7 @@ export type ApiHomepageHomepageDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -1589,7 +1593,7 @@ export type ApiProductTagProductTagDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A UID field
      */
@@ -1656,7 +1660,7 @@ export type ApiProductProductDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A UID field
      */
@@ -1747,7 +1751,7 @@ export type ApiProductCategoryProductCategoryDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A UID field
      */
@@ -1860,7 +1864,7 @@ export type ApiThemeThemeDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -1945,7 +1949,7 @@ export type ApiNavigationNavigationDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -2048,7 +2052,7 @@ export type ApiPrivacyPrivacyDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A datetime field
      */
@@ -2111,7 +2115,7 @@ export type ApiProductCategoriesPageProductCategoriesPageDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * An integer field
      */
@@ -2206,7 +2210,7 @@ export type ApiProfileProfileDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -2325,7 +2329,7 @@ export type ApiTeamMemberTeamMemberDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -2420,7 +2424,7 @@ export type ApiTermTermDocument = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A datetime field
      */
@@ -2978,7 +2982,7 @@ export type ApiAboutAboutDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -3060,7 +3064,7 @@ export type ApiAuthPageAuthPageDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -3180,7 +3184,7 @@ export type ApiAuthorAuthorDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -3252,7 +3256,7 @@ export type ApiBlogPostTagBlogPostTagDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A UID field
      */
@@ -3292,7 +3296,7 @@ export type ApiBlogPostBlogPostDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A UID field
      */
@@ -3352,7 +3356,7 @@ export type ApiBlogBlogDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -3400,7 +3404,7 @@ export type ApiContactUsContactUsDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -3472,7 +3476,7 @@ export type ApiCurrencyCurrencyDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -3529,7 +3533,7 @@ export type ApiError404Error404DocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -3561,7 +3565,7 @@ export type ApiError410Error410DocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -3593,7 +3597,7 @@ export type ApiFaqFaqDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -3641,7 +3645,7 @@ export type ApiFooterFooterDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -3701,7 +3705,7 @@ export type ApiHomepageHomepageDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -3798,7 +3802,7 @@ export type ApiProductTagProductTagDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A UID field
      */
@@ -3838,7 +3842,7 @@ export type ApiProductProductDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A UID field
      */
@@ -3902,7 +3906,7 @@ export type ApiProductCategoryProductCategoryDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A UID field
      */
@@ -3961,7 +3965,7 @@ export type ApiThemeThemeDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -3993,7 +3997,7 @@ export type ApiNavigationNavigationDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -4069,7 +4073,7 @@ export type ApiPrivacyPrivacyDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A datetime field
      */
@@ -4105,7 +4109,7 @@ export type ApiProductCategoriesPageProductCategoriesPageDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * An integer field
      */
@@ -4173,7 +4177,7 @@ export type ApiProfileProfileDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -4265,7 +4269,7 @@ export type ApiTeamMemberTeamMemberDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A string field
      */
@@ -4333,7 +4337,7 @@ export type ApiTermTermDocumentWritable = {
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
     documentId: string;
-    id: number;
+    id: string | number;
     /**
      * A datetime field
      */
@@ -4529,7 +4533,7 @@ export type AboutGetAboutResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * Timestamp when this entry was first created in the CMS.
              */
@@ -4714,7 +4718,7 @@ export type AuthPageGetAuthPageResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A string field
              */
@@ -5310,7 +5314,7 @@ export type AuthorGetAuthorsResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A string field
              */
@@ -5498,7 +5502,7 @@ export type AuthorGetAuthorsByIdResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A string field
              */
@@ -5673,7 +5677,7 @@ export type BlogGetBlogResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * Timestamp when this entry was first created in the CMS.
              */
@@ -5863,7 +5867,7 @@ export type BlogPostTagGetBlogPostTagsResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A UID field
              */
@@ -6019,7 +6023,7 @@ export type BlogPostTagGetBlogPostTagsByIdResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A UID field
              */
@@ -6201,7 +6205,7 @@ export type BlogPostGetBlogPostsResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A UID field
              */
@@ -6377,7 +6381,7 @@ export type BlogPostGetBlogPostsByIdResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A UID field
              */
@@ -6540,7 +6544,7 @@ export type ContactUsGetContactUsResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A string field
              */
@@ -6754,7 +6758,7 @@ export type CurrencyGetCurrenciesResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A string field
              */
@@ -6927,7 +6931,7 @@ export type CurrencyGetCurrenciesByIdResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A string field
              */
@@ -7087,7 +7091,7 @@ export type Error404GetError404Responses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * Timestamp when this entry was first created in the CMS.
              */
@@ -7222,7 +7226,7 @@ export type Error410GetError410Responses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * Timestamp when this entry was first created in the CMS.
              */
@@ -7357,7 +7361,7 @@ export type FaqGetFaqResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A string field
              */
@@ -7751,7 +7755,7 @@ export type FooterGetFooterResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * Timestamp when this entry was first created in the CMS.
              */
@@ -7939,7 +7943,7 @@ export type HomepageGetHomepageResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * Timestamp when this entry was first created in the CMS.
              */
@@ -8181,7 +8185,7 @@ export type NavigationGetNavigationResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A string field
              */
@@ -8360,7 +8364,7 @@ export type PrivacyGetPrivacyResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A datetime field
              */
@@ -8538,7 +8542,7 @@ export type ProductCategoryGetProductCategoriesResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A UID field
              */
@@ -8685,7 +8689,7 @@ export type ProductCategoriesPageGetProductCategoriesPageResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * An integer field
              */
@@ -8869,7 +8873,7 @@ export type ProductCategoryGetProductCategoriesByIdResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A UID field
              */
@@ -9055,7 +9059,7 @@ export type ProductTagGetProductTagsResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A UID field
              */
@@ -9211,7 +9215,7 @@ export type ProductTagGetProductTagsByIdResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A UID field
              */
@@ -9393,7 +9397,7 @@ export type ProductGetProductsResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A UID field
              */
@@ -9573,7 +9577,7 @@ export type ProductGetProductsByIdResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A UID field
              */
@@ -9740,7 +9744,7 @@ export type ProfileGetProfileResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A string field
              */
@@ -10004,7 +10008,7 @@ export type TeamMemberGetTeamMembersResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A string field
              */
@@ -10188,7 +10192,7 @@ export type TeamMemberGetTeamMembersByIdResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A string field
              */
@@ -10359,7 +10363,7 @@ export type TermGetTermResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * A datetime field
              */
@@ -10537,7 +10541,7 @@ export type ThemeGetThemesResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * Timestamp when this entry was first created in the CMS.
              */
@@ -10685,7 +10689,7 @@ export type ThemeGetThemesByIdResponses = {
              * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
              */
             documentId: string;
-            id: number;
+            id: string | number;
             /**
              * Timestamp when this entry was first created in the CMS.
              */

@@ -8,10 +8,9 @@
  * Supports RTL/LTR layout via DirectionEnum.
  */
 
-'use client'
-
-import { CMSIcon, CMSText } from '@/components/elements'
 import { DirectionEnum, IconPositionEnum, type ElementsLabelEntry } from '@/lib/generated/types.gen'
+import { CMSIcon } from './CMSIcon'
+import { CMSText } from './CMSText'
 
 /**
  * Props for the Label component
@@ -27,6 +26,8 @@ export interface LabelProps {
   iconSize?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl'
   /** Hide the icon (default: false) */
   hideIcon?: boolean
+  /** Promote icon with circular background (default: false) */
+  promoteIcon?: boolean
   /** Display mode - 'block' stacks in parent, 'inline' flows inline (default: block) */
   display?: 'block' | 'inline'
   /** Additional CSS classes for the container */
@@ -47,6 +48,7 @@ export interface LabelProps {
  * @param props.as - HTML tag for text wrapper
  * @param props.iconSize - Size of the icon
  * @param props.hideIcon - Whether to hide the icon
+ * @param props.promoteIcon - When true, icon renders with circular background
  * @param props.display - Display mode (block or inline)
  * @param props.className - Container CSS classes
  * @param props.textClassName - Text CSS classes
@@ -59,6 +61,7 @@ export function Label({
   as: Tag = 'span',
   iconSize = 'lg',
   hideIcon = false,
+  promoteIcon = false,
   display = 'block',
   className = '',
   textClassName = '',
@@ -72,7 +75,13 @@ export function Label({
 
   const iconElement =
     icon && !hideIcon ? (
-      <CMSIcon icon={icon} size={iconSize} className={iconClassName} ariaLabel={ariaDescription} />
+      <CMSIcon
+        icon={icon}
+        size={iconSize}
+        className={iconClassName}
+        ariaLabel={ariaDescription}
+        promoted={promoteIcon}
+      />
     ) : null
 
   const displayClass = display === 'inline' ? 'inline-flex' : 'flex'
@@ -85,7 +94,7 @@ export function Label({
 
   return (
     <Tag
-      className={`${displayClass} flex-row gap-2 ${className}`}
+      className={`${displayClass} flex-row items-center gap-2 ${className}`}
       aria-label={ariaDescription}
       dir={isRtl ? 'rtl' : 'ltr'}
     >

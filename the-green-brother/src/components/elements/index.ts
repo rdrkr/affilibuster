@@ -18,12 +18,14 @@
  */
 
 // Primitive Components
-export { CMSIcon, resolveIcon, type CMSIconProps, type ResolvedIcon } from './CMSIcon'
+export { CMSIcon, type CMSIconProps, type ResolvedIcon } from './CMSIcon'
 export { CMSImage, type CMSImageProps, type CMSMedia } from './CMSImage'
 export { CMSText, resolveTextFormatHtml, type CMSTextProps } from './CMSText'
 
 // Composite Components
-export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './Button'
+export { ButtonAction, type ButtonActionProps } from './ButtonAction'
+export { ButtonLink, type ButtonLinkProps } from './ButtonLink'
+export { Card, type CardProps } from './Card'
 export { Header, type HeaderProps } from './Header'
 export { Label, type LabelProps } from './Label'
 export { TextBlock, type TextBlockProps } from './TextBlock'

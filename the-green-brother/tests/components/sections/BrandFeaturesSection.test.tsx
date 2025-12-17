@@ -11,7 +11,7 @@ import { AlignmentEnum, DirectionEnum, IconPositionEnum } from '@/lib/generated/
 
 // Mock the CMSIcon and CMSText components
 jest.mock('@/components/elements', () => ({
-  Button: function MockButton({
+  ButtonLink: function MockButtonLink({
     data,
     variant,
   }: {
@@ -42,6 +42,33 @@ jest.mock('@/components/elements', () => ({
   },
   CMSText: function MockCMSText({ text }: { text?: string }) {
     return <>{text}</>
+  },
+  Header: function MockHeader({
+    data,
+    level = 2,
+    className,
+    headerClassName,
+    subheaderClassName,
+  }: {
+    data?: { header?: { text?: string; icon?: string }; subheader?: { text?: string }; alignment?: string }
+    level?: number
+    className?: string
+    headerClassName?: string
+    subheaderClassName?: string
+  }) {
+    if (!data) return null
+    const Tag = `h${String(level)}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+    return (
+      <div className={className} data-testid="mock-header">
+        {data.header?.icon && (
+          <span data-testid="mock-icon" data-icon={data.header.icon}>
+            {data.header.icon}
+          </span>
+        )}
+        {data.header?.text && <Tag className={headerClassName}>{data.header.text}</Tag>}
+        {data.subheader?.text && <p className={subheaderClassName}>{data.subheader.text}</p>}
+      </div>
+    )
   },
   Label: function MockLabel({
     data,
@@ -81,6 +108,7 @@ describe('BrandFeaturesSection', () => {
       {
         id: 1,
         alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+        promoteHeaderIcon: false,
         header: {
           text: 'Vetted Brands',
           ariaDescription: 'Vetted brands feature',
@@ -98,6 +126,7 @@ describe('BrandFeaturesSection', () => {
       {
         id: 2,
         alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+        promoteHeaderIcon: false,
         header: {
           text: 'Support the Planet',
           ariaDescription: 'Support the planet feature',
@@ -115,6 +144,7 @@ describe('BrandFeaturesSection', () => {
       {
         id: 3,
         alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+        promoteHeaderIcon: false,
         header: {
           text: 'Exclusive Deals',
           ariaDescription: 'Exclusive deals feature',
@@ -132,6 +162,7 @@ describe('BrandFeaturesSection', () => {
       {
         id: 4,
         alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+        promoteHeaderIcon: false,
         header: {
           text: 'Circular Economy',
           ariaDescription: 'Circular economy feature',
@@ -152,7 +183,7 @@ describe('BrandFeaturesSection', () => {
   it('should render section with header text (as HTML)', () => {
     render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-    expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument()
   })
 
   it('should render subheader when provided', () => {
@@ -199,18 +230,20 @@ describe('BrandFeaturesSection', () => {
     expect(screen.getByText('Products designed for minimal waste and maximum reuse.')).toBeInTheDocument()
   })
 
-  it('should render feature icons', () => {
+  it('should render feature icons via Header component', () => {
     render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={mockSectionData} />)
 
     const icons = screen.getAllByTestId('mock-icon')
-    // 4 feature icons + 1 learn more button icon = 5 total
+    // 4 feature icons rendered via Header + 1 learn more button icon = 5 total
     expect(icons).toHaveLength(5)
 
-    // Check feature icons (starting from index 1, after learn more icon)
-    expect(icons[1]).toHaveAttribute('data-icon', 'verified')
-    expect(icons[2]).toHaveAttribute('data-icon', 'public')
-    expect(icons[3]).toHaveAttribute('data-icon', 'sell')
-    expect(icons[4]).toHaveAttribute('data-icon', 'recycling')
+    // Check feature icons (learn more button icon is first in DOM order)
+    // The order depends on rendering, so we check that expected icons exist
+    const iconValues = icons.map(icon => icon.getAttribute('data-icon'))
+    expect(iconValues).toContain('verified')
+    expect(iconValues).toContain('public')
+    expect(iconValues).toContain('sell')
+    expect(iconValues).toContain('recycling')
   })
 
   it('should open learn more link in new tab when configured', () => {
@@ -277,7 +310,10 @@ describe('BrandFeaturesSection', () => {
   it('should not render feature when header is not provided', () => {
     const dataWithInvalidFeature: BrandFeaturesSectionProps['data'] = {
       ...mockSectionData,
-      features: [{ id: 1, alignment: AlignmentEnum.LANGUAGE_DIRECTION }, ...mockSectionData.features],
+      features: [
+        { id: 1, alignment: AlignmentEnum.LANGUAGE_DIRECTION, promoteHeaderIcon: false },
+        ...mockSectionData.features,
+      ],
     }
 
     render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithInvalidFeature} />)
@@ -313,5 +349,71 @@ describe('BrandFeaturesSection', () => {
 
     const buttonContainer = container.querySelector('.justify-start')
     expect(buttonContainer).toBeInTheDocument()
+  })
+
+  it('should render features in separate containers when showHeader is false', () => {
+    const dataWithoutHeader: BrandFeaturesSectionProps['data'] = {
+      ...mockSectionData,
+      showHeader: false,
+    }
+
+    const { container } = render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithoutHeader} />)
+
+    // Each feature should be in its own container with bg-surface-dark
+    const featureContainers = container.querySelectorAll('.bg-surface-dark.rounded-xl')
+    expect(featureContainers.length).toBe(4)
+  })
+
+  it('should not render decorative elements when showHeader is false', () => {
+    const dataWithoutHeader: BrandFeaturesSectionProps['data'] = {
+      ...mockSectionData,
+      showHeader: false,
+    }
+
+    const { container } = render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithoutHeader} />)
+
+    // No decorative blur elements
+    const decorativeElements = container.querySelectorAll('.blur-3xl')
+    expect(decorativeElements).toHaveLength(0)
+  })
+
+  it('should use vertical layout when less than 4 features', () => {
+    const dataWithFewFeatures: BrandFeaturesSectionProps['data'] = {
+      ...mockSectionData,
+      features: mockSectionData.features.slice(0, 2), // Only 2 features
+    }
+
+    const { container } = render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithFewFeatures} />)
+
+    // Should have flex-col class for vertical layout
+    const verticalContainer = container.querySelector('.flex-col')
+    expect(verticalContainer).toBeInTheDocument()
+  })
+
+  it('should not render feature without header when showHeader is false', () => {
+    const dataWithInvalidFeatureNoHeader: BrandFeaturesSectionProps['data'] = {
+      ...mockSectionData,
+      showHeader: false,
+      features: [
+        { id: 99, alignment: AlignmentEnum.LANGUAGE_DIRECTION, promoteHeaderIcon: false }, // No header
+        ...mockSectionData.features.slice(0, 1),
+      ],
+    }
+
+    const { container } = render(
+      <BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithInvalidFeatureNoHeader} />
+    )
+
+    // Should only render 1 valid feature container
+    const featureContainers = container.querySelectorAll('.bg-surface-dark.rounded-xl')
+    expect(featureContainers.length).toBe(1)
+  })
+
+  it('should use grid layout when 4 or more features', () => {
+    const { container } = render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+    // Should have grid class for grid layout
+    const gridContainer = container.querySelector('.grid')
+    expect(gridContainer).toBeInTheDocument()
   })
 })

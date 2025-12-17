@@ -33,25 +33,21 @@ lint_typescript() {
   if [[ "${ACTION}" = "check" ]]; then
     echo "  📋 Checking TypeScript (TheGreenBrother ESLint)..."
     cd the-green-brother
-    npm install --silent || LINT_FAILED=$?
     npm run lint || LINT_FAILED=$?
     cd ..
 
     echo "  📋 Checking TypeScript (CMS ESLint)..."
     cd cms
-    npm install --silent || LINT_FAILED=$?
     npm run lint || LINT_FAILED=$?
     cd ..
   else
     echo "  🔧 Fixing TypeScript (TheGreenBrother ESLint)..."
     cd the-green-brother
-    npm install --silent || LINT_FAILED=$?
     npm run lint:fix || LINT_FAILED=$?
     cd ..
 
     echo "  🔧 Fixing TypeScript (CMS)..."
     cd cms
-    npm install --silent || LINT_FAILED=$?
     npm run lint:fix || LINT_FAILED=$?
     cd ..
   fi

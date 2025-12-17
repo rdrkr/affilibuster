@@ -60,7 +60,7 @@ export function Footer({ data: footerData, lang }: FooterProps) {
                 </text>
               </svg>
             </div>
-            <p className="text-neutral-100 mb-6 max-w-sm">{footerData.brandDescription}</p>
+            <p className="text-sm text-neutral-100 mb-6 max-w-sm">{footerData.brandDescription}</p>
             <div className="flex space-x-4">
               <a
                 href="https://twitter.com"

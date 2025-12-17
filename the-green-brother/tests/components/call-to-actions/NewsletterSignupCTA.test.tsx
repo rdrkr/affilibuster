@@ -36,7 +36,7 @@ describe('NewsletterSignupCTA', () => {
   it('should render newsletter title', () => {
     render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-    expect(screen.getByRole('heading', { level: 3, name: 'Join Our Community' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 4, name: 'Join Our Community' })).toBeInTheDocument()
   })
 
   it('should render newsletter description', () => {
@@ -105,9 +105,9 @@ describe('NewsletterSignupCTA', () => {
     expect(emailInput).toHaveAttribute('dir', 'ltr')
   })
 
-  it('should apply flex-row-reverse to form for RTL direction', () => {
+  it('should have flex gap-2 on form for RTL direction (dir attribute handles layout)', () => {
     const { container } = render(<NewsletterSignupCTA direction={DirectionEnum.RTL} data={mockSectionData} />)
     const form = container.querySelector('form')
-    expect(form).toHaveClass('flex-row-reverse')
+    expect(form).toHaveClass('flex', 'gap-2')
   })
 })

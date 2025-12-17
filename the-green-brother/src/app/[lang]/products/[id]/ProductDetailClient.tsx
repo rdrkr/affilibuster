@@ -190,7 +190,7 @@ export default function ProductDetailClient({ product, lang }: ProductDetailClie
           )}
 
           {product.content?.header?.subheader?.text && (
-            <div className="prose prose-invert mb-8 text-tertiary-300">
+            <div className="prose mb-8 text-tertiary-300 prose-invert">
               <p>
                 <CMSText text={product.content.header.subheader.text} />
               </p>
@@ -268,7 +268,7 @@ export default function ProductDetailClient({ product, lang }: ProductDetailClie
         <div className="mb-16 max-w-3xl">
           <h2 className="mb-6 text-2xl font-bold text-white">Product Details</h2>
           <div
-            className="prose prose-invert max-w-none text-tertiary-300"
+            className="prose max-w-none text-tertiary-300 prose-invert"
             dangerouslySetInnerHTML={{ __html: product.content.content }}
           />
         </div>

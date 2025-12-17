@@ -60,14 +60,73 @@ jest.mock('@/components/elements', () => ({
   },
   Header: function MockHeader({
     data,
+    level = 2,
   }: {
     data: { header?: { text?: string; ariaDescription?: string }; subheader?: { text?: string } }
+    level?: number
   }) {
+    const HeadingTag = `h${String(level)}` as 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
     return (
       <div data-testid="mock-header">
-        <h2>{data.header?.text}</h2>
+        <HeadingTag>{data.header?.text}</HeadingTag>
         {data.subheader?.text && <p>{data.subheader.text}</p>}
       </div>
+    )
+  },
+  Label: function MockLabel({
+    data,
+    className,
+    iconSize,
+  }: {
+    data?: { text?: string; icon?: string; iconPosition?: string }
+    className?: string
+    iconSize?: string
+  }) {
+    return (
+      <span data-testid="mock-label" className={className} data-icon-size={iconSize}>
+        {data?.text}
+        {data?.icon && <span data-testid="mock-label-icon">{data.icon}</span>}
+      </span>
+    )
+  },
+  Card: function MockCard({
+    href,
+    image,
+    imageAlt,
+    tag,
+    children,
+    variant,
+    asLink,
+  }: {
+    href: string
+    image?: { url?: string; alternativeText?: string } | null
+    imageAlt?: string
+    tag?: string
+    children: React.ReactNode
+    variant?: 'product' | 'blog'
+    className?: string
+    asLink?: boolean
+  }) {
+    const getImageUrl = () => {
+      if (!image) return '/images/placeholder.svg'
+      if (!image.url) return '/images/placeholder.svg'
+      return image.url.startsWith('http') ? image.url : `https://localhost:1337${image.url}`
+    }
+    const alt = image?.alternativeText ?? imageAlt ?? ''
+    const Wrapper = asLink === false ? 'div' : 'a'
+    return (
+      <Wrapper
+        data-testid="mock-card"
+        data-variant={variant}
+        href={asLink === false ? undefined : href}
+        data-href={asLink === false ? href : undefined}
+        className="group"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img data-testid="mock-card-image" src={getImageUrl()} alt={alt} />
+        {tag && <span data-testid="mock-card-tag">{tag}</span>}
+        <div data-testid="mock-card-content">{children}</div>
+      </Wrapper>
     )
   },
 }))
@@ -78,6 +137,7 @@ describe('BlogTeaserSection', () => {
     id: 1,
     header: {
       alignment: AlignmentEnum.CENTER,
+      promoteHeaderIcon: false,
       header: {
         text: 'From Our Blog',
         ariaDescription: 'Blog posts section',
@@ -105,6 +165,7 @@ describe('BlogTeaserSection', () => {
       content: {
         header: {
           alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+          promoteHeaderIcon: false,
           header: {
             text: '10 Ways to Reduce Plastic Waste',
             ariaDescription: 'Read article about reducing plastic',
@@ -172,6 +233,7 @@ describe('BlogTeaserSection', () => {
       content: {
         header: {
           alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+          promoteHeaderIcon: false,
           header: {
             text: 'Sustainable Fashion Guide',
             ariaDescription: 'Read article about sustainable fashion',
@@ -379,40 +441,35 @@ describe('BlogTeaserSection', () => {
     expect(readArticleTexts).toHaveLength(2)
   })
 
-  it('should apply flex-row-reverse to read article label for RTL direction', () => {
+  it('should render Label component for read article in RTL direction', () => {
     const { DirectionEnum } =
       jest.requireActual<typeof import('@/lib/generated/types.gen')>('@/lib/generated/types.gen')
 
-    const { container } = render(
-      <BlogTeaserSection data={mockSectionData} blogPosts={mockBlogPosts} direction={DirectionEnum.RTL} />
-    )
+    render(<BlogTeaserSection data={mockSectionData} blogPosts={mockBlogPosts} direction={DirectionEnum.RTL} />)
 
-    const readArticleContainer = container.querySelector('.flex-row-reverse')
-    expect(readArticleContainer).toBeInTheDocument()
+    // Label component handles RTL internally
+    const labels = screen.getAllByTestId('mock-label')
+    expect(labels.length).toBe(2) // One per blog post
   })
 
-  it('should apply mr-1 to icon for RTL direction instead of ml-1', () => {
+  it('should render read article using Label component for RTL direction', () => {
     const { DirectionEnum } =
       jest.requireActual<typeof import('@/lib/generated/types.gen')>('@/lib/generated/types.gen')
 
-    const { container } = render(
-      <BlogTeaserSection data={mockSectionData} blogPosts={mockBlogPosts} direction={DirectionEnum.RTL} />
-    )
+    render(<BlogTeaserSection data={mockSectionData} blogPosts={mockBlogPosts} direction={DirectionEnum.RTL} />)
 
-    const icon = container.querySelector('[data-testid="mock-icon"].mr-1')
-    expect(icon).toBeInTheDocument()
+    const labels = screen.getAllByTestId('mock-label')
+    expect(labels.length).toBeGreaterThan(0)
   })
 
-  it('should apply ml-1 to icon for LTR direction (default)', () => {
-    const { container } = render(
-      <BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />
-    )
+  it('should render read article using Label component for LTR direction', () => {
+    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
 
-    const icon = container.querySelector('[data-testid="mock-icon"].ml-1')
-    expect(icon).toBeInTheDocument()
+    const labels = screen.getAllByTestId('mock-label')
+    expect(labels.length).toBeGreaterThan(0)
   })
 
-  it('should apply dir="rtl" to carousel for RTL direction', () => {
+  it('should apply dir rtl to carousel for RTL direction', () => {
     const { DirectionEnum } =
       jest.requireActual<typeof import('@/lib/generated/types.gen')>('@/lib/generated/types.gen')
 
@@ -424,7 +481,7 @@ describe('BlogTeaserSection', () => {
     expect(carousel).toHaveAttribute('dir', 'rtl')
   })
 
-  it('should apply dir="ltr" to carousel for LTR direction', () => {
+  it('should apply dir ltr to carousel for LTR direction', () => {
     const { container } = render(
       <BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />
     )

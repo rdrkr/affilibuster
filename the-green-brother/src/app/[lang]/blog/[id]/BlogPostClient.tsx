@@ -156,13 +156,13 @@ export default function BlogPostClient({ post, lang }: BlogPostClientProps) {
       {post.content?.content && (
         <div
           className={`
-            prose prose-invert prose-lg
+            prose prose-lg max-w-none
+            text-tertiary-300
+            prose-invert
             prose-headings:text-white
             prose-a:text-primary-400
             hover:prose-a:text-primary-300
-            prose-strong:text-white
-            prose-code:text-primary-300
-            max-w-none text-tertiary-300
+            prose-strong:text-white prose-code:text-primary-300
           `}
           dangerouslySetInnerHTML={{ __html: post.content.content }}
         />

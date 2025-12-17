@@ -7,8 +7,6 @@
  * Converts **bold** text to primary-colored spans.
  */
 
-'use client'
-
 import type { ReactNode } from 'react'
 import { createElement, Fragment } from 'react'
 
@@ -30,29 +28,46 @@ export interface CMSTextProps {
  * @returns React node with styled bold text
  */
 export function resolveTextFormat(text: string): ReactNode {
-  const boldPattern = /\*\*([^*]+)\*\*/g
-  const parts: ReactNode[] = []
-  let lastIndex = 0
-  let match: RegExpExecArray | null
-  let keyIndex = 0
+  // Split by newline (handling both literal \n and escaped \\n) to handle line breaks
+  const lines = text.replace(/\\n/g, '\n').split('\n')
 
-  while ((match = boldPattern.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index))
+  // Helper to format bold text within a line
+  const formatLine = (line: string): ReactNode => {
+    const boldPattern = /\*\*([^*]+)\*\*/g
+    const parts: ReactNode[] = []
+    let lastIndex = 0
+    let match: RegExpExecArray | null
+    let keyIndex = 0
+
+    while ((match = boldPattern.exec(line)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(line.slice(lastIndex, match.index))
+      }
+      parts.push(createElement('span', { key: `bold-${String(keyIndex++)}`, className: 'text-primary' }, match[1]))
+      lastIndex = match.index + match[0].length
     }
-    parts.push(createElement('span', { key: `bold-${String(keyIndex++)}`, className: 'text-primary' }, match[1]))
-    lastIndex = match.index + match[0].length
+
+    if (lastIndex < line.length) {
+      parts.push(line.slice(lastIndex))
+    }
+
+    if (parts.length === 0) {
+      return line
+    }
+
+    return parts.length === 1 ? parts[0] : createElement(Fragment, null, ...parts)
   }
 
-  if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex))
-  }
+  // Process each line and join with <br />
+  const result: ReactNode[] = []
+  lines.forEach((line, index) => {
+    if (index > 0) {
+      result.push(createElement('br', { key: `br-${String(index)}` }))
+    }
+    result.push(formatLine(line))
+  })
 
-  if (parts.length === 0) {
-    return text
-  }
-
-  return parts.length === 1 ? parts[0] : createElement(Fragment, null, ...parts)
+  return result.length === 1 ? result[0] : createElement(Fragment, null, ...result)
 }
 
 /**
@@ -86,7 +101,7 @@ export function resolveTextFormatHtml(text: string | undefined | null): string {
   if (!text) {
     return ''
   }
-  return text.replace(/\*\*([^*]+)\*\*/g, '<span class="text-primary">$1</span>')
+  return text.replace(/\*\*([^*]+)\*\*/g, '<span class="text-primary">$1</span>').replace(/(\\n|\n)/g, '<br />')
 }
 
 export default CMSText

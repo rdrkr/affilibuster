@@ -6,7 +6,7 @@
 
 import { render, screen } from '@testing-library/react'
 
-import { DynamicZone } from '@/components/layout/DynamicZone'
+import { DynamicZone, getAlignmentClass, type VerticalAlignment } from '@/components/layout/DynamicZone'
 import { DirectionEnum } from '@/lib/generated/types.gen'
 
 describe('DynamicZone', () => {
@@ -29,7 +29,14 @@ describe('DynamicZone', () => {
       { __component: 'sections.features', id: 2, title: 'Features' },
     ]
 
-    render(<DynamicZone direction={DirectionEnum.LTR} sections={sections} renderSection={mockRenderSection} />)
+    render(
+      <DynamicZone
+        verticalAlignment="center"
+        direction={DirectionEnum.LTR}
+        sections={sections}
+        renderSection={mockRenderSection}
+      />
+    )
 
     expect(screen.getByText('Hero')).toBeInTheDocument()
     expect(screen.getByText('Features')).toBeInTheDocument()
@@ -44,7 +51,12 @@ describe('DynamicZone', () => {
     ]
 
     const { container } = render(
-      <DynamicZone direction={DirectionEnum.LTR} sections={sections} renderSection={mockRenderSection} />
+      <DynamicZone
+        verticalAlignment="center"
+        direction={DirectionEnum.LTR}
+        sections={sections}
+        renderSection={mockRenderSection}
+      />
     )
 
     // Should have horizontal flex container
@@ -60,7 +72,12 @@ describe('DynamicZone', () => {
     ]
 
     const { container } = render(
-      <DynamicZone sections={sections} renderSection={mockRenderSection} direction={DirectionEnum.RTL} />
+      <DynamicZone
+        verticalAlignment="center"
+        sections={sections}
+        renderSection={mockRenderSection}
+        direction={DirectionEnum.RTL}
+      />
     )
 
     const horizontalGroup = container.querySelector('[class*="md:flex-row-reverse"]')
@@ -75,7 +92,12 @@ describe('DynamicZone', () => {
     ]
 
     const { container } = render(
-      <DynamicZone sections={sections} renderSection={mockRenderSection} direction={DirectionEnum.LTR} />
+      <DynamicZone
+        verticalAlignment="center"
+        sections={sections}
+        renderSection={mockRenderSection}
+        direction={DirectionEnum.LTR}
+      />
     )
 
     // Should have flex-row but not flex-row-reverse
@@ -88,6 +110,7 @@ describe('DynamicZone', () => {
 
     const { container } = render(
       <DynamicZone
+        verticalAlignment="center"
         direction={DirectionEnum.LTR}
         sections={sections}
         renderSection={mockRenderSection}
@@ -100,7 +123,12 @@ describe('DynamicZone', () => {
 
   it('should handle empty sections array', () => {
     const { container } = render(
-      <DynamicZone direction={DirectionEnum.LTR} sections={[]} renderSection={mockRenderSection} />
+      <DynamicZone
+        verticalAlignment="center"
+        direction={DirectionEnum.LTR}
+        sections={[]}
+        renderSection={mockRenderSection}
+      />
     )
 
     expect(container.firstChild).toBeEmptyDOMElement()
@@ -113,7 +141,12 @@ describe('DynamicZone', () => {
     ]
 
     const { container } = render(
-      <DynamicZone direction={DirectionEnum.LTR} sections={sections} renderSection={mockRenderSection} />
+      <DynamicZone
+        verticalAlignment="center"
+        direction={DirectionEnum.LTR}
+        sections={sections}
+        renderSection={mockRenderSection}
+      />
     )
 
     const verticalGroup = container.querySelector('[class*="gap-12"]')
@@ -130,7 +163,14 @@ describe('DynamicZone', () => {
       { __component: 'sections.contact', id: 6, title: 'Contact' },
     ]
 
-    render(<DynamicZone direction={DirectionEnum.LTR} sections={sections} renderSection={mockRenderSection} />)
+    render(
+      <DynamicZone
+        verticalAlignment="center"
+        direction={DirectionEnum.LTR}
+        sections={sections}
+        renderSection={mockRenderSection}
+      />
+    )
 
     // All sections should be rendered
     expect(screen.getByText('Hero')).toBeInTheDocument()
@@ -147,7 +187,12 @@ describe('DynamicZone', () => {
 
     // Render section that is a marker returns null
     const { container } = render(
-      <DynamicZone direction={DirectionEnum.LTR} sections={sections} renderSection={mockRenderSection} />
+      <DynamicZone
+        verticalAlignment="center"
+        direction={DirectionEnum.LTR}
+        sections={sections}
+        renderSection={mockRenderSection}
+      />
     )
 
     // Should only render Hero, marker returns null
@@ -162,7 +207,14 @@ describe('DynamicZone', () => {
       { __component: 'sections.features', id: 3, title: 'Features' },
     ]
 
-    render(<DynamicZone direction={DirectionEnum.LTR} sections={sections} renderSection={mockRenderSection} />)
+    render(
+      <DynamicZone
+        verticalAlignment="center"
+        direction={DirectionEnum.LTR}
+        sections={sections}
+        renderSection={mockRenderSection}
+      />
+    )
 
     expect(screen.getByText('Hero')).toBeInTheDocument()
     expect(screen.getByText('Features')).toBeInTheDocument()
@@ -176,7 +228,12 @@ describe('DynamicZone', () => {
     ]
 
     const { container } = render(
-      <DynamicZone direction={DirectionEnum.LTR} sections={sections} renderSection={mockRenderSection} />
+      <DynamicZone
+        verticalAlignment="center"
+        direction={DirectionEnum.LTR}
+        sections={sections}
+        renderSection={mockRenderSection}
+      />
     )
 
     const flexItems = container.querySelectorAll('.flex-1')
@@ -198,10 +255,74 @@ describe('DynamicZone', () => {
       return <div data-testid={`section-${String(section.id)}`}>{section.title}</div>
     }
 
-    render(<DynamicZone direction={DirectionEnum.LTR} sections={sections} renderSection={customRenderSection} />)
+    render(
+      <DynamicZone
+        verticalAlignment="center"
+        direction={DirectionEnum.LTR}
+        sections={sections}
+        renderSection={customRenderSection}
+      />
+    )
 
     // Unknown marker should be skipped, sections should still render
     expect(screen.getByText('Hero')).toBeInTheDocument()
     expect(screen.getByText('Features')).toBeInTheDocument()
+  })
+
+  it('should apply vertical alignment classes', () => {
+    const sections: TestSection[] = [
+      { __component: 'markers.start-horizontal-layout-marker', id: 0 },
+      { __component: 'sections.hero', id: 1, title: 'Hero' },
+      { __component: 'markers.end-horizontal-layout-marker', id: 2 },
+    ]
+
+    const { container: topContainer } = render(
+      <DynamicZone
+        verticalAlignment="top"
+        direction={DirectionEnum.LTR}
+        sections={sections}
+        renderSection={mockRenderSection}
+      />
+    )
+    expect(topContainer.querySelector('.md\\:items-start')).toBeInTheDocument()
+
+    const { container: bottomContainer } = render(
+      <DynamicZone
+        verticalAlignment="bottom"
+        direction={DirectionEnum.LTR}
+        sections={sections}
+        renderSection={mockRenderSection}
+      />
+    )
+    expect(bottomContainer.querySelector('.md\\:items-end')).toBeInTheDocument()
+  })
+
+  it('should apply custom horizontal group spacing', () => {
+    const sections: TestSection[] = [
+      { __component: 'markers.start-horizontal-layout-marker', id: 0 },
+      { __component: 'sections.hero', id: 1, title: 'Hero' },
+      { __component: 'markers.end-horizontal-layout-marker', id: 2 },
+    ]
+
+    const { container } = render(
+      <DynamicZone
+        verticalAlignment="center"
+        horizontalGroupSpacing="p-10"
+        direction={DirectionEnum.LTR}
+        sections={sections}
+        renderSection={mockRenderSection}
+      />
+    )
+    expect(container.querySelector('.p-10')).toBeInTheDocument()
+  })
+
+  describe('getAlignmentClass', () => {
+    it('should return correct classes', () => {
+      expect(getAlignmentClass('top')).toBe('md:items-start')
+      expect(getAlignmentClass('bottom')).toBe('md:items-end')
+      expect(getAlignmentClass('center')).toBe('md:items-center')
+      // Testing fallback for runtime safety
+      expect(getAlignmentClass('invalid' as unknown as VerticalAlignment)).toBe('md:items-center')
+    })
   })
 })

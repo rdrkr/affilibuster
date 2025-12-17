@@ -63,7 +63,8 @@ export interface ElementsHeader extends Struct.ComponentSchema {
     alignment: Schema.Attribute.Enumeration<['center', 'language-direction']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'language-direction'>
-    header: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
+    header: Schema.Attribute.Component<'elements.label', false>
+    promoteHeaderIcon: Schema.Attribute.Boolean & Schema.Attribute.Required & Schema.Attribute.DefaultTo<false>
     subheader: Schema.Attribute.Component<'elements.label', false>
   }
 }

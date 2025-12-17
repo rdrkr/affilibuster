@@ -6,7 +6,7 @@
 
 import { render, screen } from '@testing-library/react'
 
-import { CMSIcon, resolveIcon } from '@/components/elements/CMSIcon'
+import { CMSIcon } from '@/components/elements/CMSIcon'
 
 // Mock next/image
 jest.mock('next/image', () => ({
@@ -29,88 +29,7 @@ jest.mock('next/image', () => ({
   },
 }))
 
-describe('resolveIcon', () => {
-  it('should return null for undefined', () => {
-    expect(resolveIcon(undefined)).toBeNull()
-  })
-
-  it('should return null for null', () => {
-    expect(resolveIcon(null)).toBeNull()
-  })
-
-  it('should return null for empty string', () => {
-    expect(resolveIcon('')).toBeNull()
-  })
-
-  it('should return null for whitespace-only string', () => {
-    expect(resolveIcon('   ')).toBeNull()
-  })
-
-  it('should resolve SVG file as local icon', () => {
-    const result = resolveIcon('brand.svg')
-    expect(result).toEqual({ type: 'local', value: '/icons/brand.svg' })
-  })
-
-  it('should resolve PNG file as local icon', () => {
-    const result = resolveIcon('logo.png')
-    expect(result).toEqual({ type: 'local', value: '/icons/logo.png' })
-  })
-
-  it('should resolve JPG file as local icon', () => {
-    const result = resolveIcon('photo.jpg')
-    expect(result).toEqual({ type: 'local', value: '/icons/photo.jpg' })
-  })
-
-  it('should resolve JPEG file as local icon', () => {
-    const result = resolveIcon('photo.jpeg')
-    expect(result).toEqual({ type: 'local', value: '/icons/photo.jpeg' })
-  })
-
-  it('should resolve GIF file as local icon', () => {
-    const result = resolveIcon('animation.gif')
-    expect(result).toEqual({ type: 'local', value: '/icons/animation.gif' })
-  })
-
-  it('should resolve WebP file as local icon', () => {
-    const result = resolveIcon('image.webp')
-    expect(result).toEqual({ type: 'local', value: '/icons/image.webp' })
-  })
-
-  it('should resolve ICO file as local icon', () => {
-    const result = resolveIcon('favicon.ico')
-    expect(result).toEqual({ type: 'local', value: '/icons/favicon.ico' })
-  })
-
-  it('should be case-insensitive for file extensions', () => {
-    expect(resolveIcon('LOGO.SVG')).toEqual({ type: 'local', value: '/icons/LOGO.SVG' })
-    expect(resolveIcon('Image.PNG')).toEqual({ type: 'local', value: '/icons/Image.PNG' })
-  })
-
-  it('should resolve simple name as material symbol', () => {
-    const result = resolveIcon('home')
-    expect(result).toEqual({ type: 'material', value: 'home' })
-  })
-
-  it('should convert spaces to underscores for material symbols', () => {
-    const result = resolveIcon('Account Circle')
-    expect(result).toEqual({ type: 'material', value: 'account_circle' })
-  })
-
-  it('should convert PascalCase to snake_case for material symbols', () => {
-    const result = resolveIcon('ViewList')
-    expect(result).toEqual({ type: 'material', value: 'view_list' })
-  })
-
-  it('should handle mixed format names', () => {
-    const result = resolveIcon('Arrow Forward')
-    expect(result).toEqual({ type: 'material', value: 'arrow_forward' })
-  })
-
-  it('should trim whitespace', () => {
-    const result = resolveIcon('  home  ')
-    expect(result).toEqual({ type: 'material', value: 'home' })
-  })
-})
+// resolveIcon tests removed - function is now private
 
 describe('CMSIcon', () => {
   it('should render null for undefined icon', () => {
@@ -125,6 +44,11 @@ describe('CMSIcon', () => {
 
   it('should render null for empty string icon', () => {
     const { container } = render(<CMSIcon icon="" />)
+    expect(container.firstChild).toBeNull()
+  })
+
+  it('should render null for whitespace-only icon', () => {
+    const { container } = render(<CMSIcon icon="   " />)
     expect(container.firstChild).toBeNull()
   })
 
@@ -238,5 +162,32 @@ describe('CMSIcon', () => {
     render(<CMSIcon icon="brand.svg" />)
     const img = screen.getByTestId('mock-image')
     expect(img).toHaveAttribute('alt', '')
+  })
+
+  it('should render promoted material icon with circular background', () => {
+    const { container } = render(<CMSIcon icon="home" promoted />)
+    const icon = screen.getByText('home')
+    expect(icon).toHaveClass('text-primary')
+    // Should be wrapped in a span with circular background
+    const wrapper = container.querySelector('.rounded-full')
+    expect(wrapper).toBeInTheDocument()
+    expect(wrapper).toHaveClass('bg-primary/10')
+  })
+
+  it('should render promoted local icon with circular background', () => {
+    const { container } = render(<CMSIcon icon="brand.svg" promoted />)
+    const wrapper = container.querySelector('.rounded-full')
+    expect(wrapper).toBeInTheDocument()
+    expect(wrapper).toHaveClass('bg-primary/10')
+    // Image should be inside the wrapper
+    const img = screen.getByTestId('mock-image')
+    expect(wrapper).toContainElement(img)
+  })
+
+  it('should use larger size when promoted', () => {
+    render(<CMSIcon icon="home" promoted />)
+    const icon = screen.getByText('home')
+    // Promoted uses xl (32px) size
+    expect(icon).toHaveStyle({ fontSize: '32px' })
   })
 })

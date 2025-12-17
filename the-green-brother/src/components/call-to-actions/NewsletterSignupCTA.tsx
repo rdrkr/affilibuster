@@ -10,8 +10,14 @@
 
 'use client'
 
-import { Button, CMSText } from '@/components/elements'
-import { DirectionEnum, type CallToActionsNewsletterSignupCtaEntry } from '@/lib/generated/types.gen'
+import { ButtonAction, Header } from '@/components/elements'
+import {
+  AlignmentEnum,
+  DirectionEnum,
+  IconPositionEnum,
+  type CallToActionsNewsletterSignupCtaEntry,
+  type ElementsHeaderEntry,
+} from '@/lib/generated/types.gen'
 
 /**
  * Props for the NewsletterSignupCTA component
@@ -38,17 +44,33 @@ export function NewsletterSignupCTA({ data, direction }: NewsletterSignupCTAProp
   const isRTL = direction === DirectionEnum.RTL
 
   return (
-    <section className="relative py-6" data-testid="newsletter-signup-cta">
+    <section className="relative py-6" data-testid="newsletter-signup-cta" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="mx-auto max-w-2xl">
         <div className="rounded-xl border border-white/5 bg-white/5 p-8">
-          <h3 className="mb-2 text-center text-xl font-bold text-white">
-            <CMSText text={title} />
-          </h3>
-          <p className="mb-6 text-center text-sm text-text-secondary-dark">
-            <CMSText text={description} />
-          </p>
+          <Header
+            data={
+              {
+                header: {
+                  text: title,
+                  ariaDescription: '',
+                  iconPosition: IconPositionEnum.BEFORE_TEXT,
+                },
+                subheader: {
+                  text: description,
+                  ariaDescription: '',
+                  iconPosition: IconPositionEnum.BEFORE_TEXT,
+                },
+                alignment: AlignmentEnum.CENTER,
+              } as ElementsHeaderEntry
+            }
+            level={4}
+            direction={direction}
+            className="mb-6"
+            headerClassName="text-white"
+            subheaderClassName="text-sm"
+          />
           <form
-            className={`flex gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
+            className="flex gap-2"
             onSubmit={e => {
               e.preventDefault()
             }}
@@ -65,10 +87,9 @@ export function NewsletterSignupCTA({ data, direction }: NewsletterSignupCTAProp
               `}
               dir={isRTL ? 'rtl' : 'ltr'}
             />
-            <Button
+            <ButtonAction
               data={submitButton}
               direction={direction}
-              asButton
               variant="primary"
               size="md"
               className={`

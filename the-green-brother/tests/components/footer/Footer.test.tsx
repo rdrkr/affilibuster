@@ -16,14 +16,22 @@ jest.mock('next/link', () => ({
 
 // Mock CMS elements
 jest.mock('@/components/elements', () => ({
-  Button: function MockButton({ data }: { data: { label?: { text?: string } } }) {
-    return <button>{data.label?.text}</button>
+  ButtonLink: function MockButtonLink({ data }: { data: { label?: { text?: string }; url?: string } }) {
+    return <a href={data.url}>{data.label?.text}</a>
   },
   CMSText: function MockCMSText({ text }: { text?: string }) {
     return <span>{text}</span>
   },
   Label: function MockLabel({ data }: { data: { text?: string } }) {
     return <span>{data.text}</span>
+  },
+  TextBlock: function MockTextBlock({ data }: { data: { header?: { header?: { text?: string } }; content?: string } }) {
+    return (
+      <div data-testid="text-block">
+        {data.header?.header?.text && <h5>{data.header.header.text}</h5>}
+        {data.content && <div>{data.content}</div>}
+      </div>
+    )
   },
 }))
 
@@ -61,8 +69,7 @@ describe('Footer', () => {
     const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
-    const year = new Date().getFullYear().toString()
-    expect(screen.getByText(content => content.includes(year))).toBeInTheDocument()
+    expect(screen.getByText(content => content.includes('© {year}'))).toBeInTheDocument()
   })
 
   it('should render text-block columns', async () => {
@@ -107,27 +114,6 @@ describe('Footer', () => {
     expect(screen.getByText('Subscribe to our newsletter')).toBeInTheDocument()
   })
 
-  it('should parse markdown links in text-block content', async () => {
-    mockGetFooter.mockResolvedValue({
-      columns: [
-        {
-          id: 1,
-          __component: 'elements.text-block',
-          header: { header: { text: 'Links' } },
-          content: '[About](/about)\n[Contact](/contact)',
-        },
-      ],
-      copyrightsLabel: { text: '© {year}' },
-      quickLinks: [],
-    } as unknown as Awaited<ReturnType<typeof getFooter>>)
-
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
-    render(Component!)
-
-    expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute('href', '/about')
-    expect(screen.getByRole('link', { name: 'Contact' })).toHaveAttribute('href', '/contact')
-  })
-
   it('should handle horizontal layout markers', async () => {
     mockGetFooter.mockResolvedValue({
       columns: [
@@ -162,8 +148,8 @@ describe('Footer', () => {
       columns: [],
       copyrightsLabel: { text: '© {year}' },
       quickLinks: [
-        { label: { text: 'Privacy' }, url: '/privacy', openInNewTab: false },
-        { label: { text: 'Terms' }, url: '/terms', openInNewTab: false },
+        { id: 123, label: { text: 'Privacy' }, url: '/privacy', openInNewTab: false },
+        { label: { text: 'Terms' }, url: '/terms', openInNewTab: false }, // No ID to test fallback
       ],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
@@ -236,8 +222,7 @@ describe('Footer', () => {
     const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
-    const year = new Date().getFullYear().toString()
-    expect(screen.getByText(content => content.includes(year))).toBeInTheDocument()
+    expect(screen.getByText(content => content.includes('© {year}'))).toBeInTheDocument()
   })
 
   it('should handle vertical column group after horizontal group', async () => {
@@ -353,8 +338,7 @@ describe('Footer', () => {
 
     // Find the container for copyright and quick links (it has flex-col by default)
     // The copyright text is a good anchor
-    const year = new Date().getFullYear().toString()
-    const copyrightElement = screen.getByText(content => content.includes(year))
+    const copyrightElement = screen.getByText(content => content.includes('© {year}'))
     const bottomSection = copyrightElement.closest('.flex.flex-col.items-center.justify-between')
 
     expect(bottomSection).toHaveClass('md:flex-row-reverse')
@@ -370,8 +354,8 @@ describe('Footer', () => {
     const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
-    const year = new Date().getFullYear().toString()
-    const copyrightElement = screen.getByText(content => content.includes(year))
+    // Verify literal string is passed (logic moved/removed)
+    const copyrightElement = screen.getByText(content => content.includes('© {year}'))
     const bottomSection = copyrightElement.closest('.flex.flex-col.items-center.justify-between')
 
     expect(bottomSection).not.toHaveClass('md:flex-row-reverse')

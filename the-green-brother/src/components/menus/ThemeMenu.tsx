@@ -10,8 +10,10 @@
 'use client'
 
 import type { ApiThemeThemeDocument, MenusThemeSelectorEntry } from '@/lib/generated/types.gen'
+import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 
-import { CMSIcon, CMSText } from '../elements'
+import { ButtonAction, ButtonLink, CMSIcon, CMSText } from '../elements'
+import { DropdownMenu } from './DropdownMenu'
 
 /**
  * Props for the ThemeMenu component
@@ -23,6 +25,8 @@ export interface ThemeMenuProps {
   selectedTheme: string
   /** Callback when theme is selected */
   onThemeChange: (themeName: string) => void
+  /** Text direction for RTL support */
+  direction: DirectionEnum
 }
 
 /**
@@ -31,83 +35,81 @@ export interface ThemeMenuProps {
  * @param props.data - CMS data for the theme menu
  * @param props.selectedTheme - Currently selected theme name
  * @param props.onThemeChange - Callback when theme is selected
+ * @param props.direction - Text direction for RTL support
  * @returns Theme menu component
  */
-export function ThemeMenu({ data, selectedTheme, onThemeChange }: ThemeMenuProps) {
+export function ThemeMenu({ data, selectedTheme, onThemeChange, direction }: ThemeMenuProps) {
   const themes = data.themes ?? []
+  const isRTL = direction === DirectionEnum.RTL
+  const isIconAfterText = data.menuButton.label?.iconPosition === IconPositionEnum.AFTER_TEXT
 
   return (
     <div className="group relative flex h-full items-center">
-      <button
+      {/* Menu button with chevron */}
+      <div
         className={`
-          hidden items-center gap-1.5 rounded-full p-2 transition-colors
-          group-hover:bg-surface-dark group-hover:text-white
-          lg:flex
+          hidden items-center gap-1 lg:flex
+          ${isRTL ? 'flex-row-reverse' : ''}
         `}
-        aria-label={data.menuButton.label?.ariaDescription}
       >
-        <CMSIcon icon={data.menuButton.label?.icon} size="lg" />
+        <ButtonLink
+          data={data.menuButton}
+          direction={direction}
+          variant="ghost"
+          iconSize="md"
+          size="sm"
+          className={`
+            bg-transparent! px-0! text-text-secondary-dark!
+            transition-colors group-hover:text-primary!
+            hover:bg-transparent!
+          `}
+        />
+        {/* Chevron - always on opposite side of icon */}
         <span
           className={`
-          hidden
-          lg:inline
-        `}
-        >
-          <CMSText text={data.menuButton.label?.text} />
-        </span>
-        <span
-          className={`
-          material-symbols-outlined text-sm transition-transform duration-300
-          group-hover:rotate-180
-        `}
+            material-symbols-outlined pointer-events-none text-sm
+            text-text-secondary-dark transition-transform
+            duration-300 group-hover:rotate-180 group-hover:text-primary
+            ${isIconAfterText ? 'order-first' : 'order-last'}
+          `}
         >
           expand_more
         </span>
-      </button>
-
-      <div
-        className={`
-          invisible absolute top-full right-0 z-50 w-40 pt-6 opacity-0
-          transition-all duration-300
-          group-hover:visible group-hover:opacity-100
-        `}
-      >
-        <div
-          className={`
-          overflow-hidden rounded-xl border border-white/10 bg-surface-dark
-          p-1.5 shadow-xl
-        `}
-        >
-          {themes.map((theme: ApiThemeThemeDocument) => {
-            if (!theme.content) {
-              return null
-            }
-
-            return (
-              <button
-                key={theme.content.text}
-                onClick={() => {
-                  if (theme.content) {
-                    onThemeChange(theme.content.text)
-                  }
-                }}
-                className={`
-                  flex w-full items-center gap-3 rounded-xl px-4 py-2.5
-                  text-left text-sm text-white transition-colors
-                  hover:bg-white/10
-                  ${selectedTheme === theme.content.text ? `bg-white/5` : ''}
-                `}
-                aria-label={theme.content.ariaDescription}
-              >
-                <CMSIcon icon={theme.content.icon ?? 'palette'} size="md" />
-                <span className="font-medium">
-                  <CMSText text={theme.content.text} />
-                </span>
-              </button>
-            )
-          })}
-        </div>
       </div>
+
+      <DropdownMenu width="10rem" align="right" direction={direction} contentClassName="space-y-1 p-1.5">
+        {themes.map((theme: ApiThemeThemeDocument) => {
+          if (!theme.content) {
+            return null
+          }
+
+          return (
+            <ButtonAction
+              key={theme.content.text}
+              direction={direction}
+              onClick={() => {
+                if (theme.content) {
+                  onThemeChange(theme.content.text)
+                }
+              }}
+              variant="ghost"
+              className={`
+                flex w-full items-center justify-start gap-3 rounded-xl px-4 py-2.5
+                text-sm text-white transition-colors
+                hover:bg-white/10
+                ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}
+                ${selectedTheme === theme.content.text ? `bg-white/5` : ''}
+              `}
+              data={{ label: theme.content, url: '', openInNewTab: false }}
+            >
+              <CMSIcon icon={theme.content.icon ?? 'palette'} size="md" />
+              <span className="font-medium">
+                <CMSText text={theme.content.text} />
+              </span>
+            </ButtonAction>
+          )
+        })}
+      </DropdownMenu>
     </div>
   )
 }

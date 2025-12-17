@@ -5,7 +5,7 @@
  *
  * Renders the hero banner section with background image, header, subheader, and CTA button.
  * All content comes from CMS - no hardcoded strings.
- * Uses Header and Button composites for content.
+ * Uses Header and ButtonLink composites for content.
  *
  * Supports three layout variants:
  * - TEXT_OVER_BACKGROUND: Header centered over image (image as background)
@@ -13,9 +13,7 @@
  * - TEXT_BELOW_BACKGROUND: Header below image (stacked vertically)
  */
 
-'use client'
-
-import { Button, CMSImage, Header } from '@/components/elements'
+import { ButtonLink, CMSImage, Header } from '@/components/elements'
 import { AlignmentEnum, DirectionEnum, VariantEnum, type SectionsHeroEntry } from '@/lib/generated/types.gen'
 
 /**
@@ -40,30 +38,42 @@ export interface HeroSectionProps {
 export function HeroSection({ data, direction }: HeroSectionProps) {
   const { header, exploreButton, image, variant } = data
 
-  // Render content (header + button)
-  const renderContent = () => (
+  // --- Shared Logic ---
+
+  // Determine if content should be right-aligned (RTL) or left-aligned (LTR)
+  // or centered if explicitly set in CMS
+  const isRTL = direction === DirectionEnum.RTL
+  const isCentered = header.alignment === AlignmentEnum.CENTER
+
+  // Calculate justify class for the container
+  const justifyClass = isCentered ? 'justify-center' : isRTL ? 'justify-end' : 'justify-start'
+
+  // Calculate text alignment and flex item alignment for content
+  const textAlignClass = isCentered
+    ? 'text-center items-center'
+    : isRTL
+      ? 'text-right items-end'
+      : 'text-left items-start'
+
+  // --- Render Helpers ---
+
+  const renderContent = (isOverlay: boolean) => (
     <div
       className={`
-        animate-fade-in-up relative z-20 max-w-4xl px-4 text-white
+        animate-fade-in-up relative z-20 flex max-w-4xl flex-col px-4 text-white
+        ${textAlignClass}
+        ${isOverlay && !isCentered ? (isRTL ? 'mr-8' : 'ml-8') : ''}
       `}
     >
       <Header
         data={header}
-        level={2}
-        headerClassName={`
-          text-4xl leading-tight tracking-tight
-          md:text-6xl
-          lg:text-7xl
-        `}
-        subheaderClassName={`
-          mx-auto max-w-2xl text-lg font-medium text-gray-200
-          md:text-xl
-        `}
+        headerClassName="text-7xl leading-tight tracking-tight"
+        subheaderClassName="mt-8 text-xl text-white"
         direction={direction}
       />
       {exploreButton && (
         <div className="mt-10">
-          <Button
+          <ButtonLink
             data={exploreButton}
             direction={direction}
             variant="primary"
@@ -79,40 +89,39 @@ export function HeroSection({ data, direction }: HeroSectionProps) {
     </div>
   )
 
-  // Render image
-  const renderImage = (isOverlay = false) => (
-    <div className={isOverlay ? 'absolute inset-0 z-0' : 'relative w-full'}>
+  const renderImage = (isOverlay: boolean) => (
+    <div className={isOverlay ? 'absolute inset-0 z-0' : 'relative h-[40vh] max-h-[400px] min-h-[250px] w-full'}>
       <CMSImage
         image={image}
         className={`h-full w-full object-cover ${isOverlay ? 'opacity-80' : 'rounded-xl'}`}
-        fill={isOverlay}
+        fill
         preload
         sizes="100vw"
       />
     </div>
   )
 
-  // TEXT_OVER_BACKGROUND: Header centered with image as background (current behavior)
-  if (variant === VariantEnum.TEXT_OVER_BACKGROUND) {
-    // Calculate alignment class for the container
-    const alignmentClass = header.alignment === AlignmentEnum.CENTER ? 'justify-center' : 'justify-start'
+  // --- Layout Variants ---
 
+  // TEXT_OVER_BACKGROUND: Header centered over image (image as background)
+  if (variant === VariantEnum.TEXT_OVER_BACKGROUND) {
     return (
       <section
         className={`
-          relative flex h-[60vh] max-h-[600px] min-h-[400px] items-center
-          ${alignmentClass} overflow-hidden rounded-xl shadow-2xl
+          relative flex h-[60vh] max-h-[600px] min-h-[400px] items-center overflow-hidden
+          rounded-xl shadow-2xl ${justifyClass}
         `}
         aria-label={header.header?.ariaDescription ?? ''}
       >
         {renderImage(true)}
+        {/* Dark overlay gradient for readability */}
         <div
           className={`
             absolute inset-0 z-10 bg-linear-to-t from-background-dark/90
             via-background-dark/40 to-transparent
           `}
         />
-        {renderContent()}
+        {renderContent(true)}
       </section>
     )
   }
@@ -120,26 +129,24 @@ export function HeroSection({ data, direction }: HeroSectionProps) {
   // TEXT_ABOVE_BACKGROUND: Header above image (stacked vertically)
   if (variant === VariantEnum.TEXT_ABOVE_BACKGROUND) {
     return (
-      <section className="flex flex-col gap-8" aria-label={header.header?.ariaDescription ?? ''}>
-        {renderContent()}
-        <div className="overflow-hidden rounded-xl shadow-2xl">
-          <div className="relative h-[40vh] max-h-[400px] min-h-[250px]">
-            <CMSImage image={image} className="h-full w-full object-cover" fill preload sizes="100vw" />
-          </div>
-        </div>
+      <section
+        className={`flex flex-col gap-8 ${isCentered ? 'items-center' : isRTL ? 'items-end' : 'items-start'}`}
+        aria-label={header.header?.ariaDescription ?? ''}
+      >
+        <div className={`w-full ${justifyClass} flex`}>{renderContent(false)}</div>
+        <div className="w-full overflow-hidden rounded-xl shadow-2xl">{renderImage(false)}</div>
       </section>
     )
   }
 
   // TEXT_BELOW_BACKGROUND: Header below image (stacked vertically) - default case
   return (
-    <section className="flex flex-col gap-8" aria-label={header.header?.ariaDescription ?? ''}>
-      <div className="overflow-hidden rounded-xl shadow-2xl">
-        <div className="relative h-[40vh] max-h-[400px] min-h-[250px]">
-          <CMSImage image={image} className="h-full w-full object-cover" fill preload sizes="100vw" />
-        </div>
-      </div>
-      {renderContent()}
+    <section
+      className={`flex flex-col gap-8 ${isCentered ? 'items-center' : isRTL ? 'items-end' : 'items-start'}`}
+      aria-label={header.header?.ariaDescription ?? ''}
+    >
+      <div className="w-full overflow-hidden rounded-xl shadow-2xl">{renderImage(false)}</div>
+      <div className={`w-full ${justifyClass} flex`}>{renderContent(false)}</div>
     </section>
   )
 }

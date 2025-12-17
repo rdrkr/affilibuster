@@ -9,17 +9,14 @@
 
 'use client'
 
-import Image from 'next/image'
-import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-import { resolveIcon } from '@/components/elements'
 import type { ApiNavigationNavigationDocument } from '@/lib/generated/types.gen'
 import { CodeEnum, DirectionEnum, Language } from '@/lib/generated/types.gen'
 
 import { LanguageMenu, ProductCategoriesMenu, SearchMenu, ThemeMenu, type LanguageOption } from '@/components/menus'
-import { CMSIcon, CMSText } from '../elements'
+import { ButtonLink } from '../elements'
 import { MobileMenu, type MobileNavLink } from './MobileMenu'
 
 /**
@@ -100,10 +97,15 @@ export function Navigation({ data, languages: apiLanguages, direction }: Navigat
    * @returns True if the path is active
    */
   const isActive = (path: string): boolean => {
-    // Handle /en locale for home page
-    if (path === '/' && (pathname === '/en' || pathname === '/')) return true
-    if (path === '/' && pathname !== '/' && pathname !== '/en') return false
-    return pathname.startsWith(path)
+    // Get path without language prefix (e.g., /en/products -> /products)
+    const pathWithoutLang = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/')
+
+    // Handle home page
+    if (path === '/') {
+      return pathWithoutLang === '/' || pathname === '/' || /^\/[a-z]{2}$/.test(pathname)
+    }
+
+    return pathWithoutLang.startsWith(path)
   }
 
   // Map API languages to LanguageOption format
@@ -128,9 +130,6 @@ export function Navigation({ data, languages: apiLanguages, direction }: Navigat
     { href: data.aboutButton.url, text: data.aboutButton.label?.text, isActive: isActive('/about') },
   ]
 
-  // Resolve brand icon
-  const brandIcon = resolveIcon(data.brandButton.label?.icon)
-
   return (
     <div
       className={`
@@ -141,7 +140,7 @@ export function Navigation({ data, languages: apiLanguages, direction }: Navigat
     >
       <nav
         className={`
-          relative rounded-full border border-white/10 bg-surface-dark/90 p-2
+          relative rounded-full border border-white/10 bg-surface-dark/70 p-2
           shadow-lg backdrop-blur-lg
           md:p-3
           lg:px-6
@@ -151,43 +150,15 @@ export function Navigation({ data, languages: apiLanguages, direction }: Navigat
         <div className={`relative z-20 flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
           <div className={`flex items-center gap-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
             {/* Brand Logo */}
-            <Link
-              href={data.brandButton.url}
-              className="group flex shrink-0 items-center gap-3"
-              aria-label={data.brandButton.label?.ariaDescription}
-            >
-              {brandIcon?.type === 'local' ? (
-                <Image
-                  src={brandIcon.value}
-                  alt=""
-                  width={32}
-                  height={32}
-                  className={`
-                    transition-transform
-                    group-hover:scale-110
-                  `}
-                  aria-hidden="true"
-                />
-              ) : (
-                <CMSIcon
-                  icon={data.brandButton.label?.icon}
-                  size="xl"
-                  className={`
-                    transition-transform
-                    group-hover:scale-110
-                  `}
-                />
-              )}
-              <h1
-                className={`
-                hidden text-xl font-bold tracking-tight text-white
-                sm:text-2xl
-                lg:block
-              `}
-              >
-                <CMSText text={data.brandButton.label?.text} />
-              </h1>
-            </Link>
+            <ButtonLink
+              data={data.brandButton}
+              direction={direction}
+              variant="link"
+              iconSize="3xl"
+              size="2xl"
+              className="group p-0! text-white hover:text-white"
+              noAnimation={true}
+            />
 
             {/* Desktop Navigation Links */}
             <div
@@ -198,46 +169,49 @@ export function Navigation({ data, languages: apiLanguages, direction }: Navigat
                 ${isRTL ? 'flex-row-reverse' : ''}
               `}
             >
-              <Link
-                href={data.homeButton.url}
+              <ButtonLink
+                data={data.homeButton}
+                direction={direction}
+                variant="ghost"
+                iconSize="md"
+                size="sm"
                 className={`
-                  flex items-center gap-1.5 transition-colors
-                  hover:text-primary
-                  ${isActive('/') ? `text-primary` : ''}
+                  bg-transparent! px-0! transition-colors
+                  hover:bg-transparent!
+                  hover:text-primary!
+                  ${isActive('/') ? `text-primary!` : `text-text-secondary-dark!`}
                 `}
-                aria-label={data.homeButton.label?.ariaDescription}
-              >
-                <CMSIcon icon={data.homeButton.label?.icon} size="md" />
-                <CMSText text={data.homeButton.label?.text} />
-              </Link>
+              />
 
               {/* Products Dropdown */}
-              <ProductCategoriesMenu data={data.productsMenu} isActive={isActive('/products')} />
+              <ProductCategoriesMenu data={data.productsMenu} isActive={isActive('/products')} direction={direction} />
 
-              <Link
-                href={data.blogButton.url}
+              <ButtonLink
+                data={data.blogButton}
+                direction={direction}
+                variant="ghost"
+                iconSize="md"
+                size="sm"
                 className={`
-                  flex items-center gap-1.5 transition-colors
-                  hover:text-primary
-                  ${isActive('/blog') ? `text-primary` : ''}
+                  bg-transparent! px-0! transition-colors
+                  hover:bg-transparent!
+                  hover:text-primary!
+                  ${isActive('/blog') ? `text-primary!` : `text-text-secondary-dark!`}
                 `}
-                aria-label={data.blogButton.label?.ariaDescription}
-              >
-                <CMSIcon icon={data.blogButton.label?.icon} size="md" />
-                <CMSText text={data.blogButton.label?.text} />
-              </Link>
-              <Link
-                href={data.aboutButton.url}
+              />
+              <ButtonLink
+                data={data.aboutButton}
+                direction={direction}
+                variant="ghost"
+                iconSize="md"
+                size="sm"
                 className={`
-                  flex items-center gap-1.5 whitespace-nowrap transition-colors
-                  hover:text-primary
-                  ${isActive('/about') ? `text-primary` : ''}
+                  bg-transparent! px-0! whitespace-nowrap transition-colors
+                  hover:bg-transparent!
+                  hover:text-primary!
+                  ${isActive('/about') ? `text-primary!` : `text-text-secondary-dark!`}
                 `}
-                aria-label={data.aboutButton.label?.ariaDescription}
-              >
-                <CMSIcon icon={data.aboutButton.label?.icon} size="md" />
-                <CMSText text={data.aboutButton.label?.text} />
-              </Link>
+              />
             </div>
           </div>
 
@@ -252,7 +226,12 @@ export function Navigation({ data, languages: apiLanguages, direction }: Navigat
             <SearchMenu data={data.searchMenu} />
 
             {/* Theme Selector */}
-            <ThemeMenu data={data.themeMenu} selectedTheme={selectedTheme} onThemeChange={setSelectedTheme} />
+            <ThemeMenu
+              data={data.themeMenu}
+              selectedTheme={selectedTheme}
+              onThemeChange={setSelectedTheme}
+              direction={direction}
+            />
 
             {/* Language Selector */}
             <LanguageMenu
@@ -260,24 +239,22 @@ export function Navigation({ data, languages: apiLanguages, direction }: Navigat
               languages={languages}
               selectedLang={currentLang}
               onLanguageChange={handleLanguageChange}
+              direction={direction}
             />
 
             {/* Login Button */}
-            <Link
-              href={data.loginButton.url}
+            <ButtonLink
+              data={data.loginButton}
+              direction={direction}
+              variant="primary"
+              iconSize="lg"
               className={`
-                hidden shrink-0 items-center gap-2 rounded-full bg-primary px-5
+                hidden shrink-0 items-center gap-2 rounded-full px-5
                 py-2 font-bold text-background-dark transition-colors
                 hover:bg-primary-hover
                 sm:flex
               `}
-              aria-label={data.loginButton.label?.ariaDescription}
-            >
-              <CMSIcon icon={data.loginButton.label?.icon} size="lg" />
-              <span>
-                <CMSText text={data.loginButton.label?.text} />
-              </span>
-            </Link>
+            />
 
             {/* Mobile Menu Toggle */}
             <MobileMenu

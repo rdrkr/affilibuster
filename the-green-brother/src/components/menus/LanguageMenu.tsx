@@ -10,9 +10,13 @@
 
 'use client'
 
-import type { CodeEnum, MenusLanguageSelectorEntry } from '@/lib/generated/types.gen'
+import Link from 'next/link'
 
-import { CMSIcon, CMSText } from '../elements'
+import type { CodeEnum, MenusLanguageSelectorEntry } from '@/lib/generated/types.gen'
+import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
+
+import { ButtonAction, CMSIcon, CMSText } from '../elements'
+import { DropdownMenu } from './DropdownMenu'
 
 /**
  * Language option for the selector
@@ -38,6 +42,8 @@ export interface LanguageMenuProps {
   selectedLang: CodeEnum
   /** Callback when language is selected */
   onLanguageChange: (langCode: CodeEnum) => void
+  /** Text direction for RTL support */
+  direction: DirectionEnum
 }
 
 /**
@@ -47,81 +53,92 @@ export interface LanguageMenuProps {
  * @param props.languages - Available language options
  * @param props.selectedLang - Currently selected language code
  * @param props.onLanguageChange - Callback when language is selected
+ * @param props.direction - Text direction for RTL support
  * @returns Language menu component
  */
-export function LanguageMenu({ data, languages, selectedLang, onLanguageChange }: LanguageMenuProps) {
+export function LanguageMenu({ data, languages, selectedLang, onLanguageChange, direction }: LanguageMenuProps) {
+  const isRTL = direction === DirectionEnum.RTL
+  const isIconAfterText = data.menuButton.label?.iconPosition === IconPositionEnum.AFTER_TEXT
+  const label = data.menuButton.label
+
+  // Icon with badge overlay component
+  const iconWithBadge = label?.icon ? (
+    <span className={`relative ${isIconAfterText ? 'order-last' : 'order-first'}`}>
+      <CMSIcon icon={label.icon} size="md" />
+      {/* Badge positioned at bottom-right of icon */}
+      <span
+        className={`
+          pointer-events-none absolute -right-1 bottom-1 flex min-w-[14px]
+          items-center justify-center rounded-sm bg-primary px-0.5 text-[10px]
+          leading-none font-bold text-black transition-colors
+          group-hover:bg-text-secondary-dark
+        `}
+      >
+        {languages.find(lang => lang.code === selectedLang)?.name.substring(0, 2)}
+      </span>
+    </span>
+  ) : null
+
   return (
     <div className="group relative flex h-full items-center">
-      <button
+      {/* Menu button with chevron */}
+      <div
         className={`
-          relative flex items-center gap-2 rounded-full px-3 py-2
-          transition-colors
-          group-hover:bg-surface-dark group-hover:text-white
+          flex items-center
+          ${isRTL ? 'flex-row-reverse' : ''}
         `}
-        aria-label={data.menuButton.label?.ariaDescription}
       >
-        <div className="relative">
-          <CMSIcon icon={data.menuButton.label?.icon} size="lg" />
-          <span
-            className={`
-              absolute -right-1 -bottom-1 flex min-w-[14px] items-center
-              justify-center rounded-sm bg-primary px-0.5 text-xs leading-none
-              font-bold text-black
-            `}
-          >
-            {selectedLang}
-          </span>
-        </div>
-        <span
+        {/* Custom button with icon+badge */}
+        <Link
+          href={data.menuButton.url}
           className={`
-          hidden
-          lg:inline
-        `}
+            inline-flex items-center gap-2 text-sm font-medium
+            text-text-secondary-dark transition-colors
+            group-hover:text-primary
+            ${isRTL ? 'flex-row-reverse' : ''}
+          `}
+          aria-label={label?.ariaDescription}
         >
-          <CMSText text={data.menuButton.label?.text} />
-        </span>
+          {iconWithBadge}
+          {/* Text */}
+          <CMSText text={label?.text} />
+        </Link>
+        {/* Chevron - always on opposite side of icon */}
         <span
           className={`
-          material-symbols-outlined text-sm transition-transform duration-300
-          group-hover:rotate-180
-        `}
+            material-symbols-outlined pointer-events-none text-sm
+            text-text-secondary-dark transition-transform
+            duration-300 group-hover:rotate-180 group-hover:text-primary
+            ${isIconAfterText ? 'order-first' : 'order-last'}
+            ${isIconAfterText ? 'me-1' : 'ms-1'}
+          `}
         >
           expand_more
         </span>
-      </button>
-
-      <div
-        className={`
-          invisible absolute top-full right-0 z-50 w-48 pt-6 opacity-0
-          transition-all duration-300
-          group-hover:visible group-hover:opacity-100
-        `}
-      >
-        <div
-          className={`
-          overflow-hidden rounded-xl border border-white/10 bg-surface-dark
-          p-1.5 shadow-xl
-        `}
-        >
-          {languages.map(lang => (
-            <button
-              key={lang.name}
-              onClick={() => {
-                onLanguageChange(lang.code)
-              }}
-              className={`
-                flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left
-                text-sm text-white transition-colors
-                hover:bg-white/10
-                ${selectedLang === lang.code ? `bg-white/5` : ''}
-              `}
-            >
-              <span className="text-lg">{lang.flag}</span>
-              <span className="font-medium">{lang.name}</span>
-            </button>
-          ))}
-        </div>
       </div>
+
+      <DropdownMenu width="12rem" align="right" direction={direction} contentClassName="space-y-1 p-1.5">
+        {languages.map(lang => (
+          <ButtonAction
+            key={lang.name}
+            direction={direction}
+            onClick={() => {
+              onLanguageChange(lang.code)
+            }}
+            variant="ghost"
+            className={`
+              flex w-full items-center justify-start gap-3 rounded-xl px-4 py-2.5
+              text-sm text-white transition-colors
+              hover:bg-white/10
+              ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}
+              ${selectedLang === lang.code ? `bg-white/5` : ''}
+            `}
+          >
+            <span className="text-lg">{lang.flag}</span>
+            <span className="font-medium">{lang.name}</span>
+          </ButtonAction>
+        ))}
+      </DropdownMenu>
     </div>
   )
 }

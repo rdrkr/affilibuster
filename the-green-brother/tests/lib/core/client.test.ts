@@ -447,6 +447,69 @@ describe('apiRequest', () => {
 
     await expect(apiRequest(request)).rejects.toThrow('Authentication required')
   })
+
+  it('should handle null and undefined values in query params', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ data: [] }),
+    } as Response)
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const request = createApiRequest('/products', {
+      query: {
+        name: 'test',
+        undefinedParam: undefined,
+        nullParam: null,
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any)
+    await apiRequest(request)
+
+    const callUrl = (mockFetch.mock.calls[0]?.[0] as string) || ''
+    expect(callUrl).toContain('name=test')
+    expect(callUrl).not.toContain('undefinedParam')
+    expect(callUrl).not.toContain('nullParam')
+  })
+
+  it('should handle null items in array query params', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ data: [] }),
+    } as Response)
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const request = createApiRequest('/products', {
+      query: {
+        fields: ['name', null, undefined, 'price'],
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any)
+    await apiRequest(request)
+
+    const callUrl = (mockFetch.mock.calls[0]?.[0] as string) || ''
+    expect(callUrl).toContain('fields=name')
+    expect(callUrl).toContain('fields=price')
+    // Should skip null and undefined in arrays
+    expect(callUrl.match(/fields=/g)?.length).toBe(2)
+  })
+
+  it('should handle request with body set to undefined', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true }),
+    } as Response)
+
+    const request = {
+      url: '/auth/login',
+      body: undefined,
+    } as unknown as Parameters<typeof apiRequest>[0]
+    await apiRequest(request, { method: 'POST' })
+
+    const fetchCall = mockFetch.mock.calls[0]
+    const fetchOptions = fetchCall![1]!
+    // Body should not be set in fetchOptions when request.body is undefined
+    expect(fetchOptions.body).toBeUndefined()
+  })
 })
 
 describe('ApiError', () => {

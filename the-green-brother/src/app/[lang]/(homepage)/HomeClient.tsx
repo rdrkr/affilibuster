@@ -9,44 +9,23 @@
 
 'use client'
 
-import { useEffect, useState } from 'react'
-
-import { HomeSections } from '@/components/homepage'
-import type {
-  ApiBlogPostBlogPostDocument,
-  ApiHomepageHomepageDocument,
-  ApiProductCategoryProductCategoryDocument,
-  ApiProductProductDocument,
-} from '@/lib/generated/types.gen'
-import { DirectionEnum } from '@/lib/generated/types.gen'
+import { type ReactNode, useEffect, useState } from 'react'
 
 /**
  * Props for the HomeClient component
  */
 export interface HomeClientProps {
-  /** Homepage CMS data (null if unavailable) */
-  homepageData: ApiHomepageHomepageDocument | null
-  /** Featured products from CMS */
-  products: ApiProductProductDocument[]
-  /** Product categories from CMS */
-  categories: ApiProductCategoryProductCategoryDocument[]
-  /** Blog posts from CMS */
-  blogPosts: ApiBlogPostBlogPostDocument[]
-  /** Language direction for RTL support */
-  direction: DirectionEnum
+  /** content to render inside the animated wrapper */
+  children: ReactNode
 }
 
 /**
- * Homepage client component that renders CMS-driven sections with animations.
- * @param props - Homepage data from server component
- * @param props.homepageData - Homepage CMS data (null if unavailable)
- * @param props.products - Featured products from CMS
- * @param props.categories - Product categories from CMS
- * @param props.blogPosts - Blog posts from CMS
- * @param props.direction - Language direction for RTL support
- * @returns Rendered homepage or null if no CMS data
+ * Homepage client wrapper that handles enter animations.
+ * @param props - Component props
+ * @param props.children - Content to render (HomeSections from server)
+ * @returns Animated wrapper div
  */
-export default function HomeClient({ homepageData, products, categories, blogPosts, direction }: HomeClientProps) {
+export default function HomeClient({ children }: HomeClientProps) {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -59,11 +38,6 @@ export default function HomeClient({ homepageData, products, categories, blogPos
     }
   }, [])
 
-  // Don't render if no homepage data from CMS
-  if (!homepageData) {
-    return null
-  }
-
   return (
     <div
       className={`
@@ -72,13 +46,7 @@ export default function HomeClient({ homepageData, products, categories, blogPos
         ${isVisible ? `opacity-100` : `opacity-0`}
       `}
     >
-      <HomeSections
-        sections={homepageData.sections}
-        products={products}
-        categories={categories}
-        blogPosts={blogPosts}
-        direction={direction}
-      />
+      {children}
     </div>
   )
 }

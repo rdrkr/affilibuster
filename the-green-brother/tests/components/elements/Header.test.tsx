@@ -9,8 +9,41 @@ import { render, screen } from '@testing-library/react'
 import { Header, type HeaderProps } from '@/components/elements/Header'
 import { AlignmentEnum, DirectionEnum, type ElementsHeaderEntry, IconPositionEnum } from '@/lib/generated/types.gen'
 
-// Mock the Label component
-jest.mock('@/components/elements', () => ({
+// Mock the Label component (Header uses relative import)
+jest.mock('@/components/elements/Label', () => ({
+  __esModule: true,
+  default: function MockLabel({
+    data,
+    as: Tag = 'span',
+    iconSize,
+    className,
+  }: {
+    data?: { text?: string; ariaDescription?: string }
+    as?: string
+    iconSize?: string
+    className?: string
+  }) {
+    // Handle heading tags - use div to avoid type issues
+    if (Tag.startsWith('h')) {
+      const level = parseInt(Tag.charAt(1), 10)
+      return (
+        <div
+          data-testid={`mock-label-${Tag}`}
+          data-icon-size={iconSize}
+          className={className}
+          role="heading"
+          aria-level={level}
+        >
+          {data?.text}
+        </div>
+      )
+    }
+    return (
+      <span data-testid={`mock-label-${Tag}`} data-icon-size={iconSize} className={className}>
+        {data?.text}
+      </span>
+    )
+  },
   Label: function MockLabel({
     data,
     as: Tag = 'span',
@@ -48,6 +81,7 @@ jest.mock('@/components/elements', () => ({
 describe('Header', () => {
   const mockHeaderData: HeaderProps['data'] = {
     alignment: AlignmentEnum.CENTER,
+    promoteHeaderIcon: false,
     header: {
       text: 'Main Heading',
       icon: 'star',
@@ -98,6 +132,7 @@ describe('Header', () => {
     const dataWithLanguageDirection = {
       ...mockHeaderData,
       alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+      promoteHeaderIcon: false,
     }
     const { container } = render(<Header data={dataWithLanguageDirection} direction={DirectionEnum.LTR} />)
     expect(container.firstChild).toHaveClass('text-left')
@@ -108,6 +143,7 @@ describe('Header', () => {
     const dataWithLanguageDirection = {
       ...mockHeaderData,
       alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+      promoteHeaderIcon: false,
     }
     const { container } = render(<Header data={dataWithLanguageDirection} direction={DirectionEnum.RTL} />)
     expect(container.firstChild).toHaveClass('text-right')
@@ -163,6 +199,7 @@ describe('Header', () => {
     const dataWithLanguageDirection = {
       ...mockHeaderData,
       alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+      promoteHeaderIcon: false,
     }
     render(<Header direction={DirectionEnum.LTR} data={dataWithLanguageDirection} />)
     const headerLabel = screen.getByTestId('mock-label-h2')
@@ -176,5 +213,67 @@ describe('Header', () => {
       expect(screen.getByTestId(`mock-label-h${String(level)}`)).toBeInTheDocument()
       unmount()
     })
+  })
+
+  it('should render promoted layout when promoteHeaderIcon is true and icon exists', () => {
+    const dataWithPromotedIcon = {
+      ...mockHeaderData,
+      promoteHeaderIcon: true,
+    }
+    render(<Header direction={DirectionEnum.LTR} data={dataWithPromotedIcon} />)
+    // Should still render header and subheader text
+    expect(screen.getByText('Main Heading')).toBeInTheDocument()
+    expect(screen.getByText('Subheading text')).toBeInTheDocument()
+  })
+
+  it('should render promoted layout with center alignment', () => {
+    const dataWithPromotedIconCenter = {
+      ...mockHeaderData,
+      promoteHeaderIcon: true,
+      alignment: AlignmentEnum.CENTER,
+    }
+    const { container } = render(<Header direction={DirectionEnum.LTR} data={dataWithPromotedIconCenter} />)
+    // Should have justify-center class for center alignment
+    const flexContainer = container.querySelector('.flex.justify-center')
+    expect(flexContainer).toBeInTheDocument()
+    // Should align items to start (top)
+    expect(flexContainer).toHaveClass('items-start')
+  })
+
+  it('should render promoted layout with RTL direction', () => {
+    const dataWithPromotedIconRTL = {
+      ...mockHeaderData,
+      promoteHeaderIcon: true,
+      alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+    }
+    render(<Header direction={DirectionEnum.RTL} data={dataWithPromotedIconRTL} />)
+    // Should render header and subheader text
+    expect(screen.getByText('Main Heading')).toBeInTheDocument()
+    expect(screen.getByText('Subheading text')).toBeInTheDocument()
+  })
+
+  it('should render non-promoted layout when promoteHeaderIcon is true but no icon', () => {
+    const dataWithoutIcon = {
+      ...mockHeaderData,
+      promoteHeaderIcon: true,
+      header: {
+        ...mockHeaderData.header,
+        icon: undefined,
+      },
+    } as unknown as ElementsHeaderEntry
+    render(<Header direction={DirectionEnum.LTR} data={dataWithoutIcon} />)
+    // Should render header in standard layout
+    expect(screen.getByText('Main Heading')).toBeInTheDocument()
+  })
+
+  it('should render promoted layout without subheader', () => {
+    const dataWithPromotedNoSubheader = {
+      ...mockHeaderData,
+      promoteHeaderIcon: true,
+      subheader: undefined,
+    } as unknown as ElementsHeaderEntry
+    render(<Header direction={DirectionEnum.LTR} data={dataWithPromotedNoSubheader} />)
+    expect(screen.getByText('Main Heading')).toBeInTheDocument()
+    expect(screen.queryByText('Subheading text')).not.toBeInTheDocument()
   })
 })

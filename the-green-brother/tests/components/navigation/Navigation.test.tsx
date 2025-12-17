@@ -45,6 +45,16 @@ jest.mock('@/components/elements', () => ({
     return <span>{text}</span>
   },
   resolveIcon: jest.fn((icon: { name?: string } | undefined) => (icon?.name ?? 'default') as string),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ButtonLink: function MockButtonLink(props: any) {
+    const { children, data, className } = props
+    const ariaLabel = props['aria-label'] ?? data?.label?.ariaDescription
+    return (
+      <a href={data?.url} className={className} aria-label={ariaLabel}>
+        {children}
+      </a>
+    )
+  },
 }))
 
 // Mock menus

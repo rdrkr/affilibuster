@@ -61,7 +61,7 @@ function toMaterialIcon(iconName: string): string {
  * resolveIcon(null)             // null
  * ```
  */
-export function resolveIcon(icon: string | undefined | null): ResolvedIcon | null {
+function resolveIcon(icon: string | undefined | null): ResolvedIcon | null {
   if (!icon) {
     return null
   }
@@ -99,6 +99,8 @@ export interface CMSIconProps {
   className?: string
   /** Aria label for accessibility */
   ariaLabel?: string
+  /** When true, renders the icon larger with a circular background */
+  promoted?: boolean
 }
 
 /**
@@ -123,6 +125,7 @@ const sizeMappings = {
  * @param props.size - Size class for the icon
  * @param props.className - Additional CSS classes
  * @param props.ariaLabel - Aria label for accessibility
+ * @param props.promoted - When true, renders the icon larger with a circular background
  * @returns Icon element or null if no icon
  * @example
  * ```tsx
@@ -131,32 +134,52 @@ const sizeMappings = {
  * <CMSIcon icon="Account Circle" />
  * ```
  */
-export function CMSIcon({ icon, size = 'lg', className = '', ariaLabel }: CMSIconProps) {
+export function CMSIcon({ icon, size = 'lg', className = '', ariaLabel, promoted = false }: CMSIconProps) {
   const resolved = resolveIcon(icon)
 
   if (!resolved) {
     return null
   }
 
-  const sizeValue = sizeMappings[size]
+  // Use larger size when promoted
+  const effectiveSize = promoted ? 'xl' : size
+  const sizeValue = sizeMappings[effectiveSize]
+
+  // Promoted styling: circular background with fixed size for perfect circle
+  // Calculate container size: icon size + 2 * padding
+  const promotedContainerSize = sizeValue + 24 // p-3 = 12px on each side = 24px total
+  const promotedClasses = promoted ? 'inline-flex items-center justify-center rounded-full bg-primary/10 shrink-0' : ''
+  const promotedStyle = promoted
+    ? { width: `${String(promotedContainerSize)}px`, height: `${String(promotedContainerSize)}px` }
+    : {}
 
   if (resolved.type === 'local') {
-    return (
+    const imageElement = (
       <Image
         src={resolved.value}
         alt={ariaLabel ?? ''}
         width={sizeValue}
         height={sizeValue}
-        className={className}
+        className={promoted ? '' : className}
         aria-hidden={!ariaLabel}
       />
     )
+
+    if (promoted) {
+      return (
+        <span className={`${promotedClasses} ${className}`} style={promotedStyle}>
+          {imageElement}
+        </span>
+      )
+    }
+
+    return imageElement
   }
 
   // Material Symbol - use inline style for precise font-size control
-  return (
+  const materialIcon = (
     <span
-      className={`material-symbols-outlined-bold ${className}`}
+      className={`material-symbols-outlined-bold ${promoted ? 'text-primary' : ''} ${promoted ? '' : className}`}
       style={{ fontSize: `${String(sizeValue)}px` }}
       aria-label={ariaLabel}
       aria-hidden={!ariaLabel}
@@ -164,6 +187,16 @@ export function CMSIcon({ icon, size = 'lg', className = '', ariaLabel }: CMSIco
       {resolved.value}
     </span>
   )
+
+  if (promoted) {
+    return (
+      <span className={`${promotedClasses} ${className}`} style={promotedStyle}>
+        {materialIcon}
+      </span>
+    )
+  }
+
+  return materialIcon
 }
 
 export default CMSIcon

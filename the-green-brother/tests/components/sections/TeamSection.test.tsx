@@ -112,6 +112,7 @@ describe('TeamSection', () => {
     id: 1,
     header: {
       alignment: AlignmentEnum.CENTER,
+      promoteHeaderIcon: false,
       header: {
         text: 'Meet Our Team',
         ariaDescription: 'Team section heading',

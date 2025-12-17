@@ -5,7 +5,7 @@
 import React from 'react'
 
 import { NewsletterSignupCTA } from '@/components/call-to-actions'
-import { Button, CMSIcon, CMSImage, CMSText, Header, Label, TextBlock } from '@/components/elements'
+import { ButtonAction, ButtonLink, CMSIcon, CMSImage, CMSText, Header, Label, TextBlock } from '@/components/elements'
 import { LanguageMenu, ProductCategoriesMenu, SearchMenu, ThemeMenu } from '@/components/menus'
 import BackToTopButton from '@/components/navigation/BackToTopButton'
 import { BrandFeaturesSection, HeroSection } from '@/components/sections'
@@ -55,6 +55,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
           },
           header: {
             alignment: AlignmentEnum.CENTER,
+            promoteHeaderIcon: false,
             header: {
               icon: 'eco',
               text: 'TheGreenBrother **Style Guide**',
@@ -761,6 +762,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                   direction={direction}
                   data={{
                     alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+                    promoteHeaderIcon: false,
                     header: {
                       icon: 'nest_eco_leaf',
                       text: 'Sustainable Products',
@@ -774,13 +776,12 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                     },
                   }}
                   level={2}
-                  headerClassName="text-3xl text-white"
-                  subheaderClassName="text-text-secondary-dark"
                 />
                 <Header
                   direction={direction}
                   data={{
                     alignment: AlignmentEnum.CENTER,
+                    promoteHeaderIcon: false,
                     header: {
                       icon: 'star',
                       text: 'Featured Collection',
@@ -789,7 +790,6 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                     },
                   }}
                   level={3}
-                  headerClassName="text-2xl text-white"
                 />
               </div>
               <div className="mt-6 rounded-xl bg-surface-dark p-4">
@@ -798,6 +798,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                     {`<Header direction={direction}
   data={{
     alignment: AlignmentEnum.CENTER,
+        promoteHeaderIcon: false,
     header: { icon: 'nest_eco_leaf', text: 'Title', ariaDescription: '...' },
     subheader: { text: 'Subtitle', ariaDescription: '...' }
   }}
@@ -820,7 +821,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                 <div>
                   <h4 className="mb-4 text-lg font-semibold text-white">Variants</h4>
                   <div className="flex flex-wrap gap-4">
-                    <Button
+                    <ButtonLink
                       direction={direction}
                       data={{
                         label: {
@@ -833,7 +834,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       }}
                       variant="primary"
                     />
-                    <Button
+                    <ButtonLink
                       direction={direction}
                       data={{
                         label: {
@@ -846,7 +847,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       }}
                       variant="secondary"
                     />
-                    <Button
+                    <ButtonLink
                       direction={direction}
                       data={{
                         label: {
@@ -859,7 +860,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       }}
                       variant="outline"
                     />
-                    <Button
+                    <ButtonLink
                       direction={direction}
                       data={{
                         label: {
@@ -872,7 +873,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       }}
                       variant="ghost"
                     />
-                    <Button
+                    <ButtonLink
                       direction={direction}
                       data={{
                         label: {
@@ -892,7 +893,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                 <div>
                   <h4 className="mb-4 text-lg font-semibold text-white">Sizes</h4>
                   <div className="flex flex-wrap items-center gap-4">
-                    <Button
+                    <ButtonLink
                       direction={direction}
                       data={{
                         label: {
@@ -906,7 +907,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       variant="primary"
                       size="sm"
                     />
-                    <Button
+                    <ButtonLink
                       direction={direction}
                       data={{
                         label: {
@@ -920,7 +921,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       variant="primary"
                       size="md"
                     />
-                    <Button
+                    <ButtonLink
                       direction={direction}
                       data={{
                         label: {
@@ -941,7 +942,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                 <div>
                   <h4 className="mb-4 text-lg font-semibold text-white">With Icons</h4>
                   <div className="flex flex-wrap gap-4">
-                    <Button
+                    <ButtonLink
                       direction={direction}
                       data={{
                         label: {
@@ -956,7 +957,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       variant="primary"
                       size="lg"
                     />
-                    <Button
+                    <ButtonLink
                       direction={direction}
                       data={{
                         label: {
@@ -977,7 +978,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                 <div>
                   <h4 className="mb-4 text-lg font-semibold text-white">States</h4>
                   <div className="flex flex-wrap gap-4">
-                    <Button
+                    <ButtonLink
                       direction={direction}
                       data={{
                         label: {
@@ -990,7 +991,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       }}
                       variant="primary"
                     />
-                    <Button
+                    <ButtonAction
                       direction={direction}
                       data={{
                         label: {
@@ -1003,7 +1004,6 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       }}
                       variant="primary"
                       disabled
-                      asButton
                     />
                   </div>
                 </div>
@@ -1012,13 +1012,16 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
               <div className="mt-6 rounded-xl bg-surface-dark p-4">
                 <pre className="overflow-x-auto text-xs">
                   <code className="text-tertiary-300">
-                    {`<Button direction={direction}
+                    {`<ButtonLink direction={direction}
   data={{
-    icon: 'nest_eco_leaf',
-    text: 'Shop Eco-Friendly',
+    label: {
+      icon: 'nest_eco_leaf',
+      text: 'Shop Eco-Friendly',
+      iconPosition: IconPositionEnum.BEFORE_TEXT,
+      ariaDescription: '...'
+    },
     url: '/products',
     openInNewTab: false,
-    ariaDescription: '...'
   }}
   variant="primary"
   size="lg"
@@ -1040,6 +1043,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                   __component: 'elements.text-block',
                   header: {
                     alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+                    promoteHeaderIcon: false,
                     header: {
                       icon: 'info',
                       text: 'About TheGreenBrother',
@@ -1109,6 +1113,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                   onLanguageChange={(code: CodeEnum) => {
                     console.log('Language changed to:', code)
                   }}
+                  direction={direction}
                 />
               </div>
               <div className="mt-6 rounded-xl bg-surface-dark p-4">
@@ -1182,6 +1187,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                   onThemeChange={(theme: string) => {
                     console.log('Theme changed to:', theme)
                   }}
+                  direction={direction}
                 />
               </div>
               <div className="mt-6 rounded-xl bg-surface-dark p-4">
@@ -1332,6 +1338,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       ],
                     }}
                     isActive={false}
+                    direction={direction}
                   />
                 </div>
               </div>
@@ -1411,6 +1418,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       },
                       header: {
                         alignment: AlignmentEnum.CENTER,
+                        promoteHeaderIcon: false,
                         header: {
                           icon: 'eco',
                           text: 'Text **Over** Background',
@@ -1461,6 +1469,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       },
                       header: {
                         alignment: AlignmentEnum.CENTER,
+                        promoteHeaderIcon: false,
                         header: {
                           icon: 'nature',
                           text: 'Text **Above** Background',
@@ -1519,6 +1528,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       {
                         id: 1,
                         alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+                        promoteHeaderIcon: false,
                         header: {
                           icon: 'eco',
                           text: '100% Sustainable',
@@ -1534,6 +1544,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       {
                         id: 2,
                         alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+                        promoteHeaderIcon: false,
                         header: {
                           icon: 'verified',
                           text: 'Quality Guaranteed',
@@ -1549,6 +1560,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       {
                         id: 3,
                         alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+                        promoteHeaderIcon: false,
                         header: {
                           icon: 'local_shipping',
                           text: 'Carbon Neutral Shipping',
@@ -1564,6 +1576,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       {
                         id: 4,
                         alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+                        promoteHeaderIcon: false,
                         header: {
                           icon: 'recycling',
                           text: 'Recyclable Packaging',

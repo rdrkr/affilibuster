@@ -20,12 +20,18 @@ jest.mock('@/lib/languages/api', () => ({
 // Mock the HomeClient component
 jest.mock('@/app/[lang]/(homepage)/HomeClient', () => ({
   __esModule: true,
-  default: function MockHomeClient(props: Record<string, unknown>) {
-    return <div data-testid="home-client" data-props={JSON.stringify(props)} />
+  default: function MockHomeClient({ children }: { children: React.ReactNode }) {
+    return <div data-testid="home-client">{children}</div>
   },
 }))
 
+// Mock HomeSections component
+jest.mock('@/components/homepage', () => ({
+  HomeSections: jest.fn(() => <div data-testid="home-sections" />),
+}))
+
 import HomePage from '@/app/[lang]/(homepage)/page'
+import { HomeSections } from '@/components/homepage'
 import { getBlogPosts, getHomepage, getProductCategories, getProducts } from '@/lib/client'
 import { CodeEnum, CurrencyCode, DirectionEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
@@ -36,6 +42,7 @@ const mockGetProducts = getProducts as jest.MockedFunction<typeof getProducts>
 const mockGetProductCategories = getProductCategories as jest.MockedFunction<typeof getProductCategories>
 const mockGetBlogPosts = getBlogPosts as jest.MockedFunction<typeof getBlogPosts>
 const mockGetLanguages = getLanguages as jest.MockedFunction<typeof getLanguages>
+const mockHomeSections = HomeSections as unknown as jest.Mock
 
 describe('HomePage', () => {
   beforeEach(() => {
@@ -78,7 +85,7 @@ describe('HomePage', () => {
     ])
   })
 
-  it('should fetch data and pass to HomeClient', async () => {
+  it('should fetch data and pass to HomeSections', async () => {
     const mockHomepageData = { sections: [] }
     const mockProducts = { data: [{ id: 1 }], meta: {} }
     const mockCategories = { data: [{ id: 1 }], meta: {} }
@@ -101,10 +108,21 @@ describe('HomePage', () => {
     })
     expect(mockGetLanguages).toHaveBeenCalled()
     expect(screen.getByTestId('home-client')).toBeInTheDocument()
+    expect(screen.getByTestId('home-sections')).toBeInTheDocument()
+    expect(mockHomeSections).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sections: mockHomepageData.sections,
+        products: mockProducts.data,
+        categories: mockCategories.data,
+        blogPosts: mockBlogPosts.data,
+        direction: DirectionEnum.LTR,
+      }),
+      undefined
+    )
   })
 
-  it('should pass empty arrays when responses are null', async () => {
-    mockGetHomepage.mockResolvedValue(null)
+  it('should pass empty arrays when other responses are null', async () => {
+    mockGetHomepage.mockResolvedValue({ sections: [] } as unknown as Awaited<ReturnType<typeof getHomepage>>)
     mockGetProducts.mockResolvedValue(null)
     mockGetProductCategories.mockResolvedValue(null)
     mockGetBlogPosts.mockResolvedValue(null)
@@ -112,11 +130,29 @@ describe('HomePage', () => {
     const Component = await HomePage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
     render(Component)
 
-    const homeClient = screen.getByTestId('home-client')
-    const props = JSON.parse(homeClient.getAttribute('data-props') ?? '{}')
-    expect(props.products).toEqual([])
-    expect(props.categories).toEqual([])
-    expect(props.blogPosts).toEqual([])
+    expect(mockHomeSections).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sections: [],
+        products: [],
+        categories: [],
+        blogPosts: [],
+      }),
+      undefined
+    )
+  })
+
+  it('should return null if homepage data is missing', async () => {
+    mockGetHomepage.mockResolvedValue(null)
+    mockGetProducts.mockResolvedValue({ data: [] } as unknown as Awaited<ReturnType<typeof getProducts>>)
+    mockGetProductCategories.mockResolvedValue({ data: [] } as unknown as Awaited<
+      ReturnType<typeof getProductCategories>
+    >)
+    mockGetBlogPosts.mockResolvedValue({ data: [] } as unknown as Awaited<ReturnType<typeof getBlogPosts>>)
+    mockGetLanguages.mockResolvedValue([])
+
+    const result = await HomePage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+
+    expect(result).toBeNull()
   })
 
   it('should work with Italian locale', async () => {
@@ -144,9 +180,12 @@ describe('HomePage', () => {
     const Component = await HomePage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
     render(Component)
 
-    const homeClient = screen.getByTestId('home-client')
-    const props = JSON.parse(homeClient.getAttribute('data-props') ?? '{}')
-    expect(props.direction).toBe(DirectionEnum.LTR)
+    expect(mockHomeSections).toHaveBeenCalledWith(
+      expect.objectContaining({
+        direction: DirectionEnum.LTR,
+      }),
+      undefined
+    )
   })
 
   it('should pass RTL direction for Hebrew locale', async () => {
@@ -160,9 +199,12 @@ describe('HomePage', () => {
     const Component = await HomePage({ params: Promise.resolve({ lang: CodeEnum.HE }) })
     render(Component)
 
-    const homeClient = screen.getByTestId('home-client')
-    const props = JSON.parse(homeClient.getAttribute('data-props') ?? '{}')
-    expect(props.direction).toBe(DirectionEnum.RTL)
+    expect(mockHomeSections).toHaveBeenCalledWith(
+      expect.objectContaining({
+        direction: DirectionEnum.RTL,
+      }),
+      undefined
+    )
   })
 
   it('should default to LTR when languages API returns null', async () => {
@@ -177,8 +219,11 @@ describe('HomePage', () => {
     const Component = await HomePage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
     render(Component)
 
-    const homeClient = screen.getByTestId('home-client')
-    const props = JSON.parse(homeClient.getAttribute('data-props') ?? '{}')
-    expect(props.direction).toBe(DirectionEnum.LTR)
+    expect(mockHomeSections).toHaveBeenCalledWith(
+      expect.objectContaining({
+        direction: DirectionEnum.LTR,
+      }),
+      undefined
+    )
   })
 })

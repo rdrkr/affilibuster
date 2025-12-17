@@ -7,9 +7,8 @@
 import * as elements from '@/components/elements'
 
 describe('components/elements barrel exports', () => {
-  it('should export CMSIcon component and helpers', () => {
+  it('should export CMSIcon component', () => {
     expect(elements.CMSIcon).toBeDefined()
-    expect(elements.resolveIcon).toBeDefined()
   })
 
   it('should export CMSImage component', () => {
@@ -21,8 +20,12 @@ describe('components/elements barrel exports', () => {
     expect(elements.resolveTextFormatHtml).toBeDefined()
   })
 
-  it('should export Button component', () => {
-    expect(elements.Button).toBeDefined()
+  it('should export ButtonAction component', () => {
+    expect(elements.ButtonAction).toBeDefined()
+  })
+
+  it('should export ButtonLink component', () => {
+    expect(elements.ButtonLink).toBeDefined()
   })
 
   it('should export Header component', () => {

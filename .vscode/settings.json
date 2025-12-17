@@ -179,6 +179,7 @@
     "Asyncio",
     "asyncpg",
     "autogenerate",
+    "Blockquotes",
     "bschauer",
     "Buildx",
     "certfile",
@@ -294,6 +295,7 @@
     "worksteal",
     "worktree",
     "xdist",
+    "אודות",
     "עברית"
   ],
   "cSpell.enabledFileTypes": {

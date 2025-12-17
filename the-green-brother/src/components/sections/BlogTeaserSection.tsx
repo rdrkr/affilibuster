@@ -8,11 +8,7 @@
  * Uses Header composite for section title.
  */
 
-'use client'
-
-import Link from 'next/link'
-
-import { CMSIcon, CMSImage, CMSText, Header } from '@/components/elements'
+import { Card, Header, Label } from '@/components/elements'
 import {
   DirectionEnum,
   type ApiBlogPostBlogPostDocument,
@@ -52,19 +48,12 @@ export function BlogTeaserSection({ data, blogPosts, direction }: BlogTeaserSect
 
   return (
     <section className="mb-24" aria-label={header.header?.ariaDescription ?? ''}>
-      <Header
-        data={header}
-        level={2}
-        className="mb-12"
-        headerClassName="text-3xl text-white"
-        subheaderClassName="mx-auto max-w-2xl text-lg text-text-secondary-dark"
-        direction={direction}
-      />
+      <Header data={header} level={2} direction={direction} />
 
       {/* Horizontal scroll carousel */}
       <div
         className={`
-          scrollbar-hide flex snap-x snap-mandatory gap-8 overflow-x-auto
+          scrollbar-hide mt-12 flex snap-x snap-mandatory gap-8 overflow-x-auto
         `}
         role="region"
         aria-label={header.header?.ariaDescription ?? ''}
@@ -72,77 +61,37 @@ export function BlogTeaserSection({ data, blogPosts, direction }: BlogTeaserSect
       >
         {blogPosts.map(post => {
           const { featuredImage } = post
-          const firstTag = post.tags?.[0]
+          const firstTag = post.tags?.[0]?.tag?.text ?? ''
 
           return (
-            <Link
+            <Card
               key={post.documentId}
               href={`/blog/${post.slug}`}
-              className={`
-                group isolate flex h-card w-blog-carousel-mobile shrink-0 snap-start
-                flex-col overflow-hidden rounded-xl border
-                border-white/5 bg-surface-dark transition-all
-                hover:-translate-y-1 hover:border-primary/30
-                md:w-blog-carousel-desktop
-              `}
+              image={featuredImage}
+              imageAlt={post.content?.header?.header?.text ?? ''}
+              tag={firstTag}
+              variant="blog"
             >
-              <div className="relative h-48 overflow-hidden bg-tertiary-800">
-                <CMSImage
-                  image={featuredImage}
-                  fallbackAlt={post.content?.header?.header?.text ?? ''}
-                  className={`
-                    object-cover transition-transform duration-500
-                    group-hover:scale-110
-                  `}
-                  fill
-                  sizes="(max-width: 768px) 85vw, calc((100vw - 4rem) / 3.5)"
+              {post.content?.header && (
+                <Header
+                  data={post.content.header}
+                  level={4}
+                  direction={direction}
+                  className="mb-3"
+                  headerClassName="line-clamp-2 text-lg leading-snug font-bold text-white transition-colors group-hover:text-primary"
+                  subheaderClassName="line-clamp-3 grow text-sm text-text-secondary-dark"
+                />
+              )}
+              <div className={`mt-auto flex items-center text-xs font-bold text-primary`}>
+                <Label
+                  data={post.readArticleLabel}
+                  direction={direction}
+                  iconSize="sm"
+                  display="inline"
+                  className="text-xs font-bold text-primary"
                 />
               </div>
-              <div className="flex grow flex-col p-6">
-                {firstTag?.tag && (
-                  <span
-                    className={`
-                    mb-2 text-xs font-bold tracking-wider text-primary uppercase
-                  `}
-                  >
-                    <CMSText text={firstTag.tag.text} />
-                  </span>
-                )}
-                {post.content?.header?.header && (
-                  <h3
-                    className={`
-                      mb-3 line-clamp-2 text-lg leading-snug font-bold
-                      text-white transition-colors
-                      group-hover:text-primary
-                    `}
-                  >
-                    <CMSText text={post.content.header.header.text} />
-                  </h3>
-                )}
-                {post.content?.header?.subheader?.text && (
-                  <p
-                    className={`
-                    mb-4 line-clamp-3 grow text-sm text-text-secondary-dark
-                  `}
-                  >
-                    <CMSText text={post.content.header.subheader.text} />
-                  </p>
-                )}
-                <div
-                  className={`
-                    mt-auto flex items-center text-xs font-bold text-primary
-                    ${isRTL ? 'flex-row-reverse' : ''}
-                  `}
-                >
-                  <CMSText text={post.readArticleLabel.text} />
-                  <CMSIcon
-                    icon={post.readArticleLabel.icon ?? 'arrow_forward'}
-                    size="sm"
-                    className={isRTL ? 'mr-1' : 'ml-1'}
-                  />
-                </div>
-              </div>
-            </Link>
+            </Card>
           )
         })}
       </div>

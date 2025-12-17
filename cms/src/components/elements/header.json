@@ -10,7 +10,7 @@
       "type": "component",
       "component": "elements.label",
       "repeatable": false,
-      "required": true
+      "required": false
     },
     "subheader": {
       "type": "component",
@@ -23,6 +23,11 @@
       "required": true,
       "default": "language-direction",
       "enum": ["center", "language-direction"]
+    },
+    "promoteHeaderIcon": {
+      "type": "boolean",
+      "required": true,
+      "default": false
     }
   },
   "config": {}

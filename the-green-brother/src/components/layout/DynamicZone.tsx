@@ -25,8 +25,13 @@ interface DynamicSection {
  */
 interface SectionGroup {
   layout: 'vertical' | 'horizontal'
-  sections: { section: DynamicSection; element: ReactNode; index: number }[]
+  sections: { section: DynamicSection; element: ReactNode | Promise<ReactNode>; index: number }[]
 }
+
+/**
+ * Vertical alignment options for horizontal layout
+ */
+export type VerticalAlignment = 'top' | 'center' | 'bottom'
 
 /**
  * Props for the DynamicZone component
@@ -35,11 +40,19 @@ export interface DynamicZoneProps<T extends DynamicSection> {
   /** Array of sections from CMS dynamic zone */
   sections: T[]
   /** Function to render each section based on its type */
-  renderSection: (section: T) => ReactNode
+  renderSection: (section: T) => ReactNode | Promise<ReactNode>
   /** Language direction for RTL support (defaults to DirectionEnum.LTR) */
   direction: DirectionEnum
   /** Additional className for the container */
   className?: string
+  /** Vertical alignment for horizontal layout groups */
+  verticalAlignment: VerticalAlignment
+  /**
+   * Spacing classes for horizontal groups.
+   * Defaults to '-mt-26 -mb-12' for overlap effect.
+   * Pass empty string to disable.
+   */
+  horizontalGroupSpacing?: string
 }
 
 /**
@@ -57,7 +70,7 @@ const END_MARKER = 'markers.end-horizontal-layout-marker'
  */
 function groupSections<T extends DynamicSection>(
   sections: T[],
-  renderSection: (section: T) => ReactNode
+  renderSection: (section: T) => ReactNode | Promise<ReactNode>
 ): SectionGroup[] {
   const groups: SectionGroup[] = []
   let currentGroup: SectionGroup = { layout: 'vertical', sections: [] }
@@ -101,6 +114,22 @@ function groupSections<T extends DynamicSection>(
 }
 
 /**
+ * Helper to get alignment utility class
+ * @param alignment - Vertical alignment option
+ * @returns Tailwind CSS class for alignment
+ */
+export const getAlignmentClass = (alignment: VerticalAlignment): string => {
+  switch (alignment) {
+    case 'top':
+      return 'md:items-start'
+    case 'bottom':
+      return 'md:items-end'
+    default:
+      return 'md:items-center'
+  }
+}
+
+/**
  * Dynamic zone renderer with horizontal layout marker support.
  *
  * Renders CMS dynamic zone sections, grouping sections between
@@ -111,18 +140,16 @@ function groupSections<T extends DynamicSection>(
  * @param props.renderSection - Function to render each section
  * @param props.direction - Language direction (ltr/rtl)
  * @param props.className - Additional className for container
+ * @param props.verticalAlignment - Vertical alignment for horizontal groups
+ * @param props.horizontalGroupSpacing - Custom spacing for horizontal groups
  * @returns Rendered dynamic zone with horizontal groups
  * @example
  * ```tsx
  * <DynamicZone
  *   sections={homepage.sections}
- *   renderSection={(section) => {
- *     switch (section.__component) {
- *       case 'sections.hero': return <HeroSection data={section} />
- *       default: return null
- *     }
- *   }}
+ *   renderSection={(section) => ...}
  *   direction="ltr"
+ *   verticalAlignment="center"
  * />
  * ```
  */
@@ -131,9 +158,12 @@ export function DynamicZone<T extends DynamicSection>({
   renderSection,
   direction,
   className = '',
+  verticalAlignment,
+  horizontalGroupSpacing = '-mt-26 -mb-12',
 }: DynamicZoneProps<T>) {
   const groups = groupSections(sections, renderSection)
   const isRTL = direction === DirectionEnum.RTL
+  const alignmentClass = getAlignmentClass(verticalAlignment)
 
   return (
     <div className={`flex flex-col gap-12 ${className}`}>
@@ -143,14 +173,15 @@ export function DynamicZone<T extends DynamicSection>({
             <div
               key={`group-${String(groupIndex)}`}
               className={`
-                -mt-26 -mb-12 flex flex-col gap-0
-                md:flex-row md:items-center md:gap-12
+                flex flex-col gap-0
+                md:flex-row ${alignmentClass} md:gap-12
+                ${horizontalGroupSpacing}
                 ${isRTL ? 'md:flex-row-reverse' : ''}
               `}
             >
               {group.sections.map(({ element, index }) => (
                 <div key={`section-${String(index)}`} className="flex-1">
-                  {element}
+                  {element as ReactNode}
                 </div>
               ))}
             </div>
@@ -158,10 +189,10 @@ export function DynamicZone<T extends DynamicSection>({
         }
 
         // Vertical layout - render sections normally (fragments to avoid nested gaps)
-        return group.sections.map(({ element, index }) => <div key={`section-${String(index)}`}>{element}</div>)
+        return group.sections.map(({ element, index }) => (
+          <div key={`section-${String(index)}`}>{element as ReactNode}</div>
+        ))
       })}
     </div>
   )
 }
-
-export default DynamicZone

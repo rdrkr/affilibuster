@@ -112,6 +112,32 @@ describe('CMSText', () => {
       unmount()
     })
   })
+  it('should convert newlines to <br /> elements', () => {
+    const { container } = render(<CMSText text={'Line 1\nLine 2'} />)
+    const br = container.querySelector('br')
+    expect(br).toBeInTheDocument()
+    // Text nodes should be processed
+    expect(screen.getByText(/Line 1/)).toBeInTheDocument()
+    expect(screen.getByText(/Line 2/)).toBeInTheDocument()
+  })
+
+  it('should handle mixed bold and newlines', () => {
+    const { container } = render(<CMSText text={'**Bold**\nText'} />)
+    // Check for bold span
+    expect(container.querySelector('.text-primary')).toHaveTextContent('Bold')
+    // Check for break
+    expect(container.querySelector('br')).toBeInTheDocument()
+    // Check for plain text
+    expect(screen.getByText('Text')).toBeInTheDocument()
+  })
+
+  it('should convert escaped newlines (\\n) to <br /> elements', () => {
+    const { container } = render(<CMSText text={'Line 1\\nLine 2'} />)
+    const br = container.querySelector('br')
+    expect(br).toBeInTheDocument()
+    expect(screen.getByText(/Line 1/)).toBeInTheDocument()
+    expect(screen.getByText(/Line 2/)).toBeInTheDocument()
+  })
 })
 
 describe('resolveTextFormat', () => {
@@ -155,5 +181,13 @@ describe('resolveTextFormatHtml', () => {
 
   it('should handle only bold text', () => {
     expect(resolveTextFormatHtml('**OnlyBold**')).toBe('<span class="text-primary">OnlyBold</span>')
+  })
+
+  it('should convert newlines to <br /> tags', () => {
+    expect(resolveTextFormatHtml('Line 1\nLine 2')).toBe('Line 1<br />Line 2')
+  })
+
+  it('should handle mixed bold and newlines', () => {
+    expect(resolveTextFormatHtml('**Bold**\nText')).toBe('<span class="text-primary">Bold</span><br />Text')
   })
 })

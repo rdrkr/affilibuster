@@ -6,31 +6,9 @@
 
 import { act, render, screen } from '@testing-library/react'
 
-// Mock HomeSections component
-jest.mock('@/components/homepage', () => ({
-  HomeSections: function MockHomeSections({ direction }: { direction?: string }) {
-    return (
-      <div data-testid="home-sections" data-direction={direction}>
-        Home Sections
-      </div>
-    )
-  },
-}))
-
-import HomeClient, { type HomeClientProps } from '@/app/[lang]/(homepage)/HomeClient'
-import { DirectionEnum } from '@/lib/generated/types.gen'
+import HomeClient from '@/app/[lang]/(homepage)/HomeClient'
 
 describe('HomeClient', () => {
-  const defaultProps: HomeClientProps = {
-    homepageData: {
-      sections: [],
-    } as unknown as HomeClientProps['homepageData'],
-    products: [],
-    categories: [],
-    blogPosts: [],
-    direction: DirectionEnum.LTR,
-  }
-
   beforeEach(() => {
     jest.useFakeTimers()
   })
@@ -39,20 +17,23 @@ describe('HomeClient', () => {
     jest.useRealTimers()
   })
 
-  it('should return null when homepageData is null', () => {
-    const { container } = render(<HomeClient {...defaultProps} homepageData={null} />)
+  it('should render children', () => {
+    render(
+      <HomeClient>
+        <div data-testid="child">Child Content</div>
+      </HomeClient>
+    )
 
-    expect(container.firstChild).toBeNull()
-  })
-
-  it('should render HomeSections when homepageData is provided', () => {
-    render(<HomeClient {...defaultProps} />)
-
-    expect(screen.getByTestId('home-sections')).toBeInTheDocument()
+    expect(screen.getByTestId('child')).toBeInTheDocument()
+    expect(screen.getByText('Child Content')).toBeInTheDocument()
   })
 
   it('should start with opacity-0 and transition to opacity-100', () => {
-    const { container } = render(<HomeClient {...defaultProps} />)
+    const { container } = render(
+      <HomeClient>
+        <div>Content</div>
+      </HomeClient>
+    )
 
     // Initially should be opacity-0
     const wrapper = container.firstChild as HTMLElement
@@ -69,7 +50,11 @@ describe('HomeClient', () => {
   it('should cancel animation frame on unmount', () => {
     const cancelAnimationFrameSpy = jest.spyOn(window, 'cancelAnimationFrame')
 
-    const { unmount } = render(<HomeClient {...defaultProps} />)
+    const { unmount } = render(
+      <HomeClient>
+        <div>Content</div>
+      </HomeClient>
+    )
     unmount()
 
     expect(cancelAnimationFrameSpy).toHaveBeenCalled()
@@ -77,22 +62,14 @@ describe('HomeClient', () => {
   })
 
   it('should render with transition classes', () => {
-    const { container } = render(<HomeClient {...defaultProps} />)
+    const { container } = render(
+      <HomeClient>
+        <div>Content</div>
+      </HomeClient>
+    )
 
     const wrapper = container.firstChild as HTMLElement
     expect(wrapper.className).toContain('transition-opacity')
     expect(wrapper.className).toContain('duration-1000')
-  })
-
-  it('should pass LTR direction to HomeSections by default', () => {
-    render(<HomeClient {...defaultProps} />)
-
-    expect(screen.getByTestId('home-sections').getAttribute('data-direction')).toBe(DirectionEnum.LTR)
-  })
-
-  it('should pass RTL direction to HomeSections when specified', () => {
-    render(<HomeClient {...defaultProps} direction={DirectionEnum.RTL} />)
-
-    expect(screen.getByTestId('home-sections').getAttribute('data-direction')).toBe(DirectionEnum.RTL)
   })
 })

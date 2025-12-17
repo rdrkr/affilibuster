@@ -8,8 +8,6 @@
  * Uses Header composite for section title and Label for category items.
  */
 
-'use client'
-
 import Link from 'next/link'
 
 import { CMSIcon, CMSText, Header } from '@/components/elements'
@@ -51,18 +49,11 @@ export function ProductCategoriesSection({ data, categories, direction }: Produc
 
   return (
     <section className="mb-0" aria-label={header.header?.ariaDescription ?? ''}>
-      <Header
-        data={header}
-        level={3}
-        className="mb-10"
-        headerClassName="text-3xl"
-        subheaderClassName="text-text-secondary-dark"
-        direction={direction}
-      />
+      <Header data={header} level={2} direction={direction} />
       <div
         className={`
-        flex flex-wrap justify-center gap-8
-        md:gap-16
+        mt-12 flex flex-wrap justify-center
+        gap-8 md:gap-16
       `}
       >
         {categories.map(category => {

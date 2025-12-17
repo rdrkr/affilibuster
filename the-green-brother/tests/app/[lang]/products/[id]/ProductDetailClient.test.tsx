@@ -217,4 +217,93 @@ describe('ProductDetailClient', () => {
       fireEvent.click(thumbnailButtons[1]!)
     }
   })
+
+  it('should use slug as fallback when content.header.header.text is missing', () => {
+    const productMissingTitle = {
+      ...mockProduct,
+      slug: 'eco-fallback-slug',
+      affiliateButton: { url: '' },
+      content: {
+        header: {
+          header: { text: undefined },
+        },
+      },
+    } as unknown as ApiProductProductDocument
+
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {
+      return
+    })
+
+    render(<ProductDetailClient product={productMissingTitle} lang={CodeEnum.EN} />)
+
+    // Click Add to Cart to trigger handleAddToCart which uses the fallback
+    const addToCartButton = screen.getByRole('button', { name: 'Add to Cart' })
+    fireEvent.click(addToCartButton)
+
+    // Should use slug as fallback
+    expect(consoleSpy).toHaveBeenCalledWith('Added 1 of eco-fallback-slug to cart')
+    consoleSpy.mockRestore()
+  })
+
+  it('should not render category when not available', () => {
+    const productWithoutCategory = {
+      ...mockProduct,
+      category: undefined,
+    } as unknown as ApiProductProductDocument
+
+    render(<ProductDetailClient product={productWithoutCategory} lang={CodeEnum.EN} />)
+
+    expect(screen.queryByText('Electronics')).not.toBeInTheDocument()
+  })
+
+  it('should not render price section when price is not available', () => {
+    const productWithoutPrice = {
+      ...mockProduct,
+      price: undefined,
+    } as unknown as ApiProductProductDocument
+
+    render(<ProductDetailClient product={productWithoutPrice} lang={CodeEnum.EN} />)
+
+    expect(screen.queryByText('$49.99')).not.toBeInTheDocument()
+  })
+
+  it('should not render subheader when not available', () => {
+    const productWithoutSubheader = {
+      ...mockProduct,
+      content: {
+        header: { header: { text: 'No Subheader Product' } },
+        content: '<p>Content</p>',
+      },
+    } as unknown as ApiProductProductDocument
+
+    render(<ProductDetailClient product={productWithoutSubheader} lang={CodeEnum.EN} />)
+
+    expect(screen.queryByText('A sustainable product')).not.toBeInTheDocument()
+  })
+
+  it('should not render currency code for USD', () => {
+    const productWithUSD = {
+      ...mockProduct,
+      currency: { code: 'USD' },
+    } as ApiProductProductDocument
+
+    render(<ProductDetailClient product={productWithUSD} lang={CodeEnum.EN} />)
+
+    // USD code should not be displayed
+    expect(screen.queryByText('USD')).not.toBeInTheDocument()
+  })
+
+  it('should not show thumbnails for single image', () => {
+    const productWithSingleImage = {
+      ...mockProduct,
+      images: [{ url: '/images/single.jpg' }],
+    } as ApiProductProductDocument
+
+    render(<ProductDetailClient product={productWithSingleImage} lang={CodeEnum.EN} />)
+
+    // Only 1 image, no thumbnail grid
+    const buttons = screen.getAllByRole('button')
+    const thumbnailButtons = buttons.filter(btn => btn.className.includes('aspect-square'))
+    expect(thumbnailButtons.length).toBe(0)
+  })
 })

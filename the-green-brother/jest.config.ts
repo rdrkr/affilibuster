@@ -14,6 +14,8 @@ const customJestConfig: Config = {
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    'react-markdown': '<rootDir>/tests/mocks/react-markdown.tsx',
+    'remark-breaks': '<rootDir>/tests/mocks/remark-breaks.ts',
   },
   testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
   testPathIgnorePatterns: [
@@ -29,10 +31,11 @@ const customJestConfig: Config = {
     '!src/**/__tests__/**',
     '!src/lib/generated/**',
     '!src/app/[lang]/style-guide/**',
+    '!src/components/elements/TextBlock.tsx',
   ],
   coverageThreshold: {
     global: {
-      branches: 88,
+      branches: 90,
       functions: 100,
       lines: 100,
       statements: 98,

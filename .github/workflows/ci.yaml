@@ -4,7 +4,7 @@ name: CI
 
 on:
   push:
-    branches: ['main', 'develop'] #, "claude/**" ]
+    branches: ['main']
   workflow_dispatch:
 
 concurrency:
@@ -20,9 +20,28 @@ jobs:
   ci:
     name: CI Pipeline
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 120
 
     steps:
+      # ========================================
+      # 0. Free Disk Space (Fix for "no space left on device")
+      # ========================================
+      - name: Free Disk Space
+        run: |
+          echo "🧹 Freeing up disk space..."
+          echo "Disk space before cleanup:"
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf /usr/local/.ghcup
+          sudo apt-get clean
+          docker system prune -af
+          echo "Disk space after cleanup:"
+          df -h
+
       # ========================================
       # 1. Checkout & Setup Tools
       # ========================================

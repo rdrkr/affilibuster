@@ -9,8 +9,25 @@ import { render, screen } from '@testing-library/react'
 import { Label, type LabelProps } from '@/components/elements/Label'
 import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 
-// Mock the CMS primitive components
-jest.mock('@/components/elements', () => ({
+// Mock the CMS primitive components (Label uses relative imports)
+jest.mock('@/components/elements/CMSIcon', () => ({
+  __esModule: true,
+  default: function MockCMSIcon({
+    icon,
+    size,
+    className,
+  }: {
+    icon?: string
+    size?: string
+    className?: string
+    ariaLabel?: string
+  }) {
+    return (
+      <span data-testid="mock-icon" data-icon={icon} data-size={size} className={className}>
+        {icon}
+      </span>
+    )
+  },
   CMSIcon: function MockCMSIcon({
     icon,
     size,
@@ -24,6 +41,17 @@ jest.mock('@/components/elements', () => ({
     return (
       <span data-testid="mock-icon" data-icon={icon} data-size={size} className={className}>
         {icon}
+      </span>
+    )
+  },
+}))
+
+jest.mock('@/components/elements/CMSText', () => ({
+  __esModule: true,
+  default: function MockCMSText({ text, className }: { text?: string; className?: string }) {
+    return (
+      <span data-testid="mock-text" className={className}>
+        {text}
       </span>
     )
   },

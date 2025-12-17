@@ -1,6 +1,6 @@
 openapi: 3.1.0
 x-powered-by: strapi
-x-strapi-version: 5.32.0
+x-strapi-version: 5.33.0
 info:
   title: affilibuster-cms
   description: API documentation for affilibuster-cms v0.1.0
@@ -113,7 +113,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -462,7 +464,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       loginTitle:
                         description: A string field
                         type: string
@@ -882,7 +886,9 @@ paths:
                           type: string
                           example: 550e8400-e29b-41d4-a716-446655440000
                         id:
-                          type: number
+                          anyOf:
+                            - type: string
+                            - type: number
                         name:
                           description: A string field
                           type: string
@@ -1221,7 +1227,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       name:
                         description: A string field
                         type: string
@@ -1447,7 +1455,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -1773,7 +1783,9 @@ paths:
                           type: string
                           example: 550e8400-e29b-41d4-a716-446655440000
                         id:
-                          type: number
+                          anyOf:
+                            - type: string
+                            - type: number
                         tagId:
                           description: A UID field
                           type: string
@@ -2035,7 +2047,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       tagId:
                         description: A UID field
                         type: string
@@ -2363,7 +2377,9 @@ paths:
                           type: string
                           example: 550e8400-e29b-41d4-a716-446655440000
                         id:
-                          type: number
+                          anyOf:
+                            - type: string
+                            - type: number
                         slug:
                           description: A UID field
                           type: string
@@ -2656,7 +2672,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       slug:
                         description: A UID field
                         type: string
@@ -2894,7 +2912,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       title:
                         description: A string field
                         type: string
@@ -3272,7 +3292,9 @@ paths:
                           type: string
                           example: 550e8400-e29b-41d4-a716-446655440000
                         id:
-                          type: number
+                          anyOf:
+                            - type: string
+                            - type: number
                         code:
                           description: A string field
                           type: string
@@ -3607,7 +3629,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       code:
                         description: A string field
                         type: string
@@ -3835,7 +3859,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -4023,7 +4049,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -4221,7 +4249,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       title:
                         description: A string field
                         type: string
@@ -4844,7 +4874,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -5116,7 +5148,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -5423,7 +5457,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       siteTitle:
                         description: A string field
                         default: TheGreenBrother
@@ -5660,7 +5696,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       lastUpdated:
                         description: A datetime field
                         type: string
@@ -5969,7 +6007,9 @@ paths:
                           type: string
                           example: 550e8400-e29b-41d4-a716-446655440000
                         id:
-                          type: number
+                          anyOf:
+                            - type: string
+                            - type: number
                         slug:
                           description: A UID field
                           type: string
@@ -6188,7 +6228,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       itemsPerPage:
                         description: An integer field
                         default: 12
@@ -6483,7 +6525,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       slug:
                         description: A UID field
                         type: string
@@ -6803,7 +6847,9 @@ paths:
                           type: string
                           example: 550e8400-e29b-41d4-a716-446655440000
                         id:
-                          type: number
+                          anyOf:
+                            - type: string
+                            - type: number
                         tagId:
                           description: A UID field
                           type: string
@@ -7065,7 +7111,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       tagId:
                         description: A UID field
                         type: string
@@ -7387,7 +7435,9 @@ paths:
                           type: string
                           example: 550e8400-e29b-41d4-a716-446655440000
                         id:
-                          type: number
+                          anyOf:
+                            - type: string
+                            - type: number
                         slug:
                           description: A UID field
                           type: string
@@ -7679,7 +7729,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       slug:
                         description: A UID field
                         type: string
@@ -7932,7 +7984,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       profileTitle:
                         description: A string field
                         type: string
@@ -8331,7 +8385,9 @@ paths:
                           type: string
                           example: 550e8400-e29b-41d4-a716-446655440000
                         id:
-                          type: number
+                          anyOf:
+                            - type: string
+                            - type: number
                         name:
                           description: A string field
                           type: string
@@ -8666,7 +8722,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       name:
                         description: A string field
                         type: string
@@ -8892,7 +8950,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       lastUpdated:
                         description: A datetime field
                         type: string
@@ -9195,7 +9255,9 @@ paths:
                           type: string
                           example: 550e8400-e29b-41d4-a716-446655440000
                         id:
-                          type: number
+                          anyOf:
+                            - type: string
+                            - type: number
                         createdAt:
                           description: Timestamp when this entry was first created in the CMS.
                           type: string
@@ -9442,7 +9504,9 @@ paths:
                         type: string
                         example: 550e8400-e29b-41d4-a716-446655440000
                       id:
-                        type: number
+                        anyOf:
+                          - type: string
+                          - type: number
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -9555,7 +9619,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         createdAt:
           description: Timestamp when this entry was first created in the CMS.
           type: string
@@ -9744,7 +9810,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         loginTitle:
           description: A string field
           type: string
@@ -9883,7 +9951,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         name:
           description: A string field
           type: string
@@ -10008,6 +10078,12 @@ components:
           enum:
             - center
             - language-direction
+        promoteHeaderIcon:
+          description: A boolean field
+          default: false
+          anyOf:
+            - type: boolean
+            - type: 'null'
         header:
           description: A component field
           $ref: '#/components/schemas/ElementsLabelEntry'
@@ -10019,6 +10095,7 @@ components:
           description: Component instance ID
       required:
         - alignment
+        - promoteHeaderIcon
       additionalProperties: false
       id: ElementsHeaderEntry
     ApiAuthorAuthorDocument:
@@ -10030,7 +10107,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         name:
           description: A string field
           type: string
@@ -10141,7 +10220,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         tagId:
           description: A UID field
           type: string
@@ -10223,7 +10304,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         slug:
           description: A UID field
           type: string
@@ -10375,7 +10458,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         createdAt:
           description: Timestamp when this entry was first created in the CMS.
           type: string
@@ -10467,7 +10552,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         title:
           description: A string field
           type: string
@@ -10570,7 +10657,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         code:
           description: A string field
           type: string
@@ -10684,7 +10773,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         createdAt:
           description: Timestamp when this entry was first created in the CMS.
           type: string
@@ -10757,7 +10848,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         createdAt:
           description: Timestamp when this entry was first created in the CMS.
           type: string
@@ -10830,7 +10923,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         title:
           description: A string field
           type: string
@@ -10920,7 +11015,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         createdAt:
           description: Timestamp when this entry was first created in the CMS.
           type: string
@@ -11053,7 +11150,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         createdAt:
           description: Timestamp when this entry was first created in the CMS.
           type: string
@@ -11261,7 +11360,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         tagId:
           description: A UID field
           type: string
@@ -11343,7 +11444,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         slug:
           description: A UID field
           type: string
@@ -11449,7 +11552,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         slug:
           description: A UID field
           type: string
@@ -11583,7 +11688,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         createdAt:
           description: Timestamp when this entry was first created in the CMS.
           type: string
@@ -11688,7 +11795,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         siteTitle:
           description: A string field
           default: TheGreenBrother
@@ -11807,7 +11916,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         lastUpdated:
           description: A datetime field
           type: string
@@ -11883,7 +11994,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         itemsPerPage:
           description: An integer field
           default: 12
@@ -11999,7 +12112,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         profileTitle:
           description: A string field
           type: string
@@ -12117,7 +12232,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         name:
           description: A string field
           type: string
@@ -12224,7 +12341,9 @@ components:
           type: string
           example: 550e8400-e29b-41d4-a716-446655440000
         id:
-          type: number
+          anyOf:
+            - type: string
+            - type: number
         lastUpdated:
           description: A datetime field
           type: string

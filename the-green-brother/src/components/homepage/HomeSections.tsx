@@ -8,8 +8,6 @@
  * Supports horizontal layout markers for grouping sections in rows.
  */
 
-'use client'
-
 import type { ReactNode } from 'react'
 
 import { NewsletterSignupCTA } from '@/components/call-to-actions'
@@ -105,7 +103,15 @@ export function HomeSections({ sections, products, categories, blogPosts, direct
     }
   }
 
-  return <DynamicZone sections={sections} renderSection={renderSection} direction={direction} className="space-y-8" />
+  return (
+    <DynamicZone
+      sections={sections}
+      renderSection={renderSection}
+      direction={direction}
+      className="space-y-8"
+      verticalAlignment="center"
+    />
+  )
 }
 
 export default HomeSections

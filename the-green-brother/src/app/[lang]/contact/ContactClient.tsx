@@ -26,7 +26,7 @@ export default function ContactClient({ contactData }: ContactClientProps) {
         </div>
 
         {/* Contact form labels and fields would be rendered here using CMS data */}
-        <div className="prose prose-invert max-w-none text-tertiary-300">
+        <div className="prose max-w-none text-tertiary-300 prose-invert">
           <p className="text-center text-tertiary-400">Contact form with CMS labels</p>
         </div>
       </div>

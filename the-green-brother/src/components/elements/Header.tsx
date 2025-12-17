@@ -7,10 +7,8 @@
  * Matches CMS elements.header schema: header Label + subheader Label + alignment
  */
 
-'use client'
-
-import { Label } from '@/components/elements'
 import { AlignmentEnum, DirectionEnum, type ElementsHeaderEntry } from '@/lib/generated/types.gen'
+import { Label } from './Label'
 
 /**
  * Props for the Header component
@@ -77,11 +75,65 @@ export function Header({
     return null
   }
 
-  const { alignment, header, subheader } = data
+  const { alignment, header, subheader, promoteHeaderIcon } = data
   const alignmentClass = getAlignmentClass(alignment, direction)
 
   // Map level to heading tag
   const HeadingTag = `h${String(level)}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+
+  // Map defaults for levels if no explicit size class is provided in headerClassName
+  const DEFAULT_LEVEL_CLASSES: Record<number, string> = {
+    1: 'text-4xl',
+    2: 'text-3xl',
+    3: 'text-2xl',
+    4: 'text-xl',
+    5: 'text-lg',
+    6: 'text-base',
+  }
+  const defaultSizeClass = DEFAULT_LEVEL_CLASSES[level] ?? 'text-2xl'
+
+  // When promoted, render icon separate from text so subheader aligns with header text
+  const isPromoted = promoteHeaderIcon ?? false
+
+  if (isPromoted && header?.icon) {
+    const isRTL = direction === DirectionEnum.RTL
+    return (
+      <div className={`${alignmentClass} ${className}`}>
+        <div
+          className={`flex items-start gap-4 ${alignment === AlignmentEnum.CENTER ? 'justify-center' : ''} ${isRTL ? 'flex-row-reverse' : ''}`}
+        >
+          <Label
+            data={{ ...header, text: '' }}
+            as="span"
+            iconSize={headerIconSize}
+            promoteIcon
+            className="shrink-0"
+            iconClassName="text-primary"
+            direction={direction}
+          />
+          <div className="flex flex-col">
+            <Label
+              data={header}
+              as={HeadingTag}
+              iconSize={headerIconSize}
+              hideIcon
+              className={`font-bold ${direction === DirectionEnum.RTL ? 'text-right' : 'text-left'} ${defaultSizeClass} ${headerClassName}`}
+              direction={direction}
+            />
+            {subheader && (
+              <Label
+                data={subheader}
+                as="p"
+                iconSize={subheaderIconSize}
+                className={`mt-1 ${direction === DirectionEnum.RTL ? 'text-right' : 'text-left'} text-text-secondary-dark ${subheaderClassName}`}
+                direction={direction}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={`${alignmentClass} ${className}`}>
@@ -90,7 +142,8 @@ export function Header({
           data={header}
           as={HeadingTag}
           iconSize={headerIconSize}
-          className={`font-bold ${alignmentClass} ${headerClassName}`}
+          promoteIcon={isPromoted}
+          className={`font-bold ${alignmentClass} ${defaultSizeClass} ${headerClassName}`}
           iconClassName="text-primary"
           direction={direction}
         />
@@ -100,7 +153,7 @@ export function Header({
           data={subheader}
           as="p"
           iconSize={subheaderIconSize}
-          className={`mt-4 ${alignmentClass} text-text-secondary-dark ${subheaderClassName}`}
+          className={`mt-2 ${alignmentClass} text-text-secondary-dark ${subheaderClassName}`}
           direction={direction}
         />
       )}

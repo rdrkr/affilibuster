@@ -68,6 +68,7 @@ describe('HomeSections', () => {
       id: 1,
       header: {
         alignment: AlignmentEnum.CENTER,
+        promoteHeaderIcon: false,
         header: {
           text: 'Hero',
           ariaDescription: 'Hero section',
@@ -93,6 +94,7 @@ describe('HomeSections', () => {
       id: 2,
       header: {
         alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+        promoteHeaderIcon: false,
         header: {
           text: 'Products',
           ariaDescription: 'Products section',
@@ -111,6 +113,7 @@ describe('HomeSections', () => {
       id: 3,
       header: {
         alignment: AlignmentEnum.CENTER,
+        promoteHeaderIcon: false,
         header: {
           text: 'Categories',
           ariaDescription: 'Categories section',
@@ -133,6 +136,7 @@ describe('HomeSections', () => {
       id: 5,
       header: {
         alignment: AlignmentEnum.CENTER,
+        promoteHeaderIcon: false,
         header: {
           text: 'Blog',
           ariaDescription: 'Blog section',
@@ -204,6 +208,51 @@ describe('HomeSections', () => {
       <HomeSections
         direction={DirectionEnum.LTR}
         sections={sections}
+        products={mockProducts}
+        categories={mockCategories}
+        blogPosts={mockBlogPosts}
+      />
+    )
+
+    const categoryGridSection = screen.getByTestId('category-grid-section')
+    expect(categoryGridSection).toBeInTheDocument()
+    expect(categoryGridSection).toHaveAttribute('data-id', '3')
+  })
+
+  it('should render category grid section with custom categories', () => {
+    const sectionWithCategories: ApiHomepageHomepageDocument['sections'] = [
+      {
+        __component: 'sections.category-grid',
+        id: 3,
+        header: {
+          alignment: AlignmentEnum.CENTER,
+          promoteHeaderIcon: false,
+          header: {
+            text: 'Cats',
+            iconPosition: IconPositionEnum.BEFORE_TEXT,
+            ariaDescription: 'Cats category',
+          },
+        },
+        categories: [
+          {
+            documentId: 'c1',
+            id: 1,
+            slug: 'cat-1',
+            content: {
+              text: 'Cat 1',
+              iconPosition: IconPositionEnum.BEFORE_TEXT,
+              ariaDescription: 'Cat 1 category',
+            },
+            publishedAt: '2025-01-01',
+          },
+        ],
+      },
+    ]
+
+    render(
+      <HomeSections
+        direction={DirectionEnum.LTR}
+        sections={sectionWithCategories}
         products={mockProducts}
         categories={mockCategories}
         blogPosts={mockBlogPosts}
@@ -322,6 +371,7 @@ describe('HomeSections', () => {
         id: 999,
         header: {
           alignment: AlignmentEnum.CENTER,
+          promoteHeaderIcon: false,
           header: {
             text: 'Unknown',
             ariaDescription: 'Unknown section',
@@ -365,6 +415,7 @@ describe('HomeSections', () => {
         id: 7,
         header: {
           alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+          promoteHeaderIcon: false,
           header: {
             text: 'Text Block',
             ariaDescription: 'Text block section',

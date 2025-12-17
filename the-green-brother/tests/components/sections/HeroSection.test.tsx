@@ -59,7 +59,7 @@ jest.mock('@/components/elements', () => ({
       </div>
     )
   },
-  Button: function MockButton({
+  ButtonLink: function MockButtonLink({
     data,
   }: {
     data: { label?: { text?: string; ariaDescription?: string }; url: string; openInNewTab: boolean | null }
@@ -83,6 +83,7 @@ describe('HeroSection', () => {
     id: 1,
     header: {
       alignment: AlignmentEnum.CENTER,
+      promoteHeaderIcon: false,
       header: {
         text: 'Live Sustainably, <span class="text-primary">Effortlessly</span>',
         ariaDescription: 'Main hero heading',
@@ -272,6 +273,7 @@ describe('HeroSection', () => {
       header: {
         ...mockBaseData.header,
         alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+        promoteHeaderIcon: false,
       },
     }
     const { container } = render(<HeroSection direction={DirectionEnum.LTR} data={dataWithAlign} />)
@@ -287,6 +289,7 @@ describe('HeroSection', () => {
       header: {
         ...mockBaseData.header,
         alignment: AlignmentEnum.CENTER,
+        promoteHeaderIcon: false,
       },
     }
     const { container } = render(<HeroSection direction={DirectionEnum.LTR} data={dataWithAlign} />)

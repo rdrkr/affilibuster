@@ -48,12 +48,15 @@ jest.mock('@/components/elements', () => ({
   },
   Header: function MockHeader({
     data,
+    level = 2,
   }: {
     data: { header?: { text?: string; ariaDescription?: string }; subheader?: { text?: string } }
+    level?: number
   }) {
+    const Tag = `h${String(level)}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
     return (
       <div data-testid="mock-header">
-        <h3>{data.header?.text}</h3>
+        <Tag>{data.header?.text}</Tag>
         {data.subheader?.text && <p>{data.subheader.text}</p>}
       </div>
     )
@@ -66,6 +69,7 @@ describe('ProductCategoriesSection', () => {
     id: 1,
     header: {
       alignment: AlignmentEnum.CENTER,
+      promoteHeaderIcon: false,
       header: {
         text: 'Shop by Category',
         ariaDescription: 'Product categories section',
@@ -174,7 +178,7 @@ describe('ProductCategoriesSection', () => {
       <ProductCategoriesSection direction={DirectionEnum.LTR} data={mockSectionData} categories={mockCategories} />
     )
 
-    expect(screen.getByRole('heading', { level: 3, name: 'Shop by Category' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'Shop by Category' })).toBeInTheDocument()
   })
 
   it('should render subheader when provided', () => {

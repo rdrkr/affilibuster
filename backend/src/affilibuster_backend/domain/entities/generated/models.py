@@ -384,7 +384,7 @@ class ApiAuthPageAuthPageDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     login_title: str | None = Field(None, alias="loginTitle")
     """
     A string field
@@ -512,7 +512,7 @@ class PluginUploadFileDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     name: str
     """
     A string field
@@ -638,6 +638,10 @@ class ElementsHeaderEntry(BaseModel):
     """
     An enum field
     """
+    promote_header_icon: bool | None = Field(..., alias="promoteHeaderIcon")
+    """
+    A boolean field
+    """
     header: ElementsLabelEntry | None = None
     """
     A component field
@@ -711,7 +715,7 @@ class ApiContactUsContactUsDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     title: str | None = None
     """
     A string field
@@ -800,7 +804,7 @@ class ApiCurrencyCurrencyDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     code: str = Field(..., max_length=3, min_length=3)
     """
     A string field
@@ -868,7 +872,7 @@ class ApiFaqFaqDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     title: str
     """
     A string field
@@ -955,7 +959,7 @@ class ApiThemeThemeDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -1029,7 +1033,7 @@ class ApiPrivacyPrivacyDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     last_updated: str | None = Field(None, alias="lastUpdated")
     """
     A datetime field
@@ -1073,7 +1077,7 @@ class ApiProfileProfileDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     profile_title: str | None = Field(None, alias="profileTitle")
     """
     A string field
@@ -1173,7 +1177,7 @@ class ApiTeamMemberTeamMemberDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     name: str
     """
     A string field
@@ -1249,7 +1253,7 @@ class ApiTermTermDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     last_updated: str | None = Field(None, alias="lastUpdated")
     """
     A datetime field
@@ -1648,7 +1652,7 @@ class Data1(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     login_title: str | None = Field(None, alias="loginTitle")
     """
     A string field
@@ -2571,7 +2575,7 @@ class Data6(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     title: str | None = None
     """
     A string field
@@ -2834,7 +2838,7 @@ class Datum3(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     code: str = Field(..., max_length=3, min_length=3)
     """
     A string field
@@ -2964,7 +2968,7 @@ class Data7(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     code: str = Field(..., max_length=3, min_length=3)
     """
     A string field
@@ -3129,7 +3133,7 @@ class Data10(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     title: str
     """
     A string field
@@ -3636,7 +3640,7 @@ class Data14(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     last_updated: str | None = Field(None, alias="lastUpdated")
     """
     A datetime field
@@ -4374,7 +4378,7 @@ class Data19(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     profile_title: str | None = Field(None, alias="profileTitle")
     """
     A string field
@@ -4666,7 +4670,7 @@ class Datum7(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     name: str
     """
     A string field
@@ -4807,7 +4811,7 @@ class Data20(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     name: str
     """
     A string field
@@ -4926,7 +4930,7 @@ class Data21(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     last_updated: str | None = Field(None, alias="lastUpdated")
     """
     A datetime field
@@ -5131,7 +5135,7 @@ class Datum8(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -5227,7 +5231,7 @@ class Data22(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -5358,7 +5362,7 @@ class ApiError404Error404Document(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -5398,7 +5402,7 @@ class ApiError410Error410Document(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -5485,7 +5489,7 @@ class ApiFooterFooterDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -5632,7 +5636,7 @@ class Data8(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -5684,7 +5688,7 @@ class Data9(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -5753,7 +5757,7 @@ class Data11(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -5813,7 +5817,7 @@ class ApiAboutAboutDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -5853,7 +5857,7 @@ class ApiAuthorAuthorDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     name: str
     """
     A string field
@@ -5933,7 +5937,7 @@ class ApiBlogPostTagBlogPostTagDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     tag_id: str = Field(..., alias="tagId")
     """
     A UID field
@@ -5981,7 +5985,7 @@ class ApiBlogPostBlogPostDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     slug: str
     """
     A UID field
@@ -6049,7 +6053,7 @@ class ApiBlogBlogDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -6105,7 +6109,7 @@ class ApiHomepageHomepageDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -6164,7 +6168,7 @@ class ApiProductTagProductTagDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     tag_id: str = Field(..., alias="tagId")
     """
     A UID field
@@ -6212,7 +6216,7 @@ class ApiProductProductDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     slug: str
     """
     A UID field
@@ -6284,7 +6288,7 @@ class ApiProductCategoryProductCategoryDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     slug: str
     """
     A UID field
@@ -6336,7 +6340,7 @@ class ApiNavigationNavigationDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     site_title: str = Field(..., alias="siteTitle")
     """
     A string field
@@ -6420,7 +6424,7 @@ class ApiProductCategoriesPageProductCategoriesPageDocument(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     items_per_page: int = Field(..., alias="itemsPerPage", ge=-9007199254740991, le=9007199254740991)
     """
     An integer field
@@ -6592,7 +6596,7 @@ class Data(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -6644,7 +6648,7 @@ class Datum(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     name: str
     """
     A string field
@@ -6736,7 +6740,7 @@ class Data2(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     name: str
     """
     A string field
@@ -6828,7 +6832,7 @@ class Data3(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -6896,7 +6900,7 @@ class Datum1(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     tag_id: str = Field(..., alias="tagId")
     """
     A UID field
@@ -6956,7 +6960,7 @@ class Data4(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     tag_id: str = Field(..., alias="tagId")
     """
     A UID field
@@ -7016,7 +7020,7 @@ class Datum2(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     slug: str
     """
     A UID field
@@ -7096,7 +7100,7 @@ class Data5(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     slug: str
     """
     A UID field
@@ -7176,7 +7180,7 @@ class Data12(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -7228,7 +7232,7 @@ class Data13(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     site_title: str = Field(..., alias="siteTitle")
     """
     A string field
@@ -7324,7 +7328,7 @@ class Datum4(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     slug: str
     """
     A UID field
@@ -7388,7 +7392,7 @@ class Data15(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     items_per_page: int = Field(..., alias="itemsPerPage", ge=-9007199254740991, le=9007199254740991)
     """
     An integer field
@@ -7476,7 +7480,7 @@ class Data16(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     slug: str
     """
     A UID field
@@ -7540,7 +7544,7 @@ class Datum5(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     tag_id: str = Field(..., alias="tagId")
     """
     A UID field
@@ -7600,7 +7604,7 @@ class Data17(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     tag_id: str = Field(..., alias="tagId")
     """
     A UID field
@@ -7660,7 +7664,7 @@ class Datum6(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     slug: str
     """
     A UID field
@@ -7744,7 +7748,7 @@ class Data18(BaseModel):
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: float
+    id: str | float
     slug: str
     """
     A UID field

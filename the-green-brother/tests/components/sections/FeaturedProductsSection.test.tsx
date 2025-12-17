@@ -64,17 +64,20 @@ jest.mock('@/components/elements', () => ({
   },
   Header: function MockHeader({
     data,
+    level = 2,
   }: {
     data: { header?: { text?: string; ariaDescription?: string }; subheader?: { text?: string } }
+    level?: number
   }) {
+    const Tag = `h${String(level)}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
     return (
       <div data-testid="mock-header">
-        <h3>{data.header?.text}</h3>
+        <Tag>{data.header?.text}</Tag>
         {data.subheader?.text && <p>{data.subheader.text}</p>}
       </div>
     )
   },
-  Button: function MockButton({
+  ButtonLink: function MockButtonLink({
     data,
   }: {
     data: { label?: { text?: string; ariaDescription?: string }; url: string; openInNewTab: boolean | null }
@@ -90,6 +93,46 @@ jest.mock('@/components/elements', () => ({
       </a>
     )
   },
+  Card: function MockCard({
+    href,
+    image,
+    imageAlt,
+    tag,
+    children,
+    variant,
+    asLink,
+  }: {
+    href: string
+    image?: { url?: string; alternativeText?: string } | null
+    imageAlt?: string
+    tag?: string
+    children: React.ReactNode
+    variant?: 'product' | 'blog'
+    className?: string
+    asLink?: boolean
+  }) {
+    const getImageUrl = () => {
+      if (!image) return '/images/placeholder.svg'
+      if (!image.url) return '/images/placeholder.svg'
+      return image.url.startsWith('http') ? image.url : `https://localhost:1337${image.url}`
+    }
+    const alt = image?.alternativeText ?? imageAlt ?? ''
+    const Wrapper = asLink === false ? 'div' : 'a'
+    return (
+      <Wrapper
+        data-testid="mock-card"
+        data-variant={variant}
+        href={asLink === false ? undefined : href}
+        data-href={asLink === false ? href : undefined}
+        className="group"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img data-testid="mock-card-image" src={getImageUrl()} alt={alt} />
+        {tag && <span data-testid="mock-card-tag">{tag}</span>}
+        <div data-testid="mock-card-content">{children}</div>
+      </Wrapper>
+    )
+  },
 }))
 
 describe('FeaturedProductsSection', () => {
@@ -98,6 +141,7 @@ describe('FeaturedProductsSection', () => {
     id: 1,
     header: {
       alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+      promoteHeaderIcon: false,
       header: {
         text: 'Featured Products',
         ariaDescription: 'Featured products section',
@@ -134,6 +178,7 @@ describe('FeaturedProductsSection', () => {
       content: {
         header: {
           alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+          promoteHeaderIcon: false,
           header: {
             text: 'Eco Water Bottle',
             ariaDescription: 'Eco-friendly water bottle product',
@@ -187,6 +232,7 @@ describe('FeaturedProductsSection', () => {
       content: {
         header: {
           alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+          promoteHeaderIcon: false,
           header: {
             text: 'Bamboo Toothbrush',
             ariaDescription: 'Bamboo toothbrush product',
@@ -236,7 +282,7 @@ describe('FeaturedProductsSection', () => {
   it('should render section with header text', () => {
     render(<FeaturedProductsSection direction={DirectionEnum.LTR} data={mockSectionData} products={mockProducts} />)
 
-    expect(screen.getByRole('heading', { level: 3, name: 'Featured Products' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'Featured Products' })).toBeInTheDocument()
   })
 
   it('should render subheader when provided', () => {

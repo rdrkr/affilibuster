@@ -4,6 +4,18 @@
 import { CodeEnum } from '@/lib/generated/types.gen'
 import '@testing-library/jest-dom'
 
+// Mock remark (ESM-only package that Jest can't parse)
+jest.mock('remark', () => ({
+  remark: () => ({
+    use: () => ({
+      process: (content: string) =>
+        Promise.resolve({
+          toString: () => content, // Return content unchanged in tests
+        }),
+    }),
+  }),
+}))
+
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   useRouter() {

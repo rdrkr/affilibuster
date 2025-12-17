@@ -5,12 +5,10 @@
  *
  * Renders a horizontal scrollable carousel of featured products.
  * All content comes from CMS - no hardcoded strings.
- * Uses Header and Button composites for section title and actions.
+ * Uses Header and ButtonLink composites for section title and actions.
  */
 
-'use client'
-
-import { Button, CMSIcon, CMSImage, CMSText, Header } from '@/components/elements'
+import { ButtonLink, Card, CMSIcon, CMSText, Header } from '@/components/elements'
 import {
   DirectionEnum,
   type ApiProductProductDocument,
@@ -51,20 +49,16 @@ export function FeaturedProductsSection({ data, products, direction }: FeaturedP
   return (
     <section aria-label={header.header?.ariaDescription ?? ''}>
       <div className={`mb-8 flex items-end justify-between px-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-        <Header
-          data={header}
-          level={3}
-          headerClassName="text-3xl text-white"
-          subheaderClassName="text-text-secondary-dark"
-          direction={direction}
-        />
-        <Button
-          data={viewAllButton}
-          direction={direction}
-          variant="link"
-          iconSize="sm"
-          className="font-semibold text-primary hover:text-primary-hover"
-        />
+        <Header data={header} level={2} direction={direction} />
+        <div>
+          <ButtonLink
+            data={viewAllButton}
+            direction={direction}
+            variant="link"
+            iconSize="sm"
+            className="font-semibold text-primary hover:text-primary-hover"
+          />
+        </div>
       </div>
 
       <div
@@ -75,101 +69,77 @@ export function FeaturedProductsSection({ data, products, direction }: FeaturedP
       >
         {products.map(product => {
           const primaryImage = product.images[0]
+          const tagText = product.tags?.at(0)?.tag?.text ?? ''
 
           return (
-            <div
+            <Card
               key={product.documentId}
-              className={`
-                group h-card w-carousel-mobile shrink-0 snap-start
-                md:w-carousel-desktop
-              `}
+              href={`/products/${product.slug}`}
+              image={primaryImage}
+              imageAlt={product.content?.header?.header?.text ?? ''}
+              variant="product"
+              asLink={false}
+              imageOverlay={
+                <div className="absolute top-3 right-3">
+                  <button
+                    type="button"
+                    className={`
+                      flex h-10 w-10 items-center justify-center rounded-full
+                      bg-background-dark/50 text-white backdrop-blur-md
+                      transition-colors
+                      hover:bg-primary hover:text-black
+                    `}
+                    aria-label={product.content?.header?.header?.ariaDescription ?? ''}
+                  >
+                    <CMSIcon icon="favorite_border" size="lg" />
+                  </button>
+                </div>
+              }
             >
-              <div
-                className={`
-                  isolate flex h-full flex-col overflow-hidden rounded-xl
-                  border border-white/5 bg-surface-dark shadow-lg
-                  transition-all duration-300
-                  hover:-translate-y-1 hover:transform hover:border-primary/30
-                `}
-              >
-                <div className="relative h-64 overflow-hidden bg-tertiary-800">
-                  <CMSImage
-                    image={primaryImage}
-                    fallbackAlt={product.content?.header?.header?.text ?? ''}
+              {/* Tag and Price row */}
+              <div className="mb-2 flex items-center justify-between">
+                {tagText && (
+                  <span
                     className={`
-                      h-full w-full object-cover transition-transform
-                      duration-500
-                      group-hover:scale-110
+                      text-xs font-bold tracking-wider text-primary uppercase
                     `}
-                    fill
-                    sizes="320px"
-                  />
-                  <div className="absolute top-3 right-3">
-                    <button
-                      type="button"
-                      className={`
-                        flex h-10 w-10 items-center justify-center rounded-full
-                        bg-background-dark/50 text-white backdrop-blur-md
-                        transition-colors
-                        hover:bg-primary hover:text-black
-                      `}
-                      aria-label={product.content?.header?.header?.ariaDescription ?? ''}
-                    >
-                      <CMSIcon icon="favorite_border" size="lg" />
-                    </button>
-                  </div>
-                </div>
-                <div className="flex flex-1 flex-col p-5">
-                  {/* Tag and Price row */}
-                  <div className="mb-2 flex items-center justify-between">
-                    {product.tags?.at(0)?.tag?.text && (
-                      <span
-                        className={`
-                          text-xs font-bold tracking-wider text-primary uppercase
-                        `}
-                      >
-                        <CMSText text={product.tags.at(0)?.tag?.text} />
-                      </span>
-                    )}
-                    <span
-                      className={`
-                        rounded-md bg-white/10 px-2 py-1 text-sm font-bold
-                        text-white
-                      `}
-                    >
-                      {product.currency?.symbol ?? '$'}
-                      {product.price.toFixed(2)}
-                    </span>
-                  </div>
-                  {/* Product name */}
-                  {product.content?.header?.header && (
-                    <h4
-                      className={`
-                        line-clamp-2 text-lg font-bold text-white
-                        transition-colors
-                        group-hover:text-primary
-                      `}
-                    >
-                      <CMSText text={product.content.header.header.text} />
-                    </h4>
-                  )}
-                  <Button
-                    data={{
-                      label: product.viewDetailsLabel,
-                      url: `/products/${product.slug}`,
-                      openInNewTab: false,
-                    }}
-                    variant="ghost"
-                    className={`
-                      mt-auto w-full rounded-xl bg-white/5 py-3
-                      text-center font-semibold text-white
-                      hover:bg-primary hover:text-background-dark
-                    `}
-                    direction={direction}
-                  />
-                </div>
+                  >
+                    <CMSText text={tagText} />
+                  </span>
+                )}
+                <span
+                  className={`
+                    rounded-md bg-white/10 px-2 py-1 text-sm font-bold
+                    text-white
+                  `}
+                >
+                  {product.currency?.symbol ?? '$'}
+                  {product.price.toFixed(2)}
+                </span>
               </div>
-            </div>
+              {/* Product name */}
+              {product.content?.header?.header && (
+                <h4
+                  className={`
+                    line-clamp-2 text-lg font-bold text-white
+                    transition-colors
+                    group-hover:text-primary
+                  `}
+                >
+                  <CMSText text={product.content.header.header.text} />
+                </h4>
+              )}
+              <ButtonLink
+                data={{
+                  label: product.viewDetailsLabel,
+                  url: `/products/${product.slug}`,
+                  openInNewTab: false,
+                }}
+                variant="secondary"
+                className="mt-auto w-full py-3 text-center"
+                direction={direction}
+              />
+            </Card>
           )
         })}
       </div>
