@@ -1,5 +1,6 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
+import { ThemeProvider } from '@/components/providers'
 import { getNavigation } from '@/lib/content/api'
 import '@/styles/globals.css'
 import type { Metadata } from 'next'
@@ -30,17 +31,34 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // Inline script to prevent FOUC by setting theme before React hydrates
+  const themeScript = `
+    (function() {
+      try {
+        var stored = localStorage.getItem('theme-preference');
+        var theme = stored === 'light' || stored === 'dark' ? stored : null;
+        if (!theme && stored !== 'light' && stored !== 'dark') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  `
+
   return (
     <html lang="en" suppressHydrationWarning>
-      <link rel="icon" href="/favicon.ico" sizes="any" />
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body
         className={`
           ${inter.className}
-          bg-background-dark font-sans text-text-main-dark
+          font-sans transition-colors duration-300
           selection:bg-primary selection:text-black
         `}
       >
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   )

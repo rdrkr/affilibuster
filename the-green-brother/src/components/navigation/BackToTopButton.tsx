@@ -49,7 +49,7 @@ const BackToTopButton = ({ direction = DirectionEnum.LTR }: BackToTopButtonProps
       onClick={scrollToTop}
       aria-label="Scroll to top"
       className={`
-        fixed ${isRTL ? 'left-6' : 'right-6'} bottom-6 z-40 flex h-12 w-12 transform items-center
+        fixed ${isRTL ? 'left-6' : 'right-6'} bottom-6 z-40 flex size-12 transform items-center
         justify-center rounded-full bg-primary text-background-dark shadow-lg
         transition-all duration-500
         hover:bg-primary-hover

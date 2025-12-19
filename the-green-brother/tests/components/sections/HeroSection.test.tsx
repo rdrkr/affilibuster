@@ -297,4 +297,102 @@ describe('HeroSection', () => {
     expect(container.firstChild).toHaveClass('justify-center')
     expect(container.firstChild).not.toHaveClass('justify-start')
   })
+  describe('Layout Variants & Alignment', () => {
+    it('should render TEXT_BELOW_BACKGROUND with LTR alignment', () => {
+      const data = {
+        ...mockBaseData,
+        variant: VariantEnum.TEXT_BELOW_BACKGROUND,
+        header: { ...mockBaseData.header, alignment: AlignmentEnum.LANGUAGE_DIRECTION },
+      }
+      const { container } = render(<HeroSection direction={DirectionEnum.LTR} data={data} />)
+      // TEXT_BELOW renders image first, then content
+      // Just check class names for alignment
+      // justifyClass should be justify-start
+      // textAlignClass should be text-left items-start
+      // We look for the content div
+      const contentDiv = container.querySelector('.text-left.items-start')
+      expect(contentDiv).toBeInTheDocument()
+      // The wrapper div (container.firstChild -> second child) should have justify-start
+      // Or simply look for the class which should exist on the inner div
+      const contentWrapper = container.querySelector('.w-full.flex')
+      expect(contentWrapper).toHaveClass('justify-start')
+    })
+
+    it('should render TEXT_BELOW_BACKGROUND with RTL alignment', () => {
+      const data = {
+        ...mockBaseData,
+        variant: VariantEnum.TEXT_BELOW_BACKGROUND,
+        header: { ...mockBaseData.header, alignment: AlignmentEnum.LANGUAGE_DIRECTION },
+      }
+      const { container } = render(<HeroSection direction={DirectionEnum.RTL} data={data} />)
+      // justifyClass: justify-end
+      // textAlignClass: text-right items-end
+      const contentDiv = container.querySelector('.text-right.items-end')
+      expect(contentDiv).toBeInTheDocument()
+      // The wrapper div should have justify-end
+      expect(contentDiv?.parentElement).toHaveClass('justify-end')
+    })
+
+    it('should render TEXT_BELOW_BACKGROUND with CENTER alignment', () => {
+      const data = {
+        ...mockBaseData,
+        variant: VariantEnum.TEXT_BELOW_BACKGROUND,
+        header: { ...mockBaseData.header, alignment: AlignmentEnum.CENTER },
+      }
+      const { container } = render(<HeroSection direction={DirectionEnum.LTR} data={data} />)
+      const contentDiv = container.querySelector('.text-center.items-center')
+      expect(contentDiv).toBeInTheDocument()
+      expect(contentDiv?.parentElement).toHaveClass('justify-center')
+    })
+
+    it('should render TEXT_ABOVE_BACKGROUND with LTR alignment', () => {
+      const data = {
+        ...mockBaseData,
+        variant: VariantEnum.TEXT_ABOVE_BACKGROUND,
+        header: { ...mockBaseData.header, alignment: AlignmentEnum.LANGUAGE_DIRECTION },
+      }
+      const { container } = render(<HeroSection direction={DirectionEnum.LTR} data={data} />)
+      const contentDiv = container.querySelector('.text-left.items-start')
+      expect(contentDiv).toBeInTheDocument()
+      expect(contentDiv?.parentElement).toHaveClass('justify-start')
+    })
+
+    it('should render TEXT_ABOVE_BACKGROUND with RTL alignment', () => {
+      const data = {
+        ...mockBaseData,
+        variant: VariantEnum.TEXT_ABOVE_BACKGROUND,
+        header: { ...mockBaseData.header, alignment: AlignmentEnum.LANGUAGE_DIRECTION },
+      }
+      const { container } = render(<HeroSection direction={DirectionEnum.RTL} data={data} />)
+      const contentDiv = container.querySelector('.text-right.items-end')
+      expect(contentDiv).toBeInTheDocument()
+      expect(contentDiv?.parentElement).toHaveClass('justify-end')
+    })
+
+    it('should render TEXT_OVER_BACKGROUND with RTL alignment (checking overlay margin)', () => {
+      const data = {
+        ...mockBaseData,
+        variant: VariantEnum.TEXT_OVER_BACKGROUND,
+        header: { ...mockBaseData.header, alignment: AlignmentEnum.LANGUAGE_DIRECTION },
+      }
+      const { container } = render(<HeroSection direction={DirectionEnum.RTL} data={data} />)
+      // Content should have 'mr-8' for RTL overlay non-centered
+      const contentDiv = container.querySelector('.mr-8')
+      expect(contentDiv).toBeInTheDocument()
+      expect(contentDiv).toHaveClass('text-right')
+    })
+
+    it('should render TEXT_OVER_BACKGROUND with LTR alignment (checking overlay margin)', () => {
+      const data = {
+        ...mockBaseData,
+        variant: VariantEnum.TEXT_OVER_BACKGROUND,
+        header: { ...mockBaseData.header, alignment: AlignmentEnum.LANGUAGE_DIRECTION },
+      }
+      const { container } = render(<HeroSection direction={DirectionEnum.LTR} data={data} />)
+      // Content should have 'ml-8' for LTR overlay non-centered
+      const contentDiv = container.querySelector('.ml-8')
+      expect(contentDiv).toBeInTheDocument()
+      expect(contentDiv).toHaveClass('text-left')
+    })
+  })
 })

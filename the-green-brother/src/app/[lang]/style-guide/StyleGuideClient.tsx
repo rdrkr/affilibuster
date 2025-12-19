@@ -84,7 +84,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
       <div className="container mx-auto space-y-16 px-4 py-16">
         {/* Table of Contents */}
         <section className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16">
-          <div className="absolute top-0 right-0 -mt-20 -mr-20 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 size-80 rounded-full bg-primary/5 blur-3xl" />
           <div className="relative z-10">
             <h2 className="mb-8 text-4xl font-bold text-white">Component Hierarchy</h2>
             <div className="grid gap-6 md:grid-cols-2">
@@ -127,7 +127,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
 
         {/* Primitive Components Section */}
         <section className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16">
-          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 size-80 rounded-full bg-primary/5 blur-3xl" />
 
           <div className="relative z-10 space-y-12">
             <div>
@@ -350,13 +350,13 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
 
         {/* Color Palette Section - Full Theme Tokens */}
         <section className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16">
-          <div className="absolute top-0 right-0 -mt-20 -mr-20 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 size-80 rounded-full bg-primary/5 blur-3xl" />
 
           <div className="relative z-10 space-y-16">
             <div>
               <h2 className="mb-4 text-4xl font-bold text-white">Color Palette</h2>
               <p className="text-lg text-text-secondary-dark">
-                Complete design tokens from <code className="rounded bg-surface-dark px-2 py-1">theme.css</code>. All
+                Complete design tokens from <code className="rounded-sm bg-surface-dark px-2 py-1">theme.css</code>. All
                 colors use CSS custom properties for consistency.
               </p>
             </div>
@@ -449,7 +449,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       { shade: 900, bg: 'bg-success-900', border: true },
                     ].map(({ shade, bg, border }) => (
                       <div key={`success-${String(shade)}`} className="text-center">
-                        <div className={`mb-1 h-10 rounded ${bg} ${border ? 'border border-white/10' : ''}`} />
+                        <div className={`mb-1 h-10 rounded-sm ${bg} ${border ? 'border border-white/10' : ''}`} />
                         <p className="text-xs text-text-secondary-dark">{shade}</p>
                       </div>
                     ))}
@@ -467,7 +467,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       { shade: 900, bg: 'bg-error-900', border: true },
                     ].map(({ shade, bg, border }) => (
                       <div key={`error-${String(shade)}`} className="text-center">
-                        <div className={`mb-1 h-10 rounded ${bg} ${border ? 'border border-white/10' : ''}`} />
+                        <div className={`mb-1 h-10 rounded-sm ${bg} ${border ? 'border border-white/10' : ''}`} />
                         <p className="text-xs text-text-secondary-dark">{shade}</p>
                       </div>
                     ))}
@@ -485,7 +485,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       { shade: 900, bg: 'bg-warning-900', border: true },
                     ].map(({ shade, bg, border }) => (
                       <div key={`warning-${String(shade)}`} className="text-center">
-                        <div className={`mb-1 h-10 rounded ${bg} ${border ? 'border border-white/10' : ''}`} />
+                        <div className={`mb-1 h-10 rounded-sm ${bg} ${border ? 'border border-white/10' : ''}`} />
                         <p className="text-xs text-text-secondary-dark">{shade}</p>
                       </div>
                     ))}
@@ -534,7 +534,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
 
         {/* Spacing Scale Section */}
         <section className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16">
-          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 size-80 rounded-full bg-primary/5 blur-3xl" />
 
           <div className="relative z-10">
             <h2 className="mb-4 text-4xl font-bold text-white">Spacing Scale</h2>
@@ -556,7 +556,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                 { name: 'spacing-32', size: '8rem (128px)', class: 'w-32' },
               ].map(spacing => (
                 <div key={spacing.name} className="flex items-center gap-4">
-                  <div className={`${spacing.class} h-6 rounded bg-primary`} />
+                  <div className={`${spacing.class} h-6 rounded-sm bg-primary`} />
                   <span className="w-32 font-mono text-sm text-white">{spacing.name}</span>
                   <span className="text-sm text-text-secondary-dark">{spacing.size}</span>
                 </div>
@@ -567,12 +567,12 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
 
         {/* Animations Section */}
         <section className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16">
-          <div className="absolute top-0 right-0 -mt-20 -mr-20 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 size-80 rounded-full bg-primary/5 blur-3xl" />
 
           <div className="relative z-10">
             <h2 className="mb-4 text-4xl font-bold text-white">Animations</h2>
             <p className="mb-8 text-lg text-text-secondary-dark">
-              Built-in animation keyframes from <code className="rounded bg-surface-dark px-2 py-1">theme.css</code>.
+              Built-in animation keyframes from <code className="rounded-sm bg-surface-dark px-2 py-1">theme.css</code>.
               Hover to preview.
             </p>
 
@@ -581,7 +581,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 font-semibold text-white">Fade</h3>
                 <div className="group flex h-20 items-center justify-center rounded-xl bg-surface-dark">
-                  <div className="h-12 w-12 rounded-xl bg-primary opacity-50 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="size-12 rounded-xl bg-primary opacity-50 transition-opacity duration-300 group-hover:opacity-100" />
                 </div>
                 <p className="mt-3 text-center font-mono text-xs text-text-secondary-dark">animate-fade-in</p>
               </div>
@@ -590,7 +590,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 font-semibold text-white">Scale</h3>
                 <div className="group flex h-20 items-center justify-center rounded-xl bg-surface-dark">
-                  <div className="h-12 w-12 rounded-xl bg-primary transition-transform duration-300 group-hover:scale-110" />
+                  <div className="size-12 rounded-xl bg-primary transition-transform duration-300 group-hover:scale-110" />
                 </div>
                 <p className="mt-3 text-center font-mono text-xs text-text-secondary-dark">animate-scale-up</p>
               </div>
@@ -599,7 +599,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 font-semibold text-white">Spin</h3>
                 <div className="group flex h-20 items-center justify-center rounded-xl bg-surface-dark">
-                  <div className="flex h-12 w-12 items-center justify-center">
+                  <div className="flex size-12 items-center justify-center">
                     <CMSIcon icon="refresh" size="3xl" className="text-primary group-hover:animate-spin" />
                   </div>
                 </div>
@@ -619,7 +619,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 font-semibold text-white">Slide Up</h3>
                 <div className="group flex h-20 items-center justify-center overflow-hidden rounded-xl bg-surface-dark">
-                  <div className="h-12 w-12 translate-y-4 rounded-xl bg-primary transition-transform duration-300 group-hover:translate-y-0" />
+                  <div className="size-12 translate-y-4 rounded-xl bg-primary transition-transform duration-300 group-hover:translate-y-0" />
                 </div>
                 <p className="mt-3 text-center font-mono text-xs text-text-secondary-dark">animate-slide-up</p>
               </div>
@@ -628,7 +628,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 font-semibold text-white">Slide Left</h3>
                 <div className="group flex h-20 items-center justify-center overflow-hidden rounded-xl bg-surface-dark">
-                  <div className="h-12 w-12 translate-x-8 rounded-xl bg-primary transition-transform duration-300 group-hover:translate-x-0" />
+                  <div className="size-12 translate-x-8 rounded-xl bg-primary transition-transform duration-300 group-hover:translate-x-0" />
                 </div>
                 <p className="mt-3 text-center font-mono text-xs text-text-secondary-dark">animate-slide-left</p>
               </div>
@@ -637,7 +637,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 font-semibold text-white">Combined</h3>
                 <div className="group flex h-20 items-center justify-center rounded-xl bg-surface-dark">
-                  <div className="h-12 w-12 scale-90 rounded-xl bg-primary opacity-70 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100" />
+                  <div className="size-12 scale-90 rounded-xl bg-primary opacity-70 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100" />
                 </div>
                 <p className="mt-3 text-center font-mono text-xs text-text-secondary-dark">fade + scale</p>
               </div>
@@ -647,7 +647,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
 
         {/* Typography Section */}
         <section className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16">
-          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-80 w-80 rounded-full bg-blue-500/5 blur-3xl" />
+          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 size-80 rounded-full bg-blue-500/5 blur-3xl" />
 
           <div className="relative z-10">
             <h2 className="mb-8 text-4xl font-bold text-white">Typography</h2>
@@ -658,7 +658,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                 <h3 className="mb-6 text-2xl font-semibold text-white">Headings</h3>
                 <div className="space-y-6 rounded-xl border border-white/5 bg-background-dark p-8">
                   <div>
-                    <h1 className="text-5xl leading-tight font-bold text-white md:text-6xl">Heading 1</h1>
+                    <h1 className="text-5xl/tight font-bold text-white md:text-6xl">Heading 1</h1>
                     <code className="text-sm text-text-secondary-dark">text-5xl md:text-6xl font-bold</code>
                   </div>
                   <div>
@@ -689,7 +689,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
 
         {/* Element Components Section */}
         <section className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16">
-          <div className="absolute top-0 right-0 -mt-20 -mr-20 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 size-80 rounded-full bg-primary/5 blur-3xl" />
 
           <div className="relative z-10 space-y-12">
             <div>
@@ -871,7 +871,33 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                         url: '#',
                         openInNewTab: false,
                       }}
-                      variant="ghost"
+                      variant="ghost-1"
+                    />
+                    <ButtonLink
+                      direction={direction}
+                      data={{
+                        label: {
+                          text: 'Ghost 2 Button',
+                          iconPosition: IconPositionEnum.BEFORE_TEXT,
+                          ariaDescription: 'Ghost 2 button',
+                        },
+                        url: '#',
+                        openInNewTab: false,
+                      }}
+                      variant="ghost-2"
+                    />
+                    <ButtonLink
+                      direction={direction}
+                      data={{
+                        label: {
+                          text: 'Ghost 3 Button',
+                          iconPosition: IconPositionEnum.BEFORE_TEXT,
+                          ariaDescription: 'Ghost 3 button',
+                        },
+                        url: '#',
+                        openInNewTab: false,
+                      }}
+                      variant="ghost-3"
                     />
                     <ButtonLink
                       direction={direction}
@@ -884,7 +910,20 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                         url: '#',
                         openInNewTab: false,
                       }}
-                      variant="link"
+                      variant="link-1"
+                    />
+                    <ButtonLink
+                      direction={direction}
+                      data={{
+                        label: {
+                          text: 'Secondary Link',
+                          iconPosition: IconPositionEnum.BEFORE_TEXT,
+                          ariaDescription: 'Secondary link button',
+                        },
+                        url: '#',
+                        openInNewTab: false,
+                      }}
+                      variant="link-2"
                     />
                   </div>
                 </div>
@@ -1004,6 +1043,9 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       }}
                       variant="primary"
                       disabled
+                      onClick={() => {
+                        // Disabled button needs a handler to satisfy type
+                      }}
                     />
                   </div>
                 </div>
@@ -1074,7 +1116,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
 
         {/* Interactive Components Section */}
         <section className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16">
-          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 size-80 rounded-full bg-primary/5 blur-3xl" />
 
           <div className="relative z-10 space-y-12">
             <div>
@@ -1114,6 +1156,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                     console.log('Language changed to:', code)
                   }}
                   direction={direction}
+                  showText={true}
                 />
               </div>
               <div className="mt-6 rounded-xl bg-surface-dark p-4">
@@ -1151,6 +1194,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       {
                         id: 1,
                         documentId: 'dark-theme',
+                        themeId: 'dark',
                         publishedAt: '2025-01-01T00:00:00.000Z',
                         content: {
                           icon: 'dark_mode',
@@ -1162,6 +1206,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       {
                         id: 2,
                         documentId: 'light-theme',
+                        themeId: 'light',
                         publishedAt: '2025-01-01T00:00:00.000Z',
                         content: {
                           icon: 'light_mode',
@@ -1173,6 +1218,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       {
                         id: 3,
                         documentId: 'system-theme',
+                        themeId: 'system',
                         publishedAt: '2025-01-01T00:00:00.000Z',
                         content: {
                           icon: 'computer',
@@ -1183,8 +1229,8 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       },
                     ],
                   }}
-                  selectedTheme="Dark"
-                  onThemeChange={(theme: string) => {
+                  selectedTheme="dark"
+                  onThemeChange={theme => {
                     console.log('Theme changed to:', theme)
                   }}
                   direction={direction}
@@ -1209,6 +1255,8 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
               </p>
               <div className="flex justify-center rounded-xl border border-white/10 bg-surface-dark p-8">
                 <SearchMenu
+                  direction={direction}
+                  navWidth={1200}
                   data={{
                     menuButton: {
                       label: {
@@ -1378,7 +1426,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
           id="section-components"
           className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16"
         >
-          <div className="absolute top-0 right-0 -mt-20 -mr-20 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 size-80 rounded-full bg-primary/5 blur-3xl" />
 
           <div className="relative z-10 space-y-12">
             <div>
@@ -1685,7 +1733,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
 
         {/* Layout Components Note */}
         <section className="relative overflow-hidden rounded-xl border border-primary/20 bg-primary/5 p-8 md:p-16">
-          <div className="absolute top-0 right-0 -mt-20 -mr-20 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 size-80 rounded-full bg-primary/5 blur-3xl" />
 
           <div className="relative z-10">
             <h2 className="mb-6 text-4xl font-bold text-white">Layout Components</h2>
@@ -1736,7 +1784,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
 
         {/* Design Patterns Section */}
         <section className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16">
-          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 size-80 rounded-full bg-primary/5 blur-3xl" />
 
           <div className="relative z-10 space-y-8">
             <h2 className="mb-4 text-4xl font-bold text-white">Design Patterns</h2>
@@ -1786,7 +1834,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
 
         {/* Usage Guidelines */}
         <section className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16">
-          <div className="absolute top-0 right-0 -mt-20 -mr-20 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 size-80 rounded-full bg-primary/5 blur-3xl" />
 
           <div className="relative z-10 space-y-8">
             <h2 className="mb-4 text-4xl font-bold text-white">Usage Guidelines</h2>
@@ -1841,7 +1889,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                   </li>
                   <li>
                     <strong className="text-white">MANDATORY:</strong> Use theme variables from{' '}
-                    <code className="rounded bg-surface-dark px-2 py-1">src/styles/theme.css</code>
+                    <code className="rounded-sm bg-surface-dark px-2 py-1">src/styles/theme.css</code>
                   </li>
                   <li>All colors defined as CSS custom properties</li>
                   <li>Supports automatic light/dark mode switching</li>

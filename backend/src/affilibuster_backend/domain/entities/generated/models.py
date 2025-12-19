@@ -1,9 +1,9 @@
-# Copyright (c) 2025 Affilibuster by Ronen Druker.
+# Copyright (c) 2026 Affilibuster by Ronen Druker.
 
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Any, Literal, Union
+from typing import Any, Literal
 from uuid import UUID
 
 from pydantic import AnyUrl, AwareDatetime, BaseModel, ConfigDict, EmailStr, Field, RootModel, SecretStr
@@ -625,7 +625,7 @@ class Alignment(StrEnum):
     An enum field
     """
 
-    CENTER = "center"
+    CENTER_ = "center"
     LANGUAGE_DIRECTION = "language-direction"
 
 
@@ -960,6 +960,10 @@ class ApiThemeThemeDocument(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
+    theme_id: str = Field(..., alias="themeId")
+    """
+    A UID field
+    """
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -1293,7 +1297,7 @@ class HeaderAlignment(StrEnum):
     An enumeration field
     """
 
-    CENTER = "center"
+    CENTER_ = "center"
     LANGUAGE_DIRECTION = "language-direction"
 
 
@@ -1966,14 +1970,11 @@ class Pagination5(Pagination2, Pagination3):
     )
 
 
-class Pagination(RootModel[Union[Pagination4, Pagination5]]):
+class Pagination(RootModel[Pagination4 | Pagination5]):
     """
     Pagination parameters
     """
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: Pagination4 | Pagination5
     """
     Pagination parameters
@@ -2212,14 +2213,11 @@ class Pagination65(Pagination62, Pagination63):
     )
 
 
-class Pagination6(RootModel[Union[Pagination64, Pagination65]]):
+class Pagination6(RootModel[Pagination64 | Pagination65]):
     """
     Pagination parameters
     """
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: Pagination64 | Pagination65
     """
     Pagination parameters
@@ -2407,14 +2405,11 @@ class Pagination75(Pagination72, Pagination73):
     )
 
 
-class Pagination7(RootModel[Union[Pagination74, Pagination75]]):
+class Pagination7(RootModel[Pagination74 | Pagination75]):
     """
     Pagination parameters
     """
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: Pagination74 | Pagination75
     """
     Pagination parameters
@@ -2527,7 +2522,7 @@ class BlogPostsIdGetParametersQuery(BaseModel):
 
 
 class Field9(StrEnum):
-    TITLE = "title"
+    TITLE_ = "title"
     SUBTITLE = "subtitle"
     CONTACT_TAB_LABEL = "contactTabLabel"
     FAQ_TAB_LABEL = "faqTabLabel"
@@ -2745,14 +2740,11 @@ class Pagination85(Pagination82, Pagination83):
     )
 
 
-class Pagination8(RootModel[Union[Pagination84, Pagination85]]):
+class Pagination8(RootModel[Pagination84 | Pagination85]):
     """
     Pagination parameters
     """
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: Pagination84 | Pagination85
     """
     Pagination parameters
@@ -3091,7 +3083,7 @@ class Error410GetParametersQuery(BaseModel):
 
 
 class Field14(StrEnum):
-    TITLE = "title"
+    TITLE_ = "title"
     SUBTITLE = "subtitle"
     DESCRIPTION = "description"
     CONTACT_PROMPT = "contactPrompt"
@@ -3264,14 +3256,11 @@ class Pagination95(Pagination92, Pagination93):
     )
 
 
-class Pagination9(RootModel[Union[Pagination94, Pagination95]]):
+class Pagination9(RootModel[Pagination94 | Pagination95]):
     """
     Pagination parameters
     """
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: Pagination94 | Pagination95
     """
     Pagination parameters
@@ -3347,9 +3336,6 @@ class FilesGetResponseItem(BaseModel):
 
 
 class FilesGetResponse(RootModel[list[FilesGetResponseItem]]):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: list[FilesGetResponseItem]
 
 
@@ -3551,9 +3537,6 @@ class Sections43(CallToActionsNewsletterSignupCtaEntry):
 
 
 class LanguagesGetResponse(RootModel[list[Language]]):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: list[Language]
 
 
@@ -3767,14 +3750,11 @@ class Pagination105(Pagination102, Pagination103):
     )
 
 
-class Pagination10(RootModel[Union[Pagination104, Pagination105]]):
+class Pagination10(RootModel[Pagination104 | Pagination105]):
     """
     Pagination parameters
     """
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: Pagination104 | Pagination105
     """
     Pagination parameters
@@ -4006,14 +3986,11 @@ class Pagination115(Pagination112, Pagination113):
     )
 
 
-class Pagination11(RootModel[Union[Pagination114, Pagination115]]):
+class Pagination11(RootModel[Pagination114 | Pagination115]):
     """
     Pagination parameters
     """
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: Pagination114 | Pagination115
     """
     Pagination parameters
@@ -4204,14 +4181,11 @@ class Pagination125(Pagination122, Pagination123):
     )
 
 
-class Pagination12(RootModel[Union[Pagination124, Pagination125]]):
+class Pagination12(RootModel[Pagination124 | Pagination125]):
     """
     Pagination parameters
     """
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: Pagination124 | Pagination125
     """
     Pagination parameters
@@ -4573,14 +4547,11 @@ class Pagination135(Pagination132, Pagination133):
     )
 
 
-class Pagination13(RootModel[Union[Pagination134, Pagination135]]):
+class Pagination13(RootModel[Pagination134 | Pagination135]):
     """
     Pagination parameters
     """
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: Pagination134 | Pagination135
     """
     Pagination parameters
@@ -4978,6 +4949,7 @@ class TermGetResponse(BaseModel):
 
 
 class Field30(StrEnum):
+    THEME_ID = "themeId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -5056,14 +5028,11 @@ class Pagination145(Pagination142, Pagination143):
     )
 
 
-class Pagination14(RootModel[Union[Pagination144, Pagination145]]):
+class Pagination14(RootModel[Pagination144 | Pagination145]):
     """
     Pagination parameters
     """
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: Pagination144 | Pagination145
     """
     Pagination parameters
@@ -5075,6 +5044,7 @@ class Sort50(StrEnum):
     Sort the result
     """
 
+    THEME_ID = "themeId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -5082,6 +5052,7 @@ class Sort50(StrEnum):
 
 
 class SortEnum16(StrEnum):
+    THEME_ID = "themeId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -5094,7 +5065,7 @@ class Sort51(StrEnum):
 
 
 class ThemesGetParametersQuery(BaseModel):
-    fields: list[Field30] | None = Field(None, examples=[["createdAt", "updatedAt", "publishedAt"]])
+    fields: list[Field30] | None = Field(None, examples=[["themeId", "createdAt", "updatedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -5108,7 +5079,7 @@ class ThemesGetParametersQuery(BaseModel):
     Pagination parameters
     """
     sort: Sort50 | list[SortEnum16] | dict[str, Sort51] | list[dict[str, Sort51]] | None = Field(
-        None, examples=["createdAt"]
+        None, examples=["themeId"]
     )
     """
     Sort the result
@@ -5136,6 +5107,10 @@ class Datum8(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
+    theme_id: str = Field(..., alias="themeId")
+    """
+    A UID field
+    """
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -5183,6 +5158,7 @@ class Sort53(StrEnum):
     Sort the result
     """
 
+    THEME_ID = "themeId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -5195,7 +5171,7 @@ class Sort54(StrEnum):
 
 
 class ThemesIdGetParametersQuery(BaseModel):
-    fields: list[Field30] | None = Field(None, examples=[["createdAt", "updatedAt", "publishedAt"]])
+    fields: list[Field30] | None = Field(None, examples=[["themeId", "createdAt", "updatedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -5204,7 +5180,7 @@ class ThemesIdGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     sort: Sort53 | list[SortEnum16] | dict[str, Sort54] | list[dict[str, Sort54]] | None = Field(
-        None, examples=["createdAt"]
+        None, examples=["themeId"]
     )
     """
     Sort the result
@@ -5232,6 +5208,10 @@ class Data22(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
+    theme_id: str = Field(..., alias="themeId")
+    """
+    A UID field
+    """
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -5473,10 +5453,7 @@ class Columns4(MarkersEndHorizontalLayoutMarkerEntry):
     """
 
 
-class Columns(RootModel[Union[Columns1, Columns2, Columns3, Columns4]]):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
+class Columns(RootModel[Columns1 | Columns2 | Columns3 | Columns4]):
     root: Columns1 | Columns2 | Columns3 | Columns4 = Field(..., discriminator="field__component")
 
 
@@ -5741,10 +5718,7 @@ class Columns6(ElementsTextBlockEntry):
     """
 
 
-class Columns5(RootModel[Union[Columns6, Columns7, Columns8, Columns9]]):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
+class Columns5(RootModel[Columns6 | Columns7 | Columns8 | Columns9]):
     root: Columns6 | Columns7 | Columns8 | Columns9 = Field(..., discriminator="field__component")
 
 
@@ -7855,23 +7829,18 @@ class Sections7(SectionsFeaturedProductsEntry):
 
 class Sections(
     RootModel[
-        Union[
-            Sections1,
-            Sections2,
-            Sections3,
-            Sections4,
-            Sections27,
-            Sections6,
-            Sections7,
-            Sections8,
-            Sections9,
-            Sections10,
-        ]
+        Sections1
+        | Sections2
+        | Sections3
+        | Sections4
+        | Sections27
+        | Sections6
+        | Sections7
+        | Sections8
+        | Sections9
+        | Sections10
     ]
 ):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: (
         Sections1
         | Sections2
@@ -7888,23 +7857,18 @@ class Sections(
 
 class Sections11(
     RootModel[
-        Union[
-            Sections12,
-            Sections13,
-            Sections14,
-            Sections15,
-            Sections16,
-            Sections17,
-            Sections7,
-            Sections8,
-            Sections9,
-            Sections21,
-        ]
+        Sections12
+        | Sections13
+        | Sections14
+        | Sections15
+        | Sections16
+        | Sections17
+        | Sections7
+        | Sections8
+        | Sections9
+        | Sections21
     ]
 ):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: (
         Sections12
         | Sections13
@@ -7921,23 +7885,18 @@ class Sections11(
 
 class Sections22(
     RootModel[
-        Union[
-            Sections23,
-            Sections24,
-            Sections25,
-            Sections26,
-            Sections27,
-            Sections28,
-            Sections7,
-            Sections8,
-            Sections9,
-            Sections32,
-        ]
+        Sections23
+        | Sections24
+        | Sections25
+        | Sections26
+        | Sections27
+        | Sections28
+        | Sections7
+        | Sections8
+        | Sections9
+        | Sections32
     ]
 ):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: (
         Sections23
         | Sections24
@@ -7954,23 +7913,18 @@ class Sections22(
 
 class Sections33(
     RootModel[
-        Union[
-            Sections34,
-            Sections35,
-            Sections36,
-            Sections37,
-            Sections27,
-            Sections39,
-            Sections7,
-            Sections8,
-            Sections9,
-            Sections43,
-        ]
+        Sections34
+        | Sections35
+        | Sections36
+        | Sections37
+        | Sections27
+        | Sections39
+        | Sections7
+        | Sections8
+        | Sections9
+        | Sections43
     ]
 ):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
     root: (
         Sections34
         | Sections35

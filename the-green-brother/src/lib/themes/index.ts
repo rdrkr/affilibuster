@@ -1,3 +1,4 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 export * from './api'
+export * from './useTheme'

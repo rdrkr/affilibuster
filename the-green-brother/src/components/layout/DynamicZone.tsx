@@ -159,7 +159,7 @@ export function DynamicZone<T extends DynamicSection>({
   direction,
   className = '',
   verticalAlignment,
-  horizontalGroupSpacing = '-mt-26 -mb-12',
+  horizontalGroupSpacing = '',
 }: DynamicZoneProps<T>) {
   const groups = groupSections(sections, renderSection)
   const isRTL = direction === DirectionEnum.RTL

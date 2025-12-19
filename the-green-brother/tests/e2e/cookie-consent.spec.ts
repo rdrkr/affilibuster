@@ -13,7 +13,7 @@
  * - Tracking opt-out
  */
 
-import { test, expect } from '../fixtures'
+import { expect, test } from '../fixtures'
 
 test.describe('Cookie Consent', () => {
   // ========================================

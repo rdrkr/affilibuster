@@ -17,7 +17,6 @@
   "attributes": {
     "themeId": {
       "type": "uid",
-      "private": true,
       "pluginOptions": {
         "i18n": {
           "localized": true

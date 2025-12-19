@@ -433,6 +433,26 @@ describe('BlogTeaserSection', () => {
     expect(sections[0]).toBeInTheDocument()
   })
 
+  it('should handle missing aria-label on section', () => {
+    const { header, ...restData } = mockSectionData
+    const dataWithoutAria = {
+      ...restData,
+      header: {
+        ...header,
+        header: { ...header.header, ariaDescription: undefined },
+      },
+    } as unknown as BlogTeaserSectionProps['data']
+
+    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={dataWithoutAria} blogPosts={mockBlogPosts} />)
+
+    // Should default to empty string
+    // Since role="region" requires label, it falls back to generic section.
+    // We check attribute directly.
+    // Query by class to find the section
+    const section = screen.getByRole('heading', { level: 2 }).closest('section')
+    expect(section).toHaveAttribute('aria-label', '')
+  })
+
   it('should render read article call-to-action', () => {
     render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
 

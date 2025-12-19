@@ -32,6 +32,8 @@ export interface TextBlockProps {
   }
   /** Language direction for RTL support */
   direction: DirectionEnum
+  /** Controls visibility of entire block - when false, block is hidden from layout */
+  visible?: boolean
 }
 
 /**
@@ -39,9 +41,14 @@ export interface TextBlockProps {
  * @param props - Component props with CMS text block data
  * @param props.data - TextBlock data from CMS
  * @param props.direction - Language direction for RTL support
- * @returns TextBlock component
+ * @param props.visible - Controls entire block visibility (false = hidden from layout)
+ * @returns TextBlock component or null if not visible
  */
-export function TextBlock({ data, direction }: TextBlockProps) {
+export function TextBlock({ data, direction, visible }: TextBlockProps) {
+  if (visible === false) {
+    return null
+  }
+
   const { header, content } = data
   const isRTL = direction === DirectionEnum.RTL
 
@@ -51,18 +58,19 @@ export function TextBlock({ data, direction }: TextBlockProps) {
       {content && (
         <div
           className={`
-            prose mt-2 max-w-none text-sm
-            prose-invert prose-headings:my-0
+            prose mt-4 max-w-none text-sm
+            prose-neutral dark:prose-invert
+            prose-headings:my-0
             prose-headings:mb-4
             prose-headings:font-bold
-            prose-headings:text-neutral-50
+            prose-headings:text-neutral-800 dark:prose-headings:text-neutral-50
             prose-p:mb-2
-            prose-p:text-neutral-200
-            prose-blockquote:text-neutral-300
-            prose-strong:text-neutral-50
-            prose-em:text-neutral-300
-            prose-code:text-tertiary-400
-            prose-li:text-neutral-200
+            prose-p:text-neutral-600 dark:prose-p:text-neutral-200
+            prose-blockquote:text-neutral-500 dark:prose-blockquote:text-neutral-300
+            prose-strong:text-neutral-800 dark:prose-strong:text-neutral-50
+            prose-em:text-neutral-500 dark:prose-em:text-neutral-300
+            prose-code:text-tertiary-600 dark:prose-code:text-tertiary-400
+            prose-li:text-neutral-600 dark:prose-li:text-neutral-200
             prose-img:my-0
           `}
           dir={isRTL ? 'rtl' : 'ltr'}
@@ -72,11 +80,10 @@ export function TextBlock({ data, direction }: TextBlockProps) {
             components={{
               a: ({ href, children }) => (
                 <ButtonLink
-                  variant="link"
+                  data={{ url: href ?? '', openInNewTab: null }}
+                  variant="link-2"
                   size="sm"
-                  href={href ?? ''}
                   direction={direction}
-                  className="text-text-secondary-dark no-underline hover:text-text-main-dark"
                 >
                   {children}
                 </ButtonLink>
@@ -106,7 +113,7 @@ export function TextBlock({ data, direction }: TextBlockProps) {
                     data={labelData}
                     direction={direction}
                     display="inline"
-                    className="text-sm text-text-secondary-dark"
+                    className="text-sm text-neutral-600 dark:text-text-secondary-dark"
                     hideIcon
                   />
                 )

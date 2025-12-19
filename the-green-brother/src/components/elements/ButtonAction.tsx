@@ -10,18 +10,18 @@
 
 'use client'
 
+import { forwardRef } from 'react'
+
 import { DirectionEnum, type ElementsButtonEntry } from '@/lib/generated/types.gen'
-import { Label } from './Label'
 
-/**
- * Button variant styles
- */
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'link'
-
-/**
- * Button size options
- */
-export type ButtonSize = 'sm' | 'md' | 'lg'
+import {
+  composeButtonContent,
+  getButtonBaseClasses,
+  getVisibilityClasses,
+  IconSize,
+  type ButtonSize,
+  type ButtonVariant,
+} from './common'
 
 /**
  * Props for the ButtonAction component
@@ -35,66 +35,30 @@ export interface ButtonActionProps {
   variant?: ButtonVariant
   /** Button size (default: md) */
   size?: ButtonSize
-  /** Icon size (default: md) */
-  iconSize?: 'sm' | 'md' | 'lg' | 'xl'
+  /** Icon size (default: lg) */
+  iconSize?: IconSize
   /** Additional CSS classes */
   className?: string
-  /** Click handler */
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
+  /** Click handler (required) */
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void
   /** Whether the button is disabled */
   disabled?: boolean
   /** Custom content to render (overrides data.label) */
   children?: React.ReactNode
-}
-
-/**
- * Get CSS classes for button variant
- * @param variant - Button variant
- * @returns Tailwind CSS classes
- */
-function getVariantClasses(variant: ButtonVariant): string {
-  const variants: Record<ButtonVariant, string> = {
-    primary: `
-      bg-primary text-background-dark font-bold
-      hover:bg-primary-hover
-      disabled:bg-tertiary-500 disabled:cursor-not-allowed
-    `,
-    secondary: `
-      bg-secondary text-white font-bold
-      hover:bg-secondary/90
-      disabled:bg-tertiary-500 disabled:cursor-not-allowed
-    `,
-    outline: `
-      border-2 border-primary text-primary font-bold
-      hover:bg-primary hover:text-background-dark
-      disabled:border-tertiary-500 disabled:text-tertiary-500 disabled:cursor-not-allowed
-    `,
-    ghost: `
-      text-primary font-medium
-      hover:bg-primary/10
-      disabled:text-tertiary-500 disabled:cursor-not-allowed
-    `,
-    link: `
-      text-primary font-medium transition-all duration-300
-      hover:scale-105 hover:text-shadow-shimmer
-      disabled:text-tertiary-500 disabled:cursor-not-allowed disabled:hover:scale-100
-    `,
-  }
-  return variants[variant]
-}
-
-/**
- * Get CSS classes for button size
- * @param size - Button size
- * @returns Tailwind CSS classes
- */
-function getSizeClasses(size: ButtonSize): string {
-  const sizes: Record<ButtonSize, string> = {
-    sm: 'px-3 py-1.5 text-sm rounded-md',
-    md: 'px-4 py-2 text-base rounded-xl',
-    lg: 'px-6 py-3 text-lg rounded-xl',
-  }
-  return sizes[size]
+  /** Disable hover animations for link variant */
+  noAnimation?: boolean
+  /** Enable animated text visibility - pass to Label for mode transitions (default: true) */
+  showText?: boolean
+  /** Controls visibility of entire button - when false, button is hidden from layout */
+  visible?: boolean
+  /** Whether the button is currently active */
+  isActive?: boolean
+  /** Whether the element is expanded (for menus/drawers) */
+  'aria-expanded'?: boolean
+  /** Position of children relative to label (default: 'end') */
+  childrenPosition?: 'start' | 'end'
+  /** Animation slide direction (default: 'end-to-start') */
+  slideDirection?: 'start-to-end' | 'end-to-start'
 }
 
 /**
@@ -107,50 +71,90 @@ function getSizeClasses(size: ButtonSize): string {
  * @param props.size - Button size
  * @param props.iconSize - Icon size
  * @param props.className - Additional CSS classes
- * @param props.onClick - Click handler
+ * @param props.onClick - Click handler (required)
  * @param props.disabled - Whether button is disabled
  * @param props.children - Custom content
- * @returns Button action component or null if no data
+ * @param props.noAnimation - Disable hover animations for link variant
+ * @param props.showText - Enable animated text visibility for mode transitions
+ * @param props.visible - Controls entire button visibility (false = hidden from layout)
+ * @param props.isActive - Whether the button is currently active
+ * @param props.'aria-expanded' - ARIA expanded state
+ * @param props.childrenPosition - Position of children relative to label
+ * @returns Button action component or null if no data or not visible
  */
-export function ButtonAction({
-  data,
-  direction,
-  variant = 'primary',
-  size = 'md',
-  iconSize = 'lg',
-  className = '',
-  onClick,
-  disabled = false,
-  children,
-}: ButtonActionProps) {
-  const { label } = data ?? {}
+export const ButtonAction = forwardRef<HTMLButtonElement, ButtonActionProps>(
+  (
+    {
+      data,
+      direction,
+      variant = 'primary',
+      size = 'md',
+      iconSize = 'lg',
+      className = '',
+      onClick,
+      disabled = false,
+      children,
+      noAnimation = false,
+      showText = true,
+      visible = true,
+      isActive = false,
+      'aria-expanded': ariaExpanded,
+      childrenPosition = 'end',
+      slideDirection = 'end-to-start',
+    },
+    ref
+  ) => {
+    const { label } = data ?? {}
 
-  const baseClasses = `
-    inline-flex items-center justify-center gap-2 transition-all duration-200
-    ${getVariantClasses(variant)}
-    ${getSizeClasses(size)}
-    ${className}
-  `
+    // Determine if button has an icon (from label or children)
+    const hasIcon = Boolean(label?.icon) || Boolean(children)
 
-  // Use children if provided, otherwise fallback to Label component
-  let content: React.ReactNode = children
+    const baseClasses = getButtonBaseClasses({
+      variant,
+      size,
+      isActive,
+      noAnimation,
+      showText,
+      direction,
+      hasIcon,
+      className,
+    })
 
-  if (!content && label) {
-    content = <Label data={label} direction={direction} as="span" iconSize={iconSize} display="inline" />
+    const content = composeButtonContent({
+      label,
+      children,
+      direction,
+      iconSize,
+      showText,
+      childrenPosition,
+    })
+
+    if (!content) {
+      return null
+    }
+
+    // Get aria-label from prop or nested label
+    const ariaLabel = label?.ariaDescription
+
+    const visibilityClasses = getVisibilityClasses(visible, direction, slideDirection)
+
+    return (
+      <button
+        ref={ref}
+        type="button"
+        className={`${baseClasses} ${visibilityClasses}`}
+        onClick={onClick}
+        disabled={disabled}
+        aria-label={ariaLabel}
+        aria-expanded={ariaExpanded}
+        aria-hidden={!visible}
+      >
+        {content}
+      </button>
+    )
   }
+)
 
-  if (!content) {
-    return null
-  }
-
-  // Get aria-label from nested label
-  const ariaLabel = label?.ariaDescription
-
-  return (
-    <button type="button" className={baseClasses} onClick={onClick} disabled={disabled} aria-label={ariaLabel}>
-      {content}
-    </button>
-  )
-}
+ButtonAction.displayName = 'ButtonAction'
 
 export default ButtonAction

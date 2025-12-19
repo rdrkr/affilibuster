@@ -70,40 +70,57 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
   // Render features without header section (standalone feature cards)
   if (!showHeader) {
     return (
-      <section aria-label={headerAriaDescription ?? ''} className={`space-y-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+      <div
+        className={`
+          mt-8 grid grid-flow-col grid-rows-3 gap-4
+          ${isRTL ? 'text-right' : 'text-left'}
+        `}
+        aria-label={headerAriaDescription ?? ''}
+      >
         {features.map((feature, index) => {
           if (!feature.header) {
             return null
           }
           return (
-            <div key={feature.id ?? index} className="rounded-xl border border-white/5 bg-surface-dark p-6">
+            <div
+              key={feature.id ?? index}
+              className={`
+                flex items-center justify-center
+                rounded-xl border
+                border-neutral-200 bg-white
+                p-6 shadow-sm
+                dark:border-white/5 dark:bg-surface-dark
+                dark:shadow-none
+              `}
+            >
               <Header data={feature} level={5} direction={direction} />
             </div>
           )
         })}
-      </section>
+      </div>
     )
   }
 
   return (
     <section
       className={`
-        relative overflow-hidden rounded-xl border border-white/5
-        bg-surface-dark p-8
-        md:p-16
+        relative overflow-hidden rounded-xl border border-neutral-200
+        bg-white p-8 shadow-md
+        md:p-16 dark:border-white/5 dark:bg-surface-dark
+        dark:shadow-none
       `}
       aria-label={headerAriaDescription ?? ''}
     >
       {/* Decorative background elements */}
       <div
         className={`
-        absolute top-0 right-0 -mt-20 -mr-20 h-80 w-80 rounded-full bg-primary/5
+        absolute top-0 right-0 -mt-20 -mr-20 size-80 rounded-full bg-primary/5
         blur-3xl
       `}
       />
       <div
         className={`
-        absolute bottom-0 left-0 -mb-20 -ml-20 h-80 w-80 rounded-full
+        absolute bottom-0 left-0 -mb-20 -ml-20 size-80 rounded-full
         bg-blue-500/5 blur-3xl
       `}
       />
@@ -158,7 +175,7 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
                   openInNewTab: learnMoreButtonOpenInNewTab ?? false,
                 }}
                 direction={direction}
-                variant="link"
+                variant="link-1"
               />
             </div>
           )}

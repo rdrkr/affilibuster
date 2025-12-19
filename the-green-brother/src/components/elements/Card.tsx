@@ -38,6 +38,8 @@ export interface CardProps {
   className?: string
   /** Whether the entire card is a link (default: true) */
   asLink?: boolean
+  /** Controls visibility of entire card - when false, card is hidden from layout */
+  visible?: boolean
 }
 
 /**
@@ -74,7 +76,8 @@ function getVariantClasses(variant: CardVariant): {
  * @param props.variant - Card variant (default: 'product')
  * @param props.className - Additional CSS classes
  * @param props.asLink - Whether the entire card is a link
- * @returns Card component
+ * @param props.visible - Controls entire card visibility (false = hidden from layout)
+ * @returns Card component or null if not visible
  */
 export function Card({
   href,
@@ -86,26 +89,32 @@ export function Card({
   variant = 'product',
   className = '',
   asLink = true,
+  visible,
 }: CardProps) {
+  if (visible === false) {
+    return null
+  }
+
   const variantClasses = getVariantClasses(variant)
 
   const cardClasses = `
-    group isolate flex shrink-0 snap-start flex-col overflow-hidden
-    rounded-xl border border-white/5 bg-surface-dark
+    group isolate flex shrink-0 snap-start flex-col overflow-hidden m-2
+    rounded-xl border border-neutral-200 bg-white shadow-md
     transition-all duration-300
     hover:-translate-y-1 hover:transform hover:border-primary/30
+    dark:border-white/5 dark:bg-surface-dark dark:shadow-none
     ${variantClasses.container}
     ${className}
   `
 
   const content = (
     <>
-      <div className={`relative overflow-hidden bg-tertiary-800 ${variantClasses.imageHeight}`}>
+      <div className={`relative overflow-hidden bg-neutral-100 dark:bg-tertiary-800 ${variantClasses.imageHeight}`}>
         <CMSImage
           image={image}
           fallbackAlt={imageAlt}
           className={`
-            h-full w-full object-cover transition-transform duration-500
+            size-full object-cover transition-transform duration-500
             group-hover:scale-110
           `}
           fill
@@ -118,7 +127,7 @@ export function Card({
           <span
             className={`
               mb-2 text-xs font-bold tracking-wider uppercase
-              ${variant === 'blog' ? 'self-start rounded bg-primary-900 px-2 py-1 text-white' : 'text-primary'}
+              ${variant === 'blog' ? 'self-start rounded-sm bg-primary-900 px-2 py-1 text-white' : 'text-primary'}
             `}
           >
             {tag}

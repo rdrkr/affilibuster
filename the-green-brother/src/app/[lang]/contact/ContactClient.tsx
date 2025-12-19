@@ -21,13 +21,17 @@ export default function ContactClient({ contactData }: ContactClientProps) {
     <div className="py-8">
       <div className="mx-auto max-w-4xl">
         <div className="mb-12 text-center">
-          <h1 className="mb-4 text-4xl font-bold text-white">{contactData?.title ?? 'Contact & Support'}</h1>
-          {contactData?.subtitle && <p className="text-lg text-tertiary-300">{contactData.subtitle}</p>}
+          <h1 className="mb-4 text-4xl font-bold text-neutral-800 dark:text-white">
+            {contactData?.title ?? 'Contact & Support'}
+          </h1>
+          {contactData?.subtitle && (
+            <p className="text-lg text-neutral-600 dark:text-tertiary-300">{contactData.subtitle}</p>
+          )}
         </div>
 
         {/* Contact form labels and fields would be rendered here using CMS data */}
-        <div className="prose max-w-none text-tertiary-300 prose-invert">
-          <p className="text-center text-tertiary-400">Contact form with CMS labels</p>
+        <div className="prose max-w-none text-neutral-600 prose-neutral dark:text-tertiary-300 dark:prose-invert">
+          <p className="text-center text-neutral-500 dark:text-tertiary-400">Contact form with CMS labels</p>
         </div>
       </div>
     </div>

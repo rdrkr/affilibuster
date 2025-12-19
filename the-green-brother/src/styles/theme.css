@@ -95,40 +95,10 @@
   --color-warning-900: #713f12;
 
   /* ============================================
-   * BACKGROUND COLORS (TheGreenBrother Brand)
-   * ============================================ */
-  --color-background-light: var(--color-tertiary-50);
-  --color-background-dark: var(--color-tertiary-900); /* #101d13 */
-
-  /* ============================================
-   * SURFACE COLORS (TheGreenBrother Brand)
-   * ============================================ */
-  --color-surface-light: #ffffff;
-  --color-surface-dark: var(--color-secondary-900); /* #182a1b */
-
-  /* ============================================
-   * SUBTLE/ACCENT COLORS
-   * ============================================ */
-  --color-subtle-light: var(--color-tertiary-200);
-  --color-subtle-dark: var(--color-tertiary-700); /* #3d5745 */
-
-  /* ============================================
-   * TEXT COLORS
-   * ============================================ */
-  --color-text-main-light: var(--color-tertiary-800);
-  --color-text-main-dark: #ffffff;
-  --color-text-secondary-light: var(--color-tertiary-500);
-  --color-text-secondary-dark: #a0b5a7;
-  --color-text-heading-dark: var(--color-tertiary-50);
-  --color-text-body-dark: var(--color-tertiary-100);
-  --color-text-muted-dark: var(--color-tertiary-300);
-
-  /* ============================================
    * INTERACTIVE STATE COLORS
    * ============================================ */
   --color-primary-hover: var(--color-primary-500);
   --color-focus-ring: var(--color-primary-400);
-  --color-focus-ring-dark: var(--color-primary-500);
   --color-hover-accent: var(--color-primary-300);
   --color-active-indicator: var(--color-primary-400);
 
@@ -138,8 +108,20 @@
   --color-form-input-border: var(--color-tertiary-300);
   --color-form-input-focus: var(--color-primary-500);
   --color-form-input-focus-ring: var(--color-primary-400);
-  --color-form-input-bg: #ffffff;
-  --color-form-input-bg-dark: var(--color-tertiary-800);
+
+  /* ============================================
+   * SEMANTIC THEME COLORS
+   * These are static colors for dark mode styling
+   * Components use these via utility classes like bg-surface-dark
+   * ============================================ */
+  --color-background-dark: var(--color-tertiary-900);
+  --color-surface-dark: var(--color-secondary-900);
+  --color-subtle-dark: var(--color-tertiary-700);
+  --color-text-main-dark: #ffffff;
+  --color-text-secondary-dark: #a0b5a7;
+  --color-text-heading-dark: var(--color-tertiary-50);
+  --color-text-body-dark: var(--color-tertiary-100);
+  --color-text-muted-dark: var(--color-tertiary-300);
 
   /* ============================================
    * TYPOGRAPHY - Font Families
@@ -206,7 +188,7 @@
   --width-blog-carousel-desktop: 420px;
 
   /* ============================================
-   * BORDER RADIUS SCALE (SIMPLIFIED)
+   * BORDER RADIUS SCALE
    * Only two values: xl for UI elements, full for circles
    * ============================================ */
   --radius-none: 0;
@@ -237,6 +219,8 @@
   --animate-scale-up: scaleUp 0.2s ease-out;
   --animate-scale-down: scaleDown 0.2s ease-out;
   --animate-spin: spin 1s linear infinite;
+  --animate-collapse-text: collapseText 0.2s ease-out forwards;
+  --animate-expand-text: expandText 0.2s ease-out forwards;
 }
 
 /* ============================================
@@ -346,93 +330,93 @@
   animation: shimmer 0.5s ease-in-out infinite;
 }
 
-/**
- * CSS Custom Properties for Dynamic Usage
- * These are exposed as CSS variables for use in inline styles and JavaScript.
- */
-:root {
-  /* Primary Colors */
-  --color-primary-50: #f0fdf7;
-  --color-primary-100: #dafbe8;
-  --color-primary-200: #b5f7d1;
-  --color-primary-300: #7aecb0;
-  --color-primary-400: #14f195;
-  --color-primary-500: #10c278;
-  --color-primary-600: #0d9a5f;
-  --color-primary-700: #0a7549;
-  --color-primary-800: #085d3a;
-  --color-primary-900: #064c30;
+/* Text collapse/expand animation for responsive navigation */
+@keyframes collapseText {
+  from {
+    max-width: 8rem;
+    opacity: 1;
+  }
+  to {
+    max-width: 0;
+    opacity: 0;
+  }
+}
 
-  /* Secondary Colors */
-  --color-secondary-50: #f0f7f3;
-  --color-secondary-100: #d9ede1;
-  --color-secondary-200: #b3dbc3;
-  --color-secondary-300: #8dc9a5;
-  --color-secondary-400: #67b787;
-  --color-secondary-500: #529d6f;
-  --color-secondary-600: #3d7752;
-  --color-secondary-700: #2e5a3d;
-  --color-secondary-800: #1f3d2a;
-  --color-secondary-900: #182a1b;
+@keyframes expandText {
+  from {
+    max-width: 0;
+    opacity: 0;
+  }
+  to {
+    max-width: 8rem;
+    opacity: 1;
+  }
+}
 
-  /* Tertiary Colors */
-  --color-tertiary-50: #f3f5f4;
-  --color-tertiary-100: #e1e6e3;
-  --color-tertiary-200: #c3cdc7;
-  --color-tertiary-300: #a5b4ab;
-  --color-tertiary-400: #879b8f;
-  --color-tertiary-500: #6d8276;
-  --color-tertiary-600: #56685e;
-  --color-tertiary-700: #3d5745;
-  --color-tertiary-800: #243020;
-  --color-tertiary-900: #101d13;
+/* Dropdown bounce animation - scale up with overshoot for liquid feel */
+@keyframes dropdownBounce {
+  0% {
+    transform: scale(0.9);
+  }
+  60% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 
-  /* Semantic - Success */
-  --color-success-50: #f0fdf7;
-  --color-success-100: #dafbe8;
-  --color-success-200: #b5f7d1;
-  --color-success-300: #7aecb0;
-  --color-success-400: #14f195;
-  --color-success-500: #10c278;
-  --color-success-600: #0d9a5f;
-  --color-success-700: #0a7549;
-  --color-success-800: #085d3a;
-  --color-success-900: #064c30;
-
-  /* Semantic - Error */
-  --color-error-50: #fef2f2;
-  --color-error-100: #fee2e2;
-  --color-error-200: #fecaca;
-  --color-error-300: #fca5a5;
-  --color-error-400: #f87171;
-  --color-error-500: #ef4444;
-  --color-error-600: #dc2626;
-  --color-error-700: #b91c1c;
-  --color-error-800: #991b1b;
-  --color-error-900: #7f1d1d;
-
-  /* Semantic - Warning */
-  --color-warning-50: #fefce8;
-  --color-warning-100: #fef9c3;
-  --color-warning-200: #fef08a;
-  --color-warning-300: #fde047;
-  --color-warning-400: #facc15;
-  --color-warning-500: #eab308;
-  --color-warning-600: #ca8a04;
-  --color-warning-700: #a16207;
-  --color-warning-800: #854d0e;
-  --color-warning-900: #713f12;
+/* Dropdown close animation - reverse of bounce for smooth closing */
+@keyframes dropdownClose {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+  }
+  99% {
+    transform: scale(0.8);
+    opacity: 0;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 /* ============================================
  * CUSTOM UTILITIES
+ * In Tailwind v4, use plain CSS classes instead of @layer utilities
  * ============================================ */
-@layer utilities {
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.text-shadow-sm {
+  text-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5);
+}
+.drop-shadow-icon-sm {
+  filter: drop-shadow(0px 0px 0.5px rgba(0, 0, 0, 0.5));
+}
+.text-shadow-base {
+  text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.35);
+}
+.text-shadow-md {
+  text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.42);
+}
+.text-shadow-lg {
+  text-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
+}
+.text-shadow-xl {
+  text-shadow: 0px 0px 8px rgba(0, 0, 0, 0.57);
+}
+.text-shadow-2xl {
+  text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.65);
+}
+.text-shadow-none {
+  text-shadow: none;
 }

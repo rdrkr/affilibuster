@@ -14,7 +14,7 @@
  * - Edge cases and security requirements
  */
 
-import { test, expect } from '../fixtures'
+import { expect, test } from '../fixtures'
 
 test.describe('Authentication Flows', () => {
   // ========================================

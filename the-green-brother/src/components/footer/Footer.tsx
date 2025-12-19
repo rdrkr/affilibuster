@@ -60,8 +60,8 @@ export default async function Footer({ lang = CodeEnum.EN, direction }: FooterPr
 
       case 'call-to-actions.newsletter-signup-cta':
         return (
-          <div key={column.id} className="text-text-secondary-dark">
-            <h5 className="mb-4 font-bold text-text-main-dark">
+          <div key={column.id} className="text-neutral-600 dark:text-text-secondary-dark">
+            <h5 className="mb-4 font-bold text-neutral-800 dark:text-text-main-dark">
               <CMSText text={column.title} />
             </h5>
             <p className="mb-4">
@@ -86,7 +86,7 @@ export default async function Footer({ lang = CodeEnum.EN, direction }: FooterPr
       `}
       >
         {/* Content wrapper with top separator */}
-        <div className="space-y-8 border-t border-subtle-dark">
+        <div className="space-y-8 border-t border-neutral-200 dark:border-subtle-dark">
           <DynamicZone
             sections={columns}
             renderSection={column => {
@@ -101,12 +101,19 @@ export default async function Footer({ lang = CodeEnum.EN, direction }: FooterPr
         <div
           className={`
             mt-12 flex flex-col items-center justify-between
-            border-t border-subtle-dark pt-8 text-sm text-text-secondary-dark
-            md:flex-row ${isRTL ? 'md:flex-row-reverse' : ''}
+            border-t border-neutral-200 pt-8 text-sm text-neutral-600
+            md:flex-row dark:border-subtle-dark
+            dark:text-text-secondary-dark ${isRTL ? 'md:flex-row-reverse' : ''}
           `}
         >
           {(() => {
-            return <Label data={copyrightsLabel} className="text-text-secondary-dark" direction={direction} />
+            return (
+              <Label
+                data={copyrightsLabel}
+                className="text-neutral-600 dark:text-text-secondary-dark"
+                direction={direction}
+              />
+            )
           })()}
           <div
             className={`
@@ -115,14 +122,7 @@ export default async function Footer({ lang = CodeEnum.EN, direction }: FooterPr
           `}
           >
             {quickLinks.map((link, index) => (
-              <ButtonLink
-                key={link.id ?? index}
-                data={link}
-                variant="link"
-                size="sm"
-                className="text-text-secondary-dark hover:text-text-main-dark"
-                direction={direction}
-              />
+              <ButtonLink key={link.id ?? index} data={link} variant="link-2" size="sm" direction={direction} />
             ))}
           </div>
         </div>

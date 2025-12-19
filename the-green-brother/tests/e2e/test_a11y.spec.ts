@@ -15,7 +15,7 @@
  * - RTL support
  */
 
-import { test, expect } from '../fixtures'
+import { expect, test } from '../fixtures'
 
 test.describe('Accessibility (a11y)', () => {
   // ========================================

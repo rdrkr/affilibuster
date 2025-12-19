@@ -36,6 +36,50 @@ jest.mock('next/navigation', () => ({
   })),
 }))
 
+// Mock useNavigationResize hook
+const mockSetSearchExpanded = jest.fn()
+jest.mock('@/lib/navigation', () => ({
+  ...(jest.requireActual('@/lib/navigation') as typeof import('@/lib/navigation')),
+  useNavigationResize: jest.fn(() => ({
+    navRef: { current: null },
+    visibility: {
+      startGroupMode: 'full' as const,
+      endGroupMode: 'full' as const,
+      collapsedItems: [] as string[],
+      searchMaxWidth: 256,
+      navWidth: 1024,
+    },
+    isSearchExpanded: false,
+    setSearchExpanded: mockSetSearchExpanded,
+    isReady: true,
+  })),
+}))
+
+// Mock NavigationGroup
+jest.mock('@/components/navigation/NavigationGroup', () => ({
+  __esModule: true,
+  NavigationGroup: function MockNavigationGroup({
+    displayMode,
+    position,
+    children,
+    hasIcons = true,
+  }: {
+    displayMode: string
+    position: string
+    children: (ctx: { showText: boolean; displayMode: string }) => React.ReactNode
+    hasIcons?: boolean
+  }) {
+    const effectiveMode = displayMode === 'partial' && !hasIcons ? 'minimal' : displayMode
+    const showText = effectiveMode === 'full'
+
+    return (
+      <div data-testid={`navigation-group-${position}`} data-display-mode={effectiveMode}>
+        {children({ showText, displayMode: effectiveMode })}
+      </div>
+    )
+  },
+}))
+
 // Mock CMS elements
 jest.mock('@/components/elements', () => ({
   CMSIcon: function MockCMSIcon({ icon }: { icon?: { name?: string } }) {
@@ -47,14 +91,26 @@ jest.mock('@/components/elements', () => ({
   resolveIcon: jest.fn((icon: { name?: string } | undefined) => (icon?.name ?? 'default') as string),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ButtonLink: function MockButtonLink(props: any) {
-    const { children, data, className } = props
+    const { children, data, className, showText } = props
     const ariaLabel = props['aria-label'] ?? data?.label?.ariaDescription
+    const isBrand = data?.url === '/' && data?.label?.text === 'TheGreenBrother'
+    const isMobile = (className as string | undefined)?.includes('md:hidden')
+    // Distinguish desktop vs mobile brand buttons
+    const testId =
+      isBrand && showText !== undefined ? (isMobile ? 'mobile-brand-button' : 'desktop-brand-button') : undefined
     return (
-      <a href={data?.url} className={className} aria-label={ariaLabel}>
+      <a
+        href={data?.url}
+        className={className}
+        aria-label={ariaLabel}
+        data-testid={testId}
+        data-show-text={showText !== undefined ? String(showText) : undefined}
+      >
         {children}
       </a>
     )
   },
+  getVisibilityClasses: jest.fn(() => 'mock-visibility-class'),
 }))
 
 // Mock menus
@@ -74,25 +130,66 @@ jest.mock('@/components/menus', () => ({
   ProductCategoriesMenu: function MockProductCategoriesMenu() {
     return <div data-testid="product-categories-menu">Product Categories</div>
   },
-  SearchMenu: function MockSearchMenu() {
-    return <div data-testid="search-menu">Search</div>
+  SearchMenu: function MockSearchMenu({ onExpandChange }: { onExpandChange?: (expanded: boolean) => void }) {
+    return (
+      <div data-testid="search-menu">
+        Search
+        <button data-testid="expand-search" onClick={() => onExpandChange?.(true)}>
+          Expand
+        </button>
+        <button data-testid="collapse-search" onClick={() => onExpandChange?.(false)}>
+          Collapse
+        </button>
+      </div>
+    )
   },
-  ThemeMenu: function MockThemeMenu() {
-    return <div data-testid="theme-menu">Theme</div>
+  ThemeMenu: function MockThemeMenu({ showText }: { showText?: boolean }) {
+    return (
+      <div data-testid="theme-menu" data-show-text={showText}>
+        Theme
+      </div>
+    )
   },
 }))
 
-// Mock MobileMenu
-jest.mock('@/components/navigation/MobileMenu', () => ({
-  MobileMenu: function MockMobileMenu({ isOpen, onToggle }: { isOpen: boolean; onToggle: () => void }) {
+// Mock MobileNavigationGroup
+jest.mock('@/components/navigation/MobileNavigationGroup', () => ({
+  MobileNavigationGroup: function MockMobileNavigationGroup({
+    isOpen,
+    onToggle,
+    showTheme,
+    themeData,
+  }: {
+    isOpen: boolean
+    onToggle: () => void
+    showTheme?: boolean
+    themeData?: { selectedTheme: string }
+  }) {
     return (
       <>
         <button data-testid="mobile-menu-toggle" onClick={onToggle}>
           Toggle
         </button>
-        {isOpen ? <div data-testid="mobile-menu">Mobile Menu</div> : null}
+        {isOpen ? (
+          <div data-testid="mobile-menu" data-show-theme={showTheme} data-theme={themeData?.selectedTheme}>
+            Mobile Menu
+          </div>
+        ) : null}
       </>
     )
+  },
+}))
+
+// Mock ThemeProvider context
+jest.mock('@/components/providers', () => ({
+  useThemeContext: jest.fn(() => ({
+    theme: 'system',
+    resolvedTheme: 'dark',
+    setTheme: jest.fn(),
+    isLoading: false,
+  })),
+  ThemeProvider: function MockThemeProvider({ children }: { children: React.ReactNode }) {
+    return <>{children}</>
   },
 }))
 
@@ -100,6 +197,27 @@ import { Navigation } from '@/components/navigation/Navigation'
 import { ApiNavigationNavigationDocument, CodeEnum, DirectionEnum, Language } from '@/lib/generated/types.gen'
 
 describe('Navigation', () => {
+  beforeEach(() => {
+    mockSetSearchExpanded.mockClear()
+    // Reset useNavigationResize mock to default values
+    const { useNavigationResize } = jest.requireMock<typeof import('@/lib/navigation')>('@/lib/navigation')
+    ;(useNavigationResize as jest.Mock).mockReturnValue({
+      navRef: { current: null },
+      visibility: {
+        startGroupMode: 'full' as const,
+        endGroupMode: 'full' as const,
+        collapsedItems: [] as string[],
+        searchMaxWidth: 256,
+        navWidth: 1024,
+      },
+      isSearchExpanded: false,
+      setSearchExpanded: mockSetSearchExpanded,
+      setStartHasIcons: jest.fn(),
+      setEndHasIcons: jest.fn(),
+      isReady: true,
+    })
+  })
+
   const mockData = {
     logo: { url: '/images/logo.png', alternativeText: 'Logo' },
     brandButton: { url: '/', label: { text: 'TheGreenBrother', icon: { name: 'eco' } } },
@@ -110,7 +228,9 @@ describe('Navigation', () => {
     },
     blogButton: { url: '/blog', label: { text: 'Blog' } },
     aboutButton: { url: '/about', label: { text: 'About' } },
-    searchButton: { label: { text: 'Search' } },
+    searchMenu: {
+      menuButton: { label: { text: 'Search', icon: { name: 'search' } } },
+    },
     themeMenu: {
       menuButton: { label: { text: 'Theme' } },
       themes: [],
@@ -139,7 +259,8 @@ describe('Navigation', () => {
     expect(screen.getByTestId('search-menu')).toBeInTheDocument()
     expect(screen.getByTestId('theme-menu')).toBeInTheDocument()
     expect(screen.getByTestId('language-menu')).toBeInTheDocument()
-    expect(screen.getByTestId('product-categories-menu')).toBeInTheDocument()
+    // NavigationGroup now contains product categories menu
+    expect(screen.getByTestId('navigation-group-start')).toBeInTheDocument()
   })
 
   it('should render search menu', () => {
@@ -176,10 +297,13 @@ describe('Navigation', () => {
     expect(screen.queryByTestId('mobile-menu')).not.toBeInTheDocument()
   })
 
-  it('should render product categories menu', () => {
+  it('should render start navigation group with products menu', () => {
     render(<Navigation direction={DirectionEnum.LTR} data={mockData} />)
 
-    expect(screen.getByTestId('product-categories-menu')).toBeInTheDocument()
+    // The start NavigationGroup contains nav links including products
+    const startGroup = screen.getByTestId('navigation-group-start')
+    expect(startGroup).toBeInTheDocument()
+    expect(startGroup).toHaveAttribute('data-display-mode', 'full')
   })
 
   it('should render without languages when not provided', () => {
@@ -201,6 +325,20 @@ describe('Navigation', () => {
   })
 
   it('should toggle mobile menu when button is clicked', () => {
+    const { useNavigationResize } = jest.requireMock<typeof import('@/lib/navigation')>('@/lib/navigation')
+    ;(useNavigationResize as jest.Mock).mockReturnValue({
+      navRef: { current: null },
+      visibility: {
+        startGroupMode: 'minimal' as const,
+        endGroupMode: 'partial' as const,
+        collapsedItems: ['home', 'products', 'blog', 'about'] as string[],
+        searchMaxWidth: 256,
+        navWidth: 1024,
+      },
+      setSearchExpanded: mockSetSearchExpanded,
+      isReady: true,
+    })
+
     render(<Navigation direction={DirectionEnum.LTR} data={mockData} />)
 
     const toggleButton = screen.getByTestId('mobile-menu-toggle')
@@ -323,10 +461,191 @@ describe('Navigation', () => {
     expect(screen.getByTestId('language-menu')).toBeInTheDocument()
   })
 
-  it('should apply RTL classes when direction is rtl', () => {
-    const { container } = render(<Navigation data={mockData} direction={DirectionEnum.RTL} />)
+  describe('responsive visibility', () => {
+    it('should call setSearchExpanded when search expands', () => {
+      render(<Navigation direction={DirectionEnum.LTR} data={mockData} />)
 
-    // Check for flex-row-reverse class on containers
-    expect(container.innerHTML).toContain('flex-row-reverse')
+      const expandButton = screen.getByTestId('expand-search')
+      fireEvent.click(expandButton)
+
+      expect(mockSetSearchExpanded).toHaveBeenCalledWith(true)
+    })
+
+    it('should call setSearchExpanded when search collapses', () => {
+      render(<Navigation direction={DirectionEnum.LTR} data={mockData} />)
+
+      const collapseButton = screen.getByTestId('collapse-search')
+      fireEvent.click(collapseButton)
+
+      expect(mockSetSearchExpanded).toHaveBeenCalledWith(false)
+    })
+
+    it('should pass showText to ThemeMenu', () => {
+      render(<Navigation direction={DirectionEnum.LTR} data={mockData} />)
+
+      const themeMenu = screen.getByTestId('theme-menu')
+      expect(themeMenu).toHaveAttribute('data-show-text', 'true')
+    })
+
+    it('should hide nav links when startGroupMode is minimal', () => {
+      const { useNavigationResize } = jest.requireMock<typeof import('@/lib/navigation')>('@/lib/navigation')
+      ;(useNavigationResize as jest.Mock).mockReturnValue({
+        navRef: { current: null },
+        visibility: {
+          startGroupMode: 'minimal' as const,
+          endGroupMode: 'full' as const,
+          collapsedItems: ['home', 'products', 'blog', 'about'],
+          searchMaxWidth: 256,
+          navWidth: 1024,
+        },
+        setSearchExpanded: mockSetSearchExpanded,
+        isSearchExpanded: false,
+        isReady: true,
+      })
+
+      render(<Navigation direction={DirectionEnum.LTR} data={mockData} />)
+
+      // NavigationGroup should have minimal display mode
+      const startGroup = screen.getByTestId('navigation-group-start')
+      expect(startGroup).toHaveAttribute('data-display-mode', 'minimal')
+    })
+
+    it('should keep theme menu visible even in minimal mode (never collapses)', () => {
+      const { useNavigationResize } = jest.requireMock<typeof import('@/lib/navigation')>('@/lib/navigation')
+      ;(useNavigationResize as jest.Mock).mockReturnValue({
+        navRef: { current: null },
+        visibility: {
+          startGroupMode: 'minimal' as const,
+          endGroupMode: 'partial' as const,
+          collapsedItems: ['home', 'products', 'blog', 'about'], // Note: no 'theme' or 'login'
+          searchMaxWidth: 256,
+          navWidth: 1024,
+        },
+        setSearchExpanded: mockSetSearchExpanded,
+        isSearchExpanded: false,
+        isReady: true,
+      })
+
+      render(<Navigation direction={DirectionEnum.LTR} data={mockData} />)
+
+      // Theme menu should STILL be visible - it never collapses to mobile
+      expect(screen.getByTestId('theme-menu')).toBeInTheDocument()
+    })
+
+    it('should pass showText=false to ThemeMenu when endGroupMode is partial', () => {
+      const { useNavigationResize } = jest.requireMock<typeof import('@/lib/navigation')>('@/lib/navigation')
+      ;(useNavigationResize as jest.Mock).mockReturnValue({
+        navRef: { current: null },
+        visibility: {
+          startGroupMode: 'full' as const,
+          endGroupMode: 'partial' as const,
+          collapsedItems: [] as string[],
+          searchMaxWidth: 256,
+          navWidth: 1024,
+        },
+        setSearchExpanded: mockSetSearchExpanded,
+        isSearchExpanded: false,
+        isReady: true,
+      })
+
+      render(<Navigation direction={DirectionEnum.LTR} data={mockData} />)
+
+      const themeMenu = screen.getByTestId('theme-menu')
+      expect(themeMenu).toHaveAttribute('data-show-text', 'false')
+    })
+  })
+
+  describe('brand text animation', () => {
+    it('should show brand text when displayMode is full and search is not expanded', () => {
+      const { useNavigationResize } = jest.requireMock<typeof import('@/lib/navigation')>('@/lib/navigation')
+      ;(useNavigationResize as jest.Mock).mockReturnValue({
+        navRef: { current: null },
+        visibility: {
+          startGroupMode: 'full' as const,
+          endGroupMode: 'full' as const,
+          collapsedItems: [] as string[],
+          searchMaxWidth: 256,
+          navWidth: 1024,
+        },
+        isSearchExpanded: false,
+        isReady: true,
+        setSearchExpanded: mockSetSearchExpanded,
+      })
+
+      render(<Navigation direction={DirectionEnum.LTR} data={mockData} />)
+
+      const brandButton = screen.getByTestId('desktop-brand-button')
+      // When displayMode !== 'minimal', showText should be true
+      expect(brandButton).toHaveAttribute('data-show-text', 'true')
+    })
+
+    it('should show brand text when displayMode is minimal even if search is not expanded', () => {
+      const { useNavigationResize } = jest.requireMock<typeof import('@/lib/navigation')>('@/lib/navigation')
+      ;(useNavigationResize as jest.Mock).mockReturnValue({
+        navRef: { current: null },
+        visibility: {
+          startGroupMode: 'minimal' as const,
+          endGroupMode: 'minimal' as const,
+          collapsedItems: ['home', 'products', 'blog', 'about'] as string[],
+          searchMaxWidth: 256,
+          navWidth: 1024,
+        },
+        isSearchExpanded: false,
+        isReady: true,
+        setSearchExpanded: mockSetSearchExpanded,
+      })
+
+      render(<Navigation direction={DirectionEnum.LTR} data={mockData} />)
+
+      const brandButton = screen.getByTestId('desktop-brand-button')
+      // When minimal mode, showText should be true (text threshold is SEARCH_ONLY)
+      expect(brandButton).toHaveAttribute('data-show-text', 'true')
+    })
+
+    it('should hide brand text when displayMode is minimal AND search is expanded', () => {
+      const { useNavigationResize } = jest.requireMock<typeof import('@/lib/navigation')>('@/lib/navigation')
+      ;(useNavigationResize as jest.Mock).mockReturnValue({
+        navRef: { current: null },
+        visibility: {
+          startGroupMode: 'minimal' as const,
+          endGroupMode: 'minimal' as const,
+          collapsedItems: ['home', 'products', 'blog', 'about'] as string[],
+          searchMaxWidth: 256,
+          navWidth: 800,
+        },
+        isSearchExpanded: true,
+        isReady: true,
+        setSearchExpanded: mockSetSearchExpanded,
+      })
+
+      render(<Navigation direction={DirectionEnum.LTR} data={mockData} />)
+
+      const brandButton = screen.getByTestId('desktop-brand-button')
+      // When search is expanded, brand text should be hidden to prevent overlap
+      expect(brandButton).toHaveAttribute('data-show-text', 'false')
+    })
+
+    it('should show brand text when displayMode is full even if search is expanded', () => {
+      const { useNavigationResize } = jest.requireMock<typeof import('@/lib/navigation')>('@/lib/navigation')
+      ;(useNavigationResize as jest.Mock).mockReturnValue({
+        navRef: { current: null },
+        visibility: {
+          startGroupMode: 'full' as const,
+          endGroupMode: 'full' as const,
+          collapsedItems: [] as string[],
+          searchMaxWidth: 256,
+          navWidth: 1024,
+        },
+        isSearchExpanded: true,
+        isReady: true,
+        setSearchExpanded: mockSetSearchExpanded,
+      })
+
+      render(<Navigation direction={DirectionEnum.LTR} data={mockData} />)
+
+      const brandButton = screen.getByTestId('desktop-brand-button')
+      // When displayMode is full, there's enough space - brand text stays visible
+      expect(brandButton).toHaveAttribute('data-show-text', 'true')
+    })
   })
 })

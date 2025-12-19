@@ -5,7 +5,7 @@
  * TODO: Implement tests based on frontend/tests/e2e/rtl-layout.spec.ts
  */
 
-import { test, expect } from '../fixtures'
+import { expect, test } from '../fixtures'
 
 test.describe('rtl-layout Tests', () => {
   test('placeholder test', async ({ page: _page }) => {

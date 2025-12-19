@@ -128,7 +128,7 @@ describe('CMSIcon', () => {
   })
 
   it('should apply custom className', () => {
-    // eslint-disable-next-line better-tailwindcss/no-unregistered-classes
+    // eslint-disable-next-line better-tailwindcss/no-unknown-classes
     render(<CMSIcon icon="home" className="custom-icon" />)
     const icon = screen.getByText('home')
     expect(icon).toHaveClass('custom-icon')
@@ -189,5 +189,22 @@ describe('CMSIcon', () => {
     const icon = screen.getByText('home')
     // Promoted uses xl (32px) size
     expect(icon).toHaveStyle({ fontSize: '32px' })
+  })
+
+  describe('visible prop', () => {
+    it('should render null when visible is false', () => {
+      const { container } = render(<CMSIcon icon="home" visible={false} />)
+      expect(container.firstChild).toBeNull()
+    })
+
+    it('should render icon when visible is true', () => {
+      render(<CMSIcon icon="home" visible={true} />)
+      expect(screen.getByText('home')).toBeInTheDocument()
+    })
+
+    it('should render icon when visible is not provided', () => {
+      render(<CMSIcon icon="home" />)
+      expect(screen.getByText('home')).toBeInTheDocument()
+    })
   })
 })

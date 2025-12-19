@@ -60,40 +60,39 @@ export function HeroSection({ data, direction }: HeroSectionProps) {
   const renderContent = (isOverlay: boolean) => (
     <div
       className={`
-        animate-fade-in-up relative z-20 flex max-w-4xl flex-col px-4 text-white
+        animate-fade-in-up relative z-20 flex max-w-4xl flex-col px-4
+        text-neutral-800 dark:text-white
         ${textAlignClass}
         ${isOverlay && !isCentered ? (isRTL ? 'mr-8' : 'ml-8') : ''}
       `}
     >
       <Header
         data={header}
-        headerClassName="text-7xl leading-tight tracking-tight"
-        subheaderClassName="mt-8 text-xl text-white"
+        headerClassName="text-5xl sm:text-7xl md:text-7xl leading-tight tracking-tight"
+        subheaderClassName="mt-8 text-lg sm:text-xl md:text-xl text-neutral-600 dark:text-white"
         direction={direction}
       />
       {exploreButton && (
-        <div className="mt-10">
-          <ButtonLink
-            data={exploreButton}
-            direction={direction}
-            variant="primary"
-            size="lg"
-            className={`
-              transform rounded-full bg-primary px-8 py-4 text-lg font-bold
-              text-background-dark shadow-lg shadow-primary/20
-              hover:scale-105 hover:bg-primary-hover
-            `}
-          />
-        </div>
+        <ButtonLink
+          data={exploreButton}
+          direction={direction}
+          variant="primary"
+          size="lg"
+          className={`
+            mt-10
+            shadow-lg shadow-primary/20
+            hover:scale-105
+          `}
+        />
       )}
     </div>
   )
 
   const renderImage = (isOverlay: boolean) => (
-    <div className={isOverlay ? 'absolute inset-0 z-0' : 'relative h-[40vh] max-h-[400px] min-h-[250px] w-full'}>
+    <div className={isOverlay ? 'absolute inset-0 z-0' : 'relative h-[40vh] max-h-100 min-h-62.5 w-full'}>
       <CMSImage
         image={image}
-        className={`h-full w-full object-cover ${isOverlay ? 'opacity-80' : 'rounded-xl'}`}
+        className={`size-full object-cover ${isOverlay ? 'opacity-80' : 'rounded-xl'}`}
         fill
         preload
         sizes="100vw"
@@ -108,7 +107,7 @@ export function HeroSection({ data, direction }: HeroSectionProps) {
     return (
       <section
         className={`
-          relative flex h-[60vh] max-h-[600px] min-h-[400px] items-center overflow-hidden
+          relative flex h-[60vh] max-h-150 min-h-100 items-center overflow-hidden
           rounded-xl shadow-2xl ${justifyClass}
         `}
         aria-label={header.header?.ariaDescription ?? ''}
@@ -117,8 +116,9 @@ export function HeroSection({ data, direction }: HeroSectionProps) {
         {/* Dark overlay gradient for readability */}
         <div
           className={`
-            absolute inset-0 z-10 bg-linear-to-t from-background-dark/90
-            via-background-dark/40 to-transparent
+            absolute inset-0 z-10 bg-linear-to-t from-white/90
+            via-white/40 to-transparent
+            dark:from-background-dark/90 dark:via-background-dark/40
           `}
         />
         {renderContent(true)}

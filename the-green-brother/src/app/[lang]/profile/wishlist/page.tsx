@@ -33,13 +33,13 @@ const Wishlist = () => {
         <Link
           href="/profile"
           className={`
-          rounded-full bg-surface-dark p-2 transition-colors
-          hover:bg-white/10
+          rounded-full bg-neutral-100 p-2 transition-colors
+          hover:bg-neutral-200 dark:bg-surface-dark dark:hover:bg-white/10
         `}
         >
-          <span className="material-symbols-outlined text-white">arrow_back</span>
+          <span className="material-symbols-outlined text-neutral-800 dark:text-white">arrow_back</span>
         </Link>
-        <h1 className="text-3xl font-bold text-white">Wishlist</h1>
+        <h1 className="text-3xl font-bold text-neutral-800 dark:text-white">Wishlist</h1>
       </div>
 
       <div className="space-y-4">
@@ -48,14 +48,15 @@ const Wishlist = () => {
             key={item.id}
             className={`
               group flex flex-col items-center gap-6 rounded-xl border
-              border-white/5 bg-surface-dark p-4 transition-all
+              border-neutral-200 bg-white p-4 transition-all
               hover:border-primary/30
               sm:flex-row sm:p-6
+              dark:border-white/5 dark:bg-surface-dark
             `}
           >
             <div
               className={`
-              relative h-24 w-24 shrink-0 overflow-hidden rounded-xl
+              relative size-24 shrink-0 overflow-hidden rounded-xl
             `}
             >
               <Image
@@ -75,7 +76,7 @@ const Wishlist = () => {
               sm:text-left
             `}
             >
-              <h3 className="text-lg font-bold text-white">{item.name}</h3>
+              <h3 className="text-lg font-bold text-neutral-800 dark:text-white">{item.name}</h3>
               <p className="mt-1 font-bold text-primary">{item.price}</p>
             </div>
             <div
@@ -87,10 +88,11 @@ const Wishlist = () => {
               <button
                 className={`
                   flex flex-1 items-center justify-center gap-2 rounded-xl
-                  bg-white/5 px-4 py-2 text-text-secondary-dark
+                  bg-neutral-100 px-4 py-2 text-neutral-600
                   transition-colors
                   hover:bg-red-500/10 hover:text-red-400
-                  sm:flex-none
+                  sm:flex-none dark:bg-white/5
+                  dark:text-text-secondary-dark
                 `}
               >
                 <span className="material-symbols-outlined text-lg">delete</span>

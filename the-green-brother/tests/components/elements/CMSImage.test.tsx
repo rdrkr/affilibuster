@@ -119,7 +119,7 @@ describe('CMSImage', () => {
   })
 
   it('should pass through className prop', () => {
-    // eslint-disable-next-line better-tailwindcss/no-unregistered-classes
+    // eslint-disable-next-line better-tailwindcss/no-unknown-classes
     render(<CMSImage image="/test.png" className="custom-class" />)
     const img = screen.getByTestId('mock-image')
     expect(img).toHaveClass('custom-class')

@@ -4,9 +4,13 @@
 @import '@material-symbols/font-700/outlined.css';
 @import './theme.css';
 
+/* Wire dark: variant to data-theme attribute for manual theme toggling */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 @layer base {
   body {
-    @apply bg-background-dark text-text-main-dark;
+    /* Tailwind v4 best practice: use dark: variants instead of CSS variables */
+    @apply bg-white text-tertiary-800 dark:bg-tertiary-900 dark:text-white;
   }
 
   .material-symbols-outlined {

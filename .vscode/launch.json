@@ -18,6 +18,11 @@
       "request": "launch",
       "url": "https://localhost:3000",
       "webRoot": "${workspaceFolder}/the-green-brother",
+      "sourceMapPathOverrides": {
+        "webpack://_N_E/*": "${webRoot}/*",
+        "/app/*": "${webRoot}/*",
+        "file:///app/*": "${webRoot}/*"
+      },
       "presentation": {
         "group": "the-green-brother",
         "order": 2

@@ -8,8 +8,8 @@
  */
 
 // Core client infrastructure
-export * from './core/client'
 export * from './core/api-types'
+export * from './core/client'
 
 // Feature modules
 export * from './content'

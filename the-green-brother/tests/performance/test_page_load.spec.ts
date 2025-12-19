@@ -13,7 +13,7 @@
  * - Total page load < 3s
  */
 
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.describe('Page Load Performance', () => {
   test('should load homepage within performance thresholds on 3G', async ({ page: _page }) => {

@@ -2198,7 +2198,6 @@ export interface ApiThemeTheme extends Struct.CollectionTypeSchema {
       }>
     themeId: Schema.Attribute.UID &
       Schema.Attribute.Required &
-      Schema.Attribute.Private &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true

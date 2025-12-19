@@ -55,22 +55,23 @@ export function TeamSection({ data, direction }: TeamSectionProps) {
           <div
             key={member.documentId}
             className={`
-              group overflow-hidden rounded-xl border border-white/5
-              bg-surface-dark p-6 text-center transition-all
+              group overflow-hidden rounded-xl border border-neutral-200
+              bg-white p-6 text-center shadow-md transition-all
               hover:border-primary/30
+              dark:border-white/5 dark:bg-surface-dark dark:shadow-none
             `}
           >
             {/* Profile Picture */}
-            <div className="relative mx-auto mb-4 h-32 w-32 overflow-hidden rounded-full bg-tertiary-700">
+            <div className="relative mx-auto mb-4 size-32 overflow-hidden rounded-full bg-neutral-200 dark:bg-tertiary-700">
               {member.profilePicture ? (
                 <CMSImage
                   image={member.profilePicture}
                   fallbackAlt={member.name}
-                  className="h-full w-full object-cover"
+                  className="size-full object-cover"
                   fill
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center text-4xl font-bold text-text-secondary-dark">
+                <div className="flex size-full items-center justify-center text-4xl font-bold text-neutral-400 dark:text-text-secondary-dark">
                   {member.name
                     .split(' ')
                     .map(n => n[0])
@@ -81,13 +82,15 @@ export function TeamSection({ data, direction }: TeamSectionProps) {
             </div>
 
             {/* Name */}
-            <h3 className="mb-1 text-xl font-bold text-white">{member.name}</h3>
+            <h3 className="mb-1 text-xl font-bold text-neutral-800 dark:text-white">{member.name}</h3>
 
             {/* Role */}
             <p className="mb-4 text-sm font-medium text-primary">{member.role}</p>
 
             {/* Bio */}
-            {member.bio && <p className="mb-4 line-clamp-3 text-sm text-text-secondary-dark">{member.bio}</p>}
+            {member.bio && (
+              <p className="mb-4 line-clamp-3 text-sm text-neutral-600 dark:text-text-secondary-dark">{member.bio}</p>
+            )}
 
             {/* Social Links */}
             <div className="flex justify-center gap-3">
@@ -96,7 +99,7 @@ export function TeamSection({ data, direction }: TeamSectionProps) {
                   href={`https://twitter.com/${member.twitter}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-text-secondary-dark transition-colors hover:text-primary"
+                  className="text-neutral-500 transition-colors hover:text-primary dark:text-text-secondary-dark"
                   aria-label={`${member.name} on Twitter`}
                 >
                   <CMSIcon icon="open_in_new" size="md" />
@@ -107,7 +110,7 @@ export function TeamSection({ data, direction }: TeamSectionProps) {
                   href={`https://linkedin.com/in/${member.linkedin}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-text-secondary-dark transition-colors hover:text-primary"
+                  className="text-neutral-500 transition-colors hover:text-primary dark:text-text-secondary-dark"
                   aria-label={`${member.name} on LinkedIn`}
                 >
                   <CMSIcon icon="work" size="md" />
@@ -118,7 +121,7 @@ export function TeamSection({ data, direction }: TeamSectionProps) {
                   href={`https://github.com/${member.github}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-text-secondary-dark transition-colors hover:text-primary"
+                  className="text-neutral-500 transition-colors hover:text-primary dark:text-text-secondary-dark"
                   aria-label={`${member.name} on GitHub`}
                 >
                   <CMSIcon icon="code" size="md" />
@@ -129,7 +132,7 @@ export function TeamSection({ data, direction }: TeamSectionProps) {
                   href={`https://instagram.com/${member.instagram}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-text-secondary-dark transition-colors hover:text-primary"
+                  className="text-neutral-500 transition-colors hover:text-primary dark:text-text-secondary-dark"
                   aria-label={`${member.name} on Instagram`}
                 >
                   <CMSIcon icon="photo_camera" size="md" />

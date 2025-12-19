@@ -359,8 +359,8 @@ describe('BrandFeaturesSection', () => {
 
     const { container } = render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithoutHeader} />)
 
-    // Each feature should be in its own container with bg-surface-dark
-    const featureContainers = container.querySelectorAll('.bg-surface-dark.rounded-xl')
+    // Each feature should be in its own container with bg-white (light mode) and dark:bg-surface-dark
+    const featureContainers = container.querySelectorAll('.bg-white.rounded-xl')
     expect(featureContainers.length).toBe(4)
   })
 
@@ -405,7 +405,7 @@ describe('BrandFeaturesSection', () => {
     )
 
     // Should only render 1 valid feature container
-    const featureContainers = container.querySelectorAll('.bg-surface-dark.rounded-xl')
+    const featureContainers = container.querySelectorAll('.bg-white.rounded-xl')
     expect(featureContainers.length).toBe(1)
   })
 
@@ -415,5 +415,31 @@ describe('BrandFeaturesSection', () => {
     // Should have grid class for grid layout
     const gridContainer = container.querySelector('.grid')
     expect(gridContainer).toBeInTheDocument()
+  })
+
+  it('should handle missing learnMoreButtonIcon and learnMoreButtonAriaDescription', () => {
+    const { learnMoreButtonIcon: _icon, learnMoreButtonAriaDescription: _desc, ...restData } = mockSectionData
+    const dataWithoutIcon = restData as BrandFeaturesSectionProps['data']
+
+    render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithoutIcon} />)
+
+    // Button should still render
+    expect(screen.getByText('Learn more about our mission')).toBeInTheDocument()
+    // Icon should not serve mock-icon
+    // We check via mock implementation: ButtonLink renders icon if enabled.
+    // Since we removed it, it wont be there.
+    // But ButtonLink mock renders icon if provided.
+  })
+
+  it('should handle missing headerAriaDescription', () => {
+    const { headerAriaDescription: _desc, ...restData } = mockSectionData
+    const dataWithoutDesc = restData as BrandFeaturesSectionProps['data']
+    const { container } = render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithoutDesc} />)
+
+    // When aria-label is empty, section does not have role="region"
+    // Verify it renders as a section element
+    const section = container.querySelector('section')
+    expect(section).toBeInTheDocument()
+    expect(section).toHaveAttribute('aria-label', '')
   })
 })

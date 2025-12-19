@@ -98,6 +98,7 @@ jest.mock('@/components/elements', () => ({
     image,
     imageAlt,
     tag,
+    imageOverlay,
     children,
     variant,
     asLink,
@@ -106,6 +107,7 @@ jest.mock('@/components/elements', () => ({
     image?: { url?: string; alternativeText?: string } | null
     imageAlt?: string
     tag?: string
+    imageOverlay?: React.ReactNode
     children: React.ReactNode
     variant?: 'product' | 'blog'
     className?: string
@@ -128,6 +130,7 @@ jest.mock('@/components/elements', () => ({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img data-testid="mock-card-image" src={getImageUrl()} alt={alt} />
+        {imageOverlay}
         {tag && <span data-testid="mock-card-tag">{tag}</span>}
         <div data-testid="mock-card-content">{children}</div>
       </Wrapper>
@@ -464,7 +467,8 @@ describe('FeaturedProductsSection', () => {
       <FeaturedProductsSection data={mockSectionData} products={mockProducts} direction={DirectionEnum.RTL} />
     )
 
-    const headerRow = container.querySelector('.flex-row-reverse')
+    // RTL now uses sm:flex-row-reverse for responsive layout
+    const headerRow = container.querySelector('.sm\\:flex-row-reverse')
     expect(headerRow).toBeInTheDocument()
   })
 
@@ -473,9 +477,9 @@ describe('FeaturedProductsSection', () => {
       <FeaturedProductsSection direction={DirectionEnum.LTR} data={mockSectionData} products={mockProducts} />
     )
 
-    // Check there's no flex-row-reverse class on the header row
-    const headerRow = container.querySelector('.mb-8.flex.items-end.justify-between.px-2')
-    expect(headerRow).not.toHaveClass('flex-row-reverse')
+    // LTR should not have sm:flex-row-reverse class
+    const headerRow = container.querySelector('.mb-8.flex.flex-col')
+    expect(headerRow).not.toHaveClass('sm:flex-row-reverse')
   })
 
   it('should apply dir="rtl" to carousel for RTL direction', () => {
@@ -497,5 +501,41 @@ describe('FeaturedProductsSection', () => {
 
     const carousel = container.querySelector('.snap-x')
     expect(carousel).toHaveAttribute('dir', 'ltr')
+  })
+
+  it('should render favorite button correctly', () => {
+    render(<FeaturedProductsSection direction={DirectionEnum.LTR} data={mockSectionData} products={mockProducts} />)
+    const favoriteButtons = screen.getAllByRole('button', { name: /Eco-friendly water bottle product/i })
+    expect(favoriteButtons).toHaveLength(1)
+
+    // Check inner icon
+    const icon = favoriteButtons[0]?.querySelector('[data-testid="mock-icon"][data-icon="favorite_border"]')
+    expect(icon).toBeInTheDocument()
+  })
+
+  it('should use empty string for favorite button aria-label if missing', () => {
+    // Create a product with missing aria description
+    const productWithNoAria: ApiProductProductDocument = {
+      ...mockProducts[0]!,
+      content: {
+        ...mockProducts[0]!.content!,
+        header: {
+          ...mockProducts[0]!.content!.header!,
+          header: {
+            text: 'Product',
+            iconPosition: IconPositionEnum.BEFORE_TEXT,
+            ariaDescription: undefined as unknown as string, // Simulating undefined from API
+          },
+        },
+      },
+    }
+    render(
+      <FeaturedProductsSection direction={DirectionEnum.LTR} data={mockSectionData} products={[productWithNoAria]} />
+    )
+    // Find button by icon since aria-label is empty
+    const icon = screen.getByTestId('mock-icon')
+    expect(icon).toHaveAttribute('data-icon', 'favorite_border')
+    const button = icon.closest('button')
+    expect(button).toHaveAttribute('aria-label', '')
   })
 })

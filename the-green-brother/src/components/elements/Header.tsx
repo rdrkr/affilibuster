@@ -30,6 +30,8 @@ export interface HeaderProps {
   subheaderClassName?: string
   /** Language direction for alignment (used when alignment is 'language-direction') */
   direction: DirectionEnum
+  /** Controls visibility of entire header - when false, header is hidden from layout */
+  visible?: boolean
 }
 
 /**
@@ -59,7 +61,8 @@ function getAlignmentClass(alignment: AlignmentEnum, direction: DirectionEnum): 
  * @param props.headerClassName - Header text CSS classes
  * @param props.subheaderClassName - Subheader text CSS classes
  * @param props.direction - Language direction for alignment
- * @returns Header component or null if no data
+ * @param props.visible - Controls entire header visibility (false = hidden from layout)
+ * @returns Header component or null if no data or not visible
  */
 export function Header({
   data,
@@ -70,8 +73,9 @@ export function Header({
   headerClassName = '',
   subheaderClassName = '',
   direction,
+  visible,
 }: HeaderProps) {
-  if (!data) {
+  if (!data || visible === false) {
     return null
   }
 
@@ -100,7 +104,11 @@ export function Header({
     return (
       <div className={`${alignmentClass} ${className}`}>
         <div
-          className={`flex items-start gap-4 ${alignment === AlignmentEnum.CENTER ? 'justify-center' : ''} ${isRTL ? 'flex-row-reverse' : ''}`}
+          className={`
+            flex items-start gap-4
+            ${alignment === AlignmentEnum.CENTER ? 'justify-center' : ''}
+            ${isRTL ? 'flex-row-reverse' : ''}
+          `}
         >
           <Label
             data={{ ...header, text: '' }}
@@ -108,7 +116,7 @@ export function Header({
             iconSize={headerIconSize}
             promoteIcon
             className="shrink-0"
-            iconClassName="text-primary"
+            iconClassName="text-primary text-shadow-sm dark:text-shadow-none"
             direction={direction}
           />
           <div className="flex flex-col">
@@ -117,7 +125,12 @@ export function Header({
               as={HeadingTag}
               iconSize={headerIconSize}
               hideIcon
-              className={`font-bold ${direction === DirectionEnum.RTL ? 'text-right' : 'text-left'} ${defaultSizeClass} ${headerClassName}`}
+              className={`
+                font-bold
+                ${direction === DirectionEnum.RTL ? 'text-right' : 'text-left'}
+                ${defaultSizeClass}
+                ${headerClassName}
+              `}
               direction={direction}
             />
             {subheader && (
@@ -125,7 +138,12 @@ export function Header({
                 data={subheader}
                 as="p"
                 iconSize={subheaderIconSize}
-                className={`mt-1 ${direction === DirectionEnum.RTL ? 'text-right' : 'text-left'} text-text-secondary-dark ${subheaderClassName}`}
+                className={`
+                  mt-1
+                  ${direction === DirectionEnum.RTL ? 'text-right' : 'text-left'}
+                  text-neutral-600 dark:text-text-secondary-dark
+                  ${subheaderClassName}
+                `}
                 direction={direction}
               />
             )}
@@ -144,7 +162,7 @@ export function Header({
           iconSize={headerIconSize}
           promoteIcon={isPromoted}
           className={`font-bold ${alignmentClass} ${defaultSizeClass} ${headerClassName}`}
-          iconClassName="text-primary"
+          iconClassName="text-primary text-shadow-sm dark:text-shadow-none"
           direction={direction}
         />
       )}
@@ -153,7 +171,7 @@ export function Header({
           data={subheader}
           as="p"
           iconSize={subheaderIconSize}
-          className={`mt-2 ${alignmentClass} text-text-secondary-dark ${subheaderClassName}`}
+          className={`mt-2 ${alignmentClass} text-neutral-600 dark:text-text-secondary-dark ${subheaderClassName}`}
           direction={direction}
         />
       )}

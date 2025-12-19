@@ -1866,6 +1866,10 @@ export type ApiThemeThemeDocument = {
     documentId: string;
     id: string | number;
     /**
+     * A UID field
+     */
+    themeId: string;
+    /**
      * Timestamp when this entry was first created in the CMS.
      */
     createdAt?: string;
@@ -2935,6 +2939,14 @@ export enum ItemsEnum15 {
     LOCALE = 'locale'
 }
 
+export enum ItemsEnum16 {
+    THEME_ID = 'themeId',
+    CREATED_AT = 'createdAt',
+    UPDATED_AT = 'updatedAt',
+    PUBLISHED_AT = 'publishedAt',
+    LOCALE = 'locale'
+}
+
 export enum StatusEnum {
     ACTIVE = 'active',
     LOCKED = 'locked',
@@ -3966,6 +3978,10 @@ export type ApiThemeThemeDocumentWritable = {
      */
     documentId: string;
     id: string | number;
+    /**
+     * A UID field
+     */
+    themeId: string;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -10438,12 +10454,12 @@ export type ThemeGetThemesData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum>;
+        readonly fields?: Array<ItemsEnum16>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum]?: unknown;
+            [key in ItemsEnum16]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -10479,10 +10495,10 @@ export type ThemeGetThemesData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum | Array<ItemsEnum> | {
-            [key in ItemsEnum]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum16 | Array<ItemsEnum16> | {
+            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -10542,6 +10558,10 @@ export type ThemeGetThemesResponses = {
              */
             documentId: string;
             id: string | number;
+            /**
+             * A UID field
+             */
+            themeId: string;
             /**
              * Timestamp when this entry was first created in the CMS.
              */
@@ -10617,20 +10637,20 @@ export type ThemeGetThemesByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum>;
+        readonly fields?: Array<ItemsEnum16>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum]?: unknown;
+            [key in ItemsEnum16]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum | Array<ItemsEnum> | {
-            [key in ItemsEnum]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum16 | Array<ItemsEnum16> | {
+            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -10690,6 +10710,10 @@ export type ThemeGetThemesByIdResponses = {
              */
             documentId: string;
             id: string | number;
+            /**
+             * A UID field
+             */
+            themeId: string;
             /**
              * Timestamp when this entry was first created in the CMS.
              */

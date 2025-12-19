@@ -9,20 +9,20 @@ const DeleteAccount = () => {
     <div className="mx-auto max-w-lg py-8 text-center">
       <div
         className={`
-        rounded-xl border border-white/5 bg-surface-dark p-8
-        md:p-12
+        rounded-xl border border-neutral-200 bg-white p-8 shadow-md
+        md:p-12 dark:border-white/5 dark:bg-surface-dark dark:shadow-none
       `}
       >
         <div
           className={`
-          mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full
+          mx-auto mb-6 flex size-20 items-center justify-center rounded-full
           bg-red-500/10
         `}
         >
           <span className="material-symbols-outlined text-4xl text-red-500">warning</span>
         </div>
-        <h1 className="mb-4 text-3xl font-bold text-white">Are you sure?</h1>
-        <p className="mb-8 text-text-secondary-dark">
+        <h1 className="mb-4 text-3xl font-bold text-neutral-800 dark:text-white">Are you sure?</h1>
+        <p className="mb-8 text-neutral-600 dark:text-text-secondary-dark">
           This action is irreversible. All your data, affiliations, and settings will be permanently deleted.
         </p>
 
@@ -30,7 +30,7 @@ const DeleteAccount = () => {
           <div>
             <label
               className={`
-              mb-2 block text-sm font-medium text-text-secondary-dark
+              mb-2 block text-sm font-medium text-neutral-600 dark:text-text-secondary-dark
             `}
             >
               Enter your password to confirm
@@ -39,7 +39,7 @@ const DeleteAccount = () => {
               <span
                 className={`
                   material-symbols-outlined absolute top-1/2 left-4
-                  -translate-y-1/2 text-text-secondary-dark
+                  -translate-y-1/2 text-neutral-400 dark:text-text-secondary-dark
                 `}
               >
                 lock
@@ -47,9 +47,10 @@ const DeleteAccount = () => {
               <input
                 type="password"
                 className={`
-                  w-full rounded-xl border border-white/10 bg-background-dark
-                  py-3 pr-4 pl-12 text-white outline-none
+                  w-full rounded-xl border border-neutral-200 bg-neutral-50
+                  py-3 pr-4 pl-12 text-neutral-800 outline-none
                   focus:border-transparent focus:ring-2 focus:ring-red-500
+                  dark:border-white/10 dark:bg-background-dark dark:text-white
                 `}
                 placeholder="Password"
               />
@@ -69,9 +70,10 @@ const DeleteAccount = () => {
             <Link
               href="/profile"
               className={`
-                w-full rounded-xl border border-white/10 bg-transparent py-3.5
-                text-center font-bold text-white transition-colors
-                hover:bg-white/5
+                w-full rounded-xl border border-neutral-200 bg-transparent py-3.5
+                text-center font-bold text-neutral-600 transition-colors
+                hover:bg-neutral-100 dark:border-white/10 dark:text-white
+                dark:hover:bg-white/5
               `}
             >
               Cancel

@@ -63,7 +63,7 @@ export default function ProductDetailClient({ product, lang }: ProductDetailClie
   return (
     <div className="py-8">
       {/* Breadcrumbs */}
-      <nav className="mb-8 flex items-center text-sm text-tertiary-400">
+      <nav className="mb-8 flex items-center text-sm text-neutral-500 dark:text-tertiary-400">
         <Link
           href={`/${lang}`}
           className={`
@@ -84,7 +84,7 @@ export default function ProductDetailClient({ product, lang }: ProductDetailClie
           Products
         </Link>
         <span className="material-symbols-outlined mx-2 text-sm">chevron_right</span>
-        <span className="truncate font-medium text-white">
+        <span className="truncate font-medium text-neutral-800 dark:text-white">
           <CMSText text={product.content?.header?.header?.text ?? ''} />
         </span>
       </nav>
@@ -100,7 +100,8 @@ export default function ProductDetailClient({ product, lang }: ProductDetailClie
           <div
             className={`
               relative aspect-square overflow-hidden rounded-xl border
-              border-tertiary-700 bg-tertiary-800
+              border-neutral-200 bg-white
+              dark:border-tertiary-700 dark:bg-tertiary-800
             `}
           >
             {selectedImageData ? (
@@ -113,7 +114,7 @@ export default function ProductDetailClient({ product, lang }: ProductDetailClie
                 preload
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center">
+              <div className="flex size-full items-center justify-center">
                 <span
                   className={`
                   material-symbols-outlined text-6xl text-tertiary-600
@@ -141,8 +142,8 @@ export default function ProductDetailClient({ product, lang }: ProductDetailClie
                       border-transparent
                     `
                     }
-                    relative bg-tertiary-800 transition-colors
-                    hover:border-primary-500/50
+                    relative bg-white transition-colors hover:border-primary-500/50
+                    dark:bg-tertiary-800
                   `}
                 >
                   <CMSImage
@@ -172,8 +173,8 @@ export default function ProductDetailClient({ product, lang }: ProductDetailClie
             )}
             <h1
               className={`
-              mb-4 text-3xl font-bold text-white
-              md:text-4xl
+              mb-4 text-3xl font-bold text-neutral-800 md:text-4xl
+              dark:text-white
             `}
             >
               <CMSText text={product.content?.header?.header?.text ?? ''} />
@@ -181,16 +182,16 @@ export default function ProductDetailClient({ product, lang }: ProductDetailClie
           </div>
 
           {product.price && (
-            <div className="mb-8 text-3xl font-bold text-white">
+            <div className="mb-8 text-3xl font-bold text-neutral-800 dark:text-white">
               ${product.price}
               {product.currency?.code && product.currency.code !== 'USD' && (
-                <span className="ml-2 text-lg text-tertiary-400">{product.currency.code}</span>
+                <span className="ml-2 text-lg text-neutral-500 dark:text-tertiary-400">{product.currency.code}</span>
               )}
             </div>
           )}
 
           {product.content?.header?.subheader?.text && (
-            <div className="prose mb-8 text-tertiary-300 prose-invert">
+            <div className="prose mb-8 text-neutral-600 prose-neutral dark:text-tertiary-300 dark:prose-invert">
               <p>
                 <CMSText text={product.content.header.subheader.text} />
               </p>
@@ -201,24 +202,25 @@ export default function ProductDetailClient({ product, lang }: ProductDetailClie
             <div
               className={`
                 flex w-32 items-center justify-between rounded-xl border
-                border-tertiary-700 bg-tertiary-800 px-3 py-2
+                border-neutral-200 bg-white px-3 py-2
+                dark:border-tertiary-700 dark:bg-tertiary-800
               `}
             >
               <button
                 onClick={decrementQuantity}
                 className={`
-                text-tertiary-400 transition-colors
-                hover:text-white
+                text-neutral-500 transition-colors hover:text-neutral-800
+                dark:text-tertiary-400 dark:hover:text-white
               `}
               >
                 -
               </button>
-              <span className="font-bold text-white">{quantity}</span>
+              <span className="font-bold text-neutral-800 dark:text-white">{quantity}</span>
               <button
                 onClick={incrementQuantity}
                 className={`
-                text-tertiary-400 transition-colors
-                hover:text-white
+                text-neutral-500 transition-colors hover:text-neutral-800
+                dark:text-tertiary-400 dark:hover:text-white
               `}
               >
                 +
@@ -252,9 +254,10 @@ export default function ProductDetailClient({ product, lang }: ProductDetailClie
             <button
               onClick={handleWishlistClick}
               className={`
-                rounded-xl border border-tertiary-700 bg-tertiary-800 p-3
-                text-white transition-colors
-                hover:border-primary-500 hover:text-primary-500
+                rounded-xl border border-neutral-200 bg-white p-3 text-neutral-600
+                transition-colors hover:border-primary-500 hover:text-primary-500
+                dark:border-tertiary-700 dark:bg-tertiary-800 dark:text-white
+                dark:hover:border-primary-500 dark:hover:text-primary-500
               `}
             >
               <span className="material-symbols-outlined">favorite_border</span>
@@ -266,9 +269,9 @@ export default function ProductDetailClient({ product, lang }: ProductDetailClie
       {/* Product Content */}
       {product.content?.content && (
         <div className="mb-16 max-w-3xl">
-          <h2 className="mb-6 text-2xl font-bold text-white">Product Details</h2>
+          <h2 className="mb-6 text-2xl font-bold text-neutral-800 dark:text-white">Product Details</h2>
           <div
-            className="prose max-w-none text-tertiary-300 prose-invert"
+            className="prose max-w-none text-neutral-600 prose-neutral dark:text-tertiary-300 dark:prose-invert"
             dangerouslySetInnerHTML={{ __html: product.content.content }}
           />
         </div>

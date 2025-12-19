@@ -35,6 +35,8 @@ export interface CMSImageProps extends Omit<ImageProps, 'src' | 'alt'> {
   image: string | CMSMedia | undefined | null
   /** Fallback alt text if not provided in media object */
   fallbackAlt?: string
+  /** Controls visibility - when false, element is hidden from layout */
+  visible?: boolean
 }
 
 /**
@@ -83,15 +85,22 @@ function getAltText(media: CMSMedia | undefined | null, fallback = ''): string {
  * @param props - Component props with CMS image data
  * @param props.image - CMS media object or URL string
  * @param props.fallbackAlt - Fallback alt text if not provided in media object
- * @returns Next.js Image with resolved src and alt
+ * @param props.visible - Controls visibility (false = hidden from layout)
+ * @returns Next.js Image with resolved src and alt, or null if not visible
  * @example
  * ```tsx
  * <CMSImage image={product.images[0]} fill className="object-cover" />
  * <CMSImage image={hero.image} priority sizes="100vw" />
+ * <CMSImage image={thumbnail} visible={showThumbnail} />
  * ```
  */
-export function CMSImage({ image, fallbackAlt = '', ...props }: CMSImageProps) {
+export function CMSImage({ image, fallbackAlt = '', visible, ...props }: CMSImageProps) {
   const [hasError, setHasError] = useState(false)
+
+  if (visible === false) {
+    return null
+  }
+
   const resolvedSrc = resolveImageUrl(image)
   const src = hasError ? PLACEHOLDER_IMAGE : resolvedSrc
   const alt = typeof image === 'object' && image ? getAltText(image, fallbackAlt) : fallbackAlt

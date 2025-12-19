@@ -1,360 +1,287 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-import { render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 
-import { DropdownMenu } from '@/components/menus/DropdownMenu'
-import { DirectionEnum } from '@/lib/generated/types.gen'
+import { Dropdown, DropdownMenu } from '@/components/menus/DropdownMenu'
+import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 
+/**
+ * Tests for Dropdown (presentational panel component)
+ */
+describe('Dropdown', () => {
+  it('should render children', () => {
+    render(
+      <Dropdown isVisible={true}>
+        <div>Test Content</div>
+      </Dropdown>
+    )
+    expect(screen.getByText('Test Content')).toBeInTheDocument()
+  })
+
+  it('should be visible when isVisible is true', () => {
+    render(
+      <Dropdown isVisible={true}>
+        <div>Test Content</div>
+      </Dropdown>
+    )
+    const container = screen.getByText('Test Content').closest('.fixed')
+    expect(container).toHaveClass('visible')
+    expect(container).not.toHaveClass('invisible')
+  })
+
+  it('should apply closing animation when isVisible is false', () => {
+    render(
+      <Dropdown isVisible={false}>
+        <div>Test Content</div>
+      </Dropdown>
+    )
+    // Animation is on the inner panel div, not the outer .fixed wrapper
+    const panel = screen.getByText('Test Content').parentElement
+    expect(panel?.className).toContain('dropdownClose')
+    expect(panel).not.toHaveClass('visible')
+  })
+
+  it('should apply RTL positioning classes', () => {
+    render(
+      <Dropdown isVisible={true} direction={DirectionEnum.RTL} align="start">
+        <div>Test Content</div>
+      </Dropdown>
+    )
+    const container = screen.getByText('Test Content').closest('.fixed')
+    expect(container).toHaveClass('sm:left-auto')
+  })
+
+  it('should apply custom width style', () => {
+    render(
+      <Dropdown isVisible={true} width="300px">
+        <div>Test Content</div>
+      </Dropdown>
+    )
+    // Style is on the inner panel div with the rounded-xl class
+    const panel = screen.getByText('Test Content').parentElement
+    expect(panel).toHaveStyle({ '--dropdown-width': '300px' })
+  })
+})
+
+/**
+ * Tests for DropdownMenu (wrapper with interaction logic)
+ */
 describe('DropdownMenu', () => {
-  describe('Rendering', () => {
-    it('should render children content', () => {
-      render(
-        <DropdownMenu>
-          <div>Test Content</div>
-        </DropdownMenu>
-      )
+  // Mock ButtonAction to simplify testing
+  const mockTriggerData = {
+    url: '#',
+    openInNewTab: false,
+    label: {
+      text: 'Menu',
+      icon: 'menu',
+      iconPosition: IconPositionEnum.BEFORE_TEXT,
+      ariaDescription: 'Open menu',
+    },
+  }
 
-      expect(screen.getByText('Test Content')).toBeInTheDocument()
-    })
-
-    it('should render with default props', () => {
-      const { container } = render(
-        <DropdownMenu>
-          <div>Content</div>
-        </DropdownMenu>
-      )
-
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('absolute', 'top-full', 'z-50', 'pt-6')
-      expect(dropdown).toHaveClass('invisible', 'opacity-0')
-      expect(dropdown).toHaveClass('left-0')
-    })
-
-    it('should apply custom className to container', () => {
-      const { container } = render(
-        <DropdownMenu className="mt-4">
-          <div>Content</div>
-        </DropdownMenu>
-      )
-
-      expect(container.firstChild).toHaveClass('mt-4')
-    })
-
-    it('should apply custom contentClassName to inner wrapper', () => {
-      const { container } = render(
-        <DropdownMenu contentClassName="p-6">
-          <div>Content</div>
-        </DropdownMenu>
-      )
-
-      const innerWrapper = container.querySelector('.p-6')
-      expect(innerWrapper).toBeInTheDocument()
-    })
+  it('should render trigger button', () => {
+    render(
+      <DropdownMenu triggerData={mockTriggerData} direction={DirectionEnum.LTR} testId="test-menu">
+        <div>Dropdown Content</div>
+      </DropdownMenu>
+    )
+    expect(screen.getByRole('button', { name: 'Open menu' })).toBeInTheDocument()
   })
 
-  describe('Visibility', () => {
-    it('should be invisible by default', () => {
-      const { container } = render(
-        <DropdownMenu>
-          <div>Content</div>
-        </DropdownMenu>
-      )
+  it('should open dropdown on hover', () => {
+    render(
+      <DropdownMenu triggerData={mockTriggerData} direction={DirectionEnum.LTR} testId="test-menu">
+        <div>Dropdown Content</div>
+      </DropdownMenu>
+    )
+    const container = screen.getByTestId('test-menu')
+    const button = screen.getByRole('button', { name: 'Open menu' })
 
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('invisible', 'opacity-0')
-    })
-
-    it('should be visible when isVisible is true', () => {
-      const { container } = render(
-        <DropdownMenu isVisible={true}>
-          <div>Content</div>
-        </DropdownMenu>
-      )
-
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('visible', 'opacity-100')
-    })
-
-    it('should be invisible when isVisible is false', () => {
-      const { container } = render(
-        <DropdownMenu isVisible={false}>
-          <div>Content</div>
-        </DropdownMenu>
-      )
-
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('invisible', 'opacity-0')
-    })
+    fireEvent.mouseEnter(container)
+    expect(button).toHaveAttribute('aria-expanded', 'true')
   })
 
-  describe('Alignment', () => {
-    it('should align left by default in LTR', () => {
-      const { container } = render(
-        <DropdownMenu direction={DirectionEnum.LTR}>
-          <div>Content</div>
-        </DropdownMenu>
-      )
+  it('should close dropdown on mouse leave', () => {
+    jest.useFakeTimers()
+    render(
+      <DropdownMenu triggerData={mockTriggerData} direction={DirectionEnum.LTR} testId="test-menu">
+        <div>Dropdown Content</div>
+      </DropdownMenu>
+    )
+    const container = screen.getByTestId('test-menu')
+    const button = screen.getByRole('button', { name: 'Open menu' })
 
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('left-0')
-      expect(dropdown).not.toHaveClass('right-0')
-    })
+    // Open via hover
+    fireEvent.mouseEnter(container)
+    expect(button).toHaveAttribute('aria-expanded', 'true')
 
-    it('should align right when align is right', () => {
-      const { container } = render(
-        <DropdownMenu align="right">
-          <div>Content</div>
-        </DropdownMenu>
-      )
+    // Close via mouse leave
+    fireEvent.mouseLeave(container)
+    expect(button).toHaveAttribute('aria-expanded', 'false')
 
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('right-0')
-    })
-
-    it('should align left when explicitly set', () => {
-      const { container } = render(
-        <DropdownMenu align="left">
-          <div>Content</div>
-        </DropdownMenu>
-      )
-
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('left-0')
-      expect(dropdown).not.toHaveClass('right-0')
-    })
+    jest.useRealTimers()
   })
 
-  describe('RTL Support', () => {
-    it('should swap alignment in RTL mode with left align', () => {
-      const { container } = render(
-        <DropdownMenu align="left" direction={DirectionEnum.RTL}>
-          <div>Content</div>
-        </DropdownMenu>
-      )
+  it('should toggle dropdown on click', () => {
+    jest.useFakeTimers()
+    render(
+      <DropdownMenu triggerData={mockTriggerData} direction={DirectionEnum.LTR} testId="test-menu">
+        <div>Dropdown Content</div>
+      </DropdownMenu>
+    )
+    const button = screen.getByRole('button', { name: 'Open menu' })
 
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('right-0')
-      expect(dropdown).not.toHaveClass('left-0')
+    // Click to open
+    fireEvent.click(button)
+    expect(button).toHaveAttribute('aria-expanded', 'true')
+
+    // Advance timer to allow click after hover protection
+    act(() => {
+      jest.advanceTimersByTime(100)
     })
 
-    it('should keep right alignment in RTL mode', () => {
-      const { container } = render(
-        <DropdownMenu align="right" direction={DirectionEnum.RTL}>
-          <div>Content</div>
-        </DropdownMenu>
-      )
+    // Click again to close
+    fireEvent.click(button)
+    expect(button).toHaveAttribute('aria-expanded', 'false')
 
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('right-0')
-    })
-
-    it('should use left alignment in LTR mode by default', () => {
-      const { container } = render(
-        <DropdownMenu direction={DirectionEnum.LTR}>
-          <div>Content</div>
-        </DropdownMenu>
-      )
-
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('left-0')
-      expect(dropdown).not.toHaveClass('right-0')
-    })
+    jest.useRealTimers()
   })
 
-  describe('Width', () => {
-    it('should apply custom width style when provided', () => {
-      const { container } = render(
-        <DropdownMenu width="500px">
-          <div>Content</div>
-        </DropdownMenu>
-      )
+  it('should ignore click immediately after hover (mobile double-tap fix)', () => {
+    jest.useFakeTimers()
+    render(
+      <DropdownMenu triggerData={mockTriggerData} direction={DirectionEnum.LTR} testId="test-menu">
+        <div>Dropdown Content</div>
+      </DropdownMenu>
+    )
+    const container = screen.getByTestId('test-menu')
+    const button = screen.getByRole('button', { name: 'Open menu' })
 
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveStyle({ width: '500px' })
+    // Hover to open
+    fireEvent.mouseEnter(container)
+    expect(button).toHaveAttribute('aria-expanded', 'true')
+
+    // Immediate click should be ignored
+    fireEvent.click(button)
+    expect(button).toHaveAttribute('aria-expanded', 'true')
+
+    // Wait for timeout
+    act(() => {
+      jest.advanceTimersByTime(100)
     })
 
-    it('should not apply width style when not provided', () => {
-      const { container } = render(
-        <DropdownMenu>
-          <div>Content</div>
-        </DropdownMenu>
-      )
+    // Click again should toggle
+    fireEvent.click(button)
+    expect(button).toHaveAttribute('aria-expanded', 'false')
 
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown.style.width).toBe('')
-    })
-
-    it('should handle responsive width classes', () => {
-      const { container } = render(
-        <DropdownMenu width="calc(100vw - 2rem)">
-          <div>Content</div>
-        </DropdownMenu>
-      )
-
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveStyle({ width: 'calc(100vw - 2rem)' })
-    })
+    jest.useRealTimers()
   })
 
-  describe('Styling', () => {
-    it('should have consistent dropdown styling', () => {
-      const { container } = render(
-        <DropdownMenu>
-          <div>Content</div>
-        </DropdownMenu>
-      )
+  it('should close dropdown on click outside', () => {
+    render(
+      <DropdownMenu triggerData={mockTriggerData} direction={DirectionEnum.LTR} testId="test-menu">
+        <div>Dropdown Content</div>
+      </DropdownMenu>
+    )
+    const container = screen.getByTestId('test-menu')
+    const button = screen.getByRole('button', { name: 'Open menu' })
 
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('absolute', 'top-full', 'z-50', 'pt-6')
-      expect(dropdown).toHaveClass('transition-all', 'duration-300')
-    })
+    // Open via hover
+    fireEvent.mouseEnter(container)
+    expect(button).toHaveAttribute('aria-expanded', 'true')
 
-    it('should have consistent content wrapper styling', () => {
-      render(
-        <DropdownMenu>
-          <div data-testid="test-content">Content</div>
-        </DropdownMenu>
-      )
-
-      // The content wrapper is the parent of the test content
-      const testContent = screen.getByTestId('test-content')
-      const contentWrapper = testContent.parentElement!
-      expect(contentWrapper).toHaveClass('overflow-hidden', 'rounded-xl')
-      expect(contentWrapper).toHaveClass('border', 'border-white/10')
-      expect(contentWrapper).toHaveClass('bg-surface-dark', 'shadow-xl')
-    })
+    // Click outside
+    fireEvent.mouseDown(document.body)
+    expect(button).toHaveAttribute('aria-expanded', 'false')
   })
 
-  describe('Combined Props', () => {
-    it('should work with all props combined', () => {
-      const { container } = render(
-        <DropdownMenu
-          isVisible={true}
-          align="right"
-          width="300px"
-          direction={DirectionEnum.RTL}
-          className="mb-4"
-          contentClassName="p-8"
-        >
-          <div>Test Content</div>
-        </DropdownMenu>
-      )
+  it('should close dropdown on scroll', () => {
+    render(
+      <DropdownMenu triggerData={mockTriggerData} direction={DirectionEnum.LTR} testId="test-menu">
+        <div>Dropdown Content</div>
+      </DropdownMenu>
+    )
+    const container = screen.getByTestId('test-menu')
+    const button = screen.getByRole('button', { name: 'Open menu' })
 
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('visible', 'opacity-100')
-      expect(dropdown).toHaveClass('right-0')
-      expect(dropdown).toHaveClass('mb-4')
-      expect(dropdown).toHaveStyle({ width: '300px' })
+    // Open via hover
+    fireEvent.mouseEnter(container)
+    expect(button).toHaveAttribute('aria-expanded', 'true')
 
-      const contentWrapper = container.querySelector('.p-8')
-      expect(contentWrapper).toBeInTheDocument()
-      expect(screen.getByText('Test Content')).toBeInTheDocument()
-    })
-
-    it('should handle visibility toggle correctly', () => {
-      const { container, rerender } = render(
-        <DropdownMenu isVisible={false}>
-          <div>Content</div>
-        </DropdownMenu>
-      )
-
-      expect(container.firstChild).toHaveClass('invisible', 'opacity-0')
-
-      rerender(
-        <DropdownMenu isVisible={true}>
-          <div>Content</div>
-        </DropdownMenu>
-      )
-
-      expect(container.firstChild).toHaveClass('visible', 'opacity-100')
-    })
+    // Scroll to close
+    fireEvent.scroll(window)
+    expect(button).toHaveAttribute('aria-expanded', 'false')
   })
 
-  describe('Complex Content', () => {
-    it('should render complex nested content', () => {
-      render(
-        <DropdownMenu>
-          <div>
-            <h4>Heading</h4>
-            <ul>
-              <li>Item 1</li>
-              <li>Item 2</li>
-            </ul>
-          </div>
-        </DropdownMenu>
-      )
-
-      expect(screen.getByText('Heading')).toBeInTheDocument()
-      expect(screen.getByText('Item 1')).toBeInTheDocument()
-      expect(screen.getByText('Item 2')).toBeInTheDocument()
-    })
-
-    it('should render multiple child elements', () => {
-      render(
-        <DropdownMenu>
-          <div>First</div>
-          <div>Second</div>
-          <div>Third</div>
-        </DropdownMenu>
-      )
-
-      expect(screen.getByText('First')).toBeInTheDocument()
-      expect(screen.getByText('Second')).toBeInTheDocument()
-      expect(screen.getByText('Third')).toBeInTheDocument()
-    })
+  it('should set aria-hidden based on visible prop', () => {
+    render(
+      <DropdownMenu triggerData={mockTriggerData} direction={DirectionEnum.LTR} testId="test-menu" visible={false}>
+        <div>Dropdown Content</div>
+      </DropdownMenu>
+    )
+    const container = screen.getByTestId('test-menu')
+    expect(container).toHaveAttribute('aria-hidden', 'true')
   })
 
-  describe('Edge Cases', () => {
-    it('should handle empty children', () => {
-      const { container } = render(<DropdownMenu>{null}</DropdownMenu>)
+  it('should support controlled mode with isOpen/onOpenChange', () => {
+    const mockOnOpenChange = jest.fn()
+    render(
+      <DropdownMenu
+        triggerData={mockTriggerData}
+        direction={DirectionEnum.LTR}
+        testId="test-menu"
+        isOpen={false}
+        onOpenChange={mockOnOpenChange}
+      >
+        <div>Dropdown Content</div>
+      </DropdownMenu>
+    )
+    const container = screen.getByTestId('test-menu')
 
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toBeInTheDocument()
-    })
+    // Hover should call onOpenChange
+    fireEvent.mouseEnter(container)
+    expect(mockOnOpenChange).toHaveBeenCalledWith(true)
+  })
 
-    it('should handle undefined direction gracefully', () => {
-      const { container } = render(
-        <DropdownMenu>
-          <div>Content</div>
-        </DropdownMenu>
-      )
+  it('should render with align="end"', () => {
+    render(
+      <DropdownMenu triggerData={mockTriggerData} direction={DirectionEnum.LTR} testId="test-menu" align="end">
+        <div>Dropdown Content</div>
+      </DropdownMenu>
+    )
+    const container = screen.getByTestId('test-menu')
+    fireEvent.mouseEnter(container)
 
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('left-0')
-    })
+    // The dropdown should have alignment classes
+    const dropdown = screen.getByText('Dropdown Content').closest('.fixed')
+    expect(dropdown).toHaveClass('sm:left-auto')
+  })
 
-    it('should handle empty width string', () => {
-      const { container } = render(
-        <DropdownMenu width="">
-          <div>Content</div>
-        </DropdownMenu>
-      )
+  it('should call onSelect and close dropdown when children are clicked', () => {
+    const mockOnSelect = jest.fn()
+    render(
+      <DropdownMenu
+        triggerData={mockTriggerData}
+        direction={DirectionEnum.LTR}
+        testId="test-menu"
+        onSelect={mockOnSelect}
+      >
+        <button>Select Item</button>
+      </DropdownMenu>
+    )
+    const container = screen.getByTestId('test-menu')
+    const triggerButton = screen.getByRole('button', { name: 'Open menu' })
 
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveStyle({ width: '' })
-    })
+    // Open dropdown
+    fireEvent.mouseEnter(container)
+    expect(triggerButton).toHaveAttribute('aria-expanded', 'true')
 
-    it('should handle left alignment in LTR explicitly', () => {
-      const { container } = render(
-        <DropdownMenu align="left" direction={DirectionEnum.LTR}>
-          <div>Content</div>
-        </DropdownMenu>
-      )
+    // Click dropdown content
+    const selectButton = screen.getByRole('button', { name: 'Select Item' })
+    fireEvent.click(selectButton)
 
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('left-0')
-      expect(dropdown).not.toHaveClass('right-0')
-    })
-
-    it('should handle right alignment in LTR', () => {
-      const { container } = render(
-        <DropdownMenu align="right" direction={DirectionEnum.LTR}>
-          <div>Content</div>
-        </DropdownMenu>
-      )
-
-      const dropdown = container.firstChild as HTMLElement
-      expect(dropdown).toHaveClass('right-0')
-    })
+    // Should call onSelect and close
+    expect(mockOnSelect).toHaveBeenCalledTimes(1)
+    expect(triggerButton).toHaveAttribute('aria-expanded', 'false')
   })
 })

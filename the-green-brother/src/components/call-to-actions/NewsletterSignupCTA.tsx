@@ -46,7 +46,14 @@ export function NewsletterSignupCTA({ data, direction }: NewsletterSignupCTAProp
   return (
     <section className="relative py-6" data-testid="newsletter-signup-cta" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="mx-auto max-w-2xl">
-        <div className="rounded-xl border border-white/5 bg-white/5 p-8">
+        <div
+          className={`
+          rounded-xl border
+          border-neutral-200 bg-neutral-50 p-8
+          shadow-md
+          dark:border-white/5 dark:bg-surface-dark dark:shadow-none
+        `}
+        >
           <Header
             data={
               {
@@ -66,8 +73,8 @@ export function NewsletterSignupCTA({ data, direction }: NewsletterSignupCTAProp
             level={4}
             direction={direction}
             className="mb-6"
-            headerClassName="text-white"
-            subheaderClassName="text-sm"
+            headerClassName="text-neutral-800 dark:text-white"
+            subheaderClassName="text-sm text-neutral-600 dark:text-text-secondary-dark"
           />
           <form
             className="flex gap-2"
@@ -80,16 +87,19 @@ export function NewsletterSignupCTA({ data, direction }: NewsletterSignupCTAProp
               placeholder={emailPlaceholder.text}
               aria-label={emailPlaceholder.ariaDescription}
               className={`
-                grow rounded-full border border-white/10 bg-black/20 px-4 py-2.5
-                text-sm text-white placeholder-text-secondary-dark/50
+                grow rounded-full border border-neutral-200 bg-white px-4 py-2.5
+                text-sm text-neutral-800 placeholder-neutral-400
                 focus:border-primary/50 focus:ring-1 focus:ring-primary/50
                 focus:outline-none
+                dark:border-white/10 dark:bg-black/20 dark:text-white
+                dark:placeholder-text-secondary-dark/50
               `}
               dir={isRTL ? 'rtl' : 'ltr'}
             />
             <ButtonAction
               data={submitButton}
               direction={direction}
+              showText={true}
               variant="primary"
               size="md"
               className={`
@@ -97,6 +107,9 @@ export function NewsletterSignupCTA({ data, direction }: NewsletterSignupCTAProp
                 whitespace-nowrap text-background-dark shadow-lg
                 hover:bg-primary-hover
               `}
+              onClick={() => {
+                // Submit is handled by form onSubmit, but onClick is required by ButtonAction
+              }}
             />
           </form>
         </div>

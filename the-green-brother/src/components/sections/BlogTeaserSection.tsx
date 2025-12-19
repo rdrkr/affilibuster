@@ -53,7 +53,7 @@ export function BlogTeaserSection({ data, blogPosts, direction }: BlogTeaserSect
       {/* Horizontal scroll carousel */}
       <div
         className={`
-          scrollbar-hide mt-12 flex snap-x snap-mandatory gap-8 overflow-x-auto
+          scrollbar-hide mt-12 flex snap-x snap-mandatory gap-6 overflow-x-auto
         `}
         role="region"
         aria-label={header.header?.ariaDescription ?? ''}
@@ -78,17 +78,26 @@ export function BlogTeaserSection({ data, blogPosts, direction }: BlogTeaserSect
                   level={4}
                   direction={direction}
                   className="mb-3"
-                  headerClassName="line-clamp-2 text-lg leading-snug font-bold text-white transition-colors group-hover:text-primary"
-                  subheaderClassName="line-clamp-3 grow text-sm text-text-secondary-dark"
+                  headerClassName={`
+                    line-clamp-2 text-lg leading-snug font-bold
+                    text-neutral-800 transition-colors group-hover:text-primary group-hover:text-shadow-sm
+                    dark:text-white dark:group-hover:text-shadow-none
+                  `}
+                  subheaderClassName="line-clamp-3 grow text-sm text-neutral-600 dark:text-text-secondary-dark"
                 />
               )}
-              <div className={`mt-auto flex items-center text-xs font-bold text-primary`}>
+              <div
+                className={`
+                  mt-auto flex items-center text-xs font-bold
+                  text-primary text-shadow-sm dark:text-shadow-none
+                `}
+              >
                 <Label
                   data={post.readArticleLabel}
                   direction={direction}
                   iconSize="sm"
                   display="inline"
-                  className="text-xs font-bold text-primary"
+                  className="text-xs font-bold text-primary text-shadow-sm dark:text-shadow-none"
                 />
               </div>
             </Card>

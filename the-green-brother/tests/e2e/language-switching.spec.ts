@@ -5,7 +5,7 @@
  * Reference: quickstart.md:123-148 (Test 2: Manual Language Switch)
  */
 
-import { test, expect } from '../fixtures'
+import { expect, test } from '../fixtures'
 
 test.describe('Language Switching', () => {
   test('should switch from English to Italian', async ({ page: _page }) => {

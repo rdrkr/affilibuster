@@ -8,20 +8,3 @@
  */
 
 export { HomeSections, type HomeSectionsProps } from './HomeSections'
-
-// Re-export section components from sections directory for backwards compatibility
-export {
-  BlogTeaserSection,
-  BrandFeaturesSection,
-  FeaturedProductsSection,
-  HeroSection,
-  ProductCategoriesSection,
-  type BlogTeaserSectionProps,
-  type BrandFeaturesSectionProps,
-  type FeaturedProductsSectionProps,
-  type HeroSectionProps,
-  type ProductCategoriesSectionProps,
-} from '@/components/sections'
-
-// Re-export call-to-actions components
-export { NewsletterSignupCTA, type NewsletterSignupCTAProps } from '@/components/call-to-actions'

@@ -7,8 +7,20 @@
 import * as navigation from '@/components/navigation'
 
 describe('components/navigation barrel exports', () => {
-  it('should export MobileMenu component', () => {
-    expect(navigation.MobileMenu).toBeDefined()
+  it('should export MobileNavigationGroup component', () => {
+    expect(navigation.MobileNavigationGroup).toBeDefined()
+  })
+
+  it('should export StartNavigationGroup component', () => {
+    expect(navigation.StartNavigationGroup).toBeDefined()
+  })
+
+  it('should export EndNavigationGroup component', () => {
+    expect(navigation.EndNavigationGroup).toBeDefined()
+  })
+
+  it('should export NavigationGroup component', () => {
+    expect(navigation.NavigationGroup).toBeDefined()
   })
 
   it('should export BackToTopButton component', () => {

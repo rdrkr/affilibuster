@@ -10,12 +10,12 @@
 
 'use client'
 
-import Link from 'next/link'
+import { useCallback, useState } from 'react'
 
 import type { CodeEnum, MenusLanguageSelectorEntry } from '@/lib/generated/types.gen'
 import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 
-import { ButtonAction, CMSIcon, CMSText } from '../elements'
+import { ButtonAction, CMSIcon } from '../elements'
 import { DropdownMenu } from './DropdownMenu'
 
 /**
@@ -44,6 +44,10 @@ export interface LanguageMenuProps {
   onLanguageChange: (langCode: CodeEnum) => void
   /** Text direction for RTL support */
   direction: DirectionEnum
+  /** Whether to show the text label (for responsive collapse). Defaults to true. */
+  showText: boolean
+  /** Controls visibility of entire menu - when false, menu is hidden from layout */
+  visible?: boolean
 }
 
 /**
@@ -54,21 +58,39 @@ export interface LanguageMenuProps {
  * @param props.selectedLang - Currently selected language code
  * @param props.onLanguageChange - Callback when language is selected
  * @param props.direction - Text direction for RTL support
+ * @param props.showText - Whether to show the text label (defaults to true)
+ * @param props.visible - Controls visibility of entire menu (defaults to true)
  * @returns Language menu component
  */
-export function LanguageMenu({ data, languages, selectedLang, onLanguageChange, direction }: LanguageMenuProps) {
-  const isRTL = direction === DirectionEnum.RTL
+export function LanguageMenu({
+  data,
+  languages,
+  selectedLang,
+  onLanguageChange,
+  direction,
+  showText,
+  visible = true,
+}: LanguageMenuProps) {
   const isIconAfterText = data.menuButton.label?.iconPosition === IconPositionEnum.AFTER_TEXT
   const label = data.menuButton.label
+  const [isOpen, setIsOpen] = useState(false)
+
+  const handleLanguageSelect = useCallback(
+    (langCode: CodeEnum) => {
+      onLanguageChange(langCode)
+      setIsOpen(false)
+    },
+    [onLanguageChange]
+  )
 
   // Icon with badge overlay component
   const iconWithBadge = label?.icon ? (
-    <span className={`relative ${isIconAfterText ? 'order-last' : 'order-first'}`}>
-      <CMSIcon icon={label.icon} size="md" />
+    <span className="relative">
+      <CMSIcon icon={label.icon} size="md" className={`mr-1.5`} />
       {/* Badge positioned at bottom-right of icon */}
       <span
         className={`
-          pointer-events-none absolute -right-1 bottom-1 flex min-w-[14px]
+          pointer-events-none absolute right-0.5 bottom-1 flex min-w-[14px]
           items-center justify-center rounded-sm bg-primary px-0.5 text-[10px]
           leading-none font-bold text-black transition-colors
           group-hover:bg-text-secondary-dark
@@ -79,67 +101,55 @@ export function LanguageMenu({ data, languages, selectedLang, onLanguageChange, 
     </span>
   ) : null
 
-  return (
-    <div className="group relative flex h-full items-center">
-      {/* Menu button with chevron */}
-      <div
-        className={`
-          flex items-center
-          ${isRTL ? 'flex-row-reverse' : ''}
-        `}
-      >
-        {/* Custom button with icon+badge */}
-        <Link
-          href={data.menuButton.url}
-          className={`
-            inline-flex items-center gap-2 text-sm font-medium
-            text-text-secondary-dark transition-colors
-            group-hover:text-primary
-            ${isRTL ? 'flex-row-reverse' : ''}
-          `}
-          aria-label={label?.ariaDescription}
-        >
-          {iconWithBadge}
-          {/* Text */}
-          <CMSText text={label?.text} />
-        </Link>
-        {/* Chevron - always on opposite side of icon */}
-        <span
-          className={`
-            material-symbols-outlined pointer-events-none text-sm
-            text-text-secondary-dark transition-transform
-            duration-300 group-hover:rotate-180 group-hover:text-primary
-            ${isIconAfterText ? 'order-first' : 'order-last'}
-            ${isIconAfterText ? 'me-1' : 'ms-1'}
-          `}
-        >
-          expand_more
-        </span>
-      </div>
+  // Remove icon from label and use customized icon instead.
+  const buttonData = { ...data.menuButton }
+  if (buttonData.label) {
+    const { icon: _icon, ...rest } = buttonData.label
+    buttonData.label = rest
+  }
 
-      <DropdownMenu width="12rem" align="right" direction={direction} contentClassName="space-y-1 p-1.5">
-        {languages.map(lang => (
-          <ButtonAction
-            key={lang.name}
-            direction={direction}
-            onClick={() => {
-              onLanguageChange(lang.code)
-            }}
-            variant="ghost"
-            className={`
-              flex w-full items-center justify-start gap-3 rounded-xl px-4 py-2.5
-              text-sm text-white transition-colors
-              hover:bg-white/10
-              ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}
-              ${selectedLang === lang.code ? `bg-white/5` : ''}
-            `}
-          >
-            <span className="text-lg">{lang.flag}</span>
-            <span className="font-medium">{lang.name}</span>
-          </ButtonAction>
-        ))}
-      </DropdownMenu>
-    </div>
+  // Determine children position based on icon position from CMS
+  const childrenPosition = isIconAfterText ? 'end' : 'start'
+
+  return (
+    <DropdownMenu
+      triggerData={buttonData}
+      triggerChildren={iconWithBadge}
+      triggerChildrenPosition={childrenPosition}
+      direction={direction}
+      showText={showText}
+      visible={visible}
+      testId="language-menu-container"
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+    >
+      {languages.map(lang => (
+        <ButtonAction
+          key={lang.name}
+          data={{
+            label: {
+              iconPosition: IconPositionEnum.BEFORE_TEXT,
+              text: `${lang.flag}\u00A0\u00A0${lang.name}`,
+              ariaDescription: lang.name,
+            },
+            url: '',
+            openInNewTab: false,
+          }}
+          showText={true}
+          direction={DirectionEnum.LTR}
+          onClick={() => {
+            handleLanguageSelect(lang.code)
+          }}
+          variant="ghost-2"
+          iconSize="sm"
+          size="sm"
+          isActive={selectedLang === lang.code}
+        >
+          {/* force justify as if button has icon */}
+          {'\u00A0'}
+        </ButtonAction>
+      ))}
+    </DropdownMenu>
   )
 }
 

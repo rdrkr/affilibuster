@@ -9,11 +9,26 @@
 
 'use client'
 
-import type { ApiThemeThemeDocument, MenusThemeSelectorEntry } from '@/lib/generated/types.gen'
-import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
+import { useCallback, useState } from 'react'
 
-import { ButtonAction, ButtonLink, CMSIcon, CMSText } from '../elements'
+import type { ApiThemeThemeDocument, MenusThemeSelectorEntry } from '@/lib/generated/types.gen'
+import { DirectionEnum } from '@/lib/generated/types.gen'
+import type { ThemeMode } from '@/lib/themes'
+
+import { ButtonAction } from '../elements'
 import { DropdownMenu } from './DropdownMenu'
+
+/**
+ * Maps CMS theme text labels to internal ThemeMode values
+ * @param cmsText - Theme text from CMS (e.g., "System", "Light", "Dark")
+ * @returns The corresponding ThemeMode value
+ */
+function cmsTextToThemeMode(cmsText: string): ThemeMode {
+  const normalized = cmsText.toLowerCase().trim()
+  if (normalized === 'light') return 'light'
+  if (normalized === 'dark') return 'dark'
+  return 'system'
+}
 
 /**
  * Props for the ThemeMenu component
@@ -21,96 +36,82 @@ import { DropdownMenu } from './DropdownMenu'
 export interface ThemeMenuProps {
   /** CMS data for the theme menu */
   data: MenusThemeSelectorEntry
-  /** Currently selected theme name */
-  selectedTheme: string
+  /** Currently selected theme mode */
+  selectedTheme: ThemeMode
   /** Callback when theme is selected */
-  onThemeChange: (themeName: string) => void
+  onThemeChange: (theme: ThemeMode) => void
   /** Text direction for RTL support */
   direction: DirectionEnum
+  /** Whether to show the text label (for responsive collapse). Defaults to true. */
+  showText?: boolean
+  /** Controls visibility of entire menu - when false, menu is hidden from layout */
+  visible?: boolean
 }
 
 /**
  * Theme selector dropdown menu
  * @param props - Component props with CMS data and callbacks
  * @param props.data - CMS data for the theme menu
- * @param props.selectedTheme - Currently selected theme name
+ * @param props.selectedTheme - Currently selected theme mode
  * @param props.onThemeChange - Callback when theme is selected
  * @param props.direction - Text direction for RTL support
+ * @param props.showText - Whether to show the text label (defaults to true)
+ * @param props.visible - Controls visibility of entire menu (defaults to true)
  * @returns Theme menu component
  */
-export function ThemeMenu({ data, selectedTheme, onThemeChange, direction }: ThemeMenuProps) {
+export function ThemeMenu({
+  data,
+  selectedTheme,
+  onThemeChange,
+  direction,
+  showText = true,
+  visible = true,
+}: ThemeMenuProps) {
   const themes = data.themes ?? []
-  const isRTL = direction === DirectionEnum.RTL
-  const isIconAfterText = data.menuButton.label?.iconPosition === IconPositionEnum.AFTER_TEXT
+  const [isOpen, setIsOpen] = useState(false)
+
+  const handleThemeSelect = useCallback(
+    (themeMode: ThemeMode) => {
+      onThemeChange(themeMode)
+      setIsOpen(false)
+    },
+    [onThemeChange]
+  )
 
   return (
-    <div className="group relative flex h-full items-center">
-      {/* Menu button with chevron */}
-      <div
-        className={`
-          hidden items-center gap-1 lg:flex
-          ${isRTL ? 'flex-row-reverse' : ''}
-        `}
-      >
-        <ButtonLink
-          data={data.menuButton}
-          direction={direction}
-          variant="ghost"
-          iconSize="md"
-          size="sm"
-          className={`
-            bg-transparent! px-0! text-text-secondary-dark!
-            transition-colors group-hover:text-primary!
-            hover:bg-transparent!
-          `}
-        />
-        {/* Chevron - always on opposite side of icon */}
-        <span
-          className={`
-            material-symbols-outlined pointer-events-none text-sm
-            text-text-secondary-dark transition-transform
-            duration-300 group-hover:rotate-180 group-hover:text-primary
-            ${isIconAfterText ? 'order-first' : 'order-last'}
-          `}
-        >
-          expand_more
-        </span>
-      </div>
+    <DropdownMenu
+      triggerData={data.menuButton}
+      direction={direction}
+      showText={showText}
+      visible={visible}
+      testId="theme-menu-container"
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+    >
+      {themes.map((theme: ApiThemeThemeDocument) => {
+        if (!theme.content) {
+          return null
+        }
 
-      <DropdownMenu width="10rem" align="right" direction={direction} contentClassName="space-y-1 p-1.5">
-        {themes.map((theme: ApiThemeThemeDocument) => {
-          if (!theme.content) {
-            return null
-          }
+        const themeMode = cmsTextToThemeMode(theme.themeId)
 
-          return (
-            <ButtonAction
-              key={theme.content.text}
-              direction={direction}
-              onClick={() => {
-                if (theme.content) {
-                  onThemeChange(theme.content.text)
-                }
-              }}
-              variant="ghost"
-              className={`
-                flex w-full items-center justify-start gap-3 rounded-xl px-4 py-2.5
-                text-sm text-white transition-colors
-                hover:bg-white/10
-                ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}
-                ${selectedTheme === theme.content.text ? `bg-white/5` : ''}
-              `}
-              data={{ label: theme.content, url: '', openInNewTab: false }}
-            >
-              <CMSIcon icon={theme.content.icon ?? 'palette'} size="md" />
-              <span className="font-medium">
-                <CMSText text={theme.content.text} />
-              </span>
-            </ButtonAction>
-          )
-        })}
-      </DropdownMenu>
-    </div>
+        return (
+          <ButtonAction
+            key={theme.content.text}
+            data={{ label: theme.content, url: '', openInNewTab: false }}
+            showText={true}
+            direction={direction}
+            onClick={() => {
+              handleThemeSelect(themeMode)
+            }}
+            variant="ghost-2"
+            iconSize="sm"
+            size="sm"
+            isActive={selectedTheme === themeMode}
+          />
+        )
+      })}
+    </DropdownMenu>
   )
 }
 

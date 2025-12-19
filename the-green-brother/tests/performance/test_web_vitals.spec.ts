@@ -7,7 +7,7 @@
  * Reference: Web Vitals documentation
  */
 
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.describe('Web Vitals Performance', () => {
   test('should measure LCP (Largest Contentful Paint) on homepage', async ({ page: _page }) => {

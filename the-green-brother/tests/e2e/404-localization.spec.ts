@@ -5,7 +5,7 @@
  * TODO: Implement tests based on frontend/tests/e2e/404-localization.spec.ts
  */
 
-import { test, expect } from '../fixtures'
+import { expect, test } from '../fixtures'
 
 test.describe('404-localization Tests', () => {
   test('placeholder test', async ({ page: _page }) => {

@@ -101,6 +101,8 @@ export interface CMSIconProps {
   ariaLabel?: string
   /** When true, renders the icon larger with a circular background */
   promoted?: boolean
+  /** Controls visibility - when false, element is hidden from layout */
+  visible?: boolean
 }
 
 /**
@@ -126,18 +128,20 @@ const sizeMappings = {
  * @param props.className - Additional CSS classes
  * @param props.ariaLabel - Aria label for accessibility
  * @param props.promoted - When true, renders the icon larger with a circular background
- * @returns Icon element or null if no icon
+ * @param props.visible - Controls visibility (false = hidden from layout)
+ * @returns Icon element or null if no icon or not visible
  * @example
  * ```tsx
  * <CMSIcon icon="brand.svg" size="lg" />
  * <CMSIcon icon="home" size="md" />
  * <CMSIcon icon="Account Circle" />
+ * <CMSIcon icon="menu" visible={isMenuVisible} />
  * ```
  */
-export function CMSIcon({ icon, size = 'lg', className = '', ariaLabel, promoted = false }: CMSIconProps) {
+export function CMSIcon({ icon, size = 'lg', className = '', ariaLabel, promoted = false, visible }: CMSIconProps) {
   const resolved = resolveIcon(icon)
 
-  if (!resolved) {
+  if (!resolved || visible === false) {
     return null
   }
 
@@ -160,7 +164,10 @@ export function CMSIcon({ icon, size = 'lg', className = '', ariaLabel, promoted
         alt={ariaLabel ?? ''}
         width={sizeValue}
         height={sizeValue}
-        className={promoted ? '' : className}
+        className={`
+          drop-shadow-icon-sm dark:drop-shadow-none
+          ${promoted ? '' : className}
+        `}
         aria-hidden={!ariaLabel}
       />
     )
@@ -179,7 +186,10 @@ export function CMSIcon({ icon, size = 'lg', className = '', ariaLabel, promoted
   // Material Symbol - use inline style for precise font-size control
   const materialIcon = (
     <span
-      className={`material-symbols-outlined-bold ${promoted ? 'text-primary' : ''} ${promoted ? '' : className}`}
+      className={`
+        material-symbols-outlined-bold
+        ${promoted ? 'text-primary text-shadow-sm dark:text-shadow-none' : ''} ${promoted ? '' : className}
+      `}
       style={{ fontSize: `${String(sizeValue)}px` }}
       aria-label={ariaLabel}
       aria-hidden={!ariaLabel}

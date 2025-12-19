@@ -48,22 +48,25 @@ export function FeaturedProductsSection({ data, products, direction }: FeaturedP
 
   return (
     <section aria-label={header.header?.ariaDescription ?? ''}>
-      <div className={`mb-8 flex items-end justify-between px-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+      <div
+        className={`
+          mb-8 flex flex-col items-start gap-4 px-2
+          sm:flex-row sm:items-end sm:justify-between ${isRTL ? 'sm:flex-row-reverse' : ''}
+        `}
+      >
         <Header data={header} level={2} direction={direction} />
-        <div>
-          <ButtonLink
-            data={viewAllButton}
-            direction={direction}
-            variant="link"
-            iconSize="sm"
-            className="font-semibold text-primary hover:text-primary-hover"
-          />
-        </div>
+        <ButtonLink
+          data={viewAllButton}
+          direction={direction}
+          variant="link-1"
+          iconSize="sm"
+          className={`${isRTL ? 'self-start' : 'self-end'} sm:self-auto`}
+        />
       </div>
 
       <div
         className={`
-          scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto
+          scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto
         `}
         dir={isRTL ? 'rtl' : 'ltr'}
       >
@@ -84,10 +87,10 @@ export function FeaturedProductsSection({ data, products, direction }: FeaturedP
                   <button
                     type="button"
                     className={`
-                      flex h-10 w-10 items-center justify-center rounded-full
-                      bg-background-dark/50 text-white backdrop-blur-md
-                      transition-colors
-                      hover:bg-primary hover:text-black
+                      flex size-10 items-center justify-center rounded-full
+                      bg-white/50 text-neutral-800 backdrop-blur-md
+                      transition-colors hover:bg-primary hover:text-black
+                      dark:bg-background-dark/50 dark:text-white
                     `}
                     aria-label={product.content?.header?.header?.ariaDescription ?? ''}
                   >
@@ -101,7 +104,7 @@ export function FeaturedProductsSection({ data, products, direction }: FeaturedP
                 {tagText && (
                   <span
                     className={`
-                      text-xs font-bold tracking-wider text-primary uppercase
+                      text-xs font-bold tracking-wider text-primary uppercase text-shadow-sm dark:text-shadow-none
                     `}
                   >
                     <CMSText text={tagText} />
@@ -109,8 +112,8 @@ export function FeaturedProductsSection({ data, products, direction }: FeaturedP
                 )}
                 <span
                   className={`
-                    rounded-md bg-white/10 px-2 py-1 text-sm font-bold
-                    text-white
+                    rounded-md bg-neutral-100 px-2 py-1 text-sm font-bold
+                    text-neutral-800 dark:bg-white/10 dark:text-white
                   `}
                 >
                   {product.currency?.symbol ?? '$'}
@@ -121,9 +124,10 @@ export function FeaturedProductsSection({ data, products, direction }: FeaturedP
               {product.content?.header?.header && (
                 <h4
                   className={`
-                    line-clamp-2 text-lg font-bold text-white
+                    line-clamp-2 text-lg font-bold text-neutral-800
                     transition-colors
-                    group-hover:text-primary
+                    group-hover:text-primary group-hover:text-shadow-sm
+                    dark:text-white dark:group-hover:text-shadow-none
                   `}
                 >
                   <CMSText text={product.content.header.header.text} />

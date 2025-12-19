@@ -11,26 +11,30 @@ const Signup = () => {
         <div className="mb-10 text-center">
           <div
             className={`
-              mx-auto mb-6 flex h-20 w-20 items-center justify-center
-              rounded-xl border border-white/10 bg-surface-dark shadow-xl
+              mx-auto mb-6 flex size-20 items-center justify-center
+              rounded-xl border border-neutral-200 bg-white shadow-xl
+              dark:border-white/10 dark:bg-surface-dark
             `}
           >
             <span className="material-symbols-outlined text-4xl text-primary">eco</span>
           </div>
-          <h1 className="mb-2 text-3xl font-bold text-white">Create Account</h1>
-          <p className="text-text-secondary-dark">Join the community driving sustainable change.</p>
+          <h1 className="mb-2 text-3xl font-bold text-neutral-800 dark:text-white">Create Account</h1>
+          <p className="text-neutral-600 dark:text-text-secondary-dark">
+            Join the community driving sustainable change.
+          </p>
         </div>
 
         <div
           className={`
-          rounded-xl border border-white/5 bg-surface-dark p-8 shadow-2xl
+          rounded-xl border border-neutral-200 bg-white p-8 shadow-2xl
+          dark:border-white/5 dark:bg-surface-dark
         `}
         >
           <form className="space-y-6">
             <div>
               <label
                 className={`
-                mb-2 block text-sm font-medium text-text-secondary-dark
+                mb-2 block text-sm font-medium text-neutral-600 dark:text-text-secondary-dark
               `}
               >
                 Full Name
@@ -39,7 +43,7 @@ const Signup = () => {
                 <span
                   className={`
                     material-symbols-outlined absolute top-1/2 left-4
-                    -translate-y-1/2 text-text-secondary-dark
+                    -translate-y-1/2 text-neutral-400 dark:text-text-secondary-dark
                   `}
                 >
                   person
@@ -47,9 +51,10 @@ const Signup = () => {
                 <input
                   type="text"
                   className={`
-                    w-full rounded-xl border border-white/10 bg-background-dark
-                    py-3 pr-4 pl-12 text-white outline-none
+                    w-full rounded-xl border border-neutral-200 bg-neutral-50
+                    py-3 pr-4 pl-12 text-neutral-800 outline-none
                     focus:border-transparent focus:ring-2 focus:ring-primary
+                    dark:border-white/10 dark:bg-background-dark dark:text-white
                   `}
                   placeholder="Enter your name"
                 />
@@ -58,7 +63,7 @@ const Signup = () => {
             <div>
               <label
                 className={`
-                mb-2 block text-sm font-medium text-text-secondary-dark
+                mb-2 block text-sm font-medium text-neutral-600 dark:text-text-secondary-dark
               `}
               >
                 Email
@@ -67,7 +72,7 @@ const Signup = () => {
                 <span
                   className={`
                     material-symbols-outlined absolute top-1/2 left-4
-                    -translate-y-1/2 text-text-secondary-dark
+                    -translate-y-1/2 text-neutral-400 dark:text-text-secondary-dark
                   `}
                 >
                   mail
@@ -75,9 +80,10 @@ const Signup = () => {
                 <input
                   type="email"
                   className={`
-                    w-full rounded-xl border border-white/10 bg-background-dark
-                    py-3 pr-4 pl-12 text-white outline-none
+                    w-full rounded-xl border border-neutral-200 bg-neutral-50
+                    py-3 pr-4 pl-12 text-neutral-800 outline-none
                     focus:border-transparent focus:ring-2 focus:ring-primary
+                    dark:border-white/10 dark:bg-background-dark dark:text-white
                   `}
                   placeholder="Enter your email"
                 />
@@ -86,7 +92,7 @@ const Signup = () => {
             <div>
               <label
                 className={`
-                mb-2 block text-sm font-medium text-text-secondary-dark
+                mb-2 block text-sm font-medium text-neutral-600 dark:text-text-secondary-dark
               `}
               >
                 Password
@@ -95,7 +101,7 @@ const Signup = () => {
                 <span
                   className={`
                     material-symbols-outlined absolute top-1/2 left-4
-                    -translate-y-1/2 text-text-secondary-dark
+                    -translate-y-1/2 text-neutral-400 dark:text-text-secondary-dark
                   `}
                 >
                   lock
@@ -103,9 +109,10 @@ const Signup = () => {
                 <input
                   type="password"
                   className={`
-                    w-full rounded-xl border border-white/10 bg-background-dark
-                    py-3 pr-12 pl-12 text-white outline-none
+                    w-full rounded-xl border border-neutral-200 bg-neutral-50
+                    px-12 py-3 text-neutral-800 outline-none
                     focus:border-transparent focus:ring-2 focus:ring-primary
+                    dark:border-white/10 dark:bg-background-dark dark:text-white
                   `}
                   placeholder="Create a password"
                 />
@@ -116,23 +123,22 @@ const Signup = () => {
                 type="checkbox"
                 id="terms"
                 className={`
-                  h-5 w-5 rounded border-white/10 bg-background-dark
-                  text-primary
-                  focus:ring-primary
+                  size-5 rounded-sm border-neutral-200 bg-neutral-50
+                  text-primary focus:ring-primary
+                  dark:border-white/10 dark:bg-background-dark
                 `}
               />
               <label
                 htmlFor="terms"
                 className={`
-                text-sm text-text-secondary-dark
+                text-sm text-neutral-600 dark:text-text-secondary-dark
               `}
               >
                 I agree to the{' '}
                 <a
                   href="#"
                   className={`
-                  text-white
-                  hover:underline
+                  text-neutral-800 hover:underline dark:text-white
                 `}
                 >
                   Terms
@@ -141,8 +147,7 @@ const Signup = () => {
                 <a
                   href="#"
                   className={`
-                  text-white
-                  hover:underline
+                  text-neutral-800 hover:underline dark:text-white
                 `}
                 >
                   Privacy Policy
@@ -162,7 +167,7 @@ const Signup = () => {
           </form>
         </div>
 
-        <p className="mt-8 text-center text-text-secondary-dark">
+        <p className="mt-8 text-center text-neutral-600 dark:text-text-secondary-dark">
           Already have an account?{' '}
           <Link
             href="/login"

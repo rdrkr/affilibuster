@@ -72,14 +72,14 @@ export default function ProductsClient({ pageData, products, categories }: Produ
       <div className="mb-12">
         <h1
           className={`
-          mb-6 text-4xl font-bold text-white
-          md:text-5xl
+          mb-6 text-4xl font-bold text-neutral-800 md:text-5xl
+          dark:text-white
         `}
         >
           {pageData?.pageText ?? 'Products'}
         </h1>
         {pageData?.seoMetadata?.metaDescription && (
-          <p className="mb-6 text-lg text-tertiary-300">{pageData.seoMetadata.metaDescription}</p>
+          <p className="mb-6 text-lg text-neutral-600 dark:text-tertiary-300">{pageData.seoMetadata.metaDescription}</p>
         )}
         <div
           className={`
@@ -96,7 +96,7 @@ export default function ProductsClient({ pageData, products, categories }: Produ
             <span
               className={`
               material-symbols-outlined absolute top-1/2 left-4 -translate-y-1/2
-              text-tertiary-400
+              text-neutral-400 dark:text-tertiary-400
             `}
             >
               search
@@ -109,10 +109,12 @@ export default function ProductsClient({ pageData, products, categories }: Produ
                 setSearchQuery(e.target.value)
               }}
               className={`
-                w-full rounded-full border border-tertiary-700 bg-tertiary-800
-                py-3 pr-4 pl-12 text-white transition-all outline-none
-                placeholder:text-tertiary-400
+                w-full rounded-full border border-neutral-200 bg-white
+                py-3 pr-4 pl-12 text-neutral-800 transition-all outline-none
+                placeholder:text-neutral-400
                 focus:border-transparent focus:ring-2 focus:ring-primary-500
+                dark:border-tertiary-700 dark:bg-tertiary-800 dark:text-white
+                dark:placeholder:text-tertiary-400
               `}
             />
           </div>
@@ -124,10 +126,11 @@ export default function ProductsClient({ pageData, products, categories }: Produ
           >
             <button
               className={`
-                flex items-center gap-2 rounded-full border border-tertiary-700
-                bg-tertiary-800 px-4 py-2 whitespace-nowrap text-white
-                transition-colors
-                hover:border-primary-500
+                flex items-center gap-2 rounded-full border border-neutral-200
+                bg-white px-4 py-2 whitespace-nowrap text-neutral-600
+                transition-colors hover:border-primary-500 hover:text-primary-600
+                dark:border-tertiary-700 dark:bg-tertiary-800 dark:text-white
+                dark:hover:border-primary-500
               `}
             >
               <span className="material-symbols-outlined text-lg">filter_list</span>
@@ -135,10 +138,11 @@ export default function ProductsClient({ pageData, products, categories }: Produ
             </button>
             <button
               className={`
-                flex items-center gap-2 rounded-full border border-tertiary-700
-                bg-tertiary-800 px-4 py-2 whitespace-nowrap text-white
-                transition-colors
-                hover:border-primary-500
+                flex items-center gap-2 rounded-full border border-neutral-200
+                bg-white px-4 py-2 whitespace-nowrap text-neutral-600
+                transition-colors hover:border-primary-500 hover:text-primary-600
+                dark:border-tertiary-700 dark:bg-tertiary-800 dark:text-white
+                dark:hover:border-primary-500
               `}
             >
               Sort By
@@ -164,8 +168,10 @@ export default function ProductsClient({ pageData, products, categories }: Produ
                   activeCategory === cat
                     ? 'bg-primary-600 font-bold text-white'
                     : `
-                    border border-tertiary-700 bg-tertiary-800 text-tertiary-400
-                    hover:border-primary-500 hover:text-white
+                    border border-neutral-200 bg-white text-neutral-600
+                    hover:border-primary-500 hover:text-primary-600
+                    dark:border-tertiary-700 dark:bg-tertiary-800 dark:text-tertiary-400
+                    dark:hover:border-primary-500 dark:hover:text-white
                   `
                 }
               `}
@@ -192,12 +198,13 @@ export default function ProductsClient({ pageData, products, categories }: Produ
               <div
                 key={product.documentId}
                 className={`
-                  group overflow-hidden rounded-xl border border-tertiary-700
-                  bg-tertiary-800 shadow-lg transition-all duration-300
+                  group overflow-hidden rounded-xl border border-neutral-200
+                  bg-white shadow-lg transition-all duration-300
                   hover:border-primary-500/30
+                  dark:border-tertiary-700 dark:bg-tertiary-800
                 `}
               >
-                <div className="relative h-64 overflow-hidden bg-tertiary-900">
+                <div className="relative h-64 overflow-hidden bg-neutral-100 dark:bg-tertiary-900">
                   <CMSImage
                     image={primaryImage}
                     fallbackAlt={product.content?.header?.header?.text ?? product.slug}
@@ -211,9 +218,11 @@ export default function ProductsClient({ pageData, products, categories }: Produ
                   <button
                     onClick={handleWishlistClick}
                     className={`
-                      absolute top-3 right-3 z-10 rounded-full bg-tertiary-900/50
-                      p-2 text-white backdrop-blur-md transition-colors
+                      absolute top-3 right-3 z-10 rounded-full bg-white/70
+                      p-2 text-neutral-600 backdrop-blur-md transition-colors
                       hover:bg-primary-600 hover:text-white
+                      dark:bg-tertiary-900/50 dark:text-white
+                      dark:hover:bg-primary-600 dark:hover:text-white
                     `}
                   >
                     <span className="material-symbols-outlined block text-xl">favorite_border</span>
@@ -223,7 +232,7 @@ export default function ProductsClient({ pageData, products, categories }: Produ
                   {product.category?.content?.text && (
                     <p
                       className={`
-                      mb-1 text-xs font-bold tracking-wider text-tertiary-400
+                      mb-1 text-xs font-bold tracking-wider text-primary-500
                       uppercase
                     `}
                     >
@@ -232,8 +241,8 @@ export default function ProductsClient({ pageData, products, categories }: Produ
                   )}
                   <h3
                     className={`
-                    mb-2 text-lg font-bold text-white transition-colors
-                    group-hover:text-primary-500
+                    mb-2 text-lg font-bold text-neutral-800 transition-colors
+                    group-hover:text-primary-500 dark:text-white
                   `}
                   >
                     <CMSText text={product.content?.header?.header?.text ?? ''} />
@@ -242,7 +251,7 @@ export default function ProductsClient({ pageData, products, categories }: Produ
                     {product.price && (
                       <span
                         className={`
-                      text-xl font-bold text-white
+                      text-xl font-bold text-neutral-800 dark:text-white
                     `}
                       >
                         ${product.price}
@@ -250,9 +259,10 @@ export default function ProductsClient({ pageData, products, categories }: Produ
                     )}
                     <button
                       className={`
-                        relative z-10 rounded-xl bg-tertiary-700 p-2 text-white
-                        transition-colors
-                        hover:bg-primary-600 hover:text-white
+                        relative z-10 rounded-xl bg-neutral-100 p-2 text-neutral-800
+                        transition-colors hover:bg-primary-600 hover:text-white
+                        dark:bg-tertiary-700 dark:text-white
+                        dark:hover:bg-primary-600 dark:hover:text-white
                       `}
                     >
                       <span className="material-symbols-outlined block text-xl">add_shopping_cart</span>
@@ -273,12 +283,12 @@ export default function ProductsClient({ pageData, products, categories }: Produ
         <div className="py-16 text-center">
           <span
             className={`
-            material-symbols-outlined mb-4 block text-6xl text-tertiary-600
+            material-symbols-outlined mb-4 block text-6xl text-neutral-300 dark:text-tertiary-600
           `}
           >
             inventory_2
           </span>
-          <p className="text-lg text-tertiary-400">No products found</p>
+          <p className="text-lg text-neutral-500 dark:text-tertiary-400">No products found</p>
         </div>
       )}
     </div>

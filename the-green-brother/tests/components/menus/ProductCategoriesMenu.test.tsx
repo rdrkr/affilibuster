@@ -4,7 +4,7 @@
  * Unit tests for ProductCategoriesMenu component
  */
 
-import { render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 
 import { ProductCategoriesMenu, type ProductCategoriesMenuProps } from '@/components/menus/ProductCategoriesMenu'
 import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
@@ -29,26 +29,43 @@ jest.mock('@/components/elements', () => ({
     data,
     className,
     children,
+    showText = true,
+    isActive,
+    onClick,
+    'aria-expanded': ariaExpanded,
   }: {
     data?: { url?: string; label?: { text?: string; icon?: string; ariaDescription?: string } }
     className?: string
     children?: React.ReactNode
+    showText?: boolean
+    isActive?: boolean
+    // Updated to accept onClick
+    onClick?: React.MouseEventHandler<HTMLAnchorElement>
+    'aria-expanded'?: boolean
   }) {
+    const activeClass = isActive ? 'text-primary' : ''
     return (
       <a
         href={data?.url ?? '#'}
-        className={className}
+        className={`${className ?? ''} ${activeClass}`}
         data-testid="mock-button-link"
         aria-label={data?.label?.ariaDescription}
+        aria-expanded={ariaExpanded}
+        data-has-text={showText}
+        // Pass onClick to allow toggling in tests
+        onClick={onClick}
       >
         <span data-testid="mock-icon" data-icon={data?.label?.icon}>
           {data?.label?.icon}
         </span>
-        <span data-testid="mock-text">{data?.label?.text}</span>
+        {showText && data?.label?.text ? <span data-testid="mock-text">{data.label.text}</span> : null}
         {children}
       </a>
     )
   },
+  getVisibilityClasses: jest.fn(visible =>
+    visible ? 'grid-cols-[1fr] opacity-100' : 'grid-cols-[0fr] opacity-0 pointer-events-none'
+  ),
 }))
 
 describe('ProductCategoriesMenu', () => {
@@ -135,6 +152,8 @@ describe('ProductCategoriesMenu', () => {
 
   it('should render category links', () => {
     render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+    // Open menu (click button link)
+    fireEvent.click(screen.getByRole('link', { name: 'View all products' }))
     const categoryLinks = screen.getAllByRole('link')
     // 1 menu button + 3 categories
     expect(categoryLinks).toHaveLength(4)
@@ -142,6 +161,8 @@ describe('ProductCategoriesMenu', () => {
 
   it('should render category names', () => {
     render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+    // Open menu (click button link)
+    fireEvent.click(screen.getByRole('link', { name: 'View all products' }))
     expect(screen.getByText('Kitchen')).toBeInTheDocument()
     expect(screen.getByText('Bathroom')).toBeInTheDocument()
     expect(screen.getByText('Garden')).toBeInTheDocument()
@@ -149,12 +170,16 @@ describe('ProductCategoriesMenu', () => {
 
   it('should link to correct product category URLs', () => {
     render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+    // Open menu (click button link)
+    fireEvent.click(screen.getByRole('link', { name: 'View all products' }))
     const kitchenLink = screen.getByText('Kitchen').closest('a')
     expect(kitchenLink).toHaveAttribute('href', '/products?category=kitchen')
   })
 
   it('should render category images', () => {
     render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+    // Open menu (click button link)
+    fireEvent.click(screen.getByRole('link', { name: 'View all products' }))
     const images = screen.getAllByTestId('mock-image')
     expect(images).toHaveLength(3)
   })
@@ -179,32 +204,22 @@ describe('ProductCategoriesMenu', () => {
       ],
     } as unknown as ProductCategoriesMenuProps['data']
     render(<ProductCategoriesMenu data={dataWithNullContent} isActive={false} direction={DirectionEnum.LTR} />)
+    // Open menu (click button link)
+    // Need to trigger open to check if it skipped the null one in rendered list
+    fireEvent.click(screen.getByRole('link', { name: 'View all products' }))
+
     // Should still only have 4 links (1 menu + 3 valid categories)
     const links = screen.getAllByRole('link')
     expect(links).toHaveLength(4)
-  })
-
-  it('should render expand_more icon for dropdown', () => {
-    render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
-    expect(screen.getByText('expand_more')).toBeInTheDocument()
   })
 
   it('should apply RTL styling when direction is RTL', () => {
     render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.RTL} />)
     // Component should render without error in RTL mode
     expect(screen.getByText('Products')).toBeInTheDocument()
-    const chevron = screen.getByText('expand_more')
-    // In RTL, margin start should be applied to chevron if it's last (default icon position is before text)
-    // Default: icon (before) text, so chevron is last.
-    // Logic: ${isIconAfterText ? 'order-first' : 'order-last'}
-    // ${isRTL ? '-ms-2 me-1' : 'ms-1 -me-2'} <-- Wait, let me check the implementation again
-    // In LTR: ms-1 (margin-start 1) -me-2 (negative margin end)
-    // In RTL: -ms-2 (negative margin start) me-1 (margin end 1)
-    expect(chevron).toHaveClass('-ms-2')
-    expect(chevron).toHaveClass('me-1')
   })
 
-  it('should render icon after text when iconPosition is AFTER_TEXT', () => {
+  it('should render with iconPosition AFTER_TEXT', () => {
     const mockDataIconAfter = {
       ...mockData,
       menuButton: {
@@ -216,7 +231,172 @@ describe('ProductCategoriesMenu', () => {
       },
     } as unknown as ProductCategoriesMenuProps['data']
     render(<ProductCategoriesMenu data={mockDataIconAfter} isActive={false} direction={DirectionEnum.LTR} />)
-    // Component should render with icon after text
-    expect(screen.getByText('expand_more')).toBeInTheDocument()
+    // Component should render
+    expect(screen.getByText('Products')).toBeInTheDocument()
+  })
+
+  describe('showText prop', () => {
+    it('should show text in menu button by default', () => {
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+      const buttonLink = screen.getByTestId('mock-button-link')
+      expect(buttonLink).toHaveAttribute('data-has-text', 'true')
+    })
+
+    it('should show text when showText is true', () => {
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} showText={true} />)
+      const buttonLink = screen.getByTestId('mock-button-link')
+      expect(buttonLink).toHaveAttribute('data-has-text', 'true')
+    })
+
+    it('should close menu when scrolling outside', () => {
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+      const buttonLink = screen.getByTestId('mock-button-link')
+      fireEvent.click(buttonLink)
+      // Check open state via aria-expanded (now supported by mock)
+      expect(buttonLink).toHaveAttribute('aria-expanded', 'true')
+
+      // Scroll outside
+      fireEvent.scroll(window)
+      expect(buttonLink).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('should ignore click immediately after hover (mobile double-tap fix)', () => {
+      jest.useFakeTimers()
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+      const container = screen.getByTestId('product-categories-menu-container')
+      const buttonLink = screen.getByTestId('mock-button-link')
+
+      // Hover -> Open
+      fireEvent.mouseEnter(container)
+      expect(buttonLink).toHaveAttribute('aria-expanded', 'true')
+
+      // Immediate Click (should be ignored due to justHovered logic)
+      fireEvent.click(buttonLink)
+      expect(buttonLink).toHaveAttribute('aria-expanded', 'true')
+
+      // Wait for timeout
+      act(() => {
+        jest.advanceTimersByTime(100)
+      })
+
+      // Click again (should toggle now)
+      fireEvent.click(buttonLink)
+      expect(buttonLink).toHaveAttribute('aria-expanded', 'false')
+
+      jest.useRealTimers()
+    })
+
+    it('should close menu on mouse leave', () => {
+      jest.useFakeTimers()
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+      const container = screen.getByTestId('product-categories-menu-container')
+      const buttonLink = screen.getByTestId('mock-button-link')
+
+      // Hover -> Open
+      fireEvent.mouseEnter(container)
+      expect(buttonLink).toHaveAttribute('aria-expanded', 'true')
+
+      // Mouse leave -> Close
+      fireEvent.mouseLeave(container)
+      expect(buttonLink).toHaveAttribute('aria-expanded', 'false')
+      jest.useRealTimers()
+    })
+
+    it('should close menu when internal category link is clicked', () => {
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+      const buttonLink = screen.getByTestId('mock-button-link')
+
+      // Open menu
+      fireEvent.click(buttonLink)
+      expect(buttonLink).toHaveAttribute('aria-expanded', 'true')
+
+      // Click a category link
+      const categoryLink = screen.getByText('Kitchen').closest('a')!
+      fireEvent.click(categoryLink)
+
+      // Should close
+      expect(buttonLink).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('should close menu when clicking completely outside', () => {
+      render(
+        <div>
+          <ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />
+          <button data-testid="outside">Outside</button>
+        </div>
+      )
+      const buttonLink = screen.getByTestId('mock-button-link')
+
+      // Open
+      fireEvent.click(buttonLink)
+      expect(buttonLink).toHaveAttribute('aria-expanded', 'true')
+
+      // Click outside
+      fireEvent.mouseDown(screen.getByTestId('outside'))
+      expect(buttonLink).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('should NOT close menu when clicking inside container', () => {
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+      const buttonLink = screen.getByTestId('mock-button-link')
+      const container = screen.getByTestId('product-categories-menu-container')
+
+      // Open
+      fireEvent.click(buttonLink)
+      expect(buttonLink).toHaveAttribute('aria-expanded', 'true')
+
+      // Click inside (e.g. on container div itself)
+      fireEvent.mouseDown(container)
+      expect(buttonLink).toHaveAttribute('aria-expanded', 'true')
+    })
+
+    it('should hide text when showText is false', () => {
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} showText={false} />)
+      const buttonLink = screen.getByTestId('mock-button-link')
+      expect(buttonLink).toHaveAttribute('data-has-text', 'false')
+    })
+
+    it('should still render icon when showText is false', () => {
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} showText={false} />)
+      const icons = screen.getAllByTestId('mock-icon')
+      expect(icons[0]).toHaveAttribute('data-icon', 'inventory_2')
+    })
+
+    it('should handle showText false when label is undefined', () => {
+      const dataWithNoLabel = {
+        ...mockData,
+        menuButton: {
+          ...mockData.menuButton,
+          label: undefined,
+        },
+      } as unknown as ProductCategoriesMenuProps['data']
+      // Should not throw error
+      render(
+        <ProductCategoriesMenu data={dataWithNoLabel} isActive={false} direction={DirectionEnum.LTR} showText={false} />
+      )
+      expect(screen.getByTestId('mock-button-link')).toBeInTheDocument()
+    })
+  })
+
+  describe('visible prop', () => {
+    it('should render menu when visible is true', () => {
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} visible={true} />)
+      expect(screen.getByText('Products')).toBeInTheDocument()
+    })
+
+    it('should render menu when visible is not provided', () => {
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+      expect(screen.getByText('Products')).toBeInTheDocument()
+    })
+
+    it('should render hidden element when visible is false', () => {
+      const { container } = render(
+        <ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} visible={false} />
+      )
+      const menu = container.firstChild as HTMLElement
+      expect(menu).not.toBeNull()
+      // Visibility is now handled by ButtonLink's visible prop, container just has aria-hidden
+      expect(menu).toHaveAttribute('aria-hidden', 'true')
+    })
   })
 })

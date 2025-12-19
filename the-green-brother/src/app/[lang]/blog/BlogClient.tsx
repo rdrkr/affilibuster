@@ -49,8 +49,8 @@ export default function BlogClient({ blogPageData, posts, lang }: BlogClientProp
       <div className="mx-auto mb-16 max-w-3xl text-center">
         <h1
           className={`
-          mb-4 text-4xl font-bold text-white
-          md:text-6xl
+          mb-4 text-4xl font-bold text-neutral-800 md:text-6xl
+          dark:text-white
         `}
         >
           {blogPageData?.header?.header?.text ?? (
@@ -60,7 +60,7 @@ export default function BlogClient({ blogPageData, posts, lang }: BlogClientProp
           )}
         </h1>
         {blogPageData?.header?.subheader?.text && (
-          <p className="text-lg text-tertiary-300">{blogPageData.header.subheader.text}</p>
+          <p className="text-lg text-neutral-600 dark:text-tertiary-300">{blogPageData.header.subheader.text}</p>
         )}
 
         {allTags.length > 1 && (
@@ -77,8 +77,10 @@ export default function BlogClient({ blogPageData, posts, lang }: BlogClientProp
                     tag === activeTag
                       ? 'bg-primary-600 font-bold text-white'
                       : `
-                      border border-tertiary-700 bg-tertiary-800 text-tertiary-400
-                      hover:border-primary-500 hover:text-white
+                      border border-neutral-200 bg-white text-neutral-600
+                      hover:border-primary-500 hover:text-primary-600
+                      dark:border-tertiary-700 dark:bg-tertiary-800 dark:text-tertiary-400
+                      dark:hover:border-primary-500 dark:hover:text-white
                     `
                   }
                 `}
@@ -96,16 +98,16 @@ export default function BlogClient({ blogPageData, posts, lang }: BlogClientProp
           {featuredPost && (
             <div
               className={`
-                group overflow-hidden rounded-xl border border-tertiary-700
-                bg-tertiary-800 transition-all
-                hover:border-primary-500/30
+                group overflow-hidden rounded-xl border border-neutral-200
+                bg-white transition-all hover:border-primary-500/30
+                dark:border-tertiary-700 dark:bg-tertiary-800
               `}
             >
               <div className="md:flex">
                 <div
                   className={`
-                  relative h-64 overflow-hidden bg-tertiary-900
-                  md:h-auto md:w-1/2
+                  relative h-64 overflow-hidden bg-neutral-100 md:h-auto
+                  md:w-1/2 dark:bg-tertiary-900
                 `}
                 >
                   <CMSImage
@@ -138,20 +140,20 @@ export default function BlogClient({ blogPageData, posts, lang }: BlogClientProp
                   )}
                   <h2
                     className={`
-                    mb-4 text-3xl font-bold text-white transition-colors
-                    group-hover:text-primary-500
+                    mb-4 text-3xl font-bold text-neutral-800 transition-colors
+                    group-hover:text-primary-500 dark:text-white
                   `}
                   >
                     <CMSText text={featuredPost.content?.header?.header?.text ?? ''} />
                   </h2>
                   {featuredPost.content?.header?.subheader?.text && (
-                    <p className="mb-6 text-lg text-tertiary-300">
+                    <p className="mb-6 text-lg text-neutral-600 dark:text-tertiary-300">
                       <CMSText text={featuredPost.content.header.subheader.text} />
                     </p>
                   )}
                   <div
                     className={`
-                    mb-8 flex items-center text-sm text-tertiary-400
+                    mb-8 flex items-center text-sm text-neutral-500 dark:text-tertiary-400
                   `}
                   >
                     {featuredPost.author?.name && <span>By {featuredPost.author.name}</span>}
@@ -165,9 +167,10 @@ export default function BlogClient({ blogPageData, posts, lang }: BlogClientProp
                   <Link
                     href={`/${lang}/blog/${featuredPost.documentId}`}
                     className={`
-                      inline-block w-max rounded-full bg-tertiary-700 px-8 py-3
-                      text-center font-bold text-white transition-all
+                      inline-block w-max rounded-full bg-neutral-100 px-8 py-3
+                      text-center font-bold text-neutral-800 transition-all
                       hover:bg-primary-600 hover:text-white
+                      dark:bg-tertiary-700 dark:text-white
                     `}
                   >
                     Read Article
@@ -192,11 +195,12 @@ export default function BlogClient({ blogPageData, posts, lang }: BlogClientProp
                   key={post.documentId}
                   className={`
                     group flex flex-col overflow-hidden rounded-xl border
-                    border-tertiary-700 bg-tertiary-800 transition-all
+                    border-neutral-200 bg-white transition-all
                     hover:border-primary-500/30
+                    dark:border-tertiary-700 dark:bg-tertiary-800
                   `}
                 >
-                  <div className="relative h-56 overflow-hidden bg-tertiary-900">
+                  <div className="relative h-56 overflow-hidden bg-neutral-100 dark:bg-tertiary-900">
                     <CMSImage
                       image={post.featuredImage}
                       fallbackAlt={post.content?.header?.header?.text ?? ''}
@@ -221,8 +225,8 @@ export default function BlogClient({ blogPageData, posts, lang }: BlogClientProp
                     )}
                     <h3
                       className={`
-                      mb-3 text-xl font-bold text-white transition-colors
-                      group-hover:text-primary-500
+                      mb-3 text-xl font-bold text-neutral-800 transition-colors
+                      group-hover:text-primary-500 dark:text-white
                     `}
                     >
                       <CMSText text={post.content?.header?.header?.text ?? ''} />
@@ -230,7 +234,7 @@ export default function BlogClient({ blogPageData, posts, lang }: BlogClientProp
                     {post.content?.header?.subheader?.text && (
                       <p
                         className={`
-                        mb-4 line-clamp-3 grow text-sm text-tertiary-400
+                        mb-4 line-clamp-3 grow text-sm text-neutral-600 dark:text-tertiary-400
                       `}
                       >
                         <CMSText text={post.content.header.subheader.text} />
@@ -239,7 +243,8 @@ export default function BlogClient({ blogPageData, posts, lang }: BlogClientProp
                     <div
                       className={`
                         mt-auto flex items-center justify-between border-t
-                        border-tertiary-700 pt-4 text-xs text-tertiary-400
+                        border-neutral-200 pt-4 text-xs text-neutral-500
+                        dark:border-tertiary-700 dark:text-tertiary-400
                       `}
                     >
                       {post.author?.name && <span>{post.author.name}</span>}
@@ -255,12 +260,12 @@ export default function BlogClient({ blogPageData, posts, lang }: BlogClientProp
         <div className="py-16 text-center">
           <span
             className={`
-            material-symbols-outlined mb-4 block text-6xl text-tertiary-600
+            material-symbols-outlined mb-4 block text-6xl text-neutral-300 dark:text-tertiary-600
           `}
           >
             article
           </span>
-          <p className="text-lg text-tertiary-400">No blog posts found</p>
+          <p className="text-lg text-neutral-500 dark:text-tertiary-400">No blog posts found</p>
         </div>
       )}
     </div>

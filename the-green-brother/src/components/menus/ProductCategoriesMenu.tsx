@@ -9,15 +9,16 @@
 
 'use client'
 
-import Link from 'next/link'
+import { useState } from 'react'
 
-import { ButtonLink, CMSImage, CMSText } from '@/components/elements'
 import type {
   ApiProductCategoryProductCategoryDocument,
   MenusProductCategoriesSelectorEntry,
 } from '@/lib/generated/types.gen'
+import Link from 'next/link'
+import { CMSImage, CMSText } from '../elements'
 
-import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
+import { DirectionEnum } from '@/lib/generated/types.gen'
 import { DropdownMenu } from './DropdownMenu'
 
 /**
@@ -30,6 +31,12 @@ export interface ProductCategoriesMenuProps {
   isActive: boolean
   /** Text direction for RTL support */
   direction: DirectionEnum
+  /** Whether to show text labels (default: true) */
+  showText?: boolean
+  /** Whether the menu is disabled (prevents hover interactions) */
+  disabled?: boolean
+  /** Controls visibility of entire menu - when false, menu is hidden from layout */
+  visible?: boolean
 }
 
 /**
@@ -38,91 +45,81 @@ export interface ProductCategoriesMenuProps {
  * @param props.data - CMS data for the products menu
  * @param props.isActive - Whether the products link is currently active
  * @param props.direction - Text direction for RTL support
+ * @param props.showText - Whether to show text labels (default: true)
+ * @param props.disabled - Whether the menu is disabled (prevents hover)
+ * @param props.visible - Controls visibility of entire menu - when false, menu is hidden from layout
  * @returns Product categories menu component
  */
-export function ProductCategoriesMenu({ data, isActive, direction }: ProductCategoriesMenuProps) {
+export function ProductCategoriesMenu({
+  data,
+  isActive,
+  direction,
+  showText = true,
+  disabled = false,
+  visible = true,
+}: ProductCategoriesMenuProps) {
   const categories = data.productCategories ?? []
-  const isRTL = direction === DirectionEnum.RTL
-  const isIconAfterText = data.menuButton.label?.iconPosition === IconPositionEnum.AFTER_TEXT
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="group flex h-full items-center">
-      {/* Menu button with chevron */}
-      <div
-        className={`
-          flex items-center
-          ${isRTL ? 'flex-row-reverse' : ''}
-        `}
-      >
-        <ButtonLink
-          data={data.menuButton}
-          direction={direction}
-          variant="ghost"
-          iconSize="md"
-          size="sm"
-          className={`
-            bg-transparent! px-0! transition-colors
-            group-hover:text-primary! hover:bg-transparent!
-            ${isActive ? 'text-primary!' : 'text-text-secondary-dark!'}
-          `}
-        />
-        {/* Chevron - always on opposite side of icon */}
-        <span
-          className={`
-            material-symbols-outlined text-sm text-text-secondary-dark
-            transition-transform duration-300
-            group-hover:rotate-180 group-hover:text-primary
-            ${isIconAfterText ? 'order-first' : 'order-last'}
-            ${isRTL ? '-ms-2 me-1' : 'ms-1 -me-2'}
-          `}
-        >
-          expand_more
-        </span>
-      </div>
-      {/* Dropdown menu */}
-      <DropdownMenu width="500px" direction={direction} contentClassName="grid grid-cols-2 gap-4 p-4">
-        {categories.map((category: ApiProductCategoryProductCategoryDocument) => {
-          if (!category.content) {
-            return null
-          }
+    <DropdownMenu
+      triggerData={data.menuButton}
+      triggerType="link"
+      direction={direction}
+      showText={showText}
+      visible={visible}
+      isActive={isActive}
+      disabled={disabled}
+      width="500px"
+      dropdownClassName="grid grid-cols-2 gap-4 p-4"
+      testId="product-categories-menu-container"
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+    >
+      {categories.map((category: ApiProductCategoryProductCategoryDocument) => {
+        if (!category.content) {
+          return null
+        }
 
-          return (
-            <Link
-              key={category.documentId}
-              href={`/products?category=${category.slug}`}
+        return (
+          <Link
+            key={category.documentId}
+            href={`/products?category=${category.slug}`}
+            className={`
+              group/item relative block h-32 overflow-hidden rounded-xl
+            `}
+            onClick={() => {
+              setIsOpen(false)
+            }}
+          >
+            <CMSImage
+              image={category.image}
               className={`
-                group/item relative block h-32 overflow-hidden rounded-xl
+                object-cover transition-transform duration-500
+                group-hover/item:scale-110
               `}
+              fill
+              sizes="250px"
+            />
+            <div
+              className={`
+              absolute inset-0 flex items-end bg-linear-to-t from-black/80
+              to-transparent p-4
+            `}
             >
-              <CMSImage
-                image={category.image}
+              <span
                 className={`
-                  object-cover transition-transform duration-500
-                  group-hover/item:scale-110
-                `}
-                fill
-                sizes="250px"
-              />
-              <div
-                className={`
-                absolute inset-0 flex items-end bg-linear-to-t from-black/80
-                to-transparent p-4
+                font-bold text-white transition-colors
+                group-hover/item:text-primary
               `}
               >
-                <span
-                  className={`
-                  font-bold text-white transition-colors
-                  group-hover/item:text-primary
-                `}
-                >
-                  <CMSText text={category.content.text} />
-                </span>
-              </div>
-            </Link>
-          )
-        })}
-      </DropdownMenu>
-    </div>
+                <CMSText text={category.content.text} />
+              </span>
+            </div>
+          </Link>
+        )
+      })}
+    </DropdownMenu>
   )
 }
 

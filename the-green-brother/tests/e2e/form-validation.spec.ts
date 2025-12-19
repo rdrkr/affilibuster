@@ -15,7 +15,7 @@
  * - Server-side validation
  */
 
-import { test, expect } from '../fixtures'
+import { expect, test } from '../fixtures'
 
 test.describe('Form Validation', () => {
   // ========================================

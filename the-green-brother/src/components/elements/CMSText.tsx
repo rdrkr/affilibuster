@@ -20,6 +20,8 @@ export interface CMSTextProps {
   as?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'div'
   /** Additional CSS classes */
   className?: string
+  /** Controls visibility - when false, element is hidden from layout */
+  visible?: boolean
 }
 
 /**
@@ -43,7 +45,13 @@ export function resolveTextFormat(text: string): ReactNode {
       if (match.index > lastIndex) {
         parts.push(line.slice(lastIndex, match.index))
       }
-      parts.push(createElement('span', { key: `bold-${String(keyIndex++)}`, className: 'text-primary' }, match[1]))
+      parts.push(
+        createElement(
+          'span',
+          { key: `bold-${String(keyIndex++)}`, className: 'text-primary text-shadow-sm dark:text-shadow-none' },
+          match[1]
+        )
+      )
       lastIndex = match.index + match[0].length
     }
 
@@ -76,15 +84,17 @@ export function resolveTextFormat(text: string): ReactNode {
  * @param props.text - Text content from CMS (may contain **bold** markers)
  * @param props.as - HTML element to wrap the text
  * @param props.className - Additional CSS classes
+ * @param props.visible - Controls visibility (false = hidden from layout)
  * @returns Formatted text with **bold** converted to primary-colored spans
  * @example
  * ```tsx
  * <CMSText text="Hello **World**" />
  * <CMSText text={header.text} as="h1" className="text-4xl" />
+ * <CMSText text={label} visible={isExpanded} />
  * ```
  */
-export function CMSText({ text, as: Component = 'span', className }: CMSTextProps) {
-  if (!text) {
+export function CMSText({ text, as: Component = 'span', className, visible }: CMSTextProps) {
+  if (!text || visible === false) {
     return null
   }
 
@@ -101,7 +111,9 @@ export function resolveTextFormatHtml(text: string | undefined | null): string {
   if (!text) {
     return ''
   }
-  return text.replace(/\*\*([^*]+)\*\*/g, '<span class="text-primary">$1</span>').replace(/(\\n|\n)/g, '<br />')
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, '<span class="text-primary text-shadow-sm dark:text-shadow-none">$1</span>')
+    .replace(/(\\n|\n)/g, '<br />')
 }
 
 export default CMSText

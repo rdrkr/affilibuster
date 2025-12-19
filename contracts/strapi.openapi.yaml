@@ -1,6 +1,6 @@
 openapi: 3.1.0
 x-powered-by: strapi
-x-strapi-version: 5.33.0
+x-strapi-version: 5.33.3
 info:
   title: affilibuster-cms
   description: API documentation for affilibuster-cms v0.1.0
@@ -9054,14 +9054,15 @@ paths:
             items:
               type: string
               enum:
+                - themeId
                 - createdAt
                 - updatedAt
                 - publishedAt
                 - locale
             example:
+              - themeId
               - createdAt
               - updatedAt
-              - publishedAt
           x-strapi-serialize: querystring
           description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
         - name: filters
@@ -9074,6 +9075,7 @@ paths:
             propertyNames:
               type: string
               enum:
+                - themeId
                 - createdAt
                 - updatedAt
                 - publishedAt
@@ -9149,6 +9151,7 @@ paths:
             anyOf:
               - type: string
                 enum:
+                  - themeId
                   - createdAt
                   - updatedAt
                   - publishedAt
@@ -9157,6 +9160,7 @@ paths:
                 items:
                   type: string
                   enum:
+                    - themeId
                     - createdAt
                     - updatedAt
                     - publishedAt
@@ -9165,6 +9169,7 @@ paths:
                 propertyNames:
                   type: string
                   enum:
+                    - themeId
                     - createdAt
                     - updatedAt
                     - publishedAt
@@ -9180,6 +9185,7 @@ paths:
                   propertyNames:
                     type: string
                     enum:
+                      - themeId
                       - createdAt
                       - updatedAt
                       - publishedAt
@@ -9189,7 +9195,7 @@ paths:
                     enum:
                       - asc
                       - desc
-            example: createdAt
+            example: themeId
           x-strapi-serialize: querystring
           description: Sort the result set by one or more fields. Use field name for ascending order or prefix with "-" for descending (e.g., "-createdAt"). Supports multiple sort criteria.
         - name: locale
@@ -9258,6 +9264,9 @@ paths:
                           anyOf:
                             - type: string
                             - type: number
+                        themeId:
+                          description: A UID field
+                          type: string
                         createdAt:
                           description: Timestamp when this entry was first created in the CMS.
                           type: string
@@ -9318,6 +9327,7 @@ paths:
                       required:
                         - documentId
                         - id
+                        - themeId
                         - publishedAt
                         - content
                         - seoMetadata
@@ -9364,14 +9374,15 @@ paths:
             items:
               type: string
               enum:
+                - themeId
                 - createdAt
                 - updatedAt
                 - publishedAt
                 - locale
             example:
+              - themeId
               - createdAt
               - updatedAt
-              - publishedAt
           x-strapi-serialize: querystring
           description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
         - name: filters
@@ -9384,6 +9395,7 @@ paths:
             propertyNames:
               type: string
               enum:
+                - themeId
                 - createdAt
                 - updatedAt
                 - publishedAt
@@ -9400,6 +9412,7 @@ paths:
             anyOf:
               - type: string
                 enum:
+                  - themeId
                   - createdAt
                   - updatedAt
                   - publishedAt
@@ -9408,6 +9421,7 @@ paths:
                 items:
                   type: string
                   enum:
+                    - themeId
                     - createdAt
                     - updatedAt
                     - publishedAt
@@ -9416,6 +9430,7 @@ paths:
                 propertyNames:
                   type: string
                   enum:
+                    - themeId
                     - createdAt
                     - updatedAt
                     - publishedAt
@@ -9431,6 +9446,7 @@ paths:
                   propertyNames:
                     type: string
                     enum:
+                      - themeId
                       - createdAt
                       - updatedAt
                       - publishedAt
@@ -9440,7 +9456,7 @@ paths:
                     enum:
                       - asc
                       - desc
-            example: createdAt
+            example: themeId
           x-strapi-serialize: querystring
           description: Sort the result set by one or more fields. Use field name for ascending order or prefix with "-" for descending (e.g., "-createdAt"). Supports multiple sort criteria.
         - name: locale
@@ -9507,6 +9523,9 @@ paths:
                         anyOf:
                           - type: string
                           - type: number
+                      themeId:
+                        description: A UID field
+                        type: string
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -9567,6 +9586,7 @@ paths:
                     required:
                       - documentId
                       - id
+                      - themeId
                       - publishedAt
                       - content
                       - seoMetadata
@@ -11691,6 +11711,9 @@ components:
           anyOf:
             - type: string
             - type: number
+        themeId:
+          description: A UID field
+          type: string
         createdAt:
           description: Timestamp when this entry was first created in the CMS.
           type: string
@@ -11751,6 +11774,7 @@ components:
       required:
         - documentId
         - id
+        - themeId
         - publishedAt
       additionalProperties: false
       id: ApiThemeThemeDocument

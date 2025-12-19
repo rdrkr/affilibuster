@@ -12,22 +12,22 @@ const EditProfile = () => {
         <Link
           href="/profile"
           className={`
-          rounded-full bg-surface-dark p-2 transition-colors
-          hover:bg-white/10
+          rounded-full bg-neutral-100 p-2 transition-colors
+          hover:bg-neutral-200 dark:bg-surface-dark dark:hover:bg-white/10
         `}
         >
-          <span className="material-symbols-outlined text-white">arrow_back</span>
+          <span className="material-symbols-outlined text-neutral-800 dark:text-white">arrow_back</span>
         </Link>
-        <h1 className="text-3xl font-bold text-white">Edit Profile</h1>
+        <h1 className="text-3xl font-bold text-neutral-800 dark:text-white">Edit Profile</h1>
       </div>
 
-      <div className="rounded-xl border border-white/5 bg-surface-dark p-8">
+      <div className="rounded-xl border border-neutral-200 bg-white p-8 shadow-md dark:border-white/5 dark:bg-surface-dark dark:shadow-none">
         <div className="mb-8 flex justify-center">
           <div className="group relative cursor-pointer">
             <div
               className={`
-              relative h-24 w-24 overflow-hidden rounded-full border-2
-              border-white/10
+              relative size-24 overflow-hidden rounded-full border-2
+              border-neutral-200 dark:border-white/10
             `}
             >
               <Image
@@ -51,6 +51,7 @@ const EditProfile = () => {
               <span
                 className={`
                 material-symbols-outlined text-2xl text-white drop-shadow-lg
+                dark:text-white
               `}
               >
                 photo_camera
@@ -69,7 +70,7 @@ const EditProfile = () => {
             <div>
               <label
                 className={`
-                mb-2 block text-sm font-medium text-text-secondary-dark
+                mb-2 block text-sm font-medium text-neutral-600 dark:text-text-secondary-dark
               `}
               >
                 First Name
@@ -78,16 +79,17 @@ const EditProfile = () => {
                 type="text"
                 defaultValue="Alex"
                 className={`
-                  w-full rounded-xl border border-white/10 bg-background-dark
-                  p-3 text-white outline-none
+                  w-full rounded-xl border border-neutral-200 bg-neutral-50
+                  p-3 text-neutral-800 outline-none
                   focus:border-transparent focus:ring-2 focus:ring-primary
+                  dark:border-white/10 dark:bg-background-dark dark:text-white
                 `}
               />
             </div>
             <div>
               <label
                 className={`
-                mb-2 block text-sm font-medium text-text-secondary-dark
+                mb-2 block text-sm font-medium text-neutral-600 dark:text-text-secondary-dark
               `}
               >
                 Last Name
@@ -96,9 +98,10 @@ const EditProfile = () => {
                 type="text"
                 defaultValue="Green"
                 className={`
-                  w-full rounded-xl border border-white/10 bg-background-dark
-                  p-3 text-white outline-none
+                  w-full rounded-xl border border-neutral-200 bg-neutral-50
+                  p-3 text-neutral-800 outline-none
                   focus:border-transparent focus:ring-2 focus:ring-primary
+                  dark:border-white/10 dark:bg-background-dark dark:text-white
                 `}
               />
             </div>
@@ -106,7 +109,7 @@ const EditProfile = () => {
           <div>
             <label
               className={`
-              mb-2 block text-sm font-medium text-text-secondary-dark
+              mb-2 block text-sm font-medium text-neutral-600 dark:text-text-secondary-dark
             `}
             >
               Email
@@ -115,16 +118,17 @@ const EditProfile = () => {
               type="email"
               defaultValue="alex.green@example.com"
               className={`
-                w-full rounded-xl border border-white/10 bg-background-dark p-3
-                text-white outline-none
+                w-full rounded-xl border border-neutral-200 bg-neutral-50 p-3
+                text-neutral-800 outline-none
                 focus:border-transparent focus:ring-2 focus:ring-primary
+                dark:border-white/10 dark:bg-background-dark dark:text-white
               `}
             />
           </div>
           <div>
             <label
               className={`
-              mb-2 block text-sm font-medium text-text-secondary-dark
+              mb-2 block text-sm font-medium text-neutral-600 dark:text-text-secondary-dark
             `}
             >
               Bio
@@ -133,9 +137,10 @@ const EditProfile = () => {
               rows={4}
               defaultValue="Passionate about sustainable living and finding eco-friendly alternatives for everyday products."
               className={`
-                w-full resize-none rounded-xl border border-white/10
-                bg-background-dark p-3 text-white outline-none
+                w-full resize-none rounded-xl border border-neutral-200
+                bg-neutral-50 p-3 text-neutral-800 outline-none
                 focus:border-transparent focus:ring-2 focus:ring-primary
+                dark:border-white/10 dark:bg-background-dark dark:text-white
               `}
             ></textarea>
           </div>
@@ -144,9 +149,9 @@ const EditProfile = () => {
             <Link
               href="/profile"
               className={`
-                rounded-full px-6 py-3 font-medium text-text-secondary-dark
-                transition-colors
-                hover:bg-white/5 hover:text-white
+                rounded-full px-6 py-3 font-medium text-neutral-600
+                transition-colors hover:bg-neutral-100 hover:text-neutral-800
+                dark:text-text-secondary-dark dark:hover:bg-white/5 dark:hover:text-white
               `}
             >
               Cancel

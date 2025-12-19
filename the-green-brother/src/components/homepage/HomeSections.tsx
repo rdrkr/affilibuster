@@ -110,6 +110,7 @@ export function HomeSections({ sections, products, categories, blogPosts, direct
       direction={direction}
       className="space-y-8"
       verticalAlignment="center"
+      horizontalGroupSpacing="-mt-26 -mb-12"
     />
   )
 }

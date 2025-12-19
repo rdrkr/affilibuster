@@ -30,6 +30,10 @@ export interface LabelProps {
   promoteIcon?: boolean
   /** Display mode - 'block' stacks in parent, 'inline' flows inline (default: block) */
   display?: 'block' | 'inline'
+  /** Enable animated text visibility - slides/fades text for mode transitions */
+  showText?: boolean
+  /** Controls visibility of entire label - when false, label is hidden from layout */
+  visible?: boolean
   /** Additional CSS classes for the container */
   className?: string
   /** Additional CSS classes for the text */
@@ -50,10 +54,12 @@ export interface LabelProps {
  * @param props.hideIcon - Whether to hide the icon
  * @param props.promoteIcon - When true, icon renders with circular background
  * @param props.display - Display mode (block or inline)
+ * @param props.showText - When defined, animates text visibility with slide/fade
+ * @param props.visible - Controls entire label visibility (false = hidden from layout)
  * @param props.className - Container CSS classes
  * @param props.textClassName - Text CSS classes
  * @param props.iconClassName - Icon CSS classes
- * @returns Label component or null if no data
+ * @returns Label component or null if no data or not visible
  */
 export function Label({
   data,
@@ -63,11 +69,13 @@ export function Label({
   hideIcon = false,
   promoteIcon = false,
   display = 'block',
+  showText,
+  visible,
   className = '',
   textClassName = '',
   iconClassName = '',
 }: LabelProps) {
-  if (!data) {
+  if (!data || visible === false) {
     return null
   }
 
@@ -92,6 +100,20 @@ export function Label({
   const isRtl = direction === DirectionEnum.RTL
   const isIconBeforeText = iconPosition === IconPositionEnum.BEFORE_TEXT
 
+  // Animated text wrapper - only used when showText is defined (controlled mode)
+  const textElement =
+    showText !== undefined ? (
+      <span
+        className={`
+          ${showText ? 'max-w-96 translate-x-0 opacity-100' : 'max-w-0 -translate-x-2 opacity-0'}
+        `}
+      >
+        <CMSText text={text} className={`whitespace-nowrap ${textClassName}`} />
+      </span>
+    ) : (
+      <CMSText text={text} className={textClassName} />
+    )
+
   return (
     <Tag
       className={`${displayClass} flex-row items-center gap-2 ${className}`}
@@ -99,7 +121,7 @@ export function Label({
       dir={isRtl ? 'rtl' : 'ltr'}
     >
       {isIconBeforeText && iconElement}
-      <CMSText text={text} className={textClassName} />
+      {textElement}
       {!isIconBeforeText && iconElement}
     </Tag>
   )

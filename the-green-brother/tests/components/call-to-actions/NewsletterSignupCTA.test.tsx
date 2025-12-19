@@ -64,6 +64,14 @@ describe('NewsletterSignupCTA', () => {
     expect(screen.getByText('Sign Up')).toBeInTheDocument()
   })
 
+  it('should call onClick handler when submit button is clicked', () => {
+    render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+    const submitButton = screen.getByRole('button', { name: /Submit newsletter signup/i })
+    // Verify it doesn't crash when clicked (covers the empty handler)
+    fireEvent.click(submitButton)
+  })
+
   it('should prevent form submission default behavior', () => {
     render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 

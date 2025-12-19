@@ -157,7 +157,7 @@ describe('Label', () => {
   })
 
   it('should apply custom className to container', () => {
-    // eslint-disable-next-line better-tailwindcss/no-unregistered-classes
+    // eslint-disable-next-line better-tailwindcss/no-unknown-classes
     const { container } = render(<Label direction={DirectionEnum.LTR} data={mockLabelData} className="custom-class" />)
     expect(container.firstChild).toHaveClass('custom-class')
   })

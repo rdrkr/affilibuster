@@ -61,6 +61,15 @@ describe('ButtonLink', () => {
     expect(container.firstChild).toBeNull()
   })
 
+  it('should render hidden element when visible is false', () => {
+    render(<ButtonLink direction={DirectionEnum.LTR} data={mockButtonData} visible={false} />)
+    const link = screen.getByRole('link', { hidden: true })
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveAttribute('aria-hidden', 'true')
+    expect(link.className).toContain('opacity-0')
+    expect(link.className).toContain('w-0')
+  })
+
   it('should render as a link', () => {
     render(<ButtonLink direction={DirectionEnum.LTR} data={mockButtonData} />)
     const link = screen.getByRole('link')
@@ -94,6 +103,12 @@ describe('ButtonLink', () => {
     expect(link).toHaveAttribute('aria-label', 'Test button description')
   })
 
+  it('should apply aria-expanded when provided', () => {
+    render(<ButtonLink direction={DirectionEnum.LTR} data={mockButtonData} aria-expanded={true} />)
+    const link = screen.getByRole('link')
+    expect(link).toHaveAttribute('aria-expanded', 'true')
+  })
+
   it('should pass direction to Label component', () => {
     render(<ButtonLink data={mockButtonData} direction={DirectionEnum.RTL} />)
     const label = screen.getByTestId('mock-label')
@@ -125,14 +140,28 @@ describe('ButtonLink', () => {
   })
 
   it('should apply ghost variant classes', () => {
-    render(<ButtonLink direction={DirectionEnum.LTR} data={mockButtonData} variant="ghost" />)
+    render(<ButtonLink direction={DirectionEnum.LTR} data={mockButtonData} variant="ghost-1" />)
     const link = screen.getByRole('link')
     expect(link.className).toContain('text-primary')
-    expect(link.className).toContain('hover:bg-primary/10')
+    expect(link.className).toContain('hover:bg-transparent')
+  })
+
+  it('should apply disabled styling when disabled prop is true', () => {
+    render(<ButtonLink direction={DirectionEnum.LTR} data={mockButtonData} disabled />)
+    const link = screen.getByRole('link')
+    expect(link.className).toContain('pointer-events-none')
+    expect(link.className).toContain('opacity-50')
+    expect(link.className).toContain('cursor-not-allowed')
+  })
+
+  it('should have aria-disabled when disabled is true', () => {
+    render(<ButtonLink direction={DirectionEnum.LTR} data={mockButtonData} disabled />)
+    const link = screen.getByRole('link')
+    expect(link).toHaveAttribute('aria-disabled', 'true')
   })
 
   it('should apply link variant classes without dimension classes but WITH text size', () => {
-    render(<ButtonLink direction={DirectionEnum.LTR} data={mockButtonData} variant="link" size="lg" />)
+    render(<ButtonLink direction={DirectionEnum.LTR} data={mockButtonData} variant="link-1" size="lg" />)
     const link = screen.getByRole('link')
     expect(link.className).toContain('hover:scale-105')
     // Should have p-0
@@ -169,34 +198,60 @@ describe('ButtonLink', () => {
   it('should apply lg size classes', () => {
     render(<ButtonLink direction={DirectionEnum.LTR} data={mockButtonData} size="lg" />)
     const link = screen.getByRole('link')
-    expect(link.className).toContain('px-6')
+    expect(link.className).toContain('px-5')
     expect(link.className).toContain('py-3')
     expect(link.className).toContain('text-lg')
   })
 
   it('should apply custom className', () => {
-    // eslint-disable-next-line better-tailwindcss/no-unregistered-classes
+    // eslint-disable-next-line better-tailwindcss/no-unknown-classes
     render(<ButtonLink direction={DirectionEnum.LTR} data={mockButtonData} className="custom-class" />)
     const link = screen.getByRole('link')
     expect(link.className).toContain('custom-class')
   })
 
-  it('should render children when provided', () => {
+  it('should render both label and children when both are provided', () => {
     render(
       <ButtonLink direction={DirectionEnum.LTR} data={mockButtonData}>
         <span>Custom Content</span>
       </ButtonLink>
     )
     expect(screen.getByText('Custom Content')).toBeInTheDocument()
-    // Label content should NOT be rendered
-    expect(screen.queryByText('Click Me')).not.toBeInTheDocument()
+    // Label content should ALSO be rendered (children are appended to label)
+    expect(screen.getByText('Click Me')).toBeInTheDocument()
   })
 
-  it('should not render content when label is undefined and no children', () => {
+  it('should return null when label is undefined and no children', () => {
     const dataWithoutLabel = { ...mockButtonData, label: undefined } as unknown as ButtonLinkProps['data']
-    render(<ButtonLink direction={DirectionEnum.LTR} data={dataWithoutLabel} />)
-    const link = screen.getByRole('link')
-    expect(link.children.length).toBe(0)
+    const { container } = render(<ButtonLink direction={DirectionEnum.LTR} data={dataWithoutLabel} />)
+    // Component should return null (no content to render)
+    expect(container.firstChild).toBeNull()
+  })
+
+  it('should render label before children in LTR', () => {
+    const { container } = render(
+      <ButtonLink direction={DirectionEnum.LTR} data={mockButtonData}>
+        <span data-testid="custom">Custom</span>
+      </ButtonLink>
+    )
+    const link = container.querySelector('a')
+    const children = Array.from(link?.children ?? [])
+    // First child should be the label (mock-label), second should be the custom span
+    expect(children[0]).toHaveAttribute('data-testid', 'mock-label')
+    expect(children[1]).toHaveAttribute('data-testid', 'custom')
+  })
+
+  it('should render children before label in RTL', () => {
+    const { container } = render(
+      <ButtonLink direction={DirectionEnum.RTL} data={mockButtonData}>
+        <span data-testid="custom">Custom</span>
+      </ButtonLink>
+    )
+    const link = container.querySelector('a')
+    const children = Array.from(link?.children ?? [])
+    // First child should be the custom span, second should be the label (mock-label)
+    expect(children[0]).toHaveAttribute('data-testid', 'custom')
+    expect(children[1]).toHaveAttribute('data-testid', 'mock-label')
   })
 
   it('should work with default export', () => {

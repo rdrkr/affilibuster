@@ -72,7 +72,7 @@ format_makefile() {
 
     # checkmake warns about missing "all" target, but we use .DEFAULT_GOAL := help
     # which is a valid alternative, so we ignore this specific warning
-    checkmake --config=.checkmake Makefile
+    checkmake --config=checkmake.ini Makefile
   else
     echo "  ⚠️ checkmake not installed. Install it with: brew install checkmake"
     exit 1

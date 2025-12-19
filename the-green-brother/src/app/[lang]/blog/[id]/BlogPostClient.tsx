@@ -43,7 +43,7 @@ export default function BlogPostClient({ post, lang }: BlogPostClientProps) {
   return (
     <div className="mx-auto max-w-3xl py-8">
       {/* Breadcrumbs */}
-      <nav className="mb-8 flex items-center text-sm text-tertiary-400">
+      <nav className="mb-8 flex items-center text-sm text-neutral-500 dark:text-tertiary-400">
         <Link
           href={`/${lang}`}
           className={`
@@ -64,7 +64,7 @@ export default function BlogPostClient({ post, lang }: BlogPostClientProps) {
           Blog
         </Link>
         <span className="material-symbols-outlined mx-2 text-sm">chevron_right</span>
-        <span className="truncate font-medium text-white">
+        <span className="truncate font-medium text-neutral-800 dark:text-white">
           <CMSText text={post.content?.header?.header?.text ?? ''} />
         </span>
       </nav>
@@ -84,9 +84,9 @@ export default function BlogPostClient({ post, lang }: BlogPostClientProps) {
           )}
           <h1
             className={`
-            mb-6 text-4xl leading-tight font-bold text-white
-            md:text-5xl
+            mb-6 text-4xl/tight font-bold text-neutral-900 md:text-5xl
             lg:text-6xl
+            dark:text-white
           `}
           >
             <CMSText text={post.content?.header?.header?.text ?? ''} />
@@ -94,7 +94,7 @@ export default function BlogPostClient({ post, lang }: BlogPostClientProps) {
           {post.content?.header?.subheader?.text && (
             <p
               className={`
-              mx-auto max-w-2xl text-xl leading-relaxed text-tertiary-300
+              mx-auto max-w-2xl text-xl/relaxed text-neutral-600 dark:text-tertiary-300
             `}
             >
               <CMSText text={post.content.header.subheader.text} />
@@ -104,15 +104,16 @@ export default function BlogPostClient({ post, lang }: BlogPostClientProps) {
         <div
           className={`
           flex flex-wrap items-center justify-center gap-4 text-sm
-          text-tertiary-400
+          text-neutral-500 dark:text-tertiary-400
         `}
         >
           {post.author?.name && (
             <div className="flex items-center gap-2">
               <div
                 className={`
-                  flex h-8 w-8 items-center justify-center rounded-full
-                  bg-tertiary-700 text-xs font-bold text-white
+                  flex size-8 items-center justify-center rounded-full
+                  bg-neutral-200 text-xs font-bold text-neutral-700
+                  dark:bg-tertiary-700 dark:text-white
                 `}
               >
                 {authorInitials}
@@ -147,7 +148,7 @@ export default function BlogPostClient({ post, lang }: BlogPostClientProps) {
 
       {/* Excerpt */}
       {post.content?.header?.subheader?.text && (
-        <p className="mb-8 text-xl leading-relaxed font-medium text-white">
+        <p className="mb-8 text-xl/relaxed font-medium text-neutral-800 dark:text-white">
           <CMSText text={post.content.header.subheader.text} />
         </p>
       )}
@@ -157,12 +158,13 @@ export default function BlogPostClient({ post, lang }: BlogPostClientProps) {
         <div
           className={`
             prose prose-lg max-w-none
-            text-tertiary-300
-            prose-invert
-            prose-headings:text-white
-            prose-a:text-primary-400
-            hover:prose-a:text-primary-300
-            prose-strong:text-white prose-code:text-primary-300
+            text-neutral-600 dark:text-tertiary-300
+            dark:prose-invert
+            prose-headings:text-neutral-900 dark:prose-headings:text-white
+            prose-a:text-primary-600 hover:prose-a:text-primary-700
+            dark:prose-a:text-primary-400 dark:hover:prose-a:text-primary-300
+            prose-strong:text-neutral-900 dark:prose-strong:text-white
+            prose-code:text-primary-600 dark:prose-code:text-primary-300
           `}
           dangerouslySetInnerHTML={{ __html: post.content.content }}
         />
@@ -170,20 +172,21 @@ export default function BlogPostClient({ post, lang }: BlogPostClientProps) {
 
       {/* Author Bio (if available) */}
       {post.author?.bio && (
-        <div className="mt-16 border-t border-tertiary-700 pt-8">
-          <h3 className="mb-4 text-xl font-bold text-white">About the Author</h3>
+        <div className="mt-16 border-t border-neutral-200 pt-8 dark:border-tertiary-700">
+          <h3 className="mb-4 text-xl font-bold text-neutral-900 dark:text-white">About the Author</h3>
           <div className="flex items-start gap-4">
             <div
               className={`
-                flex h-16 w-16 shrink-0 items-center justify-center rounded-full
-                bg-tertiary-700 text-xl font-bold text-white
+                flex size-16 shrink-0 items-center justify-center rounded-full
+                bg-neutral-200 text-xl font-bold text-neutral-700
+                dark:bg-tertiary-700 dark:text-white
               `}
             >
               {authorInitials}
             </div>
             <div>
-              <h4 className="mb-2 font-bold text-white">{post.author.name}</h4>
-              <p className="text-sm text-tertiary-400">{post.author.bio}</p>
+              <h4 className="mb-2 font-bold text-neutral-900 dark:text-white">{post.author.name}</h4>
+              <p className="text-sm text-neutral-600 dark:text-tertiary-400">{post.author.bio}</p>
             </div>
           </div>
         </div>

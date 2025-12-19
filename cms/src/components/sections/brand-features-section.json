@@ -12,165 +12,45 @@
       "default": false
     },
     "headerIcon": {
-      "type": "string",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "showHeader"
-            },
-            true
-          ]
-        }
-      }
+      "type": "string"
     },
     "headerText": {
-      "type": "string",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "showHeader"
-            },
-            true
-          ]
-        }
-      }
+      "type": "string"
     },
     "headerAriaDescription": {
-      "type": "string",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "showHeader"
-            },
-            true
-          ]
-        }
-      }
+      "type": "string"
     },
     "subheaderIcon": {
-      "type": "string",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "showHeader"
-            },
-            true
-          ]
-        }
-      }
+      "type": "string"
     },
     "subheaderText": {
-      "type": "string",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "showHeader"
-            },
-            true
-          ]
-        }
-      }
+      "type": "string"
     },
     "subheaderAriaDescription": {
-      "type": "string",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "showHeader"
-            },
-            true
-          ]
-        }
-      }
+      "type": "string"
     },
     "headerAlignment": {
       "type": "enumeration",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "showHeader"
-            },
-            true
-          ]
-        }
-      },
       "required": false,
       "default": "language-direction",
       "enum": ["center", "language-direction"]
     },
     "learnMoreButtonIcon": {
-      "type": "string",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "showHeader"
-            },
-            true
-          ]
-        }
-      }
+      "type": "string"
     },
     "learnMoreButtonText": {
-      "type": "string",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "showHeader"
-            },
-            true
-          ]
-        }
-      }
+      "type": "string"
     },
     "learnMoreButtonUrl": {
-      "type": "string",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "showHeader"
-            },
-            true
-          ]
-        }
-      }
+      "type": "string"
     },
     "learnMoreButtonOpenInNewTab": {
       "type": "boolean",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "showHeader"
-            },
-            true
-          ]
-        }
-      },
       "required": false,
       "default": false
     },
     "learnMoreButtonAriaDescription": {
-      "type": "string",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "showHeader"
-            },
-            true
-          ]
-        }
-      }
+      "type": "string"
     },
     "features": {
       "type": "component",

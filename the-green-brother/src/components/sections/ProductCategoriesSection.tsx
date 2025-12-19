@@ -68,32 +68,35 @@ export function ProductCategoriesSection({ data, categories, direction }: Produc
             <Link
               key={category.documentId}
               href={`/products?category=${category.slug}`}
-              className="group flex flex-col items-center gap-3"
+              className="group flex w-28 flex-col items-center gap-3"
               aria-label={content.ariaDescription}
             >
               <div
                 className={`
-                  flex h-24 w-24 transform items-center justify-center
-                  rounded-full border border-white/10 bg-surface-dark shadow-lg
+                  flex size-24 transform items-center justify-center
+                  rounded-full border border-neutral-200 bg-white shadow-lg
                   transition-all duration-300
                   group-hover:scale-110 group-hover:border-primary
                   group-hover:bg-primary
+                  dark:border-white/10 dark:bg-surface-dark
                 `}
               >
                 <CMSIcon
                   icon={content.icon ?? 'category'}
                   size="4xl"
                   className={`
-                    text-text-secondary-dark transition-colors
-                    group-hover:text-background-dark
+                    text-neutral-500 transition-colors
+                    group-hover:text-background-dark dark:text-text-secondary-dark
                   `}
                 />
               </div>
               <span
                 className={`
-                font-semibold text-text-secondary-dark transition-colors
-                group-hover:text-white
-              `}
+                  text-center font-semibold text-neutral-600
+                  transition-colors
+                  group-hover:text-neutral-800 dark:text-text-secondary-dark
+                  dark:group-hover:text-white
+                `}
               >
                 <CMSText text={content.text} />
               </span>

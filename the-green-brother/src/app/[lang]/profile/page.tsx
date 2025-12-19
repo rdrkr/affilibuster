@@ -12,8 +12,8 @@ const Profile = () => {
         <div className="group relative mb-4 inline-block">
           <div
             className={`
-            relative h-32 w-32 overflow-hidden rounded-full border-4
-            border-surface-dark shadow-xl
+            relative size-32 overflow-hidden rounded-full border-4
+            border-neutral-200 shadow-xl dark:border-surface-dark
           `}
           >
             <Image
@@ -35,45 +35,46 @@ const Profile = () => {
             <span className="material-symbols-outlined block text-lg">edit</span>
           </Link>
         </div>
-        <h1 className="text-3xl font-bold text-white">Alex Green</h1>
-        <p className="mt-1 text-text-secondary-dark">alex.green@example.com</p>
+        <h1 className="text-3xl font-bold text-neutral-800 dark:text-white">Alex Green</h1>
+        <p className="mt-1 text-neutral-600 dark:text-text-secondary-dark">alex.green@example.com</p>
       </div>
 
       <div className="space-y-8">
         <div
           className={`
-          overflow-hidden rounded-xl border border-white/5 bg-surface-dark
+          overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-md
+          dark:border-white/5 dark:bg-surface-dark dark:shadow-none
         `}
         >
           <h2
             className={`
             px-6 pt-6 pb-2 text-sm font-bold tracking-wider
-            text-text-secondary-dark uppercase
+            text-neutral-600 uppercase dark:text-text-secondary-dark
           `}
           >
             Account Settings
           </h2>
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-neutral-200 dark:divide-white/5">
             <Link
               href="/profile/edit"
               className={`
                 flex items-center justify-between p-6 transition-colors
-                hover:bg-white/5
+                hover:bg-neutral-100 dark:hover:bg-white/5
               `}
             >
               <div className="flex items-center gap-4">
                 <span
                   className={`
-                  material-symbols-outlined text-text-secondary-dark
+                  material-symbols-outlined text-neutral-500 dark:text-text-secondary-dark
                 `}
                 >
                   person
                 </span>
-                <span className="font-semibold text-white">Edit Profile</span>
+                <span className="font-semibold text-neutral-800 dark:text-white">Edit Profile</span>
               </div>
               <span
                 className={`
-                material-symbols-outlined text-text-secondary-dark
+                material-symbols-outlined text-neutral-400 dark:text-text-secondary-dark
               `}
               >
                 chevron_right
@@ -83,22 +84,22 @@ const Profile = () => {
               href="/profile/currency"
               className={`
                 flex items-center justify-between p-6 transition-colors
-                hover:bg-white/5
+                hover:bg-neutral-100 dark:hover:bg-white/5
               `}
             >
               <div className="flex items-center gap-4">
                 <span
                   className={`
-                  material-symbols-outlined text-text-secondary-dark
+                  material-symbols-outlined text-neutral-500 dark:text-text-secondary-dark
                 `}
                 >
                   payments
                 </span>
-                <span className="font-semibold text-white">Currency</span>
+                <span className="font-semibold text-neutral-800 dark:text-white">Currency</span>
               </div>
               <span
                 className={`
-                material-symbols-outlined text-text-secondary-dark
+                material-symbols-outlined text-neutral-400 dark:text-text-secondary-dark
               `}
               >
                 chevron_right
@@ -108,22 +109,22 @@ const Profile = () => {
               href="/profile/wishlist"
               className={`
                 flex items-center justify-between p-6 transition-colors
-                hover:bg-white/5
+                hover:bg-neutral-100 dark:hover:bg-white/5
               `}
             >
               <div className="flex items-center gap-4">
                 <span
                   className={`
-                  material-symbols-outlined text-text-secondary-dark
+                  material-symbols-outlined text-neutral-500 dark:text-text-secondary-dark
                 `}
                 >
                   favorite
                 </span>
-                <span className="font-semibold text-white">Wishlist</span>
+                <span className="font-semibold text-neutral-800 dark:text-white">Wishlist</span>
               </div>
               <span
                 className={`
-                material-symbols-outlined text-text-secondary-dark
+                material-symbols-outlined text-neutral-400 dark:text-text-secondary-dark
               `}
               >
                 chevron_right
@@ -134,10 +135,11 @@ const Profile = () => {
 
         <div
           className={`
-          overflow-hidden rounded-xl border border-white/5 bg-surface-dark
+          overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-md
+          dark:border-white/5 dark:bg-surface-dark dark:shadow-none
         `}
         >
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-neutral-200 dark:divide-white/5">
             <button
               className={`
                 group flex w-full items-center justify-between p-6
@@ -165,8 +167,8 @@ const Profile = () => {
             >
               <div
                 className={`
-                flex items-center gap-4 text-text-secondary-dark
-                group-hover:text-red-400
+                flex items-center gap-4 text-neutral-500
+                group-hover:text-red-400 dark:text-text-secondary-dark
               `}
               >
                 <span className="material-symbols-outlined">delete</span>

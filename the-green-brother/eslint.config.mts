@@ -51,15 +51,24 @@ export default defineConfig([
     rules: {
       // Use plugin's recommended-error config rules
       ...betterTailwindcss.configs['recommended-error']?.rules,
-      // Override no-unregistered-classes to add ignore list for legitimate non-Tailwind classes
-      'better-tailwindcss/no-unregistered-classes': [
+      // Override no-unknown-classes to add ignore list for legitimate non-Tailwind classes
+      'better-tailwindcss/no-unknown-classes': [
         'error',
         {
           ignore: [
             'material-symbols-outlined', // Google Material Symbols font
+            'material-symbols-outlined-bold', // Google Material Symbols font (bold)
             'scrollbar-hide', // Custom scrollbar utility
             'animate-fade-in-up', // Custom animation
             'text-shadow-shimmer', // Custom shimmer animation
+            'text-shadow-sm', // Custom text shadow
+            'text-shadow-base', // Custom text shadow
+            'text-shadow-md', // Custom text shadow
+            'text-shadow-lg', // Custom text shadow
+            'text-shadow-xl', // Custom text shadow
+            'text-shadow-2xl', // Custom text shadow
+            'text-shadow-none', // Custom text shadow
+            'drop-shadow-icon-sm', // Custom drop shadow for icons/images
             'prose', // Typography plugin
             'prose-invert', // Typography plugin
           ],
@@ -67,6 +76,14 @@ export default defineConfig([
       ],
       // handled by prettier
       'better-tailwindcss/enforce-consistent-line-wrapping': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
     },
   },
   // Relaxed rules for unit tests (Jest mocking limitations)

@@ -15,7 +15,7 @@
  * - No results handling
  */
 
-import { test, expect } from '../fixtures'
+import { expect, test } from '../fixtures'
 
 test.describe('Search and Filters', () => {
   // ========================================
