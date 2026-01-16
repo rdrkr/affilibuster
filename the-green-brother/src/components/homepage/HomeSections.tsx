@@ -47,6 +47,8 @@ export interface HomeSectionsProps {
   blogPosts: ApiBlogPostBlogPostDocument[]
   /** Language direction for RTL support */
   direction: DirectionEnum
+  /** Feature flag: Enable user profile features (login/signup, favorites) */
+  enableUserProfile?: boolean
 }
 
 /**
@@ -58,9 +60,17 @@ export interface HomeSectionsProps {
  * @param props.categories - Categories for category grid sections
  * @param props.blogPosts - Blog posts for blog teaser sections
  * @param props.direction - Language direction for RTL support
+ * @param props.enableUserProfile - Feature flag: Enable user profile features (login/signup, favorites)
  * @returns Rendered homepage sections with layout support
  */
-export function HomeSections({ sections, products, categories, blogPosts, direction }: HomeSectionsProps) {
+export function HomeSections({
+  sections,
+  products,
+  categories,
+  blogPosts,
+  direction,
+  enableUserProfile = false,
+}: HomeSectionsProps) {
   /**
    * Render a single section based on its component type
    * @param section - Section with __component discriminator
@@ -72,7 +82,15 @@ export function HomeSections({ sections, products, categories, blogPosts, direct
         return <HeroSection key={section.id} data={section} direction={direction} />
 
       case 'sections.featured-products':
-        return <FeaturedProductsSection key={section.id} data={section} products={products} direction={direction} />
+        return (
+          <FeaturedProductsSection
+            key={section.id}
+            data={section}
+            products={products}
+            direction={direction}
+            enableUserProfile={enableUserProfile}
+          />
+        )
 
       case 'sections.category-grid':
         // Use CMS-selected categories if available, otherwise fall back to all categories

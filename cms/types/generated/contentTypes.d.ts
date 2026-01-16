@@ -1297,6 +1297,33 @@ export interface ApiFaqFaq extends Struct.SingleTypeSchema {
   }
 }
 
+export interface ApiFeatureFlagFeatureFlag extends Struct.CollectionTypeSchema {
+  collectionName: 'feature_flags'
+  info: {
+    description: 'Feature flags for controlling feature availability across the application'
+    displayName: 'Feature Flag'
+    pluralName: 'feature-flags'
+    singularName: 'feature-flag'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  attributes: {
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    description: Schema.Attribute.String
+    developmentEnabled: Schema.Attribute.Boolean & Schema.Attribute.Required & Schema.Attribute.DefaultTo<true>
+    key: Schema.Attribute.String & Schema.Attribute.Required & Schema.Attribute.Unique
+    locale: Schema.Attribute.String & Schema.Attribute.Private
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::feature-flag.feature-flag'> & Schema.Attribute.Private
+    name: Schema.Attribute.String & Schema.Attribute.Required
+    productionEnabled: Schema.Attribute.Boolean & Schema.Attribute.Required & Schema.Attribute.DefaultTo<false>
+    publishedAt: Schema.Attribute.DateTime
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
 export interface ApiFooterFooter extends Struct.SingleTypeSchema {
   collectionName: 'footer'
   info: {
@@ -2509,6 +2536,7 @@ declare module '@strapi/strapi' {
       'api::error-404.error-404': ApiError404Error404
       'api::error-410.error-410': ApiError410Error410
       'api::faq.faq': ApiFaqFaq
+      'api::feature-flag.feature-flag': ApiFeatureFlagFeatureFlag
       'api::footer.footer': ApiFooterFooter
       'api::homepage.homepage': ApiHomepageHomepage
       'api::navigation.navigation': ApiNavigationNavigation

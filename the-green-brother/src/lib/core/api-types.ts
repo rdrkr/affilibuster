@@ -52,6 +52,10 @@ import type {
   Error410GetError410Responses,
   FaqGetFaqData,
   FaqGetFaqResponses,
+  FeatureFlagGetFeatureFlagsByIdData,
+  FeatureFlagGetFeatureFlagsByIdResponses,
+  FeatureFlagGetFeatureFlagsData,
+  FeatureFlagGetFeatureFlagsResponses,
   FooterGetFooterData,
   FooterGetFooterResponses,
   ForgotPasswordData,
@@ -159,6 +163,9 @@ export type ApiRequest =
   | TeamMemberGetTeamMembersByIdData
   | ThemeGetThemesData
   | ThemeGetThemesByIdData
+  // Feature flag operations
+  | FeatureFlagGetFeatureFlagsData
+  | FeatureFlagGetFeatureFlagsByIdData
   // Upload operations
   | UploadGetFilesData
   | UploadGetFilesByIdData
@@ -226,6 +233,9 @@ export type ApiResponse =
   | TeamMemberGetTeamMembersByIdResponses[200]
   | ThemeGetThemesResponses[200]
   | ThemeGetThemesByIdResponses[200]
+  // Feature flag operations
+  | FeatureFlagGetFeatureFlagsResponses[200]
+  | FeatureFlagGetFeatureFlagsByIdResponses[200]
   // Upload operations
   | UploadGetFilesResponses[200]
   | UploadGetFilesByIdResponses[200]

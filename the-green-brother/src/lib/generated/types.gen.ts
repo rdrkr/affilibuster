@@ -2854,6 +2854,17 @@ export enum ItemsEnum8 {
 }
 
 export enum ItemsEnum9 {
+    KEY = 'key',
+    NAME = 'name',
+    DESCRIPTION = 'description',
+    DEVELOPMENT_ENABLED = 'developmentEnabled',
+    PRODUCTION_ENABLED = 'productionEnabled',
+    CREATED_AT = 'createdAt',
+    UPDATED_AT = 'updatedAt',
+    PUBLISHED_AT = 'publishedAt'
+}
+
+export enum ItemsEnum10 {
     SITE_TITLE = 'siteTitle',
     SITE_DESCRIPTION = 'siteDescription',
     CREATED_AT = 'createdAt',
@@ -2862,7 +2873,7 @@ export enum ItemsEnum9 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum10 {
+export enum ItemsEnum11 {
     LAST_UPDATED = 'lastUpdated',
     LAST_UPDATED_LABEL = 'lastUpdatedLabel',
     CREATED_AT = 'createdAt',
@@ -2871,7 +2882,7 @@ export enum ItemsEnum10 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum11 {
+export enum ItemsEnum12 {
     SLUG = 'slug',
     CREATED_AT = 'createdAt',
     UPDATED_AT = 'updatedAt',
@@ -2879,7 +2890,7 @@ export enum ItemsEnum11 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum12 {
+export enum ItemsEnum13 {
     ITEMS_PER_PAGE = 'itemsPerPage',
     PREVIOUS_BUTTON = 'previousButton',
     NEXT_BUTTON = 'nextButton',
@@ -2895,7 +2906,7 @@ export enum ItemsEnum12 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum13 {
+export enum ItemsEnum14 {
     SLUG = 'slug',
     PRICE = 'price',
     CREATED_AT = 'createdAt',
@@ -2904,7 +2915,7 @@ export enum ItemsEnum13 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum14 {
+export enum ItemsEnum15 {
     PROFILE_TITLE = 'profileTitle',
     EDIT_PROFILE_TITLE = 'editProfileTitle',
     WISHLIST_TITLE = 'wishlistTitle',
@@ -2927,7 +2938,7 @@ export enum ItemsEnum14 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum15 {
+export enum ItemsEnum16 {
     NAME = 'name',
     SLUG = 'slug',
     ROLE = 'role',
@@ -2943,7 +2954,7 @@ export enum ItemsEnum15 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum16 {
+export enum ItemsEnum17 {
     THEME_ID = 'themeId',
     CREATED_AT = 'createdAt',
     UPDATED_AT = 'updatedAt',
@@ -7465,6 +7476,282 @@ export type FaqGetFaqResponses = {
 
 export type FaqGetFaqResponse = FaqGetFaqResponses[keyof FaqGetFaqResponses];
 
+export type FeatureFlagGetFeatureFlagsData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+         */
+        readonly fields?: Array<ItemsEnum9>;
+        /**
+         * Filters to apply to the query
+         */
+        filters?: {
+            [key in ItemsEnum9]?: unknown;
+        };
+        /**
+         * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
+         */
+        _q?: string;
+        /**
+         * Pagination parameters
+         */
+        pagination?: {
+            /**
+             * Include total count in response
+             */
+            withCount?: boolean;
+        } & ({
+            /**
+             * Page number (1-based)
+             */
+            page: number;
+            /**
+             * Number of entries per page
+             */
+            pageSize: number;
+        } | {
+            /**
+             * Number of entries to skip
+             */
+            start: number;
+            /**
+             * Maximum number of entries to return
+             */
+            limit: number;
+        });
+        /**
+         * Sort the result
+         */
+        sort?: ItemsEnum9 | Array<ItemsEnum9> | {
+            [key in ItemsEnum9]?: AdditionalPropertiesEnum;
+        } | Array<{
+            [key in ItemsEnum9]?: AdditionalPropertiesEnum;
+        }>;
+        /**
+         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+         */
+        status?: SchemaEnum;
+        /**
+         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+         */
+        customPopulate: string;
+        /**
+         * Maximum depth for population (override plugin default)
+         */
+        customDepth?: number;
+        /**
+         * Fields to ignore during population
+         */
+        customIgnored?: Array<string>;
+    };
+    url: '/feature-flags';
+};
+
+export type FeatureFlagGetFeatureFlagsErrors = {
+    /**
+     * Bad request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type FeatureFlagGetFeatureFlagsResponses = {
+    /**
+     * OK
+     */
+    200: {
+        data: Array<{
+            /**
+             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+             */
+            documentId: string;
+            id: string | number;
+            /**
+             * A string field
+             */
+            key: string;
+            /**
+             * A string field
+             */
+            name: string;
+            /**
+             * A string field
+             */
+            description?: string;
+            /**
+             * A boolean field
+             */
+            developmentEnabled: boolean | null;
+            /**
+             * A boolean field
+             */
+            productionEnabled: boolean | null;
+            /**
+             * Timestamp when this entry was first created in the CMS.
+             */
+            createdAt?: string;
+            /**
+             * Timestamp when this entry was last modified.
+             */
+            updatedAt?: string;
+            /**
+             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+             */
+            publishedAt: string;
+        }>;
+        /**
+         * Metadata object containing pagination and other response metadata
+         */
+        meta?: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type FeatureFlagGetFeatureFlagsResponse = FeatureFlagGetFeatureFlagsResponses[keyof FeatureFlagGetFeatureFlagsResponses];
+
+export type FeatureFlagGetFeatureFlagsByIdData = {
+    body?: never;
+    path: {
+        /**
+         * The document ID, represented by a UUID
+         */
+        id: string;
+    };
+    query: {
+        /**
+         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+         */
+        readonly fields?: Array<ItemsEnum9>;
+        /**
+         * Filters to apply to the query
+         */
+        filters?: {
+            [key in ItemsEnum9]?: unknown;
+        };
+        /**
+         * Sort the result
+         */
+        sort?: ItemsEnum9 | Array<ItemsEnum9> | {
+            [key in ItemsEnum9]?: AdditionalPropertiesEnum;
+        } | Array<{
+            [key in ItemsEnum9]?: AdditionalPropertiesEnum;
+        }>;
+        /**
+         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+         */
+        status?: SchemaEnum;
+        /**
+         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+         */
+        customPopulate: string;
+        /**
+         * Maximum depth for population (override plugin default)
+         */
+        customDepth?: number;
+        /**
+         * Fields to ignore during population
+         */
+        customIgnored?: Array<string>;
+    };
+    url: '/feature-flags/{id}';
+};
+
+export type FeatureFlagGetFeatureFlagsByIdErrors = {
+    /**
+     * Bad request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type FeatureFlagGetFeatureFlagsByIdResponses = {
+    /**
+     * OK
+     */
+    200: {
+        data: {
+            /**
+             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+             */
+            documentId: string;
+            id: string | number;
+            /**
+             * A string field
+             */
+            key: string;
+            /**
+             * A string field
+             */
+            name: string;
+            /**
+             * A string field
+             */
+            description?: string;
+            /**
+             * A boolean field
+             */
+            developmentEnabled: boolean | null;
+            /**
+             * A boolean field
+             */
+            productionEnabled: boolean | null;
+            /**
+             * Timestamp when this entry was first created in the CMS.
+             */
+            createdAt?: string;
+            /**
+             * Timestamp when this entry was last modified.
+             */
+            updatedAt?: string;
+            /**
+             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+             */
+            publishedAt: string;
+        };
+        /**
+         * Metadata object containing pagination and other response metadata
+         */
+        meta?: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type FeatureFlagGetFeatureFlagsByIdResponse = FeatureFlagGetFeatureFlagsByIdResponses[keyof FeatureFlagGetFeatureFlagsByIdResponses];
+
 export type UploadGetFilesData = {
     body?: never;
     path?: never;
@@ -8145,12 +8432,12 @@ export type NavigationGetNavigationData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum9>;
+        readonly fields?: Array<ItemsEnum10>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum9]?: unknown;
+            [key in ItemsEnum10]?: unknown;
         };
         /**
          * Select a locale
@@ -8324,12 +8611,12 @@ export type PrivacyGetPrivacyData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum10>;
+        readonly fields?: Array<ItemsEnum11>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum10]?: unknown;
+            [key in ItemsEnum11]?: unknown;
         };
         /**
          * Select a locale
@@ -8463,12 +8750,12 @@ export type ProductCategoryGetProductCategoriesData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum11>;
+        readonly fields?: Array<ItemsEnum12>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum11]?: unknown;
+            [key in ItemsEnum12]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -8504,10 +8791,10 @@ export type ProductCategoryGetProductCategoriesData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum11 | Array<ItemsEnum11> | {
-            [key in ItemsEnum11]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum12 | Array<ItemsEnum12> | {
+            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum11]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -8649,12 +8936,12 @@ export type ProductCategoriesPageGetProductCategoriesPageData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum12>;
+        readonly fields?: Array<ItemsEnum13>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum12]?: unknown;
+            [key in ItemsEnum13]?: unknown;
         };
         /**
          * Select a locale
@@ -8825,20 +9112,20 @@ export type ProductCategoryGetProductCategoriesByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum11>;
+        readonly fields?: Array<ItemsEnum12>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum11]?: unknown;
+            [key in ItemsEnum12]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum11 | Array<ItemsEnum11> | {
-            [key in ItemsEnum11]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum12 | Array<ItemsEnum12> | {
+            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum11]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -9318,12 +9605,12 @@ export type ProductGetProductsData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum13>;
+        readonly fields?: Array<ItemsEnum14>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum13]?: unknown;
+            [key in ItemsEnum14]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -9359,10 +9646,10 @@ export type ProductGetProductsData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum13 | Array<ItemsEnum13> | {
-            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum14 | Array<ItemsEnum14> | {
+            [key in ItemsEnum14]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum14]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -9529,20 +9816,20 @@ export type ProductGetProductsByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum13>;
+        readonly fields?: Array<ItemsEnum14>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum13]?: unknown;
+            [key in ItemsEnum14]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum13 | Array<ItemsEnum13> | {
-            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum14 | Array<ItemsEnum14> | {
+            [key in ItemsEnum14]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum14]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -9704,12 +9991,12 @@ export type ProfileGetProfileData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum14>;
+        readonly fields?: Array<ItemsEnum15>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum14]?: unknown;
+            [key in ItemsEnum15]?: unknown;
         };
         /**
          * Select a locale
@@ -9929,12 +10216,12 @@ export type TeamMemberGetTeamMembersData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum15>;
+        readonly fields?: Array<ItemsEnum16>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum15]?: unknown;
+            [key in ItemsEnum16]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -9970,10 +10257,10 @@ export type TeamMemberGetTeamMembersData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum15 | Array<ItemsEnum15> | {
-            [key in ItemsEnum15]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum16 | Array<ItemsEnum16> | {
+            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum15]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -10144,20 +10431,20 @@ export type TeamMemberGetTeamMembersByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum15>;
+        readonly fields?: Array<ItemsEnum16>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum15]?: unknown;
+            [key in ItemsEnum16]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum15 | Array<ItemsEnum15> | {
-            [key in ItemsEnum15]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum16 | Array<ItemsEnum16> | {
+            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum15]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -10323,12 +10610,12 @@ export type TermGetTermData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum10>;
+        readonly fields?: Array<ItemsEnum11>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum10]?: unknown;
+            [key in ItemsEnum11]?: unknown;
         };
         /**
          * Select a locale
@@ -10462,12 +10749,12 @@ export type ThemeGetThemesData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum16>;
+        readonly fields?: Array<ItemsEnum17>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum16]?: unknown;
+            [key in ItemsEnum17]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -10503,10 +10790,10 @@ export type ThemeGetThemesData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum16 | Array<ItemsEnum16> | {
-            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum17 | Array<ItemsEnum17> | {
+            [key in ItemsEnum17]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum17]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -10645,20 +10932,20 @@ export type ThemeGetThemesByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum16>;
+        readonly fields?: Array<ItemsEnum17>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum16]?: unknown;
+            [key in ItemsEnum17]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum16 | Array<ItemsEnum16> | {
-            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum17 | Array<ItemsEnum17> | {
+            [key in ItemsEnum17]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum17]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale

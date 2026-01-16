@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "feature_flags",
+  "info": {
+    "singularName": "feature-flag",
+    "pluralName": "feature-flags",
+    "displayName": "Feature Flag",
+    "description": "Feature flags for controlling feature availability across the application"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "key": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "string"
+    },
+    "developmentEnabled": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
+    "productionEnabled": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    }
+  }
+}

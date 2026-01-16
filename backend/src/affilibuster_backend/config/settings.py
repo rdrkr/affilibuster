@@ -125,6 +125,8 @@ class Settings(BaseSettings):
             f"{self.the_green_brother_protocol}://{self.the_green_brother_host}:{self.the_green_brother_port}",
             # Allow host.docker.internal for Playwright tests from test-runner container
             f"{self.the_green_brother_protocol}://host.docker.internal:{self.the_green_brother_port}",
+            # Allow local network access for development
+            f"{self.the_green_brother_protocol}://rdrkr-mbp-m1.local:{self.the_green_brother_port}",
         ]
 
     @property

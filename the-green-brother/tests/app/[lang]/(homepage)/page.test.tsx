@@ -17,6 +17,11 @@ jest.mock('@/lib/languages/api', () => ({
   getLanguages: jest.fn(),
 }))
 
+// Mock feature flags to avoid jose ESM import issues
+jest.mock('@/lib/feature-flags', () => ({
+  userProfileFlag: jest.fn().mockResolvedValue(false),
+}))
+
 // Mock the HomeClient component
 jest.mock('@/app/[lang]/(homepage)/HomeClient', () => ({
   __esModule: true,

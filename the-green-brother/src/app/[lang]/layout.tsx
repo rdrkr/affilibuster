@@ -4,6 +4,7 @@ import Footer from '@/components/footer'
 import Navigation from '@/components/navigation'
 import BackToTopButton from '@/components/navigation/BackToTopButton'
 import { getNavigation } from '@/lib/content/api'
+import { productSearchFlag, userProfileFlag } from '@/lib/feature-flags'
 import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
 import { LanguageCode } from '@/lib/types'
@@ -36,7 +37,13 @@ async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(lang)
 
   // Fetch CMS data
-  const [messages, navigationData, languages] = await Promise.all([getMessages(), getNavigation(lang), getLanguages()])
+  const [messages, navigationData, languages, enableProductSearch, enableUserProfile] = await Promise.all([
+    getMessages(),
+    getNavigation(lang),
+    getLanguages(),
+    productSearchFlag(),
+    userProfileFlag(),
+  ])
 
   // Find the current language's direction (default to LTR)
   const currentLanguage = languages?.find(l => l.code === lang)
@@ -46,7 +53,15 @@ async function LocaleLayout({ children, params }: Props) {
     <NextIntlClientProvider messages={messages}>
       <div className="flex min-h-screen flex-col">
         <div className="mx-auto w-full max-w-7xl">
-          {navigationData && <Navigation data={navigationData} languages={languages ?? []} direction={direction} />}
+          {navigationData && (
+            <Navigation
+              data={navigationData}
+              languages={languages ?? []}
+              direction={direction}
+              enableProductSearch={enableProductSearch}
+              enableUserProfile={enableUserProfile}
+            />
+          )}
 
           <main
             className={`

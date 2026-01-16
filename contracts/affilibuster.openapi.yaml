@@ -53,6 +53,8 @@ tags:
     description: 410 Gone error page content
   - name: faq
     description: Frequently Asked Questions content
+  - name: feature-flag
+    description: Feature flags for controlling feature availability
   - name: footer
     description: Footer content and links
   - name: health
@@ -4866,6 +4868,542 @@ paths:
         - faq
       summary: Faq Get Faq
       description: Retrieves Faq content from the CMS. Supports field selection, population, and localization.
+  /feature-flags:
+    get:
+      operationId: feature-flag/get/feature_flags
+      parameters:
+        - name: fields
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+            readOnly: true
+            type: array
+            items:
+              type: string
+              enum:
+                - key
+                - name
+                - description
+                - developmentEnabled
+                - productionEnabled
+                - createdAt
+                - updatedAt
+                - publishedAt
+            example:
+              - key
+              - name
+              - description
+          x-strapi-serialize: querystring
+          description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
+        - name: filters
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filters to apply to the query
+            type: object
+            propertyNames:
+              type: string
+              enum:
+                - key
+                - name
+                - description
+                - developmentEnabled
+                - productionEnabled
+                - createdAt
+                - updatedAt
+                - publishedAt
+            additionalProperties: {}
+          x-strapi-serialize: querystring
+          description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
+        - name: _q
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            type: string
+            example: search terms
+          x-strapi-serialize: querystring
+          description: Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
+        - name: pagination
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Pagination parameters
+            allOf:
+              - type: object
+                properties:
+                  withCount:
+                    description: Include total count in response
+                    type: boolean
+                additionalProperties: false
+              - anyOf:
+                  - description: Page-based pagination
+                    type: object
+                    properties:
+                      page:
+                        description: Page number (1-based)
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                      pageSize:
+                        description: Number of entries per page
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                    required:
+                      - page
+                      - pageSize
+                    additionalProperties: false
+                  - description: Offset-based pagination
+                    type: object
+                    properties:
+                      start:
+                        description: Number of entries to skip
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                      limit:
+                        description: Maximum number of entries to return
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                    required:
+                      - start
+                      - limit
+                    additionalProperties: false
+          x-strapi-serialize: querystring
+          description: Control pagination of collection results. Supports both page-based pagination (page/pageSize) and offset-based pagination (start/limit). Optionally include total count with withCount parameter.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Sort the result
+            anyOf:
+              - type: string
+                enum:
+                  - key
+                  - name
+                  - description
+                  - developmentEnabled
+                  - productionEnabled
+                  - createdAt
+                  - updatedAt
+                  - publishedAt
+              - type: array
+                items:
+                  type: string
+                  enum:
+                    - key
+                    - name
+                    - description
+                    - developmentEnabled
+                    - productionEnabled
+                    - createdAt
+                    - updatedAt
+                    - publishedAt
+              - type: object
+                propertyNames:
+                  type: string
+                  enum:
+                    - key
+                    - name
+                    - description
+                    - developmentEnabled
+                    - productionEnabled
+                    - createdAt
+                    - updatedAt
+                    - publishedAt
+                additionalProperties:
+                  type: string
+                  enum:
+                    - asc
+                    - desc
+              - type: array
+                items:
+                  type: object
+                  propertyNames:
+                    type: string
+                    enum:
+                      - key
+                      - name
+                      - description
+                      - developmentEnabled
+                      - productionEnabled
+                      - createdAt
+                      - updatedAt
+                      - publishedAt
+                  additionalProperties:
+                    type: string
+                    enum:
+                      - asc
+                      - desc
+            example: key
+          x-strapi-serialize: querystring
+          description: Sort the result set by one or more fields. Use field name for ascending order or prefix with "-" for descending (e.g., "-createdAt"). Supports multiple sort criteria.
+        - name: status
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Fetch documents based on their status. Default to "published" if not specified.
+            type: string
+            enum:
+              - draft
+              - published
+            example: published
+          x-strapi-serialize: querystring
+          description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: customPopulate
+          in: query
+          description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+          required: true
+          schema:
+            type: string
+            default: nested
+        - name: customDepth
+          in: query
+          description: Maximum depth for population (override plugin default)
+          required: false
+          schema:
+            type: integer
+        - name: customIgnored
+          in: query
+          description: Fields to ignore during population
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $schema: https://json-schema.org/draft/2020-12/schema
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        documentId:
+                          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                          type: string
+                          example: 550e8400-e29b-41d4-a716-446655440000
+                        id:
+                          anyOf:
+                            - type: string
+                            - type: number
+                        key:
+                          description: A string field
+                          type: string
+                        name:
+                          description: A string field
+                          type: string
+                        description:
+                          description: A string field
+                          type: string
+                        developmentEnabled:
+                          description: A boolean field
+                          default: true
+                          anyOf:
+                            - type: boolean
+                            - type: 'null'
+                        productionEnabled:
+                          description: A boolean field
+                          default: false
+                          anyOf:
+                            - type: boolean
+                            - type: 'null'
+                        createdAt:
+                          description: Timestamp when this entry was first created in the CMS.
+                          type: string
+                          example: '2025-10-30T17:41:47.696Z'
+                        updatedAt:
+                          description: Timestamp when this entry was last modified.
+                          type: string
+                          example: '2025-10-30T18:23:15.432Z'
+                        publishedAt:
+                          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                          type: string
+                          example: '2025-10-30T17:41:47.696Z'
+                      required:
+                        - documentId
+                        - id
+                        - key
+                        - name
+                        - developmentEnabled
+                        - productionEnabled
+                        - publishedAt
+                      additionalProperties: false
+                  meta:
+                    type: object
+                    description: Metadata object containing pagination and other response metadata
+                required:
+                  - data
+                additionalProperties: false
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      tags:
+        - feature-flag
+      summary: Feature Flag Get Feature Flags
+      description: Retrieves a list of Feature Flag entries from the CMS. Supports filtering, pagination, and sorting.
+  /feature-flags/{id}:
+    get:
+      operationId: feature-flag/get/feature_flags_by_id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: The document ID, represented by a UUID
+            type: string
+        - name: fields
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+            readOnly: true
+            type: array
+            items:
+              type: string
+              enum:
+                - key
+                - name
+                - description
+                - developmentEnabled
+                - productionEnabled
+                - createdAt
+                - updatedAt
+                - publishedAt
+            example:
+              - key
+              - name
+              - description
+          x-strapi-serialize: querystring
+          description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
+        - name: filters
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filters to apply to the query
+            type: object
+            propertyNames:
+              type: string
+              enum:
+                - key
+                - name
+                - description
+                - developmentEnabled
+                - productionEnabled
+                - createdAt
+                - updatedAt
+                - publishedAt
+            additionalProperties: {}
+          x-strapi-serialize: querystring
+          description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Sort the result
+            anyOf:
+              - type: string
+                enum:
+                  - key
+                  - name
+                  - description
+                  - developmentEnabled
+                  - productionEnabled
+                  - createdAt
+                  - updatedAt
+                  - publishedAt
+              - type: array
+                items:
+                  type: string
+                  enum:
+                    - key
+                    - name
+                    - description
+                    - developmentEnabled
+                    - productionEnabled
+                    - createdAt
+                    - updatedAt
+                    - publishedAt
+              - type: object
+                propertyNames:
+                  type: string
+                  enum:
+                    - key
+                    - name
+                    - description
+                    - developmentEnabled
+                    - productionEnabled
+                    - createdAt
+                    - updatedAt
+                    - publishedAt
+                additionalProperties:
+                  type: string
+                  enum:
+                    - asc
+                    - desc
+              - type: array
+                items:
+                  type: object
+                  propertyNames:
+                    type: string
+                    enum:
+                      - key
+                      - name
+                      - description
+                      - developmentEnabled
+                      - productionEnabled
+                      - createdAt
+                      - updatedAt
+                      - publishedAt
+                  additionalProperties:
+                    type: string
+                    enum:
+                      - asc
+                      - desc
+            example: key
+          x-strapi-serialize: querystring
+          description: Sort the result set by one or more fields. Use field name for ascending order or prefix with "-" for descending (e.g., "-createdAt"). Supports multiple sort criteria.
+        - name: status
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Fetch documents based on their status. Default to "published" if not specified.
+            type: string
+            enum:
+              - draft
+              - published
+            example: published
+          x-strapi-serialize: querystring
+          description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: customPopulate
+          in: query
+          description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+          required: true
+          schema:
+            type: string
+            default: nested
+        - name: customDepth
+          in: query
+          description: Maximum depth for population (override plugin default)
+          required: false
+          schema:
+            type: integer
+        - name: customIgnored
+          in: query
+          description: Fields to ignore during population
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $schema: https://json-schema.org/draft/2020-12/schema
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      documentId:
+                        description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                        type: string
+                        example: 550e8400-e29b-41d4-a716-446655440000
+                      id:
+                        anyOf:
+                          - type: string
+                          - type: number
+                      key:
+                        description: A string field
+                        type: string
+                      name:
+                        description: A string field
+                        type: string
+                      description:
+                        description: A string field
+                        type: string
+                      developmentEnabled:
+                        description: A boolean field
+                        default: true
+                        anyOf:
+                          - type: boolean
+                          - type: 'null'
+                      productionEnabled:
+                        description: A boolean field
+                        default: false
+                        anyOf:
+                          - type: boolean
+                          - type: 'null'
+                      createdAt:
+                        description: Timestamp when this entry was first created in the CMS.
+                        type: string
+                        example: '2025-10-30T17:41:47.696Z'
+                      updatedAt:
+                        description: Timestamp when this entry was last modified.
+                        type: string
+                        example: '2025-10-30T18:23:15.432Z'
+                      publishedAt:
+                        description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                        type: string
+                        example: '2025-10-30T17:41:47.696Z'
+                    required:
+                      - documentId
+                      - id
+                      - key
+                      - name
+                      - developmentEnabled
+                      - productionEnabled
+                      - publishedAt
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    description: Metadata object containing pagination and other response metadata
+                required:
+                  - data
+                additionalProperties: false
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      tags:
+        - feature-flag
+      summary: Feature Flag Get Feature Flags By Id
+      description: Retrieves Feature Flag content from the CMS. Supports field selection, population, and localization.
   /files:
     get:
       operationId: upload/get/files

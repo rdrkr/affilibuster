@@ -38,6 +38,24 @@ interface ApiRequestAdditionalOptions {
    * - 'omit': Never include credentials
    */
   credentials?: RequestCredentials
+  /**
+   * Cache mode for the request
+   * - 'force-cache': Cache the response (default for GET)
+   * - 'no-store': Don't cache the response
+   */
+  cache?: RequestCache
+  /**
+   * Next.js specific request configuration
+   */
+  next?: NextRequestConfig
+}
+
+/**
+ * Next.js extended fetch options
+ */
+export interface NextRequestConfig {
+  revalidate?: number | false
+  tags?: string[]
 }
 
 /**
@@ -205,10 +223,12 @@ export async function apiRequest<T extends ApiResponse>(
     Object.assign(headers, options.headers)
   }
 
-  const fetchOptions: RequestInit = {
+  const fetchOptions: RequestInit & { next?: NextRequestConfig } = {
     method: options?.method ?? 'GET',
     headers,
     credentials: options?.credentials ?? 'same-origin',
+    ...(options?.cache !== undefined && { cache: options.cache }),
+    ...(options?.next !== undefined && { next: options.next }),
   }
 
   // Extract and serialize request body to JSON (hidden from caller)

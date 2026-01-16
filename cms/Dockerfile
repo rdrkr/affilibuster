@@ -4,8 +4,8 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Install curl for health checks
-RUN apk add --no-cache curl
+# Install curl for health checks and postgresql-client for database queries
+RUN apk add --no-cache curl postgresql-client
 
 # Copy application code
 COPY . .

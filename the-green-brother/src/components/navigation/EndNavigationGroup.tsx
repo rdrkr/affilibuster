@@ -73,6 +73,10 @@ export interface EndNavigationGroupProps {
   onSearchExpandChange: (expanded: boolean) => void
   /** Callback to report if all group items have icons */
   onHasIconsChange?: (hasIcons: boolean) => void
+  /** Feature flag: Enable product search */
+  enableProductSearch?: boolean
+  /** Feature flag: Enable user profile (login/signup) */
+  enableUserProfile?: boolean
 }
 
 // Block 3: Component Body (start)
@@ -89,6 +93,8 @@ export interface EndNavigationGroupProps {
  * @param props.setTheme - Theme change handler
  * @param props.onSearchExpandChange - Handler for search expand state changes
  * @param props.onHasIconsChange - Callback to report icon availability
+ * @param props.enableProductSearch - Feature flag: Enable product search
+ * @param props.enableUserProfile - Feature flag: Enable user profile (login/signup)
  * @returns End navigation group component
  */
 export function EndNavigationGroup({
@@ -102,6 +108,8 @@ export function EndNavigationGroup({
   setTheme,
   onSearchExpandChange,
   onHasIconsChange,
+  enableProductSearch = false,
+  enableUserProfile = false,
 }: EndNavigationGroupProps) {
   const pathname = usePathname()
   const router = useRouter()
@@ -285,13 +293,15 @@ export function EndNavigationGroup({
       {({ showText }) => (
         <>
           {/* Search */}
-          <SearchMenu
-            data={data.searchMenu}
-            onExpandChange={handleSearchExpandChange}
-            direction={direction}
-            showText={showText}
-            navWidth={navWidth}
-          />
+          {enableProductSearch && (
+            <SearchMenu
+              data={data.searchMenu}
+              onExpandChange={handleSearchExpandChange}
+              direction={direction}
+              showText={showText}
+              navWidth={navWidth}
+            />
+          )}
 
           {/* Theme Selector */}
           <ThemeMenu
@@ -315,16 +325,18 @@ export function EndNavigationGroup({
           />
 
           {/* Login Button */}
-          <ButtonLink
-            data={data.loginButton}
-            direction={direction}
-            variant="primary"
-            iconSize="lg"
-            size="sm"
-            showText={effectiveShowLoginButtonText}
-            visible={groupVisible}
-            slideDirection="start-to-end"
-          />
+          {enableUserProfile && (
+            <ButtonLink
+              data={data.loginButton}
+              direction={direction}
+              variant="primary"
+              iconSize="lg"
+              size="sm"
+              showText={effectiveShowLoginButtonText}
+              visible={groupVisible}
+              slideDirection="start-to-end"
+            />
+          )}
 
           {/* Mobile Menu Toggle */}
           <MobileNavigationGroup

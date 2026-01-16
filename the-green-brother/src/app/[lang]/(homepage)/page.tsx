@@ -2,6 +2,7 @@
 
 import { HomeSections } from '@/components/homepage'
 import { getBlogPosts, getHomepage, getProductCategories, getProducts } from '@/lib/client'
+import { userProfileFlag } from '@/lib/feature-flags'
 import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
 import HomeClient from './HomeClient'
@@ -20,21 +21,23 @@ async function HomePage({ params }: { params: Promise<{ lang: CodeEnum }> }) {
   const lang = resolvedParams.lang
 
   // Fetch all homepage data in parallel
-  const [homepageData, productsResponse, categoriesResponse, blogPostsResponse, languages] = await Promise.all([
-    getHomepage(lang),
-    getProducts({
-      pagination: { page: 1, pageSize: 4 },
-      locale: lang,
-    }),
-    getProductCategories({
-      locale: lang,
-    }),
-    getBlogPosts({
-      pagination: { page: 1, pageSize: 3 },
-      locale: lang,
-    }),
-    getLanguages(),
-  ])
+  const [homepageData, productsResponse, categoriesResponse, blogPostsResponse, languages, enableUserProfile] =
+    await Promise.all([
+      getHomepage(lang),
+      getProducts({
+        pagination: { page: 1, pageSize: 4 },
+        locale: lang,
+      }),
+      getProductCategories({
+        locale: lang,
+      }),
+      getBlogPosts({
+        pagination: { page: 1, pageSize: 3 },
+        locale: lang,
+      }),
+      getLanguages(),
+      userProfileFlag(),
+    ])
 
   // Find the current language's direction (default to LTR)
   const currentLanguage = languages?.find(l => l.code === lang)
@@ -53,6 +56,7 @@ async function HomePage({ params }: { params: Promise<{ lang: CodeEnum }> }) {
         categories={categoriesResponse?.data ?? []}
         blogPosts={blogPostsResponse?.data ?? []}
         direction={direction}
+        enableUserProfile={enableUserProfile}
       />
     </HomeClient>
   )

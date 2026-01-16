@@ -57,6 +57,10 @@ from affilibuster_backend.domain.entities.generated.models import (
     Error410GetResponse,
     FaqGetParametersQuery,
     FaqGetResponse,
+    FeatureFlagsGetParametersQuery,
+    FeatureFlagsGetResponse,
+    FeatureFlagsIdGetParametersQuery,
+    FeatureFlagsIdGetResponse,
     FilesGetParametersQuery,
     FilesGetResponse,
     FilesIdGetParametersQuery,
@@ -150,6 +154,8 @@ CMSRequest = (
     | Error404GetParametersQuery
     | Error410GetParametersQuery
     | FaqGetParametersQuery
+    | FeatureFlagsGetParametersQuery
+    | FeatureFlagsIdGetParametersQuery
     | FilesGetParametersQuery
     | FilesIdGetParametersQuery
     | FooterGetParametersQuery
@@ -190,6 +196,8 @@ CMSResponse = (
     | Error404GetResponse
     | Error410GetResponse
     | FaqGetResponse
+    | FeatureFlagsGetResponse
+    | FeatureFlagsIdGetResponse
     | FilesGetResponse
     | FilesIdGetResponse
     | FooterGetResponse

@@ -30,6 +30,10 @@ export interface NavigationProps {
   languages?: Language[]
   /** Text direction for RTL support */
   direction: DirectionEnum
+  /** Feature flag: Enable product search */
+  enableProductSearch?: boolean
+  /** Feature flag: Enable user profile (login/signup) */
+  enableUserProfile?: boolean
 }
 
 /**
@@ -38,9 +42,17 @@ export interface NavigationProps {
  * @param props.data - Navigation data from CMS
  * @param props.languages - Languages from API
  * @param props.direction - Text direction for RTL support
+ * @param props.enableProductSearch - Feature flag: Enable product search
+ * @param props.enableUserProfile - Feature flag: Enable user profile (login/signup)
  * @returns Navigation component
  */
-export function Navigation({ data, languages, direction }: NavigationProps) {
+export function Navigation({
+  data,
+  languages,
+  direction,
+  enableProductSearch = false,
+  enableUserProfile = false,
+}: NavigationProps) {
   const { theme, setTheme } = useThemeContext()
 
   // Get responsive visibility state
@@ -105,6 +117,8 @@ export function Navigation({ data, languages, direction }: NavigationProps) {
                 setTheme={setTheme}
                 onSearchExpandChange={handleSearchExpandChange}
                 onHasIconsChange={setEndHasIcons}
+                enableProductSearch={enableProductSearch}
+                enableUserProfile={enableUserProfile}
               />
             </>
           )}

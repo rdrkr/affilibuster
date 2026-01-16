@@ -259,6 +259,7 @@
     "ossp",
     "passlib",
     "pathsep",
+    "PGPASSWORD",
     "PGPORT",
     "populator",
     "prefs",

@@ -523,7 +523,14 @@ describe('FeaturedProductsSection', () => {
   })
 
   it('should render favorite button correctly', () => {
-    render(<FeaturedProductsSection direction={DirectionEnum.LTR} data={mockSectionData} products={mockProducts} />)
+    render(
+      <FeaturedProductsSection
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        products={mockProducts}
+        enableUserProfile={true}
+      />
+    )
     const favoriteButtons = screen.getAllByRole('button', { name: /Eco-friendly water bottle product/i })
     expect(favoriteButtons).toHaveLength(1)
 
@@ -549,7 +556,12 @@ describe('FeaturedProductsSection', () => {
       },
     }
     render(
-      <FeaturedProductsSection direction={DirectionEnum.LTR} data={mockSectionData} products={[productWithNoAria]} />
+      <FeaturedProductsSection
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        products={[productWithNoAria]}
+        enableUserProfile={true}
+      />
     )
     // Find button by icon since aria-label is empty
     const icon = screen.getByTestId('mock-icon')

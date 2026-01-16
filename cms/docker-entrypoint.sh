@@ -45,44 +45,52 @@ else
   echo "📦 Checking for seed data to import..."
 
   if [ -f "/data/metadata.json" ] || [ -f "../data/metadata.json" ]; then
-    echo "  📥 Importing seed data..."
+    # Check if database already has content (admin users exist = database is initialized)
+    #shellcheck disable=SC2154
+    ADMIN_COUNT=$(PGPASSWORD="${POSTGRES_PASSWORD}" psql -h "${POSTGRES_HOST}" -p "${POSTGRES_PORT}" -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -t -c "SELECT COUNT(*) FROM admin_users;" 2>/dev/null | tr -d ' ' || echo "0")
 
-    if [ -f "/data/metadata.json" ]; then
-      DATA_PATH="/data"
+    if [ "${ADMIN_COUNT}" -gt "0" ]; then
+      echo "  ℹ️  Database already has content (${ADMIN_COUNT} admin users), skipping import"
     else
-      DATA_PATH="../data"
-    fi
+      echo "  📥 Importing seed data..."
 
-    tar -cf "${DATA_PATH}/export.tar" -C "${DATA_PATH}" assets entities schemas configuration links metadata.json
-    npm run data:import -- --force --file "${DATA_PATH}/export.tar"
-    rm -f "${DATA_PATH}/export.tar"
-
-    echo "  ✅ Seed data imported successfully"
-
-    # Restart Strapi to regenerate API token (bootstrap runs again)
-    echo "🔄 Restarting Strapi to regenerate API token..."
-    kill "${STRAPI_PID}" 2>/dev/null || true
-    wait "${STRAPI_PID}" 2>/dev/null || true
-
-    echo "🚀 Starting Strapi after seed import..."
-    npm run strapi develop &
-    STRAPI_PID=$!
-
-    echo "⏳ Waiting for Strapi to be ready..."
-    RETRY_COUNT=0
-    while [ "${RETRY_COUNT}" -lt "${MAX_RETRIES}" ]; do
-      if curl -k -s -f "http://${CMS_HOST}:${CMS_PORT}/admin" >/dev/null 2>&1; then
-        echo "✅ Strapi is ready!"
-        break
+      if [ -f "/data/metadata.json" ]; then
+        DATA_PATH="/data"
+      else
+        DATA_PATH="../data"
       fi
-      RETRY_COUNT=$((RETRY_COUNT + 1))
-      sleep 2
-    done
 
-    if [ "${RETRY_COUNT}" -eq "${MAX_RETRIES}" ]; then
-      echo "❌ Strapi failed to start within timeout"
+      tar -cf "${DATA_PATH}/export.tar" -C "${DATA_PATH}" assets entities schemas configuration links metadata.json
+      npm run data:import -- --force --file "${DATA_PATH}/export.tar"
+      rm -f "${DATA_PATH}/export.tar"
+
+      echo "  ✅ Seed data imported successfully"
+
+      # Restart Strapi to regenerate API token (bootstrap runs again)
+      echo "🔄 Restarting Strapi to regenerate API token..."
       kill "${STRAPI_PID}" 2>/dev/null || true
-      exit 1
+      wait "${STRAPI_PID}" 2>/dev/null || true
+
+      echo "🚀 Starting Strapi after seed import..."
+      npm run strapi develop &
+      STRAPI_PID=$!
+
+      echo "⏳ Waiting for Strapi to be ready..."
+      RETRY_COUNT=0
+      while [ "${RETRY_COUNT}" -lt "${MAX_RETRIES}" ]; do
+        if curl -k -s -f "http://${CMS_HOST}:${CMS_PORT}/admin" >/dev/null 2>&1; then
+          echo "✅ Strapi is ready!"
+          break
+        fi
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+        sleep 2
+      done
+
+      if [ "${RETRY_COUNT}" -eq "${MAX_RETRIES}" ]; then
+        echo "❌ Strapi failed to start within timeout"
+        kill "${STRAPI_PID}" 2>/dev/null || true
+        exit 1
+      fi
     fi
   else
     echo "  ℹ️  No seed data found, skipping import"

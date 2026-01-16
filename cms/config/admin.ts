@@ -35,9 +35,4 @@ export default ({ env }: { env: StrapiEnv }) => ({
       salt: env('TRANSFER_TOKEN_SALT'),
     },
   },
-  vite: {
-    server: {
-      allowedHosts: ['strapi-proxy', 'strapi', 'localhost'],
-    },
-  },
 })

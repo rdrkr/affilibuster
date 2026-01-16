@@ -56,6 +56,12 @@ jest.mock('@/lib/languages/api', () => ({
   getLanguages: jest.fn(),
 }))
 
+// Mock feature flags
+jest.mock('@/lib/feature-flags', () => ({
+  productSearchFlag: jest.fn().mockResolvedValue(false),
+  userProfileFlag: jest.fn().mockResolvedValue(false),
+}))
+
 import LocaleLayout from '@/app/[lang]/layout'
 import { getNavigation } from '@/lib/content/api'
 import { CodeEnum } from '@/lib/generated/types.gen'

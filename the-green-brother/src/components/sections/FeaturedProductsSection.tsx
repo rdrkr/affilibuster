@@ -27,6 +27,8 @@ export interface FeaturedProductsSectionProps {
   products: ApiProductProductDocument[]
   /** Language direction for RTL support */
   direction: DirectionEnum
+  /** Feature flag: Enable user profile features (login/signup, favorites) */
+  enableUserProfile?: boolean
 }
 
 /**
@@ -35,9 +37,15 @@ export interface FeaturedProductsSectionProps {
  * @param props.data - Featured products section data from CMS
  * @param props.products - Products to display
  * @param props.direction - Language direction for RTL support
+ * @param props.enableUserProfile - Feature flag: Enable user profile features (favorites)
  * @returns Featured products section component or null if no products
  */
-export function FeaturedProductsSection({ data, products, direction }: FeaturedProductsSectionProps) {
+export function FeaturedProductsSection({
+  data,
+  products,
+  direction,
+  enableUserProfile = false,
+}: FeaturedProductsSectionProps) {
   const { header, viewAllButton } = data
   const isRTL = direction === DirectionEnum.RTL
 
@@ -72,20 +80,22 @@ export function FeaturedProductsSection({ data, products, direction }: FeaturedP
               variant="product"
               asLink={false}
               imageOverlay={
-                <div className="absolute top-3 right-3">
-                  <button
-                    type="button"
-                    className={`
-                      flex size-10 items-center justify-center rounded-full
-                      bg-white/50 text-neutral-800 backdrop-blur-md
-                      transition-colors hover:bg-primary hover:text-black
-                      dark:bg-background-dark/50 dark:text-white
-                    `}
-                    aria-label={product.content?.header?.header?.ariaDescription ?? ''}
-                  >
-                    <CMSIcon icon="favorite_border" size="lg" />
-                  </button>
-                </div>
+                enableUserProfile && (
+                  <div className="absolute top-3 right-3">
+                    <button
+                      type="button"
+                      className={`
+                        flex size-10 items-center justify-center rounded-full
+                        bg-white/50 text-neutral-800 backdrop-blur-md
+                        transition-colors hover:bg-primary hover:text-black
+                        dark:bg-background-dark/50 dark:text-white
+                      `}
+                      aria-label={product.content?.header?.header?.ariaDescription ?? ''}
+                    >
+                      <CMSIcon icon="favorite_border" size="lg" />
+                    </button>
+                  </div>
+                )
               }
             >
               {/* Tag and Price row */}

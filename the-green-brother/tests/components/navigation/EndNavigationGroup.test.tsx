@@ -111,8 +111,11 @@ describe('EndNavigationGroup', () => {
     onSearchExpandChange: mockOnSearchExpandChange,
     apiLanguages: [
       { code: CodeEnum.EN, displayName: 'English', flag: '🇺🇸' },
+      { code: CodeEnum.EN, displayName: 'English', flag: '🇺🇸' },
       { code: CodeEnum.IT, displayName: 'Italiano', flag: '🇮🇹' },
     ] as Language[],
+    enableProductSearch: true,
+    enableUserProfile: true,
   }
 
   beforeEach(() => {
@@ -128,6 +131,11 @@ describe('EndNavigationGroup', () => {
   })
 
   describe('Mobile Menu Logic', () => {
+    it('should NOT render SearchMenu when enableProductSearch is false', () => {
+      render(<EndNavigationGroup {...defaultProps} enableProductSearch={false} />)
+      expect(screen.queryByTestId('search-menu')).not.toBeInTheDocument()
+    })
+
     it('should NOT show mobile menu when startGroupMode is full', () => {
       render(<EndNavigationGroup {...defaultProps} startGroupMode="full" />)
       const mobileNavGroup = screen.getByTestId('mobile-nav-group')

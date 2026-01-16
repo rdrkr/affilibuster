@@ -54,6 +54,7 @@ ROUTE_DESCRIPTIONS = {
     "error-404": "Get 404 Not Found error page content from Strapi.",
     "error-410": "Get 410 Gone error page content from Strapi.",
     "faq": "Get FAQ (Frequently Asked Questions) content from Strapi.",
+    "feature-flag": "Get feature flags from Strapi.",
     "footer": "Get Footer content and links from Strapi.",
     "homepage": "Get Homepage content from Strapi.",
     "navigation": "Get Navigation menu structure from Strapi.",

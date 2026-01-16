@@ -625,6 +625,7 @@ function addStrapiTags(spec: OpenAPISpec): OpenAPISpec {
     { name: 'error-404', description: '404 Not Found error page content' },
     { name: 'error-410', description: '410 Gone error page content' },
     { name: 'faq', description: 'Frequently Asked Questions content' },
+    { name: 'feature-flag', description: 'Feature flags for controlling feature availability' },
     { name: 'footer', description: 'Footer content and links' },
     { name: 'health', description: 'Health check endpoints for service monitoring' },
     { name: 'homepage', description: 'Homepage content and hero sections' },

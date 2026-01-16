@@ -85,7 +85,8 @@ describe('CMSImage', () => {
   it('should prepend CMS URL to relative paths from media object', () => {
     render(<CMSImage image={{ url: '/uploads/test.png' }} />)
     const img = screen.getByTestId('mock-image')
-    expect(img).toHaveAttribute('src', expect.stringMatching(/localhost:1337\/uploads\/test\.png$/))
+    // CMS URL is based on NEXT_PUBLIC_CMS_URL env var - match pattern with any hostname
+    expect(img).toHaveAttribute('src', expect.stringMatching(/https?:\/\/.+:\d+\/uploads\/test\.png$/))
   })
 
   it('should use alternativeText from media object', () => {

@@ -27,7 +27,7 @@ const getPort = (port?: string, protocol?: string): string => {
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  allowedDevOrigins: ['localhost', '127.0.0.1', '10.100.102.35', 'host.docker.internal'],
+  allowedDevOrigins: ['localhost', '127.0.0.1', 'host.docker.internal', 'rdrkr-mbp-m1.local'],
   // Treat TypeScript errors strictly
   typescript: {
     ignoreBuildErrors: false,

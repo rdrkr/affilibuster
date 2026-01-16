@@ -16,8 +16,14 @@ import { useState } from 'react'
 /** Default placeholder image for missing images */
 const PLACEHOLDER_IMAGE = '/images/placeholder.svg'
 
+/** CMS port from environment */
+const CMS_PORT = process.env.NEXT_PUBLIC_CMS_PORT ?? '1337'
+
+/** CMS protocol from environment */
+const CMS_PROTOCOL = process.env.NEXT_PUBLIC_CMS_PROTOCOL ?? 'https'
+
 /** CMS base URL for image resolution */
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? 'https://localhost:1337'
+const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? `${CMS_PROTOCOL}://localhost:${CMS_PORT}`
 
 /**
  * Represents a CMS media object with a URL field.
