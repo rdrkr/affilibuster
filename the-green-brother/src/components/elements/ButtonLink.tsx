@@ -57,6 +57,8 @@ export interface ButtonLinkProps {
   onClick?: React.MouseEventHandler<HTMLAnchorElement>
   /** Animation slide direction (default: 'end-to-start') */
   slideDirection?: 'start-to-end' | 'end-to-start'
+  /** Use masked icon for local icons */
+  maskedIcon?: boolean
 }
 
 /**
@@ -79,6 +81,7 @@ export interface ButtonLinkProps {
  * @param props.childrenPosition - Position of children relative to label
  * @param props.onClick - Click handler
  * @param props.slideDirection - Animation slide direction
+ * @param props.maskedIcon - Use masked icon for local icons (inherits color)
  * @returns Button link component or null if no data and no href, or not visible
  */
 export function ButtonLink({
@@ -98,6 +101,7 @@ export function ButtonLink({
   childrenPosition = 'end',
   onClick,
   slideDirection = 'end-to-start',
+  maskedIcon,
 }: ButtonLinkProps) {
   const url = data?.url
 
@@ -130,6 +134,7 @@ export function ButtonLink({
     iconSize,
     showText,
     childrenPosition,
+    maskedIcon: maskedIcon ?? false,
   })
 
   if (!content) {

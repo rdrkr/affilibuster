@@ -200,6 +200,7 @@ export interface SectionsBlogTeaser extends Struct.ComponentSchema {
   attributes: {
     blog_posts: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'>
     header: Schema.Attribute.Component<'elements.header', false> & Schema.Attribute.Required
+    viewAllButton: Schema.Attribute.Component<'elements.button', false> & Schema.Attribute.Required
   }
 }
 

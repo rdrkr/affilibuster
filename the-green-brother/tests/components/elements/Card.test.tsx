@@ -160,4 +160,30 @@ describe('Card', () => {
     const tagSpan = container.querySelector('.text-primary.uppercase')
     expect(tagSpan).not.toBeInTheDocument()
   })
+
+  it('should apply profile variant classes', () => {
+    const { container } = render(<Card {...defaultProps} variant="profile" />)
+
+    const card = container.querySelector('a')
+    expect(card?.className).toContain('h-auto')
+    expect(card?.className).toContain('text-center')
+    expect(card?.className).toContain('w-carousel-mobile')
+
+    const imageWrapper = container.querySelector('.rounded-full')
+    expect(imageWrapper).toBeInTheDocument()
+    expect(imageWrapper?.className).toContain('w-40')
+    expect(imageWrapper?.className).toContain('h-40')
+  })
+
+  it('should return null when visible is false', () => {
+    const { container } = render(<Card {...defaultProps} visible={false} />)
+
+    expect(container.firstChild).toBeNull()
+  })
+
+  it('should render imageOverlay when provided', () => {
+    render(<Card {...defaultProps} imageOverlay={<span data-testid="overlay">Overlay</span>} />)
+
+    expect(screen.getByTestId('overlay')).toBeInTheDocument()
+  })
 })

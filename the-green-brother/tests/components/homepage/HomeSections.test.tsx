@@ -144,6 +144,11 @@ describe('HomeSections', () => {
           icon: 'article',
         },
       },
+      viewAllButton: {
+        label: { text: 'View All', iconPosition: IconPositionEnum.BEFORE_TEXT, ariaDescription: 'View all' },
+        url: '/blog',
+        openInNewTab: false,
+      },
     },
     {
       __component: 'call-to-actions.newsletter-signup-cta',

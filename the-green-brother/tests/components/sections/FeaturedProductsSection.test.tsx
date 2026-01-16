@@ -79,12 +79,15 @@ jest.mock('@/components/elements', () => ({
   },
   ButtonLink: function MockButtonLink({
     data,
+    className,
   }: {
     data: { label?: { text?: string; ariaDescription?: string }; url: string; openInNewTab: boolean | null }
+    className?: string
   }) {
     return (
       <a
         href={data.url}
+        className={className}
         target={data.openInNewTab ? '_blank' : undefined}
         rel={data.openInNewTab ? 'noopener noreferrer' : undefined}
         aria-label={data.label?.ariaDescription}
@@ -134,6 +137,28 @@ jest.mock('@/components/elements', () => ({
         {tag && <span data-testid="mock-card-tag">{tag}</span>}
         <div data-testid="mock-card-content">{children}</div>
       </Wrapper>
+    )
+  },
+  Carousel: function MockCarousel({
+    children,
+    direction,
+    ariaLabel,
+  }: {
+    children: React.ReactNode
+    direction?: string
+    ariaLabel?: string
+  }) {
+    const isRTL = direction === 'rtl'
+    return (
+      <div
+        data-testid="mock-carousel"
+        className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto"
+        dir={isRTL ? 'rtl' : 'ltr'}
+        role={ariaLabel ? 'region' : undefined}
+        aria-label={ariaLabel}
+      >
+        {children}
+      </div>
     )
   },
 }))
@@ -459,27 +484,21 @@ describe('FeaturedProductsSection', () => {
     expect(section).toBeInTheDocument()
   })
 
-  it('should apply flex-row-reverse to header row for RTL direction', () => {
+  it('should align view all button to start for RTL direction', () => {
     const { DirectionEnum } =
       jest.requireActual<typeof import('@/lib/generated/types.gen')>('@/lib/generated/types.gen')
 
-    const { container } = render(
-      <FeaturedProductsSection data={mockSectionData} products={mockProducts} direction={DirectionEnum.RTL} />
-    )
+    render(<FeaturedProductsSection data={mockSectionData} products={mockProducts} direction={DirectionEnum.RTL} />)
 
-    // RTL now uses sm:flex-row-reverse for responsive layout
-    const headerRow = container.querySelector('.sm\\:flex-row-reverse')
-    expect(headerRow).toBeInTheDocument()
+    const viewAllLink = screen.getByRole('link', { name: /View all products/i })
+    expect(viewAllLink).toHaveClass('self-start')
   })
 
-  it('should not apply flex-row-reverse for LTR direction (default)', () => {
-    const { container } = render(
-      <FeaturedProductsSection direction={DirectionEnum.LTR} data={mockSectionData} products={mockProducts} />
-    )
+  it('should align view all button to end for LTR direction (default)', () => {
+    render(<FeaturedProductsSection direction={DirectionEnum.LTR} data={mockSectionData} products={mockProducts} />)
 
-    // LTR should not have sm:flex-row-reverse class
-    const headerRow = container.querySelector('.mb-8.flex.flex-col')
-    expect(headerRow).not.toHaveClass('sm:flex-row-reverse')
+    const viewAllLink = screen.getByRole('link', { name: /View all products/i })
+    expect(viewAllLink).toHaveClass('self-end')
   })
 
   it('should apply dir="rtl" to carousel for RTL direction', () => {

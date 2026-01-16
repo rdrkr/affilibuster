@@ -93,14 +93,14 @@ export function Dropdown({
   return (
     <div
       className={`
-      fixed top-[calc(var(--nav-top,5rem))] right-4 left-4 z-50
+      fixed inset-x-4 top-[calc(var(--nav-top,5rem))] z-50
       sm:absolute sm:top-[calc(var(--nav-top,1.5rem))] sm:right-0 sm:left-0
       ${positionClasses}
       ${isVisible ? 'visible' : 'pointer-events-none'}
     `}
     >
       {/* Hover bridge - covers the gap between button and dropdown */}
-      <div className={`h-6`} aria-hidden="true" />
+      <div className={`mt-4 h-2`} aria-hidden="true" />
 
       <div
         className={`
@@ -274,10 +274,7 @@ export function DropdownMenu({
   }, [containerRef])
 
   const handleToggle = useCallback(
-    (e?: React.MouseEvent) => {
-      if (e) {
-        e.preventDefault()
-      }
+    (_e?: React.MouseEvent) => {
       if (justHoveredRef.current) return
       setIsOpen(prev => !prev)
     },
@@ -320,7 +317,7 @@ export function DropdownMenu({
         variant={variant}
         iconSize={iconSize}
         size={size}
-        isActive={isActive}
+        isActive={isActive || isOpen}
         visible={visible}
         disabled={disabled}
         aria-expanded={isOpen}
@@ -334,6 +331,7 @@ export function DropdownMenu({
         variant={variant}
         iconSize={iconSize}
         size={size}
+        isActive={isActive || isOpen}
         visible={visible}
         aria-expanded={isOpen}
         childrenPosition={triggerChildrenPosition}

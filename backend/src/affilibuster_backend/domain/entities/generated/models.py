@@ -6486,6 +6486,10 @@ class SectionsBlogTeaserEntry(BaseModel):
     """
     A relational field
     """
+    view_all_button: ElementsButtonEntry = Field(..., alias="viewAllButton")
+    """
+    A component field
+    """
 
 
 class SectionsCategoryGridEntry(BaseModel):

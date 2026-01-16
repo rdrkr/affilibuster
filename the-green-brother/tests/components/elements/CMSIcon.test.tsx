@@ -207,4 +207,15 @@ describe('CMSIcon', () => {
       expect(screen.getByText('home')).toBeInTheDocument()
     })
   })
+
+  it('should render masked icon as span with bg-current', () => {
+    render(<CMSIcon icon="social.svg" masked ariaLabel="Social Icon" />)
+    // Should render a span with role="img" instead of img tag
+    const mask = screen.getByRole('img', { name: 'Social Icon' })
+    expect(mask.tagName).toBe('SPAN')
+    expect(mask).toHaveClass('bg-current')
+    expect(mask.style.backgroundColor.toLowerCase()).toBe('currentcolor')
+    // Check mask-image via style attribute or property
+    expect(mask.getAttribute('style')).toContain('mask-image: url(/icons/social.svg)')
+  })
 })

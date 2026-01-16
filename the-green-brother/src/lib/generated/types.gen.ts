@@ -2502,6 +2502,10 @@ export type SectionsBlogTeaserEntry = {
      * A relational field
      */
     blog_posts?: Array<ApiBlogPostBlogPostDocument>;
+    /**
+     * A component field
+     */
+    viewAllButton: ElementsButtonEntry;
 };
 
 /**
@@ -4400,6 +4404,10 @@ export type SectionsBlogTeaserEntryWritable = {
      * A relational field
      */
     blog_posts?: Array<ApiBlogPostBlogPostDocumentWritable>;
+    /**
+     * A component field
+     */
+    viewAllButton: ElementsButtonEntry;
 };
 
 /**

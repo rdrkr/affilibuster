@@ -17,6 +17,12 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::blog-post.blog-post"
+    },
+    "viewAllButton": {
+      "type": "component",
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
     }
   }
 }

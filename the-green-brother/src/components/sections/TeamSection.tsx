@@ -3,15 +3,13 @@
 /**
  * Team Section Component
  *
- * Renders a grid of team member cards with profile pictures, names, roles, and social links.
+ * Renders a horizontal scrollable carousel of team member cards.
  * All content comes from CMS - no hardcoded strings.
  * Uses Header composite for section title.
  */
 
-import Link from 'next/link'
-
-import { CMSIcon, CMSImage, Header } from '@/components/elements'
-import { DirectionEnum, type SectionsTeamGridEntry } from '@/lib/generated/types.gen'
+import { ButtonLink, Card, Carousel, Header } from '@/components/elements'
+import { DirectionEnum, IconPositionEnum, type SectionsTeamGridEntry } from '@/lib/generated/types.gen'
 
 /**
  * Props for the TeamSection component
@@ -26,7 +24,7 @@ export interface TeamSectionProps {
 }
 
 /**
- * Team section displaying team member cards.
+ * Team section with horizontal scrollable carousel.
  * @param props - Component props with CMS section data
  * @param props.data - Team grid section data from CMS
  * @param props.direction - Language direction for RTL support
@@ -44,48 +42,37 @@ export function TeamSection({ data, direction }: TeamSectionProps) {
     <section aria-label={header.header?.ariaDescription ?? ''}>
       <Header data={header} level={2} direction={direction} />
 
-      <div
-        className={`
-          grid grid-cols-1 gap-8
-          sm:grid-cols-2
-          lg:grid-cols-3
-        `}
-      >
+      {/* Horizontal scroll carousel */}
+      <Carousel direction={direction} className="mt-8">
         {team_members.map(member => (
-          <div
+          <Card
             key={member.documentId}
-            className={`
-              group overflow-hidden rounded-xl border border-neutral-200
-              bg-white p-6 text-center shadow-md transition-all
-              hover:border-primary/30
-              dark:border-white/5 dark:bg-surface-dark dark:shadow-none
-            `}
-          >
-            {/* Profile Picture */}
-            <div className="relative mx-auto mb-4 size-32 overflow-hidden rounded-full bg-neutral-200 dark:bg-tertiary-700">
-              {member.profilePicture ? (
-                <CMSImage
-                  image={member.profilePicture}
-                  fallbackAlt={member.name}
-                  className="size-full object-cover"
-                  fill
-                />
-              ) : (
-                <div className="flex size-full items-center justify-center text-4xl font-bold text-neutral-400 dark:text-text-secondary-dark">
+            href="#"
+            variant="profile"
+            asLink={false}
+            image={member.profilePicture}
+            imageAlt={member.name}
+            imageOverlay={
+              !member.profilePicture ? (
+                <div
+                  className="
+                    absolute inset-0 flex items-center justify-center
+                    text-4xl font-bold text-neutral-400 dark:text-text-secondary-dark"
+                >
                   {member.name
                     .split(' ')
                     .map(n => n[0])
                     .join('')
                     .toUpperCase()}
                 </div>
-              )}
-            </div>
-
+              ) : null
+            }
+          >
             {/* Name */}
-            <h3 className="mb-1 text-xl font-bold text-neutral-800 dark:text-white">{member.name}</h3>
+            <h3 className="mb-1 text-lg font-bold text-neutral-800 dark:text-white">{member.name}</h3>
 
             {/* Role */}
-            <p className="mb-4 text-sm font-medium text-primary">{member.role}</p>
+            <p className="mb-3 text-sm font-medium text-primary">{member.role}</p>
 
             {/* Bio */}
             {member.bio && (
@@ -93,55 +80,83 @@ export function TeamSection({ data, direction }: TeamSectionProps) {
             )}
 
             {/* Social Links */}
-            <div className="flex justify-center gap-3">
+            <div className="mt-auto flex justify-center gap-3">
               {member.twitter && (
-                <Link
-                  href={`https://twitter.com/${member.twitter}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-neutral-500 transition-colors hover:text-primary dark:text-text-secondary-dark"
-                  aria-label={`${member.name} on Twitter`}
-                >
-                  <CMSIcon icon="open_in_new" size="md" />
-                </Link>
+                <ButtonLink
+                  data={{
+                    url: `https://x.com/${member.twitter}`,
+                    openInNewTab: true,
+                    label: {
+                      text: '',
+                      icon: 'x.svg',
+                      iconPosition: IconPositionEnum.BEFORE_TEXT,
+                      ariaDescription: `${member.name} on X`,
+                    },
+                  }}
+                  direction={direction}
+                  variant="link-2"
+                  iconSize="md"
+                  maskedIcon={true}
+                />
               )}
               {member.linkedin && (
-                <Link
-                  href={`https://linkedin.com/in/${member.linkedin}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-neutral-500 transition-colors hover:text-primary dark:text-text-secondary-dark"
-                  aria-label={`${member.name} on LinkedIn`}
-                >
-                  <CMSIcon icon="work" size="md" />
-                </Link>
+                <ButtonLink
+                  data={{
+                    url: `https://linkedin.com/in/${member.linkedin}`,
+                    openInNewTab: true,
+                    label: {
+                      text: '',
+                      icon: 'linkedin.svg',
+                      iconPosition: IconPositionEnum.BEFORE_TEXT,
+                      ariaDescription: `${member.name} on LinkedIn`,
+                    },
+                  }}
+                  direction={direction}
+                  variant="link-2"
+                  iconSize="md"
+                  maskedIcon={true}
+                />
               )}
               {member.github && (
-                <Link
-                  href={`https://github.com/${member.github}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-neutral-500 transition-colors hover:text-primary dark:text-text-secondary-dark"
-                  aria-label={`${member.name} on GitHub`}
-                >
-                  <CMSIcon icon="code" size="md" />
-                </Link>
+                <ButtonLink
+                  data={{
+                    url: `https://github.com/${member.github}`,
+                    openInNewTab: true,
+                    label: {
+                      text: '',
+                      icon: 'github.svg',
+                      iconPosition: IconPositionEnum.BEFORE_TEXT,
+                      ariaDescription: `${member.name} on GitHub`,
+                    },
+                  }}
+                  direction={direction}
+                  variant="link-2"
+                  iconSize="md"
+                  maskedIcon={true}
+                />
               )}
               {member.instagram && (
-                <Link
-                  href={`https://instagram.com/${member.instagram}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-neutral-500 transition-colors hover:text-primary dark:text-text-secondary-dark"
-                  aria-label={`${member.name} on Instagram`}
-                >
-                  <CMSIcon icon="photo_camera" size="md" />
-                </Link>
+                <ButtonLink
+                  data={{
+                    url: `https://instagram.com/${member.instagram}`,
+                    openInNewTab: true,
+                    label: {
+                      text: '',
+                      icon: 'instagram.svg',
+                      iconPosition: IconPositionEnum.BEFORE_TEXT,
+                      ariaDescription: `${member.name} on Instagram`,
+                    },
+                  }}
+                  direction={direction}
+                  variant="link-2"
+                  iconSize="md"
+                  maskedIcon={true}
+                />
               )}
             </div>
-          </div>
+          </Card>
         ))}
-      </div>
+      </Carousel>
     </section>
   )
 }

@@ -442,4 +442,40 @@ describe('BrandFeaturesSection', () => {
     expect(section).toBeInTheDocument()
     expect(section).toHaveAttribute('aria-label', '')
   })
+  it('should use justify-start alignment for standalone features in LTR', () => {
+    const dataWithoutHeader: BrandFeaturesSectionProps['data'] = {
+      ...mockSectionData,
+      showHeader: false,
+    }
+
+    const { container } = render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithoutHeader} />)
+
+    // Each feature should be in its own container with bg-white (light mode)
+    // We check that they have justify-start class
+    const featureContainers = container.querySelectorAll('.bg-white.rounded-xl')
+    expect(featureContainers.length).toBeGreaterThan(0)
+    featureContainers.forEach(feature => {
+      expect(feature).toHaveClass('justify-start')
+      expect(feature).not.toHaveClass('justify-center')
+    })
+  })
+
+  it('should use justify-end alignment for standalone features in RTL', () => {
+    const dataWithoutHeader: BrandFeaturesSectionProps['data'] = {
+      ...mockSectionData,
+      showHeader: false,
+    }
+
+    // Use RTL direction
+    const { container } = render(<BrandFeaturesSection direction={DirectionEnum.RTL} data={dataWithoutHeader} />)
+
+    // Each feature should be in its own container with bg-white (light mode)
+    // We check that they have justify-end class
+    const featureContainers = container.querySelectorAll('.bg-white.rounded-xl')
+    expect(featureContainers.length).toBeGreaterThan(0)
+    featureContainers.forEach(feature => {
+      expect(feature).toHaveClass('justify-end')
+      expect(feature).not.toHaveClass('justify-center')
+    })
+  })
 })

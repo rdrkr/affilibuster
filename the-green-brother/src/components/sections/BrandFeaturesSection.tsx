@@ -85,7 +85,7 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
             <div
               key={feature.id ?? index}
               className={`
-                flex items-center justify-center
+                flex items-center ${isRTL ? 'justify-end' : 'justify-start'}
                 rounded-xl border
                 border-neutral-200 bg-white
                 p-6 shadow-sm
@@ -93,7 +93,7 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
                 dark:shadow-none
               `}
             >
-              <Header data={feature} level={5} direction={direction} />
+              <Header data={feature} level={5} direction={direction} className="w-full" />
             </div>
           )
         })}

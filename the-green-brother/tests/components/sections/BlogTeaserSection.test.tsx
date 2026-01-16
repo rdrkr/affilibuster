@@ -129,6 +129,41 @@ jest.mock('@/components/elements', () => ({
       </Wrapper>
     )
   },
+  Carousel: function MockCarousel({
+    children,
+    direction,
+    ariaLabel,
+  }: {
+    children: React.ReactNode
+    direction?: string
+    ariaLabel?: string
+  }) {
+    const isRTL = direction === 'rtl'
+    return (
+      <div
+        data-testid="mock-carousel"
+        className="scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto"
+        dir={isRTL ? 'rtl' : 'ltr'}
+        role={ariaLabel ? 'region' : undefined}
+        aria-label={ariaLabel}
+      >
+        {children}
+      </div>
+    )
+  },
+  ButtonLink: function MockButtonLink({
+    data,
+    className,
+  }: {
+    data: { label: { text: string }; url: string }
+    className?: string
+  }) {
+    return (
+      <a href={data.url} className={className}>
+        {data.label.text}
+      </a>
+    )
+  },
 }))
 
 describe('BlogTeaserSection', () => {
@@ -151,6 +186,16 @@ describe('BlogTeaserSection', () => {
 
         iconPosition: IconPositionEnum.BEFORE_TEXT,
       },
+    },
+    viewAllButton: {
+      label: {
+        text: 'View All Posts',
+        icon: 'arrow_forward',
+        iconPosition: IconPositionEnum.AFTER_TEXT,
+        ariaDescription: 'View all blog posts',
+      },
+      url: '/blog',
+      openInNewTab: false,
     },
   }
 
@@ -299,6 +344,25 @@ describe('BlogTeaserSection', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'From Our Blog' })).toBeInTheDocument()
   })
 
+  it('should render view all button with correct alignment for LTR', () => {
+    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
+
+    const button = screen.getByRole('link', { name: 'View All Posts' })
+    expect(button).toBeInTheDocument()
+    expect(button).toHaveAttribute('href', '/blog')
+    expect(button).toHaveClass('self-end')
+  })
+
+  it('should render view all button with correct alignment for RTL', () => {
+    const { DirectionEnum } =
+      jest.requireActual<typeof import('@/lib/generated/types.gen')>('@/lib/generated/types.gen')
+
+    render(<BlogTeaserSection direction={DirectionEnum.RTL} data={mockSectionData} blogPosts={mockBlogPosts} />)
+
+    const button = screen.getByRole('link', { name: 'View All Posts' })
+    expect(button).toHaveClass('self-start')
+  })
+
   it('should render subheader when provided', () => {
     render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
 
@@ -355,8 +419,9 @@ describe('BlogTeaserSection', () => {
     render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
 
     const links = screen.getAllByRole('link')
-    expect(links[0]).toHaveAttribute('href', '/blog/reduce-plastic-waste')
-    expect(links[1]).toHaveAttribute('href', '/blog/sustainable-fashion-guide')
+    // Skip first link (view all button)
+    expect(links[1]).toHaveAttribute('href', '/blog/reduce-plastic-waste')
+    expect(links[2]).toHaveAttribute('href', '/blog/sustainable-fashion-guide')
   })
 
   it('should not render when blogPosts array is empty', () => {

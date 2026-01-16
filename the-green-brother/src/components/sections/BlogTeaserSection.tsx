@@ -8,7 +8,7 @@
  * Uses Header composite for section title.
  */
 
-import { Card, Header, Label } from '@/components/elements'
+import { ButtonLink, Card, Carousel, Header, Label } from '@/components/elements'
 import {
   DirectionEnum,
   type ApiBlogPostBlogPostDocument,
@@ -38,7 +38,7 @@ export interface BlogTeaserSectionProps {
  * @returns Blog teaser section component or null if no blog posts
  */
 export function BlogTeaserSection({ data, blogPosts, direction }: BlogTeaserSectionProps) {
-  const { header } = data
+  const { header, viewAllButton } = data
   const isRTL = direction === DirectionEnum.RTL
 
   // Don't render if no blog posts
@@ -47,18 +47,18 @@ export function BlogTeaserSection({ data, blogPosts, direction }: BlogTeaserSect
   }
 
   return (
-    <section className="mb-24" aria-label={header.header?.ariaDescription ?? ''}>
+    <section className="mb-24 flex flex-col" aria-label={header.header?.ariaDescription ?? ''}>
       <Header data={header} level={2} direction={direction} />
+      <ButtonLink
+        data={viewAllButton}
+        direction={direction}
+        variant="link-1"
+        iconSize="sm"
+        className={`mt-4 ${isRTL ? 'self-start' : 'self-end'}`}
+      />
 
       {/* Horizontal scroll carousel */}
-      <div
-        className={`
-          scrollbar-hide mt-12 flex snap-x snap-mandatory gap-6 overflow-x-auto
-        `}
-        role="region"
-        aria-label={header.header?.ariaDescription ?? ''}
-        dir={isRTL ? 'rtl' : 'ltr'}
-      >
+      <Carousel direction={direction} ariaLabel={header.header?.ariaDescription ?? ''} className="mt-2">
         {blogPosts.map(post => {
           const { featuredImage } = post
           const firstTag = post.tags?.[0]?.tag?.text ?? ''
@@ -103,7 +103,7 @@ export function BlogTeaserSection({ data, blogPosts, direction }: BlogTeaserSect
             </Card>
           )
         })}
-      </div>
+      </Carousel>
     </section>
   )
 }

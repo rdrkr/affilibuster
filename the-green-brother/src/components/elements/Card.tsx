@@ -14,7 +14,7 @@ import CMSImage from './CMSImage'
 /**
  * Card variant type
  */
-export type CardVariant = 'product' | 'blog'
+export type CardVariant = 'product' | 'blog' | 'profile'
 
 /**
  * Props for the Card component
@@ -49,16 +49,20 @@ export interface CardProps {
  */
 function getVariantClasses(variant: CardVariant): {
   container: string
-  imageHeight: string
+  imageWrapperClass: string
 } {
-  const variants: Record<CardVariant, { container: string; imageHeight: string }> = {
+  const variants: Record<CardVariant, { container: string; imageWrapperClass: string }> = {
     product: {
       container: 'h-card w-carousel-mobile md:w-carousel-desktop',
-      imageHeight: 'h-64',
+      imageWrapperClass: 'h-64',
     },
     blog: {
       container: 'h-card w-blog-carousel-mobile md:w-blog-carousel-desktop',
-      imageHeight: 'h-48',
+      imageWrapperClass: 'h-48',
+    },
+    profile: {
+      container: 'h-auto w-carousel-mobile md:w-carousel-desktop text-center',
+      imageWrapperClass: 'w-40 h-40 mx-auto mt-6 rounded-full',
     },
   }
   return variants[variant]
@@ -107,9 +111,18 @@ export function Card({
     ${className}
   `
 
+  const sizes =
+    variant === 'product'
+      ? '320px'
+      : variant === 'profile'
+        ? '160px'
+        : '(max-width: 768px) 85vw, calc((100vw - 4rem) / 3.5)'
+
   const content = (
     <>
-      <div className={`relative overflow-hidden bg-neutral-100 dark:bg-tertiary-800 ${variantClasses.imageHeight}`}>
+      <div
+        className={`relative overflow-hidden bg-neutral-100 dark:bg-tertiary-800 ${variantClasses.imageWrapperClass}`}
+      >
         <CMSImage
           image={image}
           fallbackAlt={imageAlt}
@@ -118,7 +131,7 @@ export function Card({
             group-hover:scale-110
           `}
           fill
-          sizes={variant === 'product' ? '320px' : '(max-width: 768px) 85vw, calc((100vw - 4rem) / 3.5)'}
+          sizes={sizes}
         />
         {imageOverlay}
       </div>

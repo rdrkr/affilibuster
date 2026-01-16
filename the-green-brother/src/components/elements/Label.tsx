@@ -40,6 +40,8 @@ export interface LabelProps {
   textClassName?: string
   /** Additional CSS classes for the icon */
   iconClassName?: string
+  /** Use masked icon for local icons (inherits color) */
+  maskedIcon?: boolean
 }
 
 /**
@@ -59,6 +61,7 @@ export interface LabelProps {
  * @param props.className - Container CSS classes
  * @param props.textClassName - Text CSS classes
  * @param props.iconClassName - Icon CSS classes
+ * @param props.maskedIcon - Use masked icon for local icons (inherits color)
  * @returns Label component or null if no data or not visible
  */
 export function Label({
@@ -74,6 +77,7 @@ export function Label({
   className = '',
   textClassName = '',
   iconClassName = '',
+  maskedIcon = false,
 }: LabelProps) {
   if (!data || visible === false) {
     return null
@@ -89,6 +93,7 @@ export function Label({
         className={iconClassName}
         ariaLabel={ariaDescription}
         promoted={promoteIcon}
+        masked={maskedIcon}
       />
     ) : null
 

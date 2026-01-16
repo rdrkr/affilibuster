@@ -262,6 +262,8 @@ export interface ComposeButtonContentParams {
   showText?: boolean | undefined
   /** Position of children relative to label */
   childrenPosition?: 'start' | 'end'
+  /** Use masked icon for local icons */
+  maskedIcon?: boolean
 }
 
 /**
@@ -272,7 +274,7 @@ export interface ComposeButtonContentParams {
  * @returns Composed React node or null if no content
  */
 export function composeButtonContent(params: ComposeButtonContentParams): ReactNode {
-  const { label, children, direction, iconSize, showText, childrenPosition = 'end' } = params
+  const { label, children, direction, iconSize, showText, childrenPosition = 'end', maskedIcon } = params
 
   let content: ReactNode = children
 
@@ -319,6 +321,7 @@ export function composeButtonContent(params: ComposeButtonContentParams): ReactN
         display="inline"
         className={`items-center justify-center ${showText === false ? 'gap-0!' : ''}`}
         showText={showText ?? true}
+        maskedIcon={maskedIcon ?? false}
       />
     )
 

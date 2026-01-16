@@ -77,6 +77,70 @@ jest.mock('@/components/elements', () => ({
       </div>
     )
   },
+  Card: function MockCard({
+    children,
+    image,
+    imageAlt,
+    imageOverlay,
+  }: {
+    children: React.ReactNode
+    image?: { url?: string; alternativeText?: string }
+    imageAlt?: string
+    imageOverlay?: React.ReactNode
+  }) {
+    return (
+      <div data-testid="mock-card">
+        {image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            data-testid="mock-image"
+            src={image.url ?? '/images/placeholder.svg'}
+            alt={image.alternativeText ?? imageAlt ?? ''}
+          />
+        ) : (
+          imageOverlay
+        )}
+        {children}
+      </div>
+    )
+  },
+  ButtonLink: function MockButtonLink({
+    data,
+    maskedIcon,
+  }: {
+    data?: {
+      url?: string
+      openInNewTab?: boolean
+      label?: { text?: string; icon?: string; ariaDescription?: string }
+    }
+    maskedIcon?: boolean
+  }) {
+    if (!data?.url) return null
+    return (
+      <a
+        href={data.url}
+        target={data.openInNewTab ? '_blank' : undefined}
+        rel={data.openInNewTab ? 'noopener noreferrer' : undefined}
+        aria-label={data.label?.ariaDescription}
+        data-testid="mock-button-link"
+        data-masked={maskedIcon ? 'true' : 'false'}
+      >
+        {data.label?.icon && <span data-testid="mock-icon">{data.label.icon}</span>}
+      </a>
+    )
+  },
+  Carousel: function MockCarousel({ children, ariaLabel }: { children: React.ReactNode; ariaLabel?: string }) {
+    return (
+      <div
+        data-testid="mock-carousel"
+        className="scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto"
+        role={ariaLabel ? 'region' : undefined}
+        aria-label={ariaLabel}
+      >
+        {children}
+      </div>
+    )
+  },
 }))
 
 describe('TeamSection', () => {
@@ -172,10 +236,10 @@ describe('TeamSection', () => {
   it('should render social links when available', () => {
     render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} />)
 
-    const twitterLink = screen.getByRole('link', { name: 'John Doe on Twitter' })
-    expect(twitterLink).toHaveAttribute('href', 'https://twitter.com/johndoe')
-    expect(twitterLink).toHaveAttribute('target', '_blank')
-    expect(twitterLink).toHaveAttribute('rel', 'noopener noreferrer')
+    const xLink = screen.getByRole('link', { name: 'John Doe on X' })
+    expect(xLink).toHaveAttribute('href', 'https://x.com/johndoe')
+    expect(xLink).toHaveAttribute('target', '_blank')
+    expect(xLink).toHaveAttribute('rel', 'noopener noreferrer')
 
     const linkedinLink = screen.getByRole('link', { name: 'John Doe on LinkedIn' })
     expect(linkedinLink).toHaveAttribute('href', 'https://linkedin.com/in/johndoe')
@@ -185,6 +249,16 @@ describe('TeamSection', () => {
 
     const instagramLink = screen.getByRole('link', { name: 'John Doe on Instagram' })
     expect(instagramLink).toHaveAttribute('href', 'https://instagram.com/johndoe')
+  })
+
+  it('should use masked icons for social links', () => {
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} />)
+
+    const socialLinks = screen.getAllByTestId('mock-button-link')
+    // All 4 social links should have data-masked="true"
+    socialLinks.forEach(link => {
+      expect(link).toHaveAttribute('data-masked', 'true')
+    })
   })
 
   it('should not render social links when not provided', () => {
@@ -207,7 +281,7 @@ describe('TeamSection', () => {
 
     render(<TeamSection direction={DirectionEnum.LTR} data={dataWithoutSocials} />)
 
-    expect(screen.queryByRole('link', { name: /on Twitter/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /on X$/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /on LinkedIn/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /on GitHub/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /on Instagram/i })).not.toBeInTheDocument()
@@ -251,6 +325,20 @@ describe('TeamSection', () => {
           name: 'Jane Smith',
           role: 'CTO',
         },
+        {
+          ...mockTeamMember,
+          documentId: 'member-3',
+          id: 3,
+          name: 'Bob Jones',
+          role: 'Dev',
+        },
+        {
+          ...mockTeamMember,
+          documentId: 'member-4',
+          id: 4,
+          name: 'Sarah Connor',
+          role: 'Manager',
+        },
       ],
     }
 
@@ -258,8 +346,8 @@ describe('TeamSection', () => {
 
     expect(screen.getByText('John Doe')).toBeInTheDocument()
     expect(screen.getByText('Jane Smith')).toBeInTheDocument()
-    expect(screen.getByText('CEO')).toBeInTheDocument()
-    expect(screen.getByText('CTO')).toBeInTheDocument()
+    expect(screen.getByText('Bob Jones')).toBeInTheDocument()
+    expect(screen.getByText('Sarah Connor')).toBeInTheDocument()
   })
 
   it('should render without bio when not provided', () => {

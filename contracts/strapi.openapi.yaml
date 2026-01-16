@@ -12449,9 +12449,13 @@ components:
           items:
             $ref: '#/components/schemas/ApiBlogPostBlogPostDocument'
           description: A relational field
+        viewAllButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
       required:
         - id
         - header
+        - viewAllButton
       additionalProperties: false
     SectionsBrandFeaturesSectionEntry:
       type: object

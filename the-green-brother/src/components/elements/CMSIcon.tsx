@@ -103,6 +103,8 @@ export interface CMSIconProps {
   promoted?: boolean
   /** Controls visibility - when false, element is hidden from layout */
   visible?: boolean
+  /** When true, renders the icon as a mask with current text color (only for local icons) */
+  masked?: boolean
 }
 
 /**
@@ -129,16 +131,26 @@ const sizeMappings = {
  * @param props.ariaLabel - Aria label for accessibility
  * @param props.promoted - When true, renders the icon larger with a circular background
  * @param props.visible - Controls visibility (false = hidden from layout)
+ * @param props.masked - When true, renders local icon as a mask to inherit color
  * @returns Icon element or null if no icon or not visible
  * @example
  * ```tsx
  * <CMSIcon icon="brand.svg" size="lg" />
+ * <CMSIcon icon="social.svg" size="md" masked />
  * <CMSIcon icon="home" size="md" />
  * <CMSIcon icon="Account Circle" />
  * <CMSIcon icon="menu" visible={isMenuVisible} />
  * ```
  */
-export function CMSIcon({ icon, size = 'lg', className = '', ariaLabel, promoted = false, visible }: CMSIconProps) {
+export function CMSIcon({
+  icon,
+  size = 'lg',
+  className = '',
+  ariaLabel,
+  promoted = false,
+  visible,
+  masked = false,
+}: CMSIconProps) {
   const resolved = resolveIcon(icon)
 
   if (!resolved || visible === false) {
@@ -158,6 +170,47 @@ export function CMSIcon({ icon, size = 'lg', className = '', ariaLabel, promoted
     : {}
 
   if (resolved.type === 'local') {
+    // If masked is true, render as a colored div with mask-image
+    // This allows the icon to take the current text color (bg-current)
+    if (masked) {
+      const maskStyle = {
+        maskImage: `url(${resolved.value})`,
+        WebkitMaskImage: `url(${resolved.value})`,
+        maskRepeat: 'no-repeat',
+        WebkitMaskRepeat: 'no-repeat',
+        maskPosition: 'center',
+        WebkitMaskPosition: 'center',
+        maskSize: 'contain',
+        WebkitMaskSize: 'contain',
+        width: `${String(sizeValue)}px`,
+        height: `${String(sizeValue)}px`,
+        backgroundColor: 'currentColor',
+      }
+
+      const maskElement = (
+        <span
+          className={`
+             inline-block bg-current
+             ${promoted ? '' : className}
+          `}
+          style={maskStyle}
+          role="img"
+          aria-label={ariaLabel ?? ''}
+          aria-hidden={!ariaLabel}
+        />
+      )
+
+      if (promoted) {
+        return (
+          <span className={`${promotedClasses} ${className}`} style={promotedStyle}>
+            {maskElement}
+          </span>
+        )
+      }
+
+      return maskElement
+    }
+
     const imageElement = (
       <Image
         src={resolved.value}

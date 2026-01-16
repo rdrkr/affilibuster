@@ -8,7 +8,7 @@
  * Uses Header and ButtonLink composites for section title and actions.
  */
 
-import { ButtonLink, Card, CMSIcon, CMSText, Header } from '@/components/elements'
+import { ButtonLink, Card, Carousel, CMSIcon, CMSText, Header } from '@/components/elements'
 import {
   DirectionEnum,
   type ApiProductProductDocument,
@@ -47,29 +47,18 @@ export function FeaturedProductsSection({ data, products, direction }: FeaturedP
   }
 
   return (
-    <section aria-label={header.header?.ariaDescription ?? ''}>
-      <div
-        className={`
-          mb-8 flex flex-col items-start gap-4 px-2
-          sm:flex-row sm:items-end sm:justify-between ${isRTL ? 'sm:flex-row-reverse' : ''}
-        `}
-      >
-        <Header data={header} level={2} direction={direction} />
-        <ButtonLink
-          data={viewAllButton}
-          direction={direction}
-          variant="link-1"
-          iconSize="sm"
-          className={`${isRTL ? 'self-start' : 'self-end'} sm:self-auto`}
-        />
-      </div>
+    <section className="mb-8 flex flex-col" aria-label={header.header?.ariaDescription ?? ''}>
+      <Header data={header} level={2} direction={direction} />
+      <ButtonLink
+        data={viewAllButton}
+        direction={direction}
+        variant="link-1"
+        iconSize="sm"
+        className={`mt-4 ${isRTL ? 'self-start' : 'self-end'}`}
+      />
 
-      <div
-        className={`
-          scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto
-        `}
-        dir={isRTL ? 'rtl' : 'ltr'}
-      >
+      {/* Horizontal scroll carousel */}
+      <Carousel direction={direction} gap="sm" className="mt-2">
         {products.map(product => {
           const primaryImage = product.images[0]
           const tagText = product.tags?.at(0)?.tag?.text ?? ''
@@ -146,7 +135,7 @@ export function FeaturedProductsSection({ data, products, direction }: FeaturedP
             </Card>
           )
         })}
-      </div>
+      </Carousel>
     </section>
   )
 }

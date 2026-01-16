@@ -24,7 +24,7 @@
   "dependencies": {
     "@axe-core/playwright": "^4.11.0",
     "@eslint/js": "^9.39.2",
-    "@hey-api/openapi-ts": "^0.90.3",
+    "@hey-api/openapi-ts": "^0.90.4",
     "@material-symbols/font-400": "^0.40.2",
     "@material-symbols/font-700": "^0.40.2",
     "@playwright/test": "^1.57.0",
