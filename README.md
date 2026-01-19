@@ -193,7 +193,6 @@ affilibuster/                        # Monorepo root
 │ │ │ ├── product/                   # Product content type
 │ │ │ ├── product-category/          # Product categories
 │ │ │ ├── product-tag/               # Product tags
-│ │ │ ├── team-member/               # Team members
 │ │ │ └── [+11 more types]           # FAQ, Privacy, Terms, Error pages, etc.
 │ │ ├── components/                  # UI component schemas
 │ │ ├── index.ts                     # Strapi entry point
@@ -213,8 +212,7 @@ affilibuster/                        # Monorepo root
 │ ├── format.sh                      # Format code
 │ ├── lint.sh                        # Lint code
 │ ├── setup.sh                       # Development setup
-│ ├── test.sh                        # Run tests
-│ └── upgrade.sh                     # Upgrade dependencies
+│ └── test.sh                        # Run tests
 │
 ├── .specify/                        # SpecKit project configuration
 │ ├── memory/constitution.md         # Project constitution & principles

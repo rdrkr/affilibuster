@@ -19,20 +19,20 @@ import { apiRequest, createApiRequest } from '@/lib/core/client'
 import type {
   AboutGetAboutData,
   AboutGetAboutResponses,
-  AuthorGetAuthorsByIdData,
-  AuthorGetAuthorsByIdResponses,
-  AuthorGetAuthorsData,
-  AuthorGetAuthorsResponses,
   AuthPageGetAuthPageData,
   AuthPageGetAuthPageResponses,
   BlogGetBlogData,
   BlogGetBlogResponses,
-  BlogPostGetBlogPostsByIdData,
-  BlogPostGetBlogPostsByIdResponses,
+  BlogPostGetBlogPostsBySlugData,
+  BlogPostGetBlogPostsBySlugResponses,
   BlogPostGetBlogPostsData,
   BlogPostGetBlogPostsResponses,
   ContactUsGetContactUsData,
   ContactUsGetContactUsResponses,
+  ContributorGetContributorsBySlugData,
+  ContributorGetContributorsBySlugResponses,
+  ContributorGetContributorsData,
+  ContributorGetContributorsResponses,
   Error404GetError404Data,
   Error404GetError404Responses,
   Error410GetError410Data,
@@ -49,12 +49,12 @@ import type {
   PrivacyGetPrivacyResponses,
   ProductCategoriesPageGetProductCategoriesPageData,
   ProductCategoriesPageGetProductCategoriesPageResponses,
-  ProductCategoryGetProductCategoriesByIdData,
-  ProductCategoryGetProductCategoriesByIdResponses,
+  ProductCategoryGetProductCategoriesBySlugData,
+  ProductCategoryGetProductCategoriesBySlugResponses,
   ProductCategoryGetProductCategoriesData,
   ProductCategoryGetProductCategoriesResponses,
-  ProductGetProductsByIdData,
-  ProductGetProductsByIdResponses,
+  ProductGetProductsBySlugData,
+  ProductGetProductsBySlugResponses,
   ProductGetProductsData,
   ProductGetProductsResponses,
   ProfileGetProfileData,
@@ -465,27 +465,27 @@ export async function getProducts(
 }
 
 /**
- * Get single product by ID
- * @param id - Product document ID
+ * Get single product by Slug
+ * @param slug - Product slug
  * @param query - Optional query parameters including locale and populate
  * @returns The product data or null if the request fails
  */
-export async function getProductById(
-  id: string,
-  query?: Omit<NonNullable<ProductGetProductsByIdData['query']>, 'customPopulate'>
-): Promise<ProductGetProductsByIdResponses[200]['data'] | null> {
+export async function getProductBySlug(
+  slug: string,
+  query?: Omit<NonNullable<ProductGetProductsBySlugData['query']>, 'customPopulate'>
+): Promise<ProductGetProductsBySlugResponses[200]['data'] | null> {
   try {
-    const request = createApiRequest<ProductGetProductsByIdData>(`/products/${id}`, {
-      path: { id },
+    const request = createApiRequest<ProductGetProductsBySlugData>(`/products/slug/${slug}`, {
+      path: { slug: slug },
       query: {
         ...query,
         customPopulate: 'nested',
       },
     })
-    const response = await apiRequest<ProductGetProductsByIdResponses[200]>(request)
+    const response = await apiRequest<ProductGetProductsBySlugResponses[200]>(request)
     return response.data
   } catch (error) {
-    console.error(`Failed to fetch product ${id}:`, error)
+    console.error(`Failed to fetch product ${slug}:`, error)
     return null
   }
 }
@@ -513,27 +513,30 @@ export async function getProductCategories(
 }
 
 /**
- * Get single product category by ID
- * @param id - Product category document ID
+ * Get single product category by Slug
+ * @param slug - Product category slug
  * @param query - Optional query parameters including locale and populate
  * @returns The product category data or null if the request fails
  */
-export async function getProductCategoryById(
-  id: string,
-  query?: Omit<NonNullable<ProductCategoryGetProductCategoriesByIdData['query']>, 'customPopulate'>
-): Promise<ProductCategoryGetProductCategoriesByIdResponses[200]['data'] | null> {
+export async function getProductCategoryBySlug(
+  slug: string,
+  query?: Omit<NonNullable<ProductCategoryGetProductCategoriesBySlugData['query']>, 'customPopulate'>
+): Promise<ProductCategoryGetProductCategoriesBySlugResponses[200]['data'] | null> {
   try {
-    const request = createApiRequest<ProductCategoryGetProductCategoriesByIdData>(`/product-categories/${id}`, {
-      path: { id },
-      query: {
-        ...query,
-        customPopulate: 'nested',
-      },
-    })
-    const response = await apiRequest<ProductCategoryGetProductCategoriesByIdResponses[200]>(request)
+    const request = createApiRequest<ProductCategoryGetProductCategoriesBySlugData>(
+      `/product-categories/slug/${slug}`,
+      {
+        path: { slug: slug },
+        query: {
+          ...query,
+          customPopulate: 'nested',
+        },
+      }
+    )
+    const response = await apiRequest<ProductCategoryGetProductCategoriesBySlugResponses[200]>(request)
     return response.data
   } catch (error) {
-    console.error(`Failed to fetch product category ${id}:`, error)
+    console.error(`Failed to fetch product category ${slug}:`, error)
     return null
   }
 }
@@ -561,75 +564,75 @@ export async function getBlogPosts(
 }
 
 /**
- * Get single blog post by ID
- * @param id - Blog post document ID
+ * Get single blog post by Slug
+ * @param slug - Blog post slug
  * @param query - Optional query parameters including locale and populate
  * @returns The blog post data or null if the request fails
  */
-export async function getBlogPostById(
-  id: string,
-  query?: Omit<NonNullable<BlogPostGetBlogPostsByIdData['query']>, 'customPopulate'>
-): Promise<BlogPostGetBlogPostsByIdResponses[200]['data'] | null> {
+export async function getBlogPostBySlug(
+  slug: string,
+  query?: Omit<NonNullable<BlogPostGetBlogPostsBySlugData['query']>, 'customPopulate'>
+): Promise<BlogPostGetBlogPostsBySlugResponses[200]['data'] | null> {
   try {
-    const request = createApiRequest<BlogPostGetBlogPostsByIdData>(`/blog-posts/${id}`, {
-      path: { id },
+    const request = createApiRequest<BlogPostGetBlogPostsBySlugData>(`/blog-posts/slug/${slug}`, {
+      path: { slug },
       query: {
         ...query,
         customPopulate: 'nested',
       },
     })
-    const response = await apiRequest<BlogPostGetBlogPostsByIdResponses[200]>(request)
+    const response = await apiRequest<BlogPostGetBlogPostsBySlugResponses[200]>(request)
     return response.data
   } catch (error) {
-    console.error(`Failed to fetch blog post ${id}:`, error)
+    console.error(`Failed to fetch blog post ${slug}:`, error)
     return null
   }
 }
 
 /**
- * Get authors (collection type)
+ * Get contributors (collection type)
  * @param query - Optional query parameters including locale, filters, pagination, sort, and populate
- * @returns The authors data or null if the request fails
+ * @returns The contributors data or null if the request fails
  */
-export async function getAuthors(
-  query?: Omit<NonNullable<AuthorGetAuthorsData['query']>, 'customPopulate'>
-): Promise<AuthorGetAuthorsResponses[200] | null> {
+export async function getContributors(
+  query?: Omit<NonNullable<ContributorGetContributorsData['query']>, 'customPopulate'>
+): Promise<ContributorGetContributorsResponses[200]['data'] | null> {
   try {
-    const request = createApiRequest<AuthorGetAuthorsData>('/authors', {
+    const request = createApiRequest<ContributorGetContributorsData>('/contributors', {
       query: {
         ...query,
         customPopulate: 'nested',
       },
     })
-    return await apiRequest<AuthorGetAuthorsResponses[200]>(request)
+    return (await apiRequest<ContributorGetContributorsResponses[200]>(request)).data
   } catch (error) {
-    console.error('Failed to fetch authors:', error)
+    console.error('Failed to fetch contributors:', error)
     return null
   }
 }
 
 /**
- * Get single author by ID
- * @param id - Author document ID
+ * Get single contributor by Slug
+ * @param slug - Contributor slug
  * @param query - Optional query parameters including locale and populate
- * @returns The author data or null if the request fails
+ * @returns The contributor data or null if the request fails
  */
-export async function getAuthorById(
-  id: string,
-  query?: Omit<NonNullable<AuthorGetAuthorsByIdData['query']>, 'customPopulate'>
-): Promise<AuthorGetAuthorsByIdResponses[200]['data'] | null> {
+export async function getContributorBySlug(
+  slug: string,
+  query?: Omit<NonNullable<ContributorGetContributorsBySlugData['query']>, 'customPopulate'>
+): Promise<ContributorGetContributorsBySlugResponses[200]['data'] | null> {
   try {
-    const request = createApiRequest<AuthorGetAuthorsByIdData>(`/authors/${id}`, {
-      path: { id },
+    const request = createApiRequest<ContributorGetContributorsBySlugData>(`/contributors/slug/${slug}`, {
+      path: { slug: slug },
       query: {
         ...query,
         customPopulate: 'nested',
       },
     })
-    const response = await apiRequest<AuthorGetAuthorsByIdResponses[200]>(request)
+    const response = await apiRequest<ContributorGetContributorsBySlugResponses[200]>(request)
     return response.data
   } catch (error) {
-    console.error(`Failed to fetch author ${id}:`, error)
+    console.error(`Failed to fetch contributor ${slug}:`, error)
     return null
   }
 }

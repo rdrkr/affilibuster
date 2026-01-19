@@ -19,17 +19,17 @@ import {
 
 // Mock the CMS element components
 jest.mock('@/components/elements', () => ({
-  CMSIcon: function MockCMSIcon({ icon, size, className }: { icon?: string; size?: string; className?: string }) {
+  Icon: function MockIcon({ icon, size, className }: { icon?: string; size?: string; className?: string }) {
     return (
       <span data-testid="mock-icon" data-icon={icon} data-size={size} className={className}>
         {icon}
       </span>
     )
   },
-  CMSText: function MockCMSText({ text }: { text?: string }) {
+  Text: function MockText({ text }: { text?: string }) {
     return <>{text}</>
   },
-  CMSImage: function MockCMSImage({
+  Image: function MockImage({
     image,
     fallbackAlt,
   }: {
@@ -43,7 +43,7 @@ jest.mock('@/components/elements', () => ({
       return image.url.startsWith('http') ? image.url : `https://localhost:1337${image.url}`
     }
     const alt = typeof image === 'object' && image.alternativeText ? image.alternativeText : (fallbackAlt ?? '')
-    // eslint-disable-next-line @next/next/no-img-element
+
     return <img data-testid="mock-image" src={getImageUrl()} alt={alt} />
   },
   Header: function MockHeader({
@@ -178,7 +178,7 @@ describe('ProductCategoriesSection', () => {
       <ProductCategoriesSection direction={DirectionEnum.LTR} data={mockSectionData} categories={mockCategories} />
     )
 
-    expect(screen.getByRole('heading', { level: 2, name: 'Shop by Category' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Shop by Category' })).toBeInTheDocument()
   })
 
   it('should render subheader when provided', () => {

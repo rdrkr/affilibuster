@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-import { factories } from '@strapi/strapi'
+import { createSlugCoreController } from '../../../utils/findOneBySlug'
 
-export default factories.createCoreController('api::blog-post.blog-post')
+export default createSlugCoreController('api::blog-post.blog-post')

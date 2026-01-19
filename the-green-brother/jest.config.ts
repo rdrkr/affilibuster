@@ -16,6 +16,7 @@ const customJestConfig: Config = {
     '^@/(.*)$': '<rootDir>/src/$1',
     'react-markdown': '<rootDir>/tests/mocks/react-markdown.tsx',
     'remark-breaks': '<rootDir>/tests/mocks/remark-breaks.ts',
+    'remark-gfm': '<rootDir>/tests/mocks/remark-gfm.ts',
   },
   testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
   testPathIgnorePatterns: [
@@ -31,7 +32,6 @@ const customJestConfig: Config = {
     '!src/**/__tests__/**',
     '!src/lib/generated/**',
     '!src/app/[lang]/style-guide/**',
-    '!src/components/elements/TextBlock.tsx',
   ],
   coverageThreshold: {
     global: {

@@ -1,17 +1,32 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-import * as eslint from '@eslint/js'
+import * as eslintJs from '@eslint/js'
+import type { ESLint } from 'eslint'
 import nextVitals from 'eslint-config-next/core-web-vitals'
 import nextTs from 'eslint-config-next/typescript'
 import eslintConfigPrettier from 'eslint-config-prettier/flat'
-import betterTailwindcss from 'eslint-plugin-better-tailwindcss'
+
+import eslintPluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss'
 import jsdoc from 'eslint-plugin-jsdoc'
 import { defineConfig } from 'eslint/config'
 import * as tseslint from 'typescript-eslint'
 
 export default defineConfig([
+  // Next.js configs
   ...nextVitals,
   ...nextTs,
+
+  // TypeScript configs
+  {
+    files: ['**/*.{js,mjs,ts,tsx,cts,mts}'],
+  },
+  {
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+      },
+    },
+  },
   {
     ignores: [
       '.next/**',
@@ -26,31 +41,48 @@ export default defineConfig([
       'postcss.config.mjs',
     ],
   },
-  { files: ['**/*.{js,mjs,ts,tsx,cts,mts}'] },
-  eslint.configs.recommended,
+  eslintJs.configs.recommended,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
-  jsdoc.configs['flat/recommended-typescript-error'],
   {
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-      },
+    rules: {
+      // handled by prettier
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+      // managed by our Image object
+      'jsx-a11y/alt-text': 'off',
     },
   },
+
+  // JSDoc configs
+  jsdoc.configs['flat/recommended-typescript-error'],
   {
     plugins: {
       jsdoc,
-      'better-tailwindcss': betterTailwindcss,
     },
+    rules: {},
+  },
+
+  // Tailwind CSS configs
+  {
     settings: {
       'better-tailwindcss': {
         entryPoint: 'src/styles/globals.css',
       },
     },
+    plugins: {
+      'better-tailwindcss': eslintPluginBetterTailwindcss as unknown as ESLint.Plugin,
+    },
     rules: {
       // Use plugin's recommended-error config rules
-      ...betterTailwindcss.configs['recommended-error']?.rules,
+      ...eslintPluginBetterTailwindcss.configs['recommended-error'].rules,
+
       // Override no-unknown-classes to add ignore list for legitimate non-Tailwind classes
       'better-tailwindcss/no-unknown-classes': [
         'error',
@@ -76,19 +108,12 @@ export default defineConfig([
       ],
       // handled by prettier
       'better-tailwindcss/enforce-consistent-line-wrapping': 'off',
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-          caughtErrorsIgnorePattern: '^_',
-        },
-      ],
     },
   },
-  // Relaxed rules for unit tests (Jest mocking limitations)
+
+  // Test configs
   {
-    files: ['tests/**/*.test.ts', 'tests/**/*.test.tsx', 'tests/**/*.ts'],
+    files: ['tests/**/*.test.ts', 'tests/**/*.test.tsx', 'tests/**/*.ts', 'tests/**/*.tsx'],
     rules: {
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
@@ -103,7 +128,45 @@ export default defineConfig([
           caughtErrorsIgnorePattern: '^_',
         },
       ],
+      '@typescript-eslint/no-dynamic-delete': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/restrict-template-expressions': 'off',
+      '@typescript-eslint/unbound-method': 'off',
+      '@next/next/no-img-element': 'off',
+      // Override no-unknown-classes to add ignore list for legitimate non-Tailwind classes
+      'better-tailwindcss/no-unknown-classes': [
+        'error',
+        {
+          ignore: [
+            'custom-class', // Test-specific
+            'custom-icon', // Test-specific
+            'custom-tag', // Test-specific
+            'material-symbols-outlined',
+            'material-symbols-outlined-bold',
+            'scrollbar-hide',
+            'animate-fade-in-up',
+            'text-shadow-shimmer',
+            'text-shadow-sm',
+            'text-shadow-base',
+            'text-shadow-md',
+            'text-shadow-lg',
+            'text-shadow-xl',
+            'text-shadow-2xl',
+            'text-shadow-none',
+            'drop-shadow-icon-sm',
+            'prose',
+            'prose-invert',
+          ],
+        },
+      ],
     },
   },
+
+  // Prettier config
   eslintConfigPrettier, // must be last as per https://github.com/prettier/eslint-config-prettier?tab=readme-ov-file#eslint-config-prettier
 ])

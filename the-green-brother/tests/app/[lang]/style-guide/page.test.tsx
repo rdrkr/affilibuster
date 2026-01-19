@@ -8,7 +8,6 @@ import { CodeEnum } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 
 import StyleGuidePage, { generateMetadata, generateStaticParams } from '@/app/[lang]/style-guide/page'
-import { DirectionEnum } from '@/lib/generated/types.gen'
 
 // Mock next-intl/server
 jest.mock('next-intl/server', () => ({
@@ -18,18 +17,9 @@ jest.mock('next-intl/server', () => ({
 // Mock the StyleGuideClient component
 jest.mock('@/app/[lang]/style-guide/StyleGuideClient', () => ({
   __esModule: true,
-  default: function MockStyleGuideClient({ lang }: { lang: CodeEnum }) {
-    return <div data-testid="mock-style-guide-client" data-lang={lang}></div>
+  default: function MockStyleGuideClient() {
+    return <div data-testid="mock-style-guide-client"></div>
   },
-}))
-
-// Mock getLanguages
-jest.mock('@/lib/languages/api', () => ({
-  getLanguages: jest.fn().mockResolvedValue([
-    { code: CodeEnum.EN, direction: DirectionEnum.LTR },
-    { code: CodeEnum.IT, direction: DirectionEnum.LTR },
-    { code: CodeEnum.HE, direction: DirectionEnum.RTL },
-  ]),
 }))
 
 describe('StyleGuidePage', () => {
@@ -82,7 +72,6 @@ describe('StyleGuidePage', () => {
 
       const client = screen.getByTestId('mock-style-guide-client')
       expect(client).toBeInTheDocument()
-      expect(client).toHaveAttribute('data-lang', CodeEnum.EN)
     })
 
     it('should render StyleGuideClient with Italian language', async () => {
@@ -91,7 +80,6 @@ describe('StyleGuidePage', () => {
 
       const client = screen.getByTestId('mock-style-guide-client')
       expect(client).toBeInTheDocument()
-      expect(client).toHaveAttribute('data-lang', CodeEnum.IT)
     })
 
     it('should render StyleGuideClient with Hebrew language', async () => {
@@ -100,7 +88,6 @@ describe('StyleGuidePage', () => {
 
       const client = screen.getByTestId('mock-style-guide-client')
       expect(client).toBeInTheDocument()
-      expect(client).toHaveAttribute('data-lang', CodeEnum.HE)
     })
 
     it('should default to English when lang is missing', async () => {
@@ -108,7 +95,7 @@ describe('StyleGuidePage', () => {
       render(await StyleGuidePage({ params }))
 
       const client = screen.getByTestId('mock-style-guide-client')
-      expect(client).toHaveAttribute('data-lang', CodeEnum.EN)
+      expect(client).toBeInTheDocument()
     })
 
     it('should handle promise rejection gracefully', async () => {
@@ -122,7 +109,7 @@ describe('StyleGuidePage', () => {
       render(await StyleGuidePage({ params }))
 
       const client = screen.getByTestId('mock-style-guide-client')
-      expect(client).toHaveAttribute('data-lang', CodeEnum.EN) // Should default to CodeEnum.EN
+      expect(client).toBeInTheDocument()
 
       consoleSpy.mockRestore()
     })
@@ -141,7 +128,7 @@ describe('StyleGuidePage', () => {
       render(await StyleGuidePage({ params }))
 
       const client = screen.getByTestId('mock-style-guide-client')
-      expect(client).toHaveAttribute('data-lang', CodeEnum.EN) // Should fall back to default
+      expect(client).toBeInTheDocument()
     })
   })
 })

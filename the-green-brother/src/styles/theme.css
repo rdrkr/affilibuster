@@ -181,11 +181,16 @@
   /* ============================================
    * COMPONENT DIMENSIONS
    * ============================================ */
-  --height-card: 420px; /* Uniform card height for products and blog posts */
-  --width-carousel-mobile: 320px;
-  --width-carousel-desktop: 320px;
-  --width-blog-carousel-mobile: 420px;
-  --width-blog-carousel-desktop: 420px;
+  --height-card-xs: 120px;
+  --height-card-sm: 164px;
+  --height-card-md: 428px;
+  --height-card-lg: 500px;
+  --height-card-xl: 500px;
+  --width-card-xs: 320px;
+  --width-card-sm: 360px;
+  --width-card-md: 316px;
+  --width-card-lg: 420px;
+  --width-card-xl: 820px;
 
   /* ============================================
    * BORDER RADIUS SCALE

@@ -51,6 +51,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
+
       <body
         className={`
           ${inter.className}

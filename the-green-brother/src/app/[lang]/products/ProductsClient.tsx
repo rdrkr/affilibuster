@@ -6,7 +6,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
-import { CMSImage, CMSText } from '@/components/elements'
+import { Image, Text } from '@/components/elements'
+import { PageClient } from '@/components/layout'
 import type {
   ApiProductCategoriesPageProductCategoriesPageDocument,
   ApiProductCategoryProductCategoryDocument,
@@ -67,7 +68,7 @@ export default function ProductsClient({ pageData, products, categories }: Produ
   })
 
   return (
-    <div className="py-8">
+    <PageClient>
       {/* Header & Search */}
       <div className="mb-12">
         <h1
@@ -205,9 +206,8 @@ export default function ProductsClient({ pageData, products, categories }: Produ
                 `}
               >
                 <div className="relative h-64 overflow-hidden bg-neutral-100 dark:bg-tertiary-900">
-                  <CMSImage
+                  <Image
                     image={primaryImage}
-                    fallbackAlt={product.content?.header?.header?.text ?? product.slug}
                     className={`
                       object-cover transition-transform duration-500
                       group-hover:scale-110
@@ -230,29 +230,31 @@ export default function ProductsClient({ pageData, products, categories }: Produ
                 </div>
                 <div className="p-5">
                   {product.category?.content?.text && (
-                    <p
+                    <Text
+                      text={product.category.content.text}
+                      as="p"
                       className={`
-                      mb-1 text-xs font-bold tracking-wider text-primary-500
-                      uppercase
-                    `}
-                    >
-                      <CMSText text={product.category.content.text} />
-                    </p>
+                        mb-1 text-xs font-bold tracking-wider text-primary-500
+                        uppercase
+                      `}
+                    />
                   )}
-                  <h3
+
+                  <Text
+                    text={product.content?.header?.header?.text ?? ''}
+                    as="h3"
                     className={`
-                    mb-2 text-lg font-bold text-neutral-800 transition-colors
-                    group-hover:text-primary-500 dark:text-white
-                  `}
-                  >
-                    <CMSText text={product.content?.header?.header?.text ?? ''} />
-                  </h3>
+                      mb-2 text-lg font-bold text-neutral-800 transition-colors
+                      group-hover:text-primary-500 dark:text-white
+                    `}
+                  />
+
                   <div className="mt-4 flex items-center justify-between">
                     {product.price && (
                       <span
                         className={`
-                      text-xl font-bold text-neutral-800 dark:text-white
-                    `}
+                          text-xl font-bold text-neutral-800 dark:text-white
+                        `}
                       >
                         ${product.price}
                       </span>
@@ -269,7 +271,7 @@ export default function ProductsClient({ pageData, products, categories }: Produ
                     </button>
                   </div>
                   <Link
-                    href={`/products/${product.documentId}`}
+                    href={`/products/${product.documentId}` as const}
                     className={`
                     absolute inset-0 z-0
                   `}
@@ -291,6 +293,6 @@ export default function ProductsClient({ pageData, products, categories }: Produ
           <p className="text-lg text-neutral-500 dark:text-tertiary-400">No products found</p>
         </div>
       )}
-    </div>
+    </PageClient>
   )
 }

@@ -6,7 +6,7 @@
 
 import { render, screen } from '@testing-library/react'
 
-import { Header, type HeaderProps } from '@/components/elements/Header'
+import { Header, HeaderLevel, type HeaderProps } from '@/components/elements/Header'
 import { AlignmentEnum, DirectionEnum, type ElementsHeaderEntry, IconPositionEnum } from '@/lib/generated/types.gen'
 
 // Mock the Label component (Header uses relative import)
@@ -17,11 +17,13 @@ jest.mock('@/components/elements/Label', () => ({
     as: Tag = 'span',
     iconSize,
     className,
+    textClassName,
   }: {
     data?: { text?: string; ariaDescription?: string }
     as?: string
     iconSize?: string
     className?: string
+    textClassName?: string
   }) {
     // Handle heading tags - use div to avoid type issues
     if (Tag.startsWith('h')) {
@@ -34,13 +36,17 @@ jest.mock('@/components/elements/Label', () => ({
           role="heading"
           aria-level={level}
         >
-          {data?.text}
+          <span data-testid={`mock-label-${Tag}-text`} className={textClassName}>
+            {data?.text}
+          </span>
         </div>
       )
     }
     return (
       <span data-testid={`mock-label-${Tag}`} data-icon-size={iconSize} className={className}>
-        {data?.text}
+        <span data-testid={`mock-label-${Tag}-text`} className={textClassName}>
+          {data?.text}
+        </span>
       </span>
     )
   },
@@ -49,11 +55,13 @@ jest.mock('@/components/elements/Label', () => ({
     as: Tag = 'span',
     iconSize,
     className,
+    textClassName,
   }: {
     data?: { text?: string; ariaDescription?: string }
     as?: string
     iconSize?: string
     className?: string
+    textClassName?: string
   }) {
     // Handle heading tags - use div to avoid type issues
     if (Tag.startsWith('h')) {
@@ -66,13 +74,17 @@ jest.mock('@/components/elements/Label', () => ({
           role="heading"
           aria-level={level}
         >
-          {data?.text}
+          <span data-testid={`mock-label-${Tag}-text`} className={textClassName}>
+            {data?.text}
+          </span>
         </div>
       )
     }
     return (
       <span data-testid={`mock-label-${Tag}`} data-icon-size={iconSize} className={className}>
-        {data?.text}
+        <span data-testid={`mock-label-${Tag}-text`} className={textClassName}>
+          {data?.text}
+        </span>
       </span>
     )
   },
@@ -207,7 +219,7 @@ describe('Header', () => {
   })
 
   it('should render all heading levels correctly', () => {
-    const levels: (1 | 2 | 3 | 4 | 5 | 6)[] = [1, 2, 3, 4, 5, 6]
+    const levels: HeaderLevel[] = [1, 2, 3, 4, 5, 6]
     levels.forEach(level => {
       const { unmount } = render(<Header direction={DirectionEnum.LTR} data={mockHeaderData} level={level} />)
       expect(screen.getByTestId(`mock-label-h${String(level)}`)).toBeInTheDocument()
@@ -275,5 +287,28 @@ describe('Header', () => {
     render(<Header direction={DirectionEnum.LTR} data={dataWithPromotedNoSubheader} />)
     expect(screen.getByText('Main Heading')).toBeInTheDocument()
     expect(screen.queryByText('Subheading text')).not.toBeInTheDocument()
+  })
+
+  it('should pass subheaderTextClassName to Label textClassName', () => {
+    render(
+      <Header data={mockHeaderData} direction={DirectionEnum.LTR} subheaderTextClassName="line-clamp-2 custom-class" />
+    )
+
+    // The subheader text span should have the classes
+    const subheaderText = screen.getByTestId('mock-label-p-text')
+    expect(subheaderText).toHaveClass('line-clamp-2')
+    expect(subheaderText).toHaveClass('custom-class')
+  })
+
+  it('should pass subheaderTextClassName to Label textClassName in promoted layout', () => {
+    const dataWithPromotedIcon = {
+      ...mockHeaderData,
+      promoteHeaderIcon: true,
+    }
+    render(<Header data={dataWithPromotedIcon} direction={DirectionEnum.LTR} subheaderTextClassName="line-clamp-3" />)
+
+    // The subheader text span should have the class in promoted layout
+    const subheaderText = screen.getByTestId('mock-label-p-text')
+    expect(subheaderText).toHaveClass('line-clamp-3')
   })
 })

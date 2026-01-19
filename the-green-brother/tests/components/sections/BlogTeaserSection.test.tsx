@@ -24,24 +24,54 @@ jest.mock('next/image', () => ({
     fill?: boolean
     onError?: (e: { target: HTMLImageElement }) => void
   }) {
-    // eslint-disable-next-line @next/next/no-img-element
     return <img src={props.src} alt={props.alt} className={props.className} data-fill={props.fill} />
+  },
+}))
+
+// Mock BlogCard component
+jest.mock('@/components/blog', () => ({
+  BlogCard: function MockBlogCard({
+    post,
+    direction,
+    basePath,
+  }: {
+    post: {
+      documentId: string
+      slug: string
+      content?: { header?: { header?: { text?: string } } }
+      tags?: { tag?: { text?: string } }[]
+      featuredImage?: { url?: string; alternativeText?: string }
+    }
+    direction?: string
+    basePath?: string
+  }) {
+    return (
+      <a
+        data-testid="mock-blog-card"
+        href={`${basePath ?? '/blog'}/${post.slug}`}
+        data-direction={direction}
+        className="group"
+      >
+        <span data-testid="mock-blog-card-title">{post.content?.header?.header?.text}</span>
+        {post.tags?.[0]?.tag?.text && <span data-testid="mock-blog-card-tag">{post.tags[0].tag.text}</span>}
+      </a>
+    )
   },
 }))
 
 // Mock the CMS element components
 jest.mock('@/components/elements', () => ({
-  CMSIcon: function MockCMSIcon({ icon, size, className }: { icon?: string; size?: string; className?: string }) {
+  Icon: function MockIcon({ icon, size, className }: { icon?: string; size?: string; className?: string }) {
     return (
       <span data-testid="mock-icon" data-icon={icon} data-size={size} className={className}>
         {icon}
       </span>
     )
   },
-  CMSText: function MockCMSText({ text }: { text?: string }) {
+  Text: function MockText({ text }: { text?: string }) {
     return <>{text}</>
   },
-  CMSImage: function MockCMSImage({
+  Image: function MockImage({
     image,
     fallbackAlt,
   }: {
@@ -55,7 +85,7 @@ jest.mock('@/components/elements', () => ({
       return image.url.startsWith('http') ? image.url : `https://localhost:1337${image.url}`
     }
     const alt = typeof image === 'object' && image.alternativeText ? image.alternativeText : (fallbackAlt ?? '')
-    // eslint-disable-next-line @next/next/no-img-element
+
     return <img data-testid="mock-image" src={getImageUrl()} alt={alt} />
   },
   Header: function MockHeader({
@@ -87,46 +117,6 @@ jest.mock('@/components/elements', () => ({
         {data?.text}
         {data?.icon && <span data-testid="mock-label-icon">{data.icon}</span>}
       </span>
-    )
-  },
-  Card: function MockCard({
-    href,
-    image,
-    imageAlt,
-    tag,
-    children,
-    variant,
-    asLink,
-  }: {
-    href: string
-    image?: { url?: string; alternativeText?: string } | null
-    imageAlt?: string
-    tag?: string
-    children: React.ReactNode
-    variant?: 'product' | 'blog'
-    className?: string
-    asLink?: boolean
-  }) {
-    const getImageUrl = () => {
-      if (!image) return '/images/placeholder.svg'
-      if (!image.url) return '/images/placeholder.svg'
-      return image.url.startsWith('http') ? image.url : `https://localhost:1337${image.url}`
-    }
-    const alt = image?.alternativeText ?? imageAlt ?? ''
-    const Wrapper = asLink === false ? 'div' : 'a'
-    return (
-      <Wrapper
-        data-testid="mock-card"
-        data-variant={variant}
-        href={asLink === false ? undefined : href}
-        data-href={asLink === false ? href : undefined}
-        className="group"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img data-testid="mock-card-image" src={getImageUrl()} alt={alt} />
-        {tag && <span data-testid="mock-card-tag">{tag}</span>}
-        <div data-testid="mock-card-content">{children}</div>
-      </Wrapper>
     )
   },
   Carousel: function MockCarousel({
@@ -204,7 +194,7 @@ describe('BlogTeaserSection', () => {
       documentId: 'post-1',
       id: 1,
       slug: 'reduce-plastic-waste',
-      readTime: '5 min read',
+      readTimeInMinutes: 5,
       publishedDate: '2025-01-15',
       publishedAt: '2025-01-15',
       content: {
@@ -261,18 +251,12 @@ describe('BlogTeaserSection', () => {
         metaTitle: '10 Ways to Reduce Plastic Waste',
         metaDescription: 'Tips for reducing plastic waste',
       },
-      readArticleLabel: {
-        text: 'Read Article',
-        icon: 'arrow_forward',
-        iconPosition: IconPositionEnum.AFTER_TEXT,
-        ariaDescription: 'Read article',
-      },
     },
     {
       documentId: 'post-2',
       id: 2,
       slug: 'sustainable-fashion-guide',
-      readTime: '7 min read',
+      readTimeInMinutes: 7,
       publishedDate: '2025-01-10',
       publishedAt: '2025-01-10',
       content: {
@@ -329,23 +313,60 @@ describe('BlogTeaserSection', () => {
         metaTitle: 'Sustainable Fashion Guide',
         metaDescription: 'Guide to sustainable fashion',
       },
-      readArticleLabel: {
-        text: 'Read Article',
-        icon: 'arrow_forward',
-        iconPosition: IconPositionEnum.AFTER_TEXT,
-        ariaDescription: 'Read article',
-      },
     },
   ]
 
-  it('should render section with header text', () => {
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
+  const mockLabels = {
+    readTimeMinutesLabel: {
+      text: 'min read',
+      iconPosition: IconPositionEnum.AFTER_TEXT,
+      ariaDescription: 'Read time',
+      id: 1,
+    },
+    readArticleLabel: {
+      text: 'Read Article',
+      iconPosition: IconPositionEnum.AFTER_TEXT,
+      ariaDescription: 'Read full article',
+      id: 2,
+    },
+  }
 
-    expect(screen.getByRole('heading', { level: 2, name: 'From Our Blog' })).toBeInTheDocument()
+  const defaultContributor = {
+    name: 'Default Author',
+    slug: 'default-author',
+    bio: 'Bio',
+    publishedAt: '2025-01-01',
+    id: 999,
+    documentId: 'default-author-doc',
+  }
+
+  const defaultProps = {
+    ...mockLabels,
+    defaultContributor,
+  }
+
+  it('should render section with header text', () => {
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={mockBlogPosts}
+      />
+    )
+
+    expect(screen.getByRole('heading', { level: 3, name: 'From Our Blog' })).toBeInTheDocument()
   })
 
   it('should render view all button with correct alignment for LTR', () => {
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={mockBlogPosts}
+      />
+    )
 
     const button = screen.getByRole('link', { name: 'View All Posts' })
     expect(button).toBeInTheDocument()
@@ -357,14 +378,28 @@ describe('BlogTeaserSection', () => {
     const { DirectionEnum } =
       jest.requireActual<typeof import('@/lib/generated/types.gen')>('@/lib/generated/types.gen')
 
-    render(<BlogTeaserSection direction={DirectionEnum.RTL} data={mockSectionData} blogPosts={mockBlogPosts} />)
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.RTL}
+        data={mockSectionData}
+        blogPosts={mockBlogPosts}
+      />
+    )
 
     const button = screen.getByRole('link', { name: 'View All Posts' })
-    expect(button).toHaveClass('self-start')
+    expect(button).toHaveClass('self-end')
   })
 
   it('should render subheader when provided', () => {
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={mockBlogPosts}
+      />
+    )
 
     expect(screen.getByText('Discover tips and stories to inspire your eco-friendly journey.')).toBeInTheDocument()
   })
@@ -376,7 +411,14 @@ describe('BlogTeaserSection', () => {
       header: headerWithoutSubheader,
     }
 
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={dataWithoutSubheader} blogPosts={mockBlogPosts} />)
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={dataWithoutSubheader}
+        blogPosts={mockBlogPosts}
+      />
+    )
 
     expect(
       screen.queryByText('Discover tips and stories to inspire your eco-friendly journey.')
@@ -384,39 +426,56 @@ describe('BlogTeaserSection', () => {
   })
 
   it('should render all blog post titles', () => {
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={mockBlogPosts}
+      />
+    )
 
     expect(screen.getByText('10 Ways to Reduce Plastic Waste')).toBeInTheDocument()
     expect(screen.getByText('Sustainable Fashion Guide')).toBeInTheDocument()
   })
 
-  it('should render blog post excerpts', () => {
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
+  it('should render BlogCard for each blog post', () => {
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={mockBlogPosts}
+      />
+    )
 
-    expect(
-      screen.getByText('Simple changes to make a big impact on reducing your plastic footprint.')
-    ).toBeInTheDocument()
-    expect(screen.getByText('How to build an eco-friendly wardrobe without breaking the bank.')).toBeInTheDocument()
+    const blogCards = screen.getAllByTestId('mock-blog-card')
+    expect(blogCards).toHaveLength(2)
   })
 
-  it('should render blog post tags', () => {
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
+  it('should render blog post tags via BlogCard', () => {
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={mockBlogPosts}
+      />
+    )
 
     expect(screen.getByText('Sustainability')).toBeInTheDocument()
     expect(screen.getByText('Fashion')).toBeInTheDocument()
   })
 
-  it('should render blog post images', () => {
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
-
-    const images = screen.getAllByRole('img')
-    expect(images).toHaveLength(2)
-    expect(images[0]).toHaveAttribute('alt', 'Plastic waste reduction tips')
-    expect(images[1]).toHaveAttribute('alt', 'Sustainable fashion tips')
-  })
-
   it('should render blog post links with correct href', () => {
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={mockBlogPosts}
+      />
+    )
 
     const links = screen.getAllByRole('link')
     // Skip first link (view all button)
@@ -426,13 +485,20 @@ describe('BlogTeaserSection', () => {
 
   it('should not render when blogPosts array is empty', () => {
     const { container } = render(
-      <BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={[]} />
+      <BlogTeaserSection
+        readTimeMinutesLabel={mockLabels.readTimeMinutesLabel}
+        readArticleLabel={mockLabels.readArticleLabel}
+        defaultContributor={defaultContributor}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={[]}
+      />
     )
 
     expect(container.querySelector('section')).not.toBeInTheDocument()
   })
 
-  it('should use placeholder image when featured image URL is missing', () => {
+  it('should pass post data to BlogCard (image handling tested in BlogCard)', () => {
     const postsWithoutImage: ApiBlogPostBlogPostDocument[] = [
       {
         ...mockBlogPosts[0]!,
@@ -443,13 +509,20 @@ describe('BlogTeaserSection', () => {
       },
     ]
 
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={postsWithoutImage} />)
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={postsWithoutImage}
+      />
+    )
 
-    const image = screen.getByRole('img')
-    expect(image).toHaveAttribute('src', '/images/placeholder.svg')
+    // BlogCard receives the post data, image handling is tested in BlogCard.test.tsx
+    expect(screen.getByTestId('mock-blog-card')).toBeInTheDocument()
   })
 
-  it('should handle absolute image URLs', () => {
+  it('should pass post data to BlogCard (absolute URL handling tested in BlogCard)', () => {
     const postsWithAbsoluteUrl: ApiBlogPostBlogPostDocument[] = [
       {
         ...mockBlogPosts[0]!,
@@ -460,22 +533,37 @@ describe('BlogTeaserSection', () => {
       },
     ]
 
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={postsWithAbsoluteUrl} />)
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={postsWithAbsoluteUrl}
+      />
+    )
 
-    const image = screen.getByRole('img')
-    expect(image).toHaveAttribute('src', 'https://cdn.example.com/plastic-waste.webp')
+    // BlogCard receives the post data, URL handling is tested in BlogCard.test.tsx
+    expect(screen.getByTestId('mock-blog-card')).toBeInTheDocument()
   })
 
-  it('should not render tag when no tags provided', () => {
+  it('should pass post without tags to BlogCard', () => {
     const { tags: _tags, ...postWithoutTags } = mockBlogPosts[0]!
     const postsWithoutTags: ApiBlogPostBlogPostDocument[] = [postWithoutTags]
 
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={postsWithoutTags} />)
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={postsWithoutTags}
+      />
+    )
 
-    expect(screen.queryByText('Sustainability')).not.toBeInTheDocument()
+    // BlogCard should not render tag when not provided (mock shows no tag span)
+    expect(screen.queryByTestId('mock-blog-card-tag')).not.toBeInTheDocument()
   })
 
-  it('should use post title as alt text when alternativeText is missing', () => {
+  it('should pass post data to BlogCard (alt text handling tested in BlogCard)', () => {
     const { alternativeText: _alternativeText, ...imageWithoutAlt } = mockBlogPosts[0]!.featuredImage!
     const postsWithoutAlt: ApiBlogPostBlogPostDocument[] = [
       {
@@ -484,14 +572,28 @@ describe('BlogTeaserSection', () => {
       },
     ]
 
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={postsWithoutAlt} />)
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={postsWithoutAlt}
+      />
+    )
 
-    const image = screen.getByRole('img')
-    expect(image).toHaveAttribute('alt', '10 Ways to Reduce Plastic Waste')
+    // BlogCard receives the post data, alt text handling is tested in BlogCard.test.tsx
+    expect(screen.getByTestId('mock-blog-card')).toBeInTheDocument()
   })
 
   it('should have correct aria-label on section', () => {
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={mockBlogPosts}
+      />
+    )
 
     const sections = screen.getAllByRole('region', { name: 'Blog posts section' })
     expect(sections.length).toBeGreaterThan(0)
@@ -508,50 +610,69 @@ describe('BlogTeaserSection', () => {
       },
     } as unknown as BlogTeaserSectionProps['data']
 
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={dataWithoutAria} blogPosts={mockBlogPosts} />)
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={dataWithoutAria}
+        blogPosts={mockBlogPosts}
+      />
+    )
 
     // Should default to empty string
     // Since role="region" requires label, it falls back to generic section.
     // We check attribute directly.
     // Query by class to find the section
-    const section = screen.getByRole('heading', { level: 2 }).closest('section')
+    const section = screen.getByRole('heading', { level: 3 }).closest('section')
     expect(section).toHaveAttribute('aria-label', '')
   })
 
-  it('should render read article call-to-action', () => {
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
+  it('should render BlogCard components (CTA tested in BlogCard)', () => {
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={mockBlogPosts}
+      />
+    )
 
-    // Check for the readArticleLabel text (from mock data)
-    const readArticleTexts = screen.getAllByText('Read Article')
-    expect(readArticleTexts).toHaveLength(2)
+    // BlogCard components render read article CTA internally
+    const blogCards = screen.getAllByTestId('mock-blog-card')
+    expect(blogCards).toHaveLength(2)
   })
 
-  it('should render Label component for read article in RTL direction', () => {
+  it('should pass direction to BlogCard for RTL', () => {
     const { DirectionEnum } =
       jest.requireActual<typeof import('@/lib/generated/types.gen')>('@/lib/generated/types.gen')
 
-    render(<BlogTeaserSection data={mockSectionData} blogPosts={mockBlogPosts} direction={DirectionEnum.RTL} />)
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        data={mockSectionData}
+        blogPosts={mockBlogPosts}
+        direction={DirectionEnum.RTL}
+      />
+    )
 
-    // Label component handles RTL internally
-    const labels = screen.getAllByTestId('mock-label')
-    expect(labels.length).toBe(2) // One per blog post
+    const blogCards = screen.getAllByTestId('mock-blog-card')
+    expect(blogCards.length).toBe(2)
+    expect(blogCards[0]).toHaveAttribute('data-direction', 'rtl')
   })
 
-  it('should render read article using Label component for RTL direction', () => {
-    const { DirectionEnum } =
-      jest.requireActual<typeof import('@/lib/generated/types.gen')>('@/lib/generated/types.gen')
+  it('should pass direction to BlogCard for LTR', () => {
+    render(
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={mockBlogPosts}
+      />
+    )
 
-    render(<BlogTeaserSection data={mockSectionData} blogPosts={mockBlogPosts} direction={DirectionEnum.RTL} />)
-
-    const labels = screen.getAllByTestId('mock-label')
-    expect(labels.length).toBeGreaterThan(0)
-  })
-
-  it('should render read article using Label component for LTR direction', () => {
-    render(<BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />)
-
-    const labels = screen.getAllByTestId('mock-label')
-    expect(labels.length).toBeGreaterThan(0)
+    const blogCards = screen.getAllByTestId('mock-blog-card')
+    expect(blogCards.length).toBeGreaterThan(0)
+    expect(blogCards[0]).toHaveAttribute('data-direction', 'ltr')
   })
 
   it('should apply dir rtl to carousel for RTL direction', () => {
@@ -559,7 +680,12 @@ describe('BlogTeaserSection', () => {
       jest.requireActual<typeof import('@/lib/generated/types.gen')>('@/lib/generated/types.gen')
 
     const { container } = render(
-      <BlogTeaserSection data={mockSectionData} blogPosts={mockBlogPosts} direction={DirectionEnum.RTL} />
+      <BlogTeaserSection
+        {...defaultProps}
+        data={mockSectionData}
+        blogPosts={mockBlogPosts}
+        direction={DirectionEnum.RTL}
+      />
     )
 
     const carousel = container.querySelector('.snap-x')
@@ -568,7 +694,12 @@ describe('BlogTeaserSection', () => {
 
   it('should apply dir ltr to carousel for LTR direction', () => {
     const { container } = render(
-      <BlogTeaserSection direction={DirectionEnum.LTR} data={mockSectionData} blogPosts={mockBlogPosts} />
+      <BlogTeaserSection
+        {...defaultProps}
+        direction={DirectionEnum.LTR}
+        data={mockSectionData}
+        blogPosts={mockBlogPosts}
+      />
     )
 
     const carousel = container.querySelector('.snap-x')

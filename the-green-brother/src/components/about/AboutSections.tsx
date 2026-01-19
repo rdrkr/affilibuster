@@ -13,7 +13,7 @@ import type { ReactNode } from 'react'
 import { TextBlock } from '@/components/elements'
 import { DynamicZone } from '@/components/layout'
 import { BrandFeaturesSection, HeroSection, TeamSection } from '@/components/sections'
-import type { ApiAboutAboutDocument } from '@/lib/generated/types.gen'
+import type { ApiAboutAboutDocument, ApiContributorContributorDocument } from '@/lib/generated/types.gen'
 import { DirectionEnum } from '@/lib/generated/types.gen'
 
 /**
@@ -27,6 +27,8 @@ type AboutSection = ApiAboutAboutDocument['sections'][number]
 export interface AboutSectionsProps {
   /** About page sections array from CMS */
   sections: AboutSection[]
+  /** List of contributors for the team section */
+  contributors?: ApiContributorContributorDocument[]
   /** Language direction for RTL support */
   direction: DirectionEnum
 }
@@ -36,10 +38,11 @@ export interface AboutSectionsProps {
  * Uses DynamicZone to support horizontal layout markers.
  * @param props - Component props with sections
  * @param props.sections - About page sections array from CMS
+ * @param props.contributors - List of contributors
  * @param props.direction - Language direction for RTL support
  * @returns Rendered about page sections with layout support
  */
-export function AboutSections({ sections, direction }: AboutSectionsProps) {
+export function AboutSections({ sections, contributors = [], direction }: AboutSectionsProps) {
   /**
    * Render a single section based on its component type
    * @param section - Section with __component discriminator
@@ -51,7 +54,7 @@ export function AboutSections({ sections, direction }: AboutSectionsProps) {
         return <HeroSection key={section.id} data={section} direction={direction} />
 
       case 'sections.team-grid':
-        return <TeamSection key={section.id} data={section} direction={direction} />
+        return <TeamSection key={section.id} data={section} contributors={contributors} direction={direction} />
 
       case 'sections.brand-features-section':
         return <BrandFeaturesSection key={section.id} data={section} direction={direction} />
@@ -66,13 +69,7 @@ export function AboutSections({ sections, direction }: AboutSectionsProps) {
   }
 
   return (
-    <DynamicZone
-      sections={sections}
-      renderSection={renderSection}
-      direction={direction}
-      className="space-y-8"
-      verticalAlignment="center"
-    />
+    <DynamicZone sections={sections} renderSection={renderSection} direction={direction} verticalAlignment="center" />
   )
 }
 

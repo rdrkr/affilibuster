@@ -63,15 +63,21 @@ class TestGetProducts:
         assert data.data
 
     async def test_get_products_with_filters(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
-        """Test GET /products with filter parameters."""
+        """Test GET /products with filter parameters using slug field."""
+        # Get the first expected product slug to filter by
+        expected_slug = next(p.slug for p in EXPECTED_PRODUCTS if p.locale == "en")
+
         response = await integration_client.get(
             "/v1/products",
-            params={"customPopulate": "nested", "filters[status][$eq]": "published"},
+            params={"customPopulate": "nested", "filters[slug][$eq]": expected_slug},
         )
         assert response.status_code == 200
 
         data = ProductsGetResponse(**response.json())
         assert data.data
+        # Should return exactly one product when filtering by specific slug
+        assert len(data.data) == 1
+        assert data.data[0].slug == expected_slug
 
     async def test_get_products_with_field_selection(
         self, integration_client: AsyncClient, strapi_test_data: None

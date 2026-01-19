@@ -10,7 +10,6 @@ import { fireEvent, render, screen } from '@testing-library/react'
 jest.mock('next/image', () => ({
   __esModule: true,
   default: function MockImage({ alt, src }: { alt: string; src: string }) {
-    // eslint-disable-next-line @next/next/no-img-element
     return <img src={src} alt={alt} />
   },
 }))

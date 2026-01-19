@@ -642,106 +642,6 @@ export interface ApiAuthPageAuthPage extends Struct.SingleTypeSchema {
   }
 }
 
-export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
-  collectionName: 'authors'
-  info: {
-    description: 'Blog post authors with profile information, bio, social links, and their published articles'
-    displayName: 'Author'
-    pluralName: 'authors'
-    singularName: 'author'
-  }
-  options: {
-    draftAndPublish: true
-  }
-  pluginOptions: {
-    i18n: {
-      localized: true
-    }
-  }
-  attributes: {
-    bio: Schema.Attribute.RichText &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    blogPosts: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'>
-    createdAt: Schema.Attribute.DateTime
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    email: Schema.Attribute.Email &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    github: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    instagram: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    linkedin: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    locale: Schema.Attribute.String
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::author.author'>
-    name: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    profilePicture: Schema.Attribute.Media<'images'> &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    publishedAt: Schema.Attribute.DateTime
-    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    slug: Schema.Attribute.UID<'name'> &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    twitter: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    updatedAt: Schema.Attribute.DateTime
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    website: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-  }
-}
-
 export interface ApiBlogPostTagBlogPostTag extends Struct.CollectionTypeSchema {
   collectionName: 'blog_post_tags'
   info: {
@@ -793,7 +693,7 @@ export interface ApiBlogPostTagBlogPostTag extends Struct.CollectionTypeSchema {
 export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
   collectionName: 'blog_posts'
   info: {
-    description: 'Blog posts with title, content, featured image, author, tags, and SEO metadata'
+    description: 'Blog posts with title, content, featured image, contributor, tags, and SEO metadata'
     displayName: 'Blog Post'
     pluralName: 'blog-posts'
     singularName: 'blog-post'
@@ -807,7 +707,6 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
     }
   }
   attributes: {
-    author: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>
     content: Schema.Attribute.Component<'elements.text-block', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -815,6 +714,7 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
           localized: true
         }
       }>
+    contributor: Schema.Attribute.Relation<'manyToOne', 'api::contributor.contributor'>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     featuredImage: Schema.Attribute.Media<'images'> &
@@ -828,20 +728,14 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'>
     publishedAt: Schema.Attribute.DateTime
     publishedDate: Schema.Attribute.DateTime & Schema.Attribute.Required
-    readArticleLabel: Schema.Attribute.Component<'elements.label', false> &
+    readTimeInMinutes: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
-          localized: true
+          localized: false
         }
-      }>
-    readTime: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
+      }> &
+      Schema.Attribute.DefaultTo<5>
     seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -879,9 +773,17 @@ export interface ApiBlogBlog extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
+    aboutAuthorHeader: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     blogPosts: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    defaultContributor: Schema.Attribute.Relation<'oneToOne', 'api::contributor.contributor'>
     entryTitle: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Private &
@@ -904,6 +806,20 @@ export interface ApiBlogBlog extends Struct.SingleTypeSchema {
         }
       }>
     publishedAt: Schema.Attribute.DateTime
+    readArticleLabel: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    readTimeMinutesLabel: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -1018,6 +934,146 @@ export interface ApiContactUsContactUs extends Struct.SingleTypeSchema {
       }>
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiContributorRoleContributorRole extends Struct.CollectionTypeSchema {
+  collectionName: 'contributor_roles'
+  info: {
+    displayName: 'Role'
+    pluralName: 'contributor-roles'
+    singularName: 'contributor-role'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    contributors: Schema.Attribute.Relation<'manyToMany', 'api::contributor.contributor'>
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::contributor-role.contributor-role'>
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    publishedAt: Schema.Attribute.DateTime
+    roleId: Schema.Attribute.UID<'name'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiContributorContributor extends Struct.CollectionTypeSchema {
+  collectionName: 'contributors'
+  info: {
+    description: 'Contributors with profile information, bio, social links, and their published articles'
+    displayName: 'Contributor'
+    pluralName: 'contributors'
+    singularName: 'contributor'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    bio: Schema.Attribute.RichText &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    blogPosts: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'>
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    email: Schema.Attribute.Email &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    github: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    instagram: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    linkedin: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::contributor.contributor'>
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    profilePicture: Schema.Attribute.Media<'images'> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    publishedAt: Schema.Attribute.DateTime
+    roles: Schema.Attribute.Relation<'manyToMany', 'api::contributor-role.contributor-role'>
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    slug: Schema.Attribute.UID<'name'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    twitter: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    website: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
   }
 }
 
@@ -2039,105 +2095,6 @@ export interface ApiProfileProfile extends Struct.SingleTypeSchema {
   }
 }
 
-export interface ApiTeamMemberTeamMember extends Struct.CollectionTypeSchema {
-  collectionName: 'team_members'
-  info: {
-    displayName: 'Team Member'
-    pluralName: 'team-members'
-    singularName: 'team-member'
-  }
-  options: {
-    draftAndPublish: true
-  }
-  pluginOptions: {
-    i18n: {
-      localized: true
-    }
-  }
-  attributes: {
-    bio: Schema.Attribute.RichText &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    createdAt: Schema.Attribute.DateTime
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    email: Schema.Attribute.Email &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    github: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    instagram: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    linkedin: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    locale: Schema.Attribute.String
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::team-member.team-member'>
-    name: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    profilePicture: Schema.Attribute.Media<'images'> &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    publishedAt: Schema.Attribute.DateTime
-    role: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    slug: Schema.Attribute.UID<'name'> &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    twitter: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    updatedAt: Schema.Attribute.DateTime
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-  }
-}
-
 export interface ApiTermTerm extends Struct.SingleTypeSchema {
   collectionName: 'terms'
   info: {
@@ -2527,11 +2484,12 @@ declare module '@strapi/strapi' {
       'api::about.about': ApiAboutAbout
       'api::api-config.api-config': ApiApiConfigApiConfig
       'api::auth-page.auth-page': ApiAuthPageAuthPage
-      'api::author.author': ApiAuthorAuthor
       'api::blog-post-tag.blog-post-tag': ApiBlogPostTagBlogPostTag
       'api::blog-post.blog-post': ApiBlogPostBlogPost
       'api::blog.blog': ApiBlogBlog
       'api::contact-us.contact-us': ApiContactUsContactUs
+      'api::contributor-role.contributor-role': ApiContributorRoleContributorRole
+      'api::contributor.contributor': ApiContributorContributor
       'api::currency.currency': ApiCurrencyCurrency
       'api::error-404.error-404': ApiError404Error404
       'api::error-410.error-410': ApiError410Error410
@@ -2546,7 +2504,6 @@ declare module '@strapi/strapi' {
       'api::product-tag.product-tag': ApiProductTagProductTag
       'api::product.product': ApiProductProduct
       'api::profile.profile': ApiProfileProfile
-      'api::team-member.team-member': ApiTeamMemberTeamMember
       'api::term.term': ApiTermTerm
       'api::theme.theme': ApiThemeTheme
       'plugin::content-releases.release': PluginContentReleasesRelease

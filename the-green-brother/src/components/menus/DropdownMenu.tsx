@@ -93,14 +93,14 @@ export function Dropdown({
   return (
     <div
       className={`
-      fixed inset-x-4 top-[calc(var(--nav-top,5rem))] z-50
+      fixed inset-x-4 top-[calc(var(--nav-top,5rem))] z-50 mt-4
       sm:absolute sm:top-[calc(var(--nav-top,1.5rem))] sm:right-0 sm:left-0
       ${positionClasses}
       ${isVisible ? 'visible' : 'pointer-events-none'}
     `}
     >
       {/* Hover bridge - covers the gap between button and dropdown */}
-      <div className={`mt-4 h-2`} aria-hidden="true" />
+      <div className={`h-2`} aria-hidden="true" />
 
       <div
         className={`

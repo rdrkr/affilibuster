@@ -10,7 +10,7 @@
 
 import Link from 'next/link'
 
-import { CMSIcon, CMSText, Header } from '@/components/elements'
+import { Header, Icon, Text } from '@/components/elements'
 import {
   DirectionEnum,
   type ApiProductCategoryProductCategoryDocument,
@@ -48,8 +48,8 @@ export function ProductCategoriesSection({ data, categories, direction }: Produc
   }
 
   return (
-    <section className="mb-0" aria-label={header.header?.ariaDescription ?? ''}>
-      <Header data={header} level={2} direction={direction} />
+    <section aria-label={header.header?.ariaDescription ?? ''}>
+      <Header data={header} level={3} direction={direction} />
       <div
         className={`
         mt-12 flex flex-wrap justify-center
@@ -81,7 +81,7 @@ export function ProductCategoriesSection({ data, categories, direction }: Produc
                   dark:border-white/10 dark:bg-surface-dark
                 `}
               >
-                <CMSIcon
+                <Icon
                   icon={content.icon ?? 'category'}
                   size="4xl"
                   className={`
@@ -90,16 +90,16 @@ export function ProductCategoriesSection({ data, categories, direction }: Produc
                   `}
                 />
               </div>
-              <span
+              <Text
+                text={content.text}
+                as="span"
                 className={`
                   text-center font-semibold text-neutral-600
                   transition-colors
                   group-hover:text-neutral-800 dark:text-text-secondary-dark
                   dark:group-hover:text-white
                 `}
-              >
-                <CMSText text={content.text} />
-              </span>
+              />
             </Link>
           )
         })}
@@ -107,5 +107,3 @@ export function ProductCategoriesSection({ data, categories, direction }: Produc
     </section>
   )
 }
-
-export default ProductCategoriesSection

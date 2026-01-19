@@ -21,6 +21,10 @@ interface ReactMarkdownProps {
     a?: (props: { href?: string; children: React.ReactNode }) => React.ReactElement
     /** Custom image renderer */
     img?: (props: { src?: string; alt?: string; title?: string }) => React.ReactElement
+    /** Custom code renderer */
+    code?: (props: { children?: React.ReactNode }) => React.ReactElement
+    /** Custom table renderer */
+    table?: (props: { children?: React.ReactNode }) => React.ReactElement
     /** Other custom renderers */
     [key: string]: unknown
   }
@@ -37,8 +41,89 @@ interface ElementProps {
 }
 
 /**
+ * Check if lines at current position represent a GFM table
+ * @param lines - Array of all lines
+ * @param startIndex - Current line index
+ * @returns boolean indicating if this is a table
+ */
+const isTable = (lines: string[], startIndex: number): boolean => {
+  const line = lines[startIndex]
+  const nextLine = lines[startIndex + 1]
+  if (!line || !nextLine) return false
+
+  // Table header row must have pipes
+  if (!line.includes('|')) return false
+
+  // Separator row must be pipes and dashes (e.g., |---|---|)
+  const separatorPattern = /^\|?\s*[-:]+\s*\|/
+  return separatorPattern.test(nextLine)
+}
+
+/**
+ * Parse a GFM table starting at the given index
+ * @param lines - Array of all lines
+ * @param startIndex - Starting line index
+ * @param getKey - Function to get unique keys
+ * @returns Object with parsed table element and ending index
+ */
+const parseTable = (
+  lines: string[],
+  startIndex: number,
+  getKey: () => number
+): { element: React.ReactElement; endIndex: number } => {
+  let i = startIndex
+
+  // Parse header row
+  const headerLine = lines[i] ?? ''
+  const headerCells = headerLine
+    .split('|')
+    .map(cell => cell.trim())
+    .filter(cell => cell !== '')
+
+  i++ // Move past header row
+  i++ // Move past separator row
+
+  // Parse body rows
+  const bodyRows: string[][] = []
+  while (i < lines.length && lines[i]?.includes('|')) {
+    const rowLine = lines[i] ?? ''
+    const cells = rowLine
+      .split('|')
+      .map(cell => cell.trim())
+      .filter(cell => cell !== '')
+    if (cells.length > 0) {
+      bodyRows.push(cells)
+    }
+    i++
+  }
+
+  const element = (
+    <table key={getKey()}>
+      <thead>
+        <tr>
+          {headerCells.map((cell, idx) => (
+            <th key={idx}>{cell}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {bodyRows.map((row, rowIdx) => (
+          <tr key={rowIdx}>
+            {row.map((cell, cellIdx) => (
+              <td key={cellIdx}>{cell}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+
+  return { element, endIndex: i }
+}
+
+/**
  * Simple markdown to HTML converter for testing
- * Supports: headings, paragraphs, lists, bold, italic, code, links, blockquotes
+ * Supports: headings, paragraphs, lists, bold, italic, code, links, blockquotes, tables (GFM)
  * @param markdown - Markdown string to convert
  * @returns Array of React elements representing the rendered HTML
  */
@@ -46,6 +131,7 @@ const markdownToHTML = (markdown: string): React.ReactElement[] => {
   const lines = markdown.split('\n')
   const elements: React.ReactElement[] = []
   let key = 0
+  const getKey = () => key++
 
   let i = 0
   while (i < lines.length) {
@@ -62,6 +148,14 @@ const markdownToHTML = (markdown: string): React.ReactElement[] => {
       continue
     }
 
+    // Tables (GFM)
+    if (isTable(lines, i)) {
+      const { element, endIndex } = parseTable(lines, i, getKey)
+      elements.push(element)
+      i = endIndex
+      continue
+    }
+
     // Headings
     if (line.startsWith('#')) {
       const match = /^#+/.exec(line)
@@ -70,7 +164,7 @@ const markdownToHTML = (markdown: string): React.ReactElement[] => {
       // Use object lookup to avoid template literal type issues
       const headingTags = { 1: 'h1', 2: 'h2', 3: 'h3', 4: 'h4', 5: 'h5', 6: 'h6' } as const
       const Tag = headingTags[level]
-      elements.push(<Tag key={key++}>{parseInline(text)}</Tag>)
+      elements.push(<Tag key={getKey()}>{parseInline(text)}</Tag>)
       i++
       continue
     }
@@ -80,10 +174,10 @@ const markdownToHTML = (markdown: string): React.ReactElement[] => {
       const listItems: React.ReactElement[] = []
       while (i < lines.length && lines[i]?.startsWith('- ')) {
         const text = lines[i]?.replace(/^- /, '') ?? ''
-        listItems.push(<li key={key++}>{parseInline(text)}</li>)
+        listItems.push(<li key={getKey()}>{parseInline(text)}</li>)
         i++
       }
-      elements.push(<ul key={key++}>{listItems}</ul>)
+      elements.push(<ul key={getKey()}>{listItems}</ul>)
       continue
     }
 
@@ -92,10 +186,10 @@ const markdownToHTML = (markdown: string): React.ReactElement[] => {
       const listItems: React.ReactElement[] = []
       while (i < lines.length && /^\d+\.\s/.test(lines[i] ?? '')) {
         const text = lines[i]?.replace(/^\d+\.\s/, '') ?? ''
-        listItems.push(<li key={key++}>{parseInline(text)}</li>)
+        listItems.push(<li key={getKey()}>{parseInline(text)}</li>)
         i++
       }
-      elements.push(<ol key={key++}>{listItems}</ol>)
+      elements.push(<ol key={getKey()}>{listItems}</ol>)
       continue
     }
 
@@ -109,8 +203,8 @@ const markdownToHTML = (markdown: string): React.ReactElement[] => {
       }
       i++ // Skip closing ```
       elements.push(
-        <pre key={key++}>
-          <code>{codeLines.join('\n')}</code>
+        <pre key={getKey()}>
+          <code>{codeLines}</code>
         </pre>
       )
       continue
@@ -125,7 +219,7 @@ const markdownToHTML = (markdown: string): React.ReactElement[] => {
         i++
       }
       elements.push(
-        <blockquote key={key++}>
+        <blockquote key={getKey()}>
           <p>{quoteLines}</p>
         </blockquote>
       )
@@ -133,7 +227,7 @@ const markdownToHTML = (markdown: string): React.ReactElement[] => {
     }
 
     // Paragraphs (default)
-    elements.push(<p key={key++}>{parseInline(line)}</p>)
+    elements.push(<p key={getKey()}>{parseInline(line)}</p>)
     i++
   }
 
@@ -194,7 +288,7 @@ const parseInline = (text: string): React.ReactNode[] => {
       const alt = imageMatch[1] ?? ''
       const src = imageMatch[2] ?? ''
       const title = imageMatch[3]
-      // eslint-disable-next-line @next/next/no-img-element
+
       nodes.push(<img key={key++} src={src} alt={alt} title={title} />)
       remaining = remaining.slice(imageMatch[0].length)
       continue
@@ -243,9 +337,9 @@ const ReactMarkdown = ({ children, components }: ReactMarkdownProps): React.Reac
   const elements = markdownToHTML(children)
 
   // Replace custom elements if components are provided
-  if (components?.a || components?.img) {
+  if (components?.a || components?.img || components?.code || components?.table) {
     /**
-     * Replace link and image elements with custom components
+     * Replace link, image, code, and table elements with custom components
      * @param element - React element to process
      * @returns React element with replaced elements
      */
@@ -271,11 +365,34 @@ const ReactMarkdown = ({ children, components }: ReactMarkdownProps): React.Reac
         })
       }
 
+      // Replace code
+      if (element.type === 'code' && components.code) {
+        const CodeComponent = components.code as unknown as (props: ElementProps) => React.ReactElement
+        const props = element.props as ElementProps
+        return CodeComponent({
+          children: props.children,
+        })
+      }
+
+      // Replace table
+      if (element.type === 'table' && components.table) {
+        const TableComponent = components.table as unknown as (props: ElementProps) => React.ReactElement
+        const props = element.props as ElementProps
+        const tableElement = TableComponent({
+          children: props.children,
+        })
+        // Clone with key to avoid React warnings
+        return React.cloneElement(tableElement, { key: element.key })
+      }
+
       // Recursively replace in children
       const props = element.props as ElementProps
       if (props.children) {
         const newChildren = React.Children.map(props.children, child => {
-          if (React.isValidElement(child) && (child.type === 'a' || child.type === 'img')) {
+          if (
+            React.isValidElement(child) &&
+            (child.type === 'a' || child.type === 'img' || child.type === 'code' || child.type === 'table')
+          ) {
             return replaceCustomElements(child)
           }
           return child

@@ -11,17 +11,16 @@ import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 
 // Mock the CMS element components
 jest.mock('@/components/elements', () => ({
-  CMSIcon: function MockCMSIcon({ icon, size }: { icon?: string; size?: string }) {
+  Icon: function MockIcon({ icon, size }: { icon?: string; size?: string }) {
     return (
       <span data-testid="mock-icon" data-icon={icon} data-size={size}>
         {icon}
       </span>
     )
   },
-  CMSText: function MockCMSText({ text }: { text?: string }) {
+  Text: function MockText({ text }: { text?: string }) {
     return <span data-testid="mock-text">{text}</span>
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ButtonAction: function MockButtonAction(props: any) {
     const { children, data, onClick, className, showText, isActive } = props
     const ariaLabel = props['aria-label'] ?? data?.label?.ariaDescription
@@ -61,7 +60,6 @@ jest.mock('@/components/elements', () => ({
     }
 
     const activeClass = isActive ? 'bg-white/5' : ''
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     const finalClassName = `${className ?? ''} ${activeClass}`.trim()
 
     return (

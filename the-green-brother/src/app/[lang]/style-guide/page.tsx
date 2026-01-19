@@ -47,8 +47,6 @@ export function generateMetadata(): Metadata {
  * @param props.params - Promise containing the language parameter
  * @returns The style guide page component
  */
-import { DirectionEnum, type Language } from '@/lib/generated/types.gen'
-import { getLanguages } from '@/lib/languages/api'
 
 // ... imports remain the same ...
 
@@ -75,11 +73,7 @@ async function StyleGuidePage({ params }: Props): Promise<React.ReactElement> {
   // Enable static rendering
   setRequestLocale(lang.toString())
 
-  const languages = await getLanguages()
-  const currentLanguage = languages?.find((l: Language) => l.code === lang)
-  const direction = currentLanguage?.direction ?? DirectionEnum.LTR
-
-  return <StyleGuideClient lang={lang} direction={direction} />
+  return <StyleGuideClient />
 }
 
 export default StyleGuidePage as unknown as (props: {

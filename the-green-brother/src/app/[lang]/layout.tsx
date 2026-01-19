@@ -3,6 +3,7 @@
 import Footer from '@/components/footer'
 import Navigation from '@/components/navigation'
 import BackToTopButton from '@/components/navigation/BackToTopButton'
+import { LayoutProvider } from '@/components/providers'
 import { getNavigation } from '@/lib/content/api'
 import { productSearchFlag, userProfileFlag } from '@/lib/feature-flags'
 import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
@@ -51,31 +52,27 @@ async function LocaleLayout({ children, params }: Props) {
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <div className="flex min-h-screen flex-col">
-        <div className="mx-auto w-full max-w-7xl">
-          {navigationData && (
-            <Navigation
-              data={navigationData}
-              languages={languages ?? []}
-              direction={direction}
-              enableProductSearch={enableProductSearch}
-              enableUserProfile={enableUserProfile}
-            />
-          )}
+      <LayoutProvider lang={lang} direction={direction} navigation={navigationData ?? null}>
+        <div className="flex min-h-screen flex-col">
+          <div className="mx-auto w-full max-w-7xl">
+            {navigationData && (
+              <Navigation
+                data={navigationData}
+                languages={languages ?? []}
+                direction={direction}
+                enableProductSearch={enableProductSearch}
+                enableUserProfile={enableUserProfile}
+              />
+            )}
 
-          <main
-            className={`
-            grow px-4
-            sm:px-6
-            lg:px-8
-          `}
-          >
-            {children}
-          </main>
-          <Footer lang={lang} direction={direction} />
+            <main className="grow px-4 sm:px-6 lg:px-8">{children}</main>
+
+            <Footer lang={lang} direction={direction} />
+          </div>
+
+          <BackToTopButton direction={direction} />
         </div>
-        <BackToTopButton direction={direction} />
-      </div>
+      </LayoutProvider>
     </NextIntlClientProvider>
   )
 }

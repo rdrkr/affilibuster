@@ -18,8 +18,8 @@ describe('lib/content barrel exports', () => {
   })
 
   it('should export getProductById function', () => {
-    expect(content.getProductById).toBeDefined()
-    expect(typeof content.getProductById).toBe('function')
+    expect(content.getProductBySlug).toBeDefined()
+    expect(typeof content.getProductBySlug).toBe('function')
   })
 
   it('should export getAbout function', () => {

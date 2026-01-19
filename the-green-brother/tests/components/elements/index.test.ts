@@ -7,16 +7,16 @@
 import * as elements from '@/components/elements'
 
 describe('components/elements barrel exports', () => {
-  it('should export CMSIcon component', () => {
-    expect(elements.CMSIcon).toBeDefined()
+  it('should export Icon component', () => {
+    expect(elements.Icon).toBeDefined()
   })
 
-  it('should export CMSImage component', () => {
-    expect(elements.CMSImage).toBeDefined()
+  it('should export Image component', () => {
+    expect(elements.Image).toBeDefined()
   })
 
-  it('should export CMSText component and helpers', () => {
-    expect(elements.CMSText).toBeDefined()
+  it('should export Text component and helpers', () => {
+    expect(elements.Text).toBeDefined()
     expect(elements.resolveTextFormatHtml).toBeDefined()
   })
 

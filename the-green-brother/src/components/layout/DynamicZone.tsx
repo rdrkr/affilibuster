@@ -47,12 +47,6 @@ export interface DynamicZoneProps<T extends DynamicSection> {
   className?: string
   /** Vertical alignment for horizontal layout groups */
   verticalAlignment: VerticalAlignment
-  /**
-   * Spacing classes for horizontal groups.
-   * Defaults to '-mt-26 -mb-12' for overlap effect.
-   * Pass empty string to disable.
-   */
-  horizontalGroupSpacing?: string
 }
 
 /**
@@ -141,7 +135,6 @@ export const getAlignmentClass = (alignment: VerticalAlignment): string => {
  * @param props.direction - Language direction (ltr/rtl)
  * @param props.className - Additional className for container
  * @param props.verticalAlignment - Vertical alignment for horizontal groups
- * @param props.horizontalGroupSpacing - Custom spacing for horizontal groups
  * @returns Rendered dynamic zone with horizontal groups
  * @example
  * ```tsx
@@ -159,24 +152,22 @@ export function DynamicZone<T extends DynamicSection>({
   direction,
   className = '',
   verticalAlignment,
-  horizontalGroupSpacing = '',
 }: DynamicZoneProps<T>) {
   const groups = groupSections(sections, renderSection)
   const isRTL = direction === DirectionEnum.RTL
   const alignmentClass = getAlignmentClass(verticalAlignment)
 
   return (
-    <div className={`flex flex-col gap-12 ${className}`}>
+    <div className={`flex flex-col gap-16 ${className}`} dir={isRTL ? 'rtl' : 'ltr'}>
       {groups.map((group, groupIndex) => {
         if (group.layout === 'horizontal') {
           return (
             <div
               key={`group-${String(groupIndex)}`}
               className={`
-                flex flex-col gap-0
-                md:flex-row ${alignmentClass} md:gap-12
-                ${horizontalGroupSpacing}
-                ${isRTL ? 'md:flex-row-reverse' : ''}
+                flex flex-col gap-8
+                md:flex-row
+                ${alignmentClass}
               `}
             >
               {group.sections.map(({ element, index }) => (

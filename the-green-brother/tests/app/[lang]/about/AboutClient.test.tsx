@@ -4,13 +4,26 @@
  * Unit tests for AboutClient component
  */
 
-import { act, render, screen } from '@testing-library/react'
+import { act, screen } from '@testing-library/react'
 
 // Mock AboutSections component
 jest.mock('@/components/about', () => ({
-  AboutSections: function MockAboutSections({ sections, direction }: { sections: unknown[]; direction?: string }) {
+  AboutSections: function MockAboutSections({
+    sections,
+    contributors,
+    direction,
+  }: {
+    sections: unknown[]
+    contributors?: unknown[]
+    direction?: string
+  }) {
     return (
-      <div data-testid="about-sections" data-section-count={sections.length} data-direction={direction}>
+      <div
+        data-testid="about-sections"
+        data-section-count={sections.length}
+        data-contributor-count={contributors?.length ?? 0}
+        data-direction={direction}
+      >
         About Sections
       </div>
     )
@@ -20,6 +33,7 @@ jest.mock('@/components/about', () => ({
 import AboutClient from '@/app/[lang]/about/AboutClient'
 import type { ApiAboutAboutDocument } from '@/lib/generated/types.gen'
 import { DirectionEnum } from '@/lib/generated/types.gen'
+import { renderWithLayout } from '../../../utils/renderWithLayout'
 
 describe('AboutClient', () => {
   const mockAboutData: ApiAboutAboutDocument = {
@@ -53,26 +67,44 @@ describe('AboutClient', () => {
   })
 
   it('should return null when aboutData is null', () => {
-    const { container } = render(<AboutClient direction={DirectionEnum.LTR} aboutData={null} />)
+    const { container } = renderWithLayout(<AboutClient aboutData={null} contributors={[]} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
 
     expect(container.firstChild).toBeNull()
   })
 
   it('should render AboutSections when aboutData is provided', () => {
-    render(<AboutClient direction={DirectionEnum.LTR} aboutData={mockAboutData} />)
+    renderWithLayout(<AboutClient aboutData={mockAboutData} contributors={[]} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
 
     expect(screen.getByTestId('about-sections')).toBeInTheDocument()
   })
 
   it('should pass sections to AboutSections', () => {
-    render(<AboutClient direction={DirectionEnum.LTR} aboutData={mockAboutData} />)
+    renderWithLayout(<AboutClient aboutData={mockAboutData} contributors={[]} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
 
     const aboutSections = screen.getByTestId('about-sections')
     expect(aboutSections).toHaveAttribute('data-section-count', '2')
   })
 
+  it('should pass contributors to AboutSections', () => {
+    const mockContributors = [{ id: 1 }, { id: 2 }] as any
+    renderWithLayout(<AboutClient aboutData={mockAboutData} contributors={mockContributors} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+
+    const aboutSections = screen.getByTestId('about-sections')
+    expect(aboutSections).toHaveAttribute('data-contributor-count', '2')
+  })
+
   it('should start with opacity-0 and transition to opacity-100', () => {
-    const { container } = render(<AboutClient direction={DirectionEnum.LTR} aboutData={mockAboutData} />)
+    const { container } = renderWithLayout(<AboutClient aboutData={mockAboutData} contributors={[]} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
 
     // Initially should be opacity-0
     const wrapper = container.firstChild as HTMLElement
@@ -89,7 +121,9 @@ describe('AboutClient', () => {
   it('should cancel animation frame on unmount', () => {
     const cancelAnimationFrameSpy = jest.spyOn(window, 'cancelAnimationFrame')
 
-    const { unmount } = render(<AboutClient direction={DirectionEnum.LTR} aboutData={mockAboutData} />)
+    const { unmount } = renderWithLayout(<AboutClient aboutData={mockAboutData} contributors={[]} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
     unmount()
 
     expect(cancelAnimationFrameSpy).toHaveBeenCalled()
@@ -97,7 +131,9 @@ describe('AboutClient', () => {
   })
 
   it('should render with transition classes', () => {
-    const { container } = render(<AboutClient direction={DirectionEnum.LTR} aboutData={mockAboutData} />)
+    const { container } = renderWithLayout(<AboutClient aboutData={mockAboutData} contributors={[]} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
 
     const wrapper = container.firstChild as HTMLElement
     expect(wrapper.className).toContain('transition-opacity')
@@ -105,21 +141,27 @@ describe('AboutClient', () => {
   })
 
   it('should have space-y classes for layout', () => {
-    const { container } = render(<AboutClient direction={DirectionEnum.LTR} aboutData={mockAboutData} />)
+    const { container } = renderWithLayout(<AboutClient aboutData={mockAboutData} contributors={[]} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
 
     const wrapper = container.firstChild as HTMLElement
-    expect(wrapper.className).toContain('space-y-16')
-    expect(wrapper.className).toContain('md:space-y-24')
+    const inner = wrapper.querySelector('.gap-16')
+    expect(inner).toBeInTheDocument()
   })
 
   it('should pass LTR direction to AboutSections by default', () => {
-    render(<AboutClient direction={DirectionEnum.LTR} aboutData={mockAboutData} />)
+    renderWithLayout(<AboutClient aboutData={mockAboutData} contributors={[]} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
 
     expect(screen.getByTestId('about-sections').getAttribute('data-direction')).toBe(DirectionEnum.LTR)
   })
 
   it('should pass RTL direction to AboutSections when specified', () => {
-    render(<AboutClient aboutData={mockAboutData} direction={DirectionEnum.RTL} />)
+    renderWithLayout(<AboutClient aboutData={mockAboutData} contributors={[]} />, {
+      layoutContext: { direction: DirectionEnum.RTL },
+    })
 
     expect(screen.getByTestId('about-sections').getAttribute('data-direction')).toBe(DirectionEnum.RTL)
   })

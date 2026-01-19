@@ -21,7 +21,6 @@ jest.mock('next/server', () => {
 })
 
 // Import NextResponse to get the mock reference
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { NextResponse } = require('next/server')
 
 describe('/api/health route', () => {

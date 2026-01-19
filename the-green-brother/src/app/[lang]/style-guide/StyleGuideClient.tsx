@@ -4,37 +4,57 @@
 
 import React from 'react'
 
+import { BlogCard } from '@/components/blog'
 import { NewsletterSignupCTA } from '@/components/call-to-actions'
-import { ButtonAction, ButtonLink, CMSIcon, CMSImage, CMSText, Header, Label, TextBlock } from '@/components/elements'
+import { ButtonAction, ButtonLink, Header, Icon, Image, Label, Text, TextBlock } from '@/components/elements'
+import { ContributorCard } from '@/components/elements/ContributorCard'
+import { PageClient } from '@/components/layout'
 import { LanguageMenu, ProductCategoriesMenu, SearchMenu, ThemeMenu } from '@/components/menus'
 import BackToTopButton from '@/components/navigation/BackToTopButton'
+import { ProductCard } from '@/components/product/ProductCard'
 import { BrandFeaturesSection, HeroSection } from '@/components/sections'
 import {
   AlignmentEnum,
+  type ApiBlogPostBlogPostDocument,
+  type ApiContributorContributorDocument,
+  type ApiProductProductDocument,
   CodeEnum,
-  DirectionEnum,
   type ElementsHeaderEntry,
   IconPositionEnum,
   VariantEnum,
 } from '@/lib/generated/types.gen'
-import type { LanguageCode } from '@/lib/types'
 
-interface StyleGuideClientProps {
-  lang: LanguageCode
-  direction: DirectionEnum
-}
+import { useLayoutContext } from '@/components/providers/LayoutProvider'
 
 /**
  * Style Guide Client Component - Interactive UI showcase.
  * This is a client component that displays all design tokens and reusable components.
- * @param props - Component props
- * @param props.lang - Current language code
- * @param props.direction - Text direction
  * @returns The style guide client component
  */
-export default function StyleGuideClient({ lang, direction }: StyleGuideClientProps): React.ReactElement {
+export default function StyleGuideClient(): React.ReactElement {
+  const { lang, direction } = useLayoutContext()
+  const mockLabels = {
+    readTimeMinutesLabel: {
+      text: 'min read',
+      iconPosition: IconPositionEnum.BEFORE_TEXT,
+      ariaDescription: 'Read time in minutes',
+    },
+    readArticleLabel: {
+      text: 'Read Article',
+      iconPosition: IconPositionEnum.AFTER_TEXT,
+      ariaDescription: 'Read full article',
+    },
+    defaultContributor: {
+      documentId: 'mock-contributor',
+      id: 0,
+      name: 'The Green Brother',
+      slug: 'the-green-brother',
+      bio: 'Eco enthusiast',
+      publishedAt: new Date().toISOString(),
+    },
+  }
   return (
-    <div className="min-h-screen space-y-16 bg-background-dark py-8">
+    <PageClient>
       {/* Hero Section - Using actual HeroSection component */}
       <HeroSection
         direction={direction}
@@ -91,18 +111,34 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 text-xl font-bold text-primary">Primitives</h3>
                 <ul className="space-y-2 text-text-secondary-dark">
-                  <li>• CMSText - Text with markdown formatting</li>
-                  <li>• CMSIcon - Material Symbols & local icons</li>
-                  <li>• CMSImage - CMS media handler</li>
+                  <li>• Text - Text with markdown formatting</li>
+                  <li>• Icon - Material Symbols & local icons</li>
+                  <li>• Image - CMS media handler</li>
                 </ul>
               </div>
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 text-xl font-bold text-primary">Elements</h3>
                 <ul className="space-y-2 text-text-secondary-dark">
-                  <li>• Label - Icon + Text composition</li>
-                  <li>• Header - Title + Subtitle with alignment</li>
-                  <li>• Button - CTA with variants & sizes</li>
-                  <li>• TextBlock - Rich text with header</li>
+                  <li>
+                    <a href="#blog-card" className="hover:text-primary-hover">
+                      • BlogCard - Blog post preview
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#product-card" className="hover:text-primary-hover">
+                      • ProductCard - Product display
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#contributor-card" className="hover:text-primary-hover">
+                      • ContributorCard - Team member profile
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#card-heights" className="hover:text-primary-hover">
+                      • Card Height Variants - Full/Fixed height examples
+                    </a>
+                  </li>
                 </ul>
               </div>
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
@@ -137,9 +173,9 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
               </p>
             </div>
 
-            {/* CMSText Component */}
+            {/* Text Component */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
-              <h3 className="mb-6 text-2xl font-semibold text-white">CMSText</h3>
+              <h3 className="mb-6 text-2xl font-semibold text-white">Text</h3>
               <p className="mb-6 text-text-secondary-dark">
                 Renders CMS text with markdown-style **bold** formatting. Bold text automatically gets primary color.
               </p>
@@ -147,37 +183,33 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                 <div>
                   <h4 className="mb-3 text-lg font-semibold text-white">Plain Text</h4>
                   <div className="rounded-xl border border-white/10 bg-surface-dark p-6">
-                    <CMSText text="Simple text without formatting" className="text-lg text-white" />
+                    <Text text="Simple text without formatting" className="text-lg text-white" />
                   </div>
                 </div>
                 <div>
                   <h4 className="mb-3 text-lg font-semibold text-white">Bold Text (Markdown)</h4>
                   <div className="rounded-xl border border-white/10 bg-surface-dark p-6">
-                    <CMSText text="This text has **bold formatting** in primary color" className="text-lg text-white" />
+                    <Text text="This text has **bold formatting** in primary color" className="text-lg text-white" />
                   </div>
                 </div>
                 <div>
                   <h4 className="mb-3 text-lg font-semibold text-white">As Different HTML Elements</h4>
                   <div className="space-y-4 rounded-xl border border-white/10 bg-surface-dark p-6">
-                    <CMSText
-                      text="Heading: Eco **Friendly** Products"
-                      as="h2"
-                      className="text-3xl font-bold text-white"
-                    />
-                    <CMSText
+                    <Text text="Heading: Eco **Friendly** Products" as="h2" className="text-3xl font-bold text-white" />
+                    <Text
                       text="Paragraph: We sell **sustainable** products"
                       as="p"
                       className="text-text-secondary-dark"
                     />
-                    <CMSText text="Span: Visit our **store**" as="span" className="text-white" />
+                    <Text text="Span: Visit our **store**" as="span" className="text-white" />
                   </div>
                 </div>
               </div>
               <div className="mt-6 rounded-xl bg-surface-dark p-4">
                 <pre className="overflow-x-auto text-xs">
                   <code className="text-tertiary-300">
-                    {`<CMSText text="Hello **World**" />
-<CMSText text="Eco **Friendly**" as="h1" className="text-4xl" />
+                    {`<Text text="Hello **World**" />
+<Text text="Eco **Friendly**" as="h1" className="text-4xl" />
 
 // **bold** converts to <span className="text-primary">bold</span>`}
                   </code>
@@ -185,9 +217,9 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
               </div>
             </div>
 
-            {/* CMSIcon Component */}
+            {/* Icon Component */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
-              <h3 className="mb-6 text-2xl font-semibold text-white">CMSIcon</h3>
+              <h3 className="mb-6 text-2xl font-semibold text-white">Icon</h3>
               <p className="mb-6 text-text-secondary-dark">
                 Renders Material Symbols icons or local image files. Automatically detects type based on file extension.
               </p>
@@ -197,27 +229,27 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                   <div className="rounded-xl border border-white/10 bg-surface-dark p-6">
                     <div className="flex flex-wrap gap-8">
                       <div className="flex flex-col items-center gap-2">
-                        <CMSIcon icon="Nest Eco Leaf" size="3xl" className="text-primary" />
+                        <Icon icon="Nest Eco Leaf" size="3xl" className="text-primary" />
                         <span className="text-sm text-text-secondary-dark">nest_eco_leaf</span>
                       </div>
                       <div className="flex flex-col items-center gap-2">
-                        <CMSIcon icon="recycling" size="3xl" className="text-primary" />
+                        <Icon icon="recycling" size="3xl" className="text-primary" />
                         <span className="text-sm text-text-secondary-dark">recycling</span>
                       </div>
                       <div className="flex flex-col items-center gap-2">
-                        <CMSIcon icon="eco" size="3xl" className="text-primary" />
+                        <Icon icon="eco" size="3xl" className="text-primary" />
                         <span className="text-sm text-text-secondary-dark">eco</span>
                       </div>
                       <div className="flex flex-col items-center gap-2">
-                        <CMSIcon icon="water_drop" size="3xl" className="text-primary" />
+                        <Icon icon="water_drop" size="3xl" className="text-primary" />
                         <span className="text-sm text-text-secondary-dark">water_drop</span>
                       </div>
                       <div className="flex flex-col items-center gap-2">
-                        <CMSIcon icon="shopping_bag" size="3xl" className="text-primary" />
+                        <Icon icon="shopping_bag" size="3xl" className="text-primary" />
                         <span className="text-sm text-text-secondary-dark">shopping_bag</span>
                       </div>
                       <div className="flex flex-col items-center gap-2">
-                        <CMSIcon icon="favorite" size="3xl" className="text-primary" />
+                        <Icon icon="favorite" size="3xl" className="text-primary" />
                         <span className="text-sm text-text-secondary-dark">favorite</span>
                       </div>
                     </div>
@@ -227,35 +259,35 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                   <h4 className="mb-3 text-lg font-semibold text-white">Icon Sizes</h4>
                   <div className="flex flex-wrap items-end gap-8 rounded-xl border border-white/10 bg-surface-dark p-6">
                     <div className="flex flex-col items-center gap-2">
-                      <CMSIcon icon="eco" size="sm" className="text-primary" />
+                      <Icon icon="eco" size="sm" className="text-primary" />
                       <span className="text-xs text-text-secondary-dark">sm (16px)</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <CMSIcon icon="eco" size="md" className="text-primary" />
+                      <Icon icon="eco" size="md" className="text-primary" />
                       <span className="text-xs text-text-secondary-dark">md (20px)</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <CMSIcon icon="eco" size="lg" className="text-primary" />
+                      <Icon icon="eco" size="lg" className="text-primary" />
                       <span className="text-xs text-text-secondary-dark">lg (24px)</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <CMSIcon icon="eco" size="xl" className="text-primary" />
+                      <Icon icon="eco" size="xl" className="text-primary" />
                       <span className="text-xs text-text-secondary-dark">xl (32px)</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <CMSIcon icon="eco" size="2xl" className="text-primary" />
+                      <Icon icon="eco" size="2xl" className="text-primary" />
                       <span className="text-xs text-text-secondary-dark">2xl (40px)</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <CMSIcon icon="eco" size="3xl" className="text-primary" />
+                      <Icon icon="eco" size="3xl" className="text-primary" />
                       <span className="text-xs text-text-secondary-dark">3xl (48px)</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <CMSIcon icon="eco" size="4xl" className="text-primary" />
+                      <Icon icon="eco" size="4xl" className="text-primary" />
                       <span className="text-xs text-text-secondary-dark">4xl (56px)</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <CMSIcon icon="eco" size="5xl" className="text-primary" />
+                      <Icon icon="eco" size="5xl" className="text-primary" />
                       <span className="text-xs text-text-secondary-dark">5xl (64px)</span>
                     </div>
                   </div>
@@ -264,19 +296,19 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                   <h4 className="mb-3 text-lg font-semibold text-white">Color Variations</h4>
                   <div className="flex flex-wrap gap-8 rounded-xl border border-white/10 bg-surface-dark p-6">
                     <div className="flex flex-col items-center gap-2">
-                      <CMSIcon icon="eco" size="3xl" className="text-primary" />
+                      <Icon icon="eco" size="3xl" className="text-primary" />
                       <span className="text-sm text-text-secondary-dark">Primary</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <CMSIcon icon="eco" size="3xl" className="text-secondary" />
+                      <Icon icon="eco" size="3xl" className="text-secondary" />
                       <span className="text-sm text-text-secondary-dark">Secondary</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <CMSIcon icon="eco" size="3xl" className="text-white" />
+                      <Icon icon="eco" size="3xl" className="text-white" />
                       <span className="text-sm text-text-secondary-dark">White</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <CMSIcon icon="eco" size="3xl" className="text-text-secondary-dark" />
+                      <Icon icon="eco" size="3xl" className="text-text-secondary-dark" />
                       <span className="text-sm text-text-secondary-dark">Gray</span>
                     </div>
                   </div>
@@ -285,19 +317,19 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
               <div className="mt-6 rounded-xl bg-surface-dark p-4">
                 <pre className="overflow-x-auto text-xs">
                   <code className="text-tertiary-300">
-                    {`<CMSIcon icon="Nest Eco Leaf" size="lg" className="text-primary" />
-<CMSIcon icon="eco" size="3xl" className="text-white" />
+                    {`<Icon icon="Nest Eco Leaf" size="lg" className="text-primary" />
+<Icon icon="eco" size="3xl" className="text-white" />
 
 // Local image icons
-<CMSIcon icon="brand.svg" size="lg" />`}
+<Icon icon="brand.svg" size="lg" />`}
                   </code>
                 </pre>
               </div>
             </div>
 
-            {/* CMSImage Component */}
+            {/* Image Component */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
-              <h3 className="mb-6 text-2xl font-semibold text-white">CMSImage</h3>
+              <h3 className="mb-6 text-2xl font-semibold text-white">Image</h3>
               <p className="mb-6 text-text-secondary-dark">
                 Wrapper around Next.js Image that resolves CMS media URLs and extracts alt text. Handles placeholder
                 fallback.
@@ -306,13 +338,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                 <div>
                   <h4 className="mb-3 text-lg font-semibold text-white">Placeholder Example</h4>
                   <div className="rounded-xl border border-white/10 bg-surface-dark p-6">
-                    <CMSImage
-                      image={null}
-                      fallbackAlt="Product placeholder"
-                      width={200}
-                      height={200}
-                      className="rounded-xl"
-                    />
+                    <Image image={null} width={200} height={200} className="rounded-xl" />
                   </div>
                 </div>
                 <div>
@@ -321,7 +347,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                     <pre className="overflow-x-auto text-xs">
                       <code className="text-tertiary-300">
                         {`// With CMS media object
-<CMSImage
+<Image
   image={product.image}
   width={300}
   height={300}
@@ -330,7 +356,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
 
 // With fill (responsive)
 <div className="relative h-64 w-full">
-  <CMSImage
+  <Image
     image={hero.backgroundImage}
     fill
     className="object-cover"
@@ -600,7 +626,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                 <h3 className="mb-4 font-semibold text-white">Spin</h3>
                 <div className="group flex h-20 items-center justify-center rounded-xl bg-surface-dark">
                   <div className="flex size-12 items-center justify-center">
-                    <CMSIcon icon="refresh" size="3xl" className="text-primary group-hover:animate-spin" />
+                    <Icon icon="refresh" size="3xl" className="text-primary group-hover:animate-spin" />
                   </div>
                 </div>
                 <p className="mt-3 text-center font-mono text-xs text-text-secondary-dark">animate-spin</p>
@@ -703,7 +729,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">Label</h3>
               <p className="mb-6 text-text-secondary-dark">
-                Composites CMSIcon + CMSText. Used for headings, labels, and inline text elements with icons.
+                Composites Icon + Text. Used for headings, labels, and inline text elements with icons.
               </p>
               <div className="space-y-4">
                 <Label
@@ -775,7 +801,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                       ariaDescription: 'Section subtitle',
                     },
                   }}
-                  level={2}
+                  level={3}
                 />
                 <Header
                   direction={direction}
@@ -802,7 +828,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
     header: { icon: 'nest_eco_leaf', text: 'Title', ariaDescription: '...' },
     subheader: { text: 'Subtitle', ariaDescription: '...' }
   }}
-  level={2}
+  level={3}
 />`}
                   </code>
                 </pre>
@@ -813,7 +839,7 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">Button</h3>
               <p className="mb-6 text-text-secondary-dark">
-                CMS-driven button/link with multiple variants and sizes. Composites CMSIcon + CMSText.
+                CMS-driven button/link with multiple variants and sizes. Composites Icon + Text.
               </p>
 
               <div className="space-y-8">
@@ -1109,6 +1135,355 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
 />`}
                   </code>
                 </pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* BlogCard Component Section */}
+        <section
+          id="blog-card"
+          className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16"
+        >
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 size-80 rounded-full bg-primary/5 blur-3xl" />
+
+          <div className="relative z-10 space-y-12">
+            <div>
+              <h2 className="mb-4 text-4xl font-bold text-white">BlogCard Component</h2>
+              <p className="text-lg text-text-secondary-dark">
+                Specialized card for blog posts. Wraps the Card component with blog-specific features like tags, read
+                time, and author info.
+              </p>
+            </div>
+
+            {/* BlogCard Variants */}
+            <div className="rounded-xl border border-white/5 bg-background-dark p-8">
+              <h3 className="mb-6 text-2xl font-semibold text-white">Layouts, Widths & Sizes</h3>
+              <p className="mb-6 text-text-secondary-dark">BlogCard supports all Card layouts, widths, and sizes.</p>
+              <div className="space-y-12">
+                {(['ltr', 'rtl', 'ttb', 'btt'] as const).map(layout => (
+                  <div key={layout} className="space-y-8">
+                    <h4 className="border-b border-white/10 pb-2 text-xl font-bold tracking-wider text-white uppercase">
+                      Layout: {layout.toUpperCase()}
+                    </h4>
+                    {(['fixed', 'full', 'fit'] as const).map(width => (
+                      <div key={`${layout}-${width}`}>
+                        <h5 className="mb-4 text-lg font-semibold text-primary/80">Width: {width}</h5>
+                        <div className="flex flex-col gap-6">
+                          {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map(size => (
+                            <div key={`${layout}-${width}-${size}`} className="flex flex-col gap-2">
+                              <span className="font-mono text-xs text-tertiary-300">size=&quot;{size}&quot;</span>
+                              <BlogCard
+                                {...mockLabels}
+                                direction={direction}
+                                size={size}
+                                layout={layout}
+                                width={width}
+                                post={
+                                  {
+                                    id: 1,
+                                    documentId: `demo-${layout}-${width}-${size}`,
+                                    slug: `demo-${layout}-${width}-${size}`,
+                                    publishedAt: new Date().toISOString(),
+                                    publishedDate: '2025-01-01',
+                                    readTimeInMinutes: 5,
+                                    tags: [
+                                      {
+                                        id: 1,
+                                        documentId: 'tag-1',
+                                        tagId: 'guide',
+                                        publishedAt: new Date().toISOString(),
+                                        tag: {
+                                          text: 'Guide',
+                                          iconPosition: IconPositionEnum.BEFORE_TEXT,
+                                          ariaDescription: 'Tag',
+                                        },
+                                      },
+                                    ],
+                                    content: {
+                                      header: {
+                                        alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+                                        promoteHeaderIcon: false,
+                                        header: {
+                                          text: 'Sustainable Living',
+                                          iconPosition: IconPositionEnum.BEFORE_TEXT,
+                                          ariaDescription: 'Title',
+                                        },
+                                        subheader: {
+                                          text: 'Greener lifestyle tips.',
+                                          iconPosition: IconPositionEnum.BEFORE_TEXT,
+                                          ariaDescription: 'Subtitle',
+                                        },
+                                      },
+                                    },
+                                    readArticleLabel: {
+                                      text: 'Read',
+                                      iconPosition: IconPositionEnum.AFTER_TEXT,
+                                      ariaDescription: 'Read article',
+                                    },
+                                    contributor: mockLabels.defaultContributor,
+                                  } as unknown as ApiBlogPostBlogPostDocument
+                                }
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ProductCard Component Section */}
+        <section
+          id="product-card"
+          className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16"
+        >
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 size-80 rounded-full bg-primary/5 blur-3xl" />
+
+          <div className="relative z-10 space-y-12">
+            <div>
+              <h2 className="mb-4 text-4xl font-bold text-white">ProductCard Component</h2>
+              <p className="text-lg text-text-secondary-dark">
+                Specialized card for products. Wraps the Card component with product-specific details like price,
+                wishlist button, and tags.
+              </p>
+            </div>
+
+            {/* ProductCard Variants */}
+            <div className="rounded-xl border border-white/5 bg-background-dark p-8">
+              <h3 className="mb-6 text-2xl font-semibold text-white">Layouts, Widths & Sizes</h3>
+              <p className="mb-6 text-text-secondary-dark">ProductCard supports all Card layouts, widths, and sizes.</p>
+              <div className="space-y-12">
+                {(['ltr', 'rtl', 'ttb', 'btt'] as const).map(layout => (
+                  <div key={layout} className="space-y-8">
+                    <h4 className="border-b border-white/10 pb-2 text-xl font-bold tracking-wider text-white uppercase">
+                      Layout: {layout.toUpperCase()}
+                    </h4>
+                    {(['fixed', 'full', 'fit'] as const).map(width => (
+                      <div key={`${layout}-${width}`}>
+                        <h5 className="mb-4 text-lg font-semibold text-primary/80">Width: {width}</h5>
+                        <div className="flex flex-col gap-6">
+                          {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map(size => (
+                            <div key={`${layout}-${width}-${size}`} className="flex flex-col gap-2">
+                              <span className="font-mono text-xs text-tertiary-300">size=&quot;{size}&quot;</span>
+                              <ProductCard
+                                direction={direction}
+                                size={size}
+                                layout={layout}
+                                width={width}
+                                enableUserProfile={true}
+                                product={
+                                  {
+                                    id: 1,
+                                    documentId: `prod-${layout}-${width}-${size}`,
+                                    slug: `prod-${layout}-${width}-${size}`,
+                                    name: 'Eco Product',
+                                    price: 29.99,
+                                    publishedAt: '2025-01-01',
+                                    images: [
+                                      {
+                                        documentId: 'placeholder',
+                                        url: '/images/placeholder.svg',
+                                        mime: 'image/svg+xml',
+                                        width: 100,
+                                        height: 100,
+                                      },
+                                    ],
+                                    tags: [
+                                      {
+                                        id: 1,
+                                        tag: {
+                                          text: 'New',
+                                          iconPosition: IconPositionEnum.BEFORE_TEXT,
+                                        },
+                                      },
+                                    ],
+                                    content: {
+                                      header: {
+                                        header: {
+                                          text: 'Eco Bottle',
+                                          iconPosition: IconPositionEnum.BEFORE_TEXT,
+                                        },
+                                      },
+                                    } as unknown as ApiProductProductDocument['content'],
+                                    viewDetailsLabel: {
+                                      text: 'View',
+                                      iconPosition: IconPositionEnum.AFTER_TEXT,
+                                    },
+                                    currency: { symbol: '$' },
+                                  } as unknown as ApiProductProductDocument
+                                }
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ContributorCard Component Section */}
+        <section
+          id="contributor-card"
+          className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16"
+        >
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 size-80 rounded-full bg-primary/5 blur-3xl" />
+
+          <div className="relative z-10 space-y-12">
+            <div>
+              <h2 className="mb-4 text-4xl font-bold text-white">ContributorCard Component</h2>
+              <p className="text-lg text-text-secondary-dark">
+                Specialized card for team profiles. Handles contributor data from CMS.
+              </p>
+            </div>
+
+            {/* Common Usage Patterns */}
+            <div className="rounded-xl border border-white/5 bg-background-dark p-8">
+              <h3 className="mb-6 text-2xl font-semibold text-white">Common Usage Patterns</h3>
+              <p className="mb-6 text-text-secondary-dark">
+                Real-world examples of how ContributorCard is used throughout the site.
+              </p>
+
+              <div className="space-y-12">
+                {/* Team Section Pattern */}
+                <div className="space-y-4">
+                  <h4 className="border-b border-white/10 pb-2 text-xl font-bold tracking-wider text-white uppercase">
+                    Team Section (Carousel)
+                  </h4>
+                  <p className="text-sm text-text-secondary-dark">
+                    Used in TeamSection.tsx - Default vertical layout with fixed width for carousel display.
+                  </p>
+                  <div className="flex gap-6 overflow-x-auto pb-4">
+                    {(
+                      [
+                        {
+                          ...mockLabels.defaultContributor,
+                          name: 'Sarah Green',
+                          bio: 'Passionate about sustainable living and eco-friendly products.',
+                          roles: [{ documentId: 'role-1', id: 1, name: 'Founder', roleId: 1, publishedAt: '' }],
+                        },
+                        {
+                          ...mockLabels.defaultContributor,
+                          documentId: 'contributor-2',
+                          name: 'Mike Rivers',
+                          bio: 'Expert in renewable energy and green technology solutions.',
+                          roles: [{ documentId: 'role-2', id: 2, name: 'CTO', roleId: 2, publishedAt: '' }],
+                        },
+                        {
+                          ...mockLabels.defaultContributor,
+                          documentId: 'contributor-3',
+                          name: 'Emma Woods',
+                          bio: 'Dedicated to reducing carbon footprint through innovative design.',
+                          roles: [{ documentId: 'role-3', id: 3, name: 'Designer', roleId: 3, publishedAt: '' }],
+                        },
+                      ] as unknown as ApiContributorContributorDocument[]
+                    ).map(member => (
+                      <ContributorCard
+                        key={member.documentId}
+                        direction={direction}
+                        size="md"
+                        layout="ttb"
+                        width="fixed"
+                        member={member}
+                      />
+                    ))}
+                  </div>
+                  <div className="rounded-xl bg-surface-dark p-4">
+                    <pre className="overflow-x-auto text-xs">
+                      <code className="text-tertiary-300">
+                        {`<ContributorCard
+  direction={direction}
+  size="md"          // Default team card size
+  layout="ttb"       // Top-to-bottom (vertical)
+  width="fixed"      // Fixed width for carousel
+  member={contributor}
+/>`}
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+
+                {/* Blog Author Bio Pattern */}
+                <div className="space-y-4">
+                  <h4 className="border-b border-white/10 pb-2 text-xl font-bold tracking-wider text-white uppercase">
+                    Blog Author Bio
+                  </h4>
+                  <p className="text-sm text-text-secondary-dark">
+                    Used in BlogPostClient.tsx - Compact horizontal layout for author bios at the end of articles.
+                  </p>
+                  <div className="max-w-2xl">
+                    <ContributorCard
+                      direction={direction}
+                      size="xs"
+                      layout="ltr"
+                      width="full"
+                      className="border-none! bg-transparent! p-0 shadow-none!"
+                      member={{
+                        ...mockLabels.defaultContributor,
+                        name: 'John Doe',
+                        bio: 'Environmental journalist with 10+ years covering sustainability topics.',
+                        twitter: 'johndoe',
+                        linkedin: 'johndoe',
+                      }}
+                    />
+                  </div>
+                  <div className="rounded-xl bg-surface-dark p-4">
+                    <pre className="overflow-x-auto text-xs">
+                      <code className="text-tertiary-300">
+                        {`<ContributorCard
+  direction={direction}
+  size="xs"          // Compact size
+  layout="ltr"       // Left-to-right (horizontal)
+  width="full"       // Full width
+  className="border-none! bg-transparent! p-0 shadow-none!"
+  member={contributor}
+/>`}
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* All Layouts & Sizes Reference */}
+            <div className="rounded-xl border border-white/5 bg-background-dark p-8">
+              <h3 className="mb-6 text-2xl font-semibold text-white">All Layouts & Sizes</h3>
+              <p className="mb-6 text-text-secondary-dark">Complete reference of all layout and size combinations.</p>
+              <div className="space-y-12">
+                {(['ltr', 'rtl', 'ttb', 'btt'] as const).map(layout => (
+                  <div key={layout} className="space-y-8">
+                    <h4 className="border-b border-white/10 pb-2 text-xl font-bold tracking-wider text-white uppercase">
+                      Layout: {layout.toUpperCase()}
+                    </h4>
+                    {(['fixed', 'full', 'fit'] as const).map(width => (
+                      <div key={`${layout}-${width}`}>
+                        <h5 className="mb-4 text-lg font-semibold text-primary/80">Width: {width}</h5>
+                        <div className="flex flex-col gap-6">
+                          {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map(size => (
+                            <div key={`${layout}-${width}-${size}`} className="flex flex-col gap-2">
+                              <span className="font-mono text-xs text-tertiary-300">size=&quot;{size}&quot;</span>
+                              <ContributorCard
+                                direction={direction}
+                                size={size}
+                                layout={layout}
+                                width={width}
+                                member={mockLabels.defaultContributor}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -1860,8 +2235,8 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
                 <h3 className="mb-4 text-2xl font-bold text-white">Component Hierarchy</h3>
                 <ol className="list-inside list-decimal space-y-2 text-text-secondary-dark">
                   <li>
-                    <strong className="text-white">Primitives:</strong> CMSText, CMSIcon, CMSImage - Direct 1:1 mapping
-                    to Strapi fields
+                    <strong className="text-white">Primitives:</strong> Text, Icon, Image - Direct 1:1 mapping to Strapi
+                    fields
                   </li>
                   <li>
                     <strong className="text-white">Elements:</strong> Label, Button, Header, TextBlock - Composite
@@ -1900,6 +2275,6 @@ export default function StyleGuideClient({ lang, direction }: StyleGuideClientPr
           </div>
         </section>
       </div>
-    </div>
+    </PageClient>
   )
 }

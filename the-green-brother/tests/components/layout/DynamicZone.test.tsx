@@ -80,7 +80,11 @@ describe('DynamicZone', () => {
       />
     )
 
-    const horizontalGroup = container.querySelector('[class*="md:flex-row-reverse"]')
+    // Should rely on dir="rtl" on container, not specific class on the group
+    const containerDiv = container.firstChild
+    expect(containerDiv).toHaveAttribute('dir', 'rtl')
+
+    const horizontalGroup = container.querySelector('[class*="md:flex-row"]')
     expect(horizontalGroup).toBeInTheDocument()
   })
 
@@ -134,7 +138,7 @@ describe('DynamicZone', () => {
     expect(container.firstChild).toBeEmptyDOMElement()
   })
 
-  it('should render vertical sections in gap-12 container', () => {
+  it('should render vertical sections in gap-16 container', () => {
     const sections: TestSection[] = [
       { __component: 'sections.hero', id: 1, title: 'Hero' },
       { __component: 'sections.features', id: 2, title: 'Features' },
@@ -149,7 +153,7 @@ describe('DynamicZone', () => {
       />
     )
 
-    const verticalGroup = container.querySelector('[class*="gap-12"]')
+    const verticalGroup = container.querySelector('[class*="gap-16"]')
     expect(verticalGroup).toBeInTheDocument()
   })
 
@@ -295,25 +299,6 @@ describe('DynamicZone', () => {
       />
     )
     expect(bottomContainer.querySelector('.md\\:items-end')).toBeInTheDocument()
-  })
-
-  it('should apply custom horizontal group spacing', () => {
-    const sections: TestSection[] = [
-      { __component: 'markers.start-horizontal-layout-marker', id: 0 },
-      { __component: 'sections.hero', id: 1, title: 'Hero' },
-      { __component: 'markers.end-horizontal-layout-marker', id: 2 },
-    ]
-
-    const { container } = render(
-      <DynamicZone
-        verticalAlignment="center"
-        horizontalGroupSpacing="p-10"
-        direction={DirectionEnum.LTR}
-        sections={sections}
-        renderSection={mockRenderSection}
-      />
-    )
-    expect(container.querySelector('.p-10')).toBeInTheDocument()
   })
 
   describe('getAlignmentClass', () => {

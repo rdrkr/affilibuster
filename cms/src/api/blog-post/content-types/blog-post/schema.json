@@ -5,7 +5,7 @@
     "singularName": "blog-post",
     "pluralName": "blog-posts",
     "displayName": "Blog Post",
-    "description": "Blog posts with title, content, featured image, author, tags, and SEO metadata"
+    "description": "Blog posts with title, content, featured image, contributor, tags, and SEO metadata"
   },
   "options": {
     "draftAndPublish": true
@@ -47,20 +47,21 @@
       "required": true,
       "allowedTypes": ["images"]
     },
-    "author": {
+    "contributor": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::author.author",
+      "target": "api::contributor.contributor",
       "inversedBy": "blogPosts"
     },
-    "readTime": {
-      "type": "string",
+    "readTimeInMinutes": {
+      "type": "integer",
       "pluginOptions": {
         "i18n": {
-          "localized": true
+          "localized": false
         }
       },
-      "required": true
+      "required": true,
+      "default": 5
     },
     "tags": {
       "type": "relation",
@@ -70,17 +71,6 @@
     },
     "publishedDate": {
       "type": "datetime",
-      "required": true
-    },
-    "readArticleLabel": {
-      "type": "component",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "component": "elements.label",
-      "repeatable": false,
       "required": true
     },
     "seoMetadata": {

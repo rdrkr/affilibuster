@@ -67,6 +67,8 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['react', 'react-dom'],
   },
+  bundlePagesRouterDependencies: true,
+  typedRoutes: false,
   // URL redirects for old/changed product slugs
   redirects() {
     return [

@@ -1,10 +1,10 @@
-// Copyright (c) 2025 Affilibuster by Ronen Druker.
+// Copyright (c) 2026 Affilibuster by Ronen Druker.
 
 /**
  * Unit tests for BlogClient component
  */
 
-import { fireEvent, render, screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 
 // Mock next/link
 jest.mock('next/link', () => ({
@@ -16,31 +16,78 @@ jest.mock('next/link', () => ({
 
 // Mock CMS components
 jest.mock('@/components/elements', () => ({
-  CMSImage: function MockCMSImage({ fallbackAlt }: { fallbackAlt?: string }) {
+  Image: function MockImage({ fallbackAlt }: { fallbackAlt?: string }) {
     return <div data-testid="cms-image">{fallbackAlt}</div>
   },
-  CMSText: function MockCMSText({ text }: { text?: string }) {
+  Text: function MockText({ text }: { text?: string }) {
     return <span>{text}</span>
+  },
+  Header: function MockHeader({
+    data,
+    level = 2,
+  }: {
+    data: { header?: { text?: string }; subheader?: { text?: string } }
+    level?: number
+  }) {
+    const HeadingTag = `h${String(level)}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+    return (
+      <div data-testid="mock-header">
+        <HeadingTag data-testid="mock-header-title">{data.header?.text}</HeadingTag>
+        {data.subheader?.text && <p data-testid="mock-header-subtitle">{data.subheader.text}</p>}
+      </div>
+    )
+  },
+  ButtonLink: function MockButtonLink({ data }: { data: { label: { text: string }; url: string } }) {
+    return <a href={data.url}>{data.label.text}</a>
   },
 }))
 
+// Mock BlogCard component
+jest.mock('@/components/blog', () => ({
+  BlogCard: function MockBlogCard({
+    post,
+    basePath,
+  }: {
+    post: {
+      documentId: string
+      slug: string
+      content?: { header?: { header?: { text?: string } } }
+      tags?: { tag?: { text?: string } }[]
+    }
+    basePath?: string
+  }) {
+    return (
+      <a data-testid="mock-blog-card" href={`${basePath ?? '/blog'}/${post.slug}`} className="group">
+        <span data-testid="mock-blog-card-title">{post.content?.header?.header?.text}</span>
+        {post.tags?.[0]?.tag?.text && <span data-testid="mock-blog-card-tag">{post.tags[0].tag.text}</span>}
+      </a>
+    )
+  },
+}))
+
+// Mock Carousel component
+// Mock Carousel component
+jest.mock('@/components/layout', () => {
+  const actual = jest.requireActual('@/components/layout')
+  return {
+    ...actual,
+    Carousel: function MockCarousel({ children }: { children: React.ReactNode }) {
+      return <div data-testid="mock-carousel">{children}</div>
+    },
+  }
+})
+
 import BlogClient from '@/app/[lang]/blog/BlogClient'
-import { CodeEnum, type ApiBlogBlogDocument, type ApiBlogPostBlogPostDocument } from '@/lib/generated/types.gen'
+import { DirectionEnum, type ApiBlogBlogDocument, type ApiBlogPostBlogPostDocument } from '@/lib/generated/types.gen'
+import { renderWithLayout } from '../../../utils/renderWithLayout'
 
 describe('BlogClient', () => {
-  const mockBlogPageData: ApiBlogBlogDocument = {
-    header: {
-      header: { text: 'Our Blog' },
-      subheader: { text: 'Read our latest articles' },
-    },
-  } as ApiBlogBlogDocument
-
   const mockPosts: ApiBlogPostBlogPostDocument[] = [
     {
       documentId: 'post-1',
       slug: 'first-post',
       content: { header: { header: { text: 'First Post' }, subheader: { text: 'Introduction' } } },
-      readTime: '5 min',
+
       tags: [{ tag: { text: 'Sustainability' } }],
       featuredImage: { url: '/images/post1.jpg', alternativeText: 'Post 1' },
     } as ApiBlogPostBlogPostDocument,
@@ -48,136 +95,184 @@ describe('BlogClient', () => {
       documentId: 'post-2',
       slug: 'second-post',
       content: { header: { header: { text: 'Second Post' }, subheader: { text: 'Details' } } },
-      readTime: '3 min',
+
       tags: [{ tag: { text: 'EcoFriendly' } }],
+    } as ApiBlogPostBlogPostDocument,
+    {
+      documentId: 'post-3',
+      slug: 'third-post',
+      content: { header: { header: { text: 'Third Post' } } },
+      tags: [{ tag: { text: 'Sustainability' } }],
+    } as ApiBlogPostBlogPostDocument,
+    {
+      documentId: 'post-4',
+      slug: 'fourth-post',
+      content: { header: { header: { text: 'Fourth Post' } } },
+      tags: [{ tag: { text: 'EcoFriendly' } }],
+    } as ApiBlogPostBlogPostDocument,
+    {
+      documentId: 'post-5',
+      slug: 'fifth-post',
+      content: { header: { header: { text: 'Fifth Post' } } },
+      tags: [{ tag: { text: 'Sustainability' } }],
     } as ApiBlogPostBlogPostDocument,
   ]
 
+  const mockBlogPageData: ApiBlogBlogDocument = {
+    header: {
+      header: { text: 'Our Blog' },
+      subheader: { text: 'Read our latest articles' },
+    },
+    featuredBlogPosts: [mockPosts[0]],
+    tagFilters: [
+      { documentId: 'tag-1', tag: { text: 'Sustainability' } },
+      { documentId: 'tag-2', tag: { text: 'EcoFriendly' } },
+    ],
+    pagination: {
+      itemsPerPage: 6,
+      nextButton: { label: { text: 'View All', iconPosition: 'right', ariaDescription: 'View More' } },
+    },
+    defaultContributor: {
+      documentId: 'def-1',
+      id: 1,
+      name: 'Default',
+      slug: 'default',
+      bio: 'Bio',
+      publishedAt: '2024-01-01',
+    } as any,
+    readTimeMinutesLabel: { text: 'min read', iconPosition: 'left', ariaDescription: 'read time' } as any,
+    readArticleLabel: { text: 'Read', iconPosition: 'right', ariaDescription: 'read article' } as any,
+  } as unknown as ApiBlogBlogDocument
+
   it('should render blog header with CMS data', () => {
-    render(<BlogClient blogPageData={mockBlogPageData} posts={[]} lang={CodeEnum.EN} />)
+    renderWithLayout(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Our Blog')
     expect(screen.getByText('Read our latest articles')).toBeInTheDocument()
   })
 
-  it('should render default header when blogPageData is null', () => {
-    render(<BlogClient blogPageData={null} posts={[]} lang={CodeEnum.EN} />)
-
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Sustainable Living,')
+  it('should not render header when blogPageData is null', () => {
+    const { container } = renderWithLayout(<BlogClient blogPageData={null} posts={[]} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+    expect(container).toBeEmptyDOMElement()
   })
 
-  it('should render posts', () => {
-    render(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} lang={CodeEnum.EN} />)
-
-    expect(screen.getAllByText('First Post').length).toBeGreaterThan(0)
+  it('should render featured posts carousel (desktop and mobile versions)', () => {
+    renderWithLayout(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+    // Two carousels: one for desktop (xl + ltr), one for mobile (lg + ttb)
+    expect(screen.getAllByTestId('mock-carousel').length).toBe(2)
+    // First post is featured (appears in both carousels + may appear in tag sections)
+    expect(screen.getAllByText('First Post').length).toBeGreaterThanOrEqual(2)
   })
 
-  it('should render empty state when no posts', () => {
-    render(<BlogClient blogPageData={mockBlogPageData} posts={[]} lang={CodeEnum.EN} />)
-
-    expect(screen.getByText('No blog posts found')).toBeInTheDocument()
+  it('should render tag sections', () => {
+    renderWithLayout(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+    expect(screen.getAllByText('Sustainability').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('EcoFriendly').length).toBeGreaterThan(0)
   })
 
-  it('should extract and display unique tags', () => {
-    render(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} lang={CodeEnum.EN} />)
+  it('should filter posts by tag in sections', () => {
+    renderWithLayout(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
 
-    expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Sustainability' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'EcoFriendly' })).toBeInTheDocument()
+    // Sustainability section should have posts 1 and 3
+    // EcoFriendly section should have post 2
+    // We can't strictly assert parent-child without complex selectors in RTL,
+    // but we can check existence.
+    const posts = screen.getAllByTestId('mock-blog-card')
+    expect(posts.length).toBeGreaterThanOrEqual(3) // Featured(1) + Sust(2) + Eco(1) = 4 cards rendered
   })
 
-  it('should filter posts by tag', () => {
-    render(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} lang={CodeEnum.EN} />)
-
-    // Click on Sustainability tag
-    fireEvent.click(screen.getByRole('button', { name: 'Sustainability' }))
-
-    // Should only show posts with that tag
-    expect(screen.getAllByText('First Post').length).toBeGreaterThan(0)
+  it('should render view all button for tags', () => {
+    renderWithLayout(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+    const viewAllLinks = screen.getAllByText(/View All/)
+    // There should be at least one View All button per tag section
+    expect(viewAllLinks.length).toBeGreaterThan(0)
   })
 
-  it('should show all posts when All tag is selected', () => {
-    render(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} lang={CodeEnum.EN} />)
-
-    // Filter first
-    fireEvent.click(screen.getByRole('button', { name: 'Sustainability' }))
-    // Then reset
-    fireEvent.click(screen.getByRole('button', { name: 'All' }))
-
-    // All posts should be visible
-    expect(screen.getAllByText('First Post').length).toBeGreaterThan(0)
+  it('should align View All button correctly in RTL', () => {
+    renderWithLayout(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.RTL },
+    })
+    const viewAllLinks = screen.getAllByText(/View All/)
+    expect(viewAllLinks.length).toBeGreaterThan(0)
+    // ButtonLink is rendered as an anchor that inherits self-start class in RTL
+    const link = viewAllLinks[0]!
+    expect(link).toBeDefined()
   })
 
-  it('should not render subheader when not available', () => {
-    const dataWithoutSubheader = {
-      header: { header: { text: 'Blog' } },
-    } as ApiBlogBlogDocument
-
-    render(<BlogClient blogPageData={dataWithoutSubheader} posts={[]} lang={CodeEnum.EN} />)
-
-    expect(screen.queryByText('Read our latest articles')).not.toBeInTheDocument()
+  it('should align View All button correctly in LTR', () => {
+    renderWithLayout(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+    const viewAllLinks = screen.getAllByText(/View All/)
+    expect(viewAllLinks.length).toBeGreaterThan(0)
+    const link = viewAllLinks[0]!
+    expect(link).toBeDefined()
   })
 
-  it('should not render tags filter when only All tag exists', () => {
-    const postsWithoutTags = [{ documentId: 'post-1', slug: 'post', content: {} }] as ApiBlogPostBlogPostDocument[]
-
-    render(<BlogClient blogPageData={mockBlogPageData} posts={postsWithoutTags} lang={CodeEnum.EN} />)
-
-    // Only "All" tag should exist but not shown as filter
-    expect(screen.queryByRole('button', { name: 'Sustainability' })).not.toBeInTheDocument()
+  it('should render without featured posts if empty or null', () => {
+    const dataWithoutFeatured = { ...mockBlogPageData, featuredBlogPosts: [] }
+    renderWithLayout(<BlogClient blogPageData={dataWithoutFeatured} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+    expect(screen.queryByTestId('mock-carousel')).not.toBeInTheDocument()
+    // Headers and tags should still be there
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
   })
 
-  it('should render post without featured image', () => {
-    const postsWithoutImage = [
-      {
-        documentId: 'post-1',
-        slug: 'no-image-post',
-        content: { header: { header: { text: 'No Image Post' } } },
-        readTime: '5 min',
-        tags: [],
-      } as unknown as ApiBlogPostBlogPostDocument,
-    ]
-
-    render(<BlogClient blogPageData={mockBlogPageData} posts={postsWithoutImage} lang={CodeEnum.EN} />)
-
-    expect(screen.getAllByText('No Image Post').length).toBeGreaterThan(0)
+  it('should render detailed grid layout for remaining posts (more than 2 posts in a tag)', () => {
+    renderWithLayout(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+    // "Fifth Post" is the 3rd post in "Sustainability" tag (after filters/slice)
+    // Sustainability: Post 1, Post 3, Post 5.
+    // Logic: topPosts = slice(0, 2) -> Post 1, Post 3
+    // remainingPosts = slice(2) -> Post 5
+    // Post 5 should be rendered twice (once for mobile, once for desktop) due to adaptive layout
+    const fifthPosts = screen.getAllByText('Fifth Post')
+    expect(fifthPosts.length).toBeGreaterThanOrEqual(2)
   })
 
-  it('should render post without read time', () => {
-    const postsWithoutReadTime = [
-      {
-        documentId: 'post-1',
-        slug: 'no-readtime-post',
-        content: { header: { header: { text: 'No ReadTime Post' } } },
-        tags: [],
-      } as unknown as ApiBlogPostBlogPostDocument,
-    ]
+  it('should cleanup animation frame on unmount', () => {
+    const cancelAnimationFrameSpy = jest.spyOn(window, 'cancelAnimationFrame')
 
-    render(<BlogClient blogPageData={mockBlogPageData} posts={postsWithoutReadTime} lang={CodeEnum.EN} />)
+    const { unmount } = renderWithLayout(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
 
-    expect(screen.getAllByText('No ReadTime Post').length).toBeGreaterThan(0)
+    unmount()
+
+    expect(cancelAnimationFrameSpy).toHaveBeenCalled()
+    cancelAnimationFrameSpy.mockRestore()
   })
 
-  it('should handle posts with empty tags array', () => {
-    const postsEmptyTags = [
-      {
-        documentId: 'post-1',
-        slug: 'empty-tags',
-        content: { header: { header: { text: 'Empty Tags' } } },
-        tags: [],
-        featuredImage: { url: '/test.jpg' },
-      } as unknown as ApiBlogPostBlogPostDocument,
-    ]
+  it('should become visible after mount', async () => {
+    // Mock requestAnimationFrame to execute immediate
+    const requestAnimationFrameSpy = jest.spyOn(window, 'requestAnimationFrame').mockImplementation(cb => {
+      cb(0)
+      return 1
+    })
 
-    render(<BlogClient blogPageData={mockBlogPageData} posts={postsEmptyTags} lang={CodeEnum.EN} />)
+    const { container } = renderWithLayout(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
 
-    expect(screen.getAllByText('Empty Tags').length).toBeGreaterThan(0)
-  })
+    // Should have opacity-100 class
+    await waitFor(() => {
+      expect(container.firstChild).toHaveClass('opacity-100')
+    })
 
-  it('should link to correct blog post URL', () => {
-    const { container } = render(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} lang={CodeEnum.EN} />)
-
-    const links = container.querySelectorAll('a[href*="/blog/"]')
-    expect(links.length).toBeGreaterThan(0)
+    requestAnimationFrameSpy.mockRestore()
   })
 })

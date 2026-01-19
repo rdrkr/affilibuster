@@ -66,14 +66,18 @@ class TestGetCurrencies:
 
     async def test_get_currencies_with_filters(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
         """Test GET /currencies with filter parameters."""
+        # Filter by code which is a valid field on the currency model
         response = await integration_client.get(
             "/v1/currencies",
-            params={"customPopulate": "nested", "filters[isActive][$eq]": "true"},
+            params={"customPopulate": "nested", "filters[code][$eq]": "USD"},
         )
         assert response.status_code == 200
 
         data = CurrenciesGetResponse(**response.json())
         assert data.data
+        # Should return only USD when filtering by code=USD
+        assert len(data.data) == 1
+        assert data.data[0].code == "USD"
 
     async def test_get_currencies_with_field_selection(
         self, integration_client: AsyncClient, strapi_test_data: None

@@ -42,8 +42,7 @@ format_shell() {
   if command -v shfmt >/dev/null 2>&1; then
     # Find all shell scripts excluding generated directories
     shell_files=$(find . -type f \( -name "*.sh" -o -name "*.bash" \) \
-      ! -path "./.specify/*" \
-      ! -path "./specs/*" \
+      ! -path "*/specs/*" \
       ! -path "*/generated/*" \
       ! -path "*/node_modules/*" \
       ! -path "*/.git/*" \

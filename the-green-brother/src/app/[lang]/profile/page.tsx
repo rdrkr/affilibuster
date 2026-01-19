@@ -2,7 +2,7 @@
 
 'use client'
 
-import Image from 'next/image'
+import NextImage from 'next/image'
 import Link from 'next/link'
 
 const Profile = () => {
@@ -16,7 +16,7 @@ const Profile = () => {
             border-neutral-200 shadow-xl dark:border-surface-dark
           `}
           >
-            <Image
+            <NextImage
               src="/images/profile-avatar-placeholder.webp"
               alt="Profile"
               fill

@@ -52,17 +52,7 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
   } = data
 
   const isRTL = direction === DirectionEnum.RTL
-
-  // Map alignment to Tailwind classes
-  // LANGUAGE_DIRECTION means start for LTR languages, end for RTL
-  const getAlignmentClass = () => {
-    if (headerAlignment === AlignmentEnum.CENTER) {
-      return 'flex justify-center'
-    }
-    // LANGUAGE_DIRECTION: start for LTR, end for RTL
-    return isRTL ? 'flex justify-end' : 'flex justify-start'
-  }
-  const alignmentClass = getAlignmentClass()
+  const alignmentClass = `flex ${headerAlignment === AlignmentEnum.CENTER ? 'justify-center' : 'justify-start'}`
 
   // Determine layout based on feature count
   const useGridLayout = features.length >= 4
@@ -71,11 +61,9 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
   if (!showHeader) {
     return (
       <div
-        className={`
-          mt-8 grid grid-flow-col grid-rows-3 gap-4
-          ${isRTL ? 'text-right' : 'text-left'}
-        `}
+        className={`grid grid-flow-col grid-rows-3 gap-4`}
         aria-label={headerAriaDescription ?? ''}
+        dir={isRTL ? 'rtl' : 'ltr'}
       >
         {features.map((feature, index) => {
           if (!feature.header) {
@@ -85,7 +73,7 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
             <div
               key={feature.id ?? index}
               className={`
-                flex items-center ${isRTL ? 'justify-end' : 'justify-start'}
+                flex items-center justify-start
                 rounded-xl border
                 border-neutral-200 bg-white
                 p-6 shadow-sm
@@ -110,6 +98,7 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
         dark:shadow-none
       `}
       aria-label={headerAriaDescription ?? ''}
+      dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* Decorative background elements */}
       <div
@@ -128,7 +117,7 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
       <div
         className={`
         relative z-10
-        lg:flex lg:items-stretch lg:gap-20 ${isRTL ? 'lg:flex-row-reverse' : ''}
+        lg:flex lg:items-stretch lg:gap-20
       `}
       >
         {/* Left column - Header and CTA */}
@@ -158,7 +147,7 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
                 alignment: headerAlignment ?? AlignmentEnum.LANGUAGE_DIRECTION,
               } as ElementsHeaderEntry
             }
-            level={2}
+            level={3}
             direction={direction}
           />
           {learnMoreButtonUrl && learnMoreButtonText && (

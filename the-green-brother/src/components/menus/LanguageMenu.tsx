@@ -15,7 +15,7 @@ import { useCallback, useState } from 'react'
 import type { CodeEnum, MenusLanguageSelectorEntry } from '@/lib/generated/types.gen'
 import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 
-import { ButtonAction, CMSIcon } from '../elements'
+import { ButtonAction, Icon } from '../elements'
 import { DropdownMenu } from './DropdownMenu'
 
 /**
@@ -86,7 +86,7 @@ export function LanguageMenu({
   // Icon with badge overlay component
   const iconWithBadge = label?.icon ? (
     <span className="relative">
-      <CMSIcon icon={label.icon} size="md" className={`mr-1.5`} />
+      <Icon icon={label.icon} size="md" className={`mr-1.5`} />
       {/* Badge positioned at bottom-right of icon */}
       <span
         className={`

@@ -66,7 +66,7 @@ format-typescript: ## Format TypeScript/JavaScript (Prettier)
 format-typescript-check: ## Check TypeScript/JavaScript formatting without making changes
 	@bash scripts/format.sh typescript check
 
-format-shell: ## Format shell scripts (shfmt)
+format-shell: ## Format shell scripts
 	@bash scripts/format.sh shell
 
 format-shell-check: ## Check shell script formatting without making changes
@@ -201,17 +201,17 @@ install: install-backend install-the-green-brother install-cms ## Install all de
 setup: ## Complete development environment setup (installs all tools and dependencies)
 	@bash scripts/setup.sh
 
-upgrade: ## Update all dependencies to latest
-	@./scripts/upgrade.sh all
-
 upgrade-cms: ## Update CMS dependencies only
-	@./scripts/upgrade.sh cms
+	@cd cms && npm update --save
 
 upgrade-the-green-brother: ## Update the-green-brother dependencies only
-	@./scripts/upgrade.sh the-green-brother
+	@cd the-green-brother && npm update --save
 
 upgrade-backend: ## Update backend dependencies only
-	@./scripts/upgrade.sh backend
+	@cd backend && uv sync --upgrade
+
+upgrade: upgrade-backend upgrade-the-green-brother upgrade-cms ## Update all dependencies to latest
+	@echo "✅ All dependencies updated"
 
 clean: ## Clean up containers, volumes, and all build artifacts (zero state)
 	@bash scripts/clean.sh

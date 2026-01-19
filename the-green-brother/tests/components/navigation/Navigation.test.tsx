@@ -10,7 +10,6 @@ import { fireEvent, render, screen } from '@testing-library/react'
 jest.mock('next/image', () => ({
   __esModule: true,
   default: function MockImage({ alt, src }: { alt: string; src: string }) {
-    // eslint-disable-next-line @next/next/no-img-element
     return <img src={src} alt={alt} />
   },
 }))
@@ -82,14 +81,13 @@ jest.mock('@/components/navigation/NavigationGroup', () => ({
 
 // Mock CMS elements
 jest.mock('@/components/elements', () => ({
-  CMSIcon: function MockCMSIcon({ icon }: { icon?: { name?: string } }) {
+  Icon: function MockIcon({ icon }: { icon?: { name?: string } }) {
     return <span data-testid="cms-icon">{icon?.name}</span>
   },
-  CMSText: function MockCMSText({ text }: { text?: string }) {
+  Text: function MockText({ text }: { text?: string }) {
     return <span>{text}</span>
   },
   resolveIcon: jest.fn((icon: { name?: string } | undefined) => (icon?.name ?? 'default') as string),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ButtonLink: function MockButtonLink(props: any) {
     const { children, data, className, showText } = props
     const ariaLabel = props['aria-label'] ?? data?.label?.ariaDescription

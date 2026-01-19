@@ -23,10 +23,6 @@ from affilibuster_backend.domain.entities.generated.models import (
     AuthForgotPasswordPostRequest,
     AuthLoginPostRequest,
     AuthLogoutPostRequest,
-    AuthorsGetParametersQuery,
-    AuthorsGetResponse,
-    AuthorsIdGetParametersQuery,
-    AuthorsIdGetResponse,
     AuthPageGetParametersQuery,
     AuthPageGetResponse,
     AuthProfileChangePasswordPostRequest,
@@ -41,12 +37,24 @@ from affilibuster_backend.domain.entities.generated.models import (
     BlogPostsGetResponse,
     BlogPostsIdGetParametersQuery,
     BlogPostsIdGetResponse,
+    BlogPostsSlugSlugGetParametersQuery,
+    BlogPostsSlugSlugGetResponse,
     BlogPostTagsGetParametersQuery,
     BlogPostTagsGetResponse,
     BlogPostTagsIdGetParametersQuery,
     BlogPostTagsIdGetResponse,
     ContactUsGetParametersQuery,
     ContactUsGetResponse,
+    ContributorRolesGetParametersQuery,
+    ContributorRolesGetResponse,
+    ContributorRolesIdGetParametersQuery,
+    ContributorRolesIdGetResponse,
+    ContributorsGetParametersQuery,
+    ContributorsGetResponse,
+    ContributorsIdGetParametersQuery,
+    ContributorsIdGetResponse,
+    ContributorsSlugSlugGetParametersQuery,
+    ContributorsSlugSlugGetResponse,
     CurrenciesGetParametersQuery,
     CurrenciesGetResponse,
     CurrenciesIdGetParametersQuery,
@@ -81,10 +89,14 @@ from affilibuster_backend.domain.entities.generated.models import (
     ProductCategoriesIdGetResponse,
     ProductCategoriesPageGetParametersQuery,
     ProductCategoriesPageGetResponse,
+    ProductCategoriesSlugSlugGetParametersQuery,
+    ProductCategoriesSlugSlugGetResponse,
     ProductsGetParametersQuery,
     ProductsGetResponse,
     ProductsIdGetParametersQuery,
     ProductsIdGetResponse,
+    ProductsSlugSlugGetParametersQuery,
+    ProductsSlugSlugGetResponse,
     ProductTagsGetParametersQuery,
     ProductTagsGetResponse,
     ProductTagsIdGetParametersQuery,
@@ -92,10 +104,6 @@ from affilibuster_backend.domain.entities.generated.models import (
     ProfileGetParametersQuery,
     ProfileGetResponse,
     RedirectsCheckGetParametersQuery,
-    TeamMembersGetParametersQuery,
-    TeamMembersGetResponse,
-    TeamMembersIdGetParametersQuery,
-    TeamMembersIdGetResponse,
     TermGetParametersQuery,
     TermGetResponse,
     ThemesGetParametersQuery,
@@ -134,8 +142,6 @@ CMSRequest = (
     | AuthForgotPasswordPostRequest
     | AuthLoginPostRequest
     | AuthLogoutPostRequest
-    | AuthorsGetParametersQuery
-    | AuthorsIdGetParametersQuery
     | AuthPageGetParametersQuery
     | AuthProfileChangePasswordPostRequest
     | AuthRefreshPostRequest
@@ -146,9 +152,15 @@ CMSRequest = (
     | BlogGetParametersQuery
     | BlogPostsGetParametersQuery
     | BlogPostsIdGetParametersQuery
+    | BlogPostsSlugSlugGetParametersQuery
     | BlogPostTagsGetParametersQuery
     | BlogPostTagsIdGetParametersQuery
     | ContactUsGetParametersQuery
+    | ContributorRolesGetParametersQuery
+    | ContributorRolesIdGetParametersQuery
+    | ContributorsGetParametersQuery
+    | ContributorsIdGetParametersQuery
+    | ContributorsSlugSlugGetParametersQuery
     | CurrenciesGetParametersQuery
     | CurrenciesIdGetParametersQuery
     | Error404GetParametersQuery
@@ -166,14 +178,14 @@ CMSRequest = (
     | ProductCategoriesGetParametersQuery
     | ProductCategoriesIdGetParametersQuery
     | ProductCategoriesPageGetParametersQuery
+    | ProductCategoriesSlugSlugGetParametersQuery
     | ProductsGetParametersQuery
     | ProductsIdGetParametersQuery
+    | ProductsSlugSlugGetParametersQuery
     | ProductTagsGetParametersQuery
     | ProductTagsIdGetParametersQuery
     | ProfileGetParametersQuery
     | RedirectsCheckGetParametersQuery
-    | TeamMembersGetParametersQuery
-    | TeamMembersIdGetParametersQuery
     | TermGetParametersQuery
     | ThemesGetParametersQuery
     | ThemesIdGetParametersQuery
@@ -182,15 +194,19 @@ CMSRequest = (
 # Union of all response types
 CMSResponse = (
     AboutGetResponse
-    | AuthorsGetResponse
-    | AuthorsIdGetResponse
     | AuthPageGetResponse
     | BlogGetResponse
     | BlogPostsGetResponse
     | BlogPostsIdGetResponse
+    | BlogPostsSlugSlugGetResponse
     | BlogPostTagsGetResponse
     | BlogPostTagsIdGetResponse
     | ContactUsGetResponse
+    | ContributorRolesGetResponse
+    | ContributorRolesIdGetResponse
+    | ContributorsGetResponse
+    | ContributorsIdGetResponse
+    | ContributorsSlugSlugGetResponse
     | CurrenciesGetResponse
     | CurrenciesIdGetResponse
     | Error404GetResponse
@@ -208,13 +224,13 @@ CMSResponse = (
     | ProductCategoriesGetResponse
     | ProductCategoriesIdGetResponse
     | ProductCategoriesPageGetResponse
+    | ProductCategoriesSlugSlugGetResponse
     | ProductsGetResponse
     | ProductsIdGetResponse
+    | ProductsSlugSlugGetResponse
     | ProductTagsGetResponse
     | ProductTagsIdGetResponse
     | ProfileGetResponse
-    | TeamMembersGetResponse
-    | TeamMembersIdGetResponse
     | TermGetResponse
     | ThemesGetResponse
     | ThemesIdGetResponse

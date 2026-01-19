@@ -9,11 +9,11 @@
 
 'use client'
 
-import Image from 'next/image'
+import NextImage from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { ButtonAction, ButtonLink, CMSIcon, CMSText } from '@/components/elements'
+import { ButtonAction, ButtonLink, Icon, Text } from '@/components/elements'
 import { useScrollToClose } from '@/hooks/useScrollToClose'
 import { DirectionEnum, IconPositionEnum, type MenusSearchMenuEntry } from '@/lib/generated/types.gen'
 import { THRESHOLDS } from '@/lib/navigation'
@@ -234,7 +234,7 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
           `}
         >
           <span className="material-symbols-outlined shrink-0 text-xl text-primary">
-            <CMSIcon icon={data.menuButton.label?.icon ?? 'search'} size="md" />
+            <Icon icon={data.menuButton.label?.icon ?? 'search'} size="md" />
           </span>
 
           <input
@@ -242,7 +242,7 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
             dir={isRTL ? 'rtl' : 'ltr'}
             type="text"
             className={`
-              size-full border-none bg-transparent p-0 ${isRTL ? 'text-right' : 'text-left'} text-sm
+              size-full border-none bg-transparent p-0 ${isRTL ? 'text-right' : 'text-left'} text-base
               leading-none text-neutral-800 placeholder-neutral-400 outline-none
               focus:ring-0 dark:text-white dark:placeholder-text-secondary-dark
             `}
@@ -283,14 +283,14 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
         {!searchQuery ? (
           <div className="space-y-6 p-4">
             <div className="animate-fade-in">
-              <h4
+              <Text
+                text={data.recentSearchesLabel.text}
+                as="h4"
                 className={`
                 mb-3 text-xs font-bold tracking-wider text-neutral-500
                 uppercase dark:text-text-secondary-dark
               `}
-              >
-                <CMSText text={data.recentSearchesLabel.text} />
-              </h4>
+              />
               <div className="flex flex-wrap gap-2">
                 {recentSearches.map(term => (
                   <ButtonAction
@@ -324,9 +324,9 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
                   material-symbols-outlined text-sm text-primary
                 `}
                 >
-                  <CMSIcon icon={data.nowTrendingLabel.icon} size="sm" />
+                  <Icon icon={data.nowTrendingLabel.icon} size="sm" />
                 </span>
-                <CMSText text={data.nowTrendingLabel.text} />
+                <Text text={data.nowTrendingLabel.text} />
               </h4>
               <ul className="space-y-2">
                 {trendingSearches.map(term => (
@@ -377,7 +377,7 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
                       hover:bg-neutral-100 dark:hover:bg-white/5
                     `}
                   >
-                    <Image
+                    <NextImage
                       src={result.image}
                       alt={result.name}
                       width={40}

@@ -616,10 +616,11 @@ function addStrapiTags(spec: OpenAPISpec): OpenAPISpec {
   const tags = [
     { name: 'about', description: 'About page content management' },
     { name: 'auth-page', description: 'Authentication page content (login, signup, password reset)' },
-    { name: 'author', description: 'Author profiles and blog post attributions' },
     { name: 'blog', description: 'Blog page content and configuration' },
     { name: 'blog-post', description: 'Blog posts and articles' },
     { name: 'blog-post-tag', description: 'Blog post tags for categorization' },
+    { name: 'contributor', description: 'Contributor profiles, their roles and blog posts' },
+    { name: 'contributor-role', description: 'Contributor roles' },
     { name: 'contact-us', description: 'Contact page content and contact information' },
     { name: 'currency', description: 'Currency configuration and exchange rates' },
     { name: 'error-404', description: '404 Not Found error page content' },
@@ -637,7 +638,6 @@ function addStrapiTags(spec: OpenAPISpec): OpenAPISpec {
     { name: 'product-tag', description: 'Product tags for filtering and categorization' },
     { name: 'profile', description: 'User profile page content' },
     { name: 'redirects', description: 'URL redirect rules and configurations' },
-    { name: 'team-member', description: 'Team member profiles and information' },
     { name: 'term', description: 'Terms and conditions content' },
     { name: 'theme', description: 'Theme and styling configuration' },
     { name: 'upload', description: 'File upload and media library management' },
@@ -789,6 +789,50 @@ function replacePopulateWithNestedPopulator(spec: OpenAPISpec): OpenAPISpec {
 }
 
 /**
+ * Add 'roles' to the filters enum for the /contributors endpoint.
+ *
+ * Strapi's OpenAPI plugin excludes relational fields from the filters enum,
+ * but filtering by roles (e.g., filters[roles][name][$eq]=...) is supported.
+ * This function manually injects 'roles' into the allowed filter keys.
+ * @param spec - OpenAPI specification to modify
+ * @returns Specification with updated contributor filters
+ */
+function fixContributorFilters(spec: OpenAPISpec): OpenAPISpec {
+  const processed = JSON.parse(JSON.stringify(spec)) as OpenAPISpec
+  const contributorsPath = processed.paths['/contributors'] as Record<string, unknown> | undefined
+
+  if (contributorsPath?.get) {
+    const operation = contributorsPath.get as Record<string, unknown>
+    if (operation.parameters && Array.isArray(operation.parameters)) {
+      const filtersParam = operation.parameters.find(p => {
+        if (p && typeof p === 'object') {
+          const param = p as Record<string, unknown>
+          return param.name === 'filters' && param.in === 'query'
+        }
+        return false
+      }) as Record<string, unknown> | undefined
+
+      if (filtersParam?.schema && typeof filtersParam.schema === 'object') {
+        const schema = filtersParam.schema as Record<string, unknown>
+        if (schema.propertyNames && typeof schema.propertyNames === 'object') {
+          const propertyNames = schema.propertyNames as Record<string, unknown>
+          if (propertyNames.enum && Array.isArray(propertyNames.enum)) {
+            const enums = propertyNames.enum as string[]
+            if (!enums.includes('roles')) {
+              enums.push('roles')
+              // Sort for consistency
+              propertyNames.enum = enums.sort()
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return processed
+}
+
+/**
  * Simplify localizations field schema to use minimal reference type.
  *
  * Strapi returns localizations as shallow references containing only scalar fields
@@ -879,7 +923,7 @@ function simplifyLocalizationsSchema(spec: OpenAPISpec): OpenAPISpec {
 /**
  * Make component, media, and relation fields optional in document schemas.
  *
- * Strapi returns deeply nested circular relations (e.g., author -> blogPosts -> author -> blogPosts).
+ * Strapi returns deeply nested circular relations (e.g., contributor -> blogPosts -> contributor -> blogPosts).
  * At the nesting depth limit, Strapi returns partial objects without the full component/media fields.
  * This causes Pydantic validation errors because these fields are marked as required.
  *
@@ -889,7 +933,7 @@ function simplifyLocalizationsSchema(spec: OpenAPISpec): OpenAPISpec {
  * Affected field patterns:
  * - profilePicture, featuredImage, image, logo, etc. (media fields)
  * - seoMetadata, content, header, etc. (component fields)
- * - blogPosts, posts, author, tags, categories, products, etc. (relation fields)
+ * - blogPosts, posts, contributor, tags, categories, products, etc. (relation fields)
  * @param spec - OpenAPI specification to modify
  * @returns Specification with optional nested fields in document schemas
  */
@@ -921,7 +965,7 @@ function makeNestedFieldsOptionalInDocuments(spec: OpenAPISpec): OpenAPISpec {
     // Relation fields (can cause circular depth issues)
     'blogPosts',
     'posts',
-    'author',
+    'contributor',
     'tags',
     'categories',
     'products',
@@ -1200,6 +1244,71 @@ function makeRelatedOptionalInFileSchema(spec: OpenAPISpec): OpenAPISpec {
   }
 
   return fixed
+}
+
+/**
+ * Add slug-based endpoints to the specification.
+ *
+ * Duplicates /products/{id} -> /products/slug/{slug} (and for other content types)
+ * to document the slug-based lookup endpoints added via custom routes.
+ * @param spec - OpenAPI specification to modify
+ * @returns Specification with slug endpoints added
+ */
+function addSlugEndpoints(spec: OpenAPISpec): OpenAPISpec {
+  const processed = JSON.parse(JSON.stringify(spec)) as OpenAPISpec
+  const contentTypes = ['products', 'contributors', 'blog-posts', 'product-categories']
+
+  contentTypes.forEach(contentType => {
+    const idPathKey = `/${contentType}/{id}`
+    const slugPathKey = `/${contentType}/slug/{slug}`
+
+    // Check if ID path exists
+    if (processed.paths[idPathKey]) {
+      const idPathItem = processed.paths[idPathKey] as Record<string, unknown>
+      const slugPathItem: Record<string, unknown> = {}
+
+      // Copy operations (GET)
+      if (typeof idPathItem.get === 'object') {
+        const getOp = JSON.parse(JSON.stringify(idPathItem.get)) as Record<string, unknown>
+
+        // Update operationId
+        if (typeof getOp.operationId === 'string') {
+          getOp.operationId = getOp.operationId.replace('_by_id', '_by_slug')
+        } else {
+          // Fallback if no operationId or different format
+          const singular = contentType.replace(/s$/, '') // simple plural to singular
+          getOp.operationId = `${singular}/get/${contentType}_by_slug`
+        }
+
+        // Update parameters: replace 'id' with 'slug'
+        if (Array.isArray(getOp.parameters)) {
+          getOp.parameters = getOp.parameters.map((param: unknown) => {
+            const p = param as Record<string, unknown>
+            if (p.name === 'id' && p.in === 'path') {
+              return {
+                name: 'slug',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                  description: 'The unique slug identifier',
+                },
+              }
+            }
+            return p
+          })
+        }
+
+        // Add to slug path item
+        slugPathItem.get = getOp
+      }
+
+      // Add new path to spec
+      processed.paths[slugPathKey] = slugPathItem
+    }
+  })
+
+  return processed
 }
 
 // ============================================================================
@@ -2353,6 +2462,11 @@ function mergeOpenAPISpecs(): void {
       '✅ Strapi spec preprocessed (PUT/DELETE ops removed, servers added, patterns fixed, $id fields removed, UUID formats removed, publishedAt defaults removed, id fields added to components, meta fields added)'
     )
 
+    // Add slug endpoints
+    console.log('🔧 Adding slug-based endpoints...')
+    strapi = addSlugEndpoints(strapi)
+    console.log('✅ Slug endpoints added (/products/slug/{slug}, etc.)')
+
     // Generate missing component schemas for sections and CTAs
     console.log('🔧 Generating missing component schemas...')
     const componentsDir = path.join(strapiDir, 'src', 'components')
@@ -2364,6 +2478,11 @@ function mergeOpenAPISpecs(): void {
     const dynamicZoneMapping = parseDynamicZoneTypes(contentTypesPath)
     strapi = enhanceDynamicZoneSchemas(strapi, dynamicZoneMapping)
     console.log('✅ Dynamic zone schemas enhanced with discriminated unions')
+
+    // Inject missing filter keys (e.g., roles for contributors)
+    console.log('🔧 Fixing contributor filters...')
+    strapi = fixContributorFilters(strapi)
+    console.log('✅ Contributor filters fixed (added "roles")')
 
     // Enrich Strapi spec with metadata
     console.log('✨ Enriching Strapi spec with metadata...')

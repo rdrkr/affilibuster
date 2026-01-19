@@ -10,9 +10,9 @@ import { Label, type LabelProps } from '@/components/elements/Label'
 import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 
 // Mock the CMS primitive components (Label uses relative imports)
-jest.mock('@/components/elements/CMSIcon', () => ({
+jest.mock('@/components/elements/Icon', () => ({
   __esModule: true,
-  default: function MockCMSIcon({
+  default: function MockIcon({
     icon,
     size,
     className,
@@ -28,7 +28,7 @@ jest.mock('@/components/elements/CMSIcon', () => ({
       </span>
     )
   },
-  CMSIcon: function MockCMSIcon({
+  Icon: function MockIcon({
     icon,
     size,
     className,
@@ -46,20 +46,20 @@ jest.mock('@/components/elements/CMSIcon', () => ({
   },
 }))
 
-jest.mock('@/components/elements/CMSText', () => ({
+jest.mock('@/components/elements/Text', () => ({
   __esModule: true,
-  default: function MockCMSText({ text, className }: { text?: string; className?: string }) {
+  default: function MockText({ text, as: Component = 'span', className }: any) {
     return (
-      <span data-testid="mock-text" className={className}>
+      <Component data-testid="mock-text" className={className}>
         {text}
-      </span>
+      </Component>
     )
   },
-  CMSText: function MockCMSText({ text, className }: { text?: string; className?: string }) {
+  Text: function MockText({ text, as: Component = 'span', className }: any) {
     return (
-      <span data-testid="mock-text" className={className}>
+      <Component data-testid="mock-text" className={className}>
         {text}
-      </span>
+      </Component>
     )
   },
 }))
@@ -157,7 +157,6 @@ describe('Label', () => {
   })
 
   it('should apply custom className to container', () => {
-    // eslint-disable-next-line better-tailwindcss/no-unknown-classes
     const { container } = render(<Label direction={DirectionEnum.LTR} data={mockLabelData} className="custom-class" />)
     expect(container.firstChild).toHaveClass('custom-class')
   })
@@ -174,7 +173,7 @@ describe('Label', () => {
     expect(icon.className).toContain('icon-class')
   })
 
-  it('should pass iconSize to CMSIcon', () => {
+  it('should pass iconSize to Icon', () => {
     render(<Label direction={DirectionEnum.LTR} data={mockLabelData} iconSize="lg" />)
     const icon = screen.getByTestId('mock-icon')
     expect(icon).toHaveAttribute('data-size', 'lg')

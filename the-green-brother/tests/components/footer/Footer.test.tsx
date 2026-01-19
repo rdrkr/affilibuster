@@ -19,8 +19,8 @@ jest.mock('@/components/elements', () => ({
   ButtonLink: function MockButtonLink({ data }: { data: { label?: { text?: string }; url?: string } }) {
     return <a href={data.url}>{data.label?.text}</a>
   },
-  CMSText: function MockCMSText({ text }: { text?: string }) {
-    return <span>{text}</span>
+  Text: function MockText({ text, as: Component = 'span', className }: any) {
+    return <Component className={className}>{text}</Component>
   },
   Label: function MockLabel({ data }: { data: { text?: string } }) {
     return <span>{data.text}</span>
@@ -159,18 +159,6 @@ describe('Footer', () => {
     // Quick links are rendered as Button components
     expect(screen.getByText('Privacy')).toBeInTheDocument()
     expect(screen.getByText('Terms')).toBeInTheDocument()
-  })
-
-  it('should use default lang when not provided', async () => {
-    mockGetFooter.mockResolvedValue({
-      columns: [],
-      copyrightsLabel: { text: '© {year}' },
-      quickLinks: [],
-    } as unknown as Awaited<ReturnType<typeof getFooter>>)
-
-    await Footer({ direction: DirectionEnum.LTR })
-
-    expect(mockGetFooter).toHaveBeenCalledWith(CodeEnum.EN)
   })
 
   it('should render text-block without header', async () => {
@@ -396,8 +384,8 @@ describe('Footer', () => {
     // However, if we access parent.children, they should be in reversed order.
 
     // DynamicZone uses flexbox for horizontal layout, not grid
-    // It applies md:flex-row-reverse for RTL
-    const parent = firstHeader.closest('.md\\:flex-row-reverse')
+    // It applies md:flex-row (relying on dir="rtl" for visual reversal)
+    const parent = firstHeader.closest('.md\\:flex-row')
     expect(parent).toBeInTheDocument()
 
     // Check if the parent (DynamicZone horizontal group) has children in correct order?

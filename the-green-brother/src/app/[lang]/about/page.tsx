@@ -1,8 +1,8 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-import { getAbout } from '@/lib/client'
-import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
-import { getLanguages } from '@/lib/languages/api'
+// Import getContributors
+import { getAbout, getContributors } from '@/lib/client'
+import { CodeEnum } from '@/lib/generated/types.gen'
 import AboutClient from './AboutClient'
 
 /**
@@ -17,12 +17,21 @@ export default async function AboutPage({ params }: { params: Promise<{ lang: Co
   const resolvedParams = await params
   const lang = resolvedParams.lang
 
-  // Fetch about page content and languages in parallel
-  const [aboutData, languages] = await Promise.all([getAbout(lang), getLanguages()])
+  // Fetch about page content and contributors
+  // Filter out contributors that only have the "author" role (keep team members)
+  const [aboutData, contributors] = await Promise.all([
+    getAbout(lang),
+    getContributors({
+      locale: lang,
+      filters: {
+        roles: {
+          roleId: {
+            $nei: 'author',
+          },
+        },
+      },
+    }),
+  ])
 
-  // Find the current language's direction (default to LTR)
-  const currentLanguage = languages?.find(l => l.code === lang)
-  const direction = currentLanguage?.direction ?? DirectionEnum.LTR
-
-  return <AboutClient aboutData={aboutData} direction={direction} />
+  return <AboutClient aboutData={aboutData} contributors={contributors ?? []} />
 }

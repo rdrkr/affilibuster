@@ -59,6 +59,44 @@
       "repeatable": false,
       "required": true
     },
+    "readArticleLabel": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "readTimeMinutesLabel": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "aboutAuthorHeader": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
+    },
+    "defaultContributor": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::contributor.contributor"
+    },
     "seoMetadata": {
       "type": "component",
       "pluginOptions": {

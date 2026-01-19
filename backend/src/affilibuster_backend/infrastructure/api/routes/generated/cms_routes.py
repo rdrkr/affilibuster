@@ -20,10 +20,6 @@ from fastapi import APIRouter
 from affilibuster_backend.domain.entities.generated.models import (
     AboutGetParametersQuery,
     AboutGetResponse,
-    AuthorsGetParametersQuery,
-    AuthorsGetResponse,
-    AuthorsIdGetParametersQuery,
-    AuthorsIdGetResponse,
     AuthPageGetParametersQuery,
     AuthPageGetResponse,
     BlogGetParametersQuery,
@@ -32,12 +28,24 @@ from affilibuster_backend.domain.entities.generated.models import (
     BlogPostsGetResponse,
     BlogPostsIdGetParametersQuery,
     BlogPostsIdGetResponse,
+    BlogPostsSlugSlugGetParametersQuery,
+    BlogPostsSlugSlugGetResponse,
     BlogPostTagsGetParametersQuery,
     BlogPostTagsGetResponse,
     BlogPostTagsIdGetParametersQuery,
     BlogPostTagsIdGetResponse,
     ContactUsGetParametersQuery,
     ContactUsGetResponse,
+    ContributorRolesGetParametersQuery,
+    ContributorRolesGetResponse,
+    ContributorRolesIdGetParametersQuery,
+    ContributorRolesIdGetResponse,
+    ContributorsGetParametersQuery,
+    ContributorsGetResponse,
+    ContributorsIdGetParametersQuery,
+    ContributorsIdGetResponse,
+    ContributorsSlugSlugGetParametersQuery,
+    ContributorsSlugSlugGetResponse,
     CurrenciesGetParametersQuery,
     CurrenciesGetResponse,
     CurrenciesIdGetParametersQuery,
@@ -70,20 +78,20 @@ from affilibuster_backend.domain.entities.generated.models import (
     ProductCategoriesIdGetResponse,
     ProductCategoriesPageGetParametersQuery,
     ProductCategoriesPageGetResponse,
+    ProductCategoriesSlugSlugGetParametersQuery,
+    ProductCategoriesSlugSlugGetResponse,
     ProductsGetParametersQuery,
     ProductsGetResponse,
     ProductsIdGetParametersQuery,
     ProductsIdGetResponse,
+    ProductsSlugSlugGetParametersQuery,
+    ProductsSlugSlugGetResponse,
     ProductTagsGetParametersQuery,
     ProductTagsGetResponse,
     ProductTagsIdGetParametersQuery,
     ProductTagsIdGetResponse,
     ProfileGetParametersQuery,
     ProfileGetResponse,
-    TeamMembersGetParametersQuery,
-    TeamMembersGetResponse,
-    TeamMembersIdGetParametersQuery,
-    TeamMembersIdGetResponse,
     TermGetParametersQuery,
     TermGetResponse,
     ThemesGetParametersQuery,
@@ -94,8 +102,10 @@ from affilibuster_backend.domain.entities.generated.models import (
 from affilibuster_backend.infrastructure.api.routes.cms_route_factory import (
     CMSCollectionConfig,
     CMSSingleTypeConfig,
+    CMSSlugConfig,
     create_collection_router,
     create_single_type_router,
+    create_slug_router,
 )
 
 # =============================================================================
@@ -212,17 +222,6 @@ SINGLE_TYPE_CONFIGS: list[CMSSingleTypeConfig] = [
 
 COLLECTION_CONFIGS: list[CMSCollectionConfig] = [
     CMSCollectionConfig(
-        path="/authors",
-        tag="author",
-        list_params_model=AuthorsGetParametersQuery,
-        list_response_model=AuthorsGetResponse,
-        item_params_model=AuthorsIdGetParametersQuery,
-        item_response_model=AuthorsIdGetResponse,
-        id_description="Author ID or slug",
-        list_description="List all authors from Strapi.",
-        item_description="Get a specific author by ID or slug.",
-    ),
-    CMSCollectionConfig(
         path="/blog-post-tags",
         tag="blog-post-tag",
         list_params_model=BlogPostTagsGetParametersQuery,
@@ -243,6 +242,28 @@ COLLECTION_CONFIGS: list[CMSCollectionConfig] = [
         id_description="Blog Post ID or slug",
         list_description="List all blog posts from Strapi.",
         item_description="Get a specific blog post by ID or slug.",
+    ),
+    CMSCollectionConfig(
+        path="/contributor-roles",
+        tag="contributor-role",
+        list_params_model=ContributorRolesGetParametersQuery,
+        list_response_model=ContributorRolesGetResponse,
+        item_params_model=ContributorRolesIdGetParametersQuery,
+        item_response_model=ContributorRolesIdGetResponse,
+        id_description="Contributor Role ID or slug",
+        list_description="List all contributor roles from Strapi.",
+        item_description="Get a specific contributor role by ID or slug.",
+    ),
+    CMSCollectionConfig(
+        path="/contributors",
+        tag="contributor",
+        list_params_model=ContributorsGetParametersQuery,
+        list_response_model=ContributorsGetResponse,
+        item_params_model=ContributorsIdGetParametersQuery,
+        item_response_model=ContributorsIdGetResponse,
+        id_description="Contributor ID or slug",
+        list_description="List all contributors from Strapi.",
+        item_description="Get a specific contributor by ID or slug.",
     ),
     CMSCollectionConfig(
         path="/currencies",
@@ -311,17 +332,6 @@ COLLECTION_CONFIGS: list[CMSCollectionConfig] = [
         item_description="Get a specific product by ID or slug.",
     ),
     CMSCollectionConfig(
-        path="/team-members",
-        tag="team-member",
-        list_params_model=TeamMembersGetParametersQuery,
-        list_response_model=TeamMembersGetResponse,
-        item_params_model=TeamMembersIdGetParametersQuery,
-        item_response_model=TeamMembersIdGetResponse,
-        id_description="Team Member ID or slug",
-        list_description="List all team members from Strapi.",
-        item_description="Get a specific team member by ID or slug.",
-    ),
-    CMSCollectionConfig(
         path="/themes",
         tag="theme",
         list_params_model=ThemesGetParametersQuery,
@@ -335,6 +345,43 @@ COLLECTION_CONFIGS: list[CMSCollectionConfig] = [
 ]
 
 
+# =============================================================================
+# Slug CMS Endpoints
+# =============================================================================
+# These are endpoints that support fetching by slug (e.g. /path/slug/{slug}).
+
+SLUG_CONFIGS: list[CMSSlugConfig] = [
+    CMSSlugConfig(
+        path="/blog-posts",
+        tag="blog-post",
+        params_model=BlogPostsSlugSlugGetParametersQuery,
+        response_model=BlogPostsSlugSlugGetResponse,
+        description="Get blog post by slug from Strapi.",
+    ),
+    CMSSlugConfig(
+        path="/contributors",
+        tag="contributor",
+        params_model=ContributorsSlugSlugGetParametersQuery,
+        response_model=ContributorsSlugSlugGetResponse,
+        description="Get contributor by slug from Strapi.",
+    ),
+    CMSSlugConfig(
+        path="/product-categories",
+        tag="product-category",
+        params_model=ProductCategoriesSlugSlugGetParametersQuery,
+        response_model=ProductCategoriesSlugSlugGetResponse,
+        description="Get product category by slug from Strapi.",
+    ),
+    CMSSlugConfig(
+        path="/products",
+        tag="product",
+        params_model=ProductsSlugSlugGetParametersQuery,
+        response_model=ProductsSlugSlugGetResponse,
+        description="Get product by slug from Strapi.",
+    ),
+]
+
+
 def get_all_cms_routers() -> list[APIRouter]:
     """
     Generate all CMS proxy routers from configurations.
@@ -343,6 +390,8 @@ def get_all_cms_routers() -> list[APIRouter]:
         List of FastAPI routers ready to be included in the application
 
     """
-    return [create_single_type_router(config) for config in SINGLE_TYPE_CONFIGS] + [
-        create_collection_router(config) for config in COLLECTION_CONFIGS
-    ]
+    return (
+        [create_single_type_router(config) for config in SINGLE_TYPE_CONFIGS]
+        + [create_collection_router(config) for config in COLLECTION_CONFIGS]
+        + [create_slug_router(config) for config in SLUG_CONFIGS]
+    )

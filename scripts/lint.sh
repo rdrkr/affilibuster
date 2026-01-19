@@ -63,8 +63,7 @@ lint_shell() {
 
   if command -v shellcheck >/dev/null 2>&1; then
     shell_files=$(find . -type f \( -name "*.sh" -o -name "*.bash" \) \
-      ! -path "./.specify/*" \
-      ! -path "./specs/*" \
+      ! -path "*/specs/*" \
       ! -path "*/generated/*" \
       ! -path "*/node_modules/*" \
       ! -path "*/.git/*" \

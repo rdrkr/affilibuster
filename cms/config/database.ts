@@ -35,4 +35,7 @@ export default ({ env }: { env: StrapiEnv }) => ({
       max: 10,
     },
   },
+  settings: {
+    useTypescriptMigrations: true,
+  },
 })

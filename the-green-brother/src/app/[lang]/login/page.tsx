@@ -2,7 +2,7 @@
 
 'use client'
 
-import Image from 'next/image'
+import NextImage from 'next/image'
 import Link from 'next/link'
 
 const Login = () => {
@@ -139,7 +139,7 @@ const Login = () => {
                 dark:hover:bg-white/5
               `}
             >
-              <Image src="/icons/google.svg" width={20} height={20} alt="Google" />
+              <NextImage src="/icons/google.svg" width={20} height={20} alt="Google" />
               Google
             </button>
             <button
@@ -151,7 +151,7 @@ const Login = () => {
                 dark:hover:bg-white/5
               `}
             >
-              <Image
+              <NextImage
                 src="/icons/apple.svg"
                 width={20}
                 height={20}

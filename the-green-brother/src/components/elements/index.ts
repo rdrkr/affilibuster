@@ -6,9 +6,9 @@
  * Exports all shared CMS-driven components and functions.
  *
  * Primitives (1:1 with Strapi fields):
- * - CMSText → Strapi text field
- * - CMSIcon → Strapi icon string field
- * - CMSImage → Strapi media field
+ * - Text → Strapi text field
+ * - Icon → Strapi icon string field
+ * - Image → Strapi media field
  *
  * Composites (1:1 with Strapi components):
  * - Label → elements.label (icon + text + ariaDescription)
@@ -18,16 +18,18 @@
  */
 
 // Primitive Components
-export { CMSIcon, type CMSIconProps, type ResolvedIcon } from './CMSIcon'
-export { CMSImage, type CMSImageProps, type CMSMedia } from './CMSImage'
-export { CMSText, resolveTextFormatHtml, type CMSTextProps } from './CMSText'
+export { Icon, type IconProps, type ResolvedIcon } from './Icon'
+export { DEFAULT_IMAGE, Image, type ImageProps } from './Image'
+export { resolveTextFormatHtml, Text, type TextProps } from './Text'
 
 // Composite Components
+export { Breadcrumbs, type BreadcrumbsProps } from './Breadcrumbs'
 export { ButtonAction, type ButtonActionProps } from './ButtonAction'
 export { ButtonLink, type ButtonLinkProps } from './ButtonLink'
 export { Card, type CardProps } from './Card'
-export { Carousel, type CarouselGap, type CarouselProps } from './Carousel'
 export { getVisibilityClasses } from './common'
+export { ContributorCard, type ContributorCardProps } from './ContributorCard'
 export { Header, type HeaderProps } from './Header'
 export { Label, type LabelProps } from './Label'
+export { ScrollableTableWrapper, type ScrollableTableWrapperProps } from './ScrollableTableWrapper'
 export { TextBlock, type TextBlockProps } from './TextBlock'

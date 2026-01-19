@@ -4,7 +4,7 @@
  * Unit tests for ProductsClient component
  */
 
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 
 // Mock next/link
 jest.mock('next/link', () => ({
@@ -18,15 +18,16 @@ jest.mock('next/link', () => ({
 const mockPush = jest.fn()
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(() => ({ push: mockPush })),
+  usePathname: jest.fn(() => '/products'),
 }))
 
 // Mock CMS components
 jest.mock('@/components/elements', () => ({
-  CMSImage: function MockCMSImage({ fallbackAlt }: { fallbackAlt?: string }) {
+  Image: function MockImage({ fallbackAlt }: { fallbackAlt?: string }) {
     return <div data-testid="cms-image">{fallbackAlt}</div>
   },
-  CMSText: function MockCMSText({ text }: { text?: string }) {
-    return <span>{text}</span>
+  Text: function MockText({ text, as: Component = 'span', className }: any) {
+    return <Component className={className}>{text}</Component>
   },
 }))
 
@@ -36,6 +37,7 @@ import type {
   ApiProductCategoryProductCategoryDocument,
   ApiProductProductDocument,
 } from '@/lib/generated/types.gen'
+import { renderWithLayout } from '../../../utils/renderWithLayout'
 
 describe('ProductsClient', () => {
   const mockPageData: ApiProductCategoriesPageProductCategoriesPageDocument = {
@@ -73,32 +75,32 @@ describe('ProductsClient', () => {
   })
 
   it('should render page title from CMS data', () => {
-    render(<ProductsClient pageData={mockPageData} products={[]} categories={[]} />)
+    renderWithLayout(<ProductsClient pageData={mockPageData} products={[]} categories={[]} />)
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('All Products')
   })
 
   it('should render default title when pageData is null', () => {
-    render(<ProductsClient pageData={null} products={[]} categories={[]} />)
+    renderWithLayout(<ProductsClient pageData={null} products={[]} categories={[]} />)
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Products')
   })
 
   it('should render products', () => {
-    render(<ProductsClient pageData={mockPageData} products={mockProducts} categories={mockCategories} />)
+    renderWithLayout(<ProductsClient pageData={mockPageData} products={mockProducts} categories={mockCategories} />)
 
     expect(screen.getAllByText('Product One').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Product Two').length).toBeGreaterThan(0)
   })
 
   it('should render empty state when no products', () => {
-    render(<ProductsClient pageData={mockPageData} products={[]} categories={[]} />)
+    renderWithLayout(<ProductsClient pageData={mockPageData} products={[]} categories={[]} />)
 
     expect(screen.getByText('No products found')).toBeInTheDocument()
   })
 
   it('should render category filters', () => {
-    render(<ProductsClient pageData={mockPageData} products={mockProducts} categories={mockCategories} />)
+    renderWithLayout(<ProductsClient pageData={mockPageData} products={mockProducts} categories={mockCategories} />)
 
     expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Electronics' })).toBeInTheDocument()
@@ -106,7 +108,7 @@ describe('ProductsClient', () => {
   })
 
   it('should filter products by category', () => {
-    render(<ProductsClient pageData={mockPageData} products={mockProducts} categories={mockCategories} />)
+    renderWithLayout(<ProductsClient pageData={mockPageData} products={mockProducts} categories={mockCategories} />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Electronics' }))
 
@@ -115,7 +117,7 @@ describe('ProductsClient', () => {
   })
 
   it('should filter products by search query', () => {
-    render(<ProductsClient pageData={mockPageData} products={mockProducts} categories={mockCategories} />)
+    renderWithLayout(<ProductsClient pageData={mockPageData} products={mockProducts} categories={mockCategories} />)
 
     const searchInput = screen.getByPlaceholderText('Search sustainable products...')
     fireEvent.change(searchInput, { target: { value: 'One' } })
@@ -125,7 +127,7 @@ describe('ProductsClient', () => {
   })
 
   it('should redirect to login when clicking wishlist without being logged in', () => {
-    render(<ProductsClient pageData={mockPageData} products={mockProducts} categories={mockCategories} />)
+    renderWithLayout(<ProductsClient pageData={mockPageData} products={mockProducts} categories={mockCategories} />)
 
     // Find wishlist button and click it
     const wishlistButtons = screen.getAllByText('favorite_border')
@@ -140,7 +142,7 @@ describe('ProductsClient', () => {
       return
     })
 
-    render(<ProductsClient pageData={mockPageData} products={mockProducts} categories={mockCategories} />)
+    renderWithLayout(<ProductsClient pageData={mockPageData} products={mockProducts} categories={mockCategories} />)
 
     const wishlistButtons = screen.getAllByText('favorite_border')
     fireEvent.click(wishlistButtons[0]!)
@@ -152,7 +154,7 @@ describe('ProductsClient', () => {
   })
 
   it('should render meta description when available', () => {
-    render(<ProductsClient pageData={mockPageData} products={[]} categories={[]} />)
+    renderWithLayout(<ProductsClient pageData={mockPageData} products={[]} categories={[]} />)
 
     expect(screen.getByText('Browse our products')).toBeInTheDocument()
   })

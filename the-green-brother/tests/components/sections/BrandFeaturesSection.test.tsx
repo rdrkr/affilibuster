@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react'
 import { BrandFeaturesSection, type BrandFeaturesSectionProps } from '@/components/sections/BrandFeaturesSection'
 import { AlignmentEnum, DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 
-// Mock the CMSIcon and CMSText components
+// Mock the Icon and Text components
 jest.mock('@/components/elements', () => ({
   ButtonLink: function MockButtonLink({
     data,
@@ -33,14 +33,14 @@ jest.mock('@/components/elements', () => ({
       </a>
     )
   },
-  CMSIcon: function MockCMSIcon({ icon, size, className }: { icon?: string; size?: string; className?: string }) {
+  Icon: function MockIcon({ icon, size, className }: { icon?: string; size?: string; className?: string }) {
     return (
       <span data-testid="mock-icon" data-icon={icon} data-size={size} className={className}>
         {icon}
       </span>
     )
   },
-  CMSText: function MockCMSText({ text }: { text?: string }) {
+  Text: function MockText({ text }: { text?: string }) {
     return <>{text}</>
   },
   Header: function MockHeader({
@@ -183,7 +183,7 @@ describe('BrandFeaturesSection', () => {
   it('should render section with header text (as HTML)', () => {
     render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-    expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument()
   })
 
   it('should render subheader when provided', () => {
@@ -340,7 +340,7 @@ describe('BrandFeaturesSection', () => {
 
     const { container } = render(<BrandFeaturesSection data={mockSectionData} direction={DirectionEnum.RTL} />)
 
-    const buttonContainer = container.querySelector('.justify-end')
+    const buttonContainer = container.querySelector('.justify-start')
     expect(buttonContainer).toBeInTheDocument()
   })
 
@@ -474,7 +474,7 @@ describe('BrandFeaturesSection', () => {
     const featureContainers = container.querySelectorAll('.bg-white.rounded-xl')
     expect(featureContainers.length).toBeGreaterThan(0)
     featureContainers.forEach(feature => {
-      expect(feature).toHaveClass('justify-end')
+      expect(feature).toHaveClass('justify-start')
       expect(feature).not.toHaveClass('justify-center')
     })
   })

@@ -24,11 +24,11 @@ from pydantic import BaseModel, Field
 
 from affilibuster_backend.domain.entities.generated.models import (
     ApiAboutAboutDocument,
-    ApiAuthorAuthorDocument,
     ApiAuthPageAuthPageDocument,
     ApiBlogBlogDocument,
     ApiBlogPostBlogPostDocument,
     ApiContactUsContactUsDocument,
+    ApiContributorContributorDocument,
     ApiCurrencyCurrencyDocument,
     ApiError404Error404Document,
     ApiError410Error410Document,
@@ -185,7 +185,11 @@ def load_entities_from_jsonl() -> dict[str, dict[str | None, list[BaseModel]]]:
     entity_type_map: dict[str, tuple[type[BaseModel], list[str] | None, dict[str, Any] | None]] = {
         "api::about.about": (ApiAboutAboutDocument, ["entryTitle"], None),  # Strip Strapi-internal field
         "api::auth-page.auth-page": (ApiAuthPageAuthPageDocument, ["entryTitle"], None),
-        "api::author.author": (ApiAuthorAuthorDocument, None, None),  # Collection type - no entryTitle
+        "api::contributor.contributor": (
+            ApiContributorContributorDocument,
+            None,
+            None,
+        ),  # Collection type - no entryTitle
         "api::blog.blog": (ApiBlogBlogDocument, ["entryTitle"], None),
         "api::blog-post.blog-post": (ApiBlogPostBlogPostDocument, None, None),  # Collection type
         "api::contact-us.contact-us": (ApiContactUsContactUsDocument, ["entryTitle"], None),
@@ -327,9 +331,9 @@ EXPECTED_PRODUCTS: list[ApiProductProductDocument] = _get_collection_entities(
     "api::product.product", ApiProductProductDocument
 )
 
-# Collection Types - Authors
-EXPECTED_AUTHORS: list[ApiAuthorAuthorDocument] = _get_collection_entities(
-    "api::author.author", ApiAuthorAuthorDocument
+# Collection Types - Contributors
+EXPECTED_CONTRIBUTORS: list[ApiContributorContributorDocument] = _get_collection_entities(
+    "api::contributor.contributor", ApiContributorContributorDocument
 )
 
 # Collection Types - Blog Posts
@@ -424,7 +428,7 @@ EXPECTED_CURRENCY_CODES = [c.code for c in EXPECTED_CURRENCIES]
 EXPECTED_PRODUCT_SLUGS = [p.slug for p in EXPECTED_PRODUCTS]
 EXPECTED_LOCALE_CODES = [loc.code for loc in EXPECTED_LOCALES]
 EXPECTED_REDIRECT_FROM_PATHS = [r.from_path for r in EXPECTED_REDIRECTS]
-EXPECTED_AUTHOR_SLUGS = [a.slug for a in EXPECTED_AUTHORS]
+EXPECTED_CONTRIBUTOR_SLUGS = [a.slug for a in EXPECTED_CONTRIBUTORS]
 EXPECTED_BLOG_POST_SLUGS = [bp.slug for bp in EXPECTED_BLOG_POSTS]
 EXPECTED_PRODUCT_CATEGORY_SLUGS = [pc.slug for pc in EXPECTED_PRODUCT_CATEGORIES]
 
@@ -433,7 +437,7 @@ EXPECTED_CURRENCY_COUNT = len(EXPECTED_CURRENCIES)
 EXPECTED_PRODUCT_COUNT = len(EXPECTED_PRODUCTS)
 EXPECTED_LOCALE_COUNT = len(EXPECTED_LOCALES)
 EXPECTED_REDIRECT_COUNT = len(EXPECTED_REDIRECTS)
-EXPECTED_AUTHOR_COUNT = len(EXPECTED_AUTHORS)
+EXPECTED_CONTRIBUTOR_COUNT = len(EXPECTED_CONTRIBUTORS)
 EXPECTED_BLOG_POST_COUNT = len(EXPECTED_BLOG_POSTS)
 EXPECTED_PRODUCT_CATEGORY_COUNT = len(EXPECTED_PRODUCT_CATEGORIES)
 
@@ -450,10 +454,10 @@ EXPECTED_ENGLISH_BLOG_POST_COUNT = sum(1 for bp in EXPECTED_BLOG_POSTS if bp.loc
 EXPECTED_ITALIAN_BLOG_POST_COUNT = sum(1 for bp in EXPECTED_BLOG_POSTS if bp.locale == "it")
 EXPECTED_HEBREW_BLOG_POST_COUNT = sum(1 for bp in EXPECTED_BLOG_POSTS if bp.locale == "he")
 
-# Derived counts for authors by locale
-EXPECTED_ENGLISH_AUTHOR_COUNT = sum(1 for a in EXPECTED_AUTHORS if a.locale == "en")
-EXPECTED_ITALIAN_AUTHOR_COUNT = sum(1 for a in EXPECTED_AUTHORS if a.locale == "it")
-EXPECTED_HEBREW_AUTHOR_COUNT = sum(1 for a in EXPECTED_AUTHORS if a.locale == "he")
+# Derived counts for contributors by locale
+EXPECTED_ENGLISH_CONTRIBUTOR_COUNT = sum(1 for a in EXPECTED_CONTRIBUTORS if a.locale == "en")
+EXPECTED_ITALIAN_CONTRIBUTOR_COUNT = sum(1 for a in EXPECTED_CONTRIBUTORS if a.locale == "it")
+EXPECTED_HEBREW_CONTRIBUTOR_COUNT = sum(1 for a in EXPECTED_CONTRIBUTORS if a.locale == "he")
 
 # Derived counts for product categories by locale
 EXPECTED_ENGLISH_PRODUCT_CATEGORY_COUNT = sum(1 for pc in EXPECTED_PRODUCT_CATEGORIES if pc.locale == "en")

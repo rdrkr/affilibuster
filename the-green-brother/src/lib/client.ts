@@ -13,3 +13,4 @@ export * from './core/client'
 
 // Feature modules
 export * from './content'
+export * from './languages'

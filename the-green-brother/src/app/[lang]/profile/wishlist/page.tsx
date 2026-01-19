@@ -2,7 +2,7 @@
 
 'use client'
 
-import Image from 'next/image'
+import NextImage from 'next/image'
 import Link from 'next/link'
 
 const Wishlist = () => {
@@ -59,7 +59,7 @@ const Wishlist = () => {
               relative size-24 shrink-0 overflow-hidden rounded-xl
             `}
             >
-              <Image
+              <NextImage
                 src={item.image}
                 alt={item.name}
                 fill

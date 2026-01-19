@@ -5,7 +5,7 @@
  *
  * Renders a centered newsletter signup form with title and description.
  * All content comes from CMS - no hardcoded strings.
- * Uses CMSText for text and Button composites for actions.
+ * Uses Text for text and Button composites for actions.
  */
 
 'use client'

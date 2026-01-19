@@ -26,7 +26,6 @@ const localStorageMock = (() => {
       store[key] = value
     }),
     removeItem: jest.fn((key: string) => {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete store[key]
     }),
     clear: jest.fn(() => {
@@ -97,10 +96,9 @@ describe('getSessionId', () => {
 
 describe('createApiRequest', () => {
   it('should create request object with URL filled in', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const request = createApiRequest('/homepage', {
       query: { locale: CodeEnum.EN, customPopulate: 'nested' },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     } as any)
 
     expect(request).toEqual({
@@ -118,7 +116,7 @@ describe('createApiRequest', () => {
   })
 
   it('should create request object with query parameters', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+
     const request = createApiRequest('/products', { query: { customPopulate: 'nested' } } as any)
 
     expect(request).toEqual({
@@ -128,11 +126,67 @@ describe('createApiRequest', () => {
   })
 
   it('should create request object with path parameters', () => {
-    const request = createApiRequest('/products/123', { path: { id: '123' } })
+    const request = createApiRequest('/products/product-1', { path: { slug: 'product-1' } })
 
     expect(request).toEqual({
-      url: '/products/123',
-      path: { id: '123' },
+      url: '/products/product-1',
+      path: { slug: 'product-1' },
+    })
+  })
+  it('should flatten nested filters in query', () => {
+    const request = createApiRequest('/products', {
+      query: {
+        filters: {
+          category: {
+            name: {
+              $eq: 'electronics',
+            },
+          },
+        },
+      },
+    } as any)
+
+    expect(request).toEqual({
+      url: '/products',
+      query: {
+        'filters[category][name][$eq]': 'electronics',
+      },
+    })
+  })
+
+  it('should flatten nested pagination in query', () => {
+    const request = createApiRequest('/products', {
+      query: {
+        pagination: {
+          page: 1,
+          pageSize: 10,
+        },
+      },
+    } as any)
+
+    expect(request).toEqual({
+      url: '/products',
+      query: {
+        'pagination[page]': 1,
+        'pagination[pageSize]': 10,
+      },
+    })
+  })
+
+  it('should flatten nested sort in query', () => {
+    const request = createApiRequest('/products', {
+      query: {
+        sort: {
+          name: 'asc',
+        },
+      },
+    } as any)
+
+    expect(request).toEqual({
+      url: '/products',
+      query: {
+        'sort[name]': 'asc',
+      },
     })
   })
 })
@@ -153,10 +207,8 @@ describe('apiRequest', () => {
       json: async () => mockResponseData,
     } as Response)
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const request = createApiRequest('/homepage', {
       query: { locale: CodeEnum.EN, customPopulate: 'nested' },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any)
     const response = await apiRequest(request)
 
@@ -183,7 +235,7 @@ describe('apiRequest', () => {
       json: async () => mockResponseData,
     } as Response)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+
     const request = createApiRequest('/products', { query: { customPopulate: 'nested' } } as any)
     const response = await apiRequest(request)
 
@@ -314,12 +366,11 @@ describe('apiRequest', () => {
       json: async () => ({ data: [] }),
     } as Response)
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const request = createApiRequest('/products', {
       query: {
         fields: ['name', 'price', 'description'],
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     } as any)
     await apiRequest(request)
 
@@ -335,17 +386,17 @@ describe('apiRequest', () => {
       json: async () => ({ data: [] }),
     } as Response)
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     const request = createApiRequest('/products', {
       query: {
-        filters: { category: 'electronics', price: { $gte: 100 } },
+        metadata: { category: 'electronics', price: { $gte: 100 } },
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     } as any)
     await apiRequest(request)
 
     const callUrl = (mockFetch.mock.calls[0]?.[0] as string) || ''
-    expect(callUrl).toContain('filters=')
+    expect(callUrl).toContain('metadata=')
     expect(decodeURIComponent(callUrl)).toContain(JSON.stringify({ category: 'electronics', price: { $gte: 100 } }))
   })
 
@@ -363,13 +414,12 @@ describe('apiRequest', () => {
       json: async () => ({ data: [] }),
     } as Response)
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const request = createApiRequest('/products', {
       query: {
         page: 2,
         featured: true,
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     } as any)
     await apiRequest(request)
 
@@ -454,14 +504,13 @@ describe('apiRequest', () => {
       json: async () => ({ data: [] }),
     } as Response)
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const request = createApiRequest('/products', {
       query: {
         name: 'test',
         undefinedParam: undefined,
         nullParam: null,
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     } as any)
     await apiRequest(request)
 
@@ -477,12 +526,12 @@ describe('apiRequest', () => {
       json: async () => ({ data: [] }),
     } as Response)
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     const request = createApiRequest('/products', {
       query: {
         fields: ['name', null, undefined, 'price'],
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     } as any)
     await apiRequest(request)
 
@@ -509,6 +558,61 @@ describe('apiRequest', () => {
     const fetchOptions = fetchCall![1]!
     // Body should not be set in fetchOptions when request.body is undefined
     expect(fetchOptions.body).toBeUndefined()
+  })
+  it('should ignore unsupported types in query params (symbol, function)', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ data: [] }),
+    } as Response)
+
+
+    const request = createApiRequest('/products', {
+      query: {
+        valid: 'yes',
+        sym: Symbol('test'),
+        func: () => { console.log('test') },
+      },
+
+    } as any)
+    await apiRequest(request)
+
+    const callUrl = (mockFetch.mock.calls[0]?.[0] as string) || ''
+    expect(callUrl).toContain('valid=yes')
+    expect(callUrl).not.toContain('sym')
+    expect(callUrl).not.toContain('func')
+  })
+
+  it('should pass cache and next options to fetch', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({}),
+    } as Response)
+
+    const request = createApiRequest('/homepage', {})
+    await apiRequest(request, {
+      cache: 'force-cache',
+      next: { revalidate: 3600, tags: ['home'] },
+    })
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        cache: 'force-cache',
+        next: { revalidate: 3600, tags: ['home'] },
+      })
+    )
+  })
+
+  it('should handle 404 Not Found error with specific message', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+      statusText: 'Not Found',
+    } as Response)
+
+    const request = createApiRequest('/missing', {})
+
+    await expect(apiRequest(request)).rejects.toThrow('Resource not found')
   })
 })
 

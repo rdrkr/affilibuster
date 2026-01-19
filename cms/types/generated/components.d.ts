@@ -81,7 +81,7 @@ export interface ElementsLabel extends Struct.ComponentSchema {
     iconPosition: Schema.Attribute.Enumeration<['before_text', 'after_text']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'before_text'>
-    text: Schema.Attribute.String & Schema.Attribute.Required
+    text: Schema.Attribute.Text & Schema.Attribute.Required
   }
 }
 
@@ -289,7 +289,6 @@ export interface SectionsTeamGrid extends Struct.ComponentSchema {
   }
   attributes: {
     header: Schema.Attribute.Component<'elements.header', false> & Schema.Attribute.Required
-    team_members: Schema.Attribute.Relation<'oneToMany', 'api::team-member.team-member'>
   }
 }
 

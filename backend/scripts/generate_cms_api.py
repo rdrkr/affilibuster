@@ -45,11 +45,12 @@ EXCLUDED_ROUTES = frozenset(
 ROUTE_DESCRIPTIONS = {
     "about": "Get About page content from Strapi.",
     "auth-page": "Get authentication page content (login, signup forms) from Strapi.",
-    "author": "Get authors from Strapi.",
     "blog": "Get Blog page content and configuration from Strapi.",
     "blog-post": "Get blog posts from Strapi.",
     "blog-post-tag": "Get blog post tags from Strapi.",
     "contact-us": "Get Contact Us page content from Strapi.",
+    "contributor": "Get contributors from Strapi.",
+    "contributor-role": "Get contributor roles from Strapi.",
     "currency": "Get currencies from Strapi.",
     "error-404": "Get 404 Not Found error page content from Strapi.",
     "error-410": "Get 410 Gone error page content from Strapi.",
@@ -64,7 +65,6 @@ ROUTE_DESCRIPTIONS = {
     "product-category": "Get product categories from Strapi.",
     "product-tag": "Get product tags from Strapi.",
     "profile": "Get user Profile page content from Strapi.",
-    "team-member": "Get team members from Strapi.",
     "term": "Get Terms and Conditions content from Strapi.",
     "theme": "Get themes from Strapi.",
     "upload": "Get files upload endpoint from Strapi.",
@@ -80,11 +80,18 @@ class RouteInfo:
     response_model: str  # e.g., "AboutGetResponse"
     id_params_model: str | None = None  # For collections: "ProductsIdGetParametersQuery"
     id_response_model: str | None = None  # For collections: "ProductsIdGetResponse"
+    slug_params_model: str | None = None  # For slug lookups: "ProductsSlugSlugGetParametersQuery"
+    slug_response_model: str | None = None  # For slug lookups: "ProductsSlugSlugGetResponse"
 
     @property
     def is_collection(self) -> bool:
         """Check if this is a collection endpoint (has {Name}Id models)."""
         return self.id_params_model is not None
+
+    @property
+    def has_slug_lookup(self) -> bool:
+        """Check if this route has a slug lookup endpoint."""
+        return self.slug_params_model is not None
 
     @property
     def path(self) -> str:
@@ -148,41 +155,33 @@ def parse_models_file(models_path: Path) -> tuple[list[str], list[str]]:
 
 def _update_route_info(routes_map: dict[str, RouteInfo], name: str) -> None:
     """Update routes map with information from a single model class name."""
-    if name.endswith("IdGetParametersQuery"):
-        # Collection item params: ProductsIdGetParametersQuery -> Products
-        base = name[:-20]
-        if base not in routes_map:
-            routes_map[base] = RouteInfo(name=base, params_model="", response_model="")
-        routes_map[base].id_params_model = name
-    elif name.endswith("IdGetResponse"):
-        # Collection item response: ProductsIdGetResponse -> Products
-        base = name[:-13]
-        if base not in routes_map:
-            routes_map[base] = RouteInfo(name=base, params_model="", response_model="")
-        routes_map[base].id_response_model = name
-    elif name.endswith("GetParametersQuery"):
-        # List/single-type params: ProductsGetParametersQuery -> Products
-        base = name[:-18]
-        if base not in routes_map:
-            routes_map[base] = RouteInfo(name=base, params_model="", response_model="")
-        routes_map[base].params_model = name
-    elif name.endswith("GetResponse"):
-        # List/single-type response: ProductsGetResponse -> Products
-        base = name[:-11]
-        if base not in routes_map:
-            routes_map[base] = RouteInfo(name=base, params_model="", response_model="")
-        routes_map[base].response_model = name
+    suffix_map = {
+        "SlugSlugGetParametersQuery": ("slug_params_model", 26),
+        "SlugSlugGetResponse": ("slug_response_model", 19),
+        "IdGetParametersQuery": ("id_params_model", 20),
+        "IdGetResponse": ("id_response_model", 13),
+        "GetParametersQuery": ("params_model", 18),
+        "GetResponse": ("response_model", 11),
+    }
+
+    for suffix, (attr, length) in suffix_map.items():
+        if name.endswith(suffix):
+            base = name[:-length]
+            if base not in routes_map:
+                routes_map[base] = RouteInfo(name=base, params_model="", response_model="")
+            setattr(routes_map[base], attr, name)
+            return
 
 
-def classify_routes(class_names: list[str]) -> tuple[list[RouteInfo], list[RouteInfo]]:
+def classify_routes(class_names: list[str]) -> tuple[list[RouteInfo], list[RouteInfo], list[RouteInfo]]:
     """
-    Classify routes as single-type or collection based on naming patterns.
+    Classify routes as single-type, collection, or slug-lookup based on naming patterns.
 
     Args:
         class_names: List of class names from models.py
 
     Returns:
-        Tuple of (single_type_routes, collection_routes)
+        Tuple of (single_type_routes, collection_routes, slug_routes)
     """
     routes_map: dict[str, RouteInfo] = {}
 
@@ -192,11 +191,15 @@ def classify_routes(class_names: list[str]) -> tuple[list[RouteInfo], list[Route
     # Filter out excluded routes and incomplete routes
     single_types: list[RouteInfo] = []
     collections: list[RouteInfo] = []
+    slug_routes: list[RouteInfo] = []
 
     for route in routes_map.values():
         route_key = route.path.lstrip("/").replace("-", "")
         if route_key.rstrip("s") in EXCLUDED_ROUTES or route_key in EXCLUDED_ROUTES:
             continue
+
+        if route.has_slug_lookup and route.slug_response_model:
+            slug_routes.append(route)
 
         if not route.params_model or not route.response_model:
             continue
@@ -210,8 +213,9 @@ def classify_routes(class_names: list[str]) -> tuple[list[RouteInfo], list[Route
     # Sort alphabetically by path
     single_types.sort(key=lambda r: r.path)
     collections.sort(key=lambda r: r.path)
+    slug_routes.sort(key=lambda r: r.path)
 
-    return single_types, collections
+    return single_types, collections, slug_routes
 
 
 # =============================================================================
@@ -280,7 +284,37 @@ def _generate_collection_configs(collections: list[RouteInfo]) -> list[str]:
     return lines
 
 
-def generate_cms_routes_code(single_types: list[RouteInfo], collections: list[RouteInfo]) -> str:
+def _generate_slug_configs(slug_routes: list[RouteInfo]) -> list[str]:
+    lines = [
+        "# =============================================================================",
+        "# Slug CMS Endpoints",
+        "# =============================================================================",
+        "# These are endpoints that support fetching by slug (e.g. /path/slug/{slug}).",
+        "",
+        "SLUG_CONFIGS: list[CMSSlugConfig] = [",
+    ]
+
+    for route in slug_routes:
+        singular_tag = route.tag
+        lines.append("    CMSSlugConfig(")
+        lines.append(f'        path="{route.path}",')
+        lines.append(f'        tag="{singular_tag}",')
+        lines.append(f"        params_model={route.slug_params_model},")
+        lines.append(f"        response_model={route.slug_response_model},")
+        lines.append(f'        description="Get {singular_tag.replace("-", " ")} by slug from Strapi.",')
+        lines.append("    ),")
+
+    lines.append("]")
+    lines.append("")
+    lines.append("")
+    return lines
+
+
+def generate_cms_routes_code(
+    single_types: list[RouteInfo],
+    collections: list[RouteInfo],
+    slug_routes: list[RouteInfo],
+) -> str:
     """Generate the cms_routes.py file content."""
     # Collect all model imports
     imports: set[str] = set()
@@ -295,6 +329,12 @@ def generate_cms_routes_code(single_types: list[RouteInfo], collections: list[Ro
             imports.add(route.id_params_model)
         if route.id_response_model:
             imports.add(route.id_response_model)
+
+    for route in slug_routes:
+        if route.slug_params_model:
+            imports.add(route.slug_params_model)
+        if route.slug_response_model:
+            imports.add(route.slug_response_model)
 
     import_lines = _generate_imports(imports)
 
@@ -325,13 +365,16 @@ def generate_cms_routes_code(single_types: list[RouteInfo], collections: list[Ro
     lines.append("from affilibuster_backend.infrastructure.api.routes.cms_route_factory import (")
     lines.append("    CMSCollectionConfig,")
     lines.append("    CMSSingleTypeConfig,")
+    lines.append("    CMSSlugConfig,")
     lines.append("    create_collection_router,")
     lines.append("    create_single_type_router,")
+    lines.append("    create_slug_router,")
     lines.append(")")
     lines.append("")
 
     lines.extend(_generate_single_type_configs(single_types))
     lines.extend(_generate_collection_configs(collections))
+    lines.extend(_generate_slug_configs(slug_routes))
 
     lines.append("def get_all_cms_routers() -> list[APIRouter]:")
     lines.append('    """')
@@ -343,6 +386,8 @@ def generate_cms_routes_code(single_types: list[RouteInfo], collections: list[Ro
     lines.append('    """')
     lines.append("    return [create_single_type_router(config) for config in SINGLE_TYPE_CONFIGS] + [")
     lines.append("        create_collection_router(config) for config in COLLECTION_CONFIGS")
+    lines.append("    ] + [")
+    lines.append("        create_slug_router(config) for config in SLUG_CONFIGS")
     lines.append("    ]")
     lines.append("")
 
@@ -563,14 +608,15 @@ def main() -> None:
     logger.info("   Found %d request model classes", len(params_classes))
     logger.info("   Found %d response model classes", len(response_classes))
 
-    single_types, collections = classify_routes(all_classes)
+    single_types, collections, slug_routes = classify_routes(all_classes)
     logger.info("   Identified %d single-type routes", len(single_types))
     logger.info("   Identified %d collection routes", len(collections))
+    logger.info("   Identified %d slug routes", len(slug_routes))
     logger.info("")
 
     # Generate cms_routes.py
     logger.info("📝 Generating cms_routes.py...")
-    routes_code = generate_cms_routes_code(single_types, collections)
+    routes_code = generate_cms_routes_code(single_types, collections, slug_routes)
     routes_output_path.write_text(routes_code)
     logger.info("✅ Generated: %s", routes_output_path.relative_to(backend_root))
 
@@ -592,6 +638,11 @@ def main() -> None:
     logger.info("📋 Collection Routes:")
     for route in collections:
         logger.info("   • %s (+ %s/{id})", route.path, route.path)
+
+    logger.info("")
+    logger.info("📋 Slug Routes:")
+    for route in slug_routes:
+        logger.info("   • %s/slug/{slug}", route.path)
 
     logger.info("")
     logger.info("=" * 60)

@@ -9,9 +9,9 @@ import { act, fireEvent, render, screen } from '@testing-library/react'
 import BackToTopButton from '@/components/navigation/BackToTopButton'
 import { DirectionEnum } from '@/lib/generated/types.gen'
 
-// Mock CMSIcon
+// Mock Icon
 jest.mock('@/components/elements', () => ({
-  CMSIcon: function MockCMSIcon({ icon, size }: { icon?: string; size?: string }) {
+  Icon: function MockIcon({ icon, size }: { icon?: string; size?: string }) {
     return (
       <span data-testid="mock-icon" data-icon={icon} data-size={size}>
         {icon}

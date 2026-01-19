@@ -3,7 +3,9 @@
 /**
  * Layout Components Barrel Export
  *
- * Exports layout-related components like DynamicZone.
+ * Exports layout-related components like DynamicZone and Carousel.
  */
 
+export { Carousel, type CarouselGap, type CarouselProps, type CarouselVariant } from './Carousel'
 export { DynamicZone, type DynamicZoneProps } from './DynamicZone'
+export { PageClient, type PageClientProps } from './PageClient'

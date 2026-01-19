@@ -11,18 +11,21 @@ import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 
 // Mock the CMS element components
 jest.mock('@/components/elements', () => ({
-  CMSIcon: function MockCMSIcon({ icon, size }: { icon?: string; size?: string }) {
+  Icon: function MockIcon({ icon, size }: { icon?: string; size?: string }) {
     return (
       <span data-testid="mock-icon" data-icon={icon} data-size={size}>
         {icon}
       </span>
     )
   },
-  CMSText: function MockCMSText({ text }: { text?: string }) {
-    return <span data-testid="mock-text">{text}</span>
+  Text: function MockText({ text, as: Component = 'span', className }: any) {
+    return (
+      <Component data-testid="mock-text" className={className}>
+        {text}
+      </Component>
+    )
   },
-  CMSImage: function MockCMSImage({ image: _image, className }: { image?: unknown; className?: string }) {
-    // eslint-disable-next-line @next/next/no-img-element
+  Image: function MockImage({ image: _image, className }: { image?: unknown; className?: string }) {
     return <img src="/mock-image.jpg" alt="mock" className={className} data-testid="mock-image" />
   },
   ButtonLink: function MockButtonLink({

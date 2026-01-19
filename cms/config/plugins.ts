@@ -32,6 +32,14 @@ export default ({ env }: { env: StrapiEnv }) => ({
     config: {
       enabled: true,
       defaultDepth: 8,
+      // Ignore bidirectional relation fields that cause infinite loops
+      ignore: [
+        // Blog circular relations
+        'blogPosts', // contributor.blogPosts → blog-post → contributor.blogPosts → ...
+        'posts', // blog-post-tag.posts → blog-post → tags.posts → ...
+        // Product circular relations (same pattern)
+        'products', // product-category.products / product-tag.products
+      ],
     },
   },
   // Cloudinary upload provider - only enabled in production

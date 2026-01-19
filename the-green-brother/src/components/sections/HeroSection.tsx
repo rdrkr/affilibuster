@@ -13,9 +13,12 @@
  * - TEXT_BELOW_BACKGROUND: Header below image (stacked vertically)
  */
 
-import { ButtonLink, CMSImage, Header } from '@/components/elements'
+import { ButtonLink, Header, Image } from '@/components/elements'
 import { AlignmentEnum, DirectionEnum, VariantEnum, type SectionsHeroEntry } from '@/lib/generated/types.gen'
 
+/**
+ * Props for the HeroSection component
+ */
 /**
  * Props for the HeroSection component
  */
@@ -26,6 +29,14 @@ export interface HeroSectionProps {
   }
   /** Language direction for RTL support */
   direction: DirectionEnum
+  /** Layout variant override */
+  variant?: VariantEnum
+  /** Header slot - renders above the content (e.g., tags) */
+  header?: React.ReactNode
+  /** Content slot - main content area (e.g., title, subtitle) */
+  content?: React.ReactNode
+  /** Footer slot - bottom section (e.g., author, date) */
+  footer?: React.ReactNode
 }
 
 /**
@@ -33,17 +44,31 @@ export interface HeroSectionProps {
  * @param props - Component props with CMS hero data
  * @param props.data - Hero section data from CMS
  * @param props.direction - Language direction for RTL support
+ * @param props.variant - Layout variant override
+ * @param props.header - Header slot content
+ * @param props.content - Main content slot
+ * @param props.footer - Footer slot content
  * @returns Hero section component
  */
-export function HeroSection({ data, direction }: HeroSectionProps) {
-  const { header, exploreButton, image, variant } = data
+export function HeroSection({
+  data,
+  direction,
+  variant: variantProp,
+  header: headerSlot,
+  content: contentSlot,
+  footer: footerSlot,
+}: HeroSectionProps) {
+  // Use props or fall back to data
+  const { image } = data
+  const variant = variantProp ?? data.variant
+  const alignment = data.header.alignment
 
   // --- Shared Logic ---
 
   // Determine if content should be right-aligned (RTL) or left-aligned (LTR)
   // or centered if explicitly set in CMS
   const isRTL = direction === DirectionEnum.RTL
-  const isCentered = header.alignment === AlignmentEnum.CENTER
+  const isCentered = alignment === AlignmentEnum.CENTER
 
   // Calculate justify class for the container
   const justifyClass = isCentered ? 'justify-center' : isRTL ? 'justify-end' : 'justify-start'
@@ -66,15 +91,16 @@ export function HeroSection({ data, direction }: HeroSectionProps) {
         ${isOverlay && !isCentered ? (isRTL ? 'mr-8' : 'ml-8') : ''}
       `}
     >
-      <Header
-        data={header}
-        headerClassName="text-5xl sm:text-7xl md:text-7xl leading-tight tracking-tight"
-        subheaderClassName="mt-8 text-lg sm:text-xl md:text-xl text-neutral-600 dark:text-white"
-        direction={direction}
-      />
-      {exploreButton && (
+      {/* Manual Slots */}
+      {headerSlot}
+      {contentSlot}
+      {!contentSlot && <Header data={data.header} level={1} direction={direction} />}
+
+      {footerSlot && <div className="mt-6 flex flex-wrap items-center gap-4 text-sm">{footerSlot}</div>}
+
+      {!footerSlot && data.exploreButton && (
         <ButtonLink
-          data={exploreButton}
+          data={data.exploreButton}
           direction={direction}
           variant="primary"
           size="lg"
@@ -90,11 +116,12 @@ export function HeroSection({ data, direction }: HeroSectionProps) {
 
   const renderImage = (isOverlay: boolean) => (
     <div className={isOverlay ? 'absolute inset-0 z-0' : 'relative h-[40vh] max-h-100 min-h-62.5 w-full'}>
-      <CMSImage
+      <Image
         image={image}
         className={`size-full object-cover ${isOverlay ? 'opacity-80' : 'rounded-xl'}`}
         fill
         preload
+        loading="eager"
         sizes="100vw"
       />
     </div>
@@ -110,7 +137,7 @@ export function HeroSection({ data, direction }: HeroSectionProps) {
           relative flex h-[60vh] max-h-150 min-h-100 items-center overflow-hidden
           rounded-xl shadow-2xl ${justifyClass}
         `}
-        aria-label={header.header?.ariaDescription ?? ''}
+        aria-label={data.header.header?.ariaDescription ?? ''}
       >
         {renderImage(true)}
         {/* Dark overlay gradient for readability */}
@@ -131,7 +158,7 @@ export function HeroSection({ data, direction }: HeroSectionProps) {
     return (
       <section
         className={`flex flex-col gap-8 ${isCentered ? 'items-center' : isRTL ? 'items-end' : 'items-start'}`}
-        aria-label={header.header?.ariaDescription ?? ''}
+        aria-label={data.header.header?.ariaDescription ?? ''}
       >
         <div className={`w-full ${justifyClass} flex`}>{renderContent(false)}</div>
         <div className="w-full overflow-hidden rounded-xl shadow-2xl">{renderImage(false)}</div>
@@ -143,7 +170,7 @@ export function HeroSection({ data, direction }: HeroSectionProps) {
   return (
     <section
       className={`flex flex-col gap-8 ${isCentered ? 'items-center' : isRTL ? 'items-end' : 'items-start'}`}
-      aria-label={header.header?.ariaDescription ?? ''}
+      aria-label={data.header.header?.ariaDescription ?? ''}
     >
       <div className="w-full overflow-hidden rounded-xl shadow-2xl">{renderImage(false)}</div>
       <div className={`w-full ${justifyClass} flex`}>{renderContent(false)}</div>

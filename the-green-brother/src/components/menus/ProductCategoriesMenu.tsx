@@ -16,7 +16,7 @@ import type {
   MenusProductCategoriesSelectorEntry,
 } from '@/lib/generated/types.gen'
 import Link from 'next/link'
-import { CMSImage, CMSText } from '../elements'
+import { Image, Text } from '../elements'
 
 import { DirectionEnum } from '@/lib/generated/types.gen'
 import { DropdownMenu } from './DropdownMenu'
@@ -92,7 +92,7 @@ export function ProductCategoriesMenu({
               setIsOpen(false)
             }}
           >
-            <CMSImage
+            <Image
               image={category.image}
               className={`
                 object-cover transition-transform duration-500
@@ -107,14 +107,14 @@ export function ProductCategoriesMenu({
               to-transparent p-4
             `}
             >
-              <span
+              <Text
+                text={category.content.text}
+                as="span"
                 className={`
                 font-bold text-white transition-colors
                 group-hover/item:text-primary
               `}
-              >
-                <CMSText text={category.content.text} />
-              </span>
+              />
             </div>
           </Link>
         )

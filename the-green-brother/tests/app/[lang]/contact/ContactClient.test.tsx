@@ -4,14 +4,15 @@
  * Unit tests for ContactClient component
  */
 
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import { renderWithLayout } from '../../../utils/renderWithLayout'
 
 import ContactClient from '@/app/[lang]/contact/ContactClient'
 import type { ApiContactUsContactUsDocument } from '@/lib/generated/types.gen'
 
 describe('ContactClient', () => {
   it('should render with default title when contactData is null', () => {
-    render(<ContactClient contactData={null} />)
+    renderWithLayout(<ContactClient contactData={null} />)
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Contact & Support')
   })
@@ -21,7 +22,7 @@ describe('ContactClient', () => {
       title: 'Get In Touch',
     } as ApiContactUsContactUsDocument
 
-    render(<ContactClient contactData={contactData} />)
+    renderWithLayout(<ContactClient contactData={contactData} />)
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Get In Touch')
   })
@@ -32,7 +33,7 @@ describe('ContactClient', () => {
       subtitle: 'We would love to hear from you',
     } as ApiContactUsContactUsDocument
 
-    render(<ContactClient contactData={contactData} />)
+    renderWithLayout(<ContactClient contactData={contactData} />)
 
     expect(screen.getByText('We would love to hear from you')).toBeInTheDocument()
   })
@@ -42,13 +43,13 @@ describe('ContactClient', () => {
       title: 'Contact Us',
     } as ApiContactUsContactUsDocument
 
-    render(<ContactClient contactData={contactData} />)
+    renderWithLayout(<ContactClient contactData={contactData} />)
 
     expect(screen.queryByText('We would love to hear from you')).not.toBeInTheDocument()
   })
 
   it('should render contact form placeholder', () => {
-    render(<ContactClient contactData={null} />)
+    renderWithLayout(<ContactClient contactData={null} />)
 
     expect(screen.getByText('Contact form with CMS labels')).toBeInTheDocument()
   })

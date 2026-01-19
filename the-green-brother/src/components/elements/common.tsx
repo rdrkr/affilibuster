@@ -28,12 +28,12 @@ export type ButtonVariant =
 /**
  * Button size options
  */
-export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
+export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 
 /**
  * Icon size options
  */
-export type IconSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
+export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl'
 
 /**
  * Get CSS classes for button variant
@@ -149,6 +149,7 @@ export function getVariantClasses(
  */
 export function getSizeDimensions(size: ButtonSize): string {
   const sizes: Record<ButtonSize, string> = {
+    xs: 'py-0.5 px-2 rounded-lg min-w-[38x] min-h-[38px]',
     sm: 'py-1.5 px-3 rounded-xl min-w-[46px] min-h-[46px]',
     md: 'py-2 px-4 rounded-xl min-w-[52px] min-h-[52px]',
     lg: 'py-3 px-5 rounded-xl min-w-[62px] min-h-[62px]',
@@ -166,6 +167,7 @@ export function getSizeDimensions(size: ButtonSize): string {
  */
 export function getSizeText(size: ButtonSize): string {
   const sizes: Record<ButtonSize, string> = {
+    xs: 'text-xs',
     sm: 'text-sm',
     md: 'text-base',
     lg: 'text-lg',
@@ -264,6 +266,8 @@ export interface ComposeButtonContentParams {
   childrenPosition?: 'start' | 'end'
   /** Use masked icon for local icons */
   maskedIcon?: boolean
+  /** Additional CSS classes for the label text */
+  textClassName?: string
 }
 
 /**
@@ -274,7 +278,7 @@ export interface ComposeButtonContentParams {
  * @returns Composed React node or null if no content
  */
 export function composeButtonContent(params: ComposeButtonContentParams): ReactNode {
-  const { label, children, direction, iconSize, showText, childrenPosition = 'end', maskedIcon } = params
+  const { label, children, direction, iconSize, showText, childrenPosition = 'end', maskedIcon, textClassName } = params
 
   let content: ReactNode = children
 
@@ -322,6 +326,7 @@ export function composeButtonContent(params: ComposeButtonContentParams): ReactN
         className={`items-center justify-center ${showText === false ? 'gap-0!' : ''}`}
         showText={showText ?? true}
         maskedIcon={maskedIcon ?? false}
+        textClassName={textClassName ?? ''}
       />
     )
 

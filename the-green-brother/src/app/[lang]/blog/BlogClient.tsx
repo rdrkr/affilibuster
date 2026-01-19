@@ -1,273 +1,202 @@
-// Copyright (c) 2025 Affilibuster by Ronen Druker.
+// Copyright (c) 2026 Affilibuster by Ronen Druker.
 
 'use client'
 
-import Link from 'next/link'
-import { useState } from 'react'
+import { BlogCard } from '@/components/blog'
+import { ButtonLink, Header } from '@/components/elements'
+import { Carousel, PageClient } from '@/components/layout'
+import { useLayoutContext } from '@/components/providers'
+import {
+  AlignmentEnum,
+  DirectionEnum,
+  IconPositionEnum,
+  type ApiBlogBlogDocument,
+  type ApiBlogPostBlogPostDocument,
+} from '@/lib/generated/types.gen'
 
-import { CMSImage, CMSText } from '@/components/elements'
-import type { ApiBlogBlogDocument, ApiBlogPostBlogPostDocument, CodeEnum } from '@/lib/generated/types.gen'
+import { CardSize, CardSizeModifier } from '@/components/elements/Card'
+import { HeaderLevel } from '@/components/elements/Header'
 
 interface BlogClientProps {
   blogPageData: ApiBlogBlogDocument | null
   posts: ApiBlogPostBlogPostDocument[]
-  lang: CodeEnum
 }
 
 /**
  * Client component for blog listing page.
  *
- * Renders blog posts with filtering by category/tag.
- * Uses CMS data for all content with graceful degradation.
+ * Renders featured posts carousel and tag-based sections.
  * @param props - Component properties
  * @param props.blogPageData - Blog page metadata from CMS
  * @param props.posts - List of blog posts from CMS
- * @param props.lang - Current language code
  * @returns Blog listing UI
  */
-export default function BlogClient({ blogPageData, posts, lang }: BlogClientProps) {
-  const [activeTag, setActiveTag] = useState<string>('All')
+export default function BlogClient({ blogPageData, posts }: BlogClientProps) {
+  const { direction } = useLayoutContext()
+  const isRTL = direction === DirectionEnum.RTL
 
-  // Extract unique tags from posts
-  const allTags: string[] = ['All']
-  posts.forEach(post => {
-    const tagName = post.tags?.[0]?.tag?.text
-    if (tagName && !allTags.includes(tagName)) {
-      allTags.push(tagName)
-    }
-  })
+  if (!blogPageData?.defaultContributor) return null
 
-  // Filter posts by selected tag
-  const filteredPosts = activeTag === 'All' ? posts : posts.filter(post => post.tags?.[0]?.tag?.text === activeTag)
+  const { featuredBlogPosts, tagFilters, pagination, readTimeMinutesLabel, readArticleLabel, defaultContributor } =
+    blogPageData
+  const itemsPerPage = pagination.itemsPerPage
 
-  // Get featured post (first post)
-  const featuredPost = filteredPosts[0]
-  const gridPosts = filteredPosts.slice(1)
+  const baseBlogCard = {
+    direction: direction,
+    basePath: '/blog',
+    width: 'full' as CardSizeModifier,
+    noAnimation: true,
+    asLink: true,
+    readTimeMinutesLabel: readTimeMinutesLabel,
+    readArticleLabel: readArticleLabel,
+    defaultContributor: defaultContributor,
+  }
+
+  const featuredBlogCard = {
+    className: 'drop-shadow-xl dark:drop-shadow-xl',
+    headingLevel: 3 as HeaderLevel,
+    showTag: true,
+    ...baseBlogCard,
+  }
+
+  const mdBlogCard = {
+    size: 'md' as CardSize,
+    showTag: false,
+    ...baseBlogCard,
+  }
+
+  const smBlogCard = {
+    size: 'sm' as CardSize,
+    showTag: false,
+    ...baseBlogCard,
+  }
 
   return (
-    <div className="py-8">
-      <div className="mx-auto mb-16 max-w-3xl text-center">
-        <h1
-          className={`
-          mb-4 text-4xl font-bold text-neutral-800 md:text-6xl
-          dark:text-white
-        `}
-        >
-          {blogPageData?.header?.header?.text ?? (
-            <>
-              Sustainable Living, <span className="text-primary-500">Simplified.</span>
-            </>
-          )}
-        </h1>
-        {blogPageData?.header?.subheader?.text && (
-          <p className="text-lg text-neutral-600 dark:text-tertiary-300">{blogPageData.header.subheader.text}</p>
-        )}
-
-        {allTags.length > 1 && (
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            {allTags.map(tag => (
-              <button
-                key={tag}
-                onClick={() => {
-                  setActiveTag(tag)
-                }}
-                className={`
-                  rounded-full px-6 py-2 font-medium transition-all
-                  ${
-                    tag === activeTag
-                      ? 'bg-primary-600 font-bold text-white'
-                      : `
-                      border border-neutral-200 bg-white text-neutral-600
-                      hover:border-primary-500 hover:text-primary-600
-                      dark:border-tertiary-700 dark:bg-tertiary-800 dark:text-tertiary-400
-                      dark:hover:border-primary-500 dark:hover:text-white
-                    `
-                  }
-                `}
-              >
-                {tag}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {filteredPosts.length > 0 ? (
-        <div className="space-y-12">
-          {/* Featured Post */}
-          {featuredPost && (
-            <div
-              className={`
-                group overflow-hidden rounded-xl border border-neutral-200
-                bg-white transition-all hover:border-primary-500/30
-                dark:border-tertiary-700 dark:bg-tertiary-800
-              `}
-            >
-              <div className="md:flex">
-                <div
-                  className={`
-                  relative h-64 overflow-hidden bg-neutral-100 md:h-auto
-                  md:w-1/2 dark:bg-tertiary-900
-                `}
-                >
-                  <CMSImage
-                    image={featuredPost.featuredImage}
-                    fallbackAlt={featuredPost.content?.header?.header?.text ?? ''}
-                    className={`
-                      object-cover transition-transform duration-700
-                      group-hover:scale-105
-                    `}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    preload
-                  />
-                </div>
-                <div
-                  className={`
-                  flex flex-col justify-center p-8
-                  md:w-1/2 md:p-12
-                `}
-                >
-                  {featuredPost.tags?.[0] && (
-                    <span
-                      className={`
-                      mb-2 text-sm font-bold tracking-wider text-primary-500
-                      uppercase
-                    `}
-                    >
-                      <CMSText text={featuredPost.tags[0].tag?.text ?? ''} />
-                    </span>
-                  )}
-                  <h2
-                    className={`
-                    mb-4 text-3xl font-bold text-neutral-800 transition-colors
-                    group-hover:text-primary-500 dark:text-white
-                  `}
-                  >
-                    <CMSText text={featuredPost.content?.header?.header?.text ?? ''} />
-                  </h2>
-                  {featuredPost.content?.header?.subheader?.text && (
-                    <p className="mb-6 text-lg text-neutral-600 dark:text-tertiary-300">
-                      <CMSText text={featuredPost.content.header.subheader.text} />
-                    </p>
-                  )}
-                  <div
-                    className={`
-                    mb-8 flex items-center text-sm text-neutral-500 dark:text-tertiary-400
-                  `}
-                  >
-                    {featuredPost.author?.name && <span>By {featuredPost.author.name}</span>}
-                    {featuredPost.readTime && (
-                      <>
-                        <span className="mx-2">•</span>
-                        <span>{featuredPost.readTime} min read</span>
-                      </>
-                    )}
-                  </div>
-                  <Link
-                    href={`/${lang}/blog/${featuredPost.documentId}`}
-                    className={`
-                      inline-block w-max rounded-full bg-neutral-100 px-8 py-3
-                      text-center font-bold text-neutral-800 transition-all
-                      hover:bg-primary-600 hover:text-white
-                      dark:bg-tertiary-700 dark:text-white
-                    `}
-                  >
-                    Read Article
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Grid Posts */}
-          {gridPosts.length > 0 && (
-            <div
-              className={`
-              grid grid-cols-1 gap-8
-              md:grid-cols-2
-              lg:grid-cols-3
-            `}
-            >
-              {gridPosts.map(post => (
-                <Link
-                  href={`/${lang}/blog/${post.documentId}`}
-                  key={post.documentId}
-                  className={`
-                    group flex flex-col overflow-hidden rounded-xl border
-                    border-neutral-200 bg-white transition-all
-                    hover:border-primary-500/30
-                    dark:border-tertiary-700 dark:bg-tertiary-800
-                  `}
-                >
-                  <div className="relative h-56 overflow-hidden bg-neutral-100 dark:bg-tertiary-900">
-                    <CMSImage
-                      image={post.featuredImage}
-                      fallbackAlt={post.content?.header?.header?.text ?? ''}
-                      className={`
-                        object-cover transition-transform duration-500
-                        group-hover:scale-110
-                      `}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                  </div>
-                  <div className="flex grow flex-col p-6">
-                    {post.tags?.[0] && (
-                      <span
-                        className={`
-                        mb-2 text-xs font-bold tracking-wider text-primary-500
-                        uppercase
-                      `}
-                      >
-                        <CMSText text={post.tags[0].tag?.text ?? ''} />
-                      </span>
-                    )}
-                    <h3
-                      className={`
-                      mb-3 text-xl font-bold text-neutral-800 transition-colors
-                      group-hover:text-primary-500 dark:text-white
-                    `}
-                    >
-                      <CMSText text={post.content?.header?.header?.text ?? ''} />
-                    </h3>
-                    {post.content?.header?.subheader?.text && (
-                      <p
-                        className={`
-                        mb-4 line-clamp-3 grow text-sm text-neutral-600 dark:text-tertiary-400
-                      `}
-                      >
-                        <CMSText text={post.content.header.subheader.text} />
-                      </p>
-                    )}
-                    <div
-                      className={`
-                        mt-auto flex items-center justify-between border-t
-                        border-neutral-200 pt-4 text-xs text-neutral-500
-                        dark:border-tertiary-700 dark:text-tertiary-400
-                      `}
-                    >
-                      {post.author?.name && <span>{post.author.name}</span>}
-                      {post.readTime && <span>{post.readTime} min read</span>}
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="py-16 text-center">
-          <span
-            className={`
-            material-symbols-outlined mb-4 block text-6xl text-neutral-300 dark:text-tertiary-600
-          `}
-          >
-            article
-          </span>
-          <p className="text-lg text-neutral-500 dark:text-tertiary-400">No blog posts found</p>
-        </div>
+    <PageClient>
+      {/* Page Header */}
+      {blogPageData.header && (
+        <Header data={blogPageData.header} level={1} direction={direction} className="mx-auto max-w-3xl text-center" />
       )}
-    </div>
+
+      {featuredBlogPosts?.length && featuredBlogPosts.length > 0 && (
+        <>
+          {/* Featured Posts Hero Carousel - Desktop */}
+          <Carousel variant="hero" direction={direction} className="animate-fade-in-up hidden md:flex md:flex-col">
+            {featuredBlogPosts.map(post => (
+              <BlogCard key={post.documentId} post={post} size="xl" layout="ltr" {...featuredBlogCard} />
+            ))}
+          </Carousel>
+
+          {/* Featured Posts Hero Carousel - Mobile */}
+          <Carousel variant="hero" direction={direction} className="animate-fade-in-up flex flex-col md:hidden">
+            {featuredBlogPosts.map(post => (
+              <BlogCard key={`mobile-${post.documentId}`} post={post} size="md" layout="ttb" {...featuredBlogCard} />
+            ))}
+          </Carousel>
+        </>
+      )}
+
+      {/* Tag Sections */}
+      {tagFilters?.map(tagFilter => {
+        const tagName = tagFilter.tag?.text
+        if (!tagName) return null
+
+        // Filter posts by tag
+        const filteredPosts = posts.filter(post => post.tags?.some(TAG => TAG.tag?.text === tagName))
+
+        if (filteredPosts.length === 0) return null
+
+        // Limit posts per section
+        const sectionPosts = filteredPosts.slice(0, itemsPerPage)
+
+        // Split into top/grid
+        // Data slicing
+        // Mobile: 1 top post, rest in grid
+        // Desktop: 2 top posts, rest in grid
+        const firstPost = sectionPosts[0]
+        const secondPost = sectionPosts[1]
+        const remainingPosts = sectionPosts.slice(2)
+
+        return (
+          <section key={tagFilter.documentId} className="flex flex-col gap-6" dir={isRTL ? 'rtl' : 'ltr'}>
+            {/* Section Header */}
+            <Header
+              data={{
+                alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+                promoteHeaderIcon: false,
+                header: {
+                  text: tagName,
+                  iconPosition: IconPositionEnum.AFTER_TEXT,
+                  ariaDescription: tagName,
+                },
+              }}
+              level={3}
+              direction={direction}
+            />
+
+            {/* Top Posts Grid */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {/* First Post - Always visible */}
+              {firstPost && <BlogCard post={firstPost} {...mdBlogCard} />}
+
+              {/* Second Post - Hidden on mobile, visible on desktop */}
+              {secondPost && <BlogCard post={secondPost} className="hidden md:flex" {...mdBlogCard} />}
+            </div>
+
+            {/* Remaining Posts Adaptive Grid */}
+            {(secondPost ?? remainingPosts.length > 0) && (
+              <>
+                {/* Mobile/Tablet: SM variant (horizontal cards) */}
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:hidden">
+                  {/* Second Post - Visible on mobile only */}
+                  {secondPost && <BlogCard post={secondPost} className="md:hidden" {...smBlogCard} />}
+
+                  {/* Remaining Posts - Visible on mobile only */}
+                  {remainingPosts.map(post => (
+                    <BlogCard key={post.documentId} post={post} {...smBlogCard} />
+                  ))}
+                </div>
+
+                {/* Desktop: Full variant (vertical cards) - max 4 cols, fills width if fewer */}
+                {remainingPosts.length > 0 && (
+                  <div
+                    className="hidden gap-6 lg:grid"
+                    style={{
+                      gridTemplateColumns: `repeat(${Math.min(remainingPosts.length, 4).toString()}, 1fr)`,
+                    }}
+                  >
+                    {remainingPosts.map(post => (
+                      <BlogCard key={post.documentId} post={post} {...mdBlogCard} />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* View All Button */}
+            {pagination.nextButton.label && (
+              <ButtonLink
+                data={{
+                  url: `/blog/tag/${encodeURIComponent(tagName)}`,
+                  openInNewTab: pagination.nextButton.openInNewTab,
+                  label: {
+                    iconPosition: pagination.nextButton.label.iconPosition,
+                    text: `${pagination.nextButton.label.text} ${tagName}`,
+                    ariaDescription: pagination.nextButton.label.ariaDescription,
+                    ...(pagination.nextButton.label.icon ? { icon: pagination.nextButton.label.icon } : {}),
+                    ...(pagination.nextButton.label.id ? { id: pagination.nextButton.label.id } : {}),
+                  },
+                  ...(pagination.nextButton.id ? { id: pagination.nextButton.id } : {}),
+                }}
+                direction={direction}
+                variant="link-1"
+                iconSize="sm"
+                className="self-end"
+              />
+            )}
+          </section>
+        )
+      })}
+    </PageClient>
   )
 }

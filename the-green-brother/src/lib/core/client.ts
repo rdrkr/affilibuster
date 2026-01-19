@@ -270,15 +270,73 @@ export async function apiRequest<T extends ApiResponse>(
 }
 
 /**
+ * Helper to recursively flatten objects into Strapi bracket notation
+ * e.g. { pagination: { page: 1, pageSize: 10 } }
+ * becomes. { 'pagination[page]': 1, 'pagination[pageSize]': 10 }
+ * @param obj - The object to flatten
+ * @param prefix - The prefix for the keys
+ * @returns Flattened object with bracket notation keys
+ */
+function flattenQueryObject(
+  obj: Record<string, unknown>,
+  prefix: string
+): Record<string, string | number | boolean> {
+  const flattened: Record<string, string | number | boolean> = {}
+
+  Object.keys(obj).forEach(key => {
+    const value = obj[key]
+    const newKey = `${prefix}[${key}]`
+
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      Object.assign(flattened, flattenQueryObject(value as Record<string, unknown>, newKey))
+    } else if (value !== undefined && value !== null) {
+      flattened[newKey] = value as string | number | boolean
+    }
+  })
+
+  return flattened
+}
+
+/**
  * Helper function to create API request objects with explicit URL
  * @param url - The endpoint URL (e.g., '/homepage')
  * @param data - Request data without the URL property
  * @returns Complete request object with URL
  */
 export function createApiRequest<T extends ApiRequest>(url: string, data: Omit<T, 'url'>): T {
-  // Type assertion is safe - we're adding the required 'url' property to create a complete T
+  // Check for nested objects (filters, pagination, sort) and flatten them if present
+  // We need to type cast because ApiRequest data types have query typed as basic objects
+  const requestData = { ...data } as { query?: Record<string, unknown> }
 
-  return { ...data, url } as T
+  if (requestData.query) {
+    const keysToFlatten = ['filters', 'pagination', 'sort']
+    const flattenedParams: Record<string, string | number | boolean> = {}
+    const query = requestData.query
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { filters, pagination, sort, ...restQuery } = query
+
+    keysToFlatten.forEach(key => {
+      const value = query[key]
+      if (
+        value &&
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        Object.keys(value).length > 0
+      ) {
+        Object.assign(flattenedParams, flattenQueryObject(value as Record<string, unknown>, key))
+      }
+    })
+
+    if (Object.keys(flattenedParams).length > 0) {
+      requestData.query = {
+        ...restQuery,
+        ...flattenedParams,
+      }
+    }
+  }
+
+  // Type assertion is safe - we're adding the required 'url' property to create a complete T
+  return { ...requestData, url } as unknown as T
 }
 
 /**

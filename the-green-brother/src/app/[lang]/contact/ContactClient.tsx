@@ -2,6 +2,7 @@
 
 'use client'
 
+import { PageClient } from '@/components/layout'
 import type { ApiContactUsContactUsDocument } from '@/lib/generated/types.gen'
 
 interface ContactClientProps {
@@ -18,7 +19,7 @@ interface ContactClientProps {
  */
 export default function ContactClient({ contactData }: ContactClientProps) {
   return (
-    <div className="py-8">
+    <PageClient className="py-8">
       <div className="mx-auto max-w-4xl">
         <div className="mb-12 text-center">
           <h1 className="mb-4 text-4xl font-bold text-neutral-800 dark:text-white">
@@ -34,6 +35,6 @@ export default function ContactClient({ contactData }: ContactClientProps) {
           <p className="text-center text-neutral-500 dark:text-tertiary-400">Contact form with CMS labels</p>
         </div>
       </div>
-    </div>
+    </PageClient>
   )
 }

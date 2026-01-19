@@ -178,7 +178,6 @@ describe('ButtonAction', () => {
       <ButtonAction
         direction={DirectionEnum.LTR}
         data={mockButtonData}
-        // eslint-disable-next-line better-tailwindcss/no-unknown-classes
         className="custom-class"
         onClick={mockOnClick}
       />

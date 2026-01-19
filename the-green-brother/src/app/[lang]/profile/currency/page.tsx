@@ -2,7 +2,7 @@
 
 'use client'
 
-import Image from 'next/image'
+import NextImage from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -81,7 +81,7 @@ const Currency = () => {
               }}
             >
               <div className="flex items-center gap-4">
-                <Image
+                <NextImage
                   src={curr.flag}
                   alt={curr.name}
                   width={40}

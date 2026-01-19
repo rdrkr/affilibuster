@@ -9,7 +9,6 @@ import { render, screen } from '@testing-library/react'
 import { HomeSections } from '@/components/homepage/HomeSections'
 import {
   AlignmentEnum,
-  DirectionEnum,
   IconPositionEnum,
   VariantEnum,
   type ApiBlogPostBlogPostDocument,
@@ -59,6 +58,27 @@ jest.mock('@/components/elements', () => ({
   TextBlock: function MockTextBlock({ data }: { data: { id: number } }) {
     return <div data-testid="text-block" data-id={data.id} />
   },
+}))
+
+jest.mock('@/components/sections/TeamSection', () => ({
+  TeamSection: function MockTeamSection({ data }: { data: { id: number } }) {
+    return <div data-testid="team-section" data-id={data.id} />
+  },
+}))
+
+// Mock HomeSections component
+jest.mock('@/components/homepage/HomeSections', () => {
+  const originalModule = jest.requireActual('@/components/homepage/HomeSections')
+  return {
+    ...originalModule,
+  }
+})
+
+// Mock LayoutProvider
+jest.mock('@/components/providers/LayoutProvider', () => ({
+  useLayoutContext: jest.fn(() => ({
+    direction: 'ltr',
+  })),
 }))
 
 describe('HomeSections', () => {
@@ -173,15 +193,45 @@ describe('HomeSections', () => {
   const mockCategories: ApiProductCategoryProductCategoryDocument[] = []
   const mockBlogPosts: ApiBlogPostBlogPostDocument[] = []
 
+  const mockLabels = {
+    readTimeMinutesLabel: {
+      text: 'min read',
+      iconPosition: IconPositionEnum.AFTER_TEXT,
+      ariaDescription: 'Read time',
+      id: 1,
+    },
+    readArticleLabel: {
+      text: 'Read Article',
+      iconPosition: IconPositionEnum.AFTER_TEXT,
+      ariaDescription: 'Read full article',
+      id: 2,
+    },
+  }
+
+  const defaultContributor = {
+    name: 'Default Author',
+    slug: 'default-author',
+    bio: 'Bio',
+    publishedAt: '2025-01-01',
+    id: 999,
+    documentId: 'default-author-doc',
+  }
+
+  const defaultProps = {
+    ...mockLabels,
+    defaultContributor,
+  }
+
   it('should render hero section', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[0] ? [mockSections[0]] : []
     render(
       <HomeSections
-        direction={DirectionEnum.LTR}
         sections={sections}
         products={mockProducts}
         categories={mockCategories}
         blogPosts={mockBlogPosts}
+        contributors={[]}
+        {...defaultProps}
       />
     )
 
@@ -194,11 +244,12 @@ describe('HomeSections', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[1] ? [mockSections[1]] : []
     render(
       <HomeSections
-        direction={DirectionEnum.LTR}
         sections={sections}
         products={mockProducts}
         categories={mockCategories}
         blogPosts={mockBlogPosts}
+        contributors={[]}
+        {...defaultProps}
       />
     )
 
@@ -211,11 +262,12 @@ describe('HomeSections', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[2] ? [mockSections[2]] : []
     render(
       <HomeSections
-        direction={DirectionEnum.LTR}
         sections={sections}
         products={mockProducts}
         categories={mockCategories}
         blogPosts={mockBlogPosts}
+        contributors={[]}
+        {...defaultProps}
       />
     )
 
@@ -256,11 +308,12 @@ describe('HomeSections', () => {
 
     render(
       <HomeSections
-        direction={DirectionEnum.LTR}
         sections={sectionWithCategories}
         products={mockProducts}
         categories={mockCategories}
         blogPosts={mockBlogPosts}
+        contributors={[]}
+        {...defaultProps}
       />
     )
 
@@ -273,11 +326,12 @@ describe('HomeSections', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[3] ? [mockSections[3]] : []
     render(
       <HomeSections
-        direction={DirectionEnum.LTR}
         sections={sections}
         products={mockProducts}
         categories={mockCategories}
         blogPosts={mockBlogPosts}
+        contributors={[]}
+        {...defaultProps}
       />
     )
 
@@ -290,11 +344,12 @@ describe('HomeSections', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[4] ? [mockSections[4]] : []
     render(
       <HomeSections
-        direction={DirectionEnum.LTR}
         sections={sections}
         products={mockProducts}
         categories={mockCategories}
         blogPosts={mockBlogPosts}
+        contributors={[]}
+        {...defaultProps}
       />
     )
 
@@ -307,11 +362,12 @@ describe('HomeSections', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[5] ? [mockSections[5]] : []
     render(
       <HomeSections
-        direction={DirectionEnum.LTR}
         sections={sections}
         products={mockProducts}
         categories={mockCategories}
         blogPosts={mockBlogPosts}
+        contributors={[]}
+        {...defaultProps}
       />
     )
 
@@ -323,11 +379,12 @@ describe('HomeSections', () => {
   it('should render all sections in order', () => {
     render(
       <HomeSections
-        direction={DirectionEnum.LTR}
         sections={mockSections}
         products={mockProducts}
         categories={mockCategories}
         blogPosts={mockBlogPosts}
+        contributors={[]}
+        {...defaultProps}
       />
     )
 
@@ -342,11 +399,12 @@ describe('HomeSections', () => {
   it('should render empty fragment when no sections', () => {
     const { container } = render(
       <HomeSections
-        direction={DirectionEnum.LTR}
         sections={[]}
         products={mockProducts}
         categories={mockCategories}
         blogPosts={mockBlogPosts}
+        contributors={[]}
+        {...defaultProps}
       />
     )
 
@@ -358,11 +416,12 @@ describe('HomeSections', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[0] ? [mockSections[0]] : []
     render(
       <HomeSections
-        direction={DirectionEnum.LTR}
         sections={sections}
         products={mockProducts}
         categories={mockCategories}
         blogPosts={mockBlogPosts}
+        contributors={[]}
+        {...defaultProps}
       />
     )
 
@@ -401,11 +460,12 @@ describe('HomeSections', () => {
 
     const { container } = render(
       <HomeSections
-        direction={DirectionEnum.LTR}
         sections={sectionsWithUnknown}
         products={mockProducts}
         categories={mockCategories}
         blogPosts={mockBlogPosts}
+        contributors={[]}
+        {...defaultProps}
       />
     )
 
@@ -434,16 +494,51 @@ describe('HomeSections', () => {
 
     render(
       <HomeSections
-        direction={DirectionEnum.LTR}
         sections={sectionsWithTextBlock}
         products={mockProducts}
         categories={mockCategories}
         blogPosts={mockBlogPosts}
+        contributors={[]}
+        {...defaultProps}
       />
     )
 
     const textBlock = screen.getByTestId('text-block')
     expect(textBlock).toBeInTheDocument()
     expect(textBlock).toHaveAttribute('data-id', '7')
+  })
+
+  it('should render team section', () => {
+    const sectionsWithTeam: ApiHomepageHomepageDocument['sections'] = [
+      {
+        __component: 'sections.team-grid',
+        id: 8,
+        header: {
+          alignment: AlignmentEnum.CENTER,
+          promoteHeaderIcon: false,
+          header: {
+            text: 'Team',
+            ariaDescription: 'Team section',
+            iconPosition: IconPositionEnum.BEFORE_TEXT,
+            icon: 'groups',
+          },
+        },
+      },
+    ]
+
+    render(
+      <HomeSections
+        sections={sectionsWithTeam}
+        products={mockProducts}
+        categories={mockCategories}
+        blogPosts={mockBlogPosts}
+        contributors={[]}
+        {...defaultProps}
+      />
+    )
+
+    const teamSection = screen.getByTestId('team-section')
+    expect(teamSection).toBeInTheDocument()
+    expect(teamSection).toHaveAttribute('data-id', '8')
   })
 })

@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "contributor_roles",
+  "info": {
+    "singularName": "contributor-role",
+    "pluralName": "contributor-roles",
+    "displayName": "Role"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "roleId": {
+      "type": "uid",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "targetField": "name",
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "contributors": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::contributor.contributor",
+      "mappedBy": "roles"
+    }
+  }
+}

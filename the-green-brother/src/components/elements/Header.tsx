@@ -11,13 +11,18 @@ import { AlignmentEnum, DirectionEnum, type ElementsHeaderEntry } from '@/lib/ge
 import { Label } from './Label'
 
 /**
+ * Header level type
+ */
+export type HeaderLevel = 1 | 2 | 3 | 4 | 5 | 6
+
+/**
  * Props for the Header component
  */
 export interface HeaderProps {
   /** Header data from CMS */
   data: ElementsHeaderEntry | undefined
   /** Heading level for the title (default: 2) */
-  level?: 1 | 2 | 3 | 4 | 5 | 6
+  level?: HeaderLevel
   /** Icon size for header (default: lg) */
   headerIconSize?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl'
   /** Icon size for subheader (default: md) */
@@ -26,8 +31,10 @@ export interface HeaderProps {
   className?: string
   /** Additional CSS classes for the header text */
   headerClassName?: string
-  /** Additional CSS classes for the subheader text */
+  /** Additional CSS classes for the subheader container (Label wrapper) */
   subheaderClassName?: string
+  /** Additional CSS classes for the subheader text element (inside Label) */
+  subheaderTextClassName?: string
   /** Language direction for alignment (used when alignment is 'language-direction') */
   direction: DirectionEnum
   /** Controls visibility of entire header - when false, header is hidden from layout */
@@ -59,7 +66,8 @@ function getAlignmentClass(alignment: AlignmentEnum, direction: DirectionEnum): 
  * @param props.subheaderIconSize - Icon size for subheader
  * @param props.className - Container CSS classes
  * @param props.headerClassName - Header text CSS classes
- * @param props.subheaderClassName - Subheader text CSS classes
+ * @param props.subheaderClassName - Subheader container CSS classes
+ * @param props.subheaderTextClassName - Subheader text element CSS classes (for text truncation, etc.)
  * @param props.direction - Language direction for alignment
  * @param props.visible - Controls entire header visibility (false = hidden from layout)
  * @returns Header component or null if no data or not visible
@@ -72,6 +80,7 @@ export function Header({
   className = '',
   headerClassName = '',
   subheaderClassName = '',
+  subheaderTextClassName = '',
   direction,
   visible,
 }: HeaderProps) {
@@ -87,14 +96,25 @@ export function Header({
 
   // Map defaults for levels if no explicit size class is provided in headerClassName
   const DEFAULT_LEVEL_CLASSES: Record<number, string> = {
-    1: 'text-4xl',
-    2: 'text-3xl',
-    3: 'text-2xl',
+    1: 'text-5xl lg:text-7xl md:text-6xl leading-tight tracking-tight',
+    2: 'text-4xl',
+    3: 'text-3xl',
     4: 'text-xl',
     5: 'text-lg',
-    6: 'text-base',
+    6: 'text-base lg:text-sm md:text-lg',
   }
   const defaultSizeClass = DEFAULT_LEVEL_CLASSES[level] ?? 'text-2xl'
+
+  // Map defaults for subheader based on level
+  const DEFAULT_SUBHEADER_CLASSES: Record<number, string> = {
+    1: 'mt-8 text-lg sm:text-xl md:text-xl text-neutral-600 dark:text-white',
+    2: '',
+    3: '',
+    4: '',
+    5: '',
+    6: '',
+  }
+  const defaultSubheaderClass = DEFAULT_SUBHEADER_CLASSES[level] ?? ''
 
   // When promoted, render icon separate from text so subheader aligns with header text
   const isPromoted = promoteHeaderIcon ?? false
@@ -102,12 +122,11 @@ export function Header({
   if (isPromoted && header?.icon) {
     const isRTL = direction === DirectionEnum.RTL
     return (
-      <div className={`${alignmentClass} ${className}`}>
+      <div className={`${alignmentClass} ${className}`} dir={isRTL ? 'rtl' : 'ltr'}>
         <div
           className={`
             flex items-start gap-4
             ${alignment === AlignmentEnum.CENTER ? 'justify-center' : ''}
-            ${isRTL ? 'flex-row-reverse' : ''}
           `}
         >
           <Label
@@ -126,7 +145,7 @@ export function Header({
               iconSize={headerIconSize}
               hideIcon
               className={`
-                font-bold
+                font-bold capitalize
                 ${direction === DirectionEnum.RTL ? 'text-right' : 'text-left'}
                 ${defaultSizeClass}
                 ${headerClassName}
@@ -141,9 +160,10 @@ export function Header({
                 className={`
                   mt-1
                   ${direction === DirectionEnum.RTL ? 'text-right' : 'text-left'}
-                  text-neutral-600 dark:text-text-secondary-dark
+                  ${defaultSubheaderClass || 'text-neutral-600 dark:text-text-secondary-dark'}
                   ${subheaderClassName}
                 `}
+                textClassName={subheaderTextClassName}
                 direction={direction}
               />
             )}
@@ -171,7 +191,8 @@ export function Header({
           data={subheader}
           as="p"
           iconSize={subheaderIconSize}
-          className={`mt-2 ${alignmentClass} text-neutral-600 dark:text-text-secondary-dark ${subheaderClassName}`}
+          className={`mt-2 ${alignmentClass} ${defaultSubheaderClass || 'text-neutral-600 dark:text-text-secondary-dark'} ${subheaderClassName}`}
+          textClassName={subheaderTextClassName}
           direction={direction}
         />
       )}

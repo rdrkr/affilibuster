@@ -10,14 +10,24 @@ jest.mock('@/lib/client', () => ({
   getBlogPosts: jest.fn(),
 }))
 
+jest.mock('@/lib/languages/api', () => ({
+  getLanguages: jest.fn(),
+}))
+
 // Mock the BlogClient component
 jest.mock('@/app/[lang]/blog/BlogClient', () => ({
   __esModule: true,
-  default: function MockBlogClient(props: { blogPageData: unknown; posts: unknown[]; lang: CodeEnum }) {
+  default: function MockBlogClient(props: {
+    blogPageData: unknown
+    posts: unknown[]
+    lang: CodeEnum
+    direction: DirectionEnum
+  }) {
     return (
       <div
         data-testid="blog-client"
         data-lang={props.lang}
+        data-direction={props.direction}
         data-post-count={Array.isArray(props.posts) ? props.posts.length : 0}
       />
     )
@@ -26,15 +36,21 @@ jest.mock('@/app/[lang]/blog/BlogClient', () => ({
 
 import BlogPage from '@/app/[lang]/blog/page'
 import { getBlog, getBlogPosts } from '@/lib/client'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
+import { getLanguages } from '@/lib/languages/api'
 import { render, screen } from '@testing-library/react'
 
 const mockGetBlog = getBlog as jest.MockedFunction<typeof getBlog>
 const mockGetBlogPosts = getBlogPosts as jest.MockedFunction<typeof getBlogPosts>
+const mockGetLanguages = getLanguages as jest.MockedFunction<typeof getLanguages>
 
 describe('BlogPage', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockGetLanguages.mockResolvedValue([
+      { code: CodeEnum.EN, direction: DirectionEnum.LTR },
+      { code: CodeEnum.IT, direction: DirectionEnum.LTR },
+    ] as unknown as Awaited<ReturnType<typeof getLanguages>>)
   })
 
   it('should fetch blog data and pass to BlogClient', async () => {
@@ -64,15 +80,5 @@ describe('BlogPage', () => {
     render(Component)
 
     expect(screen.getByTestId('blog-client').getAttribute('data-post-count')).toBe('0')
-  })
-
-  it('should pass correct language to BlogClient', async () => {
-    mockGetBlog.mockResolvedValue({ header: {} } as Awaited<ReturnType<typeof getBlog>>)
-    mockGetBlogPosts.mockResolvedValue({ data: [], meta: {} } as Awaited<ReturnType<typeof getBlogPosts>>)
-
-    const Component = await BlogPage({ params: Promise.resolve({ lang: CodeEnum.IT }) })
-    render(Component)
-
-    expect(screen.getByTestId('blog-client').getAttribute('data-lang')).toBe(CodeEnum.IT)
   })
 })

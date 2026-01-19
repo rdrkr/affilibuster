@@ -8,7 +8,6 @@ exclude: |
     \.next/|
     \.pytest_cache/|
     \.venv/|
-    \.specify/|
     __pycache__/|
     backend/htmlcov/|
     backend/src/affilibuster_backend/domain/entities/generated/|

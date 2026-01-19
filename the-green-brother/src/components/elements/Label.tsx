@@ -9,8 +9,9 @@
  */
 
 import { DirectionEnum, IconPositionEnum, type ElementsLabelEntry } from '@/lib/generated/types.gen'
-import { CMSIcon } from './CMSIcon'
-import { CMSText } from './CMSText'
+import { IconSize } from './common'
+import { Icon } from './Icon'
+import { Text } from './Text'
 
 /**
  * Props for the Label component
@@ -23,7 +24,7 @@ export interface LabelProps {
   /** HTML tag to use for the text (default: span) */
   as?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
   /** Icon size (default: md) */
-  iconSize?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl'
+  iconSize?: IconSize
   /** Hide the icon (default: false) */
   hideIcon?: boolean
   /** Promote icon with circular background (default: false) */
@@ -46,7 +47,7 @@ export interface LabelProps {
 
 /**
  * Renders a label with optional icon and text.
- * Composes CMSIcon and CMSText primitives.
+ * Composes Icon and Text primitives.
  * Handles RTL/LTR layout: in RTL, 'before_text' means RIGHT side, 'after_text' means LEFT side.
  * @param props - Component props with CMS label data
  * @param props.data - Label data from CMS
@@ -87,7 +88,7 @@ export function Label({
 
   const iconElement =
     icon && !hideIcon ? (
-      <CMSIcon
+      <Icon
         icon={icon}
         size={iconSize}
         className={iconClassName}
@@ -108,15 +109,15 @@ export function Label({
   // Animated text wrapper - only used when showText is defined (controlled mode)
   const textElement =
     showText !== undefined ? (
-      <span
-        className={`
+      <Text
+        text={text}
+        as="span"
+        className={`whitespace-nowrap
           ${showText ? 'max-w-96 translate-x-0 opacity-100' : 'max-w-0 -translate-x-2 opacity-0'}
-        `}
-      >
-        <CMSText text={text} className={`whitespace-nowrap ${textClassName}`} />
-      </span>
+          ${textClassName}`}
+      />
     ) : (
-      <CMSText text={text} className={textClassName} />
+      <Text text={text} className={textClassName} />
     )
 
   return (

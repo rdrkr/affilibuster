@@ -8,25 +8,30 @@
  * Supports horizontal layout markers for grouping sections in rows.
  */
 
+'use client'
+
 import type { ReactNode } from 'react'
 
 import { NewsletterSignupCTA } from '@/components/call-to-actions'
 import { TextBlock } from '@/components/elements'
 import { DynamicZone } from '@/components/layout'
+import { useLayoutContext } from '@/components/providers/LayoutProvider'
 import {
   BlogTeaserSection,
   BrandFeaturesSection,
   FeaturedProductsSection,
   HeroSection,
   ProductCategoriesSection,
+  TeamSection,
 } from '@/components/sections'
 import type {
   ApiBlogPostBlogPostDocument,
+  ApiContributorContributorDocument,
   ApiHomepageHomepageDocument,
   ApiProductCategoryProductCategoryDocument,
   ApiProductProductDocument,
+  ElementsLabelEntry,
 } from '@/lib/generated/types.gen'
-import { DirectionEnum } from '@/lib/generated/types.gen'
 
 /**
  * Union type for all section types with discriminators
@@ -45,32 +50,38 @@ export interface HomeSectionsProps {
   categories: ApiProductCategoryProductCategoryDocument[]
   /** Blog posts for blog teaser sections */
   blogPosts: ApiBlogPostBlogPostDocument[]
-  /** Language direction for RTL support */
-  direction: DirectionEnum
+  /** Contributors for team section */
+  contributors: ApiContributorContributorDocument[]
   /** Feature flag: Enable user profile features (login/signup, favorites) */
   enableUserProfile?: boolean
+  /** Read time label */
+  readTimeMinutesLabel: ElementsLabelEntry
+  /** Read article label */
+  readArticleLabel: ElementsLabelEntry
+  /** Default contributor */
+  defaultContributor: ApiContributorContributorDocument
 }
 
 /**
  * Renders homepage sections based on their component type.
  * Uses DynamicZone to support horizontal layout markers.
  * @param props - Component props with sections and related data
- * @param props.sections - Homepage sections array from CMS
- * @param props.products - Products for featured products sections
- * @param props.categories - Categories for category grid sections
- * @param props.blogPosts - Blog posts for blog teaser sections
- * @param props.direction - Language direction for RTL support
- * @param props.enableUserProfile - Feature flag: Enable user profile features (login/signup, favorites)
  * @returns Rendered homepage sections with layout support
  */
-export function HomeSections({
-  sections,
-  products,
-  categories,
-  blogPosts,
-  direction,
-  enableUserProfile = false,
-}: HomeSectionsProps) {
+export function HomeSections(props: HomeSectionsProps) {
+  const {
+    sections,
+    products,
+    categories,
+    blogPosts,
+    contributors,
+    enableUserProfile = false,
+    readTimeMinutesLabel,
+    readArticleLabel,
+    defaultContributor,
+  } = props
+  const { direction } = useLayoutContext()
+
   /**
    * Render a single section based on its component type
    * @param section - Section with __component discriminator
@@ -107,7 +118,20 @@ export function HomeSections({
         return <BrandFeaturesSection key={section.id} data={section} direction={direction} />
 
       case 'sections.blog-teaser':
-        return <BlogTeaserSection key={section.id} data={section} blogPosts={blogPosts} direction={direction} />
+        return (
+          <BlogTeaserSection
+            key={section.id}
+            data={section}
+            blogPosts={blogPosts}
+            direction={direction}
+            readTimeMinutesLabel={readTimeMinutesLabel}
+            readArticleLabel={readArticleLabel}
+            defaultContributor={defaultContributor}
+          />
+        )
+
+      case 'sections.team-grid':
+        return <TeamSection key={section.id} data={section} contributors={contributors} direction={direction} />
 
       case 'call-to-actions.newsletter-signup-cta':
         return <NewsletterSignupCTA key={section.id} data={section} direction={direction} />
@@ -122,14 +146,7 @@ export function HomeSections({
   }
 
   return (
-    <DynamicZone
-      sections={sections}
-      renderSection={renderSection}
-      direction={direction}
-      className="space-y-8"
-      verticalAlignment="center"
-      horizontalGroupSpacing="-mt-26 -mb-12"
-    />
+    <DynamicZone sections={sections} renderSection={renderSection} direction={direction} verticalAlignment="center" />
   )
 }
 

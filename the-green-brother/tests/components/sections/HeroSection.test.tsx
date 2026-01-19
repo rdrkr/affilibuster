@@ -13,24 +13,23 @@ import { AlignmentEnum, DirectionEnum, IconPositionEnum, VariantEnum } from '@/l
 jest.mock('next/image', () => ({
   __esModule: true,
   default: function MockImage(props: { src: string; alt: string; className?: string; fill?: boolean }) {
-    // eslint-disable-next-line @next/next/no-img-element
     return <img src={props.src} alt={props.alt} className={props.className} data-fill={props.fill} />
   },
 }))
 
 // Mock the CMS element components
 jest.mock('@/components/elements', () => ({
-  CMSIcon: function MockCMSIcon({ icon, size, className }: { icon: string; size?: string; className?: string }) {
+  Icon: function MockIcon({ icon, size, className }: { icon: string; size?: string; className?: string }) {
     return (
       <span data-testid="mock-icon" data-icon={icon} data-size={size} className={className}>
         {icon}
       </span>
     )
   },
-  CMSText: function MockCMSText({ text }: { text?: string }) {
+  Text: function MockText({ text }: { text?: string }) {
     return <>{text}</>
   },
-  CMSImage: function MockCMSImage({
+  Image: function MockImage({
     image,
     fallbackAlt,
   }: {
@@ -44,7 +43,7 @@ jest.mock('@/components/elements', () => ({
       return image.url.startsWith('http') ? image.url : `https://localhost:1337${image.url}`
     }
     const alt = typeof image === 'object' && image.alternativeText ? image.alternativeText : (fallbackAlt ?? '')
-    // eslint-disable-next-line @next/next/no-img-element
+
     return <img data-testid="mock-image" src={getImageUrl()} alt={alt} />
   },
   Header: function MockHeader({

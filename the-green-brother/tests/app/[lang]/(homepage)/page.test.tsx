@@ -10,11 +10,8 @@ jest.mock('@/lib/client', () => ({
   getProducts: jest.fn(),
   getProductCategories: jest.fn(),
   getBlogPosts: jest.fn(),
-}))
-
-// Mock the languages API
-jest.mock('@/lib/languages/api', () => ({
-  getLanguages: jest.fn(),
+  getContributors: jest.fn(),
+  getBlog: jest.fn(),
 }))
 
 // Mock feature flags to avoid jose ESM import issues
@@ -31,63 +28,28 @@ jest.mock('@/app/[lang]/(homepage)/HomeClient', () => ({
 }))
 
 // Mock HomeSections component
+// Mock HomeSections component
 jest.mock('@/components/homepage', () => ({
   HomeSections: jest.fn(() => <div data-testid="home-sections" />),
 }))
 
 import HomePage from '@/app/[lang]/(homepage)/page'
 import { HomeSections } from '@/components/homepage'
-import { getBlogPosts, getHomepage, getProductCategories, getProducts } from '@/lib/client'
-import { CodeEnum, CurrencyCode, DirectionEnum } from '@/lib/generated/types.gen'
-import { getLanguages } from '@/lib/languages/api'
+import { getBlog, getBlogPosts, getContributors, getHomepage, getProductCategories, getProducts } from '@/lib/client'
+import { CodeEnum } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 
 const mockGetHomepage = getHomepage as jest.MockedFunction<typeof getHomepage>
 const mockGetProducts = getProducts as jest.MockedFunction<typeof getProducts>
 const mockGetProductCategories = getProductCategories as jest.MockedFunction<typeof getProductCategories>
 const mockGetBlogPosts = getBlogPosts as jest.MockedFunction<typeof getBlogPosts>
-const mockGetLanguages = getLanguages as jest.MockedFunction<typeof getLanguages>
+const mockGetContributors = getContributors as jest.MockedFunction<typeof getContributors>
+const mockGetBlog = getBlog as jest.MockedFunction<typeof getBlog>
 const mockHomeSections = HomeSections as unknown as jest.Mock
 
 describe('HomePage', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    // Default languages mock with all required Language properties
-    mockGetLanguages.mockResolvedValue([
-      {
-        code: CodeEnum.EN,
-        direction: DirectionEnum.LTR,
-        flag: '🇺🇸',
-        displayName: 'English',
-        nativeName: 'English',
-        urlPrefix: 'en',
-        defaultCurrency: CurrencyCode.USD,
-        localeCode: 'en-US',
-        isDefault: true,
-      },
-      {
-        code: CodeEnum.IT,
-        direction: DirectionEnum.LTR,
-        flag: '🇮🇹',
-        displayName: 'Italiano',
-        nativeName: 'Italiano',
-        urlPrefix: 'it',
-        defaultCurrency: CurrencyCode.EUR,
-        localeCode: 'it-IT',
-        isDefault: false,
-      },
-      {
-        code: CodeEnum.HE,
-        direction: DirectionEnum.RTL,
-        flag: '🇮🇱',
-        displayName: 'עברית',
-        nativeName: 'עברית',
-        urlPrefix: 'he',
-        defaultCurrency: CurrencyCode.ILS,
-        localeCode: 'he-IL',
-        isDefault: false,
-      },
-    ])
   })
 
   it('should fetch data and pass to HomeSections', async () => {
@@ -95,6 +57,13 @@ describe('HomePage', () => {
     const mockProducts = { data: [{ id: 1 }], meta: {} }
     const mockCategories = { data: [{ id: 1 }], meta: {} }
     const mockBlogPosts = { data: [{ id: 1 }], meta: {} }
+    // getContributors returns just the data array (response.data), not the full response
+    const mockContributorsData = [{ id: 1 }]
+    const mockBlogPage = {
+      defaultContributor: { id: 1, name: 'Default' },
+      readTimeMinutesLabel: { text: 'min' },
+      readArticleLabel: { text: 'Read' },
+    }
 
     mockGetHomepage.mockResolvedValue(mockHomepageData as unknown as Awaited<ReturnType<typeof getHomepage>>)
     mockGetProducts.mockResolvedValue(mockProducts as unknown as Awaited<ReturnType<typeof getProducts>>)
@@ -102,16 +71,20 @@ describe('HomePage', () => {
       mockCategories as unknown as Awaited<ReturnType<typeof getProductCategories>>
     )
     mockGetBlogPosts.mockResolvedValue(mockBlogPosts as unknown as Awaited<ReturnType<typeof getBlogPosts>>)
+    mockGetContributors.mockResolvedValue(
+      mockContributorsData as unknown as Awaited<ReturnType<typeof getContributors>>
+    )
+    mockGetBlog.mockResolvedValue(mockBlogPage as unknown as Awaited<ReturnType<typeof getBlog>>)
 
     const Component = await HomePage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
     render(Component)
 
     expect(mockGetHomepage).toHaveBeenCalledWith(CodeEnum.EN)
     expect(mockGetProducts).toHaveBeenCalledWith({
-      pagination: { page: 1, pageSize: 4 },
+      pagination: { page: 1, pageSize: 100 },
       locale: CodeEnum.EN,
     })
-    expect(mockGetLanguages).toHaveBeenCalled()
+    expect(mockGetContributors).toHaveBeenCalled()
     expect(screen.getByTestId('home-client')).toBeInTheDocument()
     expect(screen.getByTestId('home-sections')).toBeInTheDocument()
     expect(mockHomeSections).toHaveBeenCalledWith(
@@ -120,7 +93,7 @@ describe('HomePage', () => {
         products: mockProducts.data,
         categories: mockCategories.data,
         blogPosts: mockBlogPosts.data,
-        direction: DirectionEnum.LTR,
+        contributors: mockContributorsData,
       }),
       undefined
     )
@@ -131,6 +104,7 @@ describe('HomePage', () => {
     mockGetProducts.mockResolvedValue(null)
     mockGetProductCategories.mockResolvedValue(null)
     mockGetBlogPosts.mockResolvedValue(null)
+    mockGetContributors.mockResolvedValue(null)
 
     const Component = await HomePage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
     render(Component)
@@ -141,6 +115,7 @@ describe('HomePage', () => {
         products: [],
         categories: [],
         blogPosts: [],
+        contributors: [],
       }),
       undefined
     )
@@ -153,7 +128,8 @@ describe('HomePage', () => {
       ReturnType<typeof getProductCategories>
     >)
     mockGetBlogPosts.mockResolvedValue({ data: [] } as unknown as Awaited<ReturnType<typeof getBlogPosts>>)
-    mockGetLanguages.mockResolvedValue([])
+    // getContributors returns just the data array, not {data: [], meta: {}}
+    mockGetContributors.mockResolvedValue([] as unknown as Awaited<ReturnType<typeof getContributors>>)
 
     const result = await HomePage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
 
@@ -167,6 +143,8 @@ describe('HomePage', () => {
       ReturnType<typeof getProductCategories>
     >)
     mockGetBlogPosts.mockResolvedValue({ data: [], meta: {} } as unknown as Awaited<ReturnType<typeof getBlogPosts>>)
+    // getContributors returns just the data array, not {data: [], meta: {}}
+    mockGetContributors.mockResolvedValue([] as unknown as Awaited<ReturnType<typeof getContributors>>)
 
     const Component = await HomePage({ params: Promise.resolve({ lang: CodeEnum.IT }) })
     render(Component)
@@ -174,59 +152,40 @@ describe('HomePage', () => {
     expect(mockGetHomepage).toHaveBeenCalledWith(CodeEnum.IT)
   })
 
-  it('should pass LTR direction for English locale', async () => {
+  it('should fetch contributors with author role filter and pass to HomeSections', async () => {
+    // getContributors returns just the data array (already filtered server-side by roleId=author)
+    const mockAuthors = [
+      { id: 1, name: 'Author 1', roles: [{ roleId: 'author' }] },
+      { id: 2, name: 'Author 2', roles: [{ roleId: 'author' }] },
+    ]
+
     mockGetHomepage.mockResolvedValue({ sections: [] } as unknown as Awaited<ReturnType<typeof getHomepage>>)
-    mockGetProducts.mockResolvedValue({ data: [], meta: {} } as unknown as Awaited<ReturnType<typeof getProducts>>)
-    mockGetProductCategories.mockResolvedValue({ data: [], meta: {} } as unknown as Awaited<
+    mockGetProducts.mockResolvedValue({ data: [] } as unknown as Awaited<ReturnType<typeof getProducts>>)
+    mockGetProductCategories.mockResolvedValue({ data: [] } as unknown as Awaited<
       ReturnType<typeof getProductCategories>
     >)
-    mockGetBlogPosts.mockResolvedValue({ data: [], meta: {} } as unknown as Awaited<ReturnType<typeof getBlogPosts>>)
+    mockGetBlogPosts.mockResolvedValue({ data: [] } as unknown as Awaited<ReturnType<typeof getBlogPosts>>)
+    mockGetContributors.mockResolvedValue(mockAuthors as unknown as Awaited<ReturnType<typeof getContributors>>)
+    mockGetBlog.mockResolvedValue({
+      defaultContributor: { id: 1 },
+      readTimeMinutesLabel: {},
+      readArticleLabel: {},
+    } as unknown as Awaited<ReturnType<typeof getBlog>>)
 
     const Component = await HomePage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
     render(Component)
 
-    expect(mockHomeSections).toHaveBeenCalledWith(
+    // Verify getContributors was called with author role filter
+    expect(mockGetContributors).toHaveBeenCalledWith(
       expect.objectContaining({
-        direction: DirectionEnum.LTR,
-      }),
-      undefined
+        filters: { roles: { roleId: { $ei: 'author' } } },
+      })
     )
-  })
 
-  it('should pass RTL direction for Hebrew locale', async () => {
-    mockGetHomepage.mockResolvedValue({ sections: [] } as unknown as Awaited<ReturnType<typeof getHomepage>>)
-    mockGetProducts.mockResolvedValue({ data: [], meta: {} } as unknown as Awaited<ReturnType<typeof getProducts>>)
-    mockGetProductCategories.mockResolvedValue({ data: [], meta: {} } as unknown as Awaited<
-      ReturnType<typeof getProductCategories>
-    >)
-    mockGetBlogPosts.mockResolvedValue({ data: [], meta: {} } as unknown as Awaited<ReturnType<typeof getBlogPosts>>)
-
-    const Component = await HomePage({ params: Promise.resolve({ lang: CodeEnum.HE }) })
-    render(Component)
-
+    // Verify authors are passed to HomeSections as contributors
     expect(mockHomeSections).toHaveBeenCalledWith(
       expect.objectContaining({
-        direction: DirectionEnum.RTL,
-      }),
-      undefined
-    )
-  })
-
-  it('should default to LTR when languages API returns null', async () => {
-    mockGetLanguages.mockResolvedValue(null)
-    mockGetHomepage.mockResolvedValue({ sections: [] } as unknown as Awaited<ReturnType<typeof getHomepage>>)
-    mockGetProducts.mockResolvedValue({ data: [], meta: {} } as unknown as Awaited<ReturnType<typeof getProducts>>)
-    mockGetProductCategories.mockResolvedValue({ data: [], meta: {} } as unknown as Awaited<
-      ReturnType<typeof getProductCategories>
-    >)
-    mockGetBlogPosts.mockResolvedValue({ data: [], meta: {} } as unknown as Awaited<ReturnType<typeof getBlogPosts>>)
-
-    const Component = await HomePage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
-    render(Component)
-
-    expect(mockHomeSections).toHaveBeenCalledWith(
-      expect.objectContaining({
-        direction: DirectionEnum.LTR,
+        contributors: mockAuthors,
       }),
       undefined
     )

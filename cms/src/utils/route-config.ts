@@ -8,10 +8,26 @@
  * In development, all CRUD operations are enabled for testing.
  */
 
-type RouteAction = 'find' | 'findOne' | 'create' | 'update' | 'delete'
+type RouteAction = 'find' | 'findOne' | 'create' | 'update'
 
 interface RouterConfig {
   only?: RouteAction[]
+}
+
+/**
+ * Route definition for custom endpoints.
+ */
+interface RouteDefinition {
+  method: 'GET' | 'POST' | 'PUT'
+  path: string
+  handler: string
+  config?: {
+    policies?: string[]
+    middlewares?: string[]
+    description?: string
+    tags?: string[]
+    auth?: boolean
+  }
 }
 
 /**
@@ -32,4 +48,22 @@ export function isProduction(): boolean {
  */
 export function getProductionOnlyConfig(actions: RouteAction[]): RouterConfig {
   return isProduction() ? { only: actions } : {}
+}
+
+/**
+ * Create a slug-based route definition.
+ * @param pluralName - The plural name of the content type (e.g., 'products')
+ * @param controllerName - The controller name (e.g., 'product')
+ * @returns Route definition for slug-based lookup
+ */
+export function createSlugRoute(pluralName: string, controllerName: string): RouteDefinition {
+  return {
+    method: 'GET',
+    path: `/${pluralName}/slug/:slug`,
+    handler: `${controllerName}.findOneBySlug`,
+    config: {
+      description: `Find ${controllerName} by slug`,
+      tags: [controllerName],
+    },
+  }
 }

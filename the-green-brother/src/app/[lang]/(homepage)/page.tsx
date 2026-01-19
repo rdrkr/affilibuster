@@ -1,10 +1,9 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 import { HomeSections } from '@/components/homepage'
-import { getBlogPosts, getHomepage, getProductCategories, getProducts } from '@/lib/client'
+import { getBlog, getBlogPosts, getContributors, getHomepage, getProductCategories, getProducts } from '@/lib/client'
 import { userProfileFlag } from '@/lib/feature-flags'
-import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
-import { getLanguages } from '@/lib/languages/api'
+import { CodeEnum } from '@/lib/generated/types.gen'
 import HomeClient from './HomeClient'
 
 /**
@@ -21,29 +20,42 @@ async function HomePage({ params }: { params: Promise<{ lang: CodeEnum }> }) {
   const lang = resolvedParams.lang
 
   // Fetch all homepage data in parallel
-  const [homepageData, productsResponse, categoriesResponse, blogPostsResponse, languages, enableUserProfile] =
-    await Promise.all([
-      getHomepage(lang),
-      getProducts({
-        pagination: { page: 1, pageSize: 4 },
-        locale: lang,
-      }),
-      getProductCategories({
-        locale: lang,
-      }),
-      getBlogPosts({
-        pagination: { page: 1, pageSize: 3 },
-        locale: lang,
-      }),
-      getLanguages(),
-      userProfileFlag(),
-    ])
+  const [
+    homepageData,
+    productsResponse,
+    categoriesResponse,
+    blogPostsResponse,
+    authors,
+    enableUserProfile,
+    blogPageResponse,
+  ] = await Promise.all([
+    getHomepage(lang),
+    getProducts({
+      pagination: { page: 1, pageSize: 100 },
+      locale: lang,
+    }),
+    getProductCategories({
+      locale: lang,
+    }),
+    getBlogPosts({
+      pagination: { page: 1, pageSize: 100 },
+      locale: lang,
+    }),
+    getContributors({
+      locale: lang,
+      filters: {
+        roles: {
+          roleId: {
+            $ei: 'author',
+          },
+        },
+      },
+    }),
+    userProfileFlag(),
+    getBlog(lang),
+  ])
 
-  // Find the current language's direction (default to LTR)
-  const currentLanguage = languages?.find(l => l.code === lang)
-  const direction = currentLanguage?.direction ?? DirectionEnum.LTR
-
-  if (!homepageData) {
+  if (!homepageData || !blogPageResponse?.defaultContributor) {
     return null
   }
 
@@ -55,8 +67,11 @@ async function HomePage({ params }: { params: Promise<{ lang: CodeEnum }> }) {
         products={productsResponse?.data ?? []}
         categories={categoriesResponse?.data ?? []}
         blogPosts={blogPostsResponse?.data ?? []}
-        direction={direction}
+        contributors={authors ?? []}
         enableUserProfile={enableUserProfile}
+        readTimeMinutesLabel={blogPageResponse.readTimeMinutesLabel}
+        readArticleLabel={blogPageResponse.readArticleLabel}
+        defaultContributor={blogPageResponse.defaultContributor}
       />
     </HomeClient>
   )

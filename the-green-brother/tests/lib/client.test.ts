@@ -35,6 +35,6 @@ describe('lib/client barrel exports', () => {
     // Content functions from lib/content
     expect(clientExports.getHomepage).toBeDefined()
     expect(clientExports.getProducts).toBeDefined()
-    expect(clientExports.getProductById).toBeDefined()
+    expect(clientExports.getProductBySlug).toBeDefined()
   })
 })

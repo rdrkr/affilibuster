@@ -219,6 +219,7 @@
     "htmlcov",
     "httpx",
     "initdb",
+    "inversed",
     "isready",
     "Italiano",
     "keyvalue",
@@ -326,5 +327,6 @@
     "affilibuster/.vscode/mcp.json: render": {
       "allowedModels": []
     }
-  }
+  },
+  "workbench.colorTheme": "Gruvbox Dark Medium"
 }

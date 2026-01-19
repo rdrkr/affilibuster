@@ -13,24 +13,26 @@ import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 jest.mock('next/image', () => ({
   __esModule: true,
   default: function MockImage({ src, alt }: { src: string; alt: string }) {
-    // eslint-disable-next-line @next/next/no-img-element
     return <img src={src} alt={alt} data-testid="mock-image" />
   },
 }))
 
 // Mock the CMS element components
 jest.mock('@/components/elements', () => ({
-  CMSIcon: function MockCMSIcon({ icon, size }: { icon?: string; size?: string }) {
+  Icon: function MockIcon({ icon, size }: { icon?: string; size?: string }) {
     return (
       <span data-testid="mock-icon" data-icon={icon} data-size={size}>
         {icon}
       </span>
     )
   },
-  CMSText: function MockCMSText({ text }: { text?: string }) {
-    return <span data-testid="mock-text">{text}</span>
+  Text: function MockText({ text, as: Component = 'span', className }: any) {
+    return (
+      <Component data-testid="mock-text" className={className}>
+        {text}
+      </Component>
+    )
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call
   ButtonAction: (jest.requireActual('react') as any).forwardRef((props: any, ref: any) => {
     const { children, data, onClick, className } = props
     const ariaLabel = props['aria-label'] ?? data?.label?.ariaDescription
@@ -54,7 +56,6 @@ jest.mock('@/components/elements', () => ({
       </button>
     )
   }),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ButtonLink: function MockButtonLink(props: any) {
     const { children, data, className } = props
     const ariaLabel = props['aria-label'] ?? data?.label?.ariaDescription
@@ -131,9 +132,7 @@ describe('SearchMenu', () => {
       this.callback([{ target } as unknown as ResizeObserverEntry], this)
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     unobserve() {}
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     disconnect() {}
   }
 

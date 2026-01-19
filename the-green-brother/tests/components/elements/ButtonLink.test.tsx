@@ -204,7 +204,6 @@ describe('ButtonLink', () => {
   })
 
   it('should apply custom className', () => {
-    // eslint-disable-next-line better-tailwindcss/no-unknown-classes
     render(<ButtonLink direction={DirectionEnum.LTR} data={mockButtonData} className="custom-class" />)
     const link = screen.getByRole('link')
     expect(link.className).toContain('custom-class')

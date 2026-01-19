@@ -59,6 +59,8 @@ export interface ButtonActionProps {
   childrenPosition?: 'start' | 'end'
   /** Animation slide direction (default: 'end-to-start') */
   slideDirection?: 'start-to-end' | 'end-to-start'
+  /** Additional CSS classes for the label text */
+  textClassName?: string
 }
 
 /**
@@ -80,6 +82,7 @@ export interface ButtonActionProps {
  * @param props.isActive - Whether the button is currently active
  * @param props.'aria-expanded' - ARIA expanded state
  * @param props.childrenPosition - Position of children relative to label
+ * @param props.textClassName - Additional CSS classes for the label text
  * @returns Button action component or null if no data or not visible
  */
 export const ButtonAction = forwardRef<HTMLButtonElement, ButtonActionProps>(
@@ -101,6 +104,7 @@ export const ButtonAction = forwardRef<HTMLButtonElement, ButtonActionProps>(
       'aria-expanded': ariaExpanded,
       childrenPosition = 'end',
       slideDirection = 'end-to-start',
+      textClassName,
     },
     ref
   ) => {
@@ -127,6 +131,7 @@ export const ButtonAction = forwardRef<HTMLButtonElement, ButtonActionProps>(
       iconSize,
       showText,
       childrenPosition,
+      textClassName: textClassName ?? '',
     })
 
     if (!content) {

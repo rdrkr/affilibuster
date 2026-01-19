@@ -9,7 +9,9 @@
 
 'use client'
 
-import { type ReactNode, useEffect, useState } from 'react'
+import { type ReactNode } from 'react'
+
+import { PageClient } from '@/components/layout'
 
 /**
  * Props for the HomeClient component
@@ -26,27 +28,5 @@ export interface HomeClientProps {
  * @returns Animated wrapper div
  */
 export default function HomeClient({ children }: HomeClientProps) {
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    // Use requestAnimationFrame to avoid cascading renders
-    const frame = requestAnimationFrame(() => {
-      setIsVisible(true)
-    })
-    return () => {
-      cancelAnimationFrame(frame)
-    }
-  }, [])
-
-  return (
-    <div
-      className={`
-        space-y-16 py-8 transition-opacity duration-1000
-        md:space-y-24
-        ${isVisible ? `opacity-100` : `opacity-0`}
-      `}
-    >
-      {children}
-    </div>
-  )
+  return <PageClient>{children}</PageClient>
 }

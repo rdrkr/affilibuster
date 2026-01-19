@@ -53,6 +53,7 @@ from affilibuster_backend.infrastructure.dependencies import initialize_dependen
 # Import middleware
 from affilibuster_backend.infrastructure.middleware import (
     ErrorHandlingMiddleware,
+    QueryParamsParserMiddleware,
     RequestLoggingMiddleware,
 )
 
@@ -240,6 +241,10 @@ class APIVersionMiddleware(BaseHTTPMiddleware):
 
 
 app.add_middleware(APIVersionMiddleware)
+
+# Add query params parser middleware (bracket notation support)
+# Must be added before request logging so parsed params are available to routes
+app.add_middleware(QueryParamsParserMiddleware)
 
 # Add request logging middleware (T141)
 app.add_middleware(RequestLoggingMiddleware)

@@ -12,11 +12,6 @@
       "component": "elements.header",
       "repeatable": false,
       "required": true
-    },
-    "team_members": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::team-member.team-member"
     }
   }
 }

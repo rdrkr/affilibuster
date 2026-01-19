@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react'
 
-import { CMSIcon } from '@/components/elements'
+import { Icon } from '@/components/elements'
 import { DirectionEnum } from '@/lib/generated/types.gen'
 
 interface BackToTopButtonProps {
@@ -62,7 +62,7 @@ const BackToTopButton = ({ direction = DirectionEnum.LTR }: BackToTopButtonProps
         }
       `}
     >
-      <CMSIcon icon="arrow_upward" size="lg" />
+      <Icon icon="arrow_upward" size="lg" />
     </button>
   )
 }

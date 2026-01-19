@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Affilibuster by Ronen Druker.
+// Copyright (c) 2026 Affilibuster by Ronen Druker.
 
 import { getBlog, getBlogPosts } from '@/lib/client'
 import { CodeEnum } from '@/lib/generated/types.gen'
@@ -17,7 +17,6 @@ export default async function BlogPage({ params }: { params: Promise<{ lang: Cod
   const resolvedParams = await params
   const lang = resolvedParams.lang
 
-  // Fetch blog page data and posts in parallel
   const [blogPageData, postsResponse] = await Promise.all([
     getBlog(lang),
     getBlogPosts({
@@ -26,5 +25,5 @@ export default async function BlogPage({ params }: { params: Promise<{ lang: Cod
     }),
   ])
 
-  return <BlogClient blogPageData={blogPageData} posts={postsResponse?.data ?? []} lang={lang} />
+  return <BlogClient blogPageData={blogPageData} posts={postsResponse?.data ?? []} />
 }

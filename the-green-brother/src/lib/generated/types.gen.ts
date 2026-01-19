@@ -499,6 +499,61 @@ export type ApiAuthPageAuthPageDocument = {
     }>;
 };
 
+export type ElementsLabelEntry = {
+    /**
+     * A string field
+     */
+    icon?: string;
+    iconPosition: IconPositionEnum;
+    /**
+     * A text field
+     */
+    text: string;
+    /**
+     * A string field
+     */
+    ariaDescription: string;
+    /**
+     * Component instance ID
+     */
+    id?: number;
+};
+
+export type ElementsHeaderEntry = {
+    alignment: AlignmentEnum;
+    /**
+     * A boolean field
+     */
+    promoteHeaderIcon: boolean | null;
+    /**
+     * A component field
+     */
+    header?: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    subheader?: ElementsLabelEntry;
+    /**
+     * Component instance ID
+     */
+    id?: number;
+};
+
+export type ElementsTextBlockEntry = {
+    /**
+     * A richtext field
+     */
+    content?: string;
+    /**
+     * A component field
+     */
+    header?: ElementsHeaderEntry;
+    /**
+     * Component instance ID
+     */
+    id?: number;
+};
+
 export type PluginUploadFileDocument = {
     /**
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
@@ -576,62 +631,70 @@ export type PluginUploadFileDocument = {
     related?: unknown;
 };
 
-export type ElementsTextBlockEntry = {
+export type ApiContributorRoleContributorRoleDocument = {
     /**
-     * A richtext field
+     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
-    content?: string;
+    documentId: string;
+    id: string | number;
     /**
-     * A component field
+     * A UID field
      */
-    header?: ElementsHeaderEntry;
-    /**
-     * Component instance ID
-     */
-    id?: number;
-};
-
-export type ElementsLabelEntry = {
+    roleId: string;
     /**
      * A string field
      */
-    icon?: string;
-    iconPosition: IconPositionEnum;
+    name: string;
     /**
-     * A string field
+     * Timestamp when this entry was first created in the CMS.
      */
-    text: string;
+    createdAt?: string;
     /**
-     * A string field
+     * Timestamp when this entry was last modified.
      */
-    ariaDescription: string;
+    updatedAt?: string;
     /**
-     * Component instance ID
+     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
      */
-    id?: number;
+    publishedAt: string;
+    /**
+     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+     */
+    locale?: string;
+    /**
+     * A relational field
+     */
+    contributors?: Array<ApiContributorContributorDocument>;
+    /**
+     * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+     */
+    readonly localizations?: Array<{
+        id: number;
+        /**
+         * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+         */
+        documentId: string;
+        /**
+         * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+         */
+        locale: string;
+        /**
+         * Timestamp when this entry was first created in the CMS.
+         */
+        createdAt?: string;
+        /**
+         * Timestamp when this entry was last modified.
+         */
+        updatedAt?: string;
+        /**
+         * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+         */
+        publishedAt?: string;
+        [key: string]: unknown | number | string | undefined;
+    }>;
 };
 
-export type ElementsHeaderEntry = {
-    alignment: AlignmentEnum;
-    /**
-     * A boolean field
-     */
-    promoteHeaderIcon: boolean | null;
-    /**
-     * A component field
-     */
-    header?: ElementsLabelEntry;
-    /**
-     * A component field
-     */
-    subheader?: ElementsLabelEntry;
-    /**
-     * Component instance ID
-     */
-    id?: number;
-};
-
-export type ApiAuthorAuthorDocument = {
+export type ApiContributorContributorDocument = {
     /**
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
@@ -652,7 +715,7 @@ export type ApiAuthorAuthorDocument = {
     /**
      * RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
      */
-    email: string;
+    email?: string;
     /**
      * A string field
      */
@@ -696,7 +759,94 @@ export type ApiAuthorAuthorDocument = {
     /**
      * A relational field
      */
+    roles?: Array<ApiContributorRoleContributorRoleDocument>;
+    /**
+     * A relational field
+     */
     blogPosts?: Array<ApiBlogPostBlogPostDocument>;
+    /**
+     * A component field
+     */
+    seoMetadata?: ElementsSeoMetadataEntry;
+    /**
+     * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+     */
+    readonly localizations?: Array<{
+        id: number;
+        /**
+         * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+         */
+        documentId: string;
+        /**
+         * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+         */
+        locale: string;
+        /**
+         * Timestamp when this entry was first created in the CMS.
+         */
+        createdAt?: string;
+        /**
+         * Timestamp when this entry was last modified.
+         */
+        updatedAt?: string;
+        /**
+         * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+         */
+        publishedAt?: string;
+        [key: string]: unknown | number | string | undefined;
+    }>;
+};
+
+export type ApiBlogPostBlogPostDocument = {
+    /**
+     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+     */
+    documentId: string;
+    id: string | number;
+    /**
+     * A UID field
+     */
+    slug: string;
+    /**
+     * An integer field
+     */
+    readTimeInMinutes: number;
+    /**
+     * A datetime field
+     */
+    publishedDate: string;
+    /**
+     * Timestamp when this entry was first created in the CMS.
+     */
+    createdAt?: string;
+    /**
+     * Timestamp when this entry was last modified.
+     */
+    updatedAt?: string;
+    /**
+     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+     */
+    publishedAt: string;
+    /**
+     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+     */
+    locale?: string;
+    /**
+     * A component field
+     */
+    content?: ElementsTextBlockEntry;
+    /**
+     * A media field
+     */
+    featuredImage?: PluginUploadFileDocument;
+    /**
+     * A relational field
+     */
+    contributor?: ApiContributorContributorDocument;
+    /**
+     * A relational field
+     */
+    tags?: Array<ApiBlogPostTagBlogPostTagDocument>;
     /**
      * A component field
      */
@@ -764,93 +914,6 @@ export type ApiBlogPostTagBlogPostTagDocument = {
      * A relational field
      */
     posts?: Array<ApiBlogPostBlogPostDocument>;
-    /**
-     * A component field
-     */
-    seoMetadata?: ElementsSeoMetadataEntry;
-    /**
-     * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-     */
-    readonly localizations?: Array<{
-        id: number;
-        /**
-         * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-         */
-        documentId: string;
-        /**
-         * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-         */
-        locale: string;
-        /**
-         * Timestamp when this entry was first created in the CMS.
-         */
-        createdAt?: string;
-        /**
-         * Timestamp when this entry was last modified.
-         */
-        updatedAt?: string;
-        /**
-         * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-         */
-        publishedAt?: string;
-        [key: string]: unknown | number | string | undefined;
-    }>;
-};
-
-export type ApiBlogPostBlogPostDocument = {
-    /**
-     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-     */
-    documentId: string;
-    id: string | number;
-    /**
-     * A UID field
-     */
-    slug: string;
-    /**
-     * A string field
-     */
-    readTime: string;
-    /**
-     * A datetime field
-     */
-    publishedDate: string;
-    /**
-     * Timestamp when this entry was first created in the CMS.
-     */
-    createdAt?: string;
-    /**
-     * Timestamp when this entry was last modified.
-     */
-    updatedAt?: string;
-    /**
-     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-     */
-    publishedAt: string;
-    /**
-     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-     */
-    locale?: string;
-    /**
-     * A component field
-     */
-    content?: ElementsTextBlockEntry;
-    /**
-     * A media field
-     */
-    featuredImage?: PluginUploadFileDocument;
-    /**
-     * A relational field
-     */
-    author?: ApiAuthorAuthorDocument;
-    /**
-     * A relational field
-     */
-    tags?: Array<ApiBlogPostTagBlogPostTagDocument>;
-    /**
-     * A component field
-     */
-    readArticleLabel: ElementsLabelEntry;
     /**
      * A component field
      */
@@ -968,6 +1031,22 @@ export type ApiBlogBlogDocument = {
      * A component field
      */
     pagination: CallToActionsPaginationCtaEntry;
+    /**
+     * A component field
+     */
+    readArticleLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    readTimeMinutesLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    aboutAuthorHeader: ElementsHeaderEntry;
+    /**
+     * A relational field
+     */
+    defaultContributor?: ApiContributorContributorDocument;
     /**
      * A component field
      */
@@ -2328,101 +2407,6 @@ export type ApiProfileProfileDocument = {
     }>;
 };
 
-export type ApiTeamMemberTeamMemberDocument = {
-    /**
-     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-     */
-    documentId: string;
-    id: string | number;
-    /**
-     * A string field
-     */
-    name: string;
-    /**
-     * A UID field
-     */
-    slug: string;
-    /**
-     * A string field
-     */
-    role: string;
-    /**
-     * A richtext field
-     */
-    bio: string;
-    /**
-     * RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
-     */
-    email: string;
-    /**
-     * A string field
-     */
-    twitter?: string;
-    /**
-     * A string field
-     */
-    instagram?: string;
-    /**
-     * A string field
-     */
-    linkedin?: string;
-    /**
-     * A string field
-     */
-    github?: string;
-    /**
-     * Timestamp when this entry was first created in the CMS.
-     */
-    createdAt?: string;
-    /**
-     * Timestamp when this entry was last modified.
-     */
-    updatedAt?: string;
-    /**
-     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-     */
-    publishedAt: string;
-    /**
-     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-     */
-    locale?: string;
-    /**
-     * A media field
-     */
-    profilePicture?: PluginUploadFileDocument;
-    /**
-     * A component field
-     */
-    seoMetadata?: ElementsSeoMetadataEntry;
-    /**
-     * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-     */
-    readonly localizations?: Array<{
-        id: number;
-        /**
-         * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-         */
-        documentId: string;
-        /**
-         * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-         */
-        locale: string;
-        /**
-         * Timestamp when this entry was first created in the CMS.
-         */
-        createdAt?: string;
-        /**
-         * Timestamp when this entry was last modified.
-         */
-        updatedAt?: string;
-        /**
-         * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-         */
-        publishedAt?: string;
-        [key: string]: unknown | number | string | undefined;
-    }>;
-};
-
 export type ApiTermTermDocument = {
     /**
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
@@ -2646,10 +2630,6 @@ export type SectionsTeamGridEntry = {
      * A component field
      */
     header: ElementsHeaderEntry;
-    /**
-     * A relational field
-     */
-    team_members?: Array<ApiTeamMemberTeamMemberDocument>;
 };
 
 /**
@@ -2762,15 +2742,7 @@ export enum ItemsEnum2 {
 }
 
 export enum ItemsEnum3 {
-    NAME = 'name',
-    SLUG = 'slug',
-    BIO = 'bio',
-    EMAIL = 'email',
-    WEBSITE = 'website',
-    TWITTER = 'twitter',
-    LINKEDIN = 'linkedin',
-    GITHUB = 'github',
-    INSTAGRAM = 'instagram',
+    TAG_ID = 'tagId',
     CREATED_AT = 'createdAt',
     UPDATED_AT = 'updatedAt',
     PUBLISHED_AT = 'publishedAt',
@@ -2783,16 +2755,8 @@ export enum AdditionalPropertiesEnum {
 }
 
 export enum ItemsEnum4 {
-    TAG_ID = 'tagId',
-    CREATED_AT = 'createdAt',
-    UPDATED_AT = 'updatedAt',
-    PUBLISHED_AT = 'publishedAt',
-    LOCALE = 'locale'
-}
-
-export enum ItemsEnum5 {
     SLUG = 'slug',
-    READ_TIME = 'readTime',
+    READ_TIME_IN_MINUTES = 'readTimeInMinutes',
     PUBLISHED_DATE = 'publishedDate',
     CREATED_AT = 'createdAt',
     UPDATED_AT = 'updatedAt',
@@ -2800,7 +2764,7 @@ export enum ItemsEnum5 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum6 {
+export enum ItemsEnum5 {
     TITLE = 'title',
     SUBTITLE = 'subtitle',
     CONTACT_TAB_LABEL = 'contactTabLabel',
@@ -2818,7 +2782,49 @@ export enum ItemsEnum6 {
     LOCALE = 'locale'
 }
 
+export enum ItemsEnum6 {
+    ROLE_ID = 'roleId',
+    NAME = 'name',
+    CREATED_AT = 'createdAt',
+    UPDATED_AT = 'updatedAt',
+    PUBLISHED_AT = 'publishedAt',
+    LOCALE = 'locale'
+}
+
 export enum ItemsEnum7 {
+    NAME = 'name',
+    SLUG = 'slug',
+    BIO = 'bio',
+    EMAIL = 'email',
+    WEBSITE = 'website',
+    TWITTER = 'twitter',
+    LINKEDIN = 'linkedin',
+    GITHUB = 'github',
+    INSTAGRAM = 'instagram',
+    CREATED_AT = 'createdAt',
+    UPDATED_AT = 'updatedAt',
+    PUBLISHED_AT = 'publishedAt',
+    LOCALE = 'locale'
+}
+
+export enum PropertyNamesEnum {
+    BIO = 'bio',
+    CREATED_AT = 'createdAt',
+    EMAIL = 'email',
+    GITHUB = 'github',
+    INSTAGRAM = 'instagram',
+    LINKEDIN = 'linkedin',
+    LOCALE = 'locale',
+    NAME = 'name',
+    PUBLISHED_AT = 'publishedAt',
+    ROLES = 'roles',
+    SLUG = 'slug',
+    TWITTER = 'twitter',
+    UPDATED_AT = 'updatedAt',
+    WEBSITE = 'website'
+}
+
+export enum ItemsEnum8 {
     CODE = 'code',
     NAME = 'name',
     SYMBOL = 'symbol',
@@ -2841,7 +2847,7 @@ export enum SymbolPositionEnum {
     AFTER = 'after'
 }
 
-export enum ItemsEnum8 {
+export enum ItemsEnum9 {
     TITLE = 'title',
     SUBTITLE = 'subtitle',
     DESCRIPTION = 'description',
@@ -2853,7 +2859,7 @@ export enum ItemsEnum8 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum9 {
+export enum ItemsEnum10 {
     KEY = 'key',
     NAME = 'name',
     DESCRIPTION = 'description',
@@ -2864,7 +2870,7 @@ export enum ItemsEnum9 {
     PUBLISHED_AT = 'publishedAt'
 }
 
-export enum ItemsEnum10 {
+export enum ItemsEnum11 {
     SITE_TITLE = 'siteTitle',
     SITE_DESCRIPTION = 'siteDescription',
     CREATED_AT = 'createdAt',
@@ -2873,7 +2879,7 @@ export enum ItemsEnum10 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum11 {
+export enum ItemsEnum12 {
     LAST_UPDATED = 'lastUpdated',
     LAST_UPDATED_LABEL = 'lastUpdatedLabel',
     CREATED_AT = 'createdAt',
@@ -2882,7 +2888,7 @@ export enum ItemsEnum11 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum12 {
+export enum ItemsEnum13 {
     SLUG = 'slug',
     CREATED_AT = 'createdAt',
     UPDATED_AT = 'updatedAt',
@@ -2890,7 +2896,7 @@ export enum ItemsEnum12 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum13 {
+export enum ItemsEnum14 {
     ITEMS_PER_PAGE = 'itemsPerPage',
     PREVIOUS_BUTTON = 'previousButton',
     NEXT_BUTTON = 'nextButton',
@@ -2906,7 +2912,7 @@ export enum ItemsEnum13 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum14 {
+export enum ItemsEnum15 {
     SLUG = 'slug',
     PRICE = 'price',
     CREATED_AT = 'createdAt',
@@ -2915,7 +2921,7 @@ export enum ItemsEnum14 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum15 {
+export enum ItemsEnum16 {
     PROFILE_TITLE = 'profileTitle',
     EDIT_PROFILE_TITLE = 'editProfileTitle',
     WISHLIST_TITLE = 'wishlistTitle',
@@ -2932,22 +2938,6 @@ export enum ItemsEnum15 {
     NAME_LABEL = 'nameLabel',
     EMAIL_LABEL = 'emailLabel',
     PASSWORD_LABEL = 'passwordLabel',
-    CREATED_AT = 'createdAt',
-    UPDATED_AT = 'updatedAt',
-    PUBLISHED_AT = 'publishedAt',
-    LOCALE = 'locale'
-}
-
-export enum ItemsEnum16 {
-    NAME = 'name',
-    SLUG = 'slug',
-    ROLE = 'role',
-    BIO = 'bio',
-    EMAIL = 'email',
-    TWITTER = 'twitter',
-    INSTAGRAM = 'instagram',
-    LINKEDIN = 'linkedin',
-    GITHUB = 'github',
     CREATED_AT = 'createdAt',
     UPDATED_AT = 'updatedAt',
     PUBLISHED_AT = 'publishedAt',
@@ -3034,7 +3024,7 @@ export type ApiAboutAboutDocumentWritable = {
          * Component type discriminator
          */
         __component: 'sections.hero';
-    }) | (SectionsTeamGridEntryWritable & {
+    }) | (SectionsTeamGridEntry & {
         /**
          * Component type discriminator
          */
@@ -3206,7 +3196,43 @@ export type ApiAuthPageAuthPageDocumentWritable = {
     seoMetadata?: ElementsSeoMetadataEntry;
 };
 
-export type ApiAuthorAuthorDocumentWritable = {
+export type ApiContributorRoleContributorRoleDocumentWritable = {
+    /**
+     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+     */
+    documentId: string;
+    id: string | number;
+    /**
+     * A UID field
+     */
+    roleId: string;
+    /**
+     * A string field
+     */
+    name: string;
+    /**
+     * Timestamp when this entry was first created in the CMS.
+     */
+    createdAt?: string;
+    /**
+     * Timestamp when this entry was last modified.
+     */
+    updatedAt?: string;
+    /**
+     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+     */
+    publishedAt: string;
+    /**
+     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+     */
+    locale?: string;
+    /**
+     * A relational field
+     */
+    contributors?: Array<ApiContributorContributorDocumentWritable>;
+};
+
+export type ApiContributorContributorDocumentWritable = {
     /**
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
      */
@@ -3227,7 +3253,7 @@ export type ApiAuthorAuthorDocumentWritable = {
     /**
      * RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
      */
-    email: string;
+    email?: string;
     /**
      * A string field
      */
@@ -3271,7 +3297,67 @@ export type ApiAuthorAuthorDocumentWritable = {
     /**
      * A relational field
      */
+    roles?: Array<ApiContributorRoleContributorRoleDocumentWritable>;
+    /**
+     * A relational field
+     */
     blogPosts?: Array<ApiBlogPostBlogPostDocumentWritable>;
+    /**
+     * A component field
+     */
+    seoMetadata?: ElementsSeoMetadataEntry;
+};
+
+export type ApiBlogPostBlogPostDocumentWritable = {
+    /**
+     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+     */
+    documentId: string;
+    id: string | number;
+    /**
+     * A UID field
+     */
+    slug: string;
+    /**
+     * An integer field
+     */
+    readTimeInMinutes: number;
+    /**
+     * A datetime field
+     */
+    publishedDate: string;
+    /**
+     * Timestamp when this entry was first created in the CMS.
+     */
+    createdAt?: string;
+    /**
+     * Timestamp when this entry was last modified.
+     */
+    updatedAt?: string;
+    /**
+     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+     */
+    publishedAt: string;
+    /**
+     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+     */
+    locale?: string;
+    /**
+     * A component field
+     */
+    content?: ElementsTextBlockEntry;
+    /**
+     * A media field
+     */
+    featuredImage?: PluginUploadFileDocument;
+    /**
+     * A relational field
+     */
+    contributor?: ApiContributorContributorDocumentWritable;
+    /**
+     * A relational field
+     */
+    tags?: Array<ApiBlogPostTagBlogPostTagDocumentWritable>;
     /**
      * A component field
      */
@@ -3312,66 +3398,6 @@ export type ApiBlogPostTagBlogPostTagDocumentWritable = {
      * A relational field
      */
     posts?: Array<ApiBlogPostBlogPostDocumentWritable>;
-    /**
-     * A component field
-     */
-    seoMetadata?: ElementsSeoMetadataEntry;
-};
-
-export type ApiBlogPostBlogPostDocumentWritable = {
-    /**
-     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-     */
-    documentId: string;
-    id: string | number;
-    /**
-     * A UID field
-     */
-    slug: string;
-    /**
-     * A string field
-     */
-    readTime: string;
-    /**
-     * A datetime field
-     */
-    publishedDate: string;
-    /**
-     * Timestamp when this entry was first created in the CMS.
-     */
-    createdAt?: string;
-    /**
-     * Timestamp when this entry was last modified.
-     */
-    updatedAt?: string;
-    /**
-     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-     */
-    publishedAt: string;
-    /**
-     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-     */
-    locale?: string;
-    /**
-     * A component field
-     */
-    content?: ElementsTextBlockEntry;
-    /**
-     * A media field
-     */
-    featuredImage?: PluginUploadFileDocument;
-    /**
-     * A relational field
-     */
-    author?: ApiAuthorAuthorDocumentWritable;
-    /**
-     * A relational field
-     */
-    tags?: Array<ApiBlogPostTagBlogPostTagDocumentWritable>;
-    /**
-     * A component field
-     */
-    readArticleLabel: ElementsLabelEntry;
     /**
      * A component field
      */
@@ -3420,6 +3446,22 @@ export type ApiBlogBlogDocumentWritable = {
      * A component field
      */
     pagination: CallToActionsPaginationCtaEntry;
+    /**
+     * A component field
+     */
+    readArticleLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    readTimeMinutesLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    aboutAuthorHeader: ElementsHeaderEntry;
+    /**
+     * A relational field
+     */
+    defaultContributor?: ApiContributorContributorDocumentWritable;
     /**
      * A component field
      */
@@ -3757,7 +3799,7 @@ export type ApiHomepageHomepageDocumentWritable = {
          * Component type discriminator
          */
         __component: 'sections.hero';
-    }) | (SectionsTeamGridEntryWritable & {
+    }) | (SectionsTeamGridEntry & {
         /**
          * Component type discriminator
          */
@@ -4295,74 +4337,6 @@ export type ApiProfileProfileDocumentWritable = {
     seoMetadata?: ElementsSeoMetadataEntry;
 };
 
-export type ApiTeamMemberTeamMemberDocumentWritable = {
-    /**
-     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-     */
-    documentId: string;
-    id: string | number;
-    /**
-     * A string field
-     */
-    name: string;
-    /**
-     * A UID field
-     */
-    slug: string;
-    /**
-     * A string field
-     */
-    role: string;
-    /**
-     * A richtext field
-     */
-    bio: string;
-    /**
-     * RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
-     */
-    email: string;
-    /**
-     * A string field
-     */
-    twitter?: string;
-    /**
-     * A string field
-     */
-    instagram?: string;
-    /**
-     * A string field
-     */
-    linkedin?: string;
-    /**
-     * A string field
-     */
-    github?: string;
-    /**
-     * Timestamp when this entry was first created in the CMS.
-     */
-    createdAt?: string;
-    /**
-     * Timestamp when this entry was last modified.
-     */
-    updatedAt?: string;
-    /**
-     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-     */
-    publishedAt: string;
-    /**
-     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-     */
-    locale?: string;
-    /**
-     * A media field
-     */
-    profilePicture?: PluginUploadFileDocument;
-    /**
-     * A component field
-     */
-    seoMetadata?: ElementsSeoMetadataEntry;
-};
-
 export type ApiTermTermDocumentWritable = {
     /**
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
@@ -4459,24 +4433,6 @@ export type SectionsFeaturedProductsEntryWritable = {
      * A component field
      */
     viewAllButton: ElementsButtonEntry;
-};
-
-/**
- * Grid layout for team members
- */
-export type SectionsTeamGridEntryWritable = {
-    /**
-     * Component instance ID
-     */
-    id: number;
-    /**
-     * A component field
-     */
-    header: ElementsHeaderEntry;
-    /**
-     * A relational field
-     */
-    team_members?: Array<ApiTeamMemberTeamMemberDocumentWritable>;
 };
 
 /**
@@ -5239,408 +5195,6 @@ export type VerifyEmailResponses = {
 
 export type VerifyEmailResponse = VerifyEmailResponses[keyof VerifyEmailResponses];
 
-export type AuthorGetAuthorsData = {
-    body?: never;
-    path?: never;
-    query: {
-        /**
-         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
-         */
-        readonly fields?: Array<ItemsEnum3>;
-        /**
-         * Filters to apply to the query
-         */
-        filters?: {
-            [key in ItemsEnum3]?: unknown;
-        };
-        /**
-         * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
-         */
-        _q?: string;
-        /**
-         * Pagination parameters
-         */
-        pagination?: {
-            /**
-             * Include total count in response
-             */
-            withCount?: boolean;
-        } & ({
-            /**
-             * Page number (1-based)
-             */
-            page: number;
-            /**
-             * Number of entries per page
-             */
-            pageSize: number;
-        } | {
-            /**
-             * Number of entries to skip
-             */
-            start: number;
-            /**
-             * Maximum number of entries to return
-             */
-            limit: number;
-        });
-        /**
-         * Sort the result
-         */
-        sort?: ItemsEnum3 | Array<ItemsEnum3> | {
-            [key in ItemsEnum3]?: AdditionalPropertiesEnum;
-        } | Array<{
-            [key in ItemsEnum3]?: AdditionalPropertiesEnum;
-        }>;
-        /**
-         * Select a locale
-         */
-        locale?: string;
-        /**
-         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
-         */
-        status?: SchemaEnum;
-        /**
-         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
-         */
-        customPopulate: string;
-        /**
-         * Maximum depth for population (override plugin default)
-         */
-        customDepth?: number;
-        /**
-         * Fields to ignore during population
-         */
-        customIgnored?: Array<string>;
-    };
-    url: '/authors';
-};
-
-export type AuthorGetAuthorsErrors = {
-    /**
-     * Bad request
-     */
-    400: unknown;
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Forbidden
-     */
-    403: unknown;
-    /**
-     * Not found
-     */
-    404: unknown;
-    /**
-     * Internal server error
-     */
-    500: unknown;
-};
-
-export type AuthorGetAuthorsResponses = {
-    /**
-     * OK
-     */
-    200: {
-        data: Array<{
-            /**
-             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-             */
-            documentId: string;
-            id: string | number;
-            /**
-             * A string field
-             */
-            name: string;
-            /**
-             * A UID field
-             */
-            slug: string;
-            /**
-             * A richtext field
-             */
-            bio: string;
-            /**
-             * RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
-             */
-            email: string;
-            /**
-             * A string field
-             */
-            website?: string;
-            /**
-             * A string field
-             */
-            twitter?: string;
-            /**
-             * A string field
-             */
-            linkedin?: string;
-            /**
-             * A string field
-             */
-            github?: string;
-            /**
-             * A string field
-             */
-            instagram?: string;
-            /**
-             * Timestamp when this entry was first created in the CMS.
-             */
-            createdAt?: string;
-            /**
-             * Timestamp when this entry was last modified.
-             */
-            updatedAt?: string;
-            /**
-             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-             */
-            publishedAt: string;
-            /**
-             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-             */
-            locale?: string;
-            /**
-             * A media field
-             */
-            profilePicture: PluginUploadFileDocument;
-            /**
-             * A relational field
-             */
-            blogPosts?: Array<ApiBlogPostBlogPostDocument>;
-            /**
-             * A component field
-             */
-            seoMetadata: ElementsSeoMetadataEntry;
-            /**
-             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-             */
-            readonly localizations?: Array<{
-                id: number;
-                /**
-                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-                 */
-                documentId: string;
-                /**
-                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-                 */
-                locale: string;
-                /**
-                 * Timestamp when this entry was first created in the CMS.
-                 */
-                createdAt?: string;
-                /**
-                 * Timestamp when this entry was last modified.
-                 */
-                updatedAt?: string;
-                /**
-                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                 */
-                publishedAt?: string;
-                [key: string]: unknown | number | string | undefined;
-            }>;
-        }>;
-        /**
-         * Metadata object containing pagination and other response metadata
-         */
-        meta?: {
-            [key: string]: unknown;
-        };
-    };
-};
-
-export type AuthorGetAuthorsResponse = AuthorGetAuthorsResponses[keyof AuthorGetAuthorsResponses];
-
-export type AuthorGetAuthorsByIdData = {
-    body?: never;
-    path: {
-        /**
-         * The document ID, represented by a UUID
-         */
-        id: string;
-    };
-    query: {
-        /**
-         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
-         */
-        readonly fields?: Array<ItemsEnum3>;
-        /**
-         * Filters to apply to the query
-         */
-        filters?: {
-            [key in ItemsEnum3]?: unknown;
-        };
-        /**
-         * Sort the result
-         */
-        sort?: ItemsEnum3 | Array<ItemsEnum3> | {
-            [key in ItemsEnum3]?: AdditionalPropertiesEnum;
-        } | Array<{
-            [key in ItemsEnum3]?: AdditionalPropertiesEnum;
-        }>;
-        /**
-         * Select a locale
-         */
-        locale?: string;
-        /**
-         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
-         */
-        status?: SchemaEnum;
-        /**
-         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
-         */
-        customPopulate: string;
-        /**
-         * Maximum depth for population (override plugin default)
-         */
-        customDepth?: number;
-        /**
-         * Fields to ignore during population
-         */
-        customIgnored?: Array<string>;
-    };
-    url: '/authors/{id}';
-};
-
-export type AuthorGetAuthorsByIdErrors = {
-    /**
-     * Bad request
-     */
-    400: unknown;
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Forbidden
-     */
-    403: unknown;
-    /**
-     * Not found
-     */
-    404: unknown;
-    /**
-     * Internal server error
-     */
-    500: unknown;
-};
-
-export type AuthorGetAuthorsByIdResponses = {
-    /**
-     * OK
-     */
-    200: {
-        data: {
-            /**
-             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-             */
-            documentId: string;
-            id: string | number;
-            /**
-             * A string field
-             */
-            name: string;
-            /**
-             * A UID field
-             */
-            slug: string;
-            /**
-             * A richtext field
-             */
-            bio: string;
-            /**
-             * RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
-             */
-            email: string;
-            /**
-             * A string field
-             */
-            website?: string;
-            /**
-             * A string field
-             */
-            twitter?: string;
-            /**
-             * A string field
-             */
-            linkedin?: string;
-            /**
-             * A string field
-             */
-            github?: string;
-            /**
-             * A string field
-             */
-            instagram?: string;
-            /**
-             * Timestamp when this entry was first created in the CMS.
-             */
-            createdAt?: string;
-            /**
-             * Timestamp when this entry was last modified.
-             */
-            updatedAt?: string;
-            /**
-             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-             */
-            publishedAt: string;
-            /**
-             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-             */
-            locale?: string;
-            /**
-             * A media field
-             */
-            profilePicture: PluginUploadFileDocument;
-            /**
-             * A relational field
-             */
-            blogPosts?: Array<ApiBlogPostBlogPostDocument>;
-            /**
-             * A component field
-             */
-            seoMetadata: ElementsSeoMetadataEntry;
-            /**
-             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-             */
-            readonly localizations?: Array<{
-                id: number;
-                /**
-                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-                 */
-                documentId: string;
-                /**
-                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-                 */
-                locale: string;
-                /**
-                 * Timestamp when this entry was first created in the CMS.
-                 */
-                createdAt?: string;
-                /**
-                 * Timestamp when this entry was last modified.
-                 */
-                updatedAt?: string;
-                /**
-                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                 */
-                publishedAt?: string;
-                [key: string]: unknown | number | string | undefined;
-            }>;
-        };
-        /**
-         * Metadata object containing pagination and other response metadata
-         */
-        meta?: {
-            [key: string]: unknown;
-        };
-    };
-};
-
-export type AuthorGetAuthorsByIdResponse = AuthorGetAuthorsByIdResponses[keyof AuthorGetAuthorsByIdResponses];
-
 export type BlogGetBlogData = {
     body?: never;
     path?: never;
@@ -5752,6 +5306,22 @@ export type BlogGetBlogResponses = {
             /**
              * A component field
              */
+            readArticleLabel: ElementsLabelEntry;
+            /**
+             * A component field
+             */
+            readTimeMinutesLabel: ElementsLabelEntry;
+            /**
+             * A component field
+             */
+            aboutAuthorHeader: ElementsHeaderEntry;
+            /**
+             * A relational field
+             */
+            defaultContributor?: ApiContributorContributorDocument;
+            /**
+             * A component field
+             */
             seoMetadata: ElementsSeoMetadataEntry;
             /**
              * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
@@ -5799,12 +5369,12 @@ export type BlogPostTagGetBlogPostTagsData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum4>;
+        readonly fields?: Array<ItemsEnum3>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum4]?: unknown;
+            [key in ItemsEnum3]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -5840,10 +5410,10 @@ export type BlogPostTagGetBlogPostTagsData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum4 | Array<ItemsEnum4> | {
-            [key in ItemsEnum4]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum3 | Array<ItemsEnum3> | {
+            [key in ItemsEnum3]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum4]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum3]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -5986,20 +5556,20 @@ export type BlogPostTagGetBlogPostTagsByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum4>;
+        readonly fields?: Array<ItemsEnum3>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum4]?: unknown;
+            [key in ItemsEnum3]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum4 | Array<ItemsEnum4> | {
-            [key in ItemsEnum4]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum3 | Array<ItemsEnum3> | {
+            [key in ItemsEnum3]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum4]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum3]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -6137,12 +5707,12 @@ export type BlogPostGetBlogPostsData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum5>;
+        readonly fields?: Array<ItemsEnum4>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum5]?: unknown;
+            [key in ItemsEnum4]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -6178,10 +5748,10 @@ export type BlogPostGetBlogPostsData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum5 | Array<ItemsEnum5> | {
-            [key in ItemsEnum5]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum4 | Array<ItemsEnum4> | {
+            [key in ItemsEnum4]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum5]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum4]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -6246,9 +5816,9 @@ export type BlogPostGetBlogPostsResponses = {
              */
             slug: string;
             /**
-             * A string field
+             * An integer field
              */
-            readTime: string;
+            readTimeInMinutes: number;
             /**
              * A datetime field
              */
@@ -6280,15 +5850,11 @@ export type BlogPostGetBlogPostsResponses = {
             /**
              * A relational field
              */
-            author?: ApiAuthorAuthorDocument;
+            contributor?: ApiContributorContributorDocument;
             /**
              * A relational field
              */
             tags?: Array<ApiBlogPostTagBlogPostTagDocument>;
-            /**
-             * A component field
-             */
-            readArticleLabel: ElementsLabelEntry;
             /**
              * A component field
              */
@@ -6332,6 +5898,178 @@ export type BlogPostGetBlogPostsResponses = {
 
 export type BlogPostGetBlogPostsResponse = BlogPostGetBlogPostsResponses[keyof BlogPostGetBlogPostsResponses];
 
+export type BlogPostGetBlogPostsBySlugData = {
+    body?: never;
+    path: {
+        /**
+         * The unique slug identifier
+         */
+        slug: string;
+    };
+    query: {
+        /**
+         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+         */
+        readonly fields?: Array<ItemsEnum4>;
+        /**
+         * Filters to apply to the query
+         */
+        filters?: {
+            [key in ItemsEnum4]?: unknown;
+        };
+        /**
+         * Sort the result
+         */
+        sort?: ItemsEnum4 | Array<ItemsEnum4> | {
+            [key in ItemsEnum4]?: AdditionalPropertiesEnum;
+        } | Array<{
+            [key in ItemsEnum4]?: AdditionalPropertiesEnum;
+        }>;
+        /**
+         * Select a locale
+         */
+        locale?: string;
+        /**
+         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+         */
+        status?: SchemaEnum;
+        /**
+         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+         */
+        customPopulate: string;
+        /**
+         * Maximum depth for population (override plugin default)
+         */
+        customDepth?: number;
+        /**
+         * Fields to ignore during population
+         */
+        customIgnored?: Array<string>;
+    };
+    url: '/blog-posts/slug/{slug}';
+};
+
+export type BlogPostGetBlogPostsBySlugErrors = {
+    /**
+     * Bad request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type BlogPostGetBlogPostsBySlugResponses = {
+    /**
+     * OK
+     */
+    200: {
+        data: {
+            /**
+             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+             */
+            documentId: string;
+            id: string | number;
+            /**
+             * A UID field
+             */
+            slug: string;
+            /**
+             * An integer field
+             */
+            readTimeInMinutes: number;
+            /**
+             * A datetime field
+             */
+            publishedDate: string;
+            /**
+             * Timestamp when this entry was first created in the CMS.
+             */
+            createdAt?: string;
+            /**
+             * Timestamp when this entry was last modified.
+             */
+            updatedAt?: string;
+            /**
+             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+             */
+            publishedAt: string;
+            /**
+             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+             */
+            locale?: string;
+            /**
+             * A component field
+             */
+            content: ElementsTextBlockEntry;
+            /**
+             * A media field
+             */
+            featuredImage: PluginUploadFileDocument;
+            /**
+             * A relational field
+             */
+            contributor?: ApiContributorContributorDocument;
+            /**
+             * A relational field
+             */
+            tags?: Array<ApiBlogPostTagBlogPostTagDocument>;
+            /**
+             * A component field
+             */
+            seoMetadata: ElementsSeoMetadataEntry;
+            /**
+             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+             */
+            readonly localizations?: Array<{
+                id: number;
+                /**
+                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                 */
+                documentId: string;
+                /**
+                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                 */
+                locale: string;
+                /**
+                 * Timestamp when this entry was first created in the CMS.
+                 */
+                createdAt?: string;
+                /**
+                 * Timestamp when this entry was last modified.
+                 */
+                updatedAt?: string;
+                /**
+                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                 */
+                publishedAt?: string;
+                [key: string]: unknown | number | string | undefined;
+            }>;
+        };
+        /**
+         * Metadata object containing pagination and other response metadata
+         */
+        meta?: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type BlogPostGetBlogPostsBySlugResponse = BlogPostGetBlogPostsBySlugResponses[keyof BlogPostGetBlogPostsBySlugResponses];
+
 export type BlogPostGetBlogPostsByIdData = {
     body?: never;
     path: {
@@ -6344,20 +6082,20 @@ export type BlogPostGetBlogPostsByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum5>;
+        readonly fields?: Array<ItemsEnum4>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum5]?: unknown;
+            [key in ItemsEnum4]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum5 | Array<ItemsEnum5> | {
-            [key in ItemsEnum5]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum4 | Array<ItemsEnum4> | {
+            [key in ItemsEnum4]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum5]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum4]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -6422,9 +6160,9 @@ export type BlogPostGetBlogPostsByIdResponses = {
              */
             slug: string;
             /**
-             * A string field
+             * An integer field
              */
-            readTime: string;
+            readTimeInMinutes: number;
             /**
              * A datetime field
              */
@@ -6456,15 +6194,11 @@ export type BlogPostGetBlogPostsByIdResponses = {
             /**
              * A relational field
              */
-            author?: ApiAuthorAuthorDocument;
+            contributor?: ApiContributorContributorDocument;
             /**
              * A relational field
              */
             tags?: Array<ApiBlogPostTagBlogPostTagDocument>;
-            /**
-             * A component field
-             */
-            readArticleLabel: ElementsLabelEntry;
             /**
              * A component field
              */
@@ -6515,12 +6249,12 @@ export type ContactUsGetContactUsData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum6>;
+        readonly fields?: Array<ItemsEnum5>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum6]?: unknown;
+            [key in ItemsEnum5]?: unknown;
         };
         /**
          * Select a locale
@@ -6683,7 +6417,337 @@ export type ContactUsGetContactUsResponses = {
 
 export type ContactUsGetContactUsResponse = ContactUsGetContactUsResponses[keyof ContactUsGetContactUsResponses];
 
-export type CurrencyGetCurrenciesData = {
+export type ContributorRoleGetContributorRolesData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+         */
+        readonly fields?: Array<ItemsEnum6>;
+        /**
+         * Filters to apply to the query
+         */
+        filters?: {
+            [key in ItemsEnum6]?: unknown;
+        };
+        /**
+         * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
+         */
+        _q?: string;
+        /**
+         * Pagination parameters
+         */
+        pagination?: {
+            /**
+             * Include total count in response
+             */
+            withCount?: boolean;
+        } & ({
+            /**
+             * Page number (1-based)
+             */
+            page: number;
+            /**
+             * Number of entries per page
+             */
+            pageSize: number;
+        } | {
+            /**
+             * Number of entries to skip
+             */
+            start: number;
+            /**
+             * Maximum number of entries to return
+             */
+            limit: number;
+        });
+        /**
+         * Sort the result
+         */
+        sort?: ItemsEnum6 | Array<ItemsEnum6> | {
+            [key in ItemsEnum6]?: AdditionalPropertiesEnum;
+        } | Array<{
+            [key in ItemsEnum6]?: AdditionalPropertiesEnum;
+        }>;
+        /**
+         * Select a locale
+         */
+        locale?: string;
+        /**
+         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+         */
+        status?: SchemaEnum;
+        /**
+         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+         */
+        customPopulate: string;
+        /**
+         * Maximum depth for population (override plugin default)
+         */
+        customDepth?: number;
+        /**
+         * Fields to ignore during population
+         */
+        customIgnored?: Array<string>;
+    };
+    url: '/contributor-roles';
+};
+
+export type ContributorRoleGetContributorRolesErrors = {
+    /**
+     * Bad request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type ContributorRoleGetContributorRolesResponses = {
+    /**
+     * OK
+     */
+    200: {
+        data: Array<{
+            /**
+             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+             */
+            documentId: string;
+            id: string | number;
+            /**
+             * A UID field
+             */
+            roleId: string;
+            /**
+             * A string field
+             */
+            name: string;
+            /**
+             * Timestamp when this entry was first created in the CMS.
+             */
+            createdAt?: string;
+            /**
+             * Timestamp when this entry was last modified.
+             */
+            updatedAt?: string;
+            /**
+             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+             */
+            publishedAt: string;
+            /**
+             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+             */
+            locale?: string;
+            /**
+             * A relational field
+             */
+            contributors?: Array<ApiContributorContributorDocument>;
+            /**
+             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+             */
+            readonly localizations?: Array<{
+                id: number;
+                /**
+                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                 */
+                documentId: string;
+                /**
+                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                 */
+                locale: string;
+                /**
+                 * Timestamp when this entry was first created in the CMS.
+                 */
+                createdAt?: string;
+                /**
+                 * Timestamp when this entry was last modified.
+                 */
+                updatedAt?: string;
+                /**
+                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                 */
+                publishedAt?: string;
+                [key: string]: unknown | number | string | undefined;
+            }>;
+        }>;
+        /**
+         * Metadata object containing pagination and other response metadata
+         */
+        meta?: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type ContributorRoleGetContributorRolesResponse = ContributorRoleGetContributorRolesResponses[keyof ContributorRoleGetContributorRolesResponses];
+
+export type ContributorRoleGetContributorRolesByIdData = {
+    body?: never;
+    path: {
+        /**
+         * The document ID, represented by a UUID
+         */
+        id: string;
+    };
+    query: {
+        /**
+         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+         */
+        readonly fields?: Array<ItemsEnum6>;
+        /**
+         * Filters to apply to the query
+         */
+        filters?: {
+            [key in ItemsEnum6]?: unknown;
+        };
+        /**
+         * Sort the result
+         */
+        sort?: ItemsEnum6 | Array<ItemsEnum6> | {
+            [key in ItemsEnum6]?: AdditionalPropertiesEnum;
+        } | Array<{
+            [key in ItemsEnum6]?: AdditionalPropertiesEnum;
+        }>;
+        /**
+         * Select a locale
+         */
+        locale?: string;
+        /**
+         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+         */
+        status?: SchemaEnum;
+        /**
+         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+         */
+        customPopulate: string;
+        /**
+         * Maximum depth for population (override plugin default)
+         */
+        customDepth?: number;
+        /**
+         * Fields to ignore during population
+         */
+        customIgnored?: Array<string>;
+    };
+    url: '/contributor-roles/{id}';
+};
+
+export type ContributorRoleGetContributorRolesByIdErrors = {
+    /**
+     * Bad request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type ContributorRoleGetContributorRolesByIdResponses = {
+    /**
+     * OK
+     */
+    200: {
+        data: {
+            /**
+             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+             */
+            documentId: string;
+            id: string | number;
+            /**
+             * A UID field
+             */
+            roleId: string;
+            /**
+             * A string field
+             */
+            name: string;
+            /**
+             * Timestamp when this entry was first created in the CMS.
+             */
+            createdAt?: string;
+            /**
+             * Timestamp when this entry was last modified.
+             */
+            updatedAt?: string;
+            /**
+             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+             */
+            publishedAt: string;
+            /**
+             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+             */
+            locale?: string;
+            /**
+             * A relational field
+             */
+            contributors?: Array<ApiContributorContributorDocument>;
+            /**
+             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+             */
+            readonly localizations?: Array<{
+                id: number;
+                /**
+                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                 */
+                documentId: string;
+                /**
+                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                 */
+                locale: string;
+                /**
+                 * Timestamp when this entry was first created in the CMS.
+                 */
+                createdAt?: string;
+                /**
+                 * Timestamp when this entry was last modified.
+                 */
+                updatedAt?: string;
+                /**
+                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                 */
+                publishedAt?: string;
+                [key: string]: unknown | number | string | undefined;
+            }>;
+        };
+        /**
+         * Metadata object containing pagination and other response metadata
+         */
+        meta?: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type ContributorRoleGetContributorRolesByIdResponse = ContributorRoleGetContributorRolesByIdResponses[keyof ContributorRoleGetContributorRolesByIdResponses];
+
+export type ContributorGetContributorsData = {
     body?: never;
     path?: never;
     query: {
@@ -6695,7 +6759,7 @@ export type CurrencyGetCurrenciesData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum7]?: unknown;
+            [key in PropertyNamesEnum]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -6735,6 +6799,608 @@ export type CurrencyGetCurrenciesData = {
             [key in ItemsEnum7]?: AdditionalPropertiesEnum;
         } | Array<{
             [key in ItemsEnum7]?: AdditionalPropertiesEnum;
+        }>;
+        /**
+         * Select a locale
+         */
+        locale?: string;
+        /**
+         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+         */
+        status?: SchemaEnum;
+        /**
+         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+         */
+        customPopulate: string;
+        /**
+         * Maximum depth for population (override plugin default)
+         */
+        customDepth?: number;
+        /**
+         * Fields to ignore during population
+         */
+        customIgnored?: Array<string>;
+    };
+    url: '/contributors';
+};
+
+export type ContributorGetContributorsErrors = {
+    /**
+     * Bad request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type ContributorGetContributorsResponses = {
+    /**
+     * OK
+     */
+    200: {
+        data: Array<{
+            /**
+             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+             */
+            documentId: string;
+            id: string | number;
+            /**
+             * A string field
+             */
+            name: string;
+            /**
+             * A UID field
+             */
+            slug: string;
+            /**
+             * A richtext field
+             */
+            bio: string;
+            /**
+             * RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
+             */
+            email?: string;
+            /**
+             * A string field
+             */
+            website?: string;
+            /**
+             * A string field
+             */
+            twitter?: string;
+            /**
+             * A string field
+             */
+            linkedin?: string;
+            /**
+             * A string field
+             */
+            github?: string;
+            /**
+             * A string field
+             */
+            instagram?: string;
+            /**
+             * Timestamp when this entry was first created in the CMS.
+             */
+            createdAt?: string;
+            /**
+             * Timestamp when this entry was last modified.
+             */
+            updatedAt?: string;
+            /**
+             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+             */
+            publishedAt: string;
+            /**
+             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+             */
+            locale?: string;
+            /**
+             * A media field
+             */
+            profilePicture?: PluginUploadFileDocument;
+            /**
+             * A relational field
+             */
+            roles?: Array<ApiContributorRoleContributorRoleDocument>;
+            /**
+             * A relational field
+             */
+            blogPosts?: Array<ApiBlogPostBlogPostDocument>;
+            /**
+             * A component field
+             */
+            seoMetadata: ElementsSeoMetadataEntry;
+            /**
+             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+             */
+            readonly localizations?: Array<{
+                id: number;
+                /**
+                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                 */
+                documentId: string;
+                /**
+                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                 */
+                locale: string;
+                /**
+                 * Timestamp when this entry was first created in the CMS.
+                 */
+                createdAt?: string;
+                /**
+                 * Timestamp when this entry was last modified.
+                 */
+                updatedAt?: string;
+                /**
+                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                 */
+                publishedAt?: string;
+                [key: string]: unknown | number | string | undefined;
+            }>;
+        }>;
+        /**
+         * Metadata object containing pagination and other response metadata
+         */
+        meta?: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type ContributorGetContributorsResponse = ContributorGetContributorsResponses[keyof ContributorGetContributorsResponses];
+
+export type ContributorGetContributorsBySlugData = {
+    body?: never;
+    path: {
+        /**
+         * The unique slug identifier
+         */
+        slug: string;
+    };
+    query: {
+        /**
+         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+         */
+        readonly fields?: Array<ItemsEnum7>;
+        /**
+         * Filters to apply to the query
+         */
+        filters?: {
+            [key in ItemsEnum7]?: unknown;
+        };
+        /**
+         * Sort the result
+         */
+        sort?: ItemsEnum7 | Array<ItemsEnum7> | {
+            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
+        } | Array<{
+            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
+        }>;
+        /**
+         * Select a locale
+         */
+        locale?: string;
+        /**
+         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+         */
+        status?: SchemaEnum;
+        /**
+         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+         */
+        customPopulate: string;
+        /**
+         * Maximum depth for population (override plugin default)
+         */
+        customDepth?: number;
+        /**
+         * Fields to ignore during population
+         */
+        customIgnored?: Array<string>;
+    };
+    url: '/contributors/slug/{slug}';
+};
+
+export type ContributorGetContributorsBySlugErrors = {
+    /**
+     * Bad request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type ContributorGetContributorsBySlugResponses = {
+    /**
+     * OK
+     */
+    200: {
+        data: {
+            /**
+             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+             */
+            documentId: string;
+            id: string | number;
+            /**
+             * A string field
+             */
+            name: string;
+            /**
+             * A UID field
+             */
+            slug: string;
+            /**
+             * A richtext field
+             */
+            bio: string;
+            /**
+             * RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
+             */
+            email?: string;
+            /**
+             * A string field
+             */
+            website?: string;
+            /**
+             * A string field
+             */
+            twitter?: string;
+            /**
+             * A string field
+             */
+            linkedin?: string;
+            /**
+             * A string field
+             */
+            github?: string;
+            /**
+             * A string field
+             */
+            instagram?: string;
+            /**
+             * Timestamp when this entry was first created in the CMS.
+             */
+            createdAt?: string;
+            /**
+             * Timestamp when this entry was last modified.
+             */
+            updatedAt?: string;
+            /**
+             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+             */
+            publishedAt: string;
+            /**
+             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+             */
+            locale?: string;
+            /**
+             * A media field
+             */
+            profilePicture?: PluginUploadFileDocument;
+            /**
+             * A relational field
+             */
+            roles?: Array<ApiContributorRoleContributorRoleDocument>;
+            /**
+             * A relational field
+             */
+            blogPosts?: Array<ApiBlogPostBlogPostDocument>;
+            /**
+             * A component field
+             */
+            seoMetadata: ElementsSeoMetadataEntry;
+            /**
+             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+             */
+            readonly localizations?: Array<{
+                id: number;
+                /**
+                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                 */
+                documentId: string;
+                /**
+                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                 */
+                locale: string;
+                /**
+                 * Timestamp when this entry was first created in the CMS.
+                 */
+                createdAt?: string;
+                /**
+                 * Timestamp when this entry was last modified.
+                 */
+                updatedAt?: string;
+                /**
+                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                 */
+                publishedAt?: string;
+                [key: string]: unknown | number | string | undefined;
+            }>;
+        };
+        /**
+         * Metadata object containing pagination and other response metadata
+         */
+        meta?: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type ContributorGetContributorsBySlugResponse = ContributorGetContributorsBySlugResponses[keyof ContributorGetContributorsBySlugResponses];
+
+export type ContributorGetContributorsByIdData = {
+    body?: never;
+    path: {
+        /**
+         * The document ID, represented by a UUID
+         */
+        id: string;
+    };
+    query: {
+        /**
+         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+         */
+        readonly fields?: Array<ItemsEnum7>;
+        /**
+         * Filters to apply to the query
+         */
+        filters?: {
+            [key in ItemsEnum7]?: unknown;
+        };
+        /**
+         * Sort the result
+         */
+        sort?: ItemsEnum7 | Array<ItemsEnum7> | {
+            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
+        } | Array<{
+            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
+        }>;
+        /**
+         * Select a locale
+         */
+        locale?: string;
+        /**
+         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+         */
+        status?: SchemaEnum;
+        /**
+         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+         */
+        customPopulate: string;
+        /**
+         * Maximum depth for population (override plugin default)
+         */
+        customDepth?: number;
+        /**
+         * Fields to ignore during population
+         */
+        customIgnored?: Array<string>;
+    };
+    url: '/contributors/{id}';
+};
+
+export type ContributorGetContributorsByIdErrors = {
+    /**
+     * Bad request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type ContributorGetContributorsByIdResponses = {
+    /**
+     * OK
+     */
+    200: {
+        data: {
+            /**
+             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+             */
+            documentId: string;
+            id: string | number;
+            /**
+             * A string field
+             */
+            name: string;
+            /**
+             * A UID field
+             */
+            slug: string;
+            /**
+             * A richtext field
+             */
+            bio: string;
+            /**
+             * RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
+             */
+            email?: string;
+            /**
+             * A string field
+             */
+            website?: string;
+            /**
+             * A string field
+             */
+            twitter?: string;
+            /**
+             * A string field
+             */
+            linkedin?: string;
+            /**
+             * A string field
+             */
+            github?: string;
+            /**
+             * A string field
+             */
+            instagram?: string;
+            /**
+             * Timestamp when this entry was first created in the CMS.
+             */
+            createdAt?: string;
+            /**
+             * Timestamp when this entry was last modified.
+             */
+            updatedAt?: string;
+            /**
+             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+             */
+            publishedAt: string;
+            /**
+             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+             */
+            locale?: string;
+            /**
+             * A media field
+             */
+            profilePicture?: PluginUploadFileDocument;
+            /**
+             * A relational field
+             */
+            roles?: Array<ApiContributorRoleContributorRoleDocument>;
+            /**
+             * A relational field
+             */
+            blogPosts?: Array<ApiBlogPostBlogPostDocument>;
+            /**
+             * A component field
+             */
+            seoMetadata: ElementsSeoMetadataEntry;
+            /**
+             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+             */
+            readonly localizations?: Array<{
+                id: number;
+                /**
+                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                 */
+                documentId: string;
+                /**
+                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                 */
+                locale: string;
+                /**
+                 * Timestamp when this entry was first created in the CMS.
+                 */
+                createdAt?: string;
+                /**
+                 * Timestamp when this entry was last modified.
+                 */
+                updatedAt?: string;
+                /**
+                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                 */
+                publishedAt?: string;
+                [key: string]: unknown | number | string | undefined;
+            }>;
+        };
+        /**
+         * Metadata object containing pagination and other response metadata
+         */
+        meta?: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type ContributorGetContributorsByIdResponse = ContributorGetContributorsByIdResponses[keyof ContributorGetContributorsByIdResponses];
+
+export type CurrencyGetCurrenciesData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+         */
+        readonly fields?: Array<ItemsEnum8>;
+        /**
+         * Filters to apply to the query
+         */
+        filters?: {
+            [key in ItemsEnum8]?: unknown;
+        };
+        /**
+         * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
+         */
+        _q?: string;
+        /**
+         * Pagination parameters
+         */
+        pagination?: {
+            /**
+             * Include total count in response
+             */
+            withCount?: boolean;
+        } & ({
+            /**
+             * Page number (1-based)
+             */
+            page: number;
+            /**
+             * Number of entries per page
+             */
+            pageSize: number;
+        } | {
+            /**
+             * Number of entries to skip
+             */
+            start: number;
+            /**
+             * Maximum number of entries to return
+             */
+            limit: number;
+        });
+        /**
+         * Sort the result
+         */
+        sort?: ItemsEnum8 | Array<ItemsEnum8> | {
+            [key in ItemsEnum8]?: AdditionalPropertiesEnum;
+        } | Array<{
+            [key in ItemsEnum8]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -6894,20 +7560,20 @@ export type CurrencyGetCurrenciesByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum7>;
+        readonly fields?: Array<ItemsEnum8>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum7]?: unknown;
+            [key in ItemsEnum8]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum7 | Array<ItemsEnum7> | {
-            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum8 | Array<ItemsEnum8> | {
+            [key in ItemsEnum8]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum8]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -7332,12 +7998,12 @@ export type FaqGetFaqData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum8>;
+        readonly fields?: Array<ItemsEnum9>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum8]?: unknown;
+            [key in ItemsEnum9]?: unknown;
         };
         /**
          * Select a locale
@@ -7483,12 +8149,12 @@ export type FeatureFlagGetFeatureFlagsData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum9>;
+        readonly fields?: Array<ItemsEnum10>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum9]?: unknown;
+            [key in ItemsEnum10]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -7524,10 +8190,10 @@ export type FeatureFlagGetFeatureFlagsData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum9 | Array<ItemsEnum9> | {
-            [key in ItemsEnum9]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum10 | Array<ItemsEnum10> | {
+            [key in ItemsEnum10]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum9]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum10]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
@@ -7639,20 +8305,20 @@ export type FeatureFlagGetFeatureFlagsByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum9>;
+        readonly fields?: Array<ItemsEnum10>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum9]?: unknown;
+            [key in ItemsEnum10]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum9 | Array<ItemsEnum9> | {
-            [key in ItemsEnum9]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum10 | Array<ItemsEnum10> | {
+            [key in ItemsEnum10]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum9]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum10]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
@@ -8432,12 +9098,12 @@ export type NavigationGetNavigationData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum10>;
+        readonly fields?: Array<ItemsEnum11>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum10]?: unknown;
+            [key in ItemsEnum11]?: unknown;
         };
         /**
          * Select a locale
@@ -8611,12 +9277,12 @@ export type PrivacyGetPrivacyData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum11>;
+        readonly fields?: Array<ItemsEnum12>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum11]?: unknown;
+            [key in ItemsEnum12]?: unknown;
         };
         /**
          * Select a locale
@@ -8750,12 +9416,12 @@ export type ProductCategoryGetProductCategoriesData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum12>;
+        readonly fields?: Array<ItemsEnum13>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum12]?: unknown;
+            [key in ItemsEnum13]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -8791,10 +9457,10 @@ export type ProductCategoryGetProductCategoriesData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum12 | Array<ItemsEnum12> | {
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum13 | Array<ItemsEnum13> | {
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -8936,12 +9602,12 @@ export type ProductCategoriesPageGetProductCategoriesPageData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum13>;
+        readonly fields?: Array<ItemsEnum14>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum13]?: unknown;
+            [key in ItemsEnum14]?: unknown;
         };
         /**
          * Select a locale
@@ -9100,6 +9766,166 @@ export type ProductCategoriesPageGetProductCategoriesPageResponses = {
 
 export type ProductCategoriesPageGetProductCategoriesPageResponse = ProductCategoriesPageGetProductCategoriesPageResponses[keyof ProductCategoriesPageGetProductCategoriesPageResponses];
 
+export type ProductCategoryGetProductCategoriesBySlugData = {
+    body?: never;
+    path: {
+        /**
+         * The unique slug identifier
+         */
+        slug: string;
+    };
+    query: {
+        /**
+         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+         */
+        readonly fields?: Array<ItemsEnum13>;
+        /**
+         * Filters to apply to the query
+         */
+        filters?: {
+            [key in ItemsEnum13]?: unknown;
+        };
+        /**
+         * Sort the result
+         */
+        sort?: ItemsEnum13 | Array<ItemsEnum13> | {
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
+        } | Array<{
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
+        }>;
+        /**
+         * Select a locale
+         */
+        locale?: string;
+        /**
+         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+         */
+        status?: SchemaEnum;
+        /**
+         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+         */
+        customPopulate: string;
+        /**
+         * Maximum depth for population (override plugin default)
+         */
+        customDepth?: number;
+        /**
+         * Fields to ignore during population
+         */
+        customIgnored?: Array<string>;
+    };
+    url: '/product-categories/slug/{slug}';
+};
+
+export type ProductCategoryGetProductCategoriesBySlugErrors = {
+    /**
+     * Bad request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type ProductCategoryGetProductCategoriesBySlugResponses = {
+    /**
+     * OK
+     */
+    200: {
+        data: {
+            /**
+             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+             */
+            documentId: string;
+            id: string | number;
+            /**
+             * A UID field
+             */
+            slug: string;
+            /**
+             * Timestamp when this entry was first created in the CMS.
+             */
+            createdAt?: string;
+            /**
+             * Timestamp when this entry was last modified.
+             */
+            updatedAt?: string;
+            /**
+             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+             */
+            publishedAt: string;
+            /**
+             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+             */
+            locale?: string;
+            /**
+             * A component field
+             */
+            content: ElementsLabelEntry;
+            /**
+             * A media field
+             */
+            image: PluginUploadFileDocument;
+            /**
+             * A relational field
+             */
+            products?: Array<ApiProductProductDocument>;
+            /**
+             * A component field
+             */
+            seoMetadata: ElementsSeoMetadataEntry;
+            /**
+             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+             */
+            readonly localizations?: Array<{
+                id: number;
+                /**
+                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                 */
+                documentId: string;
+                /**
+                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                 */
+                locale: string;
+                /**
+                 * Timestamp when this entry was first created in the CMS.
+                 */
+                createdAt?: string;
+                /**
+                 * Timestamp when this entry was last modified.
+                 */
+                updatedAt?: string;
+                /**
+                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                 */
+                publishedAt?: string;
+                [key: string]: unknown | number | string | undefined;
+            }>;
+        };
+        /**
+         * Metadata object containing pagination and other response metadata
+         */
+        meta?: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type ProductCategoryGetProductCategoriesBySlugResponse = ProductCategoryGetProductCategoriesBySlugResponses[keyof ProductCategoryGetProductCategoriesBySlugResponses];
+
 export type ProductCategoryGetProductCategoriesByIdData = {
     body?: never;
     path: {
@@ -9112,20 +9938,20 @@ export type ProductCategoryGetProductCategoriesByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum12>;
+        readonly fields?: Array<ItemsEnum13>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum12]?: unknown;
+            [key in ItemsEnum13]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum12 | Array<ItemsEnum12> | {
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum13 | Array<ItemsEnum13> | {
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -9267,12 +10093,12 @@ export type ProductTagGetProductTagsData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum4>;
+        readonly fields?: Array<ItemsEnum3>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum4]?: unknown;
+            [key in ItemsEnum3]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -9308,10 +10134,10 @@ export type ProductTagGetProductTagsData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum4 | Array<ItemsEnum4> | {
-            [key in ItemsEnum4]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum3 | Array<ItemsEnum3> | {
+            [key in ItemsEnum3]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum4]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum3]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -9454,20 +10280,20 @@ export type ProductTagGetProductTagsByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum4>;
+        readonly fields?: Array<ItemsEnum3>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum4]?: unknown;
+            [key in ItemsEnum3]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum4 | Array<ItemsEnum4> | {
-            [key in ItemsEnum4]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum3 | Array<ItemsEnum3> | {
+            [key in ItemsEnum3]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum4]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum3]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -9605,12 +10431,12 @@ export type ProductGetProductsData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum14>;
+        readonly fields?: Array<ItemsEnum15>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum14]?: unknown;
+            [key in ItemsEnum15]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -9646,10 +10472,10 @@ export type ProductGetProductsData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum14 | Array<ItemsEnum14> | {
-            [key in ItemsEnum14]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum15 | Array<ItemsEnum15> | {
+            [key in ItemsEnum15]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum14]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum15]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -9804,6 +10630,186 @@ export type ProductGetProductsResponses = {
 
 export type ProductGetProductsResponse = ProductGetProductsResponses[keyof ProductGetProductsResponses];
 
+export type ProductGetProductsBySlugData = {
+    body?: never;
+    path: {
+        /**
+         * The unique slug identifier
+         */
+        slug: string;
+    };
+    query: {
+        /**
+         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+         */
+        readonly fields?: Array<ItemsEnum15>;
+        /**
+         * Filters to apply to the query
+         */
+        filters?: {
+            [key in ItemsEnum15]?: unknown;
+        };
+        /**
+         * Sort the result
+         */
+        sort?: ItemsEnum15 | Array<ItemsEnum15> | {
+            [key in ItemsEnum15]?: AdditionalPropertiesEnum;
+        } | Array<{
+            [key in ItemsEnum15]?: AdditionalPropertiesEnum;
+        }>;
+        /**
+         * Select a locale
+         */
+        locale?: string;
+        /**
+         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+         */
+        status?: SchemaEnum;
+        /**
+         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+         */
+        customPopulate: string;
+        /**
+         * Maximum depth for population (override plugin default)
+         */
+        customDepth?: number;
+        /**
+         * Fields to ignore during population
+         */
+        customIgnored?: Array<string>;
+    };
+    url: '/products/slug/{slug}';
+};
+
+export type ProductGetProductsBySlugErrors = {
+    /**
+     * Bad request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type ProductGetProductsBySlugResponses = {
+    /**
+     * OK
+     */
+    200: {
+        data: {
+            /**
+             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+             */
+            documentId: string;
+            id: string | number;
+            /**
+             * A UID field
+             */
+            slug: string;
+            /**
+             * A decimal field
+             */
+            price: number;
+            /**
+             * Timestamp when this entry was first created in the CMS.
+             */
+            createdAt?: string;
+            /**
+             * Timestamp when this entry was last modified.
+             */
+            updatedAt?: string;
+            /**
+             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+             */
+            publishedAt: string;
+            /**
+             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+             */
+            locale?: string;
+            /**
+             * A component field
+             */
+            content: ElementsTextBlockEntry;
+            /**
+             * A media field
+             */
+            images: Array<PluginUploadFileDocument>;
+            /**
+             * A component field
+             */
+            affiliateButton: ElementsButtonEntry;
+            /**
+             * A relational field
+             */
+            currency?: ApiCurrencyCurrencyDocument;
+            /**
+             * A relational field
+             */
+            category?: ApiProductCategoryProductCategoryDocument;
+            /**
+             * A relational field
+             */
+            tags?: Array<ApiProductTagProductTagDocument>;
+            /**
+             * A component field
+             */
+            viewDetailsLabel: ElementsLabelEntry;
+            /**
+             * A component field
+             */
+            seoMetadata: ElementsSeoMetadataEntry;
+            /**
+             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+             */
+            readonly localizations?: Array<{
+                id: number;
+                /**
+                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                 */
+                documentId: string;
+                /**
+                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                 */
+                locale: string;
+                /**
+                 * Timestamp when this entry was first created in the CMS.
+                 */
+                createdAt?: string;
+                /**
+                 * Timestamp when this entry was last modified.
+                 */
+                updatedAt?: string;
+                /**
+                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                 */
+                publishedAt?: string;
+                [key: string]: unknown | number | string | undefined;
+            }>;
+        };
+        /**
+         * Metadata object containing pagination and other response metadata
+         */
+        meta?: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type ProductGetProductsBySlugResponse = ProductGetProductsBySlugResponses[keyof ProductGetProductsBySlugResponses];
+
 export type ProductGetProductsByIdData = {
     body?: never;
     path: {
@@ -9816,20 +10822,20 @@ export type ProductGetProductsByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum14>;
+        readonly fields?: Array<ItemsEnum15>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum14]?: unknown;
+            [key in ItemsEnum15]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum14 | Array<ItemsEnum14> | {
-            [key in ItemsEnum14]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum15 | Array<ItemsEnum15> | {
+            [key in ItemsEnum15]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum14]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum15]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -9991,12 +10997,12 @@ export type ProfileGetProfileData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum15>;
+        readonly fields?: Array<ItemsEnum16>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum15]?: unknown;
+            [key in ItemsEnum16]?: unknown;
         };
         /**
          * Select a locale
@@ -10209,400 +11215,6 @@ export type CheckRedirectResponses = {
 
 export type CheckRedirectResponse = CheckRedirectResponses[keyof CheckRedirectResponses];
 
-export type TeamMemberGetTeamMembersData = {
-    body?: never;
-    path?: never;
-    query: {
-        /**
-         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
-         */
-        readonly fields?: Array<ItemsEnum16>;
-        /**
-         * Filters to apply to the query
-         */
-        filters?: {
-            [key in ItemsEnum16]?: unknown;
-        };
-        /**
-         * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
-         */
-        _q?: string;
-        /**
-         * Pagination parameters
-         */
-        pagination?: {
-            /**
-             * Include total count in response
-             */
-            withCount?: boolean;
-        } & ({
-            /**
-             * Page number (1-based)
-             */
-            page: number;
-            /**
-             * Number of entries per page
-             */
-            pageSize: number;
-        } | {
-            /**
-             * Number of entries to skip
-             */
-            start: number;
-            /**
-             * Maximum number of entries to return
-             */
-            limit: number;
-        });
-        /**
-         * Sort the result
-         */
-        sort?: ItemsEnum16 | Array<ItemsEnum16> | {
-            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
-        } | Array<{
-            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
-        }>;
-        /**
-         * Select a locale
-         */
-        locale?: string;
-        /**
-         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
-         */
-        status?: SchemaEnum;
-        /**
-         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
-         */
-        customPopulate: string;
-        /**
-         * Maximum depth for population (override plugin default)
-         */
-        customDepth?: number;
-        /**
-         * Fields to ignore during population
-         */
-        customIgnored?: Array<string>;
-    };
-    url: '/team-members';
-};
-
-export type TeamMemberGetTeamMembersErrors = {
-    /**
-     * Bad request
-     */
-    400: unknown;
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Forbidden
-     */
-    403: unknown;
-    /**
-     * Not found
-     */
-    404: unknown;
-    /**
-     * Internal server error
-     */
-    500: unknown;
-};
-
-export type TeamMemberGetTeamMembersResponses = {
-    /**
-     * OK
-     */
-    200: {
-        data: Array<{
-            /**
-             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-             */
-            documentId: string;
-            id: string | number;
-            /**
-             * A string field
-             */
-            name: string;
-            /**
-             * A UID field
-             */
-            slug: string;
-            /**
-             * A string field
-             */
-            role: string;
-            /**
-             * A richtext field
-             */
-            bio: string;
-            /**
-             * RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
-             */
-            email: string;
-            /**
-             * A string field
-             */
-            twitter?: string;
-            /**
-             * A string field
-             */
-            instagram?: string;
-            /**
-             * A string field
-             */
-            linkedin?: string;
-            /**
-             * A string field
-             */
-            github?: string;
-            /**
-             * Timestamp when this entry was first created in the CMS.
-             */
-            createdAt?: string;
-            /**
-             * Timestamp when this entry was last modified.
-             */
-            updatedAt?: string;
-            /**
-             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-             */
-            publishedAt: string;
-            /**
-             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-             */
-            locale?: string;
-            /**
-             * A media field
-             */
-            profilePicture: PluginUploadFileDocument;
-            /**
-             * A component field
-             */
-            seoMetadata: ElementsSeoMetadataEntry;
-            /**
-             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-             */
-            readonly localizations?: Array<{
-                id: number;
-                /**
-                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-                 */
-                documentId: string;
-                /**
-                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-                 */
-                locale: string;
-                /**
-                 * Timestamp when this entry was first created in the CMS.
-                 */
-                createdAt?: string;
-                /**
-                 * Timestamp when this entry was last modified.
-                 */
-                updatedAt?: string;
-                /**
-                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                 */
-                publishedAt?: string;
-                [key: string]: unknown | number | string | undefined;
-            }>;
-        }>;
-        /**
-         * Metadata object containing pagination and other response metadata
-         */
-        meta?: {
-            [key: string]: unknown;
-        };
-    };
-};
-
-export type TeamMemberGetTeamMembersResponse = TeamMemberGetTeamMembersResponses[keyof TeamMemberGetTeamMembersResponses];
-
-export type TeamMemberGetTeamMembersByIdData = {
-    body?: never;
-    path: {
-        /**
-         * The document ID, represented by a UUID
-         */
-        id: string;
-    };
-    query: {
-        /**
-         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
-         */
-        readonly fields?: Array<ItemsEnum16>;
-        /**
-         * Filters to apply to the query
-         */
-        filters?: {
-            [key in ItemsEnum16]?: unknown;
-        };
-        /**
-         * Sort the result
-         */
-        sort?: ItemsEnum16 | Array<ItemsEnum16> | {
-            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
-        } | Array<{
-            [key in ItemsEnum16]?: AdditionalPropertiesEnum;
-        }>;
-        /**
-         * Select a locale
-         */
-        locale?: string;
-        /**
-         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
-         */
-        status?: SchemaEnum;
-        /**
-         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
-         */
-        customPopulate: string;
-        /**
-         * Maximum depth for population (override plugin default)
-         */
-        customDepth?: number;
-        /**
-         * Fields to ignore during population
-         */
-        customIgnored?: Array<string>;
-    };
-    url: '/team-members/{id}';
-};
-
-export type TeamMemberGetTeamMembersByIdErrors = {
-    /**
-     * Bad request
-     */
-    400: unknown;
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Forbidden
-     */
-    403: unknown;
-    /**
-     * Not found
-     */
-    404: unknown;
-    /**
-     * Internal server error
-     */
-    500: unknown;
-};
-
-export type TeamMemberGetTeamMembersByIdResponses = {
-    /**
-     * OK
-     */
-    200: {
-        data: {
-            /**
-             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-             */
-            documentId: string;
-            id: string | number;
-            /**
-             * A string field
-             */
-            name: string;
-            /**
-             * A UID field
-             */
-            slug: string;
-            /**
-             * A string field
-             */
-            role: string;
-            /**
-             * A richtext field
-             */
-            bio: string;
-            /**
-             * RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
-             */
-            email: string;
-            /**
-             * A string field
-             */
-            twitter?: string;
-            /**
-             * A string field
-             */
-            instagram?: string;
-            /**
-             * A string field
-             */
-            linkedin?: string;
-            /**
-             * A string field
-             */
-            github?: string;
-            /**
-             * Timestamp when this entry was first created in the CMS.
-             */
-            createdAt?: string;
-            /**
-             * Timestamp when this entry was last modified.
-             */
-            updatedAt?: string;
-            /**
-             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-             */
-            publishedAt: string;
-            /**
-             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-             */
-            locale?: string;
-            /**
-             * A media field
-             */
-            profilePicture: PluginUploadFileDocument;
-            /**
-             * A component field
-             */
-            seoMetadata: ElementsSeoMetadataEntry;
-            /**
-             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-             */
-            readonly localizations?: Array<{
-                id: number;
-                /**
-                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-                 */
-                documentId: string;
-                /**
-                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-                 */
-                locale: string;
-                /**
-                 * Timestamp when this entry was first created in the CMS.
-                 */
-                createdAt?: string;
-                /**
-                 * Timestamp when this entry was last modified.
-                 */
-                updatedAt?: string;
-                /**
-                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                 */
-                publishedAt?: string;
-                [key: string]: unknown | number | string | undefined;
-            }>;
-        };
-        /**
-         * Metadata object containing pagination and other response metadata
-         */
-        meta?: {
-            [key: string]: unknown;
-        };
-    };
-};
-
-export type TeamMemberGetTeamMembersByIdResponse = TeamMemberGetTeamMembersByIdResponses[keyof TeamMemberGetTeamMembersByIdResponses];
-
 export type TermGetTermData = {
     body?: never;
     path?: never;
@@ -10610,12 +11222,12 @@ export type TermGetTermData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum11>;
+        readonly fields?: Array<ItemsEnum12>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum11]?: unknown;
+            [key in ItemsEnum12]?: unknown;
         };
         /**
          * Select a locale

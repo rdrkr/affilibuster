@@ -16,110 +16,107 @@
  */
 
 import type {
-  AboutGetAboutData,
-  AboutGetAboutResponses,
-  AuthorGetAuthorsByIdData,
-  AuthorGetAuthorsByIdResponses,
-  AuthorGetAuthorsData,
-  AuthorGetAuthorsResponses,
-  AuthPageGetAuthPageData,
-  AuthPageGetAuthPageResponses,
-  BlogGetBlogData,
-  BlogGetBlogResponses,
-  BlogPostGetBlogPostsByIdData,
-  BlogPostGetBlogPostsByIdResponses,
-  BlogPostGetBlogPostsData,
-  BlogPostGetBlogPostsResponses,
-  BlogPostTagGetBlogPostTagsByIdData,
-  BlogPostTagGetBlogPostTagsByIdResponses,
-  BlogPostTagGetBlogPostTagsData,
-  BlogPostTagGetBlogPostTagsResponses,
-  ChangePasswordData,
-  ChangePasswordResponses,
-  CheckRedirectData,
-  CheckRedirectResponses,
-  ContactUsGetContactUsData,
-  ContactUsGetContactUsResponses,
-  CurrencyGetCurrenciesByIdData,
-  CurrencyGetCurrenciesByIdResponses,
-  CurrencyGetCurrenciesData,
-  CurrencyGetCurrenciesResponses,
-  DetectLanguageData,
-  DetectLanguageResponses,
-  Error404GetError404Data,
-  Error404GetError404Responses,
-  Error410GetError410Data,
-  Error410GetError410Responses,
-  FaqGetFaqData,
-  FaqGetFaqResponses,
-  FeatureFlagGetFeatureFlagsByIdData,
-  FeatureFlagGetFeatureFlagsByIdResponses,
-  FeatureFlagGetFeatureFlagsData,
-  FeatureFlagGetFeatureFlagsResponses,
-  FooterGetFooterData,
-  FooterGetFooterResponses,
-  ForgotPasswordData,
-  ForgotPasswordResponses,
-  GetLanguagesData,
-  GetLanguagesResponses,
-  GetUserPreferencesData,
-  GetUserPreferencesResponses,
-  GetUserProfileData,
-  GetUserProfileResponses,
-  HealthCheckData,
-  HealthCheckResponses,
-  HomepageGetHomepageData,
-  HomepageGetHomepageResponses,
-  LoginUserData,
-  LoginUserResponses,
-  LogoutUserData,
-  LogoutUserResponses,
-  NavigationGetNavigationData,
-  NavigationGetNavigationResponses,
-  PrivacyGetPrivacyData,
-  PrivacyGetPrivacyResponses,
-  ProductCategoriesPageGetProductCategoriesPageData,
-  ProductCategoriesPageGetProductCategoriesPageResponses,
-  ProductCategoryGetProductCategoriesByIdData,
-  ProductCategoryGetProductCategoriesByIdResponses,
-  ProductCategoryGetProductCategoriesData,
-  ProductCategoryGetProductCategoriesResponses,
-  ProductGetProductsByIdData,
-  ProductGetProductsByIdResponses,
-  ProductGetProductsData,
-  ProductGetProductsResponses,
-  ProductTagGetProductTagsByIdData,
-  ProductTagGetProductTagsByIdResponses,
-  ProductTagGetProductTagsData,
-  ProductTagGetProductTagsResponses,
-  ProfileGetProfileData,
-  ProfileGetProfileResponses,
-  RefreshTokenData,
-  RefreshTokenResponses,
-  RegisterUserData,
-  RegisterUserResponses,
-  ResendVerificationData,
-  ResendVerificationResponses,
-  ResetPasswordData,
-  ResetPasswordResponses,
-  TeamMemberGetTeamMembersByIdData,
-  TeamMemberGetTeamMembersByIdResponses,
-  TeamMemberGetTeamMembersData,
-  TeamMemberGetTeamMembersResponses,
-  TermGetTermData,
-  TermGetTermResponses,
-  ThemeGetThemesByIdData,
-  ThemeGetThemesByIdResponses,
-  ThemeGetThemesData,
-  ThemeGetThemesResponses,
-  UpdateUserPreferencesData,
-  UpdateUserProfileData,
-  UploadGetFilesByIdData,
-  UploadGetFilesByIdResponses,
-  UploadGetFilesData,
-  UploadGetFilesResponses,
-  VerifyEmailData,
-  VerifyEmailResponses,
+    AboutGetAboutData,
+    AboutGetAboutResponses,
+    AuthPageGetAuthPageData,
+    AuthPageGetAuthPageResponses,
+    BlogGetBlogData,
+    BlogGetBlogResponses,
+    BlogPostGetBlogPostsBySlugData,
+    BlogPostGetBlogPostsBySlugResponses,
+    BlogPostGetBlogPostsData,
+    BlogPostGetBlogPostsResponses,
+    BlogPostTagGetBlogPostTagsByIdData,
+    BlogPostTagGetBlogPostTagsByIdResponses,
+    BlogPostTagGetBlogPostTagsData,
+    BlogPostTagGetBlogPostTagsResponses,
+    ChangePasswordData,
+    ChangePasswordResponses,
+    CheckRedirectData,
+    CheckRedirectResponses,
+    ContactUsGetContactUsData,
+    ContactUsGetContactUsResponses,
+    ContributorGetContributorsBySlugData,
+    ContributorGetContributorsBySlugResponses,
+    ContributorGetContributorsData,
+    ContributorGetContributorsResponses,
+    CurrencyGetCurrenciesByIdData,
+    CurrencyGetCurrenciesByIdResponses,
+    CurrencyGetCurrenciesData,
+    CurrencyGetCurrenciesResponses,
+    DetectLanguageData,
+    DetectLanguageResponses,
+    Error404GetError404Data,
+    Error404GetError404Responses,
+    Error410GetError410Data,
+    Error410GetError410Responses,
+    FaqGetFaqData,
+    FaqGetFaqResponses,
+    FeatureFlagGetFeatureFlagsByIdData,
+    FeatureFlagGetFeatureFlagsByIdResponses,
+    FeatureFlagGetFeatureFlagsData,
+    FeatureFlagGetFeatureFlagsResponses,
+    FooterGetFooterData,
+    FooterGetFooterResponses,
+    ForgotPasswordData,
+    ForgotPasswordResponses,
+    GetLanguagesData,
+    GetLanguagesResponses,
+    GetUserPreferencesData,
+    GetUserPreferencesResponses,
+    GetUserProfileData,
+    GetUserProfileResponses,
+    HealthCheckData,
+    HealthCheckResponses,
+    HomepageGetHomepageData,
+    HomepageGetHomepageResponses,
+    LoginUserData,
+    LoginUserResponses,
+    LogoutUserData,
+    LogoutUserResponses,
+    NavigationGetNavigationData,
+    NavigationGetNavigationResponses,
+    PrivacyGetPrivacyData,
+    PrivacyGetPrivacyResponses,
+    ProductCategoriesPageGetProductCategoriesPageData,
+    ProductCategoriesPageGetProductCategoriesPageResponses,
+    ProductCategoryGetProductCategoriesBySlugData,
+    ProductCategoryGetProductCategoriesBySlugResponses,
+    ProductCategoryGetProductCategoriesData,
+    ProductCategoryGetProductCategoriesResponses,
+    ProductGetProductsBySlugData,
+    ProductGetProductsBySlugResponses,
+    ProductGetProductsData,
+    ProductGetProductsResponses,
+    ProductTagGetProductTagsByIdData,
+    ProductTagGetProductTagsByIdResponses,
+    ProductTagGetProductTagsData,
+    ProductTagGetProductTagsResponses,
+    ProfileGetProfileData,
+    ProfileGetProfileResponses,
+    RefreshTokenData,
+    RefreshTokenResponses,
+    RegisterUserData,
+    RegisterUserResponses,
+    ResendVerificationData,
+    ResendVerificationResponses,
+    ResetPasswordData,
+    ResetPasswordResponses,
+
+    TermGetTermData,
+    TermGetTermResponses,
+    ThemeGetThemesByIdData,
+    ThemeGetThemesByIdResponses,
+    ThemeGetThemesData,
+    ThemeGetThemesResponses,
+    UpdateUserPreferencesData,
+    UpdateUserProfileData,
+    UploadGetFilesByIdData,
+    UploadGetFilesByIdResponses,
+    UploadGetFilesData,
+    UploadGetFilesResponses,
+    VerifyEmailData,
+    VerifyEmailResponses
 } from '@/lib/generated/types.gen'
 
 /**
@@ -145,22 +142,21 @@ export type ApiRequest =
   | ProfileGetProfileData
   | TermGetTermData
   // Content collection operations (query params for filters/pagination/sort)
-  | AuthorGetAuthorsData
-  | AuthorGetAuthorsByIdData
+  | ContributorGetContributorsData
+  | ContributorGetContributorsBySlugData
   | BlogPostGetBlogPostsData
-  | BlogPostGetBlogPostsByIdData
+  | BlogPostGetBlogPostsBySlugData
   | BlogPostTagGetBlogPostTagsData
   | BlogPostTagGetBlogPostTagsByIdData
   | CurrencyGetCurrenciesData
   | CurrencyGetCurrenciesByIdData
   | ProductCategoryGetProductCategoriesData
-  | ProductCategoryGetProductCategoriesByIdData
+  | ProductCategoryGetProductCategoriesBySlugData
   | ProductGetProductsData
-  | ProductGetProductsByIdData
+  | ProductGetProductsBySlugData
   | ProductTagGetProductTagsData
   | ProductTagGetProductTagsByIdData
-  | TeamMemberGetTeamMembersData
-  | TeamMemberGetTeamMembersByIdData
+
   | ThemeGetThemesData
   | ThemeGetThemesByIdData
   // Feature flag operations
@@ -215,22 +211,21 @@ export type ApiResponse =
   | ProfileGetProfileResponses[200]
   | TermGetTermResponses[200]
   // Content collection operations
-  | AuthorGetAuthorsResponses[200]
-  | AuthorGetAuthorsByIdResponses[200]
+  | ContributorGetContributorsResponses[200]
+  | ContributorGetContributorsBySlugResponses[200]
   | BlogPostGetBlogPostsResponses[200]
-  | BlogPostGetBlogPostsByIdResponses[200]
+  | BlogPostGetBlogPostsBySlugResponses[200]
   | BlogPostTagGetBlogPostTagsResponses[200]
   | BlogPostTagGetBlogPostTagsByIdResponses[200]
   | CurrencyGetCurrenciesResponses[200]
   | CurrencyGetCurrenciesByIdResponses[200]
   | ProductCategoryGetProductCategoriesResponses[200]
-  | ProductCategoryGetProductCategoriesByIdResponses[200]
+  | ProductCategoryGetProductCategoriesBySlugResponses[200]
   | ProductGetProductsResponses[200]
-  | ProductGetProductsByIdResponses[200]
+  | ProductGetProductsBySlugResponses[200]
   | ProductTagGetProductTagsResponses[200]
   | ProductTagGetProductTagsByIdResponses[200]
-  | TeamMemberGetTeamMembersResponses[200]
-  | TeamMemberGetTeamMembersByIdResponses[200]
+
   | ThemeGetThemesResponses[200]
   | ThemeGetThemesByIdResponses[200]
   // Feature flag operations

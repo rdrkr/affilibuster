@@ -175,13 +175,4 @@ describe('AboutSections', () => {
     expect(dynamicZone).toBeInTheDocument()
     expect(dynamicZone.children).toHaveLength(0)
   })
-
-  it('should apply space-y-8 className to DynamicZone', () => {
-    const sections: AboutSection[] = [{ __component: 'sections.hero', id: 1 } as AboutSection]
-
-    render(<AboutSections direction={DirectionEnum.LTR} sections={sections} />)
-
-    const dynamicZone = screen.getByTestId('dynamic-zone')
-    expect(dynamicZone).toHaveClass('space-y-8')
-  })
 })

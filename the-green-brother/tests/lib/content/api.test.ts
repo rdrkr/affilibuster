@@ -12,13 +12,13 @@
 
 import {
   getAbout,
-  getAuthorById,
-  getAuthors,
   getAuthPage,
   getBlog,
-  getBlogPostById,
+  getBlogPostBySlug,
   getBlogPosts,
   getContactUs,
+  getContributorBySlug,
+  getContributors,
   getError404,
   getError410,
   getFaq,
@@ -28,10 +28,10 @@ import {
   getHomepage,
   getNavigation,
   getPrivacy,
-  getProductById,
+  getProductBySlug,
   getProductCategories,
   getProductCategoriesPage,
-  getProductCategoryById,
+  getProductCategoryBySlug,
   getProducts,
   getProfile,
   getTerm,
@@ -469,14 +469,14 @@ describe('Content API - Collection Types', () => {
     })
   })
 
-  describe('getProductById', () => {
-    it('should fetch single product by ID', async () => {
-      const mockData = { id: 1, name: 'Product 1', price: 99.99 }
+  describe('getProductBySlug', () => {
+    it('should fetch single product by Slug', async () => {
+      const mockData = { id: 1, name: 'Product 1', slug: 'product-1', price: 99.99 }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getProductById('1', { locale: CodeEnum.EN })
-      expect(mockCreateApiRequest).toHaveBeenCalledWith('/products/1', {
-        path: { id: '1' },
+      const result = await getProductBySlug('product-1', { locale: CodeEnum.EN })
+      expect(mockCreateApiRequest).toHaveBeenCalledWith('/products/slug/product-1', {
+        path: { slug: 'product-1' },
         query: { locale: CodeEnum.EN, customPopulate: 'nested' },
       })
       expect(result).toEqual(mockData)
@@ -486,7 +486,7 @@ describe('Content API - Collection Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('Not found'))
 
-      const result = await getProductById('999')
+      const result = await getProductBySlug('non-existent')
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -527,13 +527,17 @@ describe('Content API - Collection Types', () => {
     })
   })
 
-  describe('getProductCategoryById', () => {
-    it('should fetch single category by ID', async () => {
-      const mockData = { id: 1, name: 'Electronics', description: '...' }
+  describe('getProductCategoryBySlug', () => {
+    it('should fetch single category by Slug', async () => {
+      const mockData = { id: 1, name: 'Electronics', slug: 'electronics', description: '...' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getProductCategoryById('123')
+      const result = await getProductCategoryBySlug('electronics')
 
+      expect(mockCreateApiRequest).toHaveBeenCalledWith('/product-categories/slug/electronics', {
+        path: { slug: 'electronics' },
+        query: { customPopulate: 'nested' },
+      })
       expect(result).toEqual(mockData)
     })
 
@@ -541,7 +545,7 @@ describe('Content API - Collection Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getProductCategoryById('123')
+      const result = await getProductCategoryBySlug('electronics')
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -589,13 +593,17 @@ describe('Content API - Collection Types', () => {
     })
   })
 
-  describe('getBlogPostById', () => {
-    it('should fetch single blog post by ID', async () => {
-      const mockData = { id: 1, title: 'Post 1', content: '...' }
+  describe('getBlogPostBySlug', () => {
+    it('should fetch single blog post by Slug', async () => {
+      const mockData = { id: 1, title: 'Post 1', slug: 'post-1', content: '...' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getBlogPostById('123')
+      const result = await getBlogPostBySlug('post-1')
 
+      expect(mockCreateApiRequest).toHaveBeenCalledWith('/blog-posts/slug/post-1', {
+        path: { slug: 'post-1' },
+        query: { customPopulate: 'nested' },
+      })
       expect(result).toEqual(mockData)
     })
 
@@ -603,7 +611,7 @@ describe('Content API - Collection Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getBlogPostById('123')
+      const result = await getBlogPostBySlug('post-1')
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -611,20 +619,49 @@ describe('Content API - Collection Types', () => {
     })
   })
 
-  describe('getAuthors', () => {
-    it('should fetch authors', async () => {
-      const mockData = { data: [{ id: 1, name: 'Author 1' }], meta: {} }
+  describe('getContributors', () => {
+    it('should fetch contributors', async () => {
+      const mockData = { data: [{ id: 1, name: 'Contributor 1' }], meta: {} }
       mockApiRequest.mockResolvedValueOnce(mockData as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getAuthors()
-      expect(result).toEqual(mockData)
+      const result = await getContributors()
+      expect(result).toEqual(mockData.data)
+    })
+
+    it('should flatten nested filters', async () => {
+      const mockData = { data: [{ id: 1, name: 'Team Member' }], meta: {} }
+      mockApiRequest.mockResolvedValueOnce(mockData as unknown as ReturnType<typeof apiClient.apiRequest>)
+
+      const result = await getContributors({
+        filters: {
+          roles: {
+            roleId: {
+              $nei: 'author',
+            },
+          },
+        },
+      })
+
+      expect(mockCreateApiRequest).toHaveBeenCalledWith('/contributors', {
+        query: {
+          customPopulate: 'nested',
+          filters: {
+            roles: {
+              roleId: {
+                $nei: 'author',
+              },
+            },
+          },
+        },
+      })
+      expect(result).toEqual(mockData.data)
     })
 
     it('should return null on error', async () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getAuthors()
+      const result = await getContributors()
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -632,12 +669,16 @@ describe('Content API - Collection Types', () => {
     })
   })
 
-  describe('getAuthorById', () => {
-    it('should fetch single author by ID', async () => {
-      const mockData = { id: 1, name: 'Author 1', bio: '...' }
+  describe('getContributorBySlug', () => {
+    it('should fetch single contributor by Slug', async () => {
+      const mockData = { id: 1, name: 'Contributor 1', slug: 'contributor-1', bio: '...' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getAuthorById('123')
+      const result = await getContributorBySlug('contributor-1')
+      expect(mockCreateApiRequest).toHaveBeenCalledWith('/contributors/slug/contributor-1', {
+        path: { slug: 'contributor-1' },
+        query: { customPopulate: 'nested' },
+      })
       expect(result).toEqual(mockData)
     })
 
@@ -645,7 +686,7 @@ describe('Content API - Collection Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getAuthorById('123')
+      const result = await getContributorBySlug('contributor-1')
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()

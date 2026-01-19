@@ -42,14 +42,14 @@ jest.mock('@/components/elements', () => ({
       </button>
     )
   },
-  CMSIcon: function MockCMSIcon({ icon, size }: { icon?: string; size?: string }) {
+  Icon: function MockIcon({ icon, size }: { icon?: string; size?: string }) {
     return (
       <span data-testid="mock-icon" data-icon={icon} data-size={size}>
         {icon}
       </span>
     )
   },
-  CMSText: function MockCMSText({ text }: { text?: string }) {
+  Text: function MockText({ text }: { text?: string }) {
     return <span data-testid="mock-text">{text}</span>
   },
   ButtonLink: jest.fn(() => null),

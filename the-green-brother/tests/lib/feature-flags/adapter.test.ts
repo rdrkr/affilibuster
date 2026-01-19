@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 /**

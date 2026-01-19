@@ -16,7 +16,7 @@
       "enum": ["before_text", "after_text"]
     },
     "text": {
-      "type": "string",
+      "type": "text",
       "required": true
     },
     "ariaDescription": {

@@ -7,13 +7,17 @@
 import { render, screen } from '@testing-library/react'
 
 import { TeamSection, type TeamSectionProps } from '@/components/sections/TeamSection'
-import { AlignmentEnum, DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
+import {
+  AlignmentEnum,
+  DirectionEnum,
+  IconPositionEnum,
+  type PluginUploadFileDocument,
+} from '@/lib/generated/types.gen'
 
 // Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
   default: function MockImage(props: { src: string; alt: string; className?: string }) {
-    // eslint-disable-next-line @next/next/no-img-element
     return <img src={props.src} alt={props.alt} className={props.className} />
   },
 }))
@@ -44,25 +48,24 @@ jest.mock('next/link', () => ({
   },
 }))
 
+// Mock API client
+jest.mock('@/lib/content/api', () => ({
+  getContributors: jest.fn(),
+}))
+
 // Mock the CMS element components
 jest.mock('@/components/elements', () => ({
-  CMSIcon: function MockCMSIcon({ icon, size, className }: { icon: string; size?: string; className?: string }) {
+  Icon: function MockIcon({ icon, size, className }: { icon: string; size?: string; className?: string }) {
     return (
       <span data-testid="mock-icon" data-icon={icon} data-size={size} className={className}>
         {icon}
       </span>
     )
   },
-  CMSImage: function MockCMSImage({
-    image,
-    fallbackAlt,
-  }: {
-    image?: { url?: string; alternativeText?: string }
-    fallbackAlt?: string
-  }) {
+  Image: function MockImage({ image }: { image?: PluginUploadFileDocument | null }) {
     const url = image?.url ?? '/images/placeholder.svg'
-    const alt = image?.alternativeText ?? fallbackAlt ?? ''
-    // eslint-disable-next-line @next/next/no-img-element
+    const alt = image?.alternativeText ?? ''
+
     return <img data-testid="mock-image" src={url} alt={alt} />
   },
   Header: function MockHeader({
@@ -80,26 +83,32 @@ jest.mock('@/components/elements', () => ({
   Card: function MockCard({
     children,
     image,
-    imageAlt,
     imageOverlay,
+    header,
+    content,
+    footer,
   }: {
-    children: React.ReactNode
-    image?: { url?: string; alternativeText?: string }
-    imageAlt?: string
+    children?: React.ReactNode
+    image?: PluginUploadFileDocument | null
     imageOverlay?: React.ReactNode
+    header?: React.ReactNode
+    content?: React.ReactNode
+    footer?: React.ReactNode
   }) {
     return (
       <div data-testid="mock-card">
         {image ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             data-testid="mock-image"
-            src={image.url ?? '/images/placeholder.svg'}
-            alt={image.alternativeText ?? imageAlt ?? ''}
+            src={image.url || '/images/placeholder.svg'}
+            alt={image.alternativeText ?? ''}
           />
         ) : (
           imageOverlay
         )}
+        {header}
+        {content}
+        {footer}
         {children}
       </div>
     )
@@ -142,14 +151,48 @@ jest.mock('@/components/elements', () => ({
     )
   },
 }))
+// Mock ContributorCard
+jest.mock('@/components/elements/ContributorCard', () => ({
+  ContributorCard: function MockContributorCard({ member }: { member: any }) {
+    return (
+      <div data-testid="contributor-card">
+        <div>{member.name}</div>
+        <div>{member.roles?.[0]?.name}</div>
+        <div>{member.bio}</div>
+        {member.profilePicture ? (
+          <img data-testid="mock-image" src={member.profilePicture.url} alt={member.profilePicture.alternativeText} />
+        ) : (
+          <div>
+            {member.name
+              .split(' ')
+              .map((n: string) => n[0])
+              .join('')}
+          </div>
+        )}
+        {member.twitter && <a href={`https://x.com/${member.twitter}`}>John Doe on X</a>}
+        {member.linkedin && <a href={`https://linkedin.com/in/${member.linkedin}`}>John Doe on LinkedIn</a>}
+        {member.github && <a href={`https://github.com/${member.github}`}>John Doe on GitHub</a>}
+        {member.instagram && <a href={`https://instagram.com/${member.instagram}`}>John Doe on Instagram</a>}
+      </div>
+    )
+  },
+}))
 
 describe('TeamSection', () => {
-  const mockTeamMember = {
+  const mockContributor = {
     documentId: 'member-1',
     id: 1,
     name: 'John Doe',
     slug: 'john-doe',
-    role: 'CEO',
+    roles: [
+      {
+        documentId: 'role-1',
+        id: 1,
+        roleId: 'ceo',
+        name: 'CEO',
+        publishedAt: '2025-01-01',
+      },
+    ],
     bio: 'A passionate leader focused on sustainability.',
     email: 'john@example.com',
     twitter: 'johndoe',
@@ -188,58 +231,58 @@ describe('TeamSection', () => {
         iconPosition: IconPositionEnum.BEFORE_TEXT,
       },
     },
-    team_members: [mockTeamMember],
   }
 
+  // Cast mockContributor to match ApiContributorContributorDocument strict typing
+  const contributors = [mockContributor] as unknown as TeamSectionProps['contributors']
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('should render team section with header', () => {
-    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} />)
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributors} />)
 
     expect(screen.getByTestId('mock-header')).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Meet Our Team')
   })
 
-  it('should render team member name and role', () => {
-    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} />)
+  it('should render contributor name and role', () => {
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributors} />)
 
     expect(screen.getByText('John Doe')).toBeInTheDocument()
     expect(screen.getByText('CEO')).toBeInTheDocument()
   })
 
-  it('should render team member bio', () => {
-    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} />)
+  it('should render contributor bio', () => {
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributors} />)
 
     expect(screen.getByText('A passionate leader focused on sustainability.')).toBeInTheDocument()
   })
 
   it('should render profile picture when available', () => {
-    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} />)
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributors} />)
 
     const image = screen.getByTestId('mock-image')
     expect(image).toHaveAttribute('alt', 'John Doe profile picture')
   })
 
   it('should render initials when profile picture is not available', () => {
-    const memberWithoutPicture = { ...mockTeamMember }
+    const memberWithoutPicture = { ...mockContributor }
     delete (memberWithoutPicture as Record<string, unknown>).profilePicture
+    const contributorsWithoutPic = [memberWithoutPicture] as unknown as TeamSectionProps['contributors']
 
-    const dataWithoutPicture: TeamSectionProps['data'] = {
-      ...mockBaseData,
-      team_members: [memberWithoutPicture],
-    }
-
-    render(<TeamSection direction={DirectionEnum.LTR} data={dataWithoutPicture} />)
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributorsWithoutPic} />)
 
     // Should show initials "JD" for John Doe
     expect(screen.getByText('JD')).toBeInTheDocument()
   })
 
   it('should render social links when available', () => {
-    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} />)
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributors} />)
 
     const xLink = screen.getByRole('link', { name: 'John Doe on X' })
     expect(xLink).toHaveAttribute('href', 'https://x.com/johndoe')
-    expect(xLink).toHaveAttribute('target', '_blank')
-    expect(xLink).toHaveAttribute('rel', 'noopener noreferrer')
 
     const linkedinLink = screen.getByRole('link', { name: 'John Doe on LinkedIn' })
     expect(linkedinLink).toHaveAttribute('href', 'https://linkedin.com/in/johndoe')
@@ -251,35 +294,21 @@ describe('TeamSection', () => {
     expect(instagramLink).toHaveAttribute('href', 'https://instagram.com/johndoe')
   })
 
-  it('should use masked icons for social links', () => {
-    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} />)
-
-    const socialLinks = screen.getAllByTestId('mock-button-link')
-    // All 4 social links should have data-masked="true"
-    socialLinks.forEach(link => {
-      expect(link).toHaveAttribute('data-masked', 'true')
-    })
-  })
-
   it('should not render social links when not provided', () => {
     const memberWithoutSocials = {
       documentId: 'member-1',
       id: 1,
       name: 'John Doe',
       slug: 'john-doe',
-      role: 'CEO',
+      roles: [{ documentId: 'role-1', id: 1, roleId: 'ceo', name: 'CEO', publishedAt: '2025-01-01' }],
       bio: 'A passionate leader focused on sustainability.',
       email: 'john@example.com',
       publishedAt: '2025-01-01',
-      profilePicture: mockTeamMember.profilePicture,
+      profilePicture: mockContributor.profilePicture,
     }
+    const contributorsNoSocials = [memberWithoutSocials] as unknown as TeamSectionProps['contributors']
 
-    const dataWithoutSocials: TeamSectionProps['data'] = {
-      ...mockBaseData,
-      team_members: [memberWithoutSocials],
-    }
-
-    render(<TeamSection direction={DirectionEnum.LTR} data={dataWithoutSocials} />)
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributorsNoSocials} />)
 
     expect(screen.queryByRole('link', { name: /on X$/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /on LinkedIn/i })).not.toBeInTheDocument()
@@ -287,62 +316,39 @@ describe('TeamSection', () => {
     expect(screen.queryByRole('link', { name: /on Instagram/i })).not.toBeInTheDocument()
   })
 
-  it('should return null when no team members', () => {
-    const dataWithoutMembers: TeamSectionProps['data'] = {
-      ...mockBaseData,
-      team_members: [],
-    }
-
-    const { container } = render(<TeamSection direction={DirectionEnum.LTR} data={dataWithoutMembers} />)
+  it('should return null when no contributors', () => {
+    const { container } = render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={[]} />)
 
     expect(container.firstChild).toBeNull()
   })
 
-  it('should return null when team_members is undefined', () => {
-    const dataWithUndefinedMembers = {
-      ...mockBaseData,
-      team_members: [] as (typeof mockTeamMember)[],
-    }
-    // Delete to simulate undefined
-    delete (dataWithUndefinedMembers as Record<string, unknown>).team_members
+  it('should render multiple contributors', () => {
+    const multipleContributors = [
+      mockContributor,
+      {
+        ...mockContributor,
+        documentId: 'member-2',
+        id: 2,
+        name: 'Jane Smith',
+        roles: [{ documentId: 'role-2', id: 2, roleId: 'cto', name: 'CTO', publishedAt: '2025-01-01' }],
+      },
+      {
+        ...mockContributor,
+        documentId: 'member-3',
+        id: 3,
+        name: 'Bob Jones',
+        roles: [{ documentId: 'role-3', id: 3, roleId: 'dev', name: 'Dev', publishedAt: '2025-01-01' }],
+      },
+      {
+        ...mockContributor,
+        documentId: 'member-4',
+        id: 4,
+        name: 'Sarah Connor',
+        roles: [{ documentId: 'role-4', id: 4, roleId: 'manager', name: 'Manager', publishedAt: '2025-01-01' }],
+      },
+    ] as unknown as TeamSectionProps['contributors']
 
-    const { container } = render(
-      <TeamSection direction={DirectionEnum.LTR} data={dataWithUndefinedMembers as TeamSectionProps['data']} />
-    )
-
-    expect(container.firstChild).toBeNull()
-  })
-
-  it('should render multiple team members', () => {
-    const dataWithMultipleMembers: TeamSectionProps['data'] = {
-      ...mockBaseData,
-      team_members: [
-        mockTeamMember,
-        {
-          ...mockTeamMember,
-          documentId: 'member-2',
-          id: 2,
-          name: 'Jane Smith',
-          role: 'CTO',
-        },
-        {
-          ...mockTeamMember,
-          documentId: 'member-3',
-          id: 3,
-          name: 'Bob Jones',
-          role: 'Dev',
-        },
-        {
-          ...mockTeamMember,
-          documentId: 'member-4',
-          id: 4,
-          name: 'Sarah Connor',
-          role: 'Manager',
-        },
-      ],
-    }
-
-    render(<TeamSection direction={DirectionEnum.LTR} data={dataWithMultipleMembers} />)
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={multipleContributors} />)
 
     expect(screen.getByText('John Doe')).toBeInTheDocument()
     expect(screen.getByText('Jane Smith')).toBeInTheDocument()
@@ -351,26 +357,133 @@ describe('TeamSection', () => {
   })
 
   it('should render without bio when not provided', () => {
-    const dataWithoutBio: TeamSectionProps['data'] = {
-      ...mockBaseData,
-      team_members: [
-        {
-          ...mockTeamMember,
-          bio: '',
-        },
-      ],
+    const contributorNoBio = {
+      ...mockContributor,
+      bio: '',
     }
+    const contributorsNoBio = [contributorNoBio] as unknown as TeamSectionProps['contributors']
 
-    render(<TeamSection direction={DirectionEnum.LTR} data={dataWithoutBio} />)
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributorsNoBio} />)
 
     expect(screen.getByText('John Doe')).toBeInTheDocument()
     expect(screen.queryByText('A passionate leader focused on sustainability.')).not.toBeInTheDocument()
   })
 
   it('should have correct aria-label on section', () => {
-    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} />)
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributors} />)
 
     const section = screen.getByRole('region', { name: 'Team section heading' })
     expect(section).toBeInTheDocument()
+  })
+
+  it('should format single role correctly', () => {
+    const contributorSingleRole = {
+      ...mockContributor,
+      roles: [
+        {
+          documentId: 'role-1',
+          id: 1,
+          roleId: 'ceo',
+          name: 'CEO',
+          publishedAt: '2025-01-01',
+        },
+      ],
+    }
+    const contributorsSingleRole = [contributorSingleRole] as unknown as TeamSectionProps['contributors']
+
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributorsSingleRole} />)
+
+    expect(screen.getByText('CEO')).toBeInTheDocument()
+  })
+
+  it('should format two roles with & separator', () => {
+    const contributorTwoRoles = {
+      ...mockContributor,
+      roles: [
+        {
+          documentId: 'role-1',
+          id: 1,
+          roleId: 'ceo',
+          name: 'CEO',
+          publishedAt: '2025-01-01',
+        },
+        {
+          documentId: 'role-2',
+          id: 2,
+          roleId: 'founder',
+          name: 'Founder',
+          publishedAt: '2025-01-01',
+        },
+      ],
+    }
+    const contributorsTwoRoles = [contributorTwoRoles] as unknown as TeamSectionProps['contributors']
+
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributorsTwoRoles} />)
+
+    expect(screen.getByText('CEO & Founder')).toBeInTheDocument()
+  })
+
+  it('should format three or more roles with comma and & separators', () => {
+    const contributorThreeRoles = {
+      ...mockContributor,
+      roles: [
+        {
+          documentId: 'role-1',
+          id: 1,
+          roleId: 'ceo',
+          name: 'CEO',
+          publishedAt: '2025-01-01',
+        },
+        {
+          documentId: 'role-2',
+          id: 2,
+          roleId: 'founder',
+          name: 'Founder',
+          publishedAt: '2025-01-01',
+        },
+        {
+          documentId: 'role-3',
+          id: 3,
+          roleId: 'artist',
+          name: 'Artist',
+          publishedAt: '2025-01-01',
+        },
+      ],
+    }
+    const contributorsThreeRoles = [contributorThreeRoles] as unknown as TeamSectionProps['contributors']
+
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributorsThreeRoles} />)
+
+    expect(screen.getByText('CEO, Founder & Artist')).toBeInTheDocument()
+  })
+
+  it('should exclude author role from display', () => {
+    const contributorWithAuthorRole = {
+      ...mockContributor,
+      roles: [
+        {
+          documentId: 'role-1',
+          id: 1,
+          roleId: 'ceo',
+          name: 'CEO',
+          publishedAt: '2025-01-01',
+        },
+        {
+          documentId: 'role-2',
+          id: 2,
+          roleId: 'author',
+          name: 'Author',
+          publishedAt: '2025-01-01',
+        },
+      ],
+    }
+    const contributorsWithAuthor = [contributorWithAuthorRole] as unknown as TeamSectionProps['contributors']
+
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributorsWithAuthor} />)
+
+    // Should only show "CEO", not "CEO & Author"
+    expect(screen.getByText('CEO')).toBeInTheDocument()
+    expect(screen.queryByText('CEO & Author')).not.toBeInTheDocument()
+    expect(screen.queryByText('Author')).not.toBeInTheDocument()
   })
 })

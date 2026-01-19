@@ -4,9 +4,10 @@
  * Unit tests for HomeClient component
  */
 
-import { act, render, screen } from '@testing-library/react'
+import { act, screen } from '@testing-library/react'
 
 import HomeClient from '@/app/[lang]/(homepage)/HomeClient'
+import { renderWithLayout } from '../../../utils/renderWithLayout'
 
 describe('HomeClient', () => {
   beforeEach(() => {
@@ -18,7 +19,7 @@ describe('HomeClient', () => {
   })
 
   it('should render children', () => {
-    render(
+    renderWithLayout(
       <HomeClient>
         <div data-testid="child">Child Content</div>
       </HomeClient>
@@ -29,7 +30,7 @@ describe('HomeClient', () => {
   })
 
   it('should start with opacity-0 and transition to opacity-100', () => {
-    const { container } = render(
+    const { container } = renderWithLayout(
       <HomeClient>
         <div>Content</div>
       </HomeClient>
@@ -50,7 +51,7 @@ describe('HomeClient', () => {
   it('should cancel animation frame on unmount', () => {
     const cancelAnimationFrameSpy = jest.spyOn(window, 'cancelAnimationFrame')
 
-    const { unmount } = render(
+    const { unmount } = renderWithLayout(
       <HomeClient>
         <div>Content</div>
       </HomeClient>
@@ -62,7 +63,7 @@ describe('HomeClient', () => {
   })
 
   it('should render with transition classes', () => {
-    const { container } = render(
+    const { container } = renderWithLayout(
       <HomeClient>
         <div>Content</div>
       </HomeClient>
