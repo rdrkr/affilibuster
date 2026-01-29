@@ -76,7 +76,7 @@ export interface EndNavigationGroupProps {
   /** Feature flag: Enable product search */
   enableProductSearch?: boolean
   /** Feature flag: Enable user profile (login/signup) */
-  enableUserProfile?: boolean
+  enableUserProfile: boolean
 }
 
 // Block 3: Component Body (start)
@@ -109,7 +109,7 @@ export function EndNavigationGroup({
   onSearchExpandChange,
   onHasIconsChange,
   enableProductSearch = false,
-  enableUserProfile = false,
+  enableUserProfile,
 }: EndNavigationGroupProps) {
   const pathname = usePathname()
   const router = useRouter()

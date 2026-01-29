@@ -20,7 +20,7 @@ else
 fi
 
 echo "⏳ Waiting for Strapi to be ready..."
-MAX_RETRIES=120
+MAX_RETRIES=240
 RETRY_COUNT=0
 while [ "${RETRY_COUNT}" -lt "${MAX_RETRIES}" ]; do
   #shellcheck disable=SC2154

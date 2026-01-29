@@ -9,13 +9,14 @@
 
 'use client'
 
+import Link from 'next/link'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
 import type {
   ApiProductCategoryProductCategoryDocument,
   MenusProductCategoriesSelectorEntry,
 } from '@/lib/generated/types.gen'
-import Link from 'next/link'
 import { Image, Text } from '../elements'
 
 import { DirectionEnum } from '@/lib/generated/types.gen'
@@ -58,8 +59,30 @@ export function ProductCategoriesMenu({
   disabled = false,
   visible = true,
 }: ProductCategoriesMenuProps) {
+  const pathname = usePathname()
+  const currentSearchParams = useSearchParams()
+  const existingSearch = currentSearchParams.get('search')
   const categories = data.productCategories ?? []
   const [isOpen, setIsOpen] = useState(false)
+
+  // Extract language segment from current pathname (e.g., /en/products -> en)
+  const langRegex = /^\/([a-z]{2})\/?/
+  const langMatch = langRegex.exec(pathname)
+  const lang = langMatch?.[1] ?? 'en'
+
+  /**
+   * Builds href for a category link, preserving search param and language segment.
+   * @param slug - The category slug
+   * @returns URL string with language, category and optional search params
+   */
+  const getCategoryHref = (slug: string): string => {
+    const params = new URLSearchParams()
+    params.set('category', slug)
+    if (existingSearch) {
+      params.set('search', existingSearch)
+    }
+    return `/${lang}/products?${params.toString()}`
+  }
 
   return (
     <DropdownMenu
@@ -76,49 +99,43 @@ export function ProductCategoriesMenu({
       isOpen={isOpen}
       onOpenChange={setIsOpen}
     >
-      {categories.map((category: ApiProductCategoryProductCategoryDocument) => {
-        if (!category.content) {
-          return null
-        }
-
-        return (
-          <Link
-            key={category.documentId}
-            href={`/products?category=${category.slug}`}
+      {categories.map((category: ApiProductCategoryProductCategoryDocument) => (
+        <Link
+          key={category.documentId}
+          href={getCategoryHref(category.slug)}
+          className={`
+            group/item relative block h-32 overflow-hidden rounded-xl
+          `}
+          onClick={() => {
+            setIsOpen(false)
+          }}
+        >
+          <Image
+            image={category.image}
             className={`
-              group/item relative block h-32 overflow-hidden rounded-xl
+              object-cover transition-transform duration-500
+              group-hover/item:scale-110
             `}
-            onClick={() => {
-              setIsOpen(false)
-            }}
-          >
-            <Image
-              image={category.image}
-              className={`
-                object-cover transition-transform duration-500
-                group-hover/item:scale-110
-              `}
-              fill
-              sizes="250px"
-            />
-            <div
-              className={`
+            fill
+            sizes="250px"
+          />
+          <div
+            className={`
               absolute inset-0 flex items-end bg-linear-to-t from-black/80
               to-transparent p-4
             `}
-            >
-              <Text
-                text={category.content.text}
-                as="span"
-                className={`
+          >
+            <Text
+              text={category.content.text}
+              as="span"
+              className={`
                 font-bold text-white transition-colors
                 group-hover/item:text-primary
               `}
-              />
-            </div>
-          </Link>
-        )
-      })}
+            />
+          </div>
+        </Link>
+      ))}
     </DropdownMenu>
   )
 }

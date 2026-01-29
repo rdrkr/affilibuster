@@ -187,6 +187,7 @@ describe('BlogTeaserSection', () => {
       url: '/blog',
       openInNewTab: false,
     },
+    blogPosts: [],
   }
 
   const mockBlogPosts: ApiBlogPostBlogPostDocument[] = [
@@ -247,10 +248,36 @@ describe('BlogTeaserSection', () => {
           },
         },
       ],
+      author: {
+        documentId: 'auth-1',
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        slug: 'john-doe',
+        bio: 'Bio',
+        publishedAt: '2025-01-01',
+        roles: [],
+        seoMetadata: {
+          metaTitle: 'John Doe',
+          metaDescription: 'Author bio',
+        },
+      },
       seoMetadata: {
         metaTitle: '10 Ways to Reduce Plastic Waste',
         metaDescription: 'Tips for reducing plastic waste',
-      },
+        metaImage: {
+          documentId: 'img-1',
+          id: 1,
+          name: 'plastic-waste.webp',
+          alternativeText: 'Plastic waste reduction tips',
+          url: '/uploads/plastic-waste.webp',
+          hash: 'plastic_abc',
+          mime: 'image/webp',
+          size: 80,
+          provider: 'local',
+          publishedAt: '2025-01-15',
+        },
+      } as any,
     },
     {
       documentId: 'post-2',
@@ -309,12 +336,43 @@ describe('BlogTeaserSection', () => {
           },
         },
       ],
+      author: {
+        documentId: 'auth-2',
+        id: 2,
+        firstName: 'Jane',
+        lastName: 'Smith',
+        slug: 'jane-smith',
+        bio: 'Bio',
+        publishedAt: '2025-01-01',
+        roles: [],
+        seoMetadata: {
+          metaTitle: 'Jane Smith',
+          metaDescription: 'Author bio',
+        },
+      },
       seoMetadata: {
         metaTitle: 'Sustainable Fashion Guide',
         metaDescription: 'Guide to sustainable fashion',
-      },
+        metaImage: {
+          documentId: 'img-2',
+          id: 2,
+          name: 'fashion.webp',
+          alternativeText: 'Sustainable fashion tips',
+          url: '/uploads/fashion.webp',
+          hash: 'fashion_abc',
+          mime: 'image/webp',
+          size: 70,
+          provider: 'local',
+          publishedAt: '2025-01-10',
+        },
+      } as any,
     },
   ]
+
+  const mockSectionDataWithPosts: BlogTeaserSectionProps['data'] = {
+    ...mockSectionData,
+    blogPosts: mockBlogPosts,
+  }
 
   const mockLabels = {
     readTimeMinutesLabel: {
@@ -331,42 +389,18 @@ describe('BlogTeaserSection', () => {
     },
   }
 
-  const defaultContributor = {
-    name: 'Default Author',
-    slug: 'default-author',
-    bio: 'Bio',
-    publishedAt: '2025-01-01',
-    id: 999,
-    documentId: 'default-author-doc',
-  }
-
   const defaultProps = {
     ...mockLabels,
-    defaultContributor,
   }
 
   it('should render section with header text', () => {
-    render(
-      <BlogTeaserSection
-        {...defaultProps}
-        direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={mockBlogPosts}
-      />
-    )
+    render(<BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={mockSectionDataWithPosts} />)
 
     expect(screen.getByRole('heading', { level: 3, name: 'From Our Blog' })).toBeInTheDocument()
   })
 
   it('should render view all button with correct alignment for LTR', () => {
-    render(
-      <BlogTeaserSection
-        {...defaultProps}
-        direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={mockBlogPosts}
-      />
-    )
+    render(<BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={mockSectionDataWithPosts} />)
 
     const button = screen.getByRole('link', { name: 'View All Posts' })
     expect(button).toBeInTheDocument()
@@ -378,28 +412,14 @@ describe('BlogTeaserSection', () => {
     const { DirectionEnum } =
       jest.requireActual<typeof import('@/lib/generated/types.gen')>('@/lib/generated/types.gen')
 
-    render(
-      <BlogTeaserSection
-        {...defaultProps}
-        direction={DirectionEnum.RTL}
-        data={mockSectionData}
-        blogPosts={mockBlogPosts}
-      />
-    )
+    render(<BlogTeaserSection {...defaultProps} direction={DirectionEnum.RTL} data={mockSectionDataWithPosts} />)
 
     const button = screen.getByRole('link', { name: 'View All Posts' })
     expect(button).toHaveClass('self-end')
   })
 
   it('should render subheader when provided', () => {
-    render(
-      <BlogTeaserSection
-        {...defaultProps}
-        direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={mockBlogPosts}
-      />
-    )
+    render(<BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={mockSectionDataWithPosts} />)
 
     expect(screen.getByText('Discover tips and stories to inspire your eco-friendly journey.')).toBeInTheDocument()
   })
@@ -408,17 +428,11 @@ describe('BlogTeaserSection', () => {
     const { subheader: _subheader, ...headerWithoutSubheader } = mockSectionData.header
     const dataWithoutSubheader: BlogTeaserSectionProps['data'] = {
       ...mockSectionData,
+      blogPosts: mockBlogPosts,
       header: headerWithoutSubheader,
     }
 
-    render(
-      <BlogTeaserSection
-        {...defaultProps}
-        direction={DirectionEnum.LTR}
-        data={dataWithoutSubheader}
-        blogPosts={mockBlogPosts}
-      />
-    )
+    render(<BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={dataWithoutSubheader} />)
 
     expect(
       screen.queryByText('Discover tips and stories to inspire your eco-friendly journey.')
@@ -426,56 +440,28 @@ describe('BlogTeaserSection', () => {
   })
 
   it('should render all blog post titles', () => {
-    render(
-      <BlogTeaserSection
-        {...defaultProps}
-        direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={mockBlogPosts}
-      />
-    )
+    render(<BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={mockSectionDataWithPosts} />)
 
     expect(screen.getByText('10 Ways to Reduce Plastic Waste')).toBeInTheDocument()
     expect(screen.getByText('Sustainable Fashion Guide')).toBeInTheDocument()
   })
 
   it('should render BlogCard for each blog post', () => {
-    render(
-      <BlogTeaserSection
-        {...defaultProps}
-        direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={mockBlogPosts}
-      />
-    )
+    render(<BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={mockSectionDataWithPosts} />)
 
     const blogCards = screen.getAllByTestId('mock-blog-card')
     expect(blogCards).toHaveLength(2)
   })
 
   it('should render blog post tags via BlogCard', () => {
-    render(
-      <BlogTeaserSection
-        {...defaultProps}
-        direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={mockBlogPosts}
-      />
-    )
+    render(<BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={mockSectionDataWithPosts} />)
 
     expect(screen.getByText('Sustainability')).toBeInTheDocument()
     expect(screen.getByText('Fashion')).toBeInTheDocument()
   })
 
   it('should render blog post links with correct href', () => {
-    render(
-      <BlogTeaserSection
-        {...defaultProps}
-        direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={mockBlogPosts}
-      />
-    )
+    render(<BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={mockSectionDataWithPosts} />)
 
     const links = screen.getAllByRole('link')
     // Skip first link (view all button)
@@ -488,10 +474,8 @@ describe('BlogTeaserSection', () => {
       <BlogTeaserSection
         readTimeMinutesLabel={mockLabels.readTimeMinutesLabel}
         readArticleLabel={mockLabels.readArticleLabel}
-        defaultContributor={defaultContributor}
         direction={DirectionEnum.LTR}
         data={mockSectionData}
-        blogPosts={[]}
       />
     )
 
@@ -513,8 +497,7 @@ describe('BlogTeaserSection', () => {
       <BlogTeaserSection
         {...defaultProps}
         direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={postsWithoutImage}
+        data={{ ...mockSectionData, blogPosts: postsWithoutImage }}
       />
     )
 
@@ -537,8 +520,7 @@ describe('BlogTeaserSection', () => {
       <BlogTeaserSection
         {...defaultProps}
         direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={postsWithAbsoluteUrl}
+        data={{ ...mockSectionData, blogPosts: postsWithAbsoluteUrl }}
       />
     )
 
@@ -547,15 +529,13 @@ describe('BlogTeaserSection', () => {
   })
 
   it('should pass post without tags to BlogCard', () => {
-    const { tags: _tags, ...postWithoutTags } = mockBlogPosts[0]!
-    const postsWithoutTags: ApiBlogPostBlogPostDocument[] = [postWithoutTags]
+    const postsWithoutTags: ApiBlogPostBlogPostDocument[] = [{ ...mockBlogPosts[0]!, tags: [] }]
 
     render(
       <BlogTeaserSection
         {...defaultProps}
         direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={postsWithoutTags}
+        data={{ ...mockSectionData, blogPosts: postsWithoutTags }}
       />
     )
 
@@ -576,8 +556,7 @@ describe('BlogTeaserSection', () => {
       <BlogTeaserSection
         {...defaultProps}
         direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={postsWithoutAlt}
+        data={{ ...mockSectionData, blogPosts: postsWithoutAlt }}
       />
     )
 
@@ -586,14 +565,7 @@ describe('BlogTeaserSection', () => {
   })
 
   it('should have correct aria-label on section', () => {
-    render(
-      <BlogTeaserSection
-        {...defaultProps}
-        direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={mockBlogPosts}
-      />
-    )
+    render(<BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={mockSectionDataWithPosts} />)
 
     const sections = screen.getAllByRole('region', { name: 'Blog posts section' })
     expect(sections.length).toBeGreaterThan(0)
@@ -604,20 +576,14 @@ describe('BlogTeaserSection', () => {
     const { header, ...restData } = mockSectionData
     const dataWithoutAria = {
       ...restData,
+      blogPosts: mockBlogPosts,
       header: {
         ...header,
         header: { ...header.header, ariaDescription: undefined },
       },
     } as unknown as BlogTeaserSectionProps['data']
 
-    render(
-      <BlogTeaserSection
-        {...defaultProps}
-        direction={DirectionEnum.LTR}
-        data={dataWithoutAria}
-        blogPosts={mockBlogPosts}
-      />
-    )
+    render(<BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={dataWithoutAria} />)
 
     // Should default to empty string
     // Since role="region" requires label, it falls back to generic section.
@@ -628,14 +594,7 @@ describe('BlogTeaserSection', () => {
   })
 
   it('should render BlogCard components (CTA tested in BlogCard)', () => {
-    render(
-      <BlogTeaserSection
-        {...defaultProps}
-        direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={mockBlogPosts}
-      />
-    )
+    render(<BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={mockSectionDataWithPosts} />)
 
     // BlogCard components render read article CTA internally
     const blogCards = screen.getAllByTestId('mock-blog-card')
@@ -646,14 +605,7 @@ describe('BlogTeaserSection', () => {
     const { DirectionEnum } =
       jest.requireActual<typeof import('@/lib/generated/types.gen')>('@/lib/generated/types.gen')
 
-    render(
-      <BlogTeaserSection
-        {...defaultProps}
-        data={mockSectionData}
-        blogPosts={mockBlogPosts}
-        direction={DirectionEnum.RTL}
-      />
-    )
+    render(<BlogTeaserSection {...defaultProps} data={mockSectionDataWithPosts} direction={DirectionEnum.RTL} />)
 
     const blogCards = screen.getAllByTestId('mock-blog-card')
     expect(blogCards.length).toBe(2)
@@ -661,14 +613,7 @@ describe('BlogTeaserSection', () => {
   })
 
   it('should pass direction to BlogCard for LTR', () => {
-    render(
-      <BlogTeaserSection
-        {...defaultProps}
-        direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={mockBlogPosts}
-      />
-    )
+    render(<BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={mockSectionDataWithPosts} />)
 
     const blogCards = screen.getAllByTestId('mock-blog-card')
     expect(blogCards.length).toBeGreaterThan(0)
@@ -680,12 +625,7 @@ describe('BlogTeaserSection', () => {
       jest.requireActual<typeof import('@/lib/generated/types.gen')>('@/lib/generated/types.gen')
 
     const { container } = render(
-      <BlogTeaserSection
-        {...defaultProps}
-        data={mockSectionData}
-        blogPosts={mockBlogPosts}
-        direction={DirectionEnum.RTL}
-      />
+      <BlogTeaserSection {...defaultProps} data={mockSectionDataWithPosts} direction={DirectionEnum.RTL} />
     )
 
     const carousel = container.querySelector('.snap-x')
@@ -694,12 +634,7 @@ describe('BlogTeaserSection', () => {
 
   it('should apply dir ltr to carousel for LTR direction', () => {
     const { container } = render(
-      <BlogTeaserSection
-        {...defaultProps}
-        direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        blogPosts={mockBlogPosts}
-      />
+      <BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={mockSectionDataWithPosts} />
     )
 
     const carousel = container.querySelector('.snap-x')

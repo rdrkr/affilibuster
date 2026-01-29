@@ -43,6 +43,8 @@ export interface LabelProps {
   iconClassName?: string
   /** Use masked icon for local icons (inherits color) */
   maskedIcon?: boolean
+  /** Load icon with high priority (for LCP optimization, local icons only) */
+  iconPriority?: boolean
 }
 
 /**
@@ -63,6 +65,7 @@ export interface LabelProps {
  * @param props.textClassName - Text CSS classes
  * @param props.iconClassName - Icon CSS classes
  * @param props.maskedIcon - Use masked icon for local icons (inherits color)
+ * @param props.iconPriority - Load icon with high priority (for LCP optimization)
  * @returns Label component or null if no data or not visible
  */
 export function Label({
@@ -79,6 +82,7 @@ export function Label({
   textClassName = '',
   iconClassName = '',
   maskedIcon = false,
+  iconPriority = false,
 }: LabelProps) {
   if (!data || visible === false) {
     return null
@@ -95,6 +99,7 @@ export function Label({
         ariaLabel={ariaDescription}
         promoted={promoteIcon}
         masked={maskedIcon}
+        priority={iconPriority}
       />
     ) : null
 

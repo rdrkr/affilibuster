@@ -9,3 +9,4 @@
 export { Carousel, type CarouselGap, type CarouselProps, type CarouselVariant } from './Carousel'
 export { DynamicZone, type DynamicZoneProps } from './DynamicZone'
 export { PageClient, type PageClientProps } from './PageClient'
+export { TabbedDynamicZone, type TabbedDynamicZoneProps } from './TabbedDynamicZone'

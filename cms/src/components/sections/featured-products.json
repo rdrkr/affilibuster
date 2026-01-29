@@ -16,7 +16,8 @@
     "products": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::product.product"
+      "target": "api::product.product",
+      "required": true
     },
     "viewAllButton": {
       "type": "component",

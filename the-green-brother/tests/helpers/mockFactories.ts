@@ -8,7 +8,16 @@
  * Ensures type safety by providing all required fields from OpenAPI-generated types.
  */
 
-import type { ApiCurrencyCurrencyDocument, ApiProductCategoryProductCategoryDocument } from '@/lib/generated/types.gen'
+import type {
+  ApiContributorContributorDocument,
+  ApiCurrencyCurrencyDocument,
+  ApiProductCategoriesPageProductCategoriesPageDocument,
+  ApiProductCategoryProductCategoryDocument,
+  ApiProductCertificateProductCertificateDocument,
+  ApiProductProductDocument,
+  ElementsHeaderEntry,
+  PluginUploadFileDocument,
+} from '@/lib/generated/types.gen'
 import {
   AlignmentEnum,
   CodeEnum,
@@ -17,7 +26,7 @@ import {
   IconPositionEnum,
   SymbolPositionEnum,
 } from '@/lib/generated/types.gen'
-import type { Footer, Language, Navigation, Product } from '@/lib/types'
+import type { Footer, Language, Navigation } from '@/lib/types'
 
 /**
  * Creates a mock Footer object with all required fields.
@@ -156,6 +165,7 @@ export function createMockNavigation(overrides: Partial<Navigation> = {}): Navig
         url: '#',
         openInNewTab: false,
       },
+      themes: [],
     },
     languageMenu: {
       menuButton: {
@@ -265,14 +275,177 @@ export function createMockCategory(
 }
 
 /**
+ * Creates a mock Contributor document with all required fields.
+ * Accepts partial overrides for test customization.
+ * @param overrides - Partial Contributor document to override default values
+ * @returns Complete Contributor document suitable for testing
+ */
+export function createMockContributor(
+  overrides: Partial<ApiContributorContributorDocument> = {}
+): ApiContributorContributorDocument {
+  return {
+    documentId: 'contributor-1',
+    id: 1,
+    firstName: 'John',
+    lastName: 'Doe',
+    slug: 'john-doe',
+    bio: 'Environmentally conscious developer',
+    email: 'john@example.com',
+    roles: [],
+    profilePicture: null as unknown as PluginUploadFileDocument, // Mocking simplified structure
+    twitter: 'johndoe',
+    linkedin: 'johndoe',
+    github: 'johndoe',
+    instagram: 'johndoe',
+    publishedAt: '2025-01-01T00:00:00.000Z',
+    createdAt: '2025-01-01T00:00:00.000Z',
+    updatedAt: '2025-01-01T00:00:00.000Z',
+    locale: 'en',
+    ...overrides,
+  } as ApiContributorContributorDocument
+}
+
+/**
+ * Creates a mock Certificate document with all required fields.
+ * @param overrides - Partial Certificate document to override default values
+ * @returns Complete Certificate document
+ */
+export function createMockCertificate(
+  overrides: Partial<ApiProductCertificateProductCertificateDocument> = {}
+): ApiProductCertificateProductCertificateDocument {
+  return {
+    documentId: 'cert-1',
+    id: 1,
+    certificateId: 'CERT-123',
+    certificate: {
+      url: '/uploads/cert.pdf',
+      name: 'Certificate.pdf',
+      hash: 'hash',
+      ext: '.pdf',
+      mime: 'application/pdf',
+      size: 100,
+      provider: 'local',
+    } as PluginUploadFileDocument,
+    publishedAt: '2025-01-01T00:00:00.000Z',
+    createdAt: '2025-01-01T00:00:00.000Z',
+    updatedAt: '2025-01-01T00:00:00.000Z',
+    locale: 'en',
+    ...overrides,
+  } as ApiProductCertificateProductCertificateDocument
+}
+
+/**
+ * Creates a mock Product Categories Page document with all required fields.
+ * @param overrides - Partial Product Categories Page document to override default values
+ * @returns Complete Product Categories Page document
+ */
+export function createMockProductCategoriesPage(
+  overrides: Partial<ApiProductCategoriesPageProductCategoriesPageDocument> = {}
+): ApiProductCategoriesPageProductCategoriesPageDocument {
+  return {
+    documentId: 'prod-cat-page-1',
+    id: 1,
+    header: {
+      alignment: AlignmentEnum.CENTER,
+      promoteHeaderIcon: false,
+      header: {
+        text: 'Products',
+        iconPosition: IconPositionEnum.BEFORE_TEXT,
+        ariaDescription: 'Products page',
+      },
+      locale: 'en',
+    } as ElementsHeaderEntry,
+    productsFilter: {
+      tagFilter: {
+        allLabel: {
+          text: 'All',
+          iconPosition: IconPositionEnum.BEFORE_TEXT,
+          ariaDescription: 'All products',
+        },
+      },
+      priceRangeFilter: {
+        header: {
+          header: {
+            text: 'Price Range',
+            iconPosition: IconPositionEnum.BEFORE_TEXT,
+            ariaDescription: 'Price range filter',
+          },
+        },
+      },
+    },
+    productsSorter: {
+      header: {
+        header: {
+          text: 'Sort By',
+          iconPosition: IconPositionEnum.BEFORE_TEXT,
+          ariaDescription: 'Sort products',
+        },
+      },
+      bestSellers: {
+        text: 'Best Sellers',
+        iconPosition: IconPositionEnum.BEFORE_TEXT,
+        ariaDescription: ' Sort by best sellers',
+      },
+      newArrivals: {
+        text: 'New Arrivals',
+        iconPosition: IconPositionEnum.BEFORE_TEXT,
+        ariaDescription: 'Sort by new arrivals',
+      },
+      priceLowToHigh: {
+        text: 'Price: Low to High',
+        iconPosition: IconPositionEnum.BEFORE_TEXT,
+        ariaDescription: 'Sort by price low to high',
+      },
+      priceHighToLow: {
+        text: 'Price: High to Low',
+        iconPosition: IconPositionEnum.BEFORE_TEXT,
+        ariaDescription: 'Sort by price high to low',
+      },
+    },
+    relatedProductsSectionHeader: {
+      alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+      promoteHeaderIcon: false,
+      header: {
+        text: 'Related Products',
+        iconPosition: IconPositionEnum.BEFORE_TEXT,
+        ariaDescription: 'Related products section',
+      },
+      locale: 'en',
+    } as ElementsHeaderEntry,
+    pagination: {
+      itemsPerPage: 12,
+      previousButton: { label: { text: 'Previous' } },
+      nextButton: { label: { text: 'Next' } },
+      noItemsFound: {
+        header: {
+          text: 'No products found',
+          icon: 'inventory_2',
+          iconPosition: IconPositionEnum.BEFORE_TEXT,
+          ariaDescription: 'No products found',
+        },
+      },
+    },
+    seoMetadata: {
+      metaTitle: 'Products',
+      metaDescription: 'Browse our products',
+    },
+    publishedAt: '2025-01-01T00:00:00.000Z',
+    createdAt: '2025-01-01T00:00:00.000Z',
+    updatedAt: '2025-01-01T00:00:00.000Z',
+    locale: 'en',
+    ...overrides,
+  } as unknown as ApiProductCategoriesPageProductCategoriesPageDocument
+}
+
+/**
  * Creates a mock Product object with all required fields.
  * Accepts partial overrides for test customization.
  * @param overrides - Partial Product object to override default values
  * @returns Complete Product object suitable for testing
  * @example
- * const product = createMockProduct({ title: 'Test Product', price: 99.99 })
+ * const product = createMockProduct({ prices: [{ amount: 99.99, currency: createMockCurrency() }] })
  */
-export function createMockProduct(overrides: Partial<Product> = {}): Product {
+export function createMockProduct(overrides: Partial<ApiProductProductDocument> = {}): ApiProductProductDocument {
   return {
     documentId: 'e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b',
     id: 1,
@@ -291,7 +464,22 @@ export function createMockProduct(overrides: Partial<Product> = {}): Product {
       },
       content: 'A sustainable, BPA-free water bottle made from recycled materials.',
     },
-    currency: createMockCurrency(),
+    prices: [
+      {
+        amount: 29.99,
+        currency: createMockCurrency(),
+      },
+    ],
+    disclaimerLabel: {
+      text: 'Disclaimer',
+      iconPosition: IconPositionEnum.BEFORE_TEXT,
+      ariaDescription: 'Product disclaimer',
+    },
+    viewDetailsLabel: {
+      text: 'View Details',
+      iconPosition: IconPositionEnum.AFTER_TEXT,
+      ariaDescription: 'View product details',
+    },
     seoMetadata: {
       metaTitle: 'Eco-Friendly Water Bottle - Best Sustainable Choice',
       metaDescription: 'Read our review of the best eco-friendly reusable water bottle',
@@ -306,13 +494,15 @@ export function createMockProduct(overrides: Partial<Product> = {}): Product {
       url: 'https://example.com/affiliate-link',
       openInNewTab: true,
     },
-    price: 29.99,
     category: createMockCategory(),
+    seller: createMockContributor(),
+    certificates: [],
+    description: [],
     createdAt: '2025-01-01T00:00:00.000Z',
     updatedAt: '2025-01-01T00:00:00.000Z',
     locale: CodeEnum.EN,
     ...overrides,
-  } as Product
+  } as ApiProductProductDocument
 }
 
 /**

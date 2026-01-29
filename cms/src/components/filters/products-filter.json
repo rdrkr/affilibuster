@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_filters_products_filters",
+  "info": {
+    "displayName": "Products Filter",
+    "icon": "filter"
+  },
+  "options": {},
+  "attributes": {
+    "header": {
+      "type": "component",
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
+    },
+    "tagFilter": {
+      "type": "component",
+      "component": "filters.tag-filter",
+      "repeatable": false,
+      "required": true
+    },
+    "priceRangeFilter": {
+      "type": "component",
+      "component": "filters.price-range-filter",
+      "repeatable": false,
+      "required": true
+    }
+  },
+  "config": {}
+}

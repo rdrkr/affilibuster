@@ -122,6 +122,7 @@ export function HeroSection({
         fill
         preload
         loading="eager"
+        fetchPriority="high"
         sizes="100vw"
       />
     </div>

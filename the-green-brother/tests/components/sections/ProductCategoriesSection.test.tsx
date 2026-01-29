@@ -84,6 +84,7 @@ describe('ProductCategoriesSection', () => {
         iconPosition: IconPositionEnum.BEFORE_TEXT,
       },
     },
+    categories: [],
   }
 
   const mockCategories: ApiProductCategoryProductCategoryDocument[] = [
@@ -268,22 +269,12 @@ describe('ProductCategoriesSection', () => {
     expect(links[2]).toHaveAttribute('aria-label', 'Tech category')
   })
 
-  it('should skip categories without content', () => {
-    const categoriesWithNull: ApiProductCategoryProductCategoryDocument[] = [
-      ...mockCategories,
-      {
-        documentId: 'cat-4',
-        id: 4,
-        slug: 'invalid',
-        publishedAt: '2025-01-01',
-      } as ApiProductCategoryProductCategoryDocument,
-    ]
-
+  it('should render all categories with content', () => {
     render(
-      <ProductCategoriesSection direction={DirectionEnum.LTR} data={mockSectionData} categories={categoriesWithNull} />
+      <ProductCategoriesSection direction={DirectionEnum.LTR} data={mockSectionData} categories={mockCategories} />
     )
 
-    // Should still render the 3 valid categories
+    // Should render the 3 categories
     const links = screen.getAllByRole('link')
     expect(links).toHaveLength(3)
     expect(screen.getByText('Home')).toBeInTheDocument()

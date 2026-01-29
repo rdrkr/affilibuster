@@ -25,11 +25,8 @@ import {
   TeamSection,
 } from '@/components/sections'
 import type {
-  ApiBlogPostBlogPostDocument,
   ApiContributorContributorDocument,
   ApiHomepageHomepageDocument,
-  ApiProductCategoryProductCategoryDocument,
-  ApiProductProductDocument,
   ElementsLabelEntry,
 } from '@/lib/generated/types.gen'
 
@@ -44,22 +41,14 @@ type HomepageSection = ApiHomepageHomepageDocument['sections'][number]
 export interface HomeSectionsProps {
   /** Homepage sections array from CMS */
   sections: HomepageSection[]
-  /** Products for featured products sections */
-  products: ApiProductProductDocument[]
-  /** Categories for category grid sections */
-  categories: ApiProductCategoryProductCategoryDocument[]
-  /** Blog posts for blog teaser sections */
-  blogPosts: ApiBlogPostBlogPostDocument[]
   /** Contributors for team section */
-  contributors: ApiContributorContributorDocument[]
+  teamMembers: ApiContributorContributorDocument[]
   /** Feature flag: Enable user profile features (login/signup, favorites) */
-  enableUserProfile?: boolean
+  enableUserProfile: boolean
   /** Read time label */
   readTimeMinutesLabel: ElementsLabelEntry
   /** Read article label */
   readArticleLabel: ElementsLabelEntry
-  /** Default contributor */
-  defaultContributor: ApiContributorContributorDocument
 }
 
 /**
@@ -69,17 +58,7 @@ export interface HomeSectionsProps {
  * @returns Rendered homepage sections with layout support
  */
 export function HomeSections(props: HomeSectionsProps) {
-  const {
-    sections,
-    products,
-    categories,
-    blogPosts,
-    contributors,
-    enableUserProfile = false,
-    readTimeMinutesLabel,
-    readArticleLabel,
-    defaultContributor,
-  } = props
+  const { sections, teamMembers, enableUserProfile, readTimeMinutesLabel, readArticleLabel } = props
   const { direction } = useLayoutContext()
 
   /**
@@ -97,19 +76,17 @@ export function HomeSections(props: HomeSectionsProps) {
           <FeaturedProductsSection
             key={section.id}
             data={section}
-            products={products}
             direction={direction}
             enableUserProfile={enableUserProfile}
           />
         )
 
       case 'sections.category-grid':
-        // Use CMS-selected categories if available, otherwise fall back to all categories
         return (
           <ProductCategoriesSection
             key={section.id}
             data={section}
-            categories={section.categories ?? categories}
+            categories={section.categories}
             direction={direction}
           />
         )
@@ -122,16 +99,14 @@ export function HomeSections(props: HomeSectionsProps) {
           <BlogTeaserSection
             key={section.id}
             data={section}
-            blogPosts={blogPosts}
             direction={direction}
             readTimeMinutesLabel={readTimeMinutesLabel}
             readArticleLabel={readArticleLabel}
-            defaultContributor={defaultContributor}
           />
         )
 
       case 'sections.team-grid':
-        return <TeamSection key={section.id} data={section} contributors={contributors} direction={direction} />
+        return <TeamSection key={section.id} data={section} contributors={teamMembers} direction={direction} />
 
       case 'call-to-actions.newsletter-signup-cta':
         return <NewsletterSignupCTA key={section.id} data={section} direction={direction} />

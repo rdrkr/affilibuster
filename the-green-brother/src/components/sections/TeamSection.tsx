@@ -58,8 +58,8 @@ export function TeamSection({ data, contributors, direction }: TeamSectionProps)
 
   // Transform members to format their roles
   const membersWithFormattedRoles = contributors.map(member => {
-    const roles = member.roles ?? []
-    const roleNames = roles.filter(role => role.roleId !== 'author').map(role => role.name)
+    const roles = member.roles
+    const roleNames = roles.map(role => role.name)
     const firstRole = roles[0]
 
     // Create a new member object with formatted roles

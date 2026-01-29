@@ -10,7 +10,7 @@ Following Clean Architecture: no framework dependencies, pure business logic.
 import re
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from uuid import UUID
 
 # Validation constants
@@ -18,7 +18,7 @@ MIN_HASHED_PASSWORD_LENGTH = 10
 MAX_DISPLAY_NAME_LENGTH = 100
 
 
-class UserStatus(str, Enum):
+class UserStatus(StrEnum):
     """User account status."""
 
     ACTIVE = "active"

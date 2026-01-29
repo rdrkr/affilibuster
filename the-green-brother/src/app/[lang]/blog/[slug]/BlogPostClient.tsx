@@ -2,7 +2,7 @@
 
 'use client'
 
-import { ContributorCard, DEFAULT_IMAGE, Header, Text, TextBlock } from '@/components/elements'
+import { ContributorCard, Header, Text, TextBlock } from '@/components/elements'
 import { PageClient } from '@/components/layout'
 import { HeroSection } from '@/components/sections/HeroSection'
 
@@ -16,7 +16,6 @@ import {
   type ApiBlogBlogDocument,
   type ApiBlogPostBlogPostDocument,
 } from '@/lib/generated/types.gen'
-import { notFound } from 'next/navigation'
 
 /**
  * Props for the BlogPostClient component.
@@ -42,13 +41,6 @@ interface BlogPostClientProps {
  * @returns Rendered blog post page
  */
 export default function BlogPostClient({ post, direction, blogData, language }: BlogPostClientProps) {
-  // Use default contributor if post contributor is missing
-  const contributor = post.contributor ?? blogData.defaultContributor
-
-  if (!contributor) {
-    notFound()
-  }
-
   // Format published date
   const publishedDate = post.publishedDate
     ? new Date(post.publishedDate).toLocaleDateString(language, {
@@ -58,9 +50,8 @@ export default function BlogPostClient({ post, direction, blogData, language }: 
       })
     : null
 
-  const postHeader = post.content?.header?.header
-
-  const postSubheader = post.content?.header?.subheader
+  const postHeader = post.content.header?.header
+  const postSubheader = post.content.header?.subheader
 
   const heroSection: SectionsHeroEntry & {
     __component: 'sections.hero'
@@ -76,7 +67,7 @@ export default function BlogPostClient({ post, direction, blogData, language }: 
         ariaDescription: postHeader?.ariaDescription ?? '',
       },
     },
-    image: post.featuredImage ?? DEFAULT_IMAGE,
+    image: post.featuredImage,
     variant: VariantEnum.TEXT_ABOVE_BACKGROUND,
   }
 
@@ -84,7 +75,7 @@ export default function BlogPostClient({ post, direction, blogData, language }: 
     <PageClient
       layout="narrow"
       breadcrumbs={{
-        customLastCrumbLabel: <Text text={post.content?.header?.header?.text ?? ''} />,
+        customLastCrumbLabel: <Text text={postHeader?.text ?? ''} />,
       }}
     >
       <HeroSection
@@ -92,9 +83,9 @@ export default function BlogPostClient({ post, direction, blogData, language }: 
         direction={direction}
         data={heroSection}
         header={
-          post.tags?.[0] ? (
+          post.tags[0] ? (
             <Text
-              text={post.tags[0].tag?.text ?? ''}
+              text={post.tags[0].tag.text}
               as="span"
               className={`
                 mb-4 block text-sm font-bold tracking-wider text-primary-500
@@ -106,7 +97,7 @@ export default function BlogPostClient({ post, direction, blogData, language }: 
         footer={
           <div className="flex items-center gap-4 text-sm font-medium text-neutral-500 dark:text-tertiary-400">
             <ContributorCard
-              member={contributor}
+              member={post.author}
               direction={direction}
               size="xs"
               layout="ltr"
@@ -131,7 +122,7 @@ export default function BlogPostClient({ post, direction, blogData, language }: 
       />
 
       {/* Article Content */}
-      {post.content?.content && (
+      {post.content.content && (
         <TextBlock
           direction={direction}
           data={{
@@ -149,11 +140,11 @@ export default function BlogPostClient({ post, direction, blogData, language }: 
       )}
 
       {/* Author Bio (if available) */}
-      {contributor.bio && (
+      {post.author.bio && (
         <div className="flex flex-col gap-4 border-t border-neutral-200 pt-8 dark:border-tertiary-700">
           <Header data={blogData.aboutAuthorHeader} direction={direction} level={3} />
           <ContributorCard
-            member={contributor}
+            member={post.author}
             direction={direction}
             size="sm"
             layout="ltr"

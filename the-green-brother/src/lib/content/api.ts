@@ -19,6 +19,7 @@ import { apiRequest, createApiRequest } from '@/lib/core/client'
 import type {
   AboutGetAboutData,
   AboutGetAboutResponses,
+  ApiContributorContributorDocument,
   AuthPageGetAuthPageData,
   AuthPageGetAuthPageResponses,
   BlogGetBlogData,
@@ -591,15 +592,18 @@ export async function getBlogPostBySlug(
 
 /**
  * Get contributors (collection type)
+ * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
  * @param query - Optional query parameters including locale, filters, pagination, sort, and populate
  * @returns The contributors data or null if the request fails
  */
 export async function getContributors(
+  locale?: NonNullable<ContributorGetContributorsData['query']>['locale'],
   query?: Omit<NonNullable<ContributorGetContributorsData['query']>, 'customPopulate'>
 ): Promise<ContributorGetContributorsResponses[200]['data'] | null> {
   try {
     const request = createApiRequest<ContributorGetContributorsData>('/contributors', {
       query: {
+        ...(locale !== undefined && { locale }),
         ...query,
         customPopulate: 'nested',
       },
@@ -609,6 +613,36 @@ export async function getContributors(
     console.error('Failed to fetch contributors:', error)
     return null
   }
+}
+/**
+ * Get team members (collection type)
+ * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param query - Optional query parameters including locale, filters, pagination, sort, and populate
+ * @returns The team members data or null if the request fails
+ */
+export async function getTeamMembers(
+  locale?: NonNullable<ContributorGetContributorsData['query']>['locale'],
+  query?: Omit<NonNullable<ContributorGetContributorsData['query']>, 'customPopulate'>
+): Promise<ApiContributorContributorDocument[]> {
+  const contributorRolesToExclude = ['author', 'seller']
+
+  const contributors = await getContributors(locale, {
+    filters: {
+      roles: {
+        roleId: { $nei: contributorRolesToExclude[0] },
+      },
+    },
+    ...query,
+  })
+
+  return (
+    contributors
+      ?.map(contributor => ({
+        ...contributor,
+        roles: contributor.roles.filter(role => !contributorRolesToExclude.includes(role.roleId)),
+      }))
+      .filter(contributor => contributor.roles.length > 0) ?? []
+  )
 }
 
 /**

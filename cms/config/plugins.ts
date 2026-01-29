@@ -9,15 +9,24 @@ import type { StrapiEnv } from './types'
  */
 
 /**
- * Configure Strapi plugins including i18n and GraphQL.
+ * Configure Strapi plugins including i18n, strapi-plugin-relation-filter, and GraphQL.
  *
  * Enables and configures the i18n plugin with support for English, Italian, and Hebrew locales.
+ * Enables strapi-plugin-relation-filter plugin for filtering relation dropdowns based on pluginOptions.
  * GraphQL plugin is disabled but configuration is preserved for future use.
  * @param env - Strapi environment variables
  * @param env.env - Strapi environment variables
- * @returns Plugins configuration object with i18n and GraphQL settings
+ * @returns Plugins configuration object with i18n, strapi-plugin-relation-filter, and GraphQL settings
  */
 export default ({ env }: { env: StrapiEnv }) => ({
+  // Relation filter plugin - filters relation dropdowns based on schema pluginOptions
+  'strapi-plugin-relation-filter': {
+    enabled: true,
+    resolve: './src/plugins/strapi-plugin-relation-filter',
+    config: {
+      debug: env('NODE_ENV') === 'development',
+    },
+  },
   // i18n plugin configuration
   i18n: {
     enabled: true,
@@ -32,14 +41,6 @@ export default ({ env }: { env: StrapiEnv }) => ({
     config: {
       enabled: true,
       defaultDepth: 8,
-      // Ignore bidirectional relation fields that cause infinite loops
-      ignore: [
-        // Blog circular relations
-        'blogPosts', // contributor.blogPosts → blog-post → contributor.blogPosts → ...
-        'posts', // blog-post-tag.posts → blog-post → tags.posts → ...
-        // Product circular relations (same pattern)
-        'products', // product-category.products / product-tag.products
-      ],
     },
   },
   // Cloudinary upload provider - only enabled in production

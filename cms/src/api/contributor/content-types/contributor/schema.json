@@ -16,7 +16,17 @@
     }
   },
   "attributes": {
-    "name": {
+    "slug": {
+      "type": "uid",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "targetField": "firstName",
+      "required": true
+    },
+    "firstName": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
@@ -25,15 +35,13 @@
       },
       "required": true
     },
-    "slug": {
-      "type": "uid",
+    "lastName": {
+      "type": "string",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      },
-      "targetField": "name",
-      "required": true
+      }
     },
     "bio": {
       "type": "richtext",
@@ -57,9 +65,9 @@
     },
     "roles": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "oneToMany",
       "target": "api::contributor-role.contributor-role",
-      "inversedBy": "contributors"
+      "required": true
     },
     "email": {
       "type": "email",
@@ -114,12 +122,6 @@
         }
       },
       "required": false
-    },
-    "blogPosts": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::blog-post.blog-post",
-      "mappedBy": "contributor"
     },
     "seoMetadata": {
       "type": "component",

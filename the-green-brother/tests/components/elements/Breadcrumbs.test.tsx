@@ -184,4 +184,47 @@ describe('Breadcrumbs', () => {
       expect(link).toHaveAttribute('data-direction', DirectionEnum.RTL)
     })
   })
+
+  it('should handle about path correctly', () => {
+    render(
+      <Breadcrumbs navigation={mockNavigation} pathname="/en/about" lang={CodeEnum.EN} direction={DirectionEnum.LTR} />
+    )
+
+    const links = screen.getAllByTestId('crumb-link')
+    expect(links.length).toBeGreaterThan(0)
+    // Home should be a link
+    expect(links.find(link => link.textContent === 'Home')).toBeDefined()
+    // About is the last crumb, so it's text not a link
+    const text = screen.getByTestId('text-component')
+    expect(text).toHaveTextContent('About')
+  })
+
+  it('should handle products path correctly', () => {
+    render(
+      <Breadcrumbs
+        navigation={mockNavigation}
+        pathname="/en/products"
+        lang={CodeEnum.EN}
+        direction={DirectionEnum.LTR}
+      />
+    )
+
+    const links = screen.getAllByTestId('crumb-link')
+    expect(links.length).toBeGreaterThan(0)
+    // Home should be a link
+    expect(links.find(link => link.textContent === 'Home')).toBeDefined()
+    // Products is the last crumb, so it's text not a link
+    const text = screen.getByTestId('text-component')
+    expect(text).toHaveTextContent('Products')
+  })
+
+  it('should handle empty segment (home) correctly', () => {
+    const { container } = render(
+      <Breadcrumbs navigation={mockNavigation} pathname="/en/" lang={CodeEnum.EN} direction={DirectionEnum.LTR} />
+    )
+
+    // When on home page with empty segments, breadcrumbs component should render
+    const nav = container.querySelector('nav')
+    expect(nav).toBeInTheDocument()
+  })
 })

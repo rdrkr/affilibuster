@@ -15,7 +15,8 @@
     "themes": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::theme.theme"
+      "target": "api::theme.theme",
+      "required": true
     }
   },
   "config": {}

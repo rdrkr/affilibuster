@@ -91,6 +91,10 @@ from affilibuster_backend.domain.entities.generated.models import (
     ProductCategoriesPageGetResponse,
     ProductCategoriesSlugSlugGetParametersQuery,
     ProductCategoriesSlugSlugGetResponse,
+    ProductCertificatesGetParametersQuery,
+    ProductCertificatesGetResponse,
+    ProductCertificatesIdGetParametersQuery,
+    ProductCertificatesIdGetResponse,
     ProductsGetParametersQuery,
     ProductsGetResponse,
     ProductsIdGetParametersQuery,
@@ -179,6 +183,8 @@ CMSRequest = (
     | ProductCategoriesIdGetParametersQuery
     | ProductCategoriesPageGetParametersQuery
     | ProductCategoriesSlugSlugGetParametersQuery
+    | ProductCertificatesGetParametersQuery
+    | ProductCertificatesIdGetParametersQuery
     | ProductsGetParametersQuery
     | ProductsIdGetParametersQuery
     | ProductsSlugSlugGetParametersQuery
@@ -225,6 +231,8 @@ CMSResponse = (
     | ProductCategoriesIdGetResponse
     | ProductCategoriesPageGetResponse
     | ProductCategoriesSlugSlugGetResponse
+    | ProductCertificatesGetResponse
+    | ProductCertificatesIdGetResponse
     | ProductsGetResponse
     | ProductsIdGetResponse
     | ProductsSlugSlugGetResponse

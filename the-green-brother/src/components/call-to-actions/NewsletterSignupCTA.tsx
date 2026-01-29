@@ -84,6 +84,9 @@ export function NewsletterSignupCTA({ data, direction }: NewsletterSignupCTAProp
           >
             <input
               type="email"
+              id="newsletter-email"
+              name="email"
+              autoComplete="email"
               placeholder={emailPlaceholder.text}
               aria-label={emailPlaceholder.ariaDescription}
               className={`

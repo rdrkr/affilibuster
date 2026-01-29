@@ -15,6 +15,8 @@ interface ReactMarkdownProps {
   children: string
   /** Remark plugins (not used in mock) */
   remarkPlugins?: unknown[]
+  /** Rehype plugins (not used in mock, but allows passing rehype-raw and rehype-sanitize) */
+  rehypePlugins?: unknown[]
   /** Custom component renderers */
   components?: {
     /** Custom link renderer */
@@ -25,6 +27,8 @@ interface ReactMarkdownProps {
     code?: (props: { children?: React.ReactNode }) => React.ReactElement
     /** Custom table renderer */
     table?: (props: { children?: React.ReactNode }) => React.ReactElement
+    /** Custom center renderer for centered content */
+    center?: (props: { children?: React.ReactNode }) => React.ReactElement
     /** Other custom renderers */
     [key: string]: unknown
   }
@@ -145,6 +149,30 @@ const markdownToHTML = (markdown: string): React.ReactElement[] => {
     // Skip empty lines
     if (line.trim() === '') {
       i++
+      continue
+    }
+
+    // Center tags (HTML)
+    if (line.trim().startsWith('<center>')) {
+      const centerLines: string[] = []
+      // Check if it's an inline center tag (single line)
+      if (line.includes('</center>')) {
+        const inlineContent = line.replace(/<\/?center>/g, '').trim()
+        elements.push(<center key={getKey()}>{parseInline(inlineContent)}</center>)
+        i++
+        continue
+      }
+      // Multi-line center block
+      i++ // Skip opening <center>
+      while (i < lines.length && !lines[i]?.trim().startsWith('</center>')) {
+        centerLines.push(lines[i] ?? '')
+        i++
+      }
+      i++ // Skip closing </center>
+      // Parse the content inside center as markdown
+      const innerContent = centerLines.join('\n')
+      const innerElements = markdownToHTML(innerContent)
+      elements.push(<center key={getKey()}>{innerElements}</center>)
       continue
     }
 
@@ -337,9 +365,9 @@ const ReactMarkdown = ({ children, components }: ReactMarkdownProps): React.Reac
   const elements = markdownToHTML(children)
 
   // Replace custom elements if components are provided
-  if (components?.a || components?.img || components?.code || components?.table) {
+  if (components?.a || components?.img || components?.code || components?.table || components?.center) {
     /**
-     * Replace link, image, code, and table elements with custom components
+     * Replace link, image, code, table, and center elements with custom components
      * @param element - React element to process
      * @returns React element with replaced elements
      */
@@ -385,13 +413,40 @@ const ReactMarkdown = ({ children, components }: ReactMarkdownProps): React.Reac
         return React.cloneElement(tableElement, { key: element.key })
       }
 
+      // Replace center
+      if (element.type === 'center' && components.center) {
+        const CenterComponent = components.center as unknown as (props: ElementProps) => React.ReactElement
+        const props = element.props as ElementProps
+
+        // Recursively process children BEFORE passing to custom component
+        let processedChildren = props.children
+        if (props.children) {
+          processedChildren = React.Children.map(props.children, child => {
+            if (React.isValidElement(child)) {
+              return replaceCustomElements(child)
+            }
+            return child
+          })
+        }
+
+        const centerElement = CenterComponent({
+          children: processedChildren,
+        })
+        // Clone with key to avoid React warnings
+        return React.cloneElement(centerElement, { key: element.key })
+      }
+
       // Recursively replace in children
       const props = element.props as ElementProps
       if (props.children) {
         const newChildren = React.Children.map(props.children, child => {
           if (
             React.isValidElement(child) &&
-            (child.type === 'a' || child.type === 'img' || child.type === 'code' || child.type === 'table')
+            (child.type === 'a' ||
+              child.type === 'img' ||
+              child.type === 'code' ||
+              child.type === 'table' ||
+              child.type === 'center')
           ) {
             return replaceCustomElements(child)
           }

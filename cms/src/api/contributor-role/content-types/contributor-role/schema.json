@@ -33,12 +33,6 @@
         }
       },
       "required": true
-    },
-    "contributors": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::contributor.contributor",
-      "mappedBy": "roles"
     }
   }
 }

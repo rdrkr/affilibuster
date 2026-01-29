@@ -227,6 +227,90 @@ describe('TextBlock', () => {
     })
   })
 
+  describe('center tag rendering', () => {
+    it('should render content inside center tags as centered', () => {
+      const dataWithCenter = createTextBlockData({
+        content: '<center>Centered text</center>',
+      })
+      const { container } = render(<TextBlock data={dataWithCenter} direction={DirectionEnum.LTR} />)
+
+      const centeredDiv = container.querySelector('div[style*="text-align: center"]')
+      expect(centeredDiv).toBeInTheDocument()
+      expect(centeredDiv).toHaveTextContent('Centered text')
+    })
+
+    it('should center complex markdown content including images and headings', () => {
+      const complexCenterContent = `<center>
+![6xl](icons/award.svg)
+
+#### Top Tier Eco-Choice
+
+This product meets our highest standards.
+</center>`
+      const dataWithComplexCenter = createTextBlockData({
+        content: complexCenterContent,
+      })
+      const { container } = render(<TextBlock data={dataWithComplexCenter} direction={DirectionEnum.LTR} />)
+
+      const centeredDiv = container.querySelector('div[style*="text-align: center"]')
+      expect(centeredDiv).toBeInTheDocument()
+
+      // Check for heading inside centered content
+      const heading = centeredDiv?.querySelector('h4')
+      expect(heading).toBeInTheDocument()
+      expect(heading).toHaveTextContent('Top Tier Eco-Choice')
+
+      // Check for paragraph
+      expect(centeredDiv).toHaveTextContent('This product meets our highest standards.')
+    })
+
+    it('should center multiple paragraphs and lists', () => {
+      const multiBlockCenter = `<center>
+First paragraph.
+
+Second paragraph.
+
+- Item 1
+- Item 2
+</center>`
+      const dataWithMultiBlock = createTextBlockData({
+        content: multiBlockCenter,
+      })
+      const { container } = render(<TextBlock data={dataWithMultiBlock} direction={DirectionEnum.LTR} />)
+
+      const centeredDiv = container.querySelector('div[style*="text-align: center"]')
+      expect(centeredDiv).toBeInTheDocument()
+      expect(centeredDiv).toHaveTextContent('First paragraph.')
+      expect(centeredDiv).toHaveTextContent('Second paragraph.')
+      expect(centeredDiv).toHaveTextContent('Item 1')
+      expect(centeredDiv).toHaveTextContent('Item 2')
+    })
+
+    it('should handle empty center tags', () => {
+      const dataWithEmptyCenter = createTextBlockData({
+        content: '<center></center>',
+      })
+      const { container } = render(<TextBlock data={dataWithEmptyCenter} direction={DirectionEnum.LTR} />)
+
+      const centeredDiv = container.querySelector('div[style*="text-align: center"]')
+      expect(centeredDiv).toBeInTheDocument()
+    })
+
+    it('should center content in RTL mode', () => {
+      const dataWithCenter = createTextBlockData({
+        content: '<center>תוכן ממורכז</center>',
+      })
+      const { container } = render(<TextBlock data={dataWithCenter} direction={DirectionEnum.RTL} />)
+
+      const centeredDiv = container.querySelector('div[style*="text-align: center"]')
+      expect(centeredDiv).toBeInTheDocument()
+      expect(centeredDiv).toHaveTextContent('תוכן ממורכז')
+
+      // Verify the parent container has RTL direction
+      expect(container.firstChild).toHaveAttribute('dir', 'rtl')
+    })
+  })
+
   describe('markdown table rendering (GFM)', () => {
     it('should render markdown tables correctly', () => {
       const tableMarkdown = `

@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 import { HomeSections } from '@/components/homepage'
-import { getBlog, getBlogPosts, getContributors, getHomepage, getProductCategories, getProducts } from '@/lib/client'
+import { getBlog, getHomepage, getTeamMembers } from '@/lib/content'
 import { userProfileFlag } from '@/lib/feature-flags'
 import { CodeEnum } from '@/lib/generated/types.gen'
 import HomeClient from './HomeClient'
@@ -20,42 +20,14 @@ async function HomePage({ params }: { params: Promise<{ lang: CodeEnum }> }) {
   const lang = resolvedParams.lang
 
   // Fetch all homepage data in parallel
-  const [
-    homepageData,
-    productsResponse,
-    categoriesResponse,
-    blogPostsResponse,
-    authors,
-    enableUserProfile,
-    blogPageResponse,
-  ] = await Promise.all([
+  const [homepageData, teamMembers, enableUserProfile, blogPageResponse] = await Promise.all([
     getHomepage(lang),
-    getProducts({
-      pagination: { page: 1, pageSize: 100 },
-      locale: lang,
-    }),
-    getProductCategories({
-      locale: lang,
-    }),
-    getBlogPosts({
-      pagination: { page: 1, pageSize: 100 },
-      locale: lang,
-    }),
-    getContributors({
-      locale: lang,
-      filters: {
-        roles: {
-          roleId: {
-            $ei: 'author',
-          },
-        },
-      },
-    }),
+    getTeamMembers(lang),
     userProfileFlag(),
     getBlog(lang),
   ])
 
-  if (!homepageData || !blogPageResponse?.defaultContributor) {
+  if (!homepageData || !blogPageResponse) {
     return null
   }
 
@@ -64,14 +36,10 @@ async function HomePage({ params }: { params: Promise<{ lang: CodeEnum }> }) {
     <HomeClient>
       <HomeSections
         sections={homepageData.sections}
-        products={productsResponse?.data ?? []}
-        categories={categoriesResponse?.data ?? []}
-        blogPosts={blogPostsResponse?.data ?? []}
-        contributors={authors ?? []}
+        teamMembers={teamMembers}
         enableUserProfile={enableUserProfile}
         readTimeMinutesLabel={blogPageResponse.readTimeMinutesLabel}
         readArticleLabel={blogPageResponse.readArticleLabel}
-        defaultContributor={blogPageResponse.defaultContributor}
       />
     </HomeClient>
   )

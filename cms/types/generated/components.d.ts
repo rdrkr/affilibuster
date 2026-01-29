@@ -1,17 +1,5 @@
 import type { Schema, Struct } from '@strapi/strapi'
 
-export interface CallToActionsCategoryCta extends Struct.ComponentSchema {
-  collectionName: 'components_call_to_actions_category_ctas'
-  info: {
-    displayName: 'Category CTA'
-    icon: 'database'
-  }
-  attributes: {
-    button: Schema.Attribute.Component<'elements.button', false> & Schema.Attribute.Required
-    category: Schema.Attribute.Relation<'oneToOne', 'api::product-category.product-category'>
-  }
-}
-
 export interface CallToActionsNewsletterSignupCta extends Struct.ComponentSchema {
   collectionName: 'components_call_to_actions_newsletter_signup_ctas'
   info: {
@@ -85,6 +73,25 @@ export interface ElementsLabel extends Struct.ComponentSchema {
   }
 }
 
+export interface ElementsPrice extends Struct.ComponentSchema {
+  collectionName: 'components_elements_prices'
+  info: {
+    displayName: 'Price'
+    icon: 'priceTag'
+  }
+  attributes: {
+    amount: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0
+        },
+        number
+      >
+    currency: Schema.Attribute.Relation<'oneToOne', 'api::currency.currency'> & Schema.Attribute.Required
+  }
+}
+
 export interface ElementsSeoMetadata extends Struct.ComponentSchema {
   collectionName: 'components_elements_seo_metadata'
   info: {
@@ -107,6 +114,42 @@ export interface ElementsTextBlock extends Struct.ComponentSchema {
   attributes: {
     content: Schema.Attribute.RichText
     header: Schema.Attribute.Component<'elements.header', false>
+  }
+}
+
+export interface FiltersPriceRangeFilter extends Struct.ComponentSchema {
+  collectionName: 'components_filters_price_range_filters'
+  info: {
+    displayName: 'Price Range Filter'
+    icon: 'filter'
+  }
+  attributes: {
+    header: Schema.Attribute.Component<'elements.header', false> & Schema.Attribute.Required
+  }
+}
+
+export interface FiltersProductsFilter extends Struct.ComponentSchema {
+  collectionName: 'components_filters_products_filters'
+  info: {
+    displayName: 'Products Filter'
+    icon: 'filter'
+  }
+  attributes: {
+    header: Schema.Attribute.Component<'elements.header', false> & Schema.Attribute.Required
+    priceRangeFilter: Schema.Attribute.Component<'filters.price-range-filter', false> & Schema.Attribute.Required
+    tagFilter: Schema.Attribute.Component<'filters.tag-filter', false> & Schema.Attribute.Required
+  }
+}
+
+export interface FiltersTagFilter extends Struct.ComponentSchema {
+  collectionName: 'components_filters_tag_filters'
+  info: {
+    displayName: 'Tag Filter'
+    icon: 'filter'
+  }
+  attributes: {
+    allLabel: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
+    header: Schema.Attribute.Component<'elements.header', false> & Schema.Attribute.Required
   }
 }
 
@@ -186,7 +229,7 @@ export interface MenusThemeSelector extends Struct.ComponentSchema {
   }
   attributes: {
     menuButton: Schema.Attribute.Component<'elements.button', false> & Schema.Attribute.Required
-    themes: Schema.Attribute.Relation<'oneToMany', 'api::theme.theme'>
+    themes: Schema.Attribute.Relation<'oneToMany', 'api::theme.theme'> & Schema.Attribute.Required
   }
 }
 
@@ -198,7 +241,7 @@ export interface SectionsBlogTeaser extends Struct.ComponentSchema {
     icon: 'gift'
   }
   attributes: {
-    blog_posts: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'>
+    blogPosts: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'> & Schema.Attribute.Required
     header: Schema.Attribute.Component<'elements.header', false> & Schema.Attribute.Required
     viewAllButton: Schema.Attribute.Component<'elements.button', false> & Schema.Attribute.Required
   }
@@ -245,7 +288,8 @@ export interface SectionsCategoryGrid extends Struct.ComponentSchema {
     icon: 'apps'
   }
   attributes: {
-    categories: Schema.Attribute.Relation<'oneToMany', 'api::product-category.product-category'>
+    categories: Schema.Attribute.Relation<'oneToMany', 'api::product-category.product-category'> &
+      Schema.Attribute.Required
     header: Schema.Attribute.Component<'elements.header', false> & Schema.Attribute.Required
   }
 }
@@ -259,7 +303,7 @@ export interface SectionsFeaturedProducts extends Struct.ComponentSchema {
   }
   attributes: {
     header: Schema.Attribute.Component<'elements.header', false> & Schema.Attribute.Required
-    products: Schema.Attribute.Relation<'oneToMany', 'api::product.product'>
+    products: Schema.Attribute.Relation<'oneToMany', 'api::product.product'> & Schema.Attribute.Required
     viewAllButton: Schema.Attribute.Component<'elements.button', false> & Schema.Attribute.Required
   }
 }
@@ -292,17 +336,35 @@ export interface SectionsTeamGrid extends Struct.ComponentSchema {
   }
 }
 
+export interface SortersProductsSorter extends Struct.ComponentSchema {
+  collectionName: 'components_sorters_products_sorters'
+  info: {
+    displayName: 'Products Sorter'
+    icon: 'layer'
+  }
+  attributes: {
+    bestSellers: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
+    header: Schema.Attribute.Component<'elements.header', false> & Schema.Attribute.Required
+    newArrivals: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
+    priceHighToLow: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
+    priceLowToHigh: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
+  }
+}
+
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
-      'call-to-actions.category-cta': CallToActionsCategoryCta
       'call-to-actions.newsletter-signup-cta': CallToActionsNewsletterSignupCta
       'call-to-actions.pagination-cta': CallToActionsPaginationCta
       'elements.button': ElementsButton
       'elements.header': ElementsHeader
       'elements.label': ElementsLabel
+      'elements.price': ElementsPrice
       'elements.seo-metadata': ElementsSeoMetadata
       'elements.text-block': ElementsTextBlock
+      'filters.price-range-filter': FiltersPriceRangeFilter
+      'filters.products-filter': FiltersProductsFilter
+      'filters.tag-filter': FiltersTagFilter
       'markers.end-horizontal-layout-marker': MarkersEndHorizontalLayoutMarker
       'markers.start-horizontal-layout-marker': MarkersStartHorizontalLayoutMarker
       'menus.language-selector': MenusLanguageSelector
@@ -316,6 +378,7 @@ declare module '@strapi/strapi' {
       'sections.featured-products': SectionsFeaturedProducts
       'sections.hero': SectionsHero
       'sections.team-grid': SectionsTeamGrid
+      'sorters.products-sorter': SortersProductsSorter
     }
   }
 }

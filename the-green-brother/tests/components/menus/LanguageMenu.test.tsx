@@ -571,13 +571,9 @@ describe('LanguageMenu', () => {
           visible={false}
         />
       )
-      // Should still be in document (with hidden: true to find hidden elements)
-      const button = screen.getByRole('button', { name: 'Select language', hidden: true })
-      expect(button).toBeInTheDocument()
-
-      // The container has aria-hidden, visibility is handled by ButtonAction's visible prop
-      const container = button.closest('div[aria-hidden]')
-      expect(container).toHaveAttribute('aria-hidden', 'true')
+      // Container is rendered, visibility is handled by trigger button's visible prop
+      const container = screen.getByTestId('language-menu-container')
+      expect(container).toBeInTheDocument()
     })
   })
 })

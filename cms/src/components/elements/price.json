@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_elements_prices",
+  "info": {
+    "displayName": "Price",
+    "icon": "priceTag"
+  },
+  "options": {},
+  "attributes": {
+    "amount": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "currency": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::currency.currency",
+      "required": true
+    }
+  },
+  "config": {}
+}

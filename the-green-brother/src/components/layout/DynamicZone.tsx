@@ -3,14 +3,17 @@
 /**
  * Dynamic Zone Layout Component
  *
- * Renders CMS dynamic zone sections with support for horizontal layout markers.
- * Sections between start and end horizontal markers are rendered in a flex row.
- * Respects language direction (LTR/RTL) for horizontal layouts.
+ * Renders CMS dynamic zone sections with support for horizontal layout markers
+ * and tabbed layout mode. Sections between start and end horizontal markers are
+ * rendered in a flex row. In tabbed mode, sections become tabs.
+ * Respects language direction (LTR/RTL) for all layouts.
  */
 
 import type { ReactNode } from 'react'
 
-import { DirectionEnum } from '@/lib/generated/types.gen'
+import { Label } from '@/components/elements/Label'
+import { DirectionEnum, type ElementsTextBlockEntry } from '@/lib/generated/types.gen'
+import { TabbedDynamicZone } from './TabbedDynamicZone'
 
 /**
  * Section with component discriminator
@@ -34,6 +37,11 @@ interface SectionGroup {
 export type VerticalAlignment = 'top' | 'center' | 'bottom'
 
 /**
+ * Layout mode for the dynamic zone
+ */
+export type DynamicZoneLayout = 'vertical' | 'horizontal' | 'tabbed'
+
+/**
  * Props for the DynamicZone component
  */
 export interface DynamicZoneProps<T extends DynamicSection> {
@@ -47,6 +55,10 @@ export interface DynamicZoneProps<T extends DynamicSection> {
   className?: string
   /** Vertical alignment for horizontal layout groups */
   verticalAlignment: VerticalAlignment
+  /** Layout mode: vertical (default), horizontal, or tabbed */
+  layout?: DynamicZoneLayout
+  /** Function to extract tab labels from sections (for tabbed layout) */
+  getTabLabel?: (section: T) => ReactNode
 }
 
 /**
@@ -54,6 +66,24 @@ export interface DynamicZoneProps<T extends DynamicSection> {
  */
 const START_MARKER = 'markers.start-horizontal-layout-marker'
 const END_MARKER = 'markers.end-horizontal-layout-marker'
+const TEXT_BLOCK_COMPONENT = 'elements.text-block'
+
+/**
+ * Strips the header from a TextBlock section to avoid duplicate rendering in tabbed mode.
+ * When a TextBlock is rendered as a tab, its header is used as the tab label,
+ * so we remove it from the content to prevent showing it twice.
+ * @param section - The section to process
+ * @returns Section with header removed if it's a TextBlock, otherwise unchanged
+ */
+function stripTextBlockHeader<T extends DynamicSection>(section: T): T {
+  if (section.__component === TEXT_BLOCK_COMPONENT) {
+    const textBlock = section as unknown as ElementsTextBlockEntry & DynamicSection
+    const { header: _, ...rest } = textBlock
+    void _ // Suppress unused variable warning for destructured header
+    return rest as unknown as T
+  }
+  return section
+}
 
 /**
  * Groups sections based on horizontal layout markers.
@@ -135,6 +165,8 @@ export const getAlignmentClass = (alignment: VerticalAlignment): string => {
  * @param props.direction - Language direction (ltr/rtl)
  * @param props.className - Additional className for container
  * @param props.verticalAlignment - Vertical alignment for horizontal groups
+ * @param props.layout - Layout mode: vertical, horizontal, or tabbed
+ * @param props.getTabLabel - Function to extract tab labels from sections
  * @returns Rendered dynamic zone with horizontal groups
  * @example
  * ```tsx
@@ -152,9 +184,53 @@ export function DynamicZone<T extends DynamicSection>({
   direction,
   className = '',
   verticalAlignment,
+  layout,
+  getTabLabel,
 }: DynamicZoneProps<T>) {
-  const groups = groupSections(sections, renderSection)
+  // Filter out marker sections for tabbed mode
+  const renderableSections = sections.filter(
+    section => section.__component !== START_MARKER && section.__component !== END_MARKER
+  )
+
   const isRTL = direction === DirectionEnum.RTL
+
+  // Tabbed layout mode
+  if (layout === 'tabbed' && renderableSections.length > 0) {
+    // Convert sections to tabs (render them here in the server component)
+    const tabs = renderableSections.map((section, index) => {
+      // Generate a unique key using component name and index
+      const tabKey = `${section.__component}-${String(index)}`
+
+      // Extract label: use getTabLabel if provided, or TextBlock header, or fallback to component name
+      let label: ReactNode
+      if (getTabLabel) {
+        label = getTabLabel(section)
+      } else if (section.__component === TEXT_BLOCK_COMPONENT) {
+        const textBlock = section as unknown as ElementsTextBlockEntry & DynamicSection
+        if (textBlock.header?.header) {
+          label = <Label data={textBlock.header.header} direction={direction} display="inline" />
+        } else {
+          label = 'Text'
+        }
+      } else {
+        label = section.__component.split('.').pop() ?? 'Tab'
+      }
+
+      // Strip header from TextBlock when rendering as tab content to avoid duplication
+      const contentSection = section.__component === TEXT_BLOCK_COMPONENT ? stripTextBlockHeader(section) : section
+
+      return {
+        key: tabKey,
+        label,
+        content: renderSection(contentSection) as ReactNode,
+      }
+    })
+
+    return <TabbedDynamicZone tabs={tabs} direction={direction} className={className} />
+  }
+
+  // Default: vertical/horizontal grouping mode
+  const groups = groupSections(sections, renderSection)
   const alignmentClass = getAlignmentClass(verticalAlignment)
 
   return (

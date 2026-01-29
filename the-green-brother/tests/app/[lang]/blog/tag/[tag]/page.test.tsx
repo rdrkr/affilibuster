@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react'
 import { CodeEnum } from '@/lib/generated/types.gen'
 
 // Mock API functions
-jest.mock('@/lib/client', () => ({
+jest.mock('@/lib/content', () => ({
   getBlog: jest.fn(),
   getBlogPosts: jest.fn(),
 }))
@@ -30,7 +30,7 @@ jest.mock('@/app/[lang]/blog/tag/[tag]/TopicClient', () => {
 })
 
 import TopicPage from '@/app/[lang]/blog/tag/[tag]/page'
-import { getBlog, getBlogPosts } from '@/lib/client'
+import { getBlog, getBlogPosts } from '@/lib/content'
 
 const mockGetBlogPosts = getBlogPosts as jest.Mock
 const mockGetBlog = getBlog as jest.Mock
@@ -49,7 +49,6 @@ describe('TopicPage', () => {
     mockGetBlogPosts.mockResolvedValue({ data: mockPosts })
     mockGetBlog.mockResolvedValue({
       pagination: { noItemsFound: { header: { text: 'No items' } } },
-      defaultContributor: { id: 1, name: 'Default' },
       readTimeMinutesLabel: { text: 'min' },
       readArticleLabel: { text: 'Read' },
     })
@@ -66,7 +65,6 @@ describe('TopicPage', () => {
     mockGetBlogPosts.mockResolvedValue({ data: [] })
     mockGetBlog.mockResolvedValue({
       pagination: {},
-      defaultContributor: { id: 1, name: 'Default' },
     })
 
     const Component = await TopicPage({
@@ -81,7 +79,6 @@ describe('TopicPage', () => {
     mockGetBlogPosts.mockResolvedValue(null)
     mockGetBlog.mockResolvedValue({
       pagination: {},
-      defaultContributor: { id: 1, name: 'Default' },
     })
 
     const Component = await TopicPage({ params: Promise.resolve({ lang: CodeEnum.EN, tag: 'Test' }) })

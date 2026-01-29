@@ -35,12 +35,6 @@
       "repeatable": false,
       "required": true
     },
-    "posts": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::blog-post.blog-post",
-      "inversedBy": "tags"
-    },
     "seoMetadata": {
       "type": "component",
       "pluginOptions": {

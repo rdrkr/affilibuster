@@ -10,12 +10,7 @@ import {
   FeaturedProductsSection,
   type FeaturedProductsSectionProps,
 } from '@/components/sections/FeaturedProductsSection'
-import {
-  AlignmentEnum,
-  DirectionEnum,
-  IconPositionEnum,
-  type ApiProductProductDocument,
-} from '@/lib/generated/types.gen'
+import { AlignmentEnum, DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 
 // Mock components
 jest.mock('@/components/elements', () => ({
@@ -86,9 +81,10 @@ describe('FeaturedProductsSection', () => {
       url: '/products',
       openInNewTab: false,
     },
+    products: [],
   }
 
-  const mockProducts: ApiProductProductDocument[] = [
+  const mockProducts = [
     {
       documentId: 'prod-1',
       id: 1,
@@ -97,7 +93,6 @@ describe('FeaturedProductsSection', () => {
       price: 29.99,
       publishedAt: '2025-01-01',
       images: [],
-      // Minimal needed since we mock ProductCard, but good to have structure
     } as any,
     {
       documentId: 'prod-2',
@@ -110,8 +105,19 @@ describe('FeaturedProductsSection', () => {
     } as any,
   ]
 
+  const mockSectionDataWithProducts: FeaturedProductsSectionProps['data'] = {
+    ...mockSectionData,
+    products: mockProducts,
+  }
+
   it('should render section with header and view all button', () => {
-    render(<FeaturedProductsSection direction={DirectionEnum.LTR} data={mockSectionData} products={mockProducts} />)
+    render(
+      <FeaturedProductsSection
+        direction={DirectionEnum.LTR}
+        data={mockSectionDataWithProducts}
+        enableUserProfile={false}
+      />
+    )
 
     expect(screen.getByText('Featured Products')).toBeInTheDocument()
     expect(screen.getByText('Subtitle')).toBeInTheDocument()
@@ -119,7 +125,13 @@ describe('FeaturedProductsSection', () => {
   })
 
   it('should render carousel with product cards', () => {
-    render(<FeaturedProductsSection direction={DirectionEnum.LTR} data={mockSectionData} products={mockProducts} />)
+    render(
+      <FeaturedProductsSection
+        direction={DirectionEnum.LTR}
+        data={mockSectionDataWithProducts}
+        enableUserProfile={false}
+      />
+    )
 
     const cards = screen.getAllByTestId('mock-product-card')
     expect(cards).toHaveLength(2)
@@ -131,8 +143,7 @@ describe('FeaturedProductsSection', () => {
     render(
       <FeaturedProductsSection
         direction={DirectionEnum.LTR}
-        data={mockSectionData}
-        products={mockProducts}
+        data={mockSectionDataWithProducts}
         enableUserProfile={true}
       />
     )
@@ -143,7 +154,7 @@ describe('FeaturedProductsSection', () => {
 
   it('should not render if products list is empty', () => {
     const { container } = render(
-      <FeaturedProductsSection direction={DirectionEnum.LTR} data={mockSectionData} products={[]} />
+      <FeaturedProductsSection direction={DirectionEnum.LTR} data={mockSectionData} enableUserProfile={false} />
     )
     expect(container.firstChild).toBeNull()
   })

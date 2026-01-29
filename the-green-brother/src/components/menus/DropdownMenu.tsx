@@ -2,7 +2,7 @@
 
 'use client'
 
-import type { ReactNode } from 'react'
+import React, { type ReactNode } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { ButtonAction, ButtonLink } from '@/components/elements'
@@ -35,6 +35,8 @@ export interface DropdownProps {
   style?: React.CSSProperties
   /** Additional CSS classes for the dropdown container */
   className?: string
+  /** Position dropdown relative to trigger instead of nav on mobile (default: false) */
+  inlineOnMobile?: boolean
 }
 
 /**
@@ -53,6 +55,7 @@ export interface DropdownProps {
  * @param props.direction - Text direction for RTL support
  * @param props.style - Custom inline styles
  * @param props.className - Additional CSS classes
+ * @param props.inlineOnMobile - Position relative to trigger on mobile (default: false)
  * @returns Dropdown panel component
  */
 export function Dropdown({
@@ -63,6 +66,7 @@ export function Dropdown({
   direction,
   style,
   className = '',
+  inlineOnMobile = false,
 }: DropdownProps) {
   const isRTL = direction === DirectionEnum.RTL
 
@@ -90,10 +94,15 @@ export function Dropdown({
     ...(width ? ({ '--dropdown-width': width } as React.CSSProperties) : {}),
   } as React.CSSProperties
 
+  // Mobile positioning: fixed for nav-style, absolute for inline
+  const mobilePositionClasses = inlineOnMobile
+    ? 'absolute inset-x-0 top-full'
+    : 'fixed inset-x-4 top-[calc(var(--nav-top,5rem))]'
+
   return (
     <div
       className={`
-      fixed inset-x-4 top-[calc(var(--nav-top,5rem))] z-50 mt-4
+      ${mobilePositionClasses} z-50 mt-4
       sm:absolute sm:top-[calc(var(--nav-top,1.5rem))] sm:right-0 sm:left-0
       ${positionClasses}
       ${isVisible ? 'visible' : 'pointer-events-none'}
@@ -120,7 +129,7 @@ export function Dropdown({
         `}
         style={containerStyle}
       >
-        {children}
+        {isVisible && children}
       </div>
     </div>
   )
@@ -175,6 +184,8 @@ export interface DropdownMenuProps {
   isOpen?: boolean
   /** Controlled mode: callback when open state changes */
   onOpenChange?: (isOpen: boolean) => void
+  /** Position dropdown relative to trigger instead of nav on mobile (default: false) */
+  inlineOnMobile?: boolean
 }
 
 /**
@@ -207,6 +218,7 @@ export interface DropdownMenuProps {
  * @param props.onSelect - Callback when item selected
  * @param props.isOpen - Controlled open state
  * @param props.onOpenChange - Controlled open change callback
+ * @param props.inlineOnMobile - Position dropdown relative to trigger on mobile
  * @returns Dropdown menu component
  */
 export function DropdownMenu({
@@ -230,6 +242,7 @@ export function DropdownMenu({
   onSelect,
   isOpen: controlledIsOpen,
   onOpenChange,
+  inlineOnMobile = false,
 }: DropdownMenuProps) {
   // Support both controlled and uncontrolled modes
   const [internalIsOpen, setInternalIsOpen] = useState(false)
@@ -251,6 +264,9 @@ export function DropdownMenu({
   const containerRef = useRef<HTMLDivElement>(null)
   // Fix for mobile double-tap: ignore click if hover just triggered
   const justHoveredRef = useRef(false)
+
+  // Check if children is empty (no content to display)
+  const hasContent = React.Children.count(children) > 0
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -276,18 +292,22 @@ export function DropdownMenu({
   const handleToggle = useCallback(
     (_e?: React.MouseEvent) => {
       if (justHoveredRef.current) return
+      // Don't open if no content
+      if (!hasContent) return
       setIsOpen(prev => !prev)
     },
-    [setIsOpen]
+    [setIsOpen, hasContent]
   )
 
   const handleMouseEnter = useCallback(() => {
+    // Don't open if no content
+    if (!hasContent) return
     setIsOpen(true)
     justHoveredRef.current = true
     setTimeout(() => {
       justHoveredRef.current = false
     }, 50)
-  }, [setIsOpen])
+  }, [setIsOpen, hasContent])
 
   const handleMouseLeave = useCallback(() => {
     setIsOpen(false)
@@ -345,7 +365,6 @@ export function DropdownMenu({
       ref={containerRef}
       className="group relative"
       data-testid={testId}
-      aria-hidden={!visible}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -354,6 +373,7 @@ export function DropdownMenu({
         direction={direction}
         align={align}
         isVisible={isOpen}
+        inlineOnMobile={inlineOnMobile}
         {...(width ? { width } : {})}
         {...(dropdownClassName ? { className: dropdownClassName } : {})}
       >

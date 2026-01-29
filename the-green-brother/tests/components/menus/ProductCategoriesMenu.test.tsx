@@ -9,6 +9,18 @@ import { act, fireEvent, render, screen } from '@testing-library/react'
 import { ProductCategoriesMenu, type ProductCategoriesMenuProps } from '@/components/menus/ProductCategoriesMenu'
 import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 
+// Mock for useSearchParams - allows tests to control URL params
+let mockSearchParams = new Map<string, string>()
+// Mock pathname for language extraction
+const mockPathname = '/en/products'
+
+jest.mock('next/navigation', () => ({
+  useSearchParams: () => ({
+    get: (key: string) => mockSearchParams.get(key) ?? null,
+  }),
+  usePathname: () => mockPathname,
+}))
+
 // Mock the CMS element components
 jest.mock('@/components/elements', () => ({
   Icon: function MockIcon({ icon, size }: { icon?: string; size?: string }) {
@@ -35,6 +47,7 @@ jest.mock('@/components/elements', () => ({
     showText = true,
     isActive,
     onClick,
+    visible = true,
     'aria-expanded': ariaExpanded,
   }: {
     data?: { url?: string; label?: { text?: string; icon?: string; ariaDescription?: string } }
@@ -42,6 +55,7 @@ jest.mock('@/components/elements', () => ({
     children?: React.ReactNode
     showText?: boolean
     isActive?: boolean
+    visible?: boolean
     // Updated to accept onClick
     onClick?: React.MouseEventHandler<HTMLAnchorElement>
     'aria-expanded'?: boolean
@@ -54,6 +68,7 @@ jest.mock('@/components/elements', () => ({
         data-testid="mock-button-link"
         aria-label={data?.label?.ariaDescription}
         aria-expanded={ariaExpanded}
+        aria-hidden={!visible}
         data-has-text={showText}
         // Pass onClick to allow toggling in tests
         onClick={onClick}
@@ -121,6 +136,10 @@ describe('ProductCategoriesMenu', () => {
     ],
   } as unknown as ProductCategoriesMenuProps['data']
 
+  beforeEach(() => {
+    mockSearchParams = new Map<string, string>()
+  })
+
   it('should render menu button link', () => {
     render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
     const link = screen.getByRole('link', { name: 'View all products' })
@@ -176,7 +195,7 @@ describe('ProductCategoriesMenu', () => {
     // Open menu (click button link)
     fireEvent.click(screen.getByRole('link', { name: 'View all products' }))
     const kitchenLink = screen.getByText('Kitchen').closest('a')
-    expect(kitchenLink).toHaveAttribute('href', '/products?category=kitchen')
+    expect(kitchenLink).toHaveAttribute('href', '/en/products?category=kitchen')
   })
 
   it('should render category images', () => {
@@ -198,20 +217,11 @@ describe('ProductCategoriesMenu', () => {
     expect(links).toHaveLength(1)
   })
 
-  it('should skip categories with null content', () => {
-    const dataWithNullContent = {
-      ...mockData,
-      productCategories: [
-        ...((mockData as { productCategories?: unknown[] }).productCategories ?? []),
-        { id: 4, documentId: 'cat-4', slug: 'other', content: undefined },
-      ],
-    } as unknown as ProductCategoriesMenuProps['data']
-    render(<ProductCategoriesMenu data={dataWithNullContent} isActive={false} direction={DirectionEnum.LTR} />)
-    // Open menu (click button link)
-    // Need to trigger open to check if it skipped the null one in rendered list
+  it('should render all categories with valid content', () => {
+    render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
     fireEvent.click(screen.getByRole('link', { name: 'View all products' }))
 
-    // Should still only have 4 links (1 menu + 3 valid categories)
+    // Should have 4 links (1 menu + 3 valid categories)
     const links = screen.getAllByRole('link')
     expect(links).toHaveLength(4)
   })
@@ -393,13 +403,48 @@ describe('ProductCategoriesMenu', () => {
     })
 
     it('should render hidden element when visible is false', () => {
-      const { container } = render(
-        <ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} visible={false} />
-      )
-      const menu = container.firstChild as HTMLElement
-      expect(menu).not.toBeNull()
-      // Visibility is now handled by ButtonLink's visible prop, container just has aria-hidden
-      expect(menu).toHaveAttribute('aria-hidden', 'true')
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} visible={false} />)
+      // Visibility is handled by the trigger link's aria-hidden attribute
+      const link = screen.getByTestId('mock-button-link')
+      expect(link).toHaveAttribute('aria-hidden', 'true')
+    })
+  })
+
+  describe('Search param preservation', () => {
+    it('should include search param in category links when search param exists', () => {
+      mockSearchParams.set('search', 'bamboo')
+
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+      // Open menu (click button link)
+      fireEvent.click(screen.getByRole('link', { name: 'View all products' }))
+
+      const kitchenLink = screen.getByText('Kitchen').closest('a')
+      expect(kitchenLink).toHaveAttribute('href', '/en/products?category=kitchen&search=bamboo')
+    })
+
+    it('should not include search param when no search param exists', () => {
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+      // Open menu (click button link)
+      fireEvent.click(screen.getByRole('link', { name: 'View all products' }))
+
+      const kitchenLink = screen.getByText('Kitchen').closest('a')
+      expect(kitchenLink).toHaveAttribute('href', '/en/products?category=kitchen')
+    })
+
+    it('should preserve search param for all category links', () => {
+      mockSearchParams.set('search', 'eco')
+
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+      // Open menu (click button link)
+      fireEvent.click(screen.getByRole('link', { name: 'View all products' }))
+
+      const kitchenLink = screen.getByText('Kitchen').closest('a')
+      const bathroomLink = screen.getByText('Bathroom').closest('a')
+      const gardenLink = screen.getByText('Garden').closest('a')
+
+      expect(kitchenLink).toHaveAttribute('href', '/en/products?category=kitchen&search=eco')
+      expect(bathroomLink).toHaveAttribute('href', '/en/products?category=bathroom&search=eco')
+      expect(gardenLink).toHaveAttribute('href', '/en/products?category=garden&search=eco')
     })
   })
 })

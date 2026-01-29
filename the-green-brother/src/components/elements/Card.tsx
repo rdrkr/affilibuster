@@ -71,6 +71,8 @@ export interface CardProps {
   visible?: boolean
   /** Language direction for RTL support */
   direction: DirectionEnum
+  /** Whether to preload image (for LCP optimization) */
+  preload?: boolean
 }
 
 const sizeConfig: Record<
@@ -152,6 +154,7 @@ function getSizeClasses(size: CardSize, layout: CardLayout) {
  * @param props.visible - Controls entire card visibility (false = hidden from layout)
  * @param props.direction - Language direction for RTL support
  * @param props.noAnimation - Whether to disable hover animations
+ * @param props.preload - Whether to preload image (for LCP optimization)
  * @returns Card component or null if not visible
  */
 export function Card({
@@ -172,6 +175,7 @@ export function Card({
   visible,
   direction,
   noAnimation = false,
+  preload = false,
 }: CardProps) {
   if (visible === false) {
     return null
@@ -251,7 +255,7 @@ export function Card({
 
   return (
     <div className={cardClasses} style={cardStyle} data-href={href} dir={isRTL ? 'rtl' : 'ltr'}>
-      {asLink && <Link href={href} className="absolute inset-0 z-10 cursor-pointer" aria-hidden="true" tabIndex={-1} />}
+      {asLink && <Link href={href} className="absolute inset-0 z-10 cursor-pointer" tabIndex={-1} />}
 
       {isHorizontalLayout ? (
         // Horizontal Layout
@@ -274,6 +278,7 @@ export function Card({
                 `}
                   sizes={imageSizes}
                   fill
+                  preload={preload}
                 />
                 {imageOverlay}
               </div>
@@ -317,6 +322,7 @@ export function Card({
                 `}
                 sizes={imageSizes}
                 fill
+                preload={preload}
               />
               {imageOverlay}
             </div>

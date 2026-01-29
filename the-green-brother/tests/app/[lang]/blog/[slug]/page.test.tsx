@@ -5,12 +5,15 @@
  */
 
 // Mock the client module
-jest.mock('@/lib/client', () => ({
+jest.mock('@/lib/content', () => ({
   __esModule: true,
   getBlogPostBySlug: jest.fn(),
-  getLanguages: jest.fn(),
   getNavigation: jest.fn(),
   getBlog: jest.fn(),
+}))
+
+jest.mock('@/lib/languages', () => ({
+  getLanguages: jest.fn(),
 }))
 
 // Mock next/navigation
@@ -30,8 +33,9 @@ jest.mock('@/app/[lang]/blog/[slug]/BlogPostClient', () => ({
 }))
 
 import BlogPostPage from '@/app/[lang]/blog/[slug]/page'
-import { getBlogPostBySlug, getLanguages, getNavigation } from '@/lib/client'
+import { getBlogPostBySlug, getNavigation } from '@/lib/content'
 import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
+import { getLanguages } from '@/lib/languages'
 import { render, screen } from '@testing-library/react'
 
 const mockGetBlogPostBySlug = getBlogPostBySlug as jest.MockedFunction<typeof getBlogPostBySlug>

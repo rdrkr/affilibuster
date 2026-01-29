@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 import { getProductCategories, getProductCategoriesPage, getProducts } from '@/lib/client'
+import { userProfileFlag } from '@/lib/feature-flags'
 import { CodeEnum } from '@/lib/generated/types.gen'
 import ProductsClient from './ProductsClient'
 
@@ -18,7 +19,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ lang:
   const lang = resolvedParams.lang
 
   // Fetch all products data in parallel
-  const [pageData, productsResponse, categoriesResponse] = await Promise.all([
+  const [pageData, productsResponse, categoriesResponse, enableUserProfile] = await Promise.all([
     getProductCategoriesPage(lang),
     getProducts({
       pagination: { page: 1, pageSize: 100 }, // Get all products for client-side filtering
@@ -28,6 +29,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ lang:
       pagination: { page: 1, pageSize: 100 },
       locale: lang,
     }),
+    userProfileFlag(),
   ])
 
   return (
@@ -35,6 +37,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ lang:
       pageData={pageData}
       products={productsResponse?.data ?? []}
       categories={categoriesResponse?.data ?? []}
+      enableUserProfile={enableUserProfile}
     />
   )
 }

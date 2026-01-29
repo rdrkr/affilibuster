@@ -61,6 +61,8 @@ export interface ButtonLinkProps {
   maskedIcon?: boolean
   /** Additional CSS classes for the label text */
   textClassName?: string
+  /** Load icon with high priority (for LCP optimization) */
+  iconPriority?: boolean
 }
 
 /**
@@ -85,6 +87,7 @@ export interface ButtonLinkProps {
  * @param props.slideDirection - Animation slide direction
  * @param props.maskedIcon - Use masked icon for local icons (inherits color)
  * @param props.textClassName - Additional CSS classes for the label text
+ * @param props.iconPriority - Load icon with high priority (for LCP optimization)
  * @returns Button link component or null if no data and no href, or not visible
  */
 export function ButtonLink({
@@ -106,6 +109,7 @@ export function ButtonLink({
   slideDirection = 'end-to-start',
   maskedIcon,
   textClassName,
+  iconPriority,
 }: ButtonLinkProps) {
   const url = data?.url
 
@@ -140,6 +144,7 @@ export function ButtonLink({
     childrenPosition,
     maskedIcon: maskedIcon ?? false,
     textClassName: textClassName ?? '',
+    iconPriority: iconPriority ?? false,
   })
 
   if (!content) {

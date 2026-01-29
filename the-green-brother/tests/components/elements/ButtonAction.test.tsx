@@ -262,4 +262,82 @@ describe('ButtonAction', () => {
     const button = screen.getByRole('button')
     expect(button).toHaveAttribute('type', 'button')
   })
+
+  describe('Accessibility Props', () => {
+    it('should apply role attribute when provided', () => {
+      render(<ButtonAction direction={DirectionEnum.LTR} data={mockButtonData} onClick={mockOnClick} role="tab" />)
+      const button = screen.getByRole('tab')
+      expect(button).toBeInTheDocument()
+    })
+
+    it('should apply aria-selected attribute when provided', () => {
+      render(
+        <ButtonAction direction={DirectionEnum.LTR} data={mockButtonData} onClick={mockOnClick} aria-selected={true} />
+      )
+      const button = screen.getByRole('button')
+      expect(button).toHaveAttribute('aria-selected', 'true')
+    })
+
+    it('should apply aria-selected false when provided', () => {
+      render(
+        <ButtonAction direction={DirectionEnum.LTR} data={mockButtonData} onClick={mockOnClick} aria-selected={false} />
+      )
+      const button = screen.getByRole('button')
+      expect(button).toHaveAttribute('aria-selected', 'false')
+    })
+
+    it('should apply aria-controls attribute when provided', () => {
+      render(
+        <ButtonAction
+          direction={DirectionEnum.LTR}
+          data={mockButtonData}
+          onClick={mockOnClick}
+          aria-controls="panel-1"
+        />
+      )
+      const button = screen.getByRole('button')
+      expect(button).toHaveAttribute('aria-controls', 'panel-1')
+    })
+
+    it('should apply id attribute when provided', () => {
+      render(
+        <ButtonAction direction={DirectionEnum.LTR} data={mockButtonData} onClick={mockOnClick} id="my-button-id" />
+      )
+      const button = screen.getByRole('button')
+      expect(button).toHaveAttribute('id', 'my-button-id')
+    })
+
+    it('should apply data-testid attribute when provided', () => {
+      render(
+        <ButtonAction
+          direction={DirectionEnum.LTR}
+          data={mockButtonData}
+          onClick={mockOnClick}
+          data-testid="custom-test-id"
+        />
+      )
+      const button = screen.getByTestId('custom-test-id')
+      expect(button).toBeInTheDocument()
+    })
+
+    it('should apply multiple accessibility props together', () => {
+      render(
+        <ButtonAction
+          direction={DirectionEnum.LTR}
+          data={mockButtonData}
+          onClick={mockOnClick}
+          role="tab"
+          aria-selected={true}
+          aria-controls="panel-1"
+          id="tab-1"
+          data-testid="tab-button-1"
+        />
+      )
+      const button = screen.getByTestId('tab-button-1')
+      expect(button).toHaveAttribute('role', 'tab')
+      expect(button).toHaveAttribute('aria-selected', 'true')
+      expect(button).toHaveAttribute('aria-controls', 'panel-1')
+      expect(button).toHaveAttribute('id', 'tab-1')
+    })
+  })
 })

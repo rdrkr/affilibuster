@@ -8,7 +8,15 @@ import tseslint from 'typescript-eslint'
 
 export default defineConfig([
   {
-    ignores: ['node_modules/**', 'dist/**', 'coverage/**', '.strapi/**', 'types/**', 'public/**', 'package-lock.json'],
+    ignores: [
+      'node_modules/**',
+      '**/dist/**',
+      'coverage/**',
+      '.strapi/**',
+      'types/**',
+      'public/**',
+      'package-lock.json',
+    ],
   },
   { files: ['**/*.{js,mjs,ts,tsx,cts,mts}'] },
   eslint.configs.recommended,

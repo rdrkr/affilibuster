@@ -5,7 +5,7 @@
  */
 
 // Mock the client module
-jest.mock('@/lib/client', () => ({
+jest.mock('@/lib/content', () => ({
   getProductBySlug: jest.fn(),
 }))
 
@@ -26,7 +26,7 @@ jest.mock('@/app/[lang]/products/[slug]/ProductDetailClient', () => ({
 }))
 
 import ProductDetailPage from '@/app/[lang]/products/[slug]/page'
-import { getProductBySlug } from '@/lib/client'
+import { getProductBySlug } from '@/lib/content'
 import { CodeEnum } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 
@@ -38,8 +38,8 @@ describe('ProductDetailPage', () => {
   })
 
   it('should fetch product and pass to ProductDetailClient', async () => {
-    const mockProduct = { documentId: 'prod-1', slug: 'prod-slug', content: { header: {} } }
-    mockGetProductBySlug.mockResolvedValue(mockProduct as Awaited<ReturnType<typeof getProductBySlug>>)
+    const mockProduct = { documentId: 'prod-1', slug: 'prod-slug', header: { header: {} } }
+    mockGetProductBySlug.mockResolvedValue(mockProduct as unknown as Awaited<ReturnType<typeof getProductBySlug>>)
 
     const Component = await ProductDetailPage({ params: Promise.resolve({ lang: CodeEnum.EN, slug: 'prod-slug' }) })
     render(Component)

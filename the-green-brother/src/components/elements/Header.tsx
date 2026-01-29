@@ -9,6 +9,7 @@
 
 import { AlignmentEnum, DirectionEnum, type ElementsHeaderEntry } from '@/lib/generated/types.gen'
 import { Label } from './Label'
+import { IconSize } from './common'
 
 /**
  * Header level type
@@ -24,9 +25,9 @@ export interface HeaderProps {
   /** Heading level for the title (default: 2) */
   level?: HeaderLevel
   /** Icon size for header (default: lg) */
-  headerIconSize?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl'
+  headerIconSize?: IconSize
   /** Icon size for subheader (default: md) */
-  subheaderIconSize?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl'
+  subheaderIconSize?: IconSize
   /** Additional CSS classes for the container */
   className?: string
   /** Additional CSS classes for the header text */

@@ -33,7 +33,17 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 /**
  * Icon size options
  */
-export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl'
+const iconSizes = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl', '6xl'] as const
+export type IconSize = (typeof iconSizes)[number]
+
+/**
+ * Check if a value is a valid IconSize
+ * @param value - Value to check
+ * @returns True if the value is a valid IconSize, false otherwise
+ */
+export function isIconSize(value: unknown): value is IconSize {
+  return typeof value === 'string' && iconSizes.includes(value as IconSize)
+}
 
 /**
  * Get CSS classes for button variant
@@ -110,9 +120,12 @@ export function getVariantClasses(
     'ghost-3': `
       cursor-pointer
       font-medium whitespace-nowrap rounded-full
-      transition-colors text-neutral-700 dark:text-white
-      bg-neutral-100 dark:bg-white/5
-      hover:bg-neutral-100 dark:hover:bg-white/10
+      transition-colors
+      ${
+        isActive
+          ? `bg-primary text-background-dark hover:bg-primary-hover`
+          : `bg-neutral-100 text-neutral-700 dark:bg-white/5 dark:text-white hover:bg-neutral-200 dark:hover:bg-white/10`
+      }
       disabled:text-tertiary-500 disabled:cursor-not-allowed
     `,
     'link-1': `
@@ -268,6 +281,8 @@ export interface ComposeButtonContentParams {
   maskedIcon?: boolean
   /** Additional CSS classes for the label text */
   textClassName?: string
+  /** Load icon with high priority (for LCP optimization) */
+  iconPriority?: boolean
 }
 
 /**
@@ -278,7 +293,17 @@ export interface ComposeButtonContentParams {
  * @returns Composed React node or null if no content
  */
 export function composeButtonContent(params: ComposeButtonContentParams): ReactNode {
-  const { label, children, direction, iconSize, showText, childrenPosition = 'end', maskedIcon, textClassName } = params
+  const {
+    label,
+    children,
+    direction,
+    iconSize,
+    showText,
+    childrenPosition = 'end',
+    maskedIcon,
+    textClassName,
+    iconPriority,
+  } = params
 
   let content: ReactNode = children
 
@@ -327,6 +352,7 @@ export function composeButtonContent(params: ComposeButtonContentParams): ReactN
         showText={showText ?? true}
         maskedIcon={maskedIcon ?? false}
         textClassName={textClassName ?? ''}
+        iconPriority={iconPriority ?? false}
       />
     )
 

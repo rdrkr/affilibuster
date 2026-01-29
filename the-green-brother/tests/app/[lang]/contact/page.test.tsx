@@ -5,7 +5,7 @@
  */
 
 // Mock the client module
-jest.mock('@/lib/client', () => ({
+jest.mock('@/lib/content', () => ({
   getContactUs: jest.fn(),
 }))
 
@@ -18,7 +18,7 @@ jest.mock('@/app/[lang]/contact/ContactClient', () => ({
 }))
 
 import ContactPage from '@/app/[lang]/contact/page'
-import { getContactUs } from '@/lib/client'
+import { getContactUs } from '@/lib/content'
 import { CodeEnum } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 

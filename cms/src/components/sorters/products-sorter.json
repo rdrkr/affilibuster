@@ -1,0 +1,41 @@
+{
+  "collectionName": "components_sorters_products_sorters",
+  "info": {
+    "displayName": "Products Sorter",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "header": {
+      "type": "component",
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
+    },
+    "bestSellers": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "newArrivals": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "priceHighToLow": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "priceLowToHigh": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    }
+  },
+  "config": {}
+}

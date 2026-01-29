@@ -26,5 +26,5 @@
     "noPropertyAccessFromIndexSignature": false
   },
   "include": ["*.ts", "*.tsx", "*.mjs", "*.mts", "**/*.ts", "**/*.tsx", "**/*.mjs", "**/*.mts", "**/*.json"],
-  "exclude": ["node_modules", "build", "dist", ".strapi", ".cache", ".tmp", "src/plugins/**", "package-lock.json"]
+  "exclude": ["node_modules", "build", "dist", ".strapi", ".cache", ".tmp", "package-lock.json"]
 }

@@ -662,7 +662,6 @@ export interface ApiBlogPostTagBlogPostTag extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::blog-post-tag.blog-post-tag'>
-    posts: Schema.Attribute.Relation<'manyToMany', 'api::blog-post.blog-post'>
     publishedAt: Schema.Attribute.DateTime
     seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
@@ -693,7 +692,7 @@ export interface ApiBlogPostTagBlogPostTag extends Struct.CollectionTypeSchema {
 export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
   collectionName: 'blog_posts'
   info: {
-    description: 'Blog posts with title, content, featured image, contributor, tags, and SEO metadata'
+    description: 'Blog posts with title, content, featured image, author, tags, and SEO metadata'
     displayName: 'Blog Post'
     pluralName: 'blog-posts'
     singularName: 'blog-post'
@@ -707,6 +706,19 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
     }
   }
   attributes: {
+    author: Schema.Attribute.Relation<'oneToOne', 'api::contributor.contributor'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        'strapi-plugin-relation-filter': {
+          filters: {
+            roles: {
+              roleId: {
+                $eq: 'author'
+              }
+            }
+          }
+        }
+      }>
     content: Schema.Attribute.Component<'elements.text-block', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -714,7 +726,6 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
           localized: true
         }
       }>
-    contributor: Schema.Attribute.Relation<'manyToOne', 'api::contributor.contributor'>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     featuredImage: Schema.Attribute.Media<'images'> &
@@ -750,7 +761,7 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
           localized: true
         }
       }>
-    tags: Schema.Attribute.Relation<'manyToMany', 'api::blog-post-tag.blog-post-tag'>
+    tags: Schema.Attribute.Relation<'oneToMany', 'api::blog-post-tag.blog-post-tag'> & Schema.Attribute.Required
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
   }
@@ -783,7 +794,6 @@ export interface ApiBlogBlog extends Struct.SingleTypeSchema {
     blogPosts: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    defaultContributor: Schema.Attribute.Relation<'oneToOne', 'api::contributor.contributor'>
     entryTitle: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Private &
@@ -953,7 +963,6 @@ export interface ApiContributorRoleContributorRole extends Struct.CollectionType
     }
   }
   attributes: {
-    contributors: Schema.Attribute.Relation<'manyToMany', 'api::contributor.contributor'>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     locale: Schema.Attribute.String
@@ -1002,13 +1011,19 @@ export interface ApiContributorContributor extends Struct.CollectionTypeSchema {
           localized: true
         }
       }>
-    blogPosts: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     email: Schema.Attribute.Email &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false
+        }
+      }>
+    firstName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
         }
       }>
     github: Schema.Attribute.String &
@@ -1023,6 +1038,12 @@ export interface ApiContributorContributor extends Struct.CollectionTypeSchema {
           localized: false
         }
       }>
+    lastName: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     linkedin: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -1031,13 +1052,6 @@ export interface ApiContributorContributor extends Struct.CollectionTypeSchema {
       }>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::contributor.contributor'>
-    name: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
     profilePicture: Schema.Attribute.Media<'images'> &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -1045,7 +1059,7 @@ export interface ApiContributorContributor extends Struct.CollectionTypeSchema {
         }
       }>
     publishedAt: Schema.Attribute.DateTime
-    roles: Schema.Attribute.Relation<'manyToMany', 'api::contributor-role.contributor-role'>
+    roles: Schema.Attribute.Relation<'oneToMany', 'api::contributor-role.contributor-role'> & Schema.Attribute.Required
     seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -1053,7 +1067,7 @@ export interface ApiContributorContributor extends Struct.CollectionTypeSchema {
           localized: true
         }
       }>
-    slug: Schema.Attribute.UID<'name'> &
+    slug: Schema.Attribute.UID<'firstName'> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -1646,24 +1660,19 @@ export interface ApiPrivacyPrivacy extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
+    content: Schema.Attribute.Component<'elements.text-block', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     entryTitle: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Private &
       Schema.Attribute.DefaultTo<'Privacy Policy Page'>
-    lastUpdated: Schema.Attribute.DateTime &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    lastUpdatedLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::privacy.privacy'>
     publishedAt: Schema.Attribute.DateTime
@@ -1696,69 +1705,50 @@ export interface ApiProductCategoriesPageProductCategoriesPage extends Struct.Si
     }
   }
   attributes: {
-    allCategoriesLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.DefaultTo<'All Categories'>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     entryTitle: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Private &
       Schema.Attribute.DefaultTo<'Product Categories Page'>
-    filterLabel: Schema.Attribute.String &
+    header: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
-      }> &
-      Schema.Attribute.DefaultTo<'Filter by category'>
-    itemsPerPage: Schema.Attribute.Integer &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }> &
-      Schema.Attribute.DefaultTo<12>
+      }>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::product-categories-page.product-categories-page'>
-    nextButton: Schema.Attribute.String &
+    pagination: Schema.Attribute.Component<'call-to-actions.pagination-cta', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    noProductsMessage: Schema.Attribute.String &
+    productsFilter: Schema.Attribute.Component<'filters.products-filter', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    pageText: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.DefaultTo<'Page {current} of {total}'>
-    previousButton: Schema.Attribute.String &
+    productsSorter: Schema.Attribute.Component<'sorters.products-sorter', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    productCategories: Schema.Attribute.Relation<'oneToMany', 'api::product-category.product-category'>
     publishedAt: Schema.Attribute.DateTime
-    resultsCountTemplate: Schema.Attribute.String &
+    relatedProductsSectionHeader: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
-      }> &
-      Schema.Attribute.DefaultTo<'{count} Products'>
+      }>
     seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -1766,13 +1756,6 @@ export interface ApiProductCategoriesPageProductCategoriesPage extends Struct.Si
           localized: true
         }
       }>
-    showingText: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }> &
-      Schema.Attribute.DefaultTo<'Showing {count} of {total}'>
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
   }
@@ -1813,7 +1796,6 @@ export interface ApiProductCategoryProductCategory extends Struct.CollectionType
       }>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::product-category.product-category'>
-    products: Schema.Attribute.Relation<'oneToMany', 'api::product.product'>
     publishedAt: Schema.Attribute.DateTime
     seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
@@ -1823,6 +1805,53 @@ export interface ApiProductCategoryProductCategory extends Struct.CollectionType
         }
       }>
     slug: Schema.Attribute.UID &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiProductCertificateProductCertificate extends Struct.CollectionTypeSchema {
+  collectionName: 'product_certificates'
+  info: {
+    displayName: 'Product Certificate'
+    pluralName: 'product-certificates'
+    singularName: 'product-certificate'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    certificate: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    certificateId: Schema.Attribute.UID &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::product-certificate.product-certificate'>
+    publishedAt: Schema.Attribute.DateTime
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -1854,7 +1883,6 @@ export interface ApiProductTagProductTag extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::product-tag.product-tag'>
-    products: Schema.Attribute.Relation<'manyToMany', 'api::product.product'>
     publishedAt: Schema.Attribute.DateTime
     seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
@@ -1906,17 +1934,34 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
           localized: true
         }
       }>
-    category: Schema.Attribute.Relation<'manyToOne', 'api::product-category.product-category'>
-    content: Schema.Attribute.Component<'elements.text-block', false> &
+    category: Schema.Attribute.Relation<'oneToOne', 'api::product-category.product-category'> &
+      Schema.Attribute.Required
+    certificates: Schema.Attribute.Relation<'oneToMany', 'api::product-certificate.product-certificate'>
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    description: Schema.Attribute.DynamicZone<
+      ['elements.text-block', 'markers.start-horizontal-layout-marker', 'markers.end-horizontal-layout-marker']
+    > &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    createdAt: Schema.Attribute.DateTime
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    currency: Schema.Attribute.Relation<'manyToOne', 'api::currency.currency'>
+    disclaimerLabel: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    header: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     images: Schema.Attribute.Media<'images', true> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -1926,14 +1971,33 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
       }>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::product.product'>
-    price: Schema.Attribute.Decimal &
+    prices: Schema.Attribute.Component<'elements.price', true> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false
         }
-      }>
+      }> &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1
+        },
+        number
+      >
     publishedAt: Schema.Attribute.DateTime
+    seller: Schema.Attribute.Relation<'oneToOne', 'api::contributor.contributor'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        'strapi-plugin-relation-filter': {
+          filters: {
+            roles: {
+              roleId: {
+                $eq: 'seller'
+              }
+            }
+          }
+        }
+      }>
     seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -1948,7 +2012,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
           localized: true
         }
       }>
-    tags: Schema.Attribute.Relation<'manyToMany', 'api::product-tag.product-tag'>
+    tags: Schema.Attribute.Relation<'oneToMany', 'api::product-tag.product-tag'>
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     viewDetailsLabel: Schema.Attribute.Component<'elements.label', false> &
@@ -2112,24 +2176,19 @@ export interface ApiTermTerm extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
+    content: Schema.Attribute.Component<'elements.text-block', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     entryTitle: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Private &
       Schema.Attribute.DefaultTo<'Terms and Conditions Page'>
-    lastUpdated: Schema.Attribute.DateTime &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
-    lastUpdatedLabel: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::term.term'>
     publishedAt: Schema.Attribute.DateTime
@@ -2400,6 +2459,7 @@ export interface PluginUploadFile extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     ext: Schema.Attribute.String
+    focalPoint: Schema.Attribute.JSON
     folder: Schema.Attribute.Relation<'manyToOne', 'plugin::upload.folder'> & Schema.Attribute.Private
     folderPath: Schema.Attribute.String &
       Schema.Attribute.Required &
@@ -2501,6 +2561,7 @@ declare module '@strapi/strapi' {
       'api::privacy.privacy': ApiPrivacyPrivacy
       'api::product-categories-page.product-categories-page': ApiProductCategoriesPageProductCategoriesPage
       'api::product-category.product-category': ApiProductCategoryProductCategory
+      'api::product-certificate.product-certificate': ApiProductCertificateProductCertificate
       'api::product-tag.product-tag': ApiProductTagProductTag
       'api::product.product': ApiProductProduct
       'api::profile.profile': ApiProfileProfile

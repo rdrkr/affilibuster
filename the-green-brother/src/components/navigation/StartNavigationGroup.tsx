@@ -146,6 +146,7 @@ export function StartNavigationGroup({
             noAnimation
             visible={displayMode !== 'none'}
             slideDirection="end-to-start"
+            iconPriority
             className={`
               text-black! hover:text-black
               dark:text-white! dark:hover:text-white

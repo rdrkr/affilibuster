@@ -1,0 +1,50 @@
+{
+  "kind": "collectionType",
+  "collectionName": "product_certificates",
+  "info": {
+    "singularName": "product-certificate",
+    "pluralName": "product-certificates",
+    "displayName": "Product Certificate"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "certificateId": {
+      "type": "uid",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "certificate": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "seoMetadata": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.seo-metadata",
+      "repeatable": false,
+      "required": true
+    }
+  }
+}

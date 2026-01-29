@@ -4,10 +4,10 @@
  * Unit tests for about page server component
  */
 
-// Mock the client module
-jest.mock('@/lib/client', () => ({
+// Mock the content module
+jest.mock('@/lib/content', () => ({
   getAbout: jest.fn(),
-  getContributors: jest.fn(),
+  getTeamMembers: jest.fn(),
 }))
 
 // Mock the languages API
@@ -42,13 +42,13 @@ jest.mock('@/app/[lang]/about/AboutClient', () => ({
 }))
 
 import AboutPage from '@/app/[lang]/about/page'
-import { getAbout, getContributors } from '@/lib/client'
+import { getAbout, getTeamMembers } from '@/lib/content'
 import { CodeEnum, CurrencyCode, DirectionEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
 import { render, screen } from '@testing-library/react'
 
 const mockGetAbout = getAbout as jest.MockedFunction<typeof getAbout>
-const mockGetContributors = getContributors as jest.MockedFunction<typeof getContributors>
+const mockGetTeamMembers = getTeamMembers as jest.MockedFunction<typeof getTeamMembers>
 const mockGetLanguages = getLanguages as jest.MockedFunction<typeof getLanguages>
 
 describe('AboutPage', () => {
@@ -94,33 +94,23 @@ describe('AboutPage', () => {
 
   it('should fetch about data and pass to AboutClient', async () => {
     const mockAboutData = { seoMetadata: { metaTitle: 'About Us' }, sections: [] }
-    const mockContributors = [{ id: 1, name: 'Contributor' }]
+    const mockTeamMembersData = [{ id: 1, name: 'Contributor', roles: [{ roleId: 'ceo', name: 'CEO' }] }]
 
     mockGetAbout.mockResolvedValue(mockAboutData as unknown as Awaited<ReturnType<typeof getAbout>>)
-    // getContributors returns just the data array, not {data: [...]}
-    mockGetContributors.mockResolvedValue(mockContributors as unknown as Awaited<ReturnType<typeof getContributors>>)
+    mockGetTeamMembers.mockResolvedValue(mockTeamMembersData as unknown as Awaited<ReturnType<typeof getTeamMembers>>)
 
     const Component = await AboutPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
     render(Component)
 
     expect(mockGetAbout).toHaveBeenCalledWith(CodeEnum.EN)
-    expect(mockGetContributors).toHaveBeenCalledWith({
-      locale: CodeEnum.EN,
-      filters: {
-        roles: {
-          roleId: {
-            $nei: 'author',
-          },
-        },
-      } as any,
-    })
+    expect(mockGetTeamMembers).toHaveBeenCalledWith(CodeEnum.EN)
     expect(screen.getByTestId('about-client')).toBeInTheDocument()
     expect(screen.getByTestId('about-client').getAttribute('data-has-data')).toBe('true')
   })
 
   it('should pass null when about data is not available', async () => {
     mockGetAbout.mockResolvedValue(null)
-    mockGetContributors.mockResolvedValue(null)
+    mockGetTeamMembers.mockResolvedValue([])
 
     const Component = await AboutPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
     render(Component)
@@ -130,8 +120,7 @@ describe('AboutPage', () => {
 
   it('should work with Italian locale', async () => {
     mockGetAbout.mockResolvedValue({ sections: [] } as unknown as Awaited<ReturnType<typeof getAbout>>)
-    // getContributors returns just the data array, not {data: [...]}
-    mockGetContributors.mockResolvedValue([] as unknown as Awaited<ReturnType<typeof getContributors>>)
+    mockGetTeamMembers.mockResolvedValue([])
 
     await AboutPage({ params: Promise.resolve({ lang: CodeEnum.IT }) })
 
@@ -140,42 +129,28 @@ describe('AboutPage', () => {
 
   it('should pass through contributors from API response', async () => {
     const mockAboutData = { seoMetadata: { metaTitle: 'About Us' }, sections: [] }
-    const mockContributors = [
+    const mockTeamMembersData = [
       { id: 1, name: 'Team Member', roles: [{ roleId: 'ceo', name: 'CEO' }] },
       {
         id: 3,
         name: 'Team And Author',
-        roles: [
-          { roleId: 'cto', name: 'CTO' },
-          { roleId: 'author', name: 'Author' },
-        ],
+        roles: [{ roleId: 'cto', name: 'CTO' }],
       },
     ]
 
     mockGetAbout.mockResolvedValue(mockAboutData as unknown as Awaited<ReturnType<typeof getAbout>>)
-    // getContributors returns just the data array, not {data: [...]}
-    mockGetContributors.mockResolvedValue(mockContributors as unknown as Awaited<ReturnType<typeof getContributors>>)
+    mockGetTeamMembers.mockResolvedValue(mockTeamMembersData as unknown as Awaited<ReturnType<typeof getTeamMembers>>)
 
     const Component = await AboutPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
     render(Component)
 
-    // Should show contributors returned by API (filtering happens on backend now)
+    // Should show team members returned by getTeamMembers (filtering happens inside getTeamMembers)
     const aboutClient = screen.getByTestId('about-client')
     expect(aboutClient.getAttribute('data-contributor-count')).toBe('2')
     expect(screen.getByText('Team Member')).toBeInTheDocument()
     expect(screen.getByText('Team And Author')).toBeInTheDocument()
 
-    // Verify filter was passed
-    expect(mockGetContributors).toHaveBeenCalledWith(
-      expect.objectContaining({
-        filters: {
-          roles: {
-            roleId: {
-              $nei: 'author',
-            },
-          },
-        },
-      })
-    )
+    // Verify getTeamMembers was called with just the locale
+    expect(mockGetTeamMembers).toHaveBeenCalledWith(CodeEnum.EN)
   })
 })

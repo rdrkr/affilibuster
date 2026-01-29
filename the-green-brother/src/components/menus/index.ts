@@ -10,4 +10,5 @@ export { Dropdown, DropdownMenu, type DropdownMenuProps, type DropdownProps } fr
 export { LanguageMenu, type LanguageMenuProps, type LanguageOption } from './LanguageMenu'
 export { ProductCategoriesMenu, type ProductCategoriesMenuProps } from './ProductCategoriesMenu'
 export { SearchMenu, type SearchMenuProps } from './SearchMenu'
+export { SortMenu, type SortMenuProps, type SortOption } from './SortMenu'
 export { ThemeMenu, type ThemeMenuProps } from './ThemeMenu'

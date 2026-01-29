@@ -13,7 +13,6 @@ import {
   AlignmentEnum,
   IconPositionEnum,
   type ApiBlogPostBlogPostDocument,
-  type ApiContributorContributorDocument,
   type ElementsHeaderEntry,
   type ElementsLabelEntry,
 } from '@/lib/generated/types.gen'
@@ -22,7 +21,7 @@ interface TopicClientProps {
   tag: string
   posts: ApiBlogPostBlogPostDocument[]
   noItemsFound?: ElementsHeaderEntry | undefined
-  defaultContributor: ApiContributorContributorDocument
+
   readTimeMinutesLabel: ElementsLabelEntry
   readArticleLabel: ElementsLabelEntry
 }
@@ -35,7 +34,6 @@ interface TopicClientProps {
  * @param props.tag - The tag name being filtered by
  * @param props.posts - List of blog posts matching the tag
  * @param props.noItemsFound - CMS data for "No items found" state
- * @param props.defaultContributor - Default contributor fallback
  * @param props.readTimeMinutesLabel - Label for read time
  * @param props.readArticleLabel - Label for read article
  * @returns Topic detail UI
@@ -44,7 +42,6 @@ export default function TopicClient({
   tag,
   posts,
   noItemsFound,
-  defaultContributor,
   readTimeMinutesLabel,
   readArticleLabel,
 }: TopicClientProps) {
@@ -70,7 +67,7 @@ export default function TopicClient({
     showTag: false,
     noAnimation: true,
     asLink: true,
-    defaultContributor: defaultContributor,
+
     readTimeMinutesLabel: readTimeMinutesLabel,
     readArticleLabel: readArticleLabel,
     layout: 'rtl' as CardLayout,

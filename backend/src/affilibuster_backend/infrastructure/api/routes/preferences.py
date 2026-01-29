@@ -51,7 +51,7 @@ async def validate_currency_code(
     try:
         # Pass customPopulate=nested to get complete currency data with seoMetadata
         # Required by OpenAPI spec for all CMS collection endpoints
-        params = CurrenciesGetParametersQuery(customPopulate="nested")
+        params = CurrenciesGetParametersQuery(customPopulate="nested", pagination=None)
         currency_data = await use_case.execute(
             "/currencies",
             params=params,

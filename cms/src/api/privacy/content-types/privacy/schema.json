@@ -22,21 +22,16 @@
       "default": "Privacy Policy Page",
       "required": true
     },
-    "lastUpdated": {
-      "type": "datetime",
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      }
-    },
-    "lastUpdatedLabel": {
-      "type": "string",
+    "content": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
+      },
+      "component": "elements.text-block",
+      "repeatable": false,
+      "required": true
     },
     "seoMetadata": {
       "type": "component",

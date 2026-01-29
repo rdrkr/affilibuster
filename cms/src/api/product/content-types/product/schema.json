@@ -25,14 +25,31 @@
       },
       "required": true
     },
-    "content": {
+    "seller": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::contributor.contributor",
+      "pluginOptions": {
+        "strapi-plugin-relation-filter": {
+          "filters": {
+            "roles": {
+              "roleId": {
+                "$eq": "seller"
+              }
+            }
+          }
+        }
+      },
+      "required": true
+    },
+    "header": {
       "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "component": "elements.text-block",
+      "component": "elements.header",
       "repeatable": false,
       "required": true
     },
@@ -47,6 +64,34 @@
       "required": true,
       "allowedTypes": ["images"]
     },
+    "prices": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "component": "elements.price",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "category": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::product-category.product-category",
+      "required": true
+    },
+    "certificates": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product-certificate.product-certificate"
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product-tag.product-tag"
+    },
     "affiliateButton": {
       "type": "component",
       "pluginOptions": {
@@ -58,31 +103,16 @@
       "repeatable": false,
       "required": true
     },
-    "price": {
-      "type": "decimal",
+    "disclaimerLabel": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
-          "localized": false
+          "localized": true
         }
       },
+      "component": "elements.label",
+      "repeatable": false,
       "required": true
-    },
-    "currency": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::currency.currency"
-    },
-    "category": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::product-category.product-category",
-      "inversedBy": "products"
-    },
-    "tags": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::product-tag.product-tag",
-      "mappedBy": "products"
     },
     "viewDetailsLabel": {
       "type": "component",
@@ -93,6 +123,20 @@
       },
       "component": "elements.label",
       "repeatable": false,
+      "required": true
+    },
+    "description": {
+      "type": "dynamiczone",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "components": [
+        "elements.text-block",
+        "markers.start-horizontal-layout-marker",
+        "markers.end-horizontal-layout-marker"
+      ],
       "required": true
     },
     "seoMetadata": {

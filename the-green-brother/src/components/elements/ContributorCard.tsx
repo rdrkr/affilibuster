@@ -61,17 +61,19 @@ export function ContributorCard({
     ${size === 'xs' || size === 'sm' ? 'border-none! bg-transparent! p-0 shadow-none!' : ''}
   `
 
-  const roleLabels = member.roles?.map(role => role.name).join(', ')
+  const roleLabels = member.roles.map(role => role.name).join(', ')
   const isXs = size === 'xs'
   const isSm = size === 'sm'
+
+  const fullName = member.lastName ? `${member.firstName} ${member.lastName}` : member.firstName
 
   const header = (
     <Header
       data={{
         header: {
-          text: member.name,
+          text: fullName,
           iconPosition: IconPositionEnum.BEFORE_TEXT,
-          ariaDescription: member.name,
+          ariaDescription: fullName,
         },
         ...(!isXs && roleLabels
           ? {
@@ -129,7 +131,7 @@ export function ContributorCard({
               text: '',
               icon: 'x.svg',
               iconPosition: IconPositionEnum.BEFORE_TEXT,
-              ariaDescription: `${member.name} on X`,
+              ariaDescription: `${fullName} on X`,
             },
           }}
           direction={direction}
@@ -147,7 +149,7 @@ export function ContributorCard({
               text: '',
               icon: 'linkedin.svg',
               iconPosition: IconPositionEnum.BEFORE_TEXT,
-              ariaDescription: `${member.name} on LinkedIn`,
+              ariaDescription: `${fullName} on LinkedIn`,
             },
           }}
           direction={direction}
@@ -165,7 +167,7 @@ export function ContributorCard({
               text: '',
               icon: 'github.svg',
               iconPosition: IconPositionEnum.BEFORE_TEXT,
-              ariaDescription: `${member.name} on GitHub`,
+              ariaDescription: `${fullName} on GitHub`,
             },
           }}
           direction={direction}
@@ -183,7 +185,7 @@ export function ContributorCard({
               text: '',
               icon: 'instagram.svg',
               iconPosition: IconPositionEnum.BEFORE_TEXT,
-              ariaDescription: `${member.name} on Instagram`,
+              ariaDescription: `${fullName} on Instagram`,
             },
           }}
           direction={direction}
@@ -212,7 +214,7 @@ export function ContributorCard({
         dark:bg-tertiary-700 dark:text-text-secondary-dark
       `}
     >
-      {member.name
+      {fullName
         .split(' ')
         .map(n => n[0])
         .join('')

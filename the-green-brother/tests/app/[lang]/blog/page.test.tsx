@@ -5,7 +5,7 @@
  */
 
 // Mock the client module
-jest.mock('@/lib/client', () => ({
+jest.mock('@/lib/content', () => ({
   getBlog: jest.fn(),
   getBlogPosts: jest.fn(),
 }))
@@ -35,7 +35,7 @@ jest.mock('@/app/[lang]/blog/BlogClient', () => ({
 }))
 
 import BlogPage from '@/app/[lang]/blog/page'
-import { getBlog, getBlogPosts } from '@/lib/client'
+import { getBlog, getBlogPosts } from '@/lib/content'
 import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
 import { render, screen } from '@testing-library/react'

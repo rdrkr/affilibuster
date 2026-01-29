@@ -16,7 +16,8 @@
     "categories": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::product-category.product-category"
+      "target": "api::product-category.product-category",
+      "required": true
     }
   }
 }

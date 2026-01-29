@@ -131,6 +131,7 @@ def _get_parsed_params(request: Request, params_model: type[CMSRequest]) -> CMSR
 
     # Construct the params model from parsed params
     # Use model_validate to handle any type coercion
+    parsed_params.setdefault("pagination", None)
     return params_model.model_validate(parsed_params)
 
 

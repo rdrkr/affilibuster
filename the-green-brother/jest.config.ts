@@ -17,6 +17,8 @@ const customJestConfig: Config = {
     'react-markdown': '<rootDir>/tests/mocks/react-markdown.tsx',
     'remark-breaks': '<rootDir>/tests/mocks/remark-breaks.ts',
     'remark-gfm': '<rootDir>/tests/mocks/remark-gfm.ts',
+    'rehype-raw': '<rootDir>/tests/mocks/rehype-raw.ts',
+    'rehype-sanitize': '<rootDir>/tests/mocks/rehype-sanitize.ts',
   },
   testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
   testPathIgnorePatterns: [

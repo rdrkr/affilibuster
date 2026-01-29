@@ -46,9 +46,18 @@ describe('ContributorCard', () => {
   const mockMember = {
     documentId: 'member-1',
     id: 1,
-    name: 'John Doe',
+    firstName: 'John',
+    lastName: 'Doe',
     slug: 'john-doe',
-    role: 'Developer',
+    roles: [
+      {
+        id: 1,
+        documentId: 'role-1',
+        name: 'Developer',
+        roleId: 'developer',
+        publishedAt: '2024-01-01',
+      },
+    ] as any[],
     bio: 'Test Bio',
     email: 'test@example.com',
     publishedAt: '2024-01-01',

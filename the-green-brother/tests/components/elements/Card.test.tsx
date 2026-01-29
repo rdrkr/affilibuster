@@ -494,7 +494,8 @@ describe('Card', () => {
     const overlayLink = links.find(l => l.getAttribute('href') === '/test-path' && l.className.includes('absolute'))
 
     expect(overlayLink).toBeInTheDocument()
-    expect(overlayLink).toHaveAttribute('aria-hidden', 'true')
+    // tabIndex={-1} removes from keyboard navigation while avoiding aria-hidden focus issues
+    expect(overlayLink).toHaveAttribute('tabindex', '-1')
   })
 
   it('should not render absolute link overlay when asLink is false', () => {

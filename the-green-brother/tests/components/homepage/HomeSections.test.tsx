@@ -11,10 +11,7 @@ import {
   AlignmentEnum,
   IconPositionEnum,
   VariantEnum,
-  type ApiBlogPostBlogPostDocument,
   type ApiHomepageHomepageDocument,
-  type ApiProductCategoryProductCategoryDocument,
-  type ApiProductProductDocument,
 } from '@/lib/generated/types.gen'
 
 // Mock all section components
@@ -127,6 +124,7 @@ describe('HomeSections', () => {
         url: '/products',
         openInNewTab: false,
       },
+      products: [],
     },
     {
       __component: 'sections.category-grid',
@@ -141,6 +139,7 @@ describe('HomeSections', () => {
           icon: 'apps',
         },
       },
+      categories: [],
     },
     {
       __component: 'sections.brand-features-section',
@@ -169,6 +168,7 @@ describe('HomeSections', () => {
         url: '/blog',
         openInNewTab: false,
       },
+      blogPosts: [],
     },
     {
       __component: 'call-to-actions.newsletter-signup-cta',
@@ -189,10 +189,6 @@ describe('HomeSections', () => {
     },
   ]
 
-  const mockProducts: ApiProductProductDocument[] = []
-  const mockCategories: ApiProductCategoryProductCategoryDocument[] = []
-  const mockBlogPosts: ApiBlogPostBlogPostDocument[] = []
-
   const mockLabels = {
     readTimeMinutesLabel: {
       text: 'min read',
@@ -208,32 +204,14 @@ describe('HomeSections', () => {
     },
   }
 
-  const defaultContributor = {
-    name: 'Default Author',
-    slug: 'default-author',
-    bio: 'Bio',
-    publishedAt: '2025-01-01',
-    id: 999,
-    documentId: 'default-author-doc',
-  }
-
   const defaultProps = {
     ...mockLabels,
-    defaultContributor,
+    enableUserProfile: false,
   }
 
   it('should render hero section', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[0] ? [mockSections[0]] : []
-    render(
-      <HomeSections
-        sections={sections}
-        products={mockProducts}
-        categories={mockCategories}
-        blogPosts={mockBlogPosts}
-        contributors={[]}
-        {...defaultProps}
-      />
-    )
+    render(<HomeSections sections={sections} teamMembers={[]} {...defaultProps} />)
 
     const heroSection = screen.getByTestId('hero-section')
     expect(heroSection).toBeInTheDocument()
@@ -242,16 +220,7 @@ describe('HomeSections', () => {
 
   it('should render featured products section', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[1] ? [mockSections[1]] : []
-    render(
-      <HomeSections
-        sections={sections}
-        products={mockProducts}
-        categories={mockCategories}
-        blogPosts={mockBlogPosts}
-        contributors={[]}
-        {...defaultProps}
-      />
-    )
+    render(<HomeSections sections={sections} teamMembers={[]} {...defaultProps} />)
 
     const featuredProductsSection = screen.getByTestId('featured-products-section')
     expect(featuredProductsSection).toBeInTheDocument()
@@ -260,16 +229,7 @@ describe('HomeSections', () => {
 
   it('should render category grid section', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[2] ? [mockSections[2]] : []
-    render(
-      <HomeSections
-        sections={sections}
-        products={mockProducts}
-        categories={mockCategories}
-        blogPosts={mockBlogPosts}
-        contributors={[]}
-        {...defaultProps}
-      />
-    )
+    render(<HomeSections sections={sections} teamMembers={[]} {...defaultProps} />)
 
     const categoryGridSection = screen.getByTestId('category-grid-section')
     expect(categoryGridSection).toBeInTheDocument()
@@ -301,21 +261,14 @@ describe('HomeSections', () => {
               ariaDescription: 'Cat 1 category',
             },
             publishedAt: '2025-01-01',
+            image: { documentId: 'img-1' } as any,
+            seoMetadata: { metaTitle: 'Cat 1', metaDescription: 'Category 1' },
           },
         ],
       },
     ]
 
-    render(
-      <HomeSections
-        sections={sectionWithCategories}
-        products={mockProducts}
-        categories={mockCategories}
-        blogPosts={mockBlogPosts}
-        contributors={[]}
-        {...defaultProps}
-      />
-    )
+    render(<HomeSections sections={sectionWithCategories} teamMembers={[]} {...defaultProps} />)
 
     const categoryGridSection = screen.getByTestId('category-grid-section')
     expect(categoryGridSection).toBeInTheDocument()
@@ -324,16 +277,7 @@ describe('HomeSections', () => {
 
   it('should render feature grid section', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[3] ? [mockSections[3]] : []
-    render(
-      <HomeSections
-        sections={sections}
-        products={mockProducts}
-        categories={mockCategories}
-        blogPosts={mockBlogPosts}
-        contributors={[]}
-        {...defaultProps}
-      />
-    )
+    render(<HomeSections sections={sections} teamMembers={[]} {...defaultProps} />)
 
     const featureGridSection = screen.getByTestId('feature-grid-section')
     expect(featureGridSection).toBeInTheDocument()
@@ -342,16 +286,7 @@ describe('HomeSections', () => {
 
   it('should render blog teaser section', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[4] ? [mockSections[4]] : []
-    render(
-      <HomeSections
-        sections={sections}
-        products={mockProducts}
-        categories={mockCategories}
-        blogPosts={mockBlogPosts}
-        contributors={[]}
-        {...defaultProps}
-      />
-    )
+    render(<HomeSections sections={sections} teamMembers={[]} {...defaultProps} />)
 
     const blogTeaserSection = screen.getByTestId('blog-teaser-section')
     expect(blogTeaserSection).toBeInTheDocument()
@@ -360,16 +295,7 @@ describe('HomeSections', () => {
 
   it('should render two column content section (newsletter CTA)', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[5] ? [mockSections[5]] : []
-    render(
-      <HomeSections
-        sections={sections}
-        products={mockProducts}
-        categories={mockCategories}
-        blogPosts={mockBlogPosts}
-        contributors={[]}
-        {...defaultProps}
-      />
-    )
+    render(<HomeSections sections={sections} teamMembers={[]} {...defaultProps} />)
 
     const twoColumnContentSection = screen.getByTestId('newsletter-signup-cta')
     expect(twoColumnContentSection).toBeInTheDocument()
@@ -377,16 +303,7 @@ describe('HomeSections', () => {
   })
 
   it('should render all sections in order', () => {
-    render(
-      <HomeSections
-        sections={mockSections}
-        products={mockProducts}
-        categories={mockCategories}
-        blogPosts={mockBlogPosts}
-        contributors={[]}
-        {...defaultProps}
-      />
-    )
+    render(<HomeSections sections={mockSections} teamMembers={[]} {...defaultProps} />)
 
     expect(screen.getByTestId('hero-section')).toBeInTheDocument()
     expect(screen.getByTestId('featured-products-section')).toBeInTheDocument()
@@ -397,16 +314,7 @@ describe('HomeSections', () => {
   })
 
   it('should render empty fragment when no sections', () => {
-    const { container } = render(
-      <HomeSections
-        sections={[]}
-        products={mockProducts}
-        categories={mockCategories}
-        blogPosts={mockBlogPosts}
-        contributors={[]}
-        {...defaultProps}
-      />
-    )
+    const { container } = render(<HomeSections sections={[]} teamMembers={[]} {...defaultProps} />)
 
     // No section content should be rendered
     expect(container.querySelector('[data-testid]')).not.toBeInTheDocument()
@@ -414,16 +322,7 @@ describe('HomeSections', () => {
 
   it('renders correctly without extra props', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[0] ? [mockSections[0]] : []
-    render(
-      <HomeSections
-        sections={sections}
-        products={mockProducts}
-        categories={mockCategories}
-        blogPosts={mockBlogPosts}
-        contributors={[]}
-        {...defaultProps}
-      />
-    )
+    render(<HomeSections sections={sections} teamMembers={[]} {...defaultProps} />)
 
     expect(screen.getByTestId('hero-section')).toBeInTheDocument()
   })
@@ -458,16 +357,7 @@ describe('HomeSections', () => {
       },
     ]
 
-    const { container } = render(
-      <HomeSections
-        sections={sectionsWithUnknown}
-        products={mockProducts}
-        categories={mockCategories}
-        blogPosts={mockBlogPosts}
-        contributors={[]}
-        {...defaultProps}
-      />
-    )
+    const { container } = render(<HomeSections sections={sectionsWithUnknown} teamMembers={[]} {...defaultProps} />)
 
     // Unknown section should not render anything
     expect(container.querySelector('[data-testid]')).not.toBeInTheDocument()
@@ -492,16 +382,7 @@ describe('HomeSections', () => {
       },
     ]
 
-    render(
-      <HomeSections
-        sections={sectionsWithTextBlock}
-        products={mockProducts}
-        categories={mockCategories}
-        blogPosts={mockBlogPosts}
-        contributors={[]}
-        {...defaultProps}
-      />
-    )
+    render(<HomeSections sections={sectionsWithTextBlock} teamMembers={[]} {...defaultProps} />)
 
     const textBlock = screen.getByTestId('text-block')
     expect(textBlock).toBeInTheDocument()
@@ -526,16 +407,7 @@ describe('HomeSections', () => {
       },
     ]
 
-    render(
-      <HomeSections
-        sections={sectionsWithTeam}
-        products={mockProducts}
-        categories={mockCategories}
-        blogPosts={mockBlogPosts}
-        contributors={[]}
-        {...defaultProps}
-      />
-    )
+    render(<HomeSections sections={sectionsWithTeam} teamMembers={[]} {...defaultProps} />)
 
     const teamSection = screen.getByTestId('team-section')
     expect(teamSection).toBeInTheDocument()

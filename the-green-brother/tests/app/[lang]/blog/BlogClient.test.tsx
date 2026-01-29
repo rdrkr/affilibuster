@@ -132,14 +132,6 @@ describe('BlogClient', () => {
       itemsPerPage: 6,
       nextButton: { label: { text: 'View All', iconPosition: 'right', ariaDescription: 'View More' } },
     },
-    defaultContributor: {
-      documentId: 'def-1',
-      id: 1,
-      name: 'Default',
-      slug: 'default',
-      bio: 'Bio',
-      publishedAt: '2024-01-01',
-    } as any,
     readTimeMinutesLabel: { text: 'min read', iconPosition: 'left', ariaDescription: 'read time' } as any,
     readArticleLabel: { text: 'Read', iconPosition: 'right', ariaDescription: 'read article' } as any,
   } as unknown as ApiBlogBlogDocument

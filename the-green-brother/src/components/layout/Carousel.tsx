@@ -45,6 +45,8 @@ export interface CarouselProps {
   ariaLabel?: string
   /** Auto-rotation interval in milliseconds for hero variant (default: 5000) */
   autoRotateInterval?: number
+  /** Initial item index to scroll to on mount (default: 0). Clamped to valid bounds. */
+  startScrollItemIndex?: number
 }
 
 /**
@@ -62,6 +64,17 @@ function getGapClass(gap: CarouselGap): string {
 }
 
 /**
+ * Clamp an index to valid bounds for item count
+ * @param index - The index to clamp
+ * @param itemCount - Total number of items
+ * @returns Clamped index between 0 and itemCount - 1, or 0 if itemCount is 0
+ */
+function clampIndex(index: number, itemCount: number): number {
+  if (itemCount <= 0) return 0
+  return Math.max(0, Math.min(index, itemCount - 1))
+}
+
+/**
  * Standard horizontal scroll carousel variant
  * @param props - Component props
  * @param props.children - Carousel items to display
@@ -69,6 +82,7 @@ function getGapClass(gap: CarouselGap): string {
  * @param props.gap - Gap between items (default: md)
  * @param props.className - Additional CSS classes
  * @param props.ariaLabel - Optional accessibility label (adds role="region")
+ * @param props.startScrollItemIndex - Initial item index to scroll to on mount (default: 0)
  * @returns Standard carousel JSX
  */
 function StandardCarousel({
@@ -77,9 +91,81 @@ function StandardCarousel({
   gap = 'md',
   className = '',
   ariaLabel,
+  startScrollItemIndex = 0,
 }: Omit<CarouselProps, 'variant' | 'autoRotateInterval'>) {
   const isRTL = direction === DirectionEnum.RTL
   const gapClass = getGapClass(gap)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const items = useMemo(() => React.Children.toArray(children), [children])
+  const itemCount = items.length
+
+  // Scroll to position whenever startScrollItemIndex changes
+  useEffect(() => {
+    const clampedIndex = clampIndex(startScrollItemIndex, itemCount)
+    console.log('[Carousel] Mount effect:', {
+      startScrollItemIndex,
+      clampedIndex,
+      itemCount,
+      isRTL,
+      hasTrackRef: !!trackRef.current,
+    })
+
+    if (clampedIndex === 0 || !trackRef.current) {
+      console.log('[Carousel] Skipping scroll (index 0 or no ref)')
+      return
+    }
+
+    // Wait for next frame to ensure layout is computed
+    requestAnimationFrame(() => {
+      const track = trackRef.current
+      if (!track?.parentElement) {
+        console.log('[Carousel] No track or parent in RAF')
+        return
+      }
+
+      const targetChild = track.children[clampedIndex] as HTMLElement | undefined
+      const parent = track.parentElement
+
+      if (targetChild) {
+        // Calculate scroll position with padding to avoid cutting off the button
+        // Get the first child's offsetLeft as the natural padding
+        const firstChild = track.children[0] as HTMLElement | undefined
+        const padding = firstChild?.offsetLeft ?? 0
+
+        // In LTR: scroll to (offsetLeft - padding) to maintain consistent left spacing
+        // In RTL: scroll to offsetLeft directly (RTL handles spacing differently)
+        const scrollLeft = isRTL ? targetChild.offsetLeft : targetChild.offsetLeft - padding
+
+        const scrollData = {
+          clampedIndex,
+          targetOffsetLeft: targetChild.offsetLeft,
+          padding,
+          calculatedScrollLeft: scrollLeft,
+          parentScrollLeft: parent.scrollLeft,
+          parentClientWidth: parent.clientWidth,
+          trackScrollWidth: track.scrollWidth,
+          isRTL,
+        }
+        console.log('[Carousel] Before scroll:', scrollData)
+
+        // Scroll the parent container (which has overflow-x-auto)
+        parent.scrollTo({
+          left: scrollLeft,
+          behavior: 'instant',
+        })
+
+        // Log after scroll (in next tick)
+        setTimeout(() => {
+          console.log('[Carousel] After scroll:', {
+            newScrollLeft: parent.scrollLeft,
+            expectedScrollLeft: targetChild.offsetLeft,
+          })
+        }, 0)
+      } else {
+        console.log('[Carousel] Target child not found at index:', clampedIndex)
+      }
+    })
+  }, [startScrollItemIndex, itemCount, isRTL])
 
   return (
     <div
@@ -88,7 +174,7 @@ function StandardCarousel({
       role={ariaLabel ? 'region' : undefined}
       aria-label={ariaLabel}
     >
-      <div data-testid="carousel-track" className={`flex w-max min-w-full justify-center ${gapClass}`}>
+      <div ref={trackRef} data-testid="carousel-track" className={`flex w-max min-w-full justify-center ${gapClass}`}>
         {children}
       </div>
     </div>
@@ -102,19 +188,9 @@ function StandardCarousel({
  * @param props.direction - Text direction for RTL/LTR layout
  * @param props.className - Additional CSS classes
  * @param props.ariaLabel - Optional accessibility label (adds role="region")
- * @param props.autoRotateInterval - Auto-rotation interval in milliseconds (default: 5000)
- * @returns Hero carousel JSX
- */
-
-/**
- * Hero carousel variant with single-item display, dot navigation, and auto-rotation
- * @param props - Component props
- * @param props.children - Carousel items to display
- * @param props.direction - Text direction for RTL/LTR layout
- * @param props.className - Additional CSS classes
- * @param props.ariaLabel - Optional accessibility label (adds role="region")
  * @param props.gap - Gap between items (default: md)
  * @param props.autoRotateInterval - Auto-rotation interval in milliseconds (default: 5000)
+ * @param props.startScrollItemIndex - Initial item index to scroll to on mount (default: 0)
  * @returns Hero carousel JSX
  */
 function HeroCarousel({
@@ -124,12 +200,16 @@ function HeroCarousel({
   ariaLabel,
   gap = 'md',
   autoRotateInterval = 5000,
+  startScrollItemIndex = 0,
 }: Omit<CarouselProps, 'variant'>) {
   const isRTL = direction === DirectionEnum.RTL
   const items = useMemo(() => React.Children.toArray(children), [children])
   const itemCount = items.length
 
-  const [activeIndex, setActiveIndex] = useState(0)
+  // Calculate initial index with clamping
+  const initialIndex = useMemo(() => clampIndex(startScrollItemIndex, itemCount), [startScrollItemIndex, itemCount])
+
+  const [activeIndex, setActiveIndex] = useState(initialIndex)
   const [isPaused, setIsPaused] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -139,8 +219,9 @@ function HeroCarousel({
   /**
    * Scroll to a specific slide index
    * @param index - Target slide index
+   * @param behavior - Scroll behavior (default: 'smooth')
    */
-  const scrollToSlide = useCallback((index: number) => {
+  const scrollToSlide = useCallback((index: number, behavior: ScrollBehavior = 'smooth') => {
     if (!trackRef.current) return
 
     const track = trackRef.current
@@ -152,7 +233,7 @@ function HeroCarousel({
 
       track.scrollTo({
         left: targetLeft,
-        behavior: 'smooth',
+        behavior,
       })
     }
   }, [])
@@ -203,6 +284,16 @@ function HeroCarousel({
       clearTimeout(timeoutId)
     }
   }, [activeIndex])
+
+  // Scroll to position whenever initialIndex changes
+  useEffect(() => {
+    if (initialIndex === 0) return
+
+    // Wait for next frame to ensure layout is computed
+    requestAnimationFrame(() => {
+      scrollToSlide(initialIndex, 'instant')
+    })
+  }, [initialIndex, scrollToSlide])
 
   // Auto-rotation effect
   useEffect(() => {
@@ -259,9 +350,9 @@ function HeroCarousel({
       {itemCount > 1 && (
         <div
           className="
-            absolute bottom-1.5 left-1/2 z-10 flex -translate-x-1/2 justify-center gap-2 rounded-full
+            absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 justify-center gap-2 rounded-full
             border border-neutral-200 bg-white/50
-            p-2 shadow-lg backdrop-blur-sm md:bottom-3
+            p-2 shadow-lg backdrop-blur-sm
             dark:border-white/10 dark:bg-neutral-800/30
           "
           role="tablist"
@@ -301,6 +392,7 @@ function HeroCarousel({
  * @param props.className - Additional CSS classes
  * @param props.ariaLabel - Optional accessibility label (adds role="region")
  * @param props.autoRotateInterval - Auto-rotation interval for hero variant in ms (default: 5000)
+ * @param props.startScrollItemIndex - Initial item index to scroll to on mount (default: 0)
  * @returns Carousel component
  */
 export function Carousel({
@@ -311,6 +403,7 @@ export function Carousel({
   className = '',
   ariaLabel,
   autoRotateInterval = 5000,
+  startScrollItemIndex = 0,
 }: CarouselProps) {
   if (variant === 'hero') {
     return (
@@ -319,6 +412,7 @@ export function Carousel({
         className={className}
         gap={gap}
         autoRotateInterval={autoRotateInterval}
+        startScrollItemIndex={startScrollItemIndex}
         {...(ariaLabel !== undefined && { ariaLabel })}
       >
         {children}
@@ -331,6 +425,7 @@ export function Carousel({
       direction={direction}
       gap={gap}
       className={className}
+      startScrollItemIndex={startScrollItemIndex}
       {...(ariaLabel !== undefined && { ariaLabel })}
     >
       {children}

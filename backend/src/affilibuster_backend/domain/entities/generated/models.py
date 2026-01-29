@@ -493,7 +493,7 @@ class ApiAuthPageAuthPageDocument(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
     """
@@ -521,7 +521,7 @@ class ElementsLabelEntry(BaseModel):
     """
     A string field
     """
-    icon_position: IconPosition = Field(..., alias="iconPosition")
+    icon_position: IconPosition | None = Field("before_text", alias="iconPosition")
     """
     An enum field
     """
@@ -553,25 +553,69 @@ class ElementsHeaderEntry(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    alignment: Alignment
+    alignment: Alignment | None = "language-direction"
     """
     An enum field
     """
-    promote_header_icon: bool | None = Field(..., alias="promoteHeaderIcon")
+    promote_header_icon: bool | None = Field(False, alias="promoteHeaderIcon")
     """
     A boolean field
     """
-    header: ElementsLabelEntry | None = None
+    header: ElementsLabelEntry | None = Field(default_factory=ElementsLabelEntry)
     """
     A component field
     """
-    subheader: ElementsLabelEntry | None = None
+    subheader: ElementsLabelEntry | None = Field(default_factory=ElementsLabelEntry)
     """
     A component field
     """
     id: int | None = None
     """
     Component instance ID
+    """
+
+
+class ApiBlogPostTagBlogPostTagDocument(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    tag_id: str = Field(..., alias="tagId")
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    tag: ElementsLabelEntry
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
     """
 
 
@@ -584,7 +628,7 @@ class ElementsTextBlockEntry(BaseModel):
     """
     A richtext field
     """
-    header: ElementsHeaderEntry | None = None
+    header: ElementsHeaderEntry | None = Field(default_factory=ElementsHeaderEntry)
     """
     A component field
     """
@@ -615,6 +659,10 @@ class PluginUploadFileDocument(BaseModel):
     caption: str | None = None
     """
     A text field
+    """
+    focal_point: Any | None = Field(None, alias="focalPoint")
+    """
+    A JSON field
     """
     width: int | None = Field(None, ge=-9007199254740991, le=9007199254740991)
     """
@@ -675,6 +723,196 @@ class PluginUploadFileDocument(BaseModel):
     related: Any | None = None
 
 
+class ApiContributorRoleContributorRoleDocument(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    role_id: str = Field(..., alias="roleId")
+    """
+    A UID field
+    """
+    name: str
+    """
+    A string field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ApiContributorContributorDocument(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    first_name: str = Field(..., alias="firstName")
+    """
+    A string field
+    """
+    last_name: str | None = Field(None, alias="lastName")
+    """
+    A string field
+    """
+    bio: str
+    """
+    A richtext field
+    """
+    email: EmailStr | None = Field(None, examples=["user@example.com"])
+    """
+    RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
+    """
+    website: str | None = None
+    """
+    A string field
+    """
+    twitter: str | None = None
+    """
+    A string field
+    """
+    linkedin: str | None = None
+    """
+    A string field
+    """
+    github: str | None = None
+    """
+    A string field
+    """
+    instagram: str | None = None
+    """
+    A string field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    profile_picture: PluginUploadFileDocument | None = Field(
+        default_factory=PluginUploadFileDocument, alias="profilePicture"
+    )
+    """
+    A media field
+    """
+    roles: list[ApiContributorRoleContributorRoleDocument]
+    """
+    A relational field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ApiBlogPostBlogPostDocument(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    read_time_in_minutes: int | None = Field(5, alias="readTimeInMinutes", ge=-9007199254740991, le=9007199254740991)
+    """
+    An integer field
+    """
+    published_date: str = Field(..., alias="publishedDate")
+    """
+    A datetime field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsTextBlockEntry
+    """
+    A component field
+    """
+    featured_image: PluginUploadFileDocument = Field(..., alias="featuredImage")
+    """
+    A media field
+    """
+    author: ApiContributorContributorDocument
+    """
+    A relational field
+    """
+    tags: list[ApiBlogPostTagBlogPostTagDocument]
+    """
+    A relational field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
 class ElementsButtonEntry(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -684,11 +922,11 @@ class ElementsButtonEntry(BaseModel):
     """
     A string field
     """
-    open_in_new_tab: bool | None = Field(..., alias="openInNewTab")
+    open_in_new_tab: bool | None = Field(False, alias="openInNewTab")
     """
     A boolean field
     """
-    label: ElementsLabelEntry | None = None
+    label: ElementsLabelEntry | None = Field(default_factory=ElementsLabelEntry)
     """
     A component field
     """
@@ -722,6 +960,74 @@ class CallToActionsPaginationCtaEntry(BaseModel):
     id: int | None = None
     """
     Component instance ID
+    """
+
+
+class ApiBlogBlogDocument(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    header: ElementsHeaderEntry
+    """
+    A component field
+    """
+    tag_filters: list[ApiBlogPostTagBlogPostTagDocument] | None = Field(None, alias="tagFilters")
+    """
+    A relational field
+    """
+    featured_blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="featuredBlogPosts")
+    """
+    A relational field
+    """
+    blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="blogPosts")
+    """
+    A relational field
+    """
+    pagination: CallToActionsPaginationCtaEntry
+    """
+    A component field
+    """
+    read_article_label: ElementsLabelEntry = Field(..., alias="readArticleLabel")
+    """
+    A component field
+    """
+    read_time_minutes_label: ElementsLabelEntry = Field(..., alias="readTimeMinutesLabel")
+    """
+    A component field
+    """
+    about_author_header: ElementsHeaderEntry = Field(..., alias="aboutAuthorHeader")
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
     """
 
 
@@ -795,7 +1101,7 @@ class ApiContactUsContactUsDocument(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
     """
@@ -836,23 +1142,23 @@ class ApiCurrencyCurrencyDocument(BaseModel):
     """
     A string field
     """
-    decimal_places: int = Field(..., alias="decimalPlaces", ge=0, le=8)
+    decimal_places: int | None = Field(2, alias="decimalPlaces", ge=0, le=8)
     """
     An integer field
     """
-    symbol_position: SymbolPosition = Field(..., alias="symbolPosition")
+    symbol_position: SymbolPosition | None = Field("before", alias="symbolPosition")
     """
     An enum field
     """
-    thousands_separator: str = Field(..., alias="thousandsSeparator")
+    thousands_separator: str | None = Field(",", alias="thousandsSeparator")
     """
     A string field
     """
-    decimal_separator: str = Field(..., alias="decimalSeparator")
+    decimal_separator: str | None = Field(".", alias="decimalSeparator")
     """
     A string field
     """
-    exchange_rate: float = Field(..., alias="exchangeRate")
+    exchange_rate: float | None = Field(1, alias="exchangeRate")
     """
     A decimal field
     """
@@ -872,7 +1178,7 @@ class ApiCurrencyCurrencyDocument(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
     """
@@ -908,11 +1214,11 @@ class ApiError404Error404Document(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    content: ElementsTextBlockEntry | None = None
+    content: ElementsTextBlockEntry
     """
     A component field
     """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
     """
@@ -948,11 +1254,11 @@ class ApiError410Error410Document(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    content: ElementsTextBlockEntry | None = None
+    content: ElementsTextBlockEntry
     """
     A component field
     """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
     """
@@ -984,11 +1290,11 @@ class ApiFaqFaqDocument(BaseModel):
     """
     A richtext field
     """
-    contact_prompt: str = Field(..., alias="contactPrompt")
+    contact_prompt: str | None = Field("Didn't find what you're looking for?", alias="contactPrompt")
     """
     A string field
     """
-    contact_button_text: str = Field(..., alias="contactButtonText")
+    contact_button_text: str | None = Field("Contact Us", alias="contactButtonText")
     """
     A string field
     """
@@ -1008,7 +1314,7 @@ class ApiFaqFaqDocument(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
     """
@@ -1035,6 +1341,54 @@ class Sections16(ElementsTextBlockEntry):
     field__component: Literal["elements.text-block"] = Field(..., alias="__component")
     """
     Component type discriminator
+    """
+
+
+class ApiProductCategoryProductCategoryDocument(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsLabelEntry
+    """
+    A component field
+    """
+    image: PluginUploadFileDocument
+    """
+    A media field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
     """
 
 
@@ -1099,11 +1453,11 @@ class ApiThemeThemeDocument(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    content: ElementsLabelEntry | None = None
+    content: ElementsLabelEntry
     """
     A component field
     """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
     """
@@ -1157,13 +1511,68 @@ class ApiPrivacyPrivacyDocument(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
-    last_updated: str | None = Field(None, alias="lastUpdated")
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
-    A datetime field
+    Timestamp when this entry was first created in the CMS.
     """
-    last_updated_label: str | None = Field(None, alias="lastUpdatedLabel")
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
     """
-    A string field
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsTextBlockEntry
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ElementsPriceEntry(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    amount: float
+    """
+    A decimal field
+    """
+    currency: ApiCurrencyCurrencyDocument
+    """
+    A relational field
+    """
+    id: int | None = None
+    """
+    Component instance ID
+    """
+
+
+class ApiProductCertificateProductCertificateDocument(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    certificate_id: str = Field(..., alias="certificateId")
+    """
+    A UID field
     """
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
@@ -1181,13 +1590,136 @@ class ApiPrivacyPrivacyDocument(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
+    certificate: ElementsLabelEntry
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
     """
     localizations: list[Localization] | None = None
     """
     Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ApiProductTagProductTagDocument(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    tag_id: str = Field(..., alias="tagId")
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    tag: ElementsLabelEntry
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class Description1(ElementsTextBlockEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["elements.text-block"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class FiltersTagFilterEntry(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    header: ElementsHeaderEntry
+    """
+    A component field
+    """
+    all_label: ElementsLabelEntry = Field(..., alias="allLabel")
+    """
+    A component field
+    """
+    id: int | None = None
+    """
+    Component instance ID
+    """
+
+
+class FiltersPriceRangeFilterEntry(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    header: ElementsHeaderEntry
+    """
+    A component field
+    """
+    id: int | None = None
+    """
+    Component instance ID
+    """
+
+
+class SortersProductsSorterEntry(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    header: ElementsHeaderEntry
+    """
+    A component field
+    """
+    best_sellers: ElementsLabelEntry = Field(..., alias="bestSellers")
+    """
+    A component field
+    """
+    new_arrivals: ElementsLabelEntry = Field(..., alias="newArrivals")
+    """
+    A component field
+    """
+    price_high_to_low: ElementsLabelEntry = Field(..., alias="priceHighToLow")
+    """
+    A component field
+    """
+    price_low_to_high: ElementsLabelEntry = Field(..., alias="priceLowToHigh")
+    """
+    A component field
+    """
+    id: int | None = None
+    """
+    Component instance ID
     """
 
 
@@ -1281,7 +1813,7 @@ class ApiProfileProfileDocument(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
     """
@@ -1301,14 +1833,6 @@ class ApiTermTermDocument(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
-    last_updated: str | None = Field(None, alias="lastUpdated")
-    """
-    A datetime field
-    """
-    last_updated_label: str | None = Field(None, alias="lastUpdatedLabel")
-    """
-    A string field
-    """
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -1325,13 +1849,44 @@ class ApiTermTermDocument(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
+    content: ElementsTextBlockEntry
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
     """
     localizations: list[Localization] | None = None
     """
     Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class SectionsBlogTeaserEntry(BaseModel):
+    """
+    Section displaying blog post previews in grid
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    id: int
+    """
+    Component instance ID
+    """
+    header: ElementsHeaderEntry
+    """
+    A component field
+    """
+    blog_posts: list[ApiBlogPostBlogPostDocument] = Field(..., alias="blogPosts")
+    """
+    A relational field
+    """
+    view_all_button: ElementsButtonEntry = Field(..., alias="viewAllButton")
+    """
+    A component field
     """
 
 
@@ -1415,6 +1970,29 @@ class SectionsBrandFeaturesSectionEntry(BaseModel):
     """
 
 
+class SectionsCategoryGridEntry(BaseModel):
+    """
+    Grid of product categories with icons
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    id: int
+    """
+    Component instance ID
+    """
+    header: ElementsHeaderEntry
+    """
+    A component field
+    """
+    categories: list[ApiProductCategoryProductCategoryDocument]
+    """
+    A relational field
+    """
+
+
 class Variant(StrEnum):
     """
     An enumeration field
@@ -1442,7 +2020,7 @@ class SectionsHeroEntry(BaseModel):
     """
     A component field
     """
-    explore_button: ElementsButtonEntry | None = Field(None, alias="exploreButton")
+    explore_button: ElementsButtonEntry | None = Field(default_factory=ElementsButtonEntry, alias="exploreButton")
     """
     A component field
     """
@@ -1629,6 +2207,26 @@ class Sections28(SectionsBrandFeaturesSectionEntry):
         populate_by_name=True,
     )
     field__component: Literal["sections.brand-features-section"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Sections30(SectionsCategoryGridEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["sections.category-grid"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Sections31(SectionsBlogTeaserEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["sections.blog-teaser"] = Field(..., alias="__component")
     """
     Component type discriminator
     """
@@ -1960,6 +2558,86 @@ class BlogGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
+class Data2(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    header: ElementsHeaderEntry
+    """
+    A component field
+    """
+    tag_filters: list[ApiBlogPostTagBlogPostTagDocument] | None = Field(None, alias="tagFilters")
+    """
+    A relational field
+    """
+    featured_blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="featuredBlogPosts")
+    """
+    A relational field
+    """
+    blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="blogPosts")
+    """
+    A relational field
+    """
+    pagination: CallToActionsPaginationCtaEntry
+    """
+    A component field
+    """
+    read_article_label: ElementsLabelEntry = Field(..., alias="readArticleLabel")
+    """
+    A component field
+    """
+    read_time_minutes_label: ElementsLabelEntry = Field(..., alias="readTimeMinutesLabel")
+    """
+    A component field
+    """
+    about_author_header: ElementsHeaderEntry = Field(..., alias="aboutAuthorHeader")
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class BlogGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data2
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
 class Field3(StrEnum):
     TAG_ID = "tagId"
     CREATED_AT = "createdAt"
@@ -2086,7 +2764,7 @@ class BlogPostTagsGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     field_q: str | None = Field(None, alias="_q", examples=["search terms"])
-    pagination: Pagination | None = None
+    pagination: Pagination | None = Field(default_factory=Pagination)
     """
     Pagination parameters
     """
@@ -2105,6 +2783,62 @@ class BlogPostTagsGetParametersQuery(BaseModel):
     custom_populate: str = Field(..., alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
+
+
+class Datum(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    tag_id: str = Field(..., alias="tagId")
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    tag: ElementsLabelEntry
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class BlogPostTagsGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: list[Datum]
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
 
 
 class Sort3(StrEnum):
@@ -2148,6 +2882,62 @@ class BlogPostTagsIdGetParametersQuery(BaseModel):
     custom_populate: str = Field(..., alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
+
+
+class Data3(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    tag_id: str = Field(..., alias="tagId")
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    tag: ElementsLabelEntry
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class BlogPostTagsIdGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data3
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
 
 
 class Field5(StrEnum):
@@ -2282,7 +3072,7 @@ class BlogPostsGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     field_q: str | None = Field(None, alias="_q", examples=["search terms"])
-    pagination: Pagination6 | None = None
+    pagination: Pagination6 | None = Field(default_factory=Pagination6)
     """
     Pagination parameters
     """
@@ -2301,6 +3091,82 @@ class BlogPostsGetParametersQuery(BaseModel):
     custom_populate: str = Field(..., alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
+
+
+class Datum1(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    read_time_in_minutes: int | None = Field(5, alias="readTimeInMinutes", ge=-9007199254740991, le=9007199254740991)
+    """
+    An integer field
+    """
+    published_date: str = Field(..., alias="publishedDate")
+    """
+    A datetime field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsTextBlockEntry
+    """
+    A component field
+    """
+    featured_image: PluginUploadFileDocument = Field(..., alias="featuredImage")
+    """
+    A media field
+    """
+    author: ApiContributorContributorDocument
+    """
+    A relational field
+    """
+    tags: list[ApiBlogPostTagBlogPostTagDocument]
+    """
+    A relational field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class BlogPostsGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: list[Datum1]
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
 
 
 class Sort9(StrEnum):
@@ -2348,6 +3214,82 @@ class BlogPostsSlugSlugGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
+class Data4(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    read_time_in_minutes: int | None = Field(5, alias="readTimeInMinutes", ge=-9007199254740991, le=9007199254740991)
+    """
+    An integer field
+    """
+    published_date: str = Field(..., alias="publishedDate")
+    """
+    A datetime field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsTextBlockEntry
+    """
+    A component field
+    """
+    featured_image: PluginUploadFileDocument = Field(..., alias="featuredImage")
+    """
+    A media field
+    """
+    author: ApiContributorContributorDocument
+    """
+    A relational field
+    """
+    tags: list[ApiBlogPostTagBlogPostTagDocument]
+    """
+    A relational field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class BlogPostsSlugSlugGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data4
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
 class Sort12(StrEnum):
     """
     Sort the result
@@ -2391,6 +3333,82 @@ class BlogPostsIdGetParametersQuery(BaseModel):
     custom_populate: str = Field(..., alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
+
+
+class Data5(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    read_time_in_minutes: int | None = Field(5, alias="readTimeInMinutes", ge=-9007199254740991, le=9007199254740991)
+    """
+    An integer field
+    """
+    published_date: str = Field(..., alias="publishedDate")
+    """
+    A datetime field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsTextBlockEntry
+    """
+    A component field
+    """
+    featured_image: PluginUploadFileDocument = Field(..., alias="featuredImage")
+    """
+    A media field
+    """
+    author: ApiContributorContributorDocument
+    """
+    A relational field
+    """
+    tags: list[ApiBlogPostTagBlogPostTagDocument]
+    """
+    A relational field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class BlogPostsIdGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data5
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
 
 
 class Field8(StrEnum):
@@ -2654,7 +3672,7 @@ class ContributorRolesGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     field_q: str | None = Field(None, alias="_q", examples=["search terms"])
-    pagination: Pagination7 | None = None
+    pagination: Pagination7 | None = Field(default_factory=Pagination7)
     """
     Pagination parameters
     """
@@ -2675,6 +3693,58 @@ class ContributorRolesGetParametersQuery(BaseModel):
     custom_populate: str = Field(..., alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
+
+
+class Datum2(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    role_id: str = Field(..., alias="roleId")
+    """
+    A UID field
+    """
+    name: str
+    """
+    A string field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ContributorRolesGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: list[Datum2]
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
 
 
 class Sort18(StrEnum):
@@ -2723,9 +3793,62 @@ class ContributorRolesIdGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
+class Data7(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    role_id: str = Field(..., alias="roleId")
+    """
+    A UID field
+    """
+    name: str
+    """
+    A string field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ContributorRolesIdGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data7
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
 class Field11(StrEnum):
-    NAME = "name"
     SLUG = "slug"
+    FIRST_NAME = "firstName"
+    LAST_NAME = "lastName"
     BIO = "bio"
     EMAIL = "email"
     WEBSITE = "website"
@@ -2827,8 +3950,9 @@ class Sort21(StrEnum):
     Sort the result
     """
 
-    NAME = "name"
     SLUG = "slug"
+    FIRST_NAME = "firstName"
+    LAST_NAME = "lastName"
     BIO = "bio"
     EMAIL = "email"
     WEBSITE = "website"
@@ -2843,8 +3967,9 @@ class Sort21(StrEnum):
 
 
 class SortEnum7(StrEnum):
-    NAME = "name"
     SLUG = "slug"
+    FIRST_NAME = "firstName"
+    LAST_NAME = "lastName"
     BIO = "bio"
     EMAIL = "email"
     WEBSITE = "website"
@@ -2864,7 +3989,7 @@ class Sort22(StrEnum):
 
 
 class ContributorsGetParametersQuery(BaseModel):
-    fields: list[Field11] | None = Field(None, examples=[["name", "slug", "bio"]])
+    fields: list[Field11] | None = Field(None, examples=[["slug", "firstName", "lastName"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -2873,11 +3998,11 @@ class ContributorsGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     field_q: str | None = Field(None, alias="_q", examples=["search terms"])
-    pagination: Pagination8 | None = None
+    pagination: Pagination8 | None = Field(default_factory=Pagination8)
     """
     Pagination parameters
     """
-    sort: Sort21 | list[SortEnum7] | dict[str, Sort22] | list[dict[str, Sort22]] | None = Field(None, examples=["name"])
+    sort: Sort21 | list[SortEnum7] | dict[str, Sort22] | list[dict[str, Sort22]] | None = Field(None, examples=["slug"])
     """
     Sort the result
     """
@@ -2894,13 +4019,112 @@ class ContributorsGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
+class Datum3(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    first_name: str = Field(..., alias="firstName")
+    """
+    A string field
+    """
+    last_name: str | None = Field(None, alias="lastName")
+    """
+    A string field
+    """
+    bio: str
+    """
+    A richtext field
+    """
+    email: EmailStr | None = Field(None, examples=["user@example.com"])
+    """
+    RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
+    """
+    website: str | None = None
+    """
+    A string field
+    """
+    twitter: str | None = None
+    """
+    A string field
+    """
+    linkedin: str | None = None
+    """
+    A string field
+    """
+    github: str | None = None
+    """
+    A string field
+    """
+    instagram: str | None = None
+    """
+    A string field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    profile_picture: PluginUploadFileDocument | None = Field(
+        default_factory=PluginUploadFileDocument, alias="profilePicture"
+    )
+    """
+    A media field
+    """
+    roles: list[ApiContributorRoleContributorRoleDocument]
+    """
+    A relational field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ContributorsGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: list[Datum3]
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
 class Sort24(StrEnum):
     """
     Sort the result
     """
 
-    NAME = "name"
     SLUG = "slug"
+    FIRST_NAME = "firstName"
+    LAST_NAME = "lastName"
     BIO = "bio"
     EMAIL = "email"
     WEBSITE = "website"
@@ -2920,7 +4144,7 @@ class Sort25(StrEnum):
 
 
 class ContributorsSlugSlugGetParametersQuery(BaseModel):
-    fields: list[Field11] | None = Field(None, examples=[["name", "slug", "bio"]])
+    fields: list[Field11] | None = Field(None, examples=[["slug", "firstName", "lastName"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -2928,7 +4152,7 @@ class ContributorsSlugSlugGetParametersQuery(BaseModel):
     """
     Filters to apply to the query
     """
-    sort: Sort24 | list[SortEnum7] | dict[str, Sort25] | list[dict[str, Sort25]] | None = Field(None, examples=["name"])
+    sort: Sort24 | list[SortEnum7] | dict[str, Sort25] | list[dict[str, Sort25]] | None = Field(None, examples=["slug"])
     """
     Sort the result
     """
@@ -2945,13 +4169,112 @@ class ContributorsSlugSlugGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
+class Data8(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    first_name: str = Field(..., alias="firstName")
+    """
+    A string field
+    """
+    last_name: str | None = Field(None, alias="lastName")
+    """
+    A string field
+    """
+    bio: str
+    """
+    A richtext field
+    """
+    email: EmailStr | None = Field(None, examples=["user@example.com"])
+    """
+    RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
+    """
+    website: str | None = None
+    """
+    A string field
+    """
+    twitter: str | None = None
+    """
+    A string field
+    """
+    linkedin: str | None = None
+    """
+    A string field
+    """
+    github: str | None = None
+    """
+    A string field
+    """
+    instagram: str | None = None
+    """
+    A string field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    profile_picture: PluginUploadFileDocument | None = Field(
+        default_factory=PluginUploadFileDocument, alias="profilePicture"
+    )
+    """
+    A media field
+    """
+    roles: list[ApiContributorRoleContributorRoleDocument]
+    """
+    A relational field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ContributorsSlugSlugGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data8
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
 class Sort27(StrEnum):
     """
     Sort the result
     """
 
-    NAME = "name"
     SLUG = "slug"
+    FIRST_NAME = "firstName"
+    LAST_NAME = "lastName"
     BIO = "bio"
     EMAIL = "email"
     WEBSITE = "website"
@@ -2971,7 +4294,7 @@ class Sort28(StrEnum):
 
 
 class ContributorsIdGetParametersQuery(BaseModel):
-    fields: list[Field11] | None = Field(None, examples=[["name", "slug", "bio"]])
+    fields: list[Field11] | None = Field(None, examples=[["slug", "firstName", "lastName"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -2979,7 +4302,7 @@ class ContributorsIdGetParametersQuery(BaseModel):
     """
     Filters to apply to the query
     """
-    sort: Sort27 | list[SortEnum7] | dict[str, Sort28] | list[dict[str, Sort28]] | None = Field(None, examples=["name"])
+    sort: Sort27 | list[SortEnum7] | dict[str, Sort28] | list[dict[str, Sort28]] | None = Field(None, examples=["slug"])
     """
     Sort the result
     """
@@ -2994,6 +4317,104 @@ class ContributorsIdGetParametersQuery(BaseModel):
     custom_populate: str = Field(..., alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
+
+
+class Data9(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    first_name: str = Field(..., alias="firstName")
+    """
+    A string field
+    """
+    last_name: str | None = Field(None, alias="lastName")
+    """
+    A string field
+    """
+    bio: str
+    """
+    A richtext field
+    """
+    email: EmailStr | None = Field(None, examples=["user@example.com"])
+    """
+    RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
+    """
+    website: str | None = None
+    """
+    A string field
+    """
+    twitter: str | None = None
+    """
+    A string field
+    """
+    linkedin: str | None = None
+    """
+    A string field
+    """
+    github: str | None = None
+    """
+    A string field
+    """
+    instagram: str | None = None
+    """
+    A string field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    profile_picture: PluginUploadFileDocument | None = Field(
+        default_factory=PluginUploadFileDocument, alias="profilePicture"
+    )
+    """
+    A media field
+    """
+    roles: list[ApiContributorRoleContributorRoleDocument]
+    """
+    A relational field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ContributorsIdGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data9
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
 
 
 class Field14(StrEnum):
@@ -3143,7 +4564,7 @@ class CurrenciesGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     field_q: str | None = Field(None, alias="_q", examples=["search terms"])
-    pagination: Pagination9 | None = None
+    pagination: Pagination9 | None = Field(default_factory=Pagination9)
     """
     Pagination parameters
     """
@@ -3188,23 +4609,23 @@ class Datum4(BaseModel):
     """
     A string field
     """
-    decimal_places: int = Field(..., alias="decimalPlaces", ge=0, le=8)
+    decimal_places: int | None = Field(2, alias="decimalPlaces", ge=0, le=8)
     """
     An integer field
     """
-    symbol_position: SymbolPosition = Field(..., alias="symbolPosition")
+    symbol_position: SymbolPosition | None = Field("before", alias="symbolPosition")
     """
     An enum field
     """
-    thousands_separator: str = Field(..., alias="thousandsSeparator")
+    thousands_separator: str | None = Field(",", alias="thousandsSeparator")
     """
     A string field
     """
-    decimal_separator: str = Field(..., alias="decimalSeparator")
+    decimal_separator: str | None = Field(".", alias="decimalSeparator")
     """
     A string field
     """
-    exchange_rate: float = Field(..., alias="exchangeRate")
+    exchange_rate: float | None = Field(1, alias="exchangeRate")
     """
     A decimal field
     """
@@ -3320,23 +4741,23 @@ class Data10(BaseModel):
     """
     A string field
     """
-    decimal_places: int = Field(..., alias="decimalPlaces", ge=0, le=8)
+    decimal_places: int | None = Field(2, alias="decimalPlaces", ge=0, le=8)
     """
     An integer field
     """
-    symbol_position: SymbolPosition = Field(..., alias="symbolPosition")
+    symbol_position: SymbolPosition | None = Field("before", alias="symbolPosition")
     """
     An enum field
     """
-    thousands_separator: str = Field(..., alias="thousandsSeparator")
+    thousands_separator: str | None = Field(",", alias="thousandsSeparator")
     """
     A string field
     """
-    decimal_separator: str = Field(..., alias="decimalSeparator")
+    decimal_separator: str | None = Field(".", alias="decimalSeparator")
     """
     A string field
     """
-    exchange_rate: float = Field(..., alias="exchangeRate")
+    exchange_rate: float | None = Field(1, alias="exchangeRate")
     """
     A decimal field
     """
@@ -3589,11 +5010,11 @@ class Data13(BaseModel):
     """
     A richtext field
     """
-    contact_prompt: str = Field(..., alias="contactPrompt")
+    contact_prompt: str | None = Field("Didn't find what you're looking for?", alias="contactPrompt")
     """
     A string field
     """
-    contact_button_text: str = Field(..., alias="contactButtonText")
+    contact_button_text: str | None = Field("Contact Us", alias="contactButtonText")
     """
     A string field
     """
@@ -3770,7 +5191,7 @@ class FeatureFlagsGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     field_q: str | None = Field(None, alias="_q", examples=["search terms"])
-    pagination: Pagination10 | None = None
+    pagination: Pagination10 | None = Field(default_factory=Pagination10)
     """
     Pagination parameters
     """
@@ -3809,11 +5230,11 @@ class Datum5(BaseModel):
     """
     A string field
     """
-    development_enabled: bool | None = Field(..., alias="developmentEnabled")
+    development_enabled: bool | None = Field(True, alias="developmentEnabled")
     """
     A boolean field
     """
-    production_enabled: bool | None = Field(..., alias="productionEnabled")
+    production_enabled: bool | None = Field(False, alias="productionEnabled")
     """
     A boolean field
     """
@@ -3907,11 +5328,11 @@ class Data14(BaseModel):
     """
     A string field
     """
-    development_enabled: bool | None = Field(..., alias="developmentEnabled")
+    development_enabled: bool | None = Field(True, alias="developmentEnabled")
     """
     A boolean field
     """
-    production_enabled: bool | None = Field(..., alias="productionEnabled")
+    production_enabled: bool | None = Field(False, alias="productionEnabled")
     """
     A boolean field
     """
@@ -4033,7 +5454,7 @@ class FilesGetParametersQuery(BaseModel):
     """
     Sort the results by specified fields
     """
-    pagination: Pagination11 | None = None
+    pagination: Pagination11 | None = Field(default_factory=Pagination11)
     """
     Pagination parameters
     """
@@ -4357,6 +5778,26 @@ class Sections39(SectionsBrandFeaturesSectionEntry):
     """
 
 
+class Sections41(SectionsCategoryGridEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["sections.category-grid"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Sections42(SectionsBlogTeaserEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["sections.blog-teaser"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
 class Sections43(CallToActionsNewsletterSignupCtaEntry):
     model_config = ConfigDict(
         populate_by_name=True,
@@ -4415,8 +5856,6 @@ class NavigationGetParametersQuery(BaseModel):
 
 
 class Field24(StrEnum):
-    LAST_UPDATED = "lastUpdated"
-    LAST_UPDATED_LABEL = "lastUpdatedLabel"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -4424,7 +5863,7 @@ class Field24(StrEnum):
 
 
 class PrivacyGetParametersQuery(BaseModel):
-    fields: list[Field24] | None = Field(None, examples=[["lastUpdated", "lastUpdatedLabel", "createdAt"]])
+    fields: list[Field24] | None = Field(None, examples=[["createdAt", "updatedAt", "publishedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -4455,14 +5894,6 @@ class Data18(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
-    last_updated: str | None = Field(None, alias="lastUpdated")
-    """
-    A datetime field
-    """
-    last_updated_label: str | None = Field(None, alias="lastUpdatedLabel")
-    """
-    A string field
-    """
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -4478,6 +5909,10 @@ class Data18(BaseModel):
     locale: str | None = Field(None, examples=["en"])
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsTextBlockEntry
+    """
+    A component field
     """
     seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
@@ -4627,7 +6062,7 @@ class ProductCategoriesGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     field_q: str | None = Field(None, alias="_q", examples=["search terms"])
-    pagination: Pagination12 | None = None
+    pagination: Pagination12 | None = Field(default_factory=Pagination12)
     """
     Pagination parameters
     """
@@ -4650,16 +6085,67 @@ class ProductCategoriesGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
+class Datum6(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsLabelEntry
+    """
+    A component field
+    """
+    image: PluginUploadFileDocument
+    """
+    A media field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ProductCategoriesGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: list[Datum6]
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
 class Field26(StrEnum):
-    ITEMS_PER_PAGE = "itemsPerPage"
-    PREVIOUS_BUTTON = "previousButton"
-    NEXT_BUTTON = "nextButton"
-    NO_PRODUCTS_MESSAGE = "noProductsMessage"
-    SHOWING_TEXT = "showingText"
-    PAGE_TEXT = "pageText"
-    FILTER_LABEL = "filterLabel"
-    ALL_CATEGORIES_LABEL = "allCategoriesLabel"
-    RESULTS_COUNT_TEMPLATE = "resultsCountTemplate"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -4667,7 +6153,7 @@ class Field26(StrEnum):
 
 
 class ProductCategoriesPageGetParametersQuery(BaseModel):
-    fields: list[Field26] | None = Field(None, examples=[["itemsPerPage", "previousButton", "nextButton"]])
+    fields: list[Field26] | None = Field(None, examples=[["createdAt", "updatedAt", "publishedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -4741,6 +6227,66 @@ class ProductCategoriesSlugSlugGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
+class Data20(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsLabelEntry
+    """
+    A component field
+    """
+    image: PluginUploadFileDocument
+    """
+    A media field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ProductCategoriesSlugSlugGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data20
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
 class Sort50(StrEnum):
     """
     Sort the result
@@ -4786,8 +6332,68 @@ class ProductCategoriesIdGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
+class Data21(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsLabelEntry
+    """
+    A component field
+    """
+    image: PluginUploadFileDocument
+    """
+    A media field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ProductCategoriesIdGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data21
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
 class Field29(StrEnum):
-    TAG_ID = "tagId"
+    CERTIFICATE_ID = "certificateId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -4882,7 +6488,7 @@ class Sort53(StrEnum):
     Sort the result
     """
 
-    TAG_ID = "tagId"
+    CERTIFICATE_ID = "certificateId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -4890,7 +6496,7 @@ class Sort53(StrEnum):
 
 
 class SortEnum17(StrEnum):
-    TAG_ID = "tagId"
+    CERTIFICATE_ID = "certificateId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -4902,8 +6508,8 @@ class Sort54(StrEnum):
     DESC = "desc"
 
 
-class ProductTagsGetParametersQuery(BaseModel):
-    fields: list[Field29] | None = Field(None, examples=[["tagId", "createdAt", "updatedAt"]])
+class ProductCertificatesGetParametersQuery(BaseModel):
+    fields: list[Field29] | None = Field(None, examples=[["certificateId", "createdAt", "updatedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -4912,12 +6518,12 @@ class ProductTagsGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     field_q: str | None = Field(None, alias="_q", examples=["search terms"])
-    pagination: Pagination13 | None = None
+    pagination: Pagination13 | None = Field(default_factory=Pagination13)
     """
     Pagination parameters
     """
     sort: Sort53 | list[SortEnum17] | dict[str, Sort54] | list[dict[str, Sort54]] | None = Field(
-        None, examples=["tagId"]
+        None, examples=["certificateId"]
     )
     """
     Sort the result
@@ -4935,12 +6541,68 @@ class ProductTagsGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
+class Datum7(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    certificate_id: str = Field(..., alias="certificateId")
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    certificate: ElementsLabelEntry
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ProductCertificatesGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: list[Datum7]
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
 class Sort56(StrEnum):
     """
     Sort the result
     """
 
-    TAG_ID = "tagId"
+    CERTIFICATE_ID = "certificateId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -4952,8 +6614,8 @@ class Sort57(StrEnum):
     DESC = "desc"
 
 
-class ProductTagsIdGetParametersQuery(BaseModel):
-    fields: list[Field29] | None = Field(None, examples=[["tagId", "createdAt", "updatedAt"]])
+class ProductCertificatesIdGetParametersQuery(BaseModel):
+    fields: list[Field29] | None = Field(None, examples=[["certificateId", "createdAt", "updatedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -4962,7 +6624,7 @@ class ProductTagsIdGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     sort: Sort56 | list[SortEnum17] | dict[str, Sort57] | list[dict[str, Sort57]] | None = Field(
-        None, examples=["tagId"]
+        None, examples=["certificateId"]
     )
     """
     Sort the result
@@ -4980,9 +6642,64 @@ class ProductTagsIdGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
+class Data22(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    certificate_id: str = Field(..., alias="certificateId")
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    certificate: ElementsLabelEntry
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ProductCertificatesIdGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data22
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
 class Field31(StrEnum):
-    SLUG = "slug"
-    PRICE = "price"
+    TAG_ID = "tagId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -5077,8 +6794,7 @@ class Sort59(StrEnum):
     Sort the result
     """
 
-    SLUG = "slug"
-    PRICE = "price"
+    TAG_ID = "tagId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -5086,8 +6802,7 @@ class Sort59(StrEnum):
 
 
 class SortEnum19(StrEnum):
-    SLUG = "slug"
-    PRICE = "price"
+    TAG_ID = "tagId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -5099,8 +6814,8 @@ class Sort60(StrEnum):
     DESC = "desc"
 
 
-class ProductsGetParametersQuery(BaseModel):
-    fields: list[Field31] | None = Field(None, examples=[["slug", "price", "createdAt"]])
+class ProductTagsGetParametersQuery(BaseModel):
+    fields: list[Field31] | None = Field(None, examples=[["tagId", "createdAt", "updatedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -5109,12 +6824,12 @@ class ProductsGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     field_q: str | None = Field(None, alias="_q", examples=["search terms"])
-    pagination: Pagination14 | None = None
+    pagination: Pagination14 | None = Field(default_factory=Pagination14)
     """
     Pagination parameters
     """
     sort: Sort59 | list[SortEnum19] | dict[str, Sort60] | list[dict[str, Sort60]] | None = Field(
-        None, examples=["slug"]
+        None, examples=["tagId"]
     )
     """
     Sort the result
@@ -5132,13 +6847,68 @@ class ProductsGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
+class Datum8(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    tag_id: str = Field(..., alias="tagId")
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    tag: ElementsLabelEntry
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ProductTagsGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: list[Datum8]
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
 class Sort62(StrEnum):
     """
     Sort the result
     """
 
-    SLUG = "slug"
-    PRICE = "price"
+    TAG_ID = "tagId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -5150,8 +6920,8 @@ class Sort63(StrEnum):
     DESC = "desc"
 
 
-class ProductsSlugSlugGetParametersQuery(BaseModel):
-    fields: list[Field31] | None = Field(None, examples=[["slug", "price", "createdAt"]])
+class ProductTagsIdGetParametersQuery(BaseModel):
+    fields: list[Field31] | None = Field(None, examples=[["tagId", "createdAt", "updatedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -5160,7 +6930,7 @@ class ProductsSlugSlugGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     sort: Sort62 | list[SortEnum19] | dict[str, Sort63] | list[dict[str, Sort63]] | None = Field(
-        None, examples=["slug"]
+        None, examples=["tagId"]
     )
     """
     Sort the result
@@ -5178,13 +6948,167 @@ class ProductsSlugSlugGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
+class Data23(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    tag_id: str = Field(..., alias="tagId")
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    tag: ElementsLabelEntry
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ProductTagsIdGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data23
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
+class Field33(StrEnum):
+    SLUG = "slug"
+    CREATED_AT = "createdAt"
+    UPDATED_AT = "updatedAt"
+    PUBLISHED_AT = "publishedAt"
+    LOCALE = "locale"
+
+
+class Pagination151(BaseModel):
+    """
+    Page-based pagination
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    page: int = Field(..., gt=0, le=9007199254740991)
+    """
+    Page number (1-based)
+    """
+    page_size: int = Field(..., alias="pageSize", gt=0, le=9007199254740991)
+    """
+    Number of entries per page
+    """
+
+
+class Pagination152(BaseModel):
+    """
+    Offset-based pagination
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    start: int = Field(..., ge=0, le=9007199254740991)
+    """
+    Number of entries to skip
+    """
+    limit: int = Field(..., gt=0, le=9007199254740991)
+    """
+    Maximum number of entries to return
+    """
+
+
+class Pagination153(BaseModel):
+    """
+    Pagination parameters
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    with_count: bool | None = Field(None, alias="withCount")
+    """
+    Include total count in response
+    """
+
+
+class Pagination154(Pagination151, Pagination153):
+    """
+    Pagination parameters
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+
+
+class Pagination155(Pagination152, Pagination153):
+    """
+    Pagination parameters
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+
+
+class Pagination15(RootModel[Pagination154 | Pagination155]):
+    """
+    Pagination parameters
+    """
+
+    root: Pagination154 | Pagination155
+    """
+    Pagination parameters
+    """
+
+
 class Sort65(StrEnum):
     """
     Sort the result
     """
 
     SLUG = "slug"
-    PRICE = "price"
+    CREATED_AT = "createdAt"
+    UPDATED_AT = "updatedAt"
+    PUBLISHED_AT = "publishedAt"
+    LOCALE = "locale"
+
+
+class SortEnum21(StrEnum):
+    SLUG = "slug"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -5196,8 +7120,8 @@ class Sort66(StrEnum):
     DESC = "desc"
 
 
-class ProductsIdGetParametersQuery(BaseModel):
-    fields: list[Field31] | None = Field(None, examples=[["slug", "price", "createdAt"]])
+class ProductsGetParametersQuery(BaseModel):
+    fields: list[Field33] | None = Field(None, examples=[["slug", "createdAt", "updatedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -5205,7 +7129,12 @@ class ProductsIdGetParametersQuery(BaseModel):
     """
     Filters to apply to the query
     """
-    sort: Sort65 | list[SortEnum19] | dict[str, Sort66] | list[dict[str, Sort66]] | None = Field(
+    field_q: str | None = Field(None, alias="_q", examples=["search terms"])
+    pagination: Pagination15 | None = Field(default_factory=Pagination15)
+    """
+    Pagination parameters
+    """
+    sort: Sort65 | list[SortEnum21] | dict[str, Sort66] | list[dict[str, Sort66]] | None = Field(
         None, examples=["slug"]
     )
     """
@@ -5224,7 +7153,477 @@ class ProductsIdGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Field34(StrEnum):
+class Description6(MarkersStartHorizontalLayoutMarkerEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["markers.start-horizontal-layout-marker"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Description7(MarkersEndHorizontalLayoutMarkerEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["markers.end-horizontal-layout-marker"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Description4(RootModel[Description1 | Description6 | Description7]):
+    root: Description1 | Description6 | Description7 = Field(..., discriminator="field__component")
+
+
+class Datum9(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    seller: ApiContributorContributorDocument
+    """
+    A relational field
+    """
+    header: ElementsHeaderEntry
+    """
+    A component field
+    """
+    images: list[PluginUploadFileDocument]
+    """
+    A media field
+    """
+    prices: list[ElementsPriceEntry] = Field(..., min_length=1)
+    """
+    A component field
+    """
+    category: ApiProductCategoryProductCategoryDocument
+    """
+    A relational field
+    """
+    certificates: list[ApiProductCertificateProductCertificateDocument] | None = None
+    """
+    A relational field
+    """
+    tags: list[ApiProductTagProductTagDocument] | None = None
+    """
+    A relational field
+    """
+    affiliate_button: ElementsButtonEntry = Field(..., alias="affiliateButton")
+    """
+    A component field
+    """
+    disclaimer_label: ElementsLabelEntry = Field(..., alias="disclaimerLabel")
+    """
+    A component field
+    """
+    view_details_label: ElementsLabelEntry = Field(..., alias="viewDetailsLabel")
+    """
+    A component field
+    """
+    description: list[Description4]
+    """
+    A dynamic zone field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ProductsGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: list[Datum9]
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
+class Sort68(StrEnum):
+    """
+    Sort the result
+    """
+
+    SLUG = "slug"
+    CREATED_AT = "createdAt"
+    UPDATED_AT = "updatedAt"
+    PUBLISHED_AT = "publishedAt"
+    LOCALE = "locale"
+
+
+class Sort69(StrEnum):
+    ASC = "asc"
+    DESC = "desc"
+
+
+class ProductsSlugSlugGetParametersQuery(BaseModel):
+    fields: list[Field33] | None = Field(None, examples=[["slug", "createdAt", "updatedAt"]])
+    """
+    The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+    """
+    filters: dict[str, Any] | None = None
+    """
+    Filters to apply to the query
+    """
+    sort: Sort68 | list[SortEnum21] | dict[str, Sort69] | list[dict[str, Sort69]] | None = Field(
+        None, examples=["slug"]
+    )
+    """
+    Sort the result
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    Select a locale
+    """
+    status: Status1 | None = Field(None, examples=["published"])
+    """
+    Fetch documents based on their status. Default to "published" if not specified.
+    """
+    custom_populate: str = Field(..., alias="customPopulate")
+    custom_depth: int | None = Field(None, alias="customDepth")
+    custom_ignored: list[str] | None = Field(None, alias="customIgnored")
+
+
+class Description9(ElementsTextBlockEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["elements.text-block"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Description10(MarkersStartHorizontalLayoutMarkerEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["markers.start-horizontal-layout-marker"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Description11(MarkersEndHorizontalLayoutMarkerEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["markers.end-horizontal-layout-marker"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Description8(RootModel[Description9 | Description10 | Description11]):
+    root: Description9 | Description10 | Description11 = Field(..., discriminator="field__component")
+
+
+class Data24(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    seller: ApiContributorContributorDocument
+    """
+    A relational field
+    """
+    header: ElementsHeaderEntry
+    """
+    A component field
+    """
+    images: list[PluginUploadFileDocument]
+    """
+    A media field
+    """
+    prices: list[ElementsPriceEntry] = Field(..., min_length=1)
+    """
+    A component field
+    """
+    category: ApiProductCategoryProductCategoryDocument
+    """
+    A relational field
+    """
+    certificates: list[ApiProductCertificateProductCertificateDocument] | None = None
+    """
+    A relational field
+    """
+    tags: list[ApiProductTagProductTagDocument] | None = None
+    """
+    A relational field
+    """
+    affiliate_button: ElementsButtonEntry = Field(..., alias="affiliateButton")
+    """
+    A component field
+    """
+    disclaimer_label: ElementsLabelEntry = Field(..., alias="disclaimerLabel")
+    """
+    A component field
+    """
+    view_details_label: ElementsLabelEntry = Field(..., alias="viewDetailsLabel")
+    """
+    A component field
+    """
+    description: list[Description8]
+    """
+    A dynamic zone field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ProductsSlugSlugGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data24
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
+class Sort71(StrEnum):
+    """
+    Sort the result
+    """
+
+    SLUG = "slug"
+    CREATED_AT = "createdAt"
+    UPDATED_AT = "updatedAt"
+    PUBLISHED_AT = "publishedAt"
+    LOCALE = "locale"
+
+
+class Sort72(StrEnum):
+    ASC = "asc"
+    DESC = "desc"
+
+
+class ProductsIdGetParametersQuery(BaseModel):
+    fields: list[Field33] | None = Field(None, examples=[["slug", "createdAt", "updatedAt"]])
+    """
+    The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+    """
+    filters: dict[str, Any] | None = None
+    """
+    Filters to apply to the query
+    """
+    sort: Sort71 | list[SortEnum21] | dict[str, Sort72] | list[dict[str, Sort72]] | None = Field(
+        None, examples=["slug"]
+    )
+    """
+    Sort the result
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    Select a locale
+    """
+    status: Status1 | None = Field(None, examples=["published"])
+    """
+    Fetch documents based on their status. Default to "published" if not specified.
+    """
+    custom_populate: str = Field(..., alias="customPopulate")
+    custom_depth: int | None = Field(None, alias="customDepth")
+    custom_ignored: list[str] | None = Field(None, alias="customIgnored")
+
+
+class Description13(ElementsTextBlockEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["elements.text-block"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Description14(MarkersStartHorizontalLayoutMarkerEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["markers.start-horizontal-layout-marker"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Description15(MarkersEndHorizontalLayoutMarkerEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["markers.end-horizontal-layout-marker"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Description12(RootModel[Description13 | Description14 | Description15]):
+    root: Description13 | Description14 | Description15 = Field(..., discriminator="field__component")
+
+
+class Data25(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    seller: ApiContributorContributorDocument
+    """
+    A relational field
+    """
+    header: ElementsHeaderEntry
+    """
+    A component field
+    """
+    images: list[PluginUploadFileDocument]
+    """
+    A media field
+    """
+    prices: list[ElementsPriceEntry] = Field(..., min_length=1)
+    """
+    A component field
+    """
+    category: ApiProductCategoryProductCategoryDocument
+    """
+    A relational field
+    """
+    certificates: list[ApiProductCertificateProductCertificateDocument] | None = None
+    """
+    A relational field
+    """
+    tags: list[ApiProductTagProductTagDocument] | None = None
+    """
+    A relational field
+    """
+    affiliate_button: ElementsButtonEntry = Field(..., alias="affiliateButton")
+    """
+    A component field
+    """
+    disclaimer_label: ElementsLabelEntry = Field(..., alias="disclaimerLabel")
+    """
+    A component field
+    """
+    view_details_label: ElementsLabelEntry = Field(..., alias="viewDetailsLabel")
+    """
+    A component field
+    """
+    description: list[Description12]
+    """
+    A dynamic zone field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ProductsIdGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data25
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
+class Field36(StrEnum):
     PROFILE_TITLE = "profileTitle"
     EDIT_PROFILE_TITLE = "editProfileTitle"
     WISHLIST_TITLE = "wishlistTitle"
@@ -5248,7 +7647,7 @@ class Field34(StrEnum):
 
 
 class ProfileGetParametersQuery(BaseModel):
-    fields: list[Field34] | None = Field(None, examples=[["profileTitle", "editProfileTitle", "wishlistTitle"]])
+    fields: list[Field36] | None = Field(None, examples=[["profileTitle", "editProfileTitle", "wishlistTitle"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -5269,7 +7668,7 @@ class ProfileGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data25(BaseModel):
+class Data26(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -5374,7 +7773,7 @@ class ProfileGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data25
+    data: Data26
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -5385,9 +7784,7 @@ class RedirectsCheckGetParametersQuery(BaseModel):
     source_url: str = Field(..., examples=["/old-page"])
 
 
-class Field35(StrEnum):
-    LAST_UPDATED = "lastUpdated"
-    LAST_UPDATED_LABEL = "lastUpdatedLabel"
+class Field37(StrEnum):
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -5395,7 +7792,7 @@ class Field35(StrEnum):
 
 
 class TermGetParametersQuery(BaseModel):
-    fields: list[Field35] | None = Field(None, examples=[["lastUpdated", "lastUpdatedLabel", "createdAt"]])
+    fields: list[Field37] | None = Field(None, examples=[["createdAt", "updatedAt", "publishedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -5416,7 +7813,7 @@ class TermGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data26(BaseModel):
+class Data27(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -5426,14 +7823,6 @@ class Data26(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
-    last_updated: str | None = Field(None, alias="lastUpdated")
-    """
-    A datetime field
-    """
-    last_updated_label: str | None = Field(None, alias="lastUpdatedLabel")
-    """
-    A string field
-    """
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -5450,6 +7839,10 @@ class Data26(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
+    content: ElementsTextBlockEntry
+    """
+    A component field
+    """
     seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
@@ -5465,14 +7858,14 @@ class TermGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data26
+    data: Data27
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
     """
 
 
-class Field36(StrEnum):
+class Field38(StrEnum):
     THEME_ID = "themeId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
@@ -5480,7 +7873,7 @@ class Field36(StrEnum):
     LOCALE = "locale"
 
 
-class Pagination151(BaseModel):
+class Pagination161(BaseModel):
     """
     Page-based pagination
     """
@@ -5499,7 +7892,7 @@ class Pagination151(BaseModel):
     """
 
 
-class Pagination152(BaseModel):
+class Pagination162(BaseModel):
     """
     Offset-based pagination
     """
@@ -5518,7 +7911,7 @@ class Pagination152(BaseModel):
     """
 
 
-class Pagination153(BaseModel):
+class Pagination163(BaseModel):
     """
     Pagination parameters
     """
@@ -5532,7 +7925,7 @@ class Pagination153(BaseModel):
     """
 
 
-class Pagination154(Pagination151, Pagination153):
+class Pagination164(Pagination161, Pagination163):
     """
     Pagination parameters
     """
@@ -5542,7 +7935,7 @@ class Pagination154(Pagination151, Pagination153):
     )
 
 
-class Pagination155(Pagination152, Pagination153):
+class Pagination165(Pagination162, Pagination163):
     """
     Pagination parameters
     """
@@ -5552,18 +7945,18 @@ class Pagination155(Pagination152, Pagination153):
     )
 
 
-class Pagination15(RootModel[Pagination154 | Pagination155]):
+class Pagination16(RootModel[Pagination164 | Pagination165]):
     """
     Pagination parameters
     """
 
-    root: Pagination154 | Pagination155
+    root: Pagination164 | Pagination165
     """
     Pagination parameters
     """
 
 
-class Sort68(StrEnum):
+class Sort74(StrEnum):
     """
     Sort the result
     """
@@ -5575,7 +7968,7 @@ class Sort68(StrEnum):
     LOCALE = "locale"
 
 
-class SortEnum22(StrEnum):
+class SortEnum24(StrEnum):
     THEME_ID = "themeId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
@@ -5583,13 +7976,13 @@ class SortEnum22(StrEnum):
     LOCALE = "locale"
 
 
-class Sort69(StrEnum):
+class Sort75(StrEnum):
     ASC = "asc"
     DESC = "desc"
 
 
 class ThemesGetParametersQuery(BaseModel):
-    fields: list[Field36] | None = Field(None, examples=[["themeId", "createdAt", "updatedAt"]])
+    fields: list[Field38] | None = Field(None, examples=[["themeId", "createdAt", "updatedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -5598,11 +7991,11 @@ class ThemesGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     field_q: str | None = Field(None, alias="_q", examples=["search terms"])
-    pagination: Pagination15 | None = None
+    pagination: Pagination16 | None = Field(default_factory=Pagination16)
     """
     Pagination parameters
     """
-    sort: Sort68 | list[SortEnum22] | dict[str, Sort69] | list[dict[str, Sort69]] | None = Field(
+    sort: Sort74 | list[SortEnum24] | dict[str, Sort75] | list[dict[str, Sort75]] | None = Field(
         None, examples=["themeId"]
     )
     """
@@ -5621,7 +8014,7 @@ class ThemesGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Datum9(BaseModel):
+class Datum10(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -5670,14 +8063,14 @@ class ThemesGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: list[Datum9]
+    data: list[Datum10]
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
     """
 
 
-class Sort71(StrEnum):
+class Sort77(StrEnum):
     """
     Sort the result
     """
@@ -5689,13 +8082,13 @@ class Sort71(StrEnum):
     LOCALE = "locale"
 
 
-class Sort72(StrEnum):
+class Sort78(StrEnum):
     ASC = "asc"
     DESC = "desc"
 
 
 class ThemesIdGetParametersQuery(BaseModel):
-    fields: list[Field36] | None = Field(None, examples=[["themeId", "createdAt", "updatedAt"]])
+    fields: list[Field38] | None = Field(None, examples=[["themeId", "createdAt", "updatedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -5703,7 +8096,7 @@ class ThemesIdGetParametersQuery(BaseModel):
     """
     Filters to apply to the query
     """
-    sort: Sort71 | list[SortEnum22] | dict[str, Sort72] | list[dict[str, Sort72]] | None = Field(
+    sort: Sort77 | list[SortEnum24] | dict[str, Sort78] | list[dict[str, Sort78]] | None = Field(
         None, examples=["themeId"]
     )
     """
@@ -5722,7 +8115,7 @@ class ThemesIdGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data27(BaseModel):
+class Data28(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -5771,7 +8164,7 @@ class ThemesIdGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data27
+    data: Data28
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -5833,6 +8226,26 @@ class Sections6(SectionsBrandFeaturesSectionEntry):
         populate_by_name=True,
     )
     field__component: Literal["sections.brand-features-section"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Sections8(SectionsCategoryGridEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["sections.category-grid"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Sections9(SectionsBlogTeaserEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["sections.blog-teaser"] = Field(..., alias="__component")
     """
     Component type discriminator
     """
@@ -5920,7 +8333,7 @@ class ApiFooterFooterDocument(BaseModel):
     """
     A component field
     """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
     """
@@ -5980,6 +8393,26 @@ class Sections17(SectionsBrandFeaturesSectionEntry):
     """
 
 
+class Sections19(SectionsCategoryGridEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["sections.category-grid"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Sections20(SectionsBlogTeaserEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["sections.blog-teaser"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
 class Sections21(CallToActionsNewsletterSignupCtaEntry):
     model_config = ConfigDict(
         populate_by_name=True,
@@ -5987,417 +8420,6 @@ class Sections21(CallToActionsNewsletterSignupCtaEntry):
     field__component: Literal["call-to-actions.newsletter-signup-cta"] = Field(..., alias="__component")
     """
     Component type discriminator
-    """
-
-
-class MenusThemeSelectorEntry(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    menu_button: ElementsButtonEntry = Field(..., alias="menuButton")
-    """
-    A component field
-    """
-    themes: list[ApiThemeThemeDocument] | None = None
-    """
-    A relational field
-    """
-    id: int | None = None
-    """
-    Component instance ID
-    """
-
-
-class ApiAboutAboutDocument(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    sections: list[Sections]
-    """
-    A dynamic zone field
-    """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ApiContributorRoleContributorRoleDocument(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    role_id: str = Field(..., alias="roleId")
-    """
-    A UID field
-    """
-    name: str
-    """
-    A string field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    contributors: list[ApiContributorContributorDocument] | None = None
-    """
-    A relational field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ApiContributorContributorDocument(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    name: str
-    """
-    A string field
-    """
-    slug: str
-    """
-    A UID field
-    """
-    bio: str
-    """
-    A richtext field
-    """
-    email: EmailStr | None = Field(None, examples=["user@example.com"])
-    """
-    RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
-    """
-    website: str | None = None
-    """
-    A string field
-    """
-    twitter: str | None = None
-    """
-    A string field
-    """
-    linkedin: str | None = None
-    """
-    A string field
-    """
-    github: str | None = None
-    """
-    A string field
-    """
-    instagram: str | None = None
-    """
-    A string field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    profile_picture: PluginUploadFileDocument | None = Field(None, alias="profilePicture")
-    """
-    A media field
-    """
-    roles: list[ApiContributorRoleContributorRoleDocument] | None = None
-    """
-    A relational field
-    """
-    blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="blogPosts")
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ApiBlogPostBlogPostDocument(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    slug: str
-    """
-    A UID field
-    """
-    read_time_in_minutes: int = Field(..., alias="readTimeInMinutes", ge=-9007199254740991, le=9007199254740991)
-    """
-    An integer field
-    """
-    published_date: str = Field(..., alias="publishedDate")
-    """
-    A datetime field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsTextBlockEntry | None = None
-    """
-    A component field
-    """
-    featured_image: PluginUploadFileDocument | None = Field(None, alias="featuredImage")
-    """
-    A media field
-    """
-    contributor: ApiContributorContributorDocument | None = None
-    """
-    A relational field
-    """
-    tags: list[ApiBlogPostTagBlogPostTagDocument] | None = None
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ApiBlogPostTagBlogPostTagDocument(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    tag_id: str = Field(..., alias="tagId")
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    tag: ElementsLabelEntry | None = None
-    """
-    A component field
-    """
-    posts: list[ApiBlogPostBlogPostDocument] | None = None
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ApiBlogBlogDocument(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    header: ElementsHeaderEntry | None = None
-    """
-    A component field
-    """
-    tag_filters: list[ApiBlogPostTagBlogPostTagDocument] | None = Field(None, alias="tagFilters")
-    """
-    A relational field
-    """
-    featured_blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="featuredBlogPosts")
-    """
-    A relational field
-    """
-    blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="blogPosts")
-    """
-    A relational field
-    """
-    pagination: CallToActionsPaginationCtaEntry
-    """
-    A component field
-    """
-    read_article_label: ElementsLabelEntry = Field(..., alias="readArticleLabel")
-    """
-    A component field
-    """
-    read_time_minutes_label: ElementsLabelEntry = Field(..., alias="readTimeMinutesLabel")
-    """
-    A component field
-    """
-    about_author_header: ElementsHeaderEntry = Field(..., alias="aboutAuthorHeader")
-    """
-    A component field
-    """
-    default_contributor: ApiContributorContributorDocument | None = Field(None, alias="defaultContributor")
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ApiHomepageHomepageDocument(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    sections: list[Sections11]
-    """
-    A dynamic zone field
-    """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
     """
 
 
@@ -6420,175 +8442,22 @@ class MenusProductCategoriesSelectorEntry(BaseModel):
     """
 
 
-class ApiProductTagProductTagDocument(BaseModel):
+class MenusThemeSelectorEntry(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
     )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    tag_id: str = Field(..., alias="tagId")
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    tag: ElementsLabelEntry | None = None
+    menu_button: ElementsButtonEntry = Field(..., alias="menuButton")
     """
     A component field
     """
-    products: list[ApiProductProductDocument] | None = None
+    themes: list[ApiThemeThemeDocument]
     """
     A relational field
     """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
+    id: int | None = None
     """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ApiProductProductDocument(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    slug: str
-    """
-    A UID field
-    """
-    price: float
-    """
-    A decimal field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsTextBlockEntry | None = None
-    """
-    A component field
-    """
-    images: list[PluginUploadFileDocument]
-    """
-    A media field
-    """
-    affiliate_button: ElementsButtonEntry = Field(..., alias="affiliateButton")
-    """
-    A component field
-    """
-    currency: ApiCurrencyCurrencyDocument | None = None
-    """
-    A relational field
-    """
-    category: ApiProductCategoryProductCategoryDocument | None = None
-    """
-    A relational field
-    """
-    tags: list[ApiProductTagProductTagDocument] | None = None
-    """
-    A relational field
-    """
-    view_details_label: ElementsLabelEntry = Field(..., alias="viewDetailsLabel")
-    """
-    A component field
-    """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ApiProductCategoryProductCategoryDocument(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    slug: str
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsLabelEntry | None = None
-    """
-    A component field
-    """
-    image: PluginUploadFileDocument | None = None
-    """
-    A media field
-    """
-    products: list[ApiProductProductDocument] | None = None
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    Component instance ID
     """
 
 
@@ -6602,7 +8471,7 @@ class ApiNavigationNavigationDocument(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
-    site_title: str = Field(..., alias="siteTitle")
+    site_title: str | None = Field("TheGreenBrother", alias="siteTitle")
     """
     A string field
     """
@@ -6666,7 +8535,7 @@ class ApiNavigationNavigationDocument(BaseModel):
     """
     A component field
     """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
     """
@@ -6676,7 +8545,31 @@ class ApiNavigationNavigationDocument(BaseModel):
     """
 
 
-class ApiProductCategoriesPageProductCategoriesPageDocument(BaseModel):
+class Description2(MarkersStartHorizontalLayoutMarkerEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["markers.start-horizontal-layout-marker"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Description3(MarkersEndHorizontalLayoutMarkerEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["markers.end-horizontal-layout-marker"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
+class Description(RootModel[Description1 | Description2 | Description3]):
+    root: Description1 | Description2 | Description3 = Field(..., discriminator="field__component")
+
+
+class ApiProductProductDocument(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -6686,41 +8579,9 @@ class ApiProductCategoriesPageProductCategoriesPageDocument(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
-    items_per_page: int = Field(..., alias="itemsPerPage", ge=-9007199254740991, le=9007199254740991)
+    slug: str
     """
-    An integer field
-    """
-    previous_button: str | None = Field(None, alias="previousButton")
-    """
-    A string field
-    """
-    next_button: str | None = Field(None, alias="nextButton")
-    """
-    A string field
-    """
-    no_products_message: str | None = Field(None, alias="noProductsMessage")
-    """
-    A string field
-    """
-    showing_text: str = Field(..., alias="showingText")
-    """
-    A string field
-    """
-    page_text: str = Field(..., alias="pageText")
-    """
-    A string field
-    """
-    filter_label: str = Field(..., alias="filterLabel")
-    """
-    A string field
-    """
-    all_categories_label: str = Field(..., alias="allCategoriesLabel")
-    """
-    A string field
-    """
-    results_count_template: str = Field(..., alias="resultsCountTemplate")
-    """
-    A string field
+    A UID field
     """
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
@@ -6738,11 +8599,51 @@ class ApiProductCategoriesPageProductCategoriesPageDocument(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    product_categories: list[ApiProductCategoryProductCategoryDocument] | None = Field(None, alias="productCategories")
+    seller: ApiContributorContributorDocument
     """
     A relational field
     """
-    seo_metadata: ElementsSeoMetadataEntry | None = Field(None, alias="seoMetadata")
+    header: ElementsHeaderEntry
+    """
+    A component field
+    """
+    images: list[PluginUploadFileDocument]
+    """
+    A media field
+    """
+    prices: list[ElementsPriceEntry] = Field(..., min_length=1)
+    """
+    A component field
+    """
+    category: ApiProductCategoryProductCategoryDocument
+    """
+    A relational field
+    """
+    certificates: list[ApiProductCertificateProductCertificateDocument] | None = None
+    """
+    A relational field
+    """
+    tags: list[ApiProductTagProductTagDocument] | None = None
+    """
+    A relational field
+    """
+    affiliate_button: ElementsButtonEntry = Field(..., alias="affiliateButton")
+    """
+    A component field
+    """
+    disclaimer_label: ElementsLabelEntry = Field(..., alias="disclaimerLabel")
+    """
+    A component field
+    """
+    view_details_label: ElementsLabelEntry = Field(..., alias="viewDetailsLabel")
+    """
+    A component field
+    """
+    description: list[Description]
+    """
+    A dynamic zone field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
     """
@@ -6752,53 +8653,82 @@ class ApiProductCategoriesPageProductCategoriesPageDocument(BaseModel):
     """
 
 
-class SectionsBlogTeaserEntry(BaseModel):
-    """
-    Section displaying blog post previews in grid
-    """
-
+class FiltersProductsFilterEntry(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
     )
-    id: int
+    header: ElementsHeaderEntry
+    """
+    A component field
+    """
+    tag_filter: FiltersTagFilterEntry = Field(..., alias="tagFilter")
+    """
+    A component field
+    """
+    price_range_filter: FiltersPriceRangeFilterEntry = Field(..., alias="priceRangeFilter")
+    """
+    A component field
+    """
+    id: int | None = None
     """
     Component instance ID
+    """
+
+
+class ApiProductCategoriesPageProductCategoriesPageDocument(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
     header: ElementsHeaderEntry
     """
     A component field
     """
-    blog_posts: list[ApiBlogPostBlogPostDocument] | None = None
-    """
-    A relational field
-    """
-    view_all_button: ElementsButtonEntry = Field(..., alias="viewAllButton")
+    products_filter: FiltersProductsFilterEntry = Field(..., alias="productsFilter")
     """
     A component field
     """
-
-
-class SectionsCategoryGridEntry(BaseModel):
-    """
-    Grid of product categories with icons
-    """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    id: int
-    """
-    Component instance ID
-    """
-    header: ElementsHeaderEntry
+    products_sorter: SortersProductsSorterEntry = Field(..., alias="productsSorter")
     """
     A component field
     """
-    categories: list[ApiProductCategoryProductCategoryDocument] | None = None
+    related_products_section_header: ElementsHeaderEntry = Field(..., alias="relatedProductsSectionHeader")
     """
-    A relational field
+    A component field
+    """
+    pagination: CallToActionsPaginationCtaEntry
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
     """
 
 
@@ -6819,7 +8749,7 @@ class SectionsFeaturedProductsEntry(BaseModel):
     """
     A component field
     """
-    products: list[ApiProductProductDocument] | None = None
+    products: list[ApiProductProductDocument]
     """
     A relational field
     """
@@ -6829,27 +8759,42 @@ class SectionsFeaturedProductsEntry(BaseModel):
     """
 
 
-class CallToActionsCategoryCtaEntry(BaseModel):
-    """
-    Category CTA
-    """
-
+class Sections29(SectionsFeaturedProductsEntry):
     model_config = ConfigDict(
-        extra="forbid",
         populate_by_name=True,
     )
-    id: int
+    field__component: Literal["sections.featured-products"] = Field(..., alias="__component")
     """
-    Component instance ID
+    Component type discriminator
     """
-    button: ElementsButtonEntry
-    """
-    A component field
-    """
-    category: ApiProductCategoryProductCategoryDocument | None = None
-    """
-    A relational field
-    """
+
+
+class Sections22(
+    RootModel[
+        Sections23
+        | Sections24
+        | Sections25
+        | Sections26
+        | Sections27
+        | Sections28
+        | Sections29
+        | Sections30
+        | Sections31
+        | Sections32
+    ]
+):
+    root: (
+        Sections23
+        | Sections24
+        | Sections25
+        | Sections26
+        | Sections27
+        | Sections28
+        | Sections29
+        | Sections30
+        | Sections31
+        | Sections32
+    ) = Field(..., discriminator="field__component")
 
 
 class Data(BaseModel):
@@ -6904,836 +8849,42 @@ class AboutGetResponse(BaseModel):
     """
 
 
-class Data2(BaseModel):
+class Sections40(SectionsFeaturedProductsEntry):
     model_config = ConfigDict(
-        extra="forbid",
         populate_by_name=True,
     )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    field__component: Literal["sections.featured-products"] = Field(..., alias="__component")
     """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    header: ElementsHeaderEntry
-    """
-    A component field
-    """
-    tag_filters: list[ApiBlogPostTagBlogPostTagDocument] | None = Field(None, alias="tagFilters")
-    """
-    A relational field
-    """
-    featured_blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="featuredBlogPosts")
-    """
-    A relational field
-    """
-    blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="blogPosts")
-    """
-    A relational field
-    """
-    pagination: CallToActionsPaginationCtaEntry
-    """
-    A component field
-    """
-    read_article_label: ElementsLabelEntry = Field(..., alias="readArticleLabel")
-    """
-    A component field
-    """
-    read_time_minutes_label: ElementsLabelEntry = Field(..., alias="readTimeMinutesLabel")
-    """
-    A component field
-    """
-    about_author_header: ElementsHeaderEntry = Field(..., alias="aboutAuthorHeader")
-    """
-    A component field
-    """
-    default_contributor: ApiContributorContributorDocument | None = Field(None, alias="defaultContributor")
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    Component type discriminator
     """
 
 
-class BlogGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data2
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Datum(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    tag_id: str = Field(..., alias="tagId")
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    tag: ElementsLabelEntry
-    """
-    A component field
-    """
-    posts: list[ApiBlogPostBlogPostDocument] | None = None
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class BlogPostTagsGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: list[Datum]
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Data3(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    tag_id: str = Field(..., alias="tagId")
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    tag: ElementsLabelEntry
-    """
-    A component field
-    """
-    posts: list[ApiBlogPostBlogPostDocument] | None = None
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class BlogPostTagsIdGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data3
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Datum1(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    slug: str
-    """
-    A UID field
-    """
-    read_time_in_minutes: int = Field(..., alias="readTimeInMinutes", ge=-9007199254740991, le=9007199254740991)
-    """
-    An integer field
-    """
-    published_date: str = Field(..., alias="publishedDate")
-    """
-    A datetime field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsTextBlockEntry
-    """
-    A component field
-    """
-    featured_image: PluginUploadFileDocument = Field(..., alias="featuredImage")
-    """
-    A media field
-    """
-    contributor: ApiContributorContributorDocument | None = None
-    """
-    A relational field
-    """
-    tags: list[ApiBlogPostTagBlogPostTagDocument] | None = None
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class BlogPostsGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: list[Datum1]
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Data4(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    slug: str
-    """
-    A UID field
-    """
-    read_time_in_minutes: int = Field(..., alias="readTimeInMinutes", ge=-9007199254740991, le=9007199254740991)
-    """
-    An integer field
-    """
-    published_date: str = Field(..., alias="publishedDate")
-    """
-    A datetime field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsTextBlockEntry
-    """
-    A component field
-    """
-    featured_image: PluginUploadFileDocument = Field(..., alias="featuredImage")
-    """
-    A media field
-    """
-    contributor: ApiContributorContributorDocument | None = None
-    """
-    A relational field
-    """
-    tags: list[ApiBlogPostTagBlogPostTagDocument] | None = None
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class BlogPostsSlugSlugGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data4
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Data5(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    slug: str
-    """
-    A UID field
-    """
-    read_time_in_minutes: int = Field(..., alias="readTimeInMinutes", ge=-9007199254740991, le=9007199254740991)
-    """
-    An integer field
-    """
-    published_date: str = Field(..., alias="publishedDate")
-    """
-    A datetime field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsTextBlockEntry
-    """
-    A component field
-    """
-    featured_image: PluginUploadFileDocument = Field(..., alias="featuredImage")
-    """
-    A media field
-    """
-    contributor: ApiContributorContributorDocument | None = None
-    """
-    A relational field
-    """
-    tags: list[ApiBlogPostTagBlogPostTagDocument] | None = None
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class BlogPostsIdGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data5
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Datum2(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    role_id: str = Field(..., alias="roleId")
-    """
-    A UID field
-    """
-    name: str
-    """
-    A string field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    contributors: list[ApiContributorContributorDocument] | None = None
-    """
-    A relational field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ContributorRolesGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: list[Datum2]
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Data7(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    role_id: str = Field(..., alias="roleId")
-    """
-    A UID field
-    """
-    name: str
-    """
-    A string field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    contributors: list[ApiContributorContributorDocument] | None = None
-    """
-    A relational field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ContributorRolesIdGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data7
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Datum3(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    name: str
-    """
-    A string field
-    """
-    slug: str
-    """
-    A UID field
-    """
-    bio: str
-    """
-    A richtext field
-    """
-    email: EmailStr | None = Field(None, examples=["user@example.com"])
-    """
-    RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
-    """
-    website: str | None = None
-    """
-    A string field
-    """
-    twitter: str | None = None
-    """
-    A string field
-    """
-    linkedin: str | None = None
-    """
-    A string field
-    """
-    github: str | None = None
-    """
-    A string field
-    """
-    instagram: str | None = None
-    """
-    A string field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    profile_picture: PluginUploadFileDocument | None = Field(None, alias="profilePicture")
-    """
-    A media field
-    """
-    roles: list[ApiContributorRoleContributorRoleDocument] | None = None
-    """
-    A relational field
-    """
-    blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="blogPosts")
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ContributorsGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: list[Datum3]
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Data8(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    name: str
-    """
-    A string field
-    """
-    slug: str
-    """
-    A UID field
-    """
-    bio: str
-    """
-    A richtext field
-    """
-    email: EmailStr | None = Field(None, examples=["user@example.com"])
-    """
-    RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
-    """
-    website: str | None = None
-    """
-    A string field
-    """
-    twitter: str | None = None
-    """
-    A string field
-    """
-    linkedin: str | None = None
-    """
-    A string field
-    """
-    github: str | None = None
-    """
-    A string field
-    """
-    instagram: str | None = None
-    """
-    A string field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    profile_picture: PluginUploadFileDocument | None = Field(None, alias="profilePicture")
-    """
-    A media field
-    """
-    roles: list[ApiContributorRoleContributorRoleDocument] | None = None
-    """
-    A relational field
-    """
-    blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="blogPosts")
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ContributorsSlugSlugGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data8
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Data9(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    name: str
-    """
-    A string field
-    """
-    slug: str
-    """
-    A UID field
-    """
-    bio: str
-    """
-    A richtext field
-    """
-    email: EmailStr | None = Field(None, examples=["user@example.com"])
-    """
-    RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
-    """
-    website: str | None = None
-    """
-    A string field
-    """
-    twitter: str | None = None
-    """
-    A string field
-    """
-    linkedin: str | None = None
-    """
-    A string field
-    """
-    github: str | None = None
-    """
-    A string field
-    """
-    instagram: str | None = None
-    """
-    A string field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    profile_picture: PluginUploadFileDocument | None = Field(None, alias="profilePicture")
-    """
-    A media field
-    """
-    roles: list[ApiContributorRoleContributorRoleDocument] | None = None
-    """
-    A relational field
-    """
-    blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="blogPosts")
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ContributorsIdGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data9
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
+class Sections33(
+    RootModel[
+        Sections34
+        | Sections35
+        | Sections36
+        | Sections37
+        | Sections38
+        | Sections39
+        | Sections40
+        | Sections41
+        | Sections42
+        | Sections43
+    ]
+):
+    root: (
+        Sections34
+        | Sections35
+        | Sections36
+        | Sections37
+        | Sections38
+        | Sections39
+        | Sections40
+        | Sections41
+        | Sections42
+        | Sections43
+    ) = Field(..., discriminator="field__component")
 
 
 class Data16(BaseModel):
@@ -7798,7 +8949,7 @@ class Data17(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
-    site_title: str = Field(..., alias="siteTitle")
+    site_title: str | None = Field("TheGreenBrother", alias="siteTitle")
     """
     A string field
     """
@@ -7884,70 +9035,6 @@ class NavigationGetResponse(BaseModel):
     """
 
 
-class Datum6(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    slug: str
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsLabelEntry
-    """
-    A component field
-    """
-    image: PluginUploadFileDocument
-    """
-    A media field
-    """
-    products: list[ApiProductProductDocument] | None = None
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ProductCategoriesGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: list[Datum6]
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
 class Data19(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -7958,42 +9045,6 @@ class Data19(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
-    items_per_page: int = Field(..., alias="itemsPerPage", ge=-9007199254740991, le=9007199254740991)
-    """
-    An integer field
-    """
-    previous_button: str | None = Field(None, alias="previousButton")
-    """
-    A string field
-    """
-    next_button: str | None = Field(None, alias="nextButton")
-    """
-    A string field
-    """
-    no_products_message: str | None = Field(None, alias="noProductsMessage")
-    """
-    A string field
-    """
-    showing_text: str = Field(..., alias="showingText")
-    """
-    A string field
-    """
-    page_text: str = Field(..., alias="pageText")
-    """
-    A string field
-    """
-    filter_label: str = Field(..., alias="filterLabel")
-    """
-    A string field
-    """
-    all_categories_label: str = Field(..., alias="allCategoriesLabel")
-    """
-    A string field
-    """
-    results_count_template: str = Field(..., alias="resultsCountTemplate")
-    """
-    A string field
-    """
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -8010,9 +9061,25 @@ class Data19(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    product_categories: list[ApiProductCategoryProductCategoryDocument] | None = Field(None, alias="productCategories")
+    header: ElementsHeaderEntry
     """
-    A relational field
+    A component field
+    """
+    products_filter: FiltersProductsFilterEntry = Field(..., alias="productsFilter")
+    """
+    A component field
+    """
+    products_sorter: SortersProductsSorterEntry = Field(..., alias="productsSorter")
+    """
+    A component field
+    """
+    related_products_section_header: ElementsHeaderEntry = Field(..., alias="relatedProductsSectionHeader")
+    """
+    A component field
+    """
+    pagination: CallToActionsPaginationCtaEntry
+    """
+    A component field
     """
     seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
@@ -8033,526 +9100,6 @@ class ProductCategoriesPageGetResponse(BaseModel):
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
-    """
-
-
-class Data20(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    slug: str
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsLabelEntry
-    """
-    A component field
-    """
-    image: PluginUploadFileDocument
-    """
-    A media field
-    """
-    products: list[ApiProductProductDocument] | None = None
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ProductCategoriesSlugSlugGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data20
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Data21(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    slug: str
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsLabelEntry
-    """
-    A component field
-    """
-    image: PluginUploadFileDocument
-    """
-    A media field
-    """
-    products: list[ApiProductProductDocument] | None = None
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ProductCategoriesIdGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data21
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Datum7(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    tag_id: str = Field(..., alias="tagId")
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    tag: ElementsLabelEntry
-    """
-    A component field
-    """
-    products: list[ApiProductProductDocument] | None = None
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ProductTagsGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: list[Datum7]
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Data22(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    tag_id: str = Field(..., alias="tagId")
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    tag: ElementsLabelEntry
-    """
-    A component field
-    """
-    products: list[ApiProductProductDocument] | None = None
-    """
-    A relational field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ProductTagsIdGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data22
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Datum8(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    slug: str
-    """
-    A UID field
-    """
-    price: float
-    """
-    A decimal field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsTextBlockEntry
-    """
-    A component field
-    """
-    images: list[PluginUploadFileDocument]
-    """
-    A media field
-    """
-    affiliate_button: ElementsButtonEntry = Field(..., alias="affiliateButton")
-    """
-    A component field
-    """
-    currency: ApiCurrencyCurrencyDocument | None = None
-    """
-    A relational field
-    """
-    category: ApiProductCategoryProductCategoryDocument | None = None
-    """
-    A relational field
-    """
-    tags: list[ApiProductTagProductTagDocument] | None = None
-    """
-    A relational field
-    """
-    view_details_label: ElementsLabelEntry = Field(..., alias="viewDetailsLabel")
-    """
-    A component field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ProductsGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: list[Datum8]
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Data23(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    slug: str
-    """
-    A UID field
-    """
-    price: float
-    """
-    A decimal field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsTextBlockEntry
-    """
-    A component field
-    """
-    images: list[PluginUploadFileDocument]
-    """
-    A media field
-    """
-    affiliate_button: ElementsButtonEntry = Field(..., alias="affiliateButton")
-    """
-    A component field
-    """
-    currency: ApiCurrencyCurrencyDocument | None = None
-    """
-    A relational field
-    """
-    category: ApiProductCategoryProductCategoryDocument | None = None
-    """
-    A relational field
-    """
-    tags: list[ApiProductTagProductTagDocument] | None = None
-    """
-    A relational field
-    """
-    view_details_label: ElementsLabelEntry = Field(..., alias="viewDetailsLabel")
-    """
-    A component field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ProductsSlugSlugGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data23
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Data24(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    slug: str
-    """
-    A UID field
-    """
-    price: float
-    """
-    A decimal field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsTextBlockEntry
-    """
-    A component field
-    """
-    images: list[PluginUploadFileDocument]
-    """
-    A media field
-    """
-    affiliate_button: ElementsButtonEntry = Field(..., alias="affiliateButton")
-    """
-    A component field
-    """
-    currency: ApiCurrencyCurrencyDocument | None = None
-    """
-    A relational field
-    """
-    category: ApiProductCategoryProductCategoryDocument | None = None
-    """
-    A relational field
-    """
-    tags: list[ApiProductTagProductTagDocument] | None = None
-    """
-    A relational field
-    """
-    view_details_label: ElementsLabelEntry = Field(..., alias="viewDetailsLabel")
-    """
-    A component field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ProductsIdGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data24
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Sections9(SectionsBlogTeaserEntry):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-    field__component: Literal["sections.blog-teaser"] = Field(..., alias="__component")
-    """
-    Component type discriminator
-    """
-
-
-class Sections8(SectionsCategoryGridEntry):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-    field__component: Literal["sections.category-grid"] = Field(..., alias="__component")
-    """
-    Component type discriminator
     """
 
 
@@ -8594,6 +9141,56 @@ class Sections(
     ) = Field(..., discriminator="field__component")
 
 
+class ApiAboutAboutDocument(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    sections: list[Sections]
+    """
+    A dynamic zone field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class Sections18(SectionsFeaturedProductsEntry):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    field__component: Literal["sections.featured-products"] = Field(..., alias="__component")
+    """
+    Component type discriminator
+    """
+
+
 class Sections11(
     RootModel[
         Sections12
@@ -8602,9 +9199,9 @@ class Sections11(
         | Sections15
         | Sections16
         | Sections17
-        | Sections7
-        | Sections8
-        | Sections9
+        | Sections18
+        | Sections19
+        | Sections20
         | Sections21
     ]
 ):
@@ -8615,76 +9212,48 @@ class Sections11(
         | Sections15
         | Sections16
         | Sections17
-        | Sections7
-        | Sections8
-        | Sections9
+        | Sections18
+        | Sections19
+        | Sections20
         | Sections21
     ) = Field(..., discriminator="field__component")
 
 
-class Sections22(
-    RootModel[
-        Sections23
-        | Sections24
-        | Sections25
-        | Sections26
-        | Sections27
-        | Sections28
-        | Sections7
-        | Sections8
-        | Sections9
-        | Sections32
-    ]
-):
-    root: (
-        Sections23
-        | Sections24
-        | Sections25
-        | Sections26
-        | Sections27
-        | Sections28
-        | Sections7
-        | Sections8
-        | Sections9
-        | Sections32
-    ) = Field(..., discriminator="field__component")
-
-
-class Sections33(
-    RootModel[
-        Sections34
-        | Sections35
-        | Sections36
-        | Sections37
-        | Sections38
-        | Sections39
-        | Sections7
-        | Sections8
-        | Sections9
-        | Sections43
-    ]
-):
-    root: (
-        Sections34
-        | Sections35
-        | Sections36
-        | Sections37
-        | Sections38
-        | Sections39
-        | Sections7
-        | Sections8
-        | Sections9
-        | Sections43
-    ) = Field(..., discriminator="field__component")
-
-
-ApiAboutAboutDocument.model_rebuild()
-ApiContributorRoleContributorRoleDocument.model_rebuild()
-ApiContributorContributorDocument.model_rebuild()
-ApiBlogPostBlogPostDocument.model_rebuild()
-ApiHomepageHomepageDocument.model_rebuild()
-MenusProductCategoriesSelectorEntry.model_rebuild()
-ApiProductTagProductTagDocument.model_rebuild()
-ApiProductProductDocument.model_rebuild()
-Data.model_rebuild()
-Data16.model_rebuild()
+class ApiHomepageHomepageDocument(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    sections: list[Sections11]
+    """
+    A dynamic zone field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """

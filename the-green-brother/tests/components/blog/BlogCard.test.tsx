@@ -12,7 +12,6 @@ import {
   DirectionEnum,
   IconPositionEnum,
   type ApiBlogPostBlogPostDocument,
-  type ApiContributorContributorDocument,
 } from '@/lib/generated/types.gen'
 
 // Mock next/image
@@ -134,7 +133,8 @@ describe('BlogCard', () => {
   const mockAuthor = {
     documentId: 'author-1',
     id: 1,
-    name: 'John Doe',
+    firstName: 'John',
+    lastName: 'Doe',
     slug: 'john-doe',
     bio: 'A test author',
     email: 'john@example.com',
@@ -150,6 +150,11 @@ describe('BlogCard', () => {
       publishedAt: '2024-01-01',
     },
     publishedAt: '2025-01-01',
+    roles: [],
+    seoMetadata: {
+      metaTitle: 'John Doe',
+      metaDescription: 'Author bio for John Doe',
+    },
   }
 
   const createMockPost = (overrides?: Partial<ApiBlogPostBlogPostDocument>): ApiBlogPostBlogPostDocument =>
@@ -205,10 +210,22 @@ describe('BlogCard', () => {
           },
         },
       ],
-      contributor: mockAuthor,
+      author: mockAuthor,
       seoMetadata: {
         metaTitle: 'Test Post Title',
         metaDescription: 'Test post description',
+        metaImage: {
+          documentId: 'img-1',
+          id: 1,
+          name: 'test-image.webp',
+          alternativeText: 'Test image alt',
+          url: '/uploads/test-image.webp',
+          hash: 'test_abc',
+          mime: 'image/webp',
+          size: 80,
+          provider: 'local',
+          publishedAt: '2025-01-15',
+        },
       },
       readArticleLabel: {
         text: 'Read Article',
@@ -235,14 +252,6 @@ describe('BlogCard', () => {
       iconPosition: IconPositionEnum.BEFORE_TEXT,
       ariaDescription: 'minutes read',
     },
-    defaultContributor: {
-      documentId: 'def-1',
-      id: 2,
-      name: 'Default User',
-      slug: 'default-user',
-      bio: 'Default bio',
-      publishedAt: '2024-01-01',
-    } as ApiContributorContributorDocument,
   }
 
   it('should render with blog variant and lg size', () => {
@@ -298,14 +307,7 @@ describe('BlogCard', () => {
     expect(metadataText).toHaveTextContent('John Doe • 5 min read')
   })
 
-  it('should render default contributor when contributor is missing', () => {
-    const { contributor: _contributor, ...basePost } = createMockPost()
-    const postWithoutContributor = basePost as ApiBlogPostBlogPostDocument
-    render(<BlogCard {...defaultProps} post={postWithoutContributor} />)
-
-    expect(screen.getByText(/Default User/)).toBeInTheDocument()
-    expect(screen.getByText(/5 min read/)).toBeInTheDocument()
-  })
+  // Test case removed as fallback logic is removed
 
   it('should render read article button', () => {
     render(<BlogCard {...defaultProps} asLink={false} />)
@@ -341,16 +343,6 @@ describe('BlogCard', () => {
     expect(image).toHaveAttribute('alt', 'Test image alt')
   })
 
-  it('should handle missing content header gracefully', () => {
-    const { content: _content, ...basePost } = createMockPost()
-    const postWithoutContent = basePost as ApiBlogPostBlogPostDocument
-    render(<BlogCard {...defaultProps} post={postWithoutContent} />)
-
-    // Should render without crashing
-    expect(screen.getByTestId('mock-card')).toBeInTheDocument()
-    expect(screen.queryByTestId('mock-header')).not.toBeInTheDocument()
-  })
-
   it('should render with RTL direction', () => {
     render(<BlogCard {...defaultProps} direction={DirectionEnum.RTL} asLink={false} />)
 
@@ -367,13 +359,13 @@ describe('BlogCard', () => {
     expect(image).toHaveAttribute('src', '/images/placeholder.svg')
   })
 
-  it('should handle contributor without name property', () => {
-    const postWithEmptyContributor = createMockPost({
-      contributor: { ...mockAuthor, name: '' },
+  it('should handle author without name property', () => {
+    const postWithEmptyAuthor = createMockPost({
+      author: { ...mockAuthor, firstName: '', lastName: '' },
     })
-    render(<BlogCard {...defaultProps} post={postWithEmptyContributor} />)
+    render(<BlogCard {...defaultProps} post={postWithEmptyAuthor} />)
 
-    // Should not render the contributor section if name is empty (depends on exact logic)
+    // Should not render the author section if name is empty (depends on exact logic)
     expect(screen.queryByText('John Doe')).not.toBeInTheDocument()
   })
   it('should handle readArticleLabel without icon', () => {

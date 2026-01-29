@@ -154,19 +154,22 @@ jest.mock('@/components/elements', () => ({
 // Mock ContributorCard
 jest.mock('@/components/elements/ContributorCard', () => ({
   ContributorCard: function MockContributorCard({ member }: { member: any }) {
+    const fullName = member?.lastName ? `${member.firstName} ${member.lastName}` : (member?.firstName ?? '')
     return (
       <div data-testid="contributor-card">
-        <div>{member.name}</div>
+        <div>{fullName}</div>
         <div>{member.roles?.[0]?.name}</div>
         <div>{member.bio}</div>
         {member.profilePicture ? (
           <img data-testid="mock-image" src={member.profilePicture.url} alt={member.profilePicture.alternativeText} />
         ) : (
           <div>
-            {member.name
-              .split(' ')
-              .map((n: string) => n[0])
-              .join('')}
+            {fullName
+              ? fullName
+                  .split(' ')
+                  .map((n: string) => n[0])
+                  .join('')
+              : ''}
           </div>
         )}
         {member.twitter && <a href={`https://x.com/${member.twitter}`}>John Doe on X</a>}
@@ -182,7 +185,8 @@ describe('TeamSection', () => {
   const mockContributor = {
     documentId: 'member-1',
     id: 1,
-    name: 'John Doe',
+    firstName: 'John',
+    lastName: 'Doe',
     slug: 'john-doe',
     roles: [
       {
@@ -298,7 +302,8 @@ describe('TeamSection', () => {
     const memberWithoutSocials = {
       documentId: 'member-1',
       id: 1,
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       slug: 'john-doe',
       roles: [{ documentId: 'role-1', id: 1, roleId: 'ceo', name: 'CEO', publishedAt: '2025-01-01' }],
       bio: 'A passionate leader focused on sustainability.',
@@ -329,21 +334,24 @@ describe('TeamSection', () => {
         ...mockContributor,
         documentId: 'member-2',
         id: 2,
-        name: 'Jane Smith',
+        firstName: 'Jane',
+        lastName: 'Smith',
         roles: [{ documentId: 'role-2', id: 2, roleId: 'cto', name: 'CTO', publishedAt: '2025-01-01' }],
       },
       {
         ...mockContributor,
         documentId: 'member-3',
         id: 3,
-        name: 'Bob Jones',
+        firstName: 'Bob',
+        lastName: 'Jones',
         roles: [{ documentId: 'role-3', id: 3, roleId: 'dev', name: 'Dev', publishedAt: '2025-01-01' }],
       },
       {
         ...mockContributor,
         documentId: 'member-4',
         id: 4,
-        name: 'Sarah Connor',
+        firstName: 'Sarah',
+        lastName: 'Connor',
         roles: [{ documentId: 'role-4', id: 4, roleId: 'manager', name: 'Manager', publishedAt: '2025-01-01' }],
       },
     ] as unknown as TeamSectionProps['contributors']
@@ -457,8 +465,9 @@ describe('TeamSection', () => {
     expect(screen.getByText('CEO, Founder & Artist')).toBeInTheDocument()
   })
 
-  it('should exclude author role from display', () => {
-    const contributorWithAuthorRole = {
+  it('should display only roles provided (filtering happens in page component)', () => {
+    // Note: Role filtering (excluding author/seller) happens in page component before passing to TeamSection
+    const contributorWithFilteredRoles = {
       ...mockContributor,
       roles: [
         {
@@ -468,20 +477,14 @@ describe('TeamSection', () => {
           name: 'CEO',
           publishedAt: '2025-01-01',
         },
-        {
-          documentId: 'role-2',
-          id: 2,
-          roleId: 'author',
-          name: 'Author',
-          publishedAt: '2025-01-01',
-        },
+        // Author role already filtered out by about/page.tsx
       ],
     }
-    const contributorsWithAuthor = [contributorWithAuthorRole] as unknown as TeamSectionProps['contributors']
+    const contributorsFiltered = [contributorWithFilteredRoles] as unknown as TeamSectionProps['contributors']
 
-    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributorsWithAuthor} />)
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributorsFiltered} />)
 
-    // Should only show "CEO", not "CEO & Author"
+    // Should only show "CEO" (author role was filtered by page component before passing to TeamSection)
     expect(screen.getByText('CEO')).toBeInTheDocument()
     expect(screen.queryByText('CEO & Author')).not.toBeInTheDocument()
     expect(screen.queryByText('Author')).not.toBeInTheDocument()

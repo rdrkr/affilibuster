@@ -44,13 +44,15 @@ export default function StyleGuideClient(): React.ReactElement {
       iconPosition: IconPositionEnum.AFTER_TEXT,
       ariaDescription: 'Read full article',
     },
-    defaultContributor: {
+    mockAuthor: {
       documentId: 'mock-contributor',
       id: 0,
-      name: 'The Green Brother',
+      firstName: 'The Green',
+      lastName: 'Brother',
       slug: 'the-green-brother',
       bio: 'Eco enthusiast',
       publishedAt: new Date().toISOString(),
+      roles: [],
     },
   }
   return (
@@ -1198,6 +1200,10 @@ export default function StyleGuideClient(): React.ReactElement {
                                           iconPosition: IconPositionEnum.BEFORE_TEXT,
                                           ariaDescription: 'Tag',
                                         },
+                                        seoMetadata: {
+                                          metaTitle: 'Guide',
+                                          metaDescription: 'Guide tag',
+                                        },
                                       },
                                     ],
                                     content: {
@@ -1221,7 +1227,7 @@ export default function StyleGuideClient(): React.ReactElement {
                                       iconPosition: IconPositionEnum.AFTER_TEXT,
                                       ariaDescription: 'Read article',
                                     },
-                                    contributor: mockLabels.defaultContributor,
+                                    contributor: mockLabels.mockAuthor,
                                   } as unknown as ApiBlogPostBlogPostDocument
                                 }
                               />
@@ -1282,7 +1288,13 @@ export default function StyleGuideClient(): React.ReactElement {
                                     documentId: `prod-${layout}-${width}-${size}`,
                                     slug: `prod-${layout}-${width}-${size}`,
                                     name: 'Eco Product',
-                                    price: 29.99,
+                                    prices: [
+                                      {
+                                        id: 1,
+                                        amount: 29.99,
+                                        currency: { symbol: '$', code: 'USD' },
+                                      },
+                                    ],
                                     publishedAt: '2025-01-01',
                                     images: [
                                       {
@@ -1302,19 +1314,23 @@ export default function StyleGuideClient(): React.ReactElement {
                                         },
                                       },
                                     ],
-                                    content: {
+                                    header: {
                                       header: {
-                                        header: {
-                                          text: 'Eco Bottle',
-                                          iconPosition: IconPositionEnum.BEFORE_TEXT,
-                                        },
+                                        text: 'Eco Bottle',
+                                        iconPosition: IconPositionEnum.BEFORE_TEXT,
                                       },
-                                    } as unknown as ApiProductProductDocument['content'],
+                                    },
                                     viewDetailsLabel: {
                                       text: 'View',
                                       iconPosition: IconPositionEnum.AFTER_TEXT,
                                     },
-                                    currency: { symbol: '$' },
+                                    seoMetadata: {
+                                      metaTitle: 'Eco Product',
+                                      metaDescription: 'Eco Product description',
+                                    },
+                                    seller: {
+                                      documentId: 'seller-1',
+                                    },
                                   } as unknown as ApiProductProductDocument
                                 }
                               />
@@ -1365,22 +1381,25 @@ export default function StyleGuideClient(): React.ReactElement {
                     {(
                       [
                         {
-                          ...mockLabels.defaultContributor,
-                          name: 'Sarah Green',
+                          ...mockLabels.mockAuthor,
+                          firstName: 'Sarah',
+                          lastName: 'Green',
                           bio: 'Passionate about sustainable living and eco-friendly products.',
                           roles: [{ documentId: 'role-1', id: 1, name: 'Founder', roleId: 1, publishedAt: '' }],
                         },
                         {
-                          ...mockLabels.defaultContributor,
+                          ...mockLabels.mockAuthor,
                           documentId: 'contributor-2',
-                          name: 'Mike Rivers',
+                          firstName: 'Mike',
+                          lastName: 'Rivers',
                           bio: 'Expert in renewable energy and green technology solutions.',
                           roles: [{ documentId: 'role-2', id: 2, name: 'CTO', roleId: 2, publishedAt: '' }],
                         },
                         {
-                          ...mockLabels.defaultContributor,
+                          ...mockLabels.mockAuthor,
                           documentId: 'contributor-3',
-                          name: 'Emma Woods',
+                          firstName: 'Emma',
+                          lastName: 'Woods',
                           bio: 'Dedicated to reducing carbon footprint through innovative design.',
                           roles: [{ documentId: 'role-3', id: 3, name: 'Designer', roleId: 3, publishedAt: '' }],
                         },
@@ -1427,11 +1446,17 @@ export default function StyleGuideClient(): React.ReactElement {
                       width="full"
                       className="border-none! bg-transparent! p-0 shadow-none!"
                       member={{
-                        ...mockLabels.defaultContributor,
-                        name: 'John Doe',
+                        ...mockLabels.mockAuthor,
+                        firstName: 'John',
+                        lastName: 'Doe',
                         bio: 'Environmental journalist with 10+ years covering sustainability topics.',
                         twitter: 'johndoe',
                         linkedin: 'johndoe',
+                        roles: [],
+                        seoMetadata: {
+                          metaTitle: 'John Doe',
+                          metaDescription: 'Author bio',
+                        },
                       }}
                     />
                   </div>
@@ -1475,7 +1500,13 @@ export default function StyleGuideClient(): React.ReactElement {
                                 size={size}
                                 layout={layout}
                                 width={width}
-                                member={mockLabels.defaultContributor}
+                                member={{
+                                  ...mockLabels.mockAuthor,
+                                  seoMetadata: {
+                                    metaTitle: 'John Doe',
+                                    metaDescription: 'Author bio',
+                                  },
+                                }}
                               />
                             </div>
                           ))}
@@ -1577,6 +1608,10 @@ export default function StyleGuideClient(): React.ReactElement {
                           iconPosition: IconPositionEnum.BEFORE_TEXT,
                           ariaDescription: 'Dark theme',
                         },
+                        seoMetadata: {
+                          metaTitle: 'Dark',
+                          metaDescription: 'Dark theme',
+                        },
                       },
                       {
                         id: 2,
@@ -1589,6 +1624,10 @@ export default function StyleGuideClient(): React.ReactElement {
                           iconPosition: IconPositionEnum.BEFORE_TEXT,
                           ariaDescription: 'Light theme',
                         },
+                        seoMetadata: {
+                          metaTitle: 'Light',
+                          metaDescription: 'Light theme',
+                        },
                       },
                       {
                         id: 3,
@@ -1600,6 +1639,10 @@ export default function StyleGuideClient(): React.ReactElement {
                           text: 'System',
                           iconPosition: IconPositionEnum.BEFORE_TEXT,
                           ariaDescription: 'System theme',
+                        },
+                        seoMetadata: {
+                          metaTitle: 'System',
+                          metaDescription: 'System theme',
                         },
                       },
                     ],
@@ -1721,6 +1764,18 @@ export default function StyleGuideClient(): React.ReactElement {
                             iconPosition: IconPositionEnum.BEFORE_TEXT,
                             ariaDescription: 'Home and garden products',
                           },
+                          image: {
+                            documentId: 'img-1',
+                            id: 1,
+                            name: 'home-garden.jpg',
+                            hash: 'home_garden_123',
+                            mime: 'image/jpeg',
+                            size: 100,
+                            url: '/uploads/home-garden.jpg',
+                            provider: 'local',
+                            publishedAt: new Date().toISOString(),
+                          },
+                          seoMetadata: { metaTitle: 'Home', metaDescription: 'Home' },
                         },
                         {
                           id: 2,
@@ -1733,6 +1788,18 @@ export default function StyleGuideClient(): React.ReactElement {
                             iconPosition: IconPositionEnum.BEFORE_TEXT,
                             ariaDescription: 'Personal care products',
                           },
+                          image: {
+                            documentId: 'img-2',
+                            id: 2,
+                            name: 'personal-care.jpg',
+                            hash: 'personal_care_123',
+                            mime: 'image/jpeg',
+                            size: 100,
+                            url: '/uploads/personal-care.jpg',
+                            provider: 'local',
+                            publishedAt: new Date().toISOString(),
+                          },
+                          seoMetadata: { metaTitle: 'Personal Care', metaDescription: 'Personal Care' },
                         },
                         {
                           id: 3,
@@ -1745,6 +1812,18 @@ export default function StyleGuideClient(): React.ReactElement {
                             iconPosition: IconPositionEnum.BEFORE_TEXT,
                             ariaDescription: 'Kitchen products',
                           },
+                          image: {
+                            documentId: 'img-3',
+                            id: 3,
+                            name: 'kitchen.jpg',
+                            hash: 'kitchen_123',
+                            mime: 'image/jpeg',
+                            size: 100,
+                            url: '/uploads/kitchen.jpg',
+                            provider: 'local',
+                            publishedAt: new Date().toISOString(),
+                          },
+                          seoMetadata: { metaTitle: 'Kitchen', metaDescription: 'Kitchen' },
                         },
                         {
                           id: 4,
@@ -1757,6 +1836,18 @@ export default function StyleGuideClient(): React.ReactElement {
                             iconPosition: IconPositionEnum.BEFORE_TEXT,
                             ariaDescription: 'Outdoor products',
                           },
+                          image: {
+                            documentId: 'img-4',
+                            id: 4,
+                            name: 'outdoor.jpg',
+                            hash: 'outdoor_123',
+                            mime: 'image/jpeg',
+                            size: 100,
+                            url: '/uploads/outdoor.jpg',
+                            provider: 'local',
+                            publishedAt: new Date().toISOString(),
+                          },
+                          seoMetadata: { metaTitle: 'Outdoor', metaDescription: 'Outdoor' },
                         },
                       ],
                     }}

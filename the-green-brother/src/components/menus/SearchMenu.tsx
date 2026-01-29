@@ -11,9 +11,11 @@
 
 import NextImage from 'next/image'
 import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { ButtonAction, ButtonLink, Icon, Text } from '@/components/elements'
+import { ButtonAction, Icon, Text } from '@/components/elements'
+import { Carousel } from '@/components/layout'
 import { useScrollToClose } from '@/hooks/useScrollToClose'
 import { DirectionEnum, IconPositionEnum, type MenusSearchMenuEntry } from '@/lib/generated/types.gen'
 import { THRESHOLDS } from '@/lib/navigation'
@@ -45,6 +47,8 @@ export interface SearchMenuProps {
  * @returns Search menu component
  */
 export function SearchMenu({ data, onExpandChange, showText, direction, navWidth }: SearchMenuProps) {
+  const router = useRouter()
+  const pathname = usePathname()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -68,6 +72,29 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
       }, 300)
     }, 300)
   }, [onExpandChange])
+
+  /**
+   * Handle search submission - navigates to products page with search param.
+   * Resets category filter to "all" when search is initiated.
+   */
+  const handleSearch = useCallback(() => {
+    if (!searchQuery.trim()) return
+
+    // Build URL with search param only (reset category filter to "all")
+    const params = new URLSearchParams()
+    params.set('search', searchQuery.trim())
+
+    // Extract language segment from current pathname (e.g., /en/products -> en)
+    const langRegex = /^\/([a-z]{2})\/?/
+    const langMatch = langRegex.exec(pathname)
+    const lang = langMatch?.[1] ?? 'en'
+
+    router.push(`/${lang}/products?${params.toString()}`)
+
+    // Clear the search input after navigation
+    setSearchQuery('')
+    safeCloseSearch()
+  }, [searchQuery, router, safeCloseSearch, pathname])
 
   useScrollToClose(showDropdown, () => {
     safeCloseSearch()
@@ -251,6 +278,11 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
             onChange={e => {
               setSearchQuery(e.target.value)
             }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                handleSearch()
+              }
+            }}
             onBlur={() => {
               setTimeout(() => {
                 if (!searchQuery && searchRef.current && !searchRef.current.matches(':hover')) {
@@ -291,7 +323,7 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
                 uppercase dark:text-text-secondary-dark
               `}
               />
-              <div className="flex flex-wrap gap-2">
+              <Carousel direction={direction} gap="sm">
                 {recentSearches.map(term => (
                   <ButtonAction
                     key={term}
@@ -300,7 +332,7 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
                       url: '',
                       openInNewTab: false,
                     }}
-                    direction={DirectionEnum.LTR}
+                    direction={direction}
                     showText={true}
                     variant="ghost-3"
                     iconSize="sm"
@@ -310,7 +342,7 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
                     }}
                   />
                 ))}
-              </div>
+              </Carousel>
             </div>
             <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
               <h4
@@ -393,18 +425,19 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
               ))}
             </ul>
 
-            <ButtonLink
-              data={{ ...data.viewAllResultsButton, url: '/products' }}
+            <ButtonAction
+              data={{ ...data.viewAllResultsButton, url: '' }}
               direction={direction}
               showText={true}
               variant="link-1"
               iconSize="sm"
               size="sm"
               className={`mt-2 block truncate p-2`}
-              noAnimation
+              onClick={handleSearch}
+              data-testid="view-all-results-button"
             >
               &quot;{searchQuery.length > 8 ? searchQuery.slice(0, 8) + '...' : searchQuery}&quot;
-            </ButtonLink>
+            </ButtonAction>
           </div>
         )}
       </Dropdown>

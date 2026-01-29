@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 // Import getContributors
-import { getAbout, getContributors } from '@/lib/client'
+import { getAbout, getTeamMembers } from '@/lib/client'
 import { CodeEnum } from '@/lib/generated/types.gen'
 import AboutClient from './AboutClient'
 
@@ -17,21 +17,8 @@ export default async function AboutPage({ params }: { params: Promise<{ lang: Co
   const resolvedParams = await params
   const lang = resolvedParams.lang
 
-  // Fetch about page content and contributors
-  // Filter out contributors that only have the "author" role (keep team members)
-  const [aboutData, contributors] = await Promise.all([
-    getAbout(lang),
-    getContributors({
-      locale: lang,
-      filters: {
-        roles: {
-          roleId: {
-            $nei: 'author',
-          },
-        },
-      },
-    }),
-  ])
+  // Fetch about page content and team members
+  const [aboutData, teamMembers] = await Promise.all([getAbout(lang), getTeamMembers(lang)])
 
-  return <AboutClient aboutData={aboutData} contributors={contributors ?? []} />
+  return <AboutClient aboutData={aboutData} contributors={teamMembers} />
 }

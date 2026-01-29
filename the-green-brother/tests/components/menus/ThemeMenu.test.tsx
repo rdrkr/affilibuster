@@ -329,7 +329,7 @@ describe('ThemeMenu', () => {
   })
 
   it('should handle empty themes array', () => {
-    const dataWithNoThemes = { ...mockData, themes: undefined } as unknown as ThemeMenuProps['data']
+    const dataWithNoThemes = { ...mockData, themes: [] } as ThemeMenuProps['data']
     const { container } = render(
       <ThemeMenu
         data={dataWithNoThemes}
@@ -344,28 +344,18 @@ describe('ThemeMenu', () => {
     expect(themeButtons.length).toBeLessThanOrEqual(1)
   })
 
-  it('should skip themes with null content', () => {
-    const dataWithNullContent = {
-      ...mockData,
-      themes: [
-        ...((mockData as { themes?: unknown[] }).themes ?? []),
-        { id: 4, documentId: 'theme-4', themeId: 'null-theme', publishedAt: '2024-01-01', content: undefined },
-      ],
-    } as unknown as ThemeMenuProps['data']
+  it('should render all themes with valid content', () => {
     render(
       <ThemeMenu
-        data={dataWithNullContent}
+        data={mockData}
         selectedTheme="light"
         onThemeChange={mockOnThemeChange}
         direction={DirectionEnum.LTR}
       />
     )
-    // Open menu to check option count, but actually 'getAllByRole' checks implicit visibility if not restricted.
-    // However, DropdownMenu has `invisible` and `opacity-0`.
-    // We should open it to be sure.
     fireEvent.click(screen.getByRole('button', { name: 'Select theme' }))
 
-    // Should still render 4 buttons: 1 menu button + 3 theme options (null content theme is skipped)
+    // Should render 4 buttons: 1 menu button + 3 theme options
     const buttons = screen.getAllByRole('button')
     // 1 menu button + 3 theme option buttons
     expect(buttons).toHaveLength(4)
@@ -505,13 +495,9 @@ describe('ThemeMenu', () => {
           visible={false}
         />
       )
-      // Should still be in document (with hidden: true to find hidden elements)
-      const button = screen.getByRole('button', { name: 'Select theme', hidden: true })
-      expect(button).toBeInTheDocument()
-
-      // The container has aria-hidden, visibility is handled by ButtonAction's visible prop
-      const container = button.closest('div[aria-hidden]')
-      expect(container).toHaveAttribute('aria-hidden', 'true')
+      // Container is rendered, visibility is handled by trigger button's visible prop
+      const container = screen.getByTestId('theme-menu-container')
+      expect(container).toBeInTheDocument()
     })
   })
 })

@@ -1,6 +1,6 @@
 openapi: 3.1.0
 x-powered-by: strapi
-x-strapi-version: 5.33.4
+x-strapi-version: 5.35.0
 info:
   title: affilibuster-cms
   description: API documentation for affilibuster-cms v0.1.0
@@ -9,7 +9,6 @@ info:
     name: Proprietary
     url: https://thegreenbrother.com/license
 paths:
-  /: {}
   /about:
     get:
       operationId: about/get/about
@@ -768,9 +767,6 @@ paths:
                       aboutAuthorHeader:
                         description: A component field
                         $ref: '#/components/schemas/ElementsHeaderEntry'
-                      defaultContributor:
-                        description: A relational field
-                        $ref: '#/components/schemas/ApiContributorContributorDocument'
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -1087,11 +1083,6 @@ paths:
                         tag:
                           description: A component field
                           $ref: '#/components/schemas/ElementsLabelEntry'
-                        posts:
-                          description: A relational field
-                          type: array
-                          items:
-                            $ref: '#/components/schemas/ApiBlogPostBlogPostDocument'
                         seoMetadata:
                           description: A component field
                           $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -1351,11 +1342,6 @@ paths:
                       tag:
                         description: A component field
                         $ref: '#/components/schemas/ElementsLabelEntry'
-                      posts:
-                        description: A relational field
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ApiBlogPostBlogPostDocument'
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -1693,7 +1679,7 @@ paths:
                         featuredImage:
                           description: A media field
                           $ref: '#/components/schemas/PluginUploadFileDocument'
-                        contributor:
+                        author:
                           description: A relational field
                           $ref: '#/components/schemas/ApiContributorContributorDocument'
                         tags:
@@ -1748,6 +1734,8 @@ paths:
                         - publishedAt
                         - content
                         - featuredImage
+                        - author
+                        - tags
                         - seoMetadata
                       additionalProperties: false
                   meta:
@@ -1986,7 +1974,7 @@ paths:
                       featuredImage:
                         description: A media field
                         $ref: '#/components/schemas/PluginUploadFileDocument'
-                      contributor:
+                      author:
                         description: A relational field
                         $ref: '#/components/schemas/ApiContributorContributorDocument'
                       tags:
@@ -2041,6 +2029,8 @@ paths:
                       - publishedAt
                       - content
                       - featuredImage
+                      - author
+                      - tags
                       - seoMetadata
                     additionalProperties: false
                   meta:
@@ -2280,7 +2270,7 @@ paths:
                       featuredImage:
                         description: A media field
                         $ref: '#/components/schemas/PluginUploadFileDocument'
-                      contributor:
+                      author:
                         description: A relational field
                         $ref: '#/components/schemas/ApiContributorContributorDocument'
                       tags:
@@ -2335,6 +2325,8 @@ paths:
                       - publishedAt
                       - content
                       - featuredImage
+                      - author
+                      - tags
                       - seoMetadata
                     additionalProperties: false
                   meta:
@@ -2851,11 +2843,6 @@ paths:
                           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
                           type: string
                           example: en
-                        contributors:
-                          description: A relational field
-                          type: array
-                          items:
-                            $ref: '#/components/schemas/ApiContributorContributorDocument'
                         localizations:
                           description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
                           readOnly: true
@@ -3117,11 +3104,6 @@ paths:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
                         type: string
                         example: en
-                      contributors:
-                        description: A relational field
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ApiContributorContributorDocument'
                       localizations:
                         description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
                         readOnly: true
@@ -3199,8 +3181,9 @@ paths:
             items:
               type: string
               enum:
-                - name
                 - slug
+                - firstName
+                - lastName
                 - bio
                 - email
                 - website
@@ -3213,9 +3196,9 @@ paths:
                 - publishedAt
                 - locale
             example:
-              - name
               - slug
-              - bio
+              - firstName
+              - lastName
           x-strapi-serialize: querystring
           description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
         - name: filters
@@ -3231,11 +3214,12 @@ paths:
                 - bio
                 - createdAt
                 - email
+                - firstName
                 - github
                 - instagram
+                - lastName
                 - linkedin
                 - locale
-                - name
                 - publishedAt
                 - roles
                 - slug
@@ -3313,8 +3297,9 @@ paths:
             anyOf:
               - type: string
                 enum:
-                  - name
                   - slug
+                  - firstName
+                  - lastName
                   - bio
                   - email
                   - website
@@ -3330,8 +3315,9 @@ paths:
                 items:
                   type: string
                   enum:
-                    - name
                     - slug
+                    - firstName
+                    - lastName
                     - bio
                     - email
                     - website
@@ -3347,8 +3333,9 @@ paths:
                 propertyNames:
                   type: string
                   enum:
-                    - name
                     - slug
+                    - firstName
+                    - lastName
                     - bio
                     - email
                     - website
@@ -3371,8 +3358,9 @@ paths:
                   propertyNames:
                     type: string
                     enum:
-                      - name
                       - slug
+                      - firstName
+                      - lastName
                       - bio
                       - email
                       - website
@@ -3389,7 +3377,7 @@ paths:
                     enum:
                       - asc
                       - desc
-            example: name
+            example: slug
           x-strapi-serialize: querystring
           description: Sort the result set by one or more fields. Use field name for ascending order or prefix with "-" for descending (e.g., "-createdAt"). Supports multiple sort criteria.
         - name: locale
@@ -3458,11 +3446,14 @@ paths:
                           anyOf:
                             - type: string
                             - type: number
-                        name:
-                          description: A string field
-                          type: string
                         slug:
                           description: A UID field
+                          type: string
+                        firstName:
+                          description: A string field
+                          type: string
+                        lastName:
+                          description: A string field
                           type: string
                         bio:
                           description: A richtext field
@@ -3511,11 +3502,6 @@ paths:
                           type: array
                           items:
                             $ref: '#/components/schemas/ApiContributorRoleContributorRoleDocument'
-                        blogPosts:
-                          description: A relational field
-                          type: array
-                          items:
-                            $ref: '#/components/schemas/ApiBlogPostBlogPostDocument'
                         seoMetadata:
                           description: A component field
                           $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -3557,10 +3543,11 @@ paths:
                       required:
                         - documentId
                         - id
-                        - name
                         - slug
+                        - firstName
                         - bio
                         - publishedAt
+                        - roles
                         - seoMetadata
                       additionalProperties: false
                   meta:
@@ -3604,8 +3591,9 @@ paths:
             items:
               type: string
               enum:
-                - name
                 - slug
+                - firstName
+                - lastName
                 - bio
                 - email
                 - website
@@ -3618,9 +3606,9 @@ paths:
                 - publishedAt
                 - locale
             example:
-              - name
               - slug
-              - bio
+              - firstName
+              - lastName
           x-strapi-serialize: querystring
           description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
         - name: filters
@@ -3633,8 +3621,9 @@ paths:
             propertyNames:
               type: string
               enum:
-                - name
                 - slug
+                - firstName
+                - lastName
                 - bio
                 - email
                 - website
@@ -3658,8 +3647,9 @@ paths:
             anyOf:
               - type: string
                 enum:
-                  - name
                   - slug
+                  - firstName
+                  - lastName
                   - bio
                   - email
                   - website
@@ -3675,8 +3665,9 @@ paths:
                 items:
                   type: string
                   enum:
-                    - name
                     - slug
+                    - firstName
+                    - lastName
                     - bio
                     - email
                     - website
@@ -3692,8 +3683,9 @@ paths:
                 propertyNames:
                   type: string
                   enum:
-                    - name
                     - slug
+                    - firstName
+                    - lastName
                     - bio
                     - email
                     - website
@@ -3716,8 +3708,9 @@ paths:
                   propertyNames:
                     type: string
                     enum:
-                      - name
                       - slug
+                      - firstName
+                      - lastName
                       - bio
                       - email
                       - website
@@ -3734,7 +3727,7 @@ paths:
                     enum:
                       - asc
                       - desc
-            example: name
+            example: slug
           x-strapi-serialize: querystring
           description: Sort the result set by one or more fields. Use field name for ascending order or prefix with "-" for descending (e.g., "-createdAt"). Supports multiple sort criteria.
         - name: locale
@@ -3801,11 +3794,14 @@ paths:
                         anyOf:
                           - type: string
                           - type: number
-                      name:
-                        description: A string field
-                        type: string
                       slug:
                         description: A UID field
+                        type: string
+                      firstName:
+                        description: A string field
+                        type: string
+                      lastName:
+                        description: A string field
                         type: string
                       bio:
                         description: A richtext field
@@ -3854,11 +3850,6 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ApiContributorRoleContributorRoleDocument'
-                      blogPosts:
-                        description: A relational field
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ApiBlogPostBlogPostDocument'
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -3900,10 +3891,11 @@ paths:
                     required:
                       - documentId
                       - id
-                      - name
                       - slug
+                      - firstName
                       - bio
                       - publishedAt
+                      - roles
                       - seoMetadata
                     additionalProperties: false
                   meta:
@@ -3948,8 +3940,9 @@ paths:
             items:
               type: string
               enum:
-                - name
                 - slug
+                - firstName
+                - lastName
                 - bio
                 - email
                 - website
@@ -3962,9 +3955,9 @@ paths:
                 - publishedAt
                 - locale
             example:
-              - name
               - slug
-              - bio
+              - firstName
+              - lastName
           x-strapi-serialize: querystring
           description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
         - name: filters
@@ -3977,8 +3970,9 @@ paths:
             propertyNames:
               type: string
               enum:
-                - name
                 - slug
+                - firstName
+                - lastName
                 - bio
                 - email
                 - website
@@ -4002,8 +3996,9 @@ paths:
             anyOf:
               - type: string
                 enum:
-                  - name
                   - slug
+                  - firstName
+                  - lastName
                   - bio
                   - email
                   - website
@@ -4019,8 +4014,9 @@ paths:
                 items:
                   type: string
                   enum:
-                    - name
                     - slug
+                    - firstName
+                    - lastName
                     - bio
                     - email
                     - website
@@ -4036,8 +4032,9 @@ paths:
                 propertyNames:
                   type: string
                   enum:
-                    - name
                     - slug
+                    - firstName
+                    - lastName
                     - bio
                     - email
                     - website
@@ -4060,8 +4057,9 @@ paths:
                   propertyNames:
                     type: string
                     enum:
-                      - name
                       - slug
+                      - firstName
+                      - lastName
                       - bio
                       - email
                       - website
@@ -4078,7 +4076,7 @@ paths:
                     enum:
                       - asc
                       - desc
-            example: name
+            example: slug
           x-strapi-serialize: querystring
           description: Sort the result set by one or more fields. Use field name for ascending order or prefix with "-" for descending (e.g., "-createdAt"). Supports multiple sort criteria.
         - name: locale
@@ -4145,11 +4143,14 @@ paths:
                         anyOf:
                           - type: string
                           - type: number
-                      name:
-                        description: A string field
-                        type: string
                       slug:
                         description: A UID field
+                        type: string
+                      firstName:
+                        description: A string field
+                        type: string
+                      lastName:
+                        description: A string field
                         type: string
                       bio:
                         description: A richtext field
@@ -4198,11 +4199,6 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ApiContributorRoleContributorRoleDocument'
-                      blogPosts:
-                        description: A relational field
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ApiBlogPostBlogPostDocument'
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -4244,10 +4240,11 @@ paths:
                     required:
                       - documentId
                       - id
-                      - name
                       - slug
+                      - firstName
                       - bio
                       - publishedAt
+                      - roles
                       - seoMetadata
                     additionalProperties: false
                   meta:
@@ -7382,16 +7379,14 @@ paths:
             items:
               type: string
               enum:
-                - lastUpdated
-                - lastUpdatedLabel
                 - createdAt
                 - updatedAt
                 - publishedAt
                 - locale
             example:
-              - lastUpdated
-              - lastUpdatedLabel
               - createdAt
+              - updatedAt
+              - publishedAt
           x-strapi-serialize: querystring
           description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
         - name: filters
@@ -7404,8 +7399,6 @@ paths:
             propertyNames:
               type: string
               enum:
-                - lastUpdated
-                - lastUpdatedLabel
                 - createdAt
                 - updatedAt
                 - publishedAt
@@ -7477,12 +7470,6 @@ paths:
                         anyOf:
                           - type: string
                           - type: number
-                      lastUpdated:
-                        description: A datetime field
-                        type: string
-                      lastUpdatedLabel:
-                        description: A string field
-                        type: string
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -7499,6 +7486,9 @@ paths:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
                         type: string
                         example: en
+                      content:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsTextBlockEntry'
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -7541,6 +7531,7 @@ paths:
                       - documentId
                       - id
                       - publishedAt
+                      - content
                       - seoMetadata
                     additionalProperties: false
                   meta:
@@ -7813,11 +7804,6 @@ paths:
                         image:
                           description: A media field
                           $ref: '#/components/schemas/PluginUploadFileDocument'
-                        products:
-                          description: A relational field
-                          type: array
-                          items:
-                            $ref: '#/components/schemas/ApiProductProductDocument'
                         seoMetadata:
                           description: A component field
                           $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -7900,23 +7886,14 @@ paths:
             items:
               type: string
               enum:
-                - itemsPerPage
-                - previousButton
-                - nextButton
-                - noProductsMessage
-                - showingText
-                - pageText
-                - filterLabel
-                - allCategoriesLabel
-                - resultsCountTemplate
                 - createdAt
                 - updatedAt
                 - publishedAt
                 - locale
             example:
-              - itemsPerPage
-              - previousButton
-              - nextButton
+              - createdAt
+              - updatedAt
+              - publishedAt
           x-strapi-serialize: querystring
           description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
         - name: filters
@@ -7929,15 +7906,6 @@ paths:
             propertyNames:
               type: string
               enum:
-                - itemsPerPage
-                - previousButton
-                - nextButton
-                - noProductsMessage
-                - showingText
-                - pageText
-                - filterLabel
-                - allCategoriesLabel
-                - resultsCountTemplate
                 - createdAt
                 - updatedAt
                 - publishedAt
@@ -8009,41 +7977,6 @@ paths:
                         anyOf:
                           - type: string
                           - type: number
-                      itemsPerPage:
-                        description: An integer field
-                        default: 12
-                        type: integer
-                        minimum: -9007199254740991
-                        maximum: 9007199254740991
-                      previousButton:
-                        description: A string field
-                        type: string
-                      nextButton:
-                        description: A string field
-                        type: string
-                      noProductsMessage:
-                        description: A string field
-                        type: string
-                      showingText:
-                        description: A string field
-                        default: Showing {count} of {total}
-                        type: string
-                      pageText:
-                        description: A string field
-                        default: Page {current} of {total}
-                        type: string
-                      filterLabel:
-                        description: A string field
-                        default: Filter by category
-                        type: string
-                      allCategoriesLabel:
-                        description: A string field
-                        default: All Categories
-                        type: string
-                      resultsCountTemplate:
-                        description: A string field
-                        default: '{count} Products'
-                        type: string
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -8060,11 +7993,21 @@ paths:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
                         type: string
                         example: en
-                      productCategories:
-                        description: A relational field
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ApiProductCategoryProductCategoryDocument'
+                      header:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
+                      productsFilter:
+                        description: A component field
+                        $ref: '#/components/schemas/FiltersProductsFilterEntry'
+                      productsSorter:
+                        description: A component field
+                        $ref: '#/components/schemas/SortersProductsSorterEntry'
+                      relatedProductsSectionHeader:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
+                      pagination:
+                        description: A component field
+                        $ref: '#/components/schemas/CallToActionsPaginationCtaEntry'
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -8106,13 +8049,12 @@ paths:
                     required:
                       - documentId
                       - id
-                      - itemsPerPage
-                      - showingText
-                      - pageText
-                      - filterLabel
-                      - allCategoriesLabel
-                      - resultsCountTemplate
                       - publishedAt
+                      - header
+                      - productsFilter
+                      - productsSorter
+                      - relatedProductsSectionHeader
+                      - pagination
                       - seoMetadata
                     additionalProperties: false
                   meta:
@@ -8330,11 +8272,6 @@ paths:
                       image:
                         description: A media field
                         $ref: '#/components/schemas/PluginUploadFileDocument'
-                      products:
-                        description: A relational field
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ApiProductProductDocument'
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -8598,11 +8535,6 @@ paths:
                       image:
                         description: A media field
                         $ref: '#/components/schemas/PluginUploadFileDocument'
-                      products:
-                        description: A relational field
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ApiProductProductDocument'
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -8670,6 +8602,578 @@ paths:
         - product-category
       summary: Product Category Get Product Categories By Id
       description: Retrieves Product Category content from the CMS. Supports field selection, population, and localization.
+  /product-certificates:
+    get:
+      operationId: product-certificate/get/product_certificates
+      parameters:
+        - name: fields
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+            readOnly: true
+            type: array
+            items:
+              type: string
+              enum:
+                - certificateId
+                - createdAt
+                - updatedAt
+                - publishedAt
+                - locale
+            example:
+              - certificateId
+              - createdAt
+              - updatedAt
+          x-strapi-serialize: querystring
+          description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
+        - name: filters
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filters to apply to the query
+            type: object
+            propertyNames:
+              type: string
+              enum:
+                - certificateId
+                - createdAt
+                - updatedAt
+                - publishedAt
+                - locale
+            additionalProperties: {}
+          x-strapi-serialize: querystring
+          description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
+        - name: _q
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            type: string
+            example: search terms
+          x-strapi-serialize: querystring
+          description: Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
+        - name: pagination
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Pagination parameters
+            allOf:
+              - type: object
+                properties:
+                  withCount:
+                    description: Include total count in response
+                    type: boolean
+                additionalProperties: false
+              - anyOf:
+                  - description: Page-based pagination
+                    type: object
+                    properties:
+                      page:
+                        description: Page number (1-based)
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                      pageSize:
+                        description: Number of entries per page
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                    required:
+                      - page
+                      - pageSize
+                    additionalProperties: false
+                  - description: Offset-based pagination
+                    type: object
+                    properties:
+                      start:
+                        description: Number of entries to skip
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                      limit:
+                        description: Maximum number of entries to return
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                    required:
+                      - start
+                      - limit
+                    additionalProperties: false
+          x-strapi-serialize: querystring
+          description: Control pagination of collection results. Supports both page-based pagination (page/pageSize) and offset-based pagination (start/limit). Optionally include total count with withCount parameter.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Sort the result
+            anyOf:
+              - type: string
+                enum:
+                  - certificateId
+                  - createdAt
+                  - updatedAt
+                  - publishedAt
+                  - locale
+              - type: array
+                items:
+                  type: string
+                  enum:
+                    - certificateId
+                    - createdAt
+                    - updatedAt
+                    - publishedAt
+                    - locale
+              - type: object
+                propertyNames:
+                  type: string
+                  enum:
+                    - certificateId
+                    - createdAt
+                    - updatedAt
+                    - publishedAt
+                    - locale
+                additionalProperties:
+                  type: string
+                  enum:
+                    - asc
+                    - desc
+              - type: array
+                items:
+                  type: object
+                  propertyNames:
+                    type: string
+                    enum:
+                      - certificateId
+                      - createdAt
+                      - updatedAt
+                      - publishedAt
+                      - locale
+                  additionalProperties:
+                    type: string
+                    enum:
+                      - asc
+                      - desc
+            example: certificateId
+          x-strapi-serialize: querystring
+          description: Sort the result set by one or more fields. Use field name for ascending order or prefix with "-" for descending (e.g., "-createdAt"). Supports multiple sort criteria.
+        - name: locale
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Select a locale
+            type: string
+            example: en
+          x-strapi-serialize: querystring
+          description: Select content for a specific locale when using Strapi Internationalization (i18n). Defaults to the default locale if not specified.
+        - name: status
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Fetch documents based on their status. Default to "published" if not specified.
+            type: string
+            enum:
+              - draft
+              - published
+            example: published
+          x-strapi-serialize: querystring
+          description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: customPopulate
+          in: query
+          description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+          required: true
+          schema:
+            type: string
+            default: nested
+        - name: customDepth
+          in: query
+          description: Maximum depth for population (override plugin default)
+          required: false
+          schema:
+            type: integer
+        - name: customIgnored
+          in: query
+          description: Fields to ignore during population
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $schema: https://json-schema.org/draft/2020-12/schema
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        documentId:
+                          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                          type: string
+                          example: 550e8400-e29b-41d4-a716-446655440000
+                        id:
+                          anyOf:
+                            - type: string
+                            - type: number
+                        certificateId:
+                          description: A UID field
+                          type: string
+                        createdAt:
+                          description: Timestamp when this entry was first created in the CMS.
+                          type: string
+                          example: '2025-10-30T17:41:47.696Z'
+                        updatedAt:
+                          description: Timestamp when this entry was last modified.
+                          type: string
+                          example: '2025-10-30T18:23:15.432Z'
+                        publishedAt:
+                          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                          type: string
+                          example: '2025-10-30T17:41:47.696Z'
+                        locale:
+                          description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                          type: string
+                          example: en
+                        certificate:
+                          description: A component field
+                          $ref: '#/components/schemas/ElementsLabelEntry'
+                        seoMetadata:
+                          description: A component field
+                          $ref: '#/components/schemas/ElementsSeoMetadataEntry'
+                        localizations:
+                          description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+                          readOnly: true
+                          type: array
+                          items:
+                            type: object
+                            description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
+                            properties:
+                              id:
+                                type: number
+                              documentId:
+                                type: string
+                                description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                                example: 550e8400-e29b-41d4-a716-446655440000
+                              locale:
+                                type: string
+                                description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                                example: en
+                              createdAt:
+                                type: string
+                                description: Timestamp when this entry was first created in the CMS.
+                                example: '2025-10-30T17:41:47.696Z'
+                              updatedAt:
+                                type: string
+                                description: Timestamp when this entry was last modified.
+                                example: '2025-10-30T18:23:15.432Z'
+                              publishedAt:
+                                type: string
+                                description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                                example: '2025-10-30T17:41:47.696Z'
+                            required:
+                              - id
+                              - documentId
+                              - locale
+                            additionalProperties: true
+                      required:
+                        - documentId
+                        - id
+                        - certificateId
+                        - publishedAt
+                        - certificate
+                        - seoMetadata
+                      additionalProperties: false
+                  meta:
+                    type: object
+                    description: Metadata object containing pagination and other response metadata
+                required:
+                  - data
+                additionalProperties: false
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      tags:
+        - product-certificate
+      summary: Product Certificate Get Product Certificates
+      description: Retrieves a list of Product Certificate entries from the CMS. Supports filtering, pagination, and sorting.
+  /product-certificates/{id}:
+    get:
+      operationId: product-certificate/get/product_certificates_by_id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: The document ID, represented by a UUID
+            type: string
+        - name: fields
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+            readOnly: true
+            type: array
+            items:
+              type: string
+              enum:
+                - certificateId
+                - createdAt
+                - updatedAt
+                - publishedAt
+                - locale
+            example:
+              - certificateId
+              - createdAt
+              - updatedAt
+          x-strapi-serialize: querystring
+          description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
+        - name: filters
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filters to apply to the query
+            type: object
+            propertyNames:
+              type: string
+              enum:
+                - certificateId
+                - createdAt
+                - updatedAt
+                - publishedAt
+                - locale
+            additionalProperties: {}
+          x-strapi-serialize: querystring
+          description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Sort the result
+            anyOf:
+              - type: string
+                enum:
+                  - certificateId
+                  - createdAt
+                  - updatedAt
+                  - publishedAt
+                  - locale
+              - type: array
+                items:
+                  type: string
+                  enum:
+                    - certificateId
+                    - createdAt
+                    - updatedAt
+                    - publishedAt
+                    - locale
+              - type: object
+                propertyNames:
+                  type: string
+                  enum:
+                    - certificateId
+                    - createdAt
+                    - updatedAt
+                    - publishedAt
+                    - locale
+                additionalProperties:
+                  type: string
+                  enum:
+                    - asc
+                    - desc
+              - type: array
+                items:
+                  type: object
+                  propertyNames:
+                    type: string
+                    enum:
+                      - certificateId
+                      - createdAt
+                      - updatedAt
+                      - publishedAt
+                      - locale
+                  additionalProperties:
+                    type: string
+                    enum:
+                      - asc
+                      - desc
+            example: certificateId
+          x-strapi-serialize: querystring
+          description: Sort the result set by one or more fields. Use field name for ascending order or prefix with "-" for descending (e.g., "-createdAt"). Supports multiple sort criteria.
+        - name: locale
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Select a locale
+            type: string
+            example: en
+          x-strapi-serialize: querystring
+          description: Select content for a specific locale when using Strapi Internationalization (i18n). Defaults to the default locale if not specified.
+        - name: status
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Fetch documents based on their status. Default to "published" if not specified.
+            type: string
+            enum:
+              - draft
+              - published
+            example: published
+          x-strapi-serialize: querystring
+          description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: customPopulate
+          in: query
+          description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+          required: true
+          schema:
+            type: string
+            default: nested
+        - name: customDepth
+          in: query
+          description: Maximum depth for population (override plugin default)
+          required: false
+          schema:
+            type: integer
+        - name: customIgnored
+          in: query
+          description: Fields to ignore during population
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $schema: https://json-schema.org/draft/2020-12/schema
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      documentId:
+                        description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                        type: string
+                        example: 550e8400-e29b-41d4-a716-446655440000
+                      id:
+                        anyOf:
+                          - type: string
+                          - type: number
+                      certificateId:
+                        description: A UID field
+                        type: string
+                      createdAt:
+                        description: Timestamp when this entry was first created in the CMS.
+                        type: string
+                        example: '2025-10-30T17:41:47.696Z'
+                      updatedAt:
+                        description: Timestamp when this entry was last modified.
+                        type: string
+                        example: '2025-10-30T18:23:15.432Z'
+                      publishedAt:
+                        description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                        type: string
+                        example: '2025-10-30T17:41:47.696Z'
+                      locale:
+                        description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                        type: string
+                        example: en
+                      certificate:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsLabelEntry'
+                      seoMetadata:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsSeoMetadataEntry'
+                      localizations:
+                        description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
+                          properties:
+                            id:
+                              type: number
+                            documentId:
+                              type: string
+                              description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                              example: 550e8400-e29b-41d4-a716-446655440000
+                            locale:
+                              type: string
+                              description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                              example: en
+                            createdAt:
+                              type: string
+                              description: Timestamp when this entry was first created in the CMS.
+                              example: '2025-10-30T17:41:47.696Z'
+                            updatedAt:
+                              type: string
+                              description: Timestamp when this entry was last modified.
+                              example: '2025-10-30T18:23:15.432Z'
+                            publishedAt:
+                              type: string
+                              description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                              example: '2025-10-30T17:41:47.696Z'
+                          required:
+                            - id
+                            - documentId
+                            - locale
+                          additionalProperties: true
+                    required:
+                      - documentId
+                      - id
+                      - certificateId
+                      - publishedAt
+                      - certificate
+                      - seoMetadata
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    description: Metadata object containing pagination and other response metadata
+                required:
+                  - data
+                additionalProperties: false
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      tags:
+        - product-certificate
+      summary: Product Certificate Get Product Certificates By Id
+      description: Retrieves Product Certificate content from the CMS. Supports field selection, population, and localization.
   /product-tags:
     get:
       operationId: product-tag/get/product_tags
@@ -8917,11 +9421,6 @@ paths:
                         tag:
                           description: A component field
                           $ref: '#/components/schemas/ElementsLabelEntry'
-                        products:
-                          description: A relational field
-                          type: array
-                          items:
-                            $ref: '#/components/schemas/ApiProductProductDocument'
                         seoMetadata:
                           description: A component field
                           $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -9181,11 +9680,6 @@ paths:
                       tag:
                         description: A component field
                         $ref: '#/components/schemas/ElementsLabelEntry'
-                      products:
-                        description: A relational field
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ApiProductProductDocument'
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -9268,15 +9762,14 @@ paths:
               type: string
               enum:
                 - slug
-                - price
                 - createdAt
                 - updatedAt
                 - publishedAt
                 - locale
             example:
               - slug
-              - price
               - createdAt
+              - updatedAt
           x-strapi-serialize: querystring
           description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
         - name: filters
@@ -9290,7 +9783,6 @@ paths:
               type: string
               enum:
                 - slug
-                - price
                 - createdAt
                 - updatedAt
                 - publishedAt
@@ -9367,7 +9859,6 @@ paths:
               - type: string
                 enum:
                   - slug
-                  - price
                   - createdAt
                   - updatedAt
                   - publishedAt
@@ -9377,7 +9868,6 @@ paths:
                   type: string
                   enum:
                     - slug
-                    - price
                     - createdAt
                     - updatedAt
                     - publishedAt
@@ -9387,7 +9877,6 @@ paths:
                   type: string
                   enum:
                     - slug
-                    - price
                     - createdAt
                     - updatedAt
                     - publishedAt
@@ -9404,7 +9893,6 @@ paths:
                     type: string
                     enum:
                       - slug
-                      - price
                       - createdAt
                       - updatedAt
                       - publishedAt
@@ -9486,9 +9974,6 @@ paths:
                         slug:
                           description: A UID field
                           type: string
-                        price:
-                          description: A decimal field
-                          type: number
                         createdAt:
                           description: Timestamp when this entry was first created in the CMS.
                           type: string
@@ -9505,31 +9990,86 @@ paths:
                           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
                           type: string
                           example: en
-                        content:
+                        seller:
+                          description: A relational field
+                          $ref: '#/components/schemas/ApiContributorContributorDocument'
+                        header:
                           description: A component field
-                          $ref: '#/components/schemas/ElementsTextBlockEntry'
+                          $ref: '#/components/schemas/ElementsHeaderEntry'
                         images:
                           description: A media field
                           type: array
                           items:
                             $ref: '#/components/schemas/PluginUploadFileDocument'
-                        affiliateButton:
+                        prices:
                           description: A component field
-                          $ref: '#/components/schemas/ElementsButtonEntry'
-                        currency:
-                          description: A relational field
-                          $ref: '#/components/schemas/ApiCurrencyCurrencyDocument'
+                          minItems: 1
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/ElementsPriceEntry'
                         category:
                           description: A relational field
                           $ref: '#/components/schemas/ApiProductCategoryProductCategoryDocument'
+                        certificates:
+                          description: A relational field
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/ApiProductCertificateProductCertificateDocument'
                         tags:
                           description: A relational field
                           type: array
                           items:
                             $ref: '#/components/schemas/ApiProductTagProductTagDocument'
+                        affiliateButton:
+                          description: A component field
+                          $ref: '#/components/schemas/ElementsButtonEntry'
+                        disclaimerLabel:
+                          description: A component field
+                          $ref: '#/components/schemas/ElementsLabelEntry'
                         viewDetailsLabel:
                           description: A component field
                           $ref: '#/components/schemas/ElementsLabelEntry'
+                        description:
+                          description: A dynamic zone field
+                          type: array
+                          items:
+                            discriminator:
+                              propertyName: __component
+                              mapping:
+                                elements.text-block: '#/components/schemas/ElementsTextBlockEntry'
+                                markers.start-horizontal-layout-marker: '#/components/schemas/MarkersStartHorizontalLayoutMarkerEntry'
+                                markers.end-horizontal-layout-marker: '#/components/schemas/MarkersEndHorizontalLayoutMarkerEntry'
+                            anyOf:
+                              - allOf:
+                                  - $ref: '#/components/schemas/ElementsTextBlockEntry'
+                                  - type: object
+                                    properties:
+                                      __component:
+                                        type: string
+                                        const: elements.text-block
+                                        description: Component type discriminator
+                                    required:
+                                      - __component
+                              - allOf:
+                                  - $ref: '#/components/schemas/MarkersStartHorizontalLayoutMarkerEntry'
+                                  - type: object
+                                    properties:
+                                      __component:
+                                        type: string
+                                        const: markers.start-horizontal-layout-marker
+                                        description: Component type discriminator
+                                    required:
+                                      - __component
+                              - allOf:
+                                  - $ref: '#/components/schemas/MarkersEndHorizontalLayoutMarkerEntry'
+                                  - type: object
+                                    properties:
+                                      __component:
+                                        type: string
+                                        const: markers.end-horizontal-layout-marker
+                                        description: Component type discriminator
+                                    required:
+                                      - __component
                         seoMetadata:
                           description: A component field
                           $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -9572,12 +10112,16 @@ paths:
                         - documentId
                         - id
                         - slug
-                        - price
                         - publishedAt
-                        - content
+                        - seller
+                        - header
                         - images
+                        - prices
+                        - category
                         - affiliateButton
+                        - disclaimerLabel
                         - viewDetailsLabel
+                        - description
                         - seoMetadata
                       additionalProperties: false
                   meta:
@@ -9622,15 +10166,14 @@ paths:
               type: string
               enum:
                 - slug
-                - price
                 - createdAt
                 - updatedAt
                 - publishedAt
                 - locale
             example:
               - slug
-              - price
               - createdAt
+              - updatedAt
           x-strapi-serialize: querystring
           description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
         - name: filters
@@ -9644,7 +10187,6 @@ paths:
               type: string
               enum:
                 - slug
-                - price
                 - createdAt
                 - updatedAt
                 - publishedAt
@@ -9662,7 +10204,6 @@ paths:
               - type: string
                 enum:
                   - slug
-                  - price
                   - createdAt
                   - updatedAt
                   - publishedAt
@@ -9672,7 +10213,6 @@ paths:
                   type: string
                   enum:
                     - slug
-                    - price
                     - createdAt
                     - updatedAt
                     - publishedAt
@@ -9682,7 +10222,6 @@ paths:
                   type: string
                   enum:
                     - slug
-                    - price
                     - createdAt
                     - updatedAt
                     - publishedAt
@@ -9699,7 +10238,6 @@ paths:
                     type: string
                     enum:
                       - slug
-                      - price
                       - createdAt
                       - updatedAt
                       - publishedAt
@@ -9779,9 +10317,6 @@ paths:
                       slug:
                         description: A UID field
                         type: string
-                      price:
-                        description: A decimal field
-                        type: number
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -9798,31 +10333,86 @@ paths:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
                         type: string
                         example: en
-                      content:
+                      seller:
+                        description: A relational field
+                        $ref: '#/components/schemas/ApiContributorContributorDocument'
+                      header:
                         description: A component field
-                        $ref: '#/components/schemas/ElementsTextBlockEntry'
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
                       images:
                         description: A media field
                         type: array
                         items:
                           $ref: '#/components/schemas/PluginUploadFileDocument'
-                      affiliateButton:
+                      prices:
                         description: A component field
-                        $ref: '#/components/schemas/ElementsButtonEntry'
-                      currency:
-                        description: A relational field
-                        $ref: '#/components/schemas/ApiCurrencyCurrencyDocument'
+                        minItems: 1
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ElementsPriceEntry'
                       category:
                         description: A relational field
                         $ref: '#/components/schemas/ApiProductCategoryProductCategoryDocument'
+                      certificates:
+                        description: A relational field
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ApiProductCertificateProductCertificateDocument'
                       tags:
                         description: A relational field
                         type: array
                         items:
                           $ref: '#/components/schemas/ApiProductTagProductTagDocument'
+                      affiliateButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      disclaimerLabel:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsLabelEntry'
                       viewDetailsLabel:
                         description: A component field
                         $ref: '#/components/schemas/ElementsLabelEntry'
+                      description:
+                        description: A dynamic zone field
+                        type: array
+                        items:
+                          discriminator:
+                            propertyName: __component
+                            mapping:
+                              elements.text-block: '#/components/schemas/ElementsTextBlockEntry'
+                              markers.start-horizontal-layout-marker: '#/components/schemas/MarkersStartHorizontalLayoutMarkerEntry'
+                              markers.end-horizontal-layout-marker: '#/components/schemas/MarkersEndHorizontalLayoutMarkerEntry'
+                          anyOf:
+                            - allOf:
+                                - $ref: '#/components/schemas/ElementsTextBlockEntry'
+                                - type: object
+                                  properties:
+                                    __component:
+                                      type: string
+                                      const: elements.text-block
+                                      description: Component type discriminator
+                                  required:
+                                    - __component
+                            - allOf:
+                                - $ref: '#/components/schemas/MarkersStartHorizontalLayoutMarkerEntry'
+                                - type: object
+                                  properties:
+                                    __component:
+                                      type: string
+                                      const: markers.start-horizontal-layout-marker
+                                      description: Component type discriminator
+                                  required:
+                                    - __component
+                            - allOf:
+                                - $ref: '#/components/schemas/MarkersEndHorizontalLayoutMarkerEntry'
+                                - type: object
+                                  properties:
+                                    __component:
+                                      type: string
+                                      const: markers.end-horizontal-layout-marker
+                                      description: Component type discriminator
+                                  required:
+                                    - __component
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -9865,12 +10455,16 @@ paths:
                       - documentId
                       - id
                       - slug
-                      - price
                       - publishedAt
-                      - content
+                      - seller
+                      - header
                       - images
+                      - prices
+                      - category
                       - affiliateButton
+                      - disclaimerLabel
                       - viewDetailsLabel
+                      - description
                       - seoMetadata
                     additionalProperties: false
                   meta:
@@ -9916,15 +10510,14 @@ paths:
               type: string
               enum:
                 - slug
-                - price
                 - createdAt
                 - updatedAt
                 - publishedAt
                 - locale
             example:
               - slug
-              - price
               - createdAt
+              - updatedAt
           x-strapi-serialize: querystring
           description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
         - name: filters
@@ -9938,7 +10531,6 @@ paths:
               type: string
               enum:
                 - slug
-                - price
                 - createdAt
                 - updatedAt
                 - publishedAt
@@ -9956,7 +10548,6 @@ paths:
               - type: string
                 enum:
                   - slug
-                  - price
                   - createdAt
                   - updatedAt
                   - publishedAt
@@ -9966,7 +10557,6 @@ paths:
                   type: string
                   enum:
                     - slug
-                    - price
                     - createdAt
                     - updatedAt
                     - publishedAt
@@ -9976,7 +10566,6 @@ paths:
                   type: string
                   enum:
                     - slug
-                    - price
                     - createdAt
                     - updatedAt
                     - publishedAt
@@ -9993,7 +10582,6 @@ paths:
                     type: string
                     enum:
                       - slug
-                      - price
                       - createdAt
                       - updatedAt
                       - publishedAt
@@ -10073,9 +10661,6 @@ paths:
                       slug:
                         description: A UID field
                         type: string
-                      price:
-                        description: A decimal field
-                        type: number
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -10092,31 +10677,86 @@ paths:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
                         type: string
                         example: en
-                      content:
+                      seller:
+                        description: A relational field
+                        $ref: '#/components/schemas/ApiContributorContributorDocument'
+                      header:
                         description: A component field
-                        $ref: '#/components/schemas/ElementsTextBlockEntry'
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
                       images:
                         description: A media field
                         type: array
                         items:
                           $ref: '#/components/schemas/PluginUploadFileDocument'
-                      affiliateButton:
+                      prices:
                         description: A component field
-                        $ref: '#/components/schemas/ElementsButtonEntry'
-                      currency:
-                        description: A relational field
-                        $ref: '#/components/schemas/ApiCurrencyCurrencyDocument'
+                        minItems: 1
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ElementsPriceEntry'
                       category:
                         description: A relational field
                         $ref: '#/components/schemas/ApiProductCategoryProductCategoryDocument'
+                      certificates:
+                        description: A relational field
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ApiProductCertificateProductCertificateDocument'
                       tags:
                         description: A relational field
                         type: array
                         items:
                           $ref: '#/components/schemas/ApiProductTagProductTagDocument'
+                      affiliateButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      disclaimerLabel:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsLabelEntry'
                       viewDetailsLabel:
                         description: A component field
                         $ref: '#/components/schemas/ElementsLabelEntry'
+                      description:
+                        description: A dynamic zone field
+                        type: array
+                        items:
+                          discriminator:
+                            propertyName: __component
+                            mapping:
+                              elements.text-block: '#/components/schemas/ElementsTextBlockEntry'
+                              markers.start-horizontal-layout-marker: '#/components/schemas/MarkersStartHorizontalLayoutMarkerEntry'
+                              markers.end-horizontal-layout-marker: '#/components/schemas/MarkersEndHorizontalLayoutMarkerEntry'
+                          anyOf:
+                            - allOf:
+                                - $ref: '#/components/schemas/ElementsTextBlockEntry'
+                                - type: object
+                                  properties:
+                                    __component:
+                                      type: string
+                                      const: elements.text-block
+                                      description: Component type discriminator
+                                  required:
+                                    - __component
+                            - allOf:
+                                - $ref: '#/components/schemas/MarkersStartHorizontalLayoutMarkerEntry'
+                                - type: object
+                                  properties:
+                                    __component:
+                                      type: string
+                                      const: markers.start-horizontal-layout-marker
+                                      description: Component type discriminator
+                                  required:
+                                    - __component
+                            - allOf:
+                                - $ref: '#/components/schemas/MarkersEndHorizontalLayoutMarkerEntry'
+                                - type: object
+                                  properties:
+                                    __component:
+                                      type: string
+                                      const: markers.end-horizontal-layout-marker
+                                      description: Component type discriminator
+                                  required:
+                                    - __component
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -10159,12 +10799,16 @@ paths:
                       - documentId
                       - id
                       - slug
-                      - price
                       - publishedAt
-                      - content
+                      - seller
+                      - header
                       - images
+                      - prices
+                      - category
                       - affiliateButton
+                      - disclaimerLabel
                       - viewDetailsLabel
+                      - description
                       - seoMetadata
                     additionalProperties: false
                   meta:
@@ -10468,16 +11112,14 @@ paths:
             items:
               type: string
               enum:
-                - lastUpdated
-                - lastUpdatedLabel
                 - createdAt
                 - updatedAt
                 - publishedAt
                 - locale
             example:
-              - lastUpdated
-              - lastUpdatedLabel
               - createdAt
+              - updatedAt
+              - publishedAt
           x-strapi-serialize: querystring
           description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
         - name: filters
@@ -10490,8 +11132,6 @@ paths:
             propertyNames:
               type: string
               enum:
-                - lastUpdated
-                - lastUpdatedLabel
                 - createdAt
                 - updatedAt
                 - publishedAt
@@ -10563,12 +11203,6 @@ paths:
                         anyOf:
                           - type: string
                           - type: number
-                      lastUpdated:
-                        description: A datetime field
-                        type: string
-                      lastUpdatedLabel:
-                        description: A string field
-                        type: string
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -10585,6 +11219,9 @@ paths:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
                         type: string
                         example: en
+                      content:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsTextBlockEntry'
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -10627,6 +11264,7 @@ paths:
                       - documentId
                       - id
                       - publishedAt
+                      - content
                       - seoMetadata
                     additionalProperties: false
                   meta:
@@ -11429,6 +12067,7 @@ components:
         - id
         - publishedAt
         - sections
+        - seoMetadata
       additionalProperties: false
       id: ApiAboutAboutDocument
     ApiAuthPageAuthPageDocument:
@@ -11570,6 +12209,7 @@ components:
         - documentId
         - id
         - publishedAt
+        - seoMetadata
       additionalProperties: false
       id: ApiAuthPageAuthPageDocument
     ElementsLabelEntry:
@@ -11632,6 +12272,87 @@ components:
         - promoteHeaderIcon
       additionalProperties: false
       id: ElementsHeaderEntry
+    ApiBlogPostTagBlogPostTagDocument:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        documentId:
+          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        id:
+          anyOf:
+            - type: string
+            - type: number
+        tagId:
+          description: A UID field
+          type: string
+        createdAt:
+          description: Timestamp when this entry was first created in the CMS.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        updatedAt:
+          description: Timestamp when this entry was last modified.
+          type: string
+          example: '2025-10-30T18:23:15.432Z'
+        publishedAt:
+          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        locale:
+          description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+          type: string
+          example: en
+        tag:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        seoMetadata:
+          description: A component field
+          $ref: '#/components/schemas/ElementsSeoMetadataEntry'
+        localizations:
+          description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+          readOnly: true
+          type: array
+          items:
+            type: object
+            description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
+            properties:
+              id:
+                type: number
+              documentId:
+                type: string
+                description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                example: 550e8400-e29b-41d4-a716-446655440000
+              locale:
+                type: string
+                description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                example: en
+              createdAt:
+                type: string
+                description: Timestamp when this entry was first created in the CMS.
+                example: '2025-10-30T17:41:47.696Z'
+              updatedAt:
+                type: string
+                description: Timestamp when this entry was last modified.
+                example: '2025-10-30T18:23:15.432Z'
+              publishedAt:
+                type: string
+                description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                example: '2025-10-30T17:41:47.696Z'
+            required:
+              - id
+              - documentId
+              - locale
+            additionalProperties: true
+      required:
+        - documentId
+        - id
+        - tagId
+        - publishedAt
+        - tag
+        - seoMetadata
+      additionalProperties: false
+      id: ApiBlogPostTagBlogPostTagDocument
     ElementsTextBlockEntry:
       $schema: https://json-schema.org/draft/2020-12/schema
       type: object
@@ -11668,6 +12389,8 @@ components:
         caption:
           description: A text field
           type: string
+        focalPoint:
+          description: A JSON field
         width:
           description: An integer field
           type: integer
@@ -11762,11 +12485,6 @@ components:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
           type: string
           example: en
-        contributors:
-          description: A relational field
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiContributorContributorDocument'
         localizations:
           description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
           readOnly: true
@@ -11822,11 +12540,14 @@ components:
           anyOf:
             - type: string
             - type: number
-        name:
-          description: A string field
-          type: string
         slug:
           description: A UID field
+          type: string
+        firstName:
+          description: A string field
+          type: string
+        lastName:
+          description: A string field
           type: string
         bio:
           description: A richtext field
@@ -11875,11 +12596,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ApiContributorRoleContributorRoleDocument'
-        blogPosts:
-          description: A relational field
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiBlogPostBlogPostDocument'
         seoMetadata:
           description: A component field
           $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -11921,10 +12637,12 @@ components:
       required:
         - documentId
         - id
-        - name
         - slug
+        - firstName
         - bio
         - publishedAt
+        - roles
+        - seoMetadata
       additionalProperties: false
       id: ApiContributorContributorDocument
     ApiBlogPostBlogPostDocument:
@@ -11973,7 +12691,7 @@ components:
         featuredImage:
           description: A media field
           $ref: '#/components/schemas/PluginUploadFileDocument'
-        contributor:
+        author:
           description: A relational field
           $ref: '#/components/schemas/ApiContributorContributorDocument'
         tags:
@@ -12026,92 +12744,13 @@ components:
         - readTimeInMinutes
         - publishedDate
         - publishedAt
+        - content
+        - featuredImage
+        - author
+        - tags
+        - seoMetadata
       additionalProperties: false
       id: ApiBlogPostBlogPostDocument
-    ApiBlogPostTagBlogPostTagDocument:
-      $schema: https://json-schema.org/draft/2020-12/schema
-      type: object
-      properties:
-        documentId:
-          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-          type: string
-          example: 550e8400-e29b-41d4-a716-446655440000
-        id:
-          anyOf:
-            - type: string
-            - type: number
-        tagId:
-          description: A UID field
-          type: string
-        createdAt:
-          description: Timestamp when this entry was first created in the CMS.
-          type: string
-          example: '2025-10-30T17:41:47.696Z'
-        updatedAt:
-          description: Timestamp when this entry was last modified.
-          type: string
-          example: '2025-10-30T18:23:15.432Z'
-        publishedAt:
-          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
-          example: '2025-10-30T17:41:47.696Z'
-        locale:
-          description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-          type: string
-          example: en
-        tag:
-          description: A component field
-          $ref: '#/components/schemas/ElementsLabelEntry'
-        posts:
-          description: A relational field
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiBlogPostBlogPostDocument'
-        seoMetadata:
-          description: A component field
-          $ref: '#/components/schemas/ElementsSeoMetadataEntry'
-        localizations:
-          description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-          readOnly: true
-          type: array
-          items:
-            type: object
-            description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
-            properties:
-              id:
-                type: number
-              documentId:
-                type: string
-                description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-                example: 550e8400-e29b-41d4-a716-446655440000
-              locale:
-                type: string
-                description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-                example: en
-              createdAt:
-                type: string
-                description: Timestamp when this entry was first created in the CMS.
-                example: '2025-10-30T17:41:47.696Z'
-              updatedAt:
-                type: string
-                description: Timestamp when this entry was last modified.
-                example: '2025-10-30T18:23:15.432Z'
-              publishedAt:
-                type: string
-                description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                example: '2025-10-30T17:41:47.696Z'
-            required:
-              - id
-              - documentId
-              - locale
-            additionalProperties: true
-      required:
-        - documentId
-        - id
-        - tagId
-        - publishedAt
-      additionalProperties: false
-      id: ApiBlogPostTagBlogPostTagDocument
     ElementsButtonEntry:
       $schema: https://json-schema.org/draft/2020-12/schema
       type: object
@@ -12222,9 +12861,6 @@ components:
         aboutAuthorHeader:
           description: A component field
           $ref: '#/components/schemas/ElementsHeaderEntry'
-        defaultContributor:
-          description: A relational field
-          $ref: '#/components/schemas/ApiContributorContributorDocument'
         seoMetadata:
           description: A component field
           $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -12267,10 +12903,12 @@ components:
         - documentId
         - id
         - publishedAt
+        - header
         - pagination
         - readArticleLabel
         - readTimeMinutesLabel
         - aboutAuthorHeader
+        - seoMetadata
       additionalProperties: false
       id: ApiBlogBlogDocument
     ApiContactUsContactUsDocument:
@@ -12376,6 +13014,7 @@ components:
         - documentId
         - id
         - publishedAt
+        - seoMetadata
       additionalProperties: false
       id: ApiContactUsContactUsDocument
     ApiCurrencyCurrencyDocument:
@@ -12492,6 +13131,7 @@ components:
         - decimalSeparator
         - exchangeRate
         - publishedAt
+        - seoMetadata
       additionalProperties: false
       id: ApiCurrencyCurrencyDocument
     ApiError404Error404Document:
@@ -12567,6 +13207,8 @@ components:
         - documentId
         - id
         - publishedAt
+        - content
+        - seoMetadata
       additionalProperties: false
       id: ApiError404Error404Document
     ApiError410Error410Document:
@@ -12642,6 +13284,8 @@ components:
         - documentId
         - id
         - publishedAt
+        - content
+        - seoMetadata
       additionalProperties: false
       id: ApiError410Error410Document
     ApiFaqFaqDocument:
@@ -12734,6 +13378,7 @@ components:
         - contactPrompt
         - contactButtonText
         - publishedAt
+        - seoMetadata
       additionalProperties: false
       id: ApiFaqFaqDocument
     ApiFooterFooterDocument:
@@ -12869,6 +13514,7 @@ components:
         - columns
         - copyrightsLabel
         - quickLinks
+        - seoMetadata
       additionalProperties: false
       id: ApiFooterFooterDocument
     ApiHomepageHomepageDocument:
@@ -13060,6 +13706,7 @@ components:
         - id
         - publishedAt
         - sections
+        - seoMetadata
       additionalProperties: false
       id: ApiHomepageHomepageDocument
     MenusProductCategoriesSelectorEntry:
@@ -13081,198 +13728,6 @@ components:
         - menuButton
       additionalProperties: false
       id: MenusProductCategoriesSelectorEntry
-    ApiProductTagProductTagDocument:
-      $schema: https://json-schema.org/draft/2020-12/schema
-      type: object
-      properties:
-        documentId:
-          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-          type: string
-          example: 550e8400-e29b-41d4-a716-446655440000
-        id:
-          anyOf:
-            - type: string
-            - type: number
-        tagId:
-          description: A UID field
-          type: string
-        createdAt:
-          description: Timestamp when this entry was first created in the CMS.
-          type: string
-          example: '2025-10-30T17:41:47.696Z'
-        updatedAt:
-          description: Timestamp when this entry was last modified.
-          type: string
-          example: '2025-10-30T18:23:15.432Z'
-        publishedAt:
-          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
-          example: '2025-10-30T17:41:47.696Z'
-        locale:
-          description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-          type: string
-          example: en
-        tag:
-          description: A component field
-          $ref: '#/components/schemas/ElementsLabelEntry'
-        products:
-          description: A relational field
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiProductProductDocument'
-        seoMetadata:
-          description: A component field
-          $ref: '#/components/schemas/ElementsSeoMetadataEntry'
-        localizations:
-          description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-          readOnly: true
-          type: array
-          items:
-            type: object
-            description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
-            properties:
-              id:
-                type: number
-              documentId:
-                type: string
-                description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-                example: 550e8400-e29b-41d4-a716-446655440000
-              locale:
-                type: string
-                description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-                example: en
-              createdAt:
-                type: string
-                description: Timestamp when this entry was first created in the CMS.
-                example: '2025-10-30T17:41:47.696Z'
-              updatedAt:
-                type: string
-                description: Timestamp when this entry was last modified.
-                example: '2025-10-30T18:23:15.432Z'
-              publishedAt:
-                type: string
-                description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                example: '2025-10-30T17:41:47.696Z'
-            required:
-              - id
-              - documentId
-              - locale
-            additionalProperties: true
-      required:
-        - documentId
-        - id
-        - tagId
-        - publishedAt
-      additionalProperties: false
-      id: ApiProductTagProductTagDocument
-    ApiProductProductDocument:
-      $schema: https://json-schema.org/draft/2020-12/schema
-      type: object
-      properties:
-        documentId:
-          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-          type: string
-          example: 550e8400-e29b-41d4-a716-446655440000
-        id:
-          anyOf:
-            - type: string
-            - type: number
-        slug:
-          description: A UID field
-          type: string
-        price:
-          description: A decimal field
-          type: number
-        createdAt:
-          description: Timestamp when this entry was first created in the CMS.
-          type: string
-          example: '2025-10-30T17:41:47.696Z'
-        updatedAt:
-          description: Timestamp when this entry was last modified.
-          type: string
-          example: '2025-10-30T18:23:15.432Z'
-        publishedAt:
-          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
-          example: '2025-10-30T17:41:47.696Z'
-        locale:
-          description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-          type: string
-          example: en
-        content:
-          description: A component field
-          $ref: '#/components/schemas/ElementsTextBlockEntry'
-        images:
-          description: A media field
-          type: array
-          items:
-            $ref: '#/components/schemas/PluginUploadFileDocument'
-        affiliateButton:
-          description: A component field
-          $ref: '#/components/schemas/ElementsButtonEntry'
-        currency:
-          description: A relational field
-          $ref: '#/components/schemas/ApiCurrencyCurrencyDocument'
-        category:
-          description: A relational field
-          $ref: '#/components/schemas/ApiProductCategoryProductCategoryDocument'
-        tags:
-          description: A relational field
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiProductTagProductTagDocument'
-        viewDetailsLabel:
-          description: A component field
-          $ref: '#/components/schemas/ElementsLabelEntry'
-        seoMetadata:
-          description: A component field
-          $ref: '#/components/schemas/ElementsSeoMetadataEntry'
-        localizations:
-          description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-          readOnly: true
-          type: array
-          items:
-            type: object
-            description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
-            properties:
-              id:
-                type: number
-              documentId:
-                type: string
-                description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-                example: 550e8400-e29b-41d4-a716-446655440000
-              locale:
-                type: string
-                description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-                example: en
-              createdAt:
-                type: string
-                description: Timestamp when this entry was first created in the CMS.
-                example: '2025-10-30T17:41:47.696Z'
-              updatedAt:
-                type: string
-                description: Timestamp when this entry was last modified.
-                example: '2025-10-30T18:23:15.432Z'
-              publishedAt:
-                type: string
-                description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                example: '2025-10-30T17:41:47.696Z'
-            required:
-              - id
-              - documentId
-              - locale
-            additionalProperties: true
-      required:
-        - documentId
-        - id
-        - slug
-        - price
-        - publishedAt
-        - images
-        - affiliateButton
-        - viewDetailsLabel
-      additionalProperties: false
-      id: ApiProductProductDocument
     ApiProductCategoryProductCategoryDocument:
       $schema: https://json-schema.org/draft/2020-12/schema
       type: object
@@ -13310,11 +13765,6 @@ components:
         image:
           description: A media field
           $ref: '#/components/schemas/PluginUploadFileDocument'
-        products:
-          description: A relational field
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiProductProductDocument'
         seoMetadata:
           description: A component field
           $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -13358,6 +13808,9 @@ components:
         - id
         - slug
         - publishedAt
+        - content
+        - image
+        - seoMetadata
       additionalProperties: false
       id: ApiProductCategoryProductCategoryDocument
     MenusSearchMenuEntry:
@@ -13407,6 +13860,7 @@ components:
           description: Component instance ID
       required:
         - menuButton
+        - themes
       additionalProperties: false
       id: MenusThemeSelectorEntry
     ApiThemeThemeDocument:
@@ -13486,6 +13940,8 @@ components:
         - id
         - themeId
         - publishedAt
+        - content
+        - seoMetadata
       additionalProperties: false
       id: ApiThemeThemeDocument
     MenusLanguageSelectorEntry:
@@ -13639,6 +14095,7 @@ components:
         - languageMenu
         - loginButton
         - mobileMenuButton
+        - seoMetadata
       additionalProperties: false
       id: ApiNavigationNavigationDocument
     ApiPrivacyPrivacyDocument:
@@ -13653,12 +14110,6 @@ components:
           anyOf:
             - type: string
             - type: number
-        lastUpdated:
-          description: A datetime field
-          type: string
-        lastUpdatedLabel:
-          description: A string field
-          type: string
         createdAt:
           description: Timestamp when this entry was first created in the CMS.
           type: string
@@ -13675,6 +14126,9 @@ components:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
           type: string
           example: en
+        content:
+          description: A component field
+          $ref: '#/components/schemas/ElementsTextBlockEntry'
         seoMetadata:
           description: A component field
           $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -13717,8 +14171,440 @@ components:
         - documentId
         - id
         - publishedAt
+        - content
+        - seoMetadata
       additionalProperties: false
       id: ApiPrivacyPrivacyDocument
+    ElementsPriceEntry:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        amount:
+          description: A decimal field
+          type: number
+        currency:
+          description: A relational field
+          $ref: '#/components/schemas/ApiCurrencyCurrencyDocument'
+        id:
+          type: integer
+          description: Component instance ID
+      required:
+        - amount
+        - currency
+      additionalProperties: false
+      id: ElementsPriceEntry
+    ApiProductCertificateProductCertificateDocument:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        documentId:
+          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        id:
+          anyOf:
+            - type: string
+            - type: number
+        certificateId:
+          description: A UID field
+          type: string
+        createdAt:
+          description: Timestamp when this entry was first created in the CMS.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        updatedAt:
+          description: Timestamp when this entry was last modified.
+          type: string
+          example: '2025-10-30T18:23:15.432Z'
+        publishedAt:
+          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        locale:
+          description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+          type: string
+          example: en
+        certificate:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        seoMetadata:
+          description: A component field
+          $ref: '#/components/schemas/ElementsSeoMetadataEntry'
+        localizations:
+          description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+          readOnly: true
+          type: array
+          items:
+            type: object
+            description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
+            properties:
+              id:
+                type: number
+              documentId:
+                type: string
+                description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                example: 550e8400-e29b-41d4-a716-446655440000
+              locale:
+                type: string
+                description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                example: en
+              createdAt:
+                type: string
+                description: Timestamp when this entry was first created in the CMS.
+                example: '2025-10-30T17:41:47.696Z'
+              updatedAt:
+                type: string
+                description: Timestamp when this entry was last modified.
+                example: '2025-10-30T18:23:15.432Z'
+              publishedAt:
+                type: string
+                description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                example: '2025-10-30T17:41:47.696Z'
+            required:
+              - id
+              - documentId
+              - locale
+            additionalProperties: true
+      required:
+        - documentId
+        - id
+        - certificateId
+        - publishedAt
+        - certificate
+        - seoMetadata
+      additionalProperties: false
+      id: ApiProductCertificateProductCertificateDocument
+    ApiProductTagProductTagDocument:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        documentId:
+          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        id:
+          anyOf:
+            - type: string
+            - type: number
+        tagId:
+          description: A UID field
+          type: string
+        createdAt:
+          description: Timestamp when this entry was first created in the CMS.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        updatedAt:
+          description: Timestamp when this entry was last modified.
+          type: string
+          example: '2025-10-30T18:23:15.432Z'
+        publishedAt:
+          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        locale:
+          description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+          type: string
+          example: en
+        tag:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        seoMetadata:
+          description: A component field
+          $ref: '#/components/schemas/ElementsSeoMetadataEntry'
+        localizations:
+          description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+          readOnly: true
+          type: array
+          items:
+            type: object
+            description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
+            properties:
+              id:
+                type: number
+              documentId:
+                type: string
+                description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                example: 550e8400-e29b-41d4-a716-446655440000
+              locale:
+                type: string
+                description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                example: en
+              createdAt:
+                type: string
+                description: Timestamp when this entry was first created in the CMS.
+                example: '2025-10-30T17:41:47.696Z'
+              updatedAt:
+                type: string
+                description: Timestamp when this entry was last modified.
+                example: '2025-10-30T18:23:15.432Z'
+              publishedAt:
+                type: string
+                description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                example: '2025-10-30T17:41:47.696Z'
+            required:
+              - id
+              - documentId
+              - locale
+            additionalProperties: true
+      required:
+        - documentId
+        - id
+        - tagId
+        - publishedAt
+        - tag
+        - seoMetadata
+      additionalProperties: false
+      id: ApiProductTagProductTagDocument
+    ApiProductProductDocument:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        documentId:
+          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        id:
+          anyOf:
+            - type: string
+            - type: number
+        slug:
+          description: A UID field
+          type: string
+        createdAt:
+          description: Timestamp when this entry was first created in the CMS.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        updatedAt:
+          description: Timestamp when this entry was last modified.
+          type: string
+          example: '2025-10-30T18:23:15.432Z'
+        publishedAt:
+          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        locale:
+          description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+          type: string
+          example: en
+        seller:
+          description: A relational field
+          $ref: '#/components/schemas/ApiContributorContributorDocument'
+        header:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        images:
+          description: A media field
+          type: array
+          items:
+            $ref: '#/components/schemas/PluginUploadFileDocument'
+        prices:
+          description: A component field
+          minItems: 1
+          type: array
+          items:
+            $ref: '#/components/schemas/ElementsPriceEntry'
+        category:
+          description: A relational field
+          $ref: '#/components/schemas/ApiProductCategoryProductCategoryDocument'
+        certificates:
+          description: A relational field
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiProductCertificateProductCertificateDocument'
+        tags:
+          description: A relational field
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiProductTagProductTagDocument'
+        affiliateButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        disclaimerLabel:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        viewDetailsLabel:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        description:
+          description: A dynamic zone field
+          type: array
+          items:
+            discriminator:
+              propertyName: __component
+              mapping:
+                elements.text-block: '#/components/schemas/ElementsTextBlockEntry'
+                markers.start-horizontal-layout-marker: '#/components/schemas/MarkersStartHorizontalLayoutMarkerEntry'
+                markers.end-horizontal-layout-marker: '#/components/schemas/MarkersEndHorizontalLayoutMarkerEntry'
+            anyOf:
+              - allOf:
+                  - $ref: '#/components/schemas/ElementsTextBlockEntry'
+                  - type: object
+                    properties:
+                      __component:
+                        type: string
+                        const: elements.text-block
+                        description: Component type discriminator
+                    required:
+                      - __component
+              - allOf:
+                  - $ref: '#/components/schemas/MarkersStartHorizontalLayoutMarkerEntry'
+                  - type: object
+                    properties:
+                      __component:
+                        type: string
+                        const: markers.start-horizontal-layout-marker
+                        description: Component type discriminator
+                    required:
+                      - __component
+              - allOf:
+                  - $ref: '#/components/schemas/MarkersEndHorizontalLayoutMarkerEntry'
+                  - type: object
+                    properties:
+                      __component:
+                        type: string
+                        const: markers.end-horizontal-layout-marker
+                        description: Component type discriminator
+                    required:
+                      - __component
+        seoMetadata:
+          description: A component field
+          $ref: '#/components/schemas/ElementsSeoMetadataEntry'
+        localizations:
+          description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+          readOnly: true
+          type: array
+          items:
+            type: object
+            description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
+            properties:
+              id:
+                type: number
+              documentId:
+                type: string
+                description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                example: 550e8400-e29b-41d4-a716-446655440000
+              locale:
+                type: string
+                description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                example: en
+              createdAt:
+                type: string
+                description: Timestamp when this entry was first created in the CMS.
+                example: '2025-10-30T17:41:47.696Z'
+              updatedAt:
+                type: string
+                description: Timestamp when this entry was last modified.
+                example: '2025-10-30T18:23:15.432Z'
+              publishedAt:
+                type: string
+                description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                example: '2025-10-30T17:41:47.696Z'
+            required:
+              - id
+              - documentId
+              - locale
+            additionalProperties: true
+      required:
+        - documentId
+        - id
+        - slug
+        - publishedAt
+        - seller
+        - header
+        - images
+        - prices
+        - category
+        - affiliateButton
+        - disclaimerLabel
+        - viewDetailsLabel
+        - description
+        - seoMetadata
+      additionalProperties: false
+      id: ApiProductProductDocument
+    FiltersTagFilterEntry:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        header:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        allLabel:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        id:
+          type: integer
+          description: Component instance ID
+      required:
+        - header
+        - allLabel
+      additionalProperties: false
+      id: FiltersTagFilterEntry
+    FiltersProductsFilterEntry:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        header:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        tagFilter:
+          description: A component field
+          $ref: '#/components/schemas/FiltersTagFilterEntry'
+        priceRangeFilter:
+          description: A component field
+          $ref: '#/components/schemas/FiltersPriceRangeFilterEntry'
+        id:
+          type: integer
+          description: Component instance ID
+      required:
+        - header
+        - tagFilter
+        - priceRangeFilter
+      additionalProperties: false
+      id: FiltersProductsFilterEntry
+    FiltersPriceRangeFilterEntry:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        header:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        id:
+          type: integer
+          description: Component instance ID
+      required:
+        - header
+      additionalProperties: false
+      id: FiltersPriceRangeFilterEntry
+    SortersProductsSorterEntry:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        header:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        bestSellers:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        newArrivals:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        priceHighToLow:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        priceLowToHigh:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        id:
+          type: integer
+          description: Component instance ID
+      required:
+        - header
+        - bestSellers
+        - newArrivals
+        - priceHighToLow
+        - priceLowToHigh
+      additionalProperties: false
+      id: SortersProductsSorterEntry
     ApiProductCategoriesPageProductCategoriesPageDocument:
       $schema: https://json-schema.org/draft/2020-12/schema
       type: object
@@ -13731,41 +14617,6 @@ components:
           anyOf:
             - type: string
             - type: number
-        itemsPerPage:
-          description: An integer field
-          default: 12
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        previousButton:
-          description: A string field
-          type: string
-        nextButton:
-          description: A string field
-          type: string
-        noProductsMessage:
-          description: A string field
-          type: string
-        showingText:
-          description: A string field
-          default: Showing {count} of {total}
-          type: string
-        pageText:
-          description: A string field
-          default: Page {current} of {total}
-          type: string
-        filterLabel:
-          description: A string field
-          default: Filter by category
-          type: string
-        allCategoriesLabel:
-          description: A string field
-          default: All Categories
-          type: string
-        resultsCountTemplate:
-          description: A string field
-          default: '{count} Products'
-          type: string
         createdAt:
           description: Timestamp when this entry was first created in the CMS.
           type: string
@@ -13782,11 +14633,21 @@ components:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
           type: string
           example: en
-        productCategories:
-          description: A relational field
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiProductCategoryProductCategoryDocument'
+        header:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        productsFilter:
+          description: A component field
+          $ref: '#/components/schemas/FiltersProductsFilterEntry'
+        productsSorter:
+          description: A component field
+          $ref: '#/components/schemas/SortersProductsSorterEntry'
+        relatedProductsSectionHeader:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        pagination:
+          description: A component field
+          $ref: '#/components/schemas/CallToActionsPaginationCtaEntry'
         seoMetadata:
           description: A component field
           $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -13828,13 +14689,13 @@ components:
       required:
         - documentId
         - id
-        - itemsPerPage
-        - showingText
-        - pageText
-        - filterLabel
-        - allCategoriesLabel
-        - resultsCountTemplate
         - publishedAt
+        - header
+        - productsFilter
+        - productsSorter
+        - relatedProductsSectionHeader
+        - pagination
+        - seoMetadata
       additionalProperties: false
       id: ApiProductCategoriesPageProductCategoriesPageDocument
     ApiProfileProfileDocument:
@@ -13955,6 +14816,7 @@ components:
         - documentId
         - id
         - publishedAt
+        - seoMetadata
       additionalProperties: false
       id: ApiProfileProfileDocument
     ApiTermTermDocument:
@@ -13969,12 +14831,6 @@ components:
           anyOf:
             - type: string
             - type: number
-        lastUpdated:
-          description: A datetime field
-          type: string
-        lastUpdatedLabel:
-          description: A string field
-          type: string
         createdAt:
           description: Timestamp when this entry was first created in the CMS.
           type: string
@@ -13991,6 +14847,9 @@ components:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
           type: string
           example: en
+        content:
+          description: A component field
+          $ref: '#/components/schemas/ElementsTextBlockEntry'
         seoMetadata:
           description: A component field
           $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -14033,6 +14892,8 @@ components:
         - documentId
         - id
         - publishedAt
+        - content
+        - seoMetadata
       additionalProperties: false
       id: ApiTermTermDocument
     SectionsBlogTeaserEntry:
@@ -14045,7 +14906,7 @@ components:
         header:
           description: A component field
           $ref: '#/components/schemas/ElementsHeaderEntry'
-        blog_posts:
+        blogPosts:
           type: array
           items:
             $ref: '#/components/schemas/ApiBlogPostBlogPostDocument'
@@ -14056,6 +14917,7 @@ components:
       required:
         - id
         - header
+        - blogPosts
         - viewAllButton
       additionalProperties: false
     SectionsBrandFeaturesSectionEntry:
@@ -14135,6 +14997,7 @@ components:
       required:
         - id
         - header
+        - categories
       additionalProperties: false
     SectionsFeaturedProductsEntry:
       type: object
@@ -14157,6 +15020,7 @@ components:
       required:
         - id
         - header
+        - products
         - viewAllButton
       additionalProperties: false
     SectionsHeroEntry:
@@ -14201,23 +15065,6 @@ components:
       required:
         - id
         - header
-      additionalProperties: false
-    CallToActionsCategoryCtaEntry:
-      type: object
-      description: Category CTA
-      properties:
-        id:
-          type: integer
-          description: Component instance ID
-        button:
-          description: A component field
-          $ref: '#/components/schemas/ElementsButtonEntry'
-        category:
-          $ref: '#/components/schemas/ApiProductCategoryProductCategoryDocument'
-          description: A relational field
-      required:
-        - id
-        - button
       additionalProperties: false
     CallToActionsNewsletterSignupCtaEntry:
       type: object
@@ -14313,6 +15160,8 @@ tags:
     description: Product categories listing page content
   - name: product-category
     description: Product category definitions and metadata
+  - name: product-certificate
+    description: Product certifications
   - name: product-tag
     description: Product tags for filtering and categorization
   - name: profile

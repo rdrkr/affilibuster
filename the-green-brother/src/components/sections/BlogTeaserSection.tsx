@@ -11,13 +11,7 @@
 import { BlogCard } from '@/components/blog'
 import { ButtonLink, Header } from '@/components/elements'
 import { Carousel } from '@/components/layout'
-import {
-  DirectionEnum,
-  type ApiBlogPostBlogPostDocument,
-  type ApiContributorContributorDocument,
-  type ElementsLabelEntry,
-  type SectionsBlogTeaserEntry,
-} from '@/lib/generated/types.gen'
+import { DirectionEnum, type ElementsLabelEntry, type SectionsBlogTeaserEntry } from '@/lib/generated/types.gen'
 
 /**
  * Props for the BlogTeaserSection component
@@ -27,38 +21,25 @@ export interface BlogTeaserSectionProps {
   data: SectionsBlogTeaserEntry & {
     __component: 'sections.blog-teaser'
   }
-  /** Blog posts to display (fetched separately from CMS) */
-  blogPosts: ApiBlogPostBlogPostDocument[]
   /** Language direction for RTL support */
   direction: DirectionEnum
   /** Read time minutes label */
   readTimeMinutesLabel: ElementsLabelEntry
   /** Read article label */
   readArticleLabel: ElementsLabelEntry
-  /** Default contributor fallback */
-  defaultContributor: ApiContributorContributorDocument
 }
 
 /**
  * Blog teaser section with horizontal scrollable carousel.
  * @param props - Component props with CMS section data and blog posts
  * @param props.data - Blog teaser section data from CMS
- * @param props.blogPosts - Blog posts to display
  * @param props.direction - Language direction for RTL support
  * @param props.readTimeMinutesLabel - Read time minutes label
  * @param props.readArticleLabel - Read article label
- * @param props.defaultContributor - Default contributor fallback
  * @returns Blog teaser section component or null if no blog posts
  */
-export function BlogTeaserSection({
-  data,
-  blogPosts,
-  direction,
-  readTimeMinutesLabel,
-  readArticleLabel,
-  defaultContributor,
-}: BlogTeaserSectionProps) {
-  const { header, viewAllButton } = data
+export function BlogTeaserSection({ data, direction, readTimeMinutesLabel, readArticleLabel }: BlogTeaserSectionProps) {
+  const { header, blogPosts, viewAllButton } = data
   const isRTL = direction === DirectionEnum.RTL
 
   // Don't render if no blog posts
@@ -85,7 +66,6 @@ export function BlogTeaserSection({
             direction={direction}
             readTimeMinutesLabel={readTimeMinutesLabel}
             readArticleLabel={readArticleLabel}
-            defaultContributor={defaultContributor}
           />
         ))}
       </Carousel>

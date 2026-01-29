@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_filters_tag_filters",
+  "info": {
+    "displayName": "Tag Filter",
+    "icon": "filter"
+  },
+  "options": {},
+  "attributes": {
+    "header": {
+      "type": "component",
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
+    },
+    "allLabel": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    }
+  },
+  "config": {}
+}

@@ -154,4 +154,59 @@ describe('Image', () => {
       expect(img).toHaveAttribute('src', '/images/placeholder.svg')
     })
   })
+
+  describe('visible prop', () => {
+    it('should return null when visible is false', () => {
+      const { container } = render(
+        <Image
+          image={{ url: '/uploads/test.jpg', alternativeText: 'Test' } as unknown as PluginUploadFileDocument}
+          visible={false}
+        />
+      )
+
+      // Should not render anything
+      expect(container.firstChild).toBeNull()
+    })
+
+    it('should render normally when visible is true', () => {
+      render(
+        <Image
+          image={{ url: '/uploads/test.jpg', alternativeText: 'Test' } as unknown as PluginUploadFileDocument}
+          visible={true}
+        />
+      )
+
+      const img = screen.getByTestId('mock-image')
+      expect(img).toBeInTheDocument()
+    })
+
+    it('should render normally when visible is undefined (default)', () => {
+      render(
+        <Image image={{ url: '/uploads/test.jpg', alternativeText: 'Test' } as unknown as PluginUploadFileDocument} />
+      )
+
+      const img = screen.getByTestId('mock-image')
+      expect(img).toBeInTheDocument()
+    })
+  })
+
+  describe('URL resolution', () => {
+    it('should handle /icons/ paths correctly', () => {
+      render(
+        <Image image={{ url: '/icons/star.svg', alternativeText: 'Star' } as unknown as PluginUploadFileDocument} />
+      )
+
+      const img = screen.getByTestId('mock-image')
+      expect(img).toHaveAttribute('src', '/icons/star.svg')
+    })
+
+    it('should handle /images/ paths correctly', () => {
+      render(
+        <Image image={{ url: '/images/logo.png', alternativeText: 'Logo' } as unknown as PluginUploadFileDocument} />
+      )
+
+      const img = screen.getByTestId('mock-image')
+      expect(img).toHaveAttribute('src', '/images/logo.png')
+    })
+  })
 })

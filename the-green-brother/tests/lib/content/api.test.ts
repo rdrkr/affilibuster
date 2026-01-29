@@ -19,6 +19,7 @@ import {
   getContactUs,
   getContributorBySlug,
   getContributors,
+  getTeamMembers,
   getError404,
   getError410,
   getFaq,
@@ -632,7 +633,7 @@ describe('Content API - Collection Types', () => {
       const mockData = { data: [{ id: 1, name: 'Team Member' }], meta: {} }
       mockApiRequest.mockResolvedValueOnce(mockData as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getContributors({
+      const result = await getContributors(undefined, {
         filters: {
           roles: {
             roleId: {
@@ -666,6 +667,83 @@ describe('Content API - Collection Types', () => {
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
       consoleErrorSpy.mockRestore()
+    })
+
+    it('should fetch contributors with locale', async () => {
+      const mockData = { data: [{ id: 1, name: 'Contributor 1' }], meta: {} }
+      mockApiRequest.mockResolvedValueOnce(mockData as unknown as ReturnType<typeof apiClient.apiRequest>)
+
+      const result = await getContributors(CodeEnum.EN)
+
+      expect(mockCreateApiRequest).toHaveBeenCalledWith('/contributors', {
+        query: { locale: CodeEnum.EN, customPopulate: 'nested' },
+      })
+      expect(result).toEqual(mockData.data)
+    })
+  })
+
+  describe('getTeamMembers', () => {
+    it('should return team members excluding author and seller roles', async () => {
+      const mockContributors = {
+        data: [
+          { id: 1, name: 'CEO', roles: [{ roleId: 'ceo' }] },
+          { id: 2, name: 'Author Only', roles: [{ roleId: 'author' }] },
+          { id: 3, name: 'Multi', roles: [{ roleId: 'cto' }, { roleId: 'author' }] },
+        ],
+        meta: {},
+      }
+      mockApiRequest.mockResolvedValueOnce(mockContributors as unknown as ReturnType<typeof apiClient.apiRequest>)
+
+      const result = await getTeamMembers(CodeEnum.EN)
+
+      // Should filter out 'author' and 'seller' roles
+      // Contributor 1 (CEO) keeps their role
+      // Contributor 2 (Author Only) has no roles left -> excluded
+      // Contributor 3 (Multi) keeps 'cto' role, loses 'author' role
+      expect(result).toHaveLength(2)
+      expect(result[0]).toEqual(expect.objectContaining({ id: 1, roles: [{ roleId: 'ceo' }] }))
+      expect(result[1]).toEqual(expect.objectContaining({ id: 3, roles: [{ roleId: 'cto' }] }))
+    })
+
+    it('should return empty array when getContributors returns null', async () => {
+      mockApiRequest.mockRejectedValueOnce(new Error('API error'))
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
+
+      const result = await getTeamMembers(CodeEnum.EN)
+
+      expect(result).toEqual([])
+      consoleErrorSpy.mockRestore()
+    })
+
+    it('should pass locale to getContributors', async () => {
+      const mockData = { data: [], meta: {} }
+      mockApiRequest.mockResolvedValueOnce(mockData as unknown as ReturnType<typeof apiClient.apiRequest>)
+
+      await getTeamMembers(CodeEnum.IT)
+
+      expect(mockCreateApiRequest).toHaveBeenCalledWith('/contributors', {
+        query: {
+          locale: CodeEnum.IT,
+          filters: { roles: { roleId: { $nei: 'author' } } },
+          customPopulate: 'nested',
+        },
+      })
+    })
+
+    it('should merge additional query parameters', async () => {
+      const mockData = { data: [], meta: {} }
+      mockApiRequest.mockResolvedValueOnce(mockData as unknown as ReturnType<typeof apiClient.apiRequest>)
+
+      await getTeamMembers(CodeEnum.EN, { pagination: { page: 1, pageSize: 10 } })
+
+      expect(mockCreateApiRequest).toHaveBeenCalledWith('/contributors', {
+        query: {
+          locale: CodeEnum.EN,
+          pagination: { page: 1, pageSize: 10 },
+          filters: { roles: { roleId: { $nei: 'author' } } },
+          customPopulate: 'nested',
+        },
+      })
     })
   })
 

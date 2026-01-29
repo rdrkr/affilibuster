@@ -9,12 +9,7 @@
 
 import { ButtonLink, Card, Header, Text } from '@/components/elements'
 import type { CardLayout, CardSize, CardSizeModifier } from '@/components/elements/Card'
-import {
-  ApiContributorContributorDocument,
-  DirectionEnum,
-  type ApiBlogPostBlogPostDocument,
-  type ElementsLabelEntry,
-} from '@/lib/generated/types.gen'
+import { DirectionEnum, type ApiBlogPostBlogPostDocument, type ElementsLabelEntry } from '@/lib/generated/types.gen'
 
 import { HeaderLevel } from '../elements/Header'
 
@@ -50,8 +45,8 @@ export interface BlogCardProps {
   readTimeMinutesLabel: ElementsLabelEntry
   /** Label for read article button */
   readArticleLabel: ElementsLabelEntry
-  /** Default contributor for posts without a contributor */
-  defaultContributor: ApiContributorContributorDocument
+  /** Whether to preload image (for LCP optimization) */
+  preload?: boolean
 }
 
 /**
@@ -71,7 +66,7 @@ export interface BlogCardProps {
  * @param props.showTag - Whether to show tag
  * @param props.readTimeMinutesLabel - Label for read time
  * @param props.readArticleLabel - Label for read article button
- * @param props.defaultContributor - Default contributor for posts without a contributor
+ * @param props.preload - Whether to preload image (for LCP optimization)
  * @returns BlogCard component
  */
 export function BlogCard({
@@ -89,13 +84,15 @@ export function BlogCard({
   showTag = true,
   readTimeMinutesLabel,
   readArticleLabel,
-  defaultContributor,
+  preload = false,
 }: BlogCardProps) {
   const { featuredImage, tags, content, readTimeInMinutes, slug } = post
-  const contributor = post.contributor ?? defaultContributor
-  const firstTag = tags?.[0]?.tag?.text ?? ''
+
+  const author = post.author
+  const firstTag = tags[0]?.tag.text ?? ''
   const readTimeString = `${String(readTimeInMinutes)} ${readTimeMinutesLabel.text}`
-  const authorAndReadTime = `${contributor.name} • ${readTimeString}`
+  const authorName = author.lastName ? `${author.firstName} ${author.lastName}` : author.firstName
+  const authorAndReadTime = authorName ? `${authorName} • ${readTimeString}` : readTimeString
   const postUrl = `${basePath}/${slug}`
 
   // Determine layout based on size if not explicitly provided
@@ -117,7 +114,7 @@ export function BlogCard({
 
   // Content slot: Header with title and excerpt (hide subheader for 'sm' size)
   // Wrapped in overflow-hidden with min-w-0 to ensure text truncation works properly in flex containers
-  const contentSlot = content?.header ? (
+  const contentSlot = content.header ? (
     <div className="min-w-0 overflow-hidden">
       <Header
         data={
@@ -194,6 +191,7 @@ export function BlogCard({
       height={height}
       direction={direction}
       noAnimation={noAnimation ?? false}
+      preload={preload}
       className={`
         group @container flex justify-between overflow-hidden
         ${className}

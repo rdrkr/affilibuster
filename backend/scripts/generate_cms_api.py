@@ -63,6 +63,7 @@ ROUTE_DESCRIPTIONS = {
     "product": "Get products from Strapi.",
     "product-categories-page": "Get Product Categories listing page content from Strapi.",
     "product-category": "Get product categories from Strapi.",
+    "product-certificate": "Get product certificates from Strapi.",
     "product-tag": "Get product tags from Strapi.",
     "profile": "Get user Profile page content from Strapi.",
     "term": "Get Terms and Conditions content from Strapi.",
@@ -78,10 +79,13 @@ class RouteInfo:
     name: str  # PascalCase name from model (e.g., "About", "Products")
     params_model: str  # e.g., "AboutGetParametersQuery"
     response_model: str  # e.g., "AboutGetResponse"
-    id_params_model: str | None = None  # For collections: "ProductsIdGetParametersQuery"
+    # For collections: "ProductsIdGetParametersQuery"
+    id_params_model: str | None = None
     id_response_model: str | None = None  # For collections: "ProductsIdGetResponse"
-    slug_params_model: str | None = None  # For slug lookups: "ProductsSlugSlugGetParametersQuery"
-    slug_response_model: str | None = None  # For slug lookups: "ProductsSlugSlugGetResponse"
+    # For slug lookups: "ProductsSlugSlugGetParametersQuery"
+    slug_params_model: str | None = None
+    # For slug lookups: "ProductsSlugSlugGetResponse"
+    slug_response_model: str | None = None
 
     @property
     def is_collection(self) -> bool:

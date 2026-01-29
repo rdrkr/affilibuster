@@ -5,7 +5,7 @@
     "singularName": "blog-post",
     "pluralName": "blog-posts",
     "displayName": "Blog Post",
-    "description": "Blog posts with title, content, featured image, contributor, tags, and SEO metadata"
+    "description": "Blog posts with title, content, featured image, author, tags, and SEO metadata"
   },
   "options": {
     "draftAndPublish": true
@@ -47,11 +47,22 @@
       "required": true,
       "allowedTypes": ["images"]
     },
-    "contributor": {
+    "author": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "oneToOne",
       "target": "api::contributor.contributor",
-      "inversedBy": "blogPosts"
+      "pluginOptions": {
+        "strapi-plugin-relation-filter": {
+          "filters": {
+            "roles": {
+              "roleId": {
+                "$eq": "author"
+              }
+            }
+          }
+        }
+      },
+      "required": true
     },
     "readTimeInMinutes": {
       "type": "integer",
@@ -65,9 +76,9 @@
     },
     "tags": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "oneToMany",
       "target": "api::blog-post-tag.blog-post-tag",
-      "mappedBy": "posts"
+      "required": true
     },
     "publishedDate": {
       "type": "datetime",

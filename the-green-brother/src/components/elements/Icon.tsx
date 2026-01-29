@@ -106,6 +106,8 @@ export interface IconProps {
   visible?: boolean
   /** When true, renders the icon as a mask with current text color (only for local icons) */
   masked?: boolean
+  /** When true, loads the icon with high priority (for LCP optimization, local icons only) */
+  priority?: boolean
 }
 
 /**
@@ -134,10 +136,11 @@ const sizeMappings = {
  * @param props.promoted - When true, renders the icon larger with a circular background
  * @param props.visible - Controls visibility (false = hidden from layout)
  * @param props.masked - When true, renders local icon as a mask to inherit color
+ * @param props.priority - When true, loads local icon with high priority (for LCP)
  * @returns Icon element or null if no icon or not visible
  * @example
  * ```tsx
- * <Icon icon="brand.svg" size="lg" />
+ * <Icon icon="brand.svg" size="lg" priority />
  * <Icon icon="social.svg" size="md" masked />
  * <Icon icon="home" size="md" />
  * <Icon icon="Account Circle" />
@@ -152,6 +155,7 @@ export function Icon({
   promoted = false,
   visible,
   masked = false,
+  priority = false,
 }: IconProps) {
   const resolved = resolveIcon(icon)
 
@@ -219,6 +223,7 @@ export function Icon({
         alt={ariaLabel ?? ''}
         width={sizeValue}
         height={sizeValue}
+        priority={priority}
         className={`
           drop-shadow-icon-sm dark:drop-shadow-none
           ${promoted ? '' : className}
@@ -243,7 +248,7 @@ export function Icon({
     <span
       className={`
         material-symbols-outlined-bold
-        ${promoted ? 'text-primary text-shadow-sm dark:text-shadow-none' : ''} ${promoted ? '' : className}
+        ${promoted ? 'text-primary text-shadow-sm dark:text-shadow-none' : className}
       `}
       style={{ fontSize: `${String(sizeValue)}px` }}
       aria-label={ariaLabel}

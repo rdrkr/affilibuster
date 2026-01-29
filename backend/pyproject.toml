@@ -8,10 +8,10 @@ authors = [{ name = "Affilibuster Team" }]
 requires-python = ">=3.13"
 readme = "../README.md"
 dependencies = [
-  "fastapi==0.128.0",
+  "fastapi==0.128.2",
   "uvicorn[standard]==0.40.0",
   "sqlalchemy==2.0.46",
-  "alembic==1.18.1",
+  "alembic==1.18.3",
   "pydantic==2.12.5",
   "pydantic-settings==2.12.0",
   "psycopg2-binary==2.9.11",
@@ -31,7 +31,7 @@ dependencies = [
   "pytest-cov==7.0.0",
   "pytest-xdist==3.8.0",
   "pytest-mock==3.15.1",
-  "ruff==0.14.14",
+  "ruff==0.15.0",
   "mypy==1.19.1",
   "taskipy==1.14.1",
   "types-pyyaml==6.0.12.20250915",
@@ -58,10 +58,6 @@ openapi-generate = { cmd = """\
     mkdir -p src/affilibuster_backend/domain/entities/generated && \
     touch src/affilibuster_backend/domain/entities/generated/__init__.py && \
     datamodel-codegen \
-      --input ../contracts/affilibuster.openapi.yaml \
-      --output src/affilibuster_backend/domain/entities/generated/models.py \
-      --custom-file-header "# Copyright (c) 2026 Affilibuster by Ronen Druker." \
-      --allow-population-by-field-name \
     """, help = "generates Python models from OpenAPI specification" }
 generate-cms-api = { cmd = "PYTHONPATH=src:. python scripts/generate_cms_api.py", help = "auto-generates cms_routes.py and cms_entities.py from generated models" }
 seed = { cmd = "PYTHONPATH=src:. python -m scripts.seed", help = "seeds PostgreSQL database with data from backend-seed.jsonl" }
@@ -131,18 +127,25 @@ convention = "google"
 docstring-code-format = true
 
 [tool.datamodel-codegen]
+input = "../contracts/affilibuster.openapi.yaml"
+output = "src/affilibuster_backend/domain/entities/generated/models.py"
+custom-file-header = "# Copyright (c) 2026 Affilibuster by Ronen Druker."
+target-python-version = "3.13"
+input-file-type = "openapi"
+output-model-type = "pydantic_v2.BaseModel"
+formatters = ["ruff-format", "ruff-check"]
+openapi-scopes = ["schemas", "paths", "tags", "parameters"]
+allow-population-by-field-name = true
 field-constraints = true
 snake-case-field = true
 no-alias = false # allow camelCase aliases
+strict-nullable = false
 strip-default-none = false
-target-python-version = "3.13"
+use-default = true
+use-default-factory-for-optional-nested-models = true
 use-schema-description = true
 use-field-description = true
 capitalize-enum-members = true
-formatters = ["ruff-format", "ruff-check"]
-input-file-type = "openapi"
-openapi-scopes = ["schemas", "paths", "tags", "parameters"]
-output-model-type = "pydantic_v2.BaseModel"
 
 [tool.mypy]
 python_version = "3.13"

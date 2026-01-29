@@ -50,19 +50,24 @@ describe('ProductCard', () => {
     documentId: 'prod-1',
     id: 1,
     slug: 'eco-bottle',
-    price: 25.5,
-    currency: {
-      documentId: 'curr-1',
-      id: 1,
-      code: 'USD',
-      symbol: '$',
-      name: 'Dollar',
-      decimalPlaces: 2,
-      symbolPosition: 'before',
-      thousandsSeparator: ',',
-      decimalSeparator: '.',
-      publishedAt: '2025-01-01',
-    } as any,
+    prices: [
+      {
+        id: 1,
+        amount: 25.5,
+        currency: {
+          documentId: 'curr-1',
+          id: 1,
+          code: 'USD',
+          symbol: '$',
+          name: 'Dollar',
+          decimalPlaces: 2,
+          symbolPosition: 'before',
+          thousandsSeparator: ',',
+          decimalSeparator: '.',
+          publishedAt: '2025-01-01',
+        } as any,
+      },
+    ],
     images: [
       {
         documentId: 'img-1',
@@ -89,17 +94,19 @@ describe('ProductCard', () => {
           iconPosition: IconPositionEnum.BEFORE_TEXT,
           ariaDescription: 'New arrival tag',
         },
+        seoMetadata: {
+          metaTitle: 'New Arrival',
+          metaDescription: 'New arrival products',
+        },
       },
     ],
-    content: {
+    header: {
+      alignment: 'center',
+      promoteHeaderIcon: false,
       header: {
-        alignment: 'center',
-        promoteHeaderIcon: false,
-        header: {
-          text: 'Eco Water Bottle',
-          ariaDescription: 'Product Title',
-          iconPosition: IconPositionEnum.BEFORE_TEXT,
-        },
+        text: 'Eco Water Bottle',
+        ariaDescription: 'Product Title',
+        iconPosition: IconPositionEnum.BEFORE_TEXT,
       },
     } as any,
     viewDetailsLabel: {
@@ -116,12 +123,29 @@ describe('ProductCard', () => {
       url: 'https://example.com',
       openInNewTab: true,
     },
+    disclaimerLabel: {
+      text: 'Disclaimer',
+      iconPosition: IconPositionEnum.BEFORE_TEXT,
+      ariaDescription: 'Disclaimer',
+    },
+    category: {
+      documentId: 'cat-1',
+      slug: 'electronics',
+      content: { text: 'Electronics' },
+    } as any,
+    description: [],
+    seller: { documentId: 'seller-1' } as any,
+    seoMetadata: {
+      metaTitle: 'Eco Water Bottle',
+      metaDescription: 'Sustainable electronic bottle',
+    },
     publishedAt: '2025-01-01',
   }
 
   const defaultProps = {
     product: mockProduct,
     direction: DirectionEnum.LTR,
+    enableUserProfile: false,
   }
 
   it('should render generic Card with correct props', () => {
@@ -180,14 +204,14 @@ describe('ProductCard', () => {
     expect(overlay).toContainElement(icon)
   })
 
-  it('should handle currency fallback', () => {
-    const productNoCurrency = {
+  it('should handle empty prices array gracefully', () => {
+    const productNoPrices = {
       ...mockProduct,
-      currency: null,
+      prices: [],
     }
-    // Type casting because api type might say currency is optional or whatever
-    render(<ProductCard {...defaultProps} product={productNoCurrency as any} />)
-    expect(screen.getByText('$25.50')).toBeInTheDocument()
+    render(<ProductCard {...defaultProps} product={productNoPrices as any} />)
+    // Price should not be displayed
+    expect(screen.queryByText('$25.50')).not.toBeInTheDocument()
   })
 
   it('should handle missing tags gracefully', () => {

@@ -9,6 +9,24 @@ import { act, fireEvent, render, screen } from '@testing-library/react'
 import { SearchMenu, type SearchMenuProps } from '@/components/menus/SearchMenu'
 import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 
+// Mock for useSearchParams - allows tests to control URL params
+let mockSearchParams = new Map<string, string>()
+// Mock pathname for language extraction
+const mockPathname = '/en/products'
+
+// Mock for router.push - allows tests to verify URL changes
+const mockRouterPush = jest.fn()
+
+jest.mock('next/navigation', () => ({
+  useSearchParams: () => ({
+    get: (key: string) => mockSearchParams.get(key) ?? null,
+  }),
+  useRouter: () => ({
+    push: mockRouterPush,
+  }),
+  usePathname: () => mockPathname,
+}))
+
 // Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -37,6 +55,7 @@ jest.mock('@/components/elements', () => ({
     const { children, data, onClick, className } = props
     const ariaLabel = props['aria-label'] ?? data?.label?.ariaDescription
     const ariaExpanded = props['aria-expanded']
+    const testId = props['data-testid']
     // If no children, render icon and text from data.label
     const content =
       children ??
@@ -51,22 +70,18 @@ jest.mock('@/components/elements', () => ({
         </>
       ))
     return (
-      <button ref={ref} onClick={onClick} className={className} aria-label={ariaLabel} aria-expanded={ariaExpanded}>
+      <button
+        ref={ref}
+        onClick={onClick}
+        className={className}
+        aria-label={ariaLabel}
+        aria-expanded={ariaExpanded}
+        data-testid={testId}
+      >
         {content}
       </button>
     )
   }),
-  ButtonLink: function MockButtonLink(props: any) {
-    const { children, data, className } = props
-    const ariaLabel = props['aria-label'] ?? data?.label?.ariaDescription
-    // If no children, render text from data.label
-    const content = children ?? (data?.label && <span data-testid="mock-text">{data.label.text}</span>)
-    return (
-      <a href={data?.url} className={className} aria-label={ariaLabel}>
-        {content}
-      </a>
-    )
-  },
 }))
 
 describe('SearchMenu', () => {
@@ -141,6 +156,8 @@ describe('SearchMenu', () => {
 
   beforeEach(() => {
     jest.useFakeTimers()
+    mockSearchParams = new Map<string, string>()
+    mockRouterPush.mockClear()
   })
 
   afterEach(() => {
@@ -275,18 +292,24 @@ describe('SearchMenu', () => {
   })
 
   it('should show search results when query is entered', () => {
-    render(<SearchMenu {...defaultProps} />)
-    const button = screen.getByRole('button', { name: 'Open search' })
-    fireEvent.click(button)
+    const { container } = render(<SearchMenu {...defaultProps} />)
+    const searchContainer = container.firstChild as HTMLElement
+    fireEvent.mouseEnter(searchContainer)
+    act(() => {
+      jest.advanceTimersByTime(800)
+    })
     const input = screen.getByPlaceholderText('Search products...')
     fireEvent.change(input, { target: { value: 'bamboo' } })
     expect(screen.getByText('Products')).toBeInTheDocument()
   })
 
   it('should show view all results link with query', () => {
-    render(<SearchMenu {...defaultProps} />)
-    const button = screen.getByRole('button', { name: 'Open search' })
-    fireEvent.click(button)
+    const { container } = render(<SearchMenu {...defaultProps} />)
+    const searchContainer = container.firstChild as HTMLElement
+    fireEvent.mouseEnter(searchContainer)
+    act(() => {
+      jest.advanceTimersByTime(800)
+    })
     const input = screen.getByPlaceholderText('Search products...')
     fireEvent.change(input, { target: { value: 'test' } })
     expect(screen.getByText('"test"')).toBeInTheDocument()
@@ -462,6 +485,87 @@ describe('SearchMenu', () => {
       })
 
       expect(onExpandChange).toHaveBeenCalledWith(false)
+    })
+  })
+
+  describe('Navigation with search param', () => {
+    it('should navigate to products with search param on Enter key', () => {
+      render(<SearchMenu {...defaultProps} />)
+      const button = screen.getByRole('button', { name: 'Open search' })
+      fireEvent.click(button)
+
+      const input = screen.getByPlaceholderText('Search products...')
+      fireEvent.change(input, { target: { value: 'bamboo' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
+
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/products?search=bamboo')
+    })
+
+    it('should navigate to products with search param on view all results click', () => {
+      const { container } = render(<SearchMenu {...defaultProps} />)
+      const searchContainer = container.firstChild as HTMLElement
+      fireEvent.mouseEnter(searchContainer)
+      act(() => {
+        jest.advanceTimersByTime(800)
+      })
+
+      const input = screen.getByPlaceholderText('Search products...')
+      fireEvent.change(input, { target: { value: 'bamboo' } })
+
+      const viewAllButton = screen.getByTestId('view-all-results-button')
+      fireEvent.click(viewAllButton)
+
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/products?search=bamboo')
+    })
+
+    it('should reset category to "all" when navigating with search', () => {
+      mockSearchParams.set('category', 'kitchen')
+
+      render(<SearchMenu {...defaultProps} />)
+      const button = screen.getByRole('button', { name: 'Open search' })
+      fireEvent.click(button)
+
+      const input = screen.getByPlaceholderText('Search products...')
+      fireEvent.change(input, { target: { value: 'bamboo' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
+
+      // Category param should NOT be included (reset to "all")
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/products?search=bamboo')
+    })
+
+    it('should not navigate when search query is empty', () => {
+      render(<SearchMenu {...defaultProps} />)
+      const button = screen.getByRole('button', { name: 'Open search' })
+      fireEvent.click(button)
+
+      const input = screen.getByPlaceholderText('Search products...')
+      fireEvent.keyDown(input, { key: 'Enter' })
+
+      expect(mockRouterPush).not.toHaveBeenCalled()
+    })
+
+    it('should not navigate when search query is only whitespace', () => {
+      render(<SearchMenu {...defaultProps} />)
+      const button = screen.getByRole('button', { name: 'Open search' })
+      fireEvent.click(button)
+
+      const input = screen.getByPlaceholderText('Search products...')
+      fireEvent.change(input, { target: { value: '   ' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
+
+      expect(mockRouterPush).not.toHaveBeenCalled()
+    })
+
+    it('should trim whitespace from search query', () => {
+      render(<SearchMenu {...defaultProps} />)
+      const button = screen.getByRole('button', { name: 'Open search' })
+      fireEvent.click(button)
+
+      const input = screen.getByPlaceholderText('Search products...')
+      fireEvent.change(input, { target: { value: '  bamboo  ' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
+
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/products?search=bamboo')
     })
   })
 })

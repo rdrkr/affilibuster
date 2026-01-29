@@ -307,6 +307,121 @@ function removeI18nTag(spec: OpenAPISpec): OpenAPISpec {
 }
 
 /**
+ * Get plugin names to exclude from the specification.
+ *
+ * Combines:
+ * 1. Folders in cms/src/plugins (local plugins)
+ * 2. Dependencies in cms/package.json starting with "strapi-plugin-" (installed plugins)
+ * @returns Array of plugin names to exclude
+ */
+function getPluginNames(): string[] {
+  const pluginNames = new Set<string>()
+
+  // 1. Local plugins from cms/src/plugins
+  const pluginsDir = path.resolve(__dirname, '../src/plugins')
+  if (fs.existsSync(pluginsDir)) {
+    const entries = fs.readdirSync(pluginsDir, { withFileTypes: true })
+    entries.filter(entry => entry.isDirectory()).forEach(entry => pluginNames.add(entry.name))
+  }
+
+  // 2. Installed plugins from cms/package.json
+  try {
+    const packageJsonPath = path.resolve(__dirname, '../package.json')
+    if (fs.existsSync(packageJsonPath)) {
+      const content = fs.readFileSync(packageJsonPath, 'utf-8')
+      const packageJson = JSON.parse(content) as {
+        dependencies?: Record<string, string>
+        devDependencies?: Record<string, string>
+      }
+      const dependencies = { ...(packageJson.dependencies ?? {}), ...(packageJson.devDependencies ?? {}) }
+
+      Object.keys(dependencies).forEach(dep => {
+        // Filter for packages starting with "strapi-plugin-"
+        if (dep.startsWith('strapi-plugin-')) {
+          pluginNames.add(dep)
+        }
+      })
+    }
+  } catch {
+    console.warn('   ⚠ Could not read package.json to filter installed plugins')
+  }
+
+  return Array.from(pluginNames)
+}
+
+/**
+ * Remove plugin paths from the specification.
+ *
+ * Removes paths belonging to plugins identified by getPluginNames().
+ * Plugin endpoints are identified by operations with tags matching plugin names.
+ * @param spec - OpenAPI specification to modify
+ * @returns Specification with plugin paths removed
+ */
+function removePluginPaths(spec: OpenAPISpec): OpenAPISpec {
+  const pluginNames = getPluginNames()
+
+  if (pluginNames.length === 0) {
+    return spec
+  }
+
+  const processedSpec = { ...spec }
+  const processedPaths: Record<string, unknown> = {}
+
+  Object.entries(spec.paths).forEach(([pathKey, pathItem]) => {
+    if (typeof pathItem !== 'object' || pathItem === null) {
+      return
+    }
+
+    // Check if any operation on this path has a plugin tag
+    const isPluginPath = Object.values(pathItem as Record<string, unknown>).some(operation => {
+      if (operation && typeof operation === 'object' && 'tags' in operation) {
+        const tags = (operation as { tags?: string[] }).tags
+        if (Array.isArray(tags)) {
+          return tags.some(tag => pluginNames.includes(tag))
+        }
+      }
+      return false
+    })
+
+    // Only keep paths that are not plugin paths
+    if (!isPluginPath) {
+      processedPaths[pathKey] = pathItem
+    }
+  })
+
+  processedSpec.paths = processedPaths
+  return processedSpec
+}
+
+/**
+ * Remove plugin tags from the specification.
+ *
+ * Removes tags belonging to plugins identified by getPluginNames().
+ * @param spec - OpenAPI specification to modify
+ * @returns Specification with plugin tags removed
+ */
+function removePluginTags(spec: OpenAPISpec): OpenAPISpec {
+  const pluginNames = getPluginNames()
+
+  if (pluginNames.length === 0) {
+    return spec
+  }
+
+  const processedSpec = { ...spec }
+
+  if (processedSpec.tags && Array.isArray(processedSpec.tags)) {
+    processedSpec.tags = processedSpec.tags.filter(tag => {
+      if ('name' in tag) {
+        return !pluginNames.includes((tag as { name: string }).name)
+      }
+      return true
+    })
+  }
+
+  return processedSpec
+}
+
+/**
  * Remove health check paths from the specification.
  *
  * Removes /health and other health check endpoints as these are
@@ -635,6 +750,7 @@ function addStrapiTags(spec: OpenAPISpec): OpenAPISpec {
     { name: 'product', description: 'Product catalog and details' },
     { name: 'product-categories-page', description: 'Product categories listing page content' },
     { name: 'product-category', description: 'Product category definitions and metadata' },
+    { name: 'product-certificate', description: 'Product certifications' },
     { name: 'product-tag', description: 'Product tags for filtering and categorization' },
     { name: 'profile', description: 'User profile page content' },
     { name: 'redirects', description: 'URL redirect rules and configurations' },
@@ -915,90 +1031,6 @@ function simplifyLocalizationsSchema(spec: OpenAPISpec): OpenAPISpec {
   // Traverse component schemas
   if (processed.components?.schemas) {
     traverse(processed.components.schemas)
-  }
-
-  return processed
-}
-
-/**
- * Make component, media, and relation fields optional in document schemas.
- *
- * Strapi returns deeply nested circular relations (e.g., contributor -> blogPosts -> contributor -> blogPosts).
- * At the nesting depth limit, Strapi returns partial objects without the full component/media fields.
- * This causes Pydantic validation errors because these fields are marked as required.
- *
- * This function removes component/media/relation-like fields from the required array for document
- * schemas (Api*Document), making them optional. This allows the backend to accept partial nested data.
- *
- * Affected field patterns:
- * - profilePicture, featuredImage, image, logo, etc. (media fields)
- * - seoMetadata, content, header, etc. (component fields)
- * - blogPosts, posts, contributor, tags, categories, products, etc. (relation fields)
- * @param spec - OpenAPI specification to modify
- * @returns Specification with optional nested fields in document schemas
- */
-function makeNestedFieldsOptionalInDocuments(spec: OpenAPISpec): OpenAPISpec {
-  const processed = JSON.parse(JSON.stringify(spec)) as OpenAPISpec
-
-  if (!processed.components?.schemas) {
-    return processed
-  }
-
-  // Fields that should be optional in document schemas (for nested relations)
-  // These are typically: media, components, or relations that may not be populated at depth
-  const fieldsToMakeOptional = new Set([
-    // Media fields
-    'profilePicture',
-    'featuredImage',
-    'image',
-    'logo',
-    'icon',
-    'thumbnail',
-    'coverImage',
-    'backgroundImage',
-    // Component fields
-    'seoMetadata',
-    'content',
-    'header',
-    'tag',
-    'label',
-    // Relation fields (can cause circular depth issues)
-    'blogPosts',
-    'posts',
-    'contributor',
-    'tags',
-    'categories',
-    'products',
-    'themes',
-  ])
-
-  let modifiedCount = 0
-
-  for (const [schemaName, schema] of Object.entries(processed.components.schemas)) {
-    // Process Api*Document schemas (content type documents) AND component schemas (*Entry)
-    // These can have deeply nested relations or nullable media fields
-    const isDocument = schemaName.startsWith('Api') && schemaName.endsWith('Document')
-    const isComponent = schemaName.endsWith('Entry')
-    if (!isDocument && !isComponent) {
-      continue
-    }
-
-    const schemaObj = schema as Record<string, unknown>
-    if (!schemaObj.required || !Array.isArray(schemaObj.required)) {
-      continue
-    }
-
-    const originalRequired = schemaObj.required as string[]
-    const filteredRequired = originalRequired.filter(field => !fieldsToMakeOptional.has(field))
-    schemaObj.required = filteredRequired
-
-    if (filteredRequired.length < originalRequired.length) {
-      modifiedCount++
-    }
-  }
-
-  if (modifiedCount > 0) {
-    console.log(`   ✓ Made nested fields optional in ${String(modifiedCount)} schema(s)`)
   }
 
   return processed
@@ -1926,58 +1958,60 @@ function preprocessStrapiSpec(spec: OpenAPISpec, config: { strapiUrlProd: string
   // 6. Remove i18n tag
   processed = removeI18nTag(processed)
 
-  // 7. Add server URLs for Strapi CMS endpoints
+  // 7. Remove plugin paths (cms/src/plugins endpoints)
+  processed = removePluginPaths(processed)
+
+  // 8. Remove plugin tags
+  processed = removePluginTags(processed)
+
+  // 9. Add server URLs for Strapi CMS endpoints
   processed = addStrapiServers(processed, config.strapiUrlProd, config.strapiUrlDev)
 
-  // 8. Fix pattern fields with unsupported regex features
+  // 10. Fix pattern fields with unsupported regex features
   processed = fixStrapiPatterns(processed)
 
-  // 9. Remove $id fields from schemas
+  // 11. Remove $id fields from schemas
   processed = removeSchemaIds(processed)
 
-  // 10. Remove UUID format fields
+  // 12. Remove UUID format fields
   processed = removeUuidFormat(processed)
 
-  // 11. Remove publishedAt default values
+  // 13. Remove publishedAt default values
   processed = removePublishedAtDefaults(processed)
 
-  // 12. Fix empty populate enums
+  // 14. Fix empty populate enums
   processed = fixEmptyPopulateEnums(processed)
 
-  // 13. Replace populate with nested-populator parameters
+  // 15. Replace populate with nested-populator parameters
   processed = replacePopulateWithNestedPopulator(processed)
 
-  // 14. Add generic 200 responses where missing
+  // 16. Add generic 200 responses where missing
   processed = addMissing200Responses(processed)
 
-  // 15. Fix upload files endpoint schema
+  // 17. Fix upload files endpoint schema
   processed = fixUploadFilesSchema(processed)
 
-  // 16. Add id to component schemas
+  // 18. Add id to component schemas
   processed = addIdToComponentSchemas(processed)
 
-  // 17. Add meta to responses
+  // 19. Add meta to responses
   processed = addMetaToResponses(processed)
 
-  // 18. Add license information to info section
+  // 20. Add license information to info section
   processed = addStrapiLicense(processed)
 
-  // 19. Add tags section with descriptions
+  // 21. Add tags section with descriptions
   processed = addStrapiTags(processed)
 
-  // 20. Add security definitions to mark operations as public
+  // 22. Add security definitions to mark operations as public
   processed = addPublicSecurity(processed)
 
-  // 21. Remove deprecated 'related' field from PluginUploadFileDocument required array
+  // 23. Remove deprecated 'related' field from PluginUploadFileDocument required array
   processed = makeRelatedOptionalInFileSchema(processed)
 
-  // 22. Simplify localizations schema to avoid Pydantic validation errors
+  // 24. Simplify localizations schema to avoid Pydantic validation errors
   // Strapi returns localizations as shallow refs (scalar fields only, no components)
   processed = simplifyLocalizationsSchema(processed)
-
-  // 23. Make component/media/relation fields optional in document schemas
-  // This handles deeply nested circular relations where Strapi returns partial data
-  processed = makeNestedFieldsOptionalInDocuments(processed)
 
   return processed
 }

@@ -36,14 +36,13 @@ export default async function TopicPage({ params }: { params: Promise<{ lang: Co
     getBlog(lang),
   ])
 
-  if (!blogPageResponse?.defaultContributor) return null
+  if (!blogPageResponse) return null
 
   return (
     <TopicClient
       tag={decodedTag}
       posts={postsResponse?.data ?? []}
       noItemsFound={blogPageResponse.pagination.noItemsFound}
-      defaultContributor={blogPageResponse.defaultContributor}
       readTimeMinutesLabel={blogPageResponse.readTimeMinutesLabel}
       readArticleLabel={blogPageResponse.readArticleLabel}
     />

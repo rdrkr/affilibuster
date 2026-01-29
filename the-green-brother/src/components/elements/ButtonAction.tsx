@@ -61,6 +61,16 @@ export interface ButtonActionProps {
   slideDirection?: 'start-to-end' | 'end-to-start'
   /** Additional CSS classes for the label text */
   textClassName?: string
+  /** ARIA role attribute for the button element */
+  role?: string
+  /** Whether the element is selected (for tabs/options) */
+  'aria-selected'?: boolean
+  /** ID of the element this button controls */
+  'aria-controls'?: string
+  /** Unique ID for the button element */
+  id?: string
+  /** Test ID for testing purposes */
+  'data-testid'?: string
 }
 
 /**
@@ -83,6 +93,11 @@ export interface ButtonActionProps {
  * @param props.'aria-expanded' - ARIA expanded state
  * @param props.childrenPosition - Position of children relative to label
  * @param props.textClassName - Additional CSS classes for the label text
+ * @param props.role - ARIA role attribute for the button element
+ * @param props.'aria-selected' - ARIA selected state (for tabs/options)
+ * @param props.'aria-controls' - ID of the element this button controls
+ * @param props.id - Unique ID for the button element
+ * @param props.'data-testid' - Test ID for testing purposes
  * @returns Button action component or null if no data or not visible
  */
 export const ButtonAction = forwardRef<HTMLButtonElement, ButtonActionProps>(
@@ -105,6 +120,11 @@ export const ButtonAction = forwardRef<HTMLButtonElement, ButtonActionProps>(
       childrenPosition = 'end',
       slideDirection = 'end-to-start',
       textClassName,
+      role,
+      'aria-selected': ariaSelected,
+      'aria-controls': ariaControls,
+      id,
+      'data-testid': dataTestId,
     },
     ref
   ) => {
@@ -153,6 +173,11 @@ export const ButtonAction = forwardRef<HTMLButtonElement, ButtonActionProps>(
         aria-label={ariaLabel}
         aria-expanded={ariaExpanded}
         aria-hidden={!visible}
+        role={role}
+        aria-selected={ariaSelected}
+        aria-controls={ariaControls}
+        id={id}
+        data-testid={dataTestId}
       >
         {content}
       </button>

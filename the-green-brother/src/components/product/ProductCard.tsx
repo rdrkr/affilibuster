@@ -15,7 +15,7 @@ export interface ProductCardProps {
   /** Card size (default: 'md') */
   size?: CardSize
   /** Feature flag: Enable user profile features (favorites) */
-  enableUserProfile?: boolean
+  enableUserProfile: boolean
   /** Additional CSS classes */
   className?: string
   /** Whether the card acts as a link (defaults to false for products as they have CTA) */
@@ -26,6 +26,10 @@ export interface ProductCardProps {
   width?: CardSizeModifier
   /** Card height */
   height?: CardSizeModifier
+  /** No card hover animation */
+  noAnimation?: boolean
+  /** Whether to preload image (for LCP optimization) */
+  preload?: boolean
 }
 
 /**
@@ -43,27 +47,32 @@ export interface ProductCardProps {
  * @param props.layout - Card layout
  * @param props.width - Card width
  * @param props.height - Card height
+ * @param props.noAnimation - No card hover animation
+ * @param props.preload - Whether to preload image (for LCP optimization)
  * @returns ProductCard component
  */
 export function ProductCard({
   product,
   direction,
   size = 'md',
-  enableUserProfile = false,
+  enableUserProfile,
   className = '',
   asLink = false,
   layout = 'ttb',
   width = 'fixed',
   height = 'fixed',
+  noAnimation = true,
+  preload = false,
 }: ProductCardProps) {
   // Data extraction
   const primaryImage = product.images[0]
-  const tagText = (product.tags ?? []).at(0)?.tag?.text ?? ''
+  const tagText = (product.tags ?? []).at(0)?.tag.text ?? ''
   const imageSizes = '320px'
   const productUrl = `/products/${product.slug}`
 
-  // Price formatting
-  const priceDisplay = `${product.currency?.symbol ?? '$'}${product.price.toFixed(2)}`
+  // Price formatting - get first price from prices array
+  const primaryPrice = product.prices[0]
+  const priceDisplay = primaryPrice ? `${primaryPrice.currency.symbol}${primaryPrice.amount.toFixed(2)}` : ''
 
   return (
     <Card
@@ -77,6 +86,8 @@ export function ProductCard({
       href={productUrl}
       image={primaryImage}
       imageSizes={imageSizes}
+      noAnimation={noAnimation}
+      preload={preload}
       imageOverlay={
         enableUserProfile && (
           <div className="absolute top-3 right-3">
@@ -88,7 +99,7 @@ export function ProductCard({
                 transition-colors hover:bg-primary hover:text-black
                 dark:bg-background-dark/50 dark:text-white
               `}
-              aria-label={product.content?.header?.header?.ariaDescription ?? 'Add to favorites'}
+              aria-label={product.header.header?.ariaDescription ?? 'Add to favorites'}
             >
               <Icon icon="favorite_border" size="lg" />
             </button>
@@ -119,9 +130,9 @@ export function ProductCard({
         </div>
       }
       content={
-        product.content?.header?.header && (
+        product.header.header && (
           <Text
-            text={product.content.header.header.text}
+            text={product.header.header.text}
             as="h4"
             className={`
               line-clamp-2 text-lg font-bold text-neutral-800

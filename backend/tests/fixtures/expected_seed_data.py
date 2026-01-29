@@ -106,6 +106,40 @@ def _should_skip_entity_type(entity_type: str) -> bool:
     )
 
 
+def _is_unpublished_entity(entity_type: str, data: dict[str, Any]) -> bool:
+    """Check if entity is unpublished (only applies to API entities)."""
+    return entity_type.startswith("api::") and not data.get("publishedAt")
+
+
+def _strip_unwanted_fields(data: dict[str, Any], strip_fields: list[str] | None) -> None:
+    """Remove unwanted fields from entity data in-place."""
+    if strip_fields:
+        for field in strip_fields:
+            data.pop(field, None)
+
+
+def _add_default_fields(data: dict[str, Any], default_fields: dict[str, Any] | None) -> None:
+    """Add default values for missing required fields in-place."""
+    if default_fields:
+        for field, default_value in default_fields.items():
+            if field not in data:
+                data[field] = default_value
+
+
+def _inject_dummy_currency_if_needed(entity_type: str, data: dict[str, Any]) -> None:
+    """Inject dummy currency into product prices if missing (schema migration fix)."""
+    if entity_type != "api::product.product":
+        return
+
+    prices = data.get("prices")
+    if not isinstance(prices, list):
+        return
+
+    for price in prices:
+        if "currency" not in price:
+            price["currency"] = DUMMY_CURRENCY_DATA
+
+
 def deserialize_entity[T: BaseModel](
     json_line: str,
     model_class: type[T],
@@ -136,27 +170,18 @@ def deserialize_entity[T: BaseModel](
         if _should_skip_entity_type(wrapper.type):
             return (wrapper.type, None, None)
 
-        # Extract locale
+        # Extract locale and merge ID
         locale = wrapper.data.get("locale")
-
-        # Merge top-level ID into data (Strapi stores ID separately)
         wrapper.data["id"] = wrapper.id
 
-        # Only process published entities (plugin entities like i18n.locale don't have publishedAt)
-        if wrapper.type.startswith("api::") and not wrapper.data.get("publishedAt"):
+        # Only process published entities
+        if _is_unpublished_entity(wrapper.type, wrapper.data):
             return (wrapper.type, locale, None)
 
-        # Strip unwanted fields if specified (e.g., locale:null for Currency)
-        if strip_fields:
-            for field in strip_fields:
-                wrapper.data.pop(field, None)
-
-        # Add default values for missing required fields if specified
-        # (e.g., images=[] for products when relations not populated in DB export)
-        if default_fields:
-            for field, default_value in default_fields.items():
-                if field not in wrapper.data:
-                    wrapper.data[field] = default_value
+        # Apply field modifications
+        _strip_unwanted_fields(wrapper.data, strip_fields)
+        _add_default_fields(wrapper.data, default_fields)
+        _inject_dummy_currency_if_needed(wrapper.type, wrapper.data)
 
         # Deserialize using Pydantic model validation
         entity = model_class.model_validate(wrapper.data)
@@ -165,6 +190,67 @@ def deserialize_entity[T: BaseModel](
         return ("", None, None)
     else:
         return (wrapper.type, locale, entity)
+
+
+# Minimal valid ElementsSeoMetadataEntry data (all fields are optional).
+DUMMY_SEO_METADATA: dict[str, Any] = {}
+
+# Minimal valid PluginUploadFileDocument data for populating required image relations.
+DUMMY_IMAGE_DATA: dict[str, Any] = {
+    "documentId": "dummy-image-1",
+    "id": 1,
+    "name": "dummy-image.png",
+    "hash": "dummy_hash",
+    "mime": "image/png",
+    "size": 1.0,
+    "url": "/uploads/dummy.png",
+    "provider": "local",
+    "publishedAt": "2025-01-01T00:00:00.000Z",
+}
+
+# Minimal valid ElementsLabelEntry data for populating required label relations.
+DUMMY_LABEL_DATA: dict[str, Any] = {
+    "text": "Dummy",
+    "ariaDescription": "Dummy description",
+}
+
+# Minimal valid ApiContributorRoleContributorRoleDocument data.
+DUMMY_CONTRIBUTOR_ROLE_DATA: dict[str, Any] = {
+    "documentId": "dummy-role-1",
+    "id": 1,
+    "roleId": "dummy-role",
+    "name": "Seller",
+    "publishedAt": "2025-01-01T00:00:00.000Z",
+}
+
+# Minimal valid ApiContributorContributorDocument data for populating required seller relation.
+DUMMY_SELLER_DATA: dict[str, Any] = {
+    "documentId": "dummy-seller-1",
+    "id": 1,
+    "slug": "dummy-seller",
+    "firstName": "Dummy",
+    "bio": "Dummy seller bio",
+    "publishedAt": "2025-01-01T00:00:00.000Z",
+    "profilePicture": None,
+    "roles": [DUMMY_CONTRIBUTOR_ROLE_DATA],
+    "seoMetadata": DUMMY_SEO_METADATA,
+}
+
+# Minimal valid ApiCurrencyCurrencyDocument data for populating required currency in prices.
+DUMMY_CURRENCY_DATA: dict[str, Any] = {
+    "documentId": "dummy-currency-usd",
+    "id": 1,
+    "code": "USD",
+    "name": "US Dollar",
+    "symbol": "$",
+    "decimalPlaces": 2,
+    "symbolPosition": "before",
+    "thousandsSeparator": ",",
+    "decimalSeparator": ".",
+    "exchangeRate": 1.0,
+    "publishedAt": "2025-01-01T00:00:00.000Z",
+    "seoMetadata": DUMMY_SEO_METADATA,
+}
 
 
 def load_entities_from_jsonl() -> dict[str, dict[str | None, list[BaseModel]]]:
@@ -201,7 +287,23 @@ def load_entities_from_jsonl() -> dict[str, dict[str | None, list[BaseModel]]]:
         "api::homepage.homepage": (ApiHomepageHomepageDocument, ["entryTitle"], None),
         "api::navigation.navigation": (ApiNavigationNavigationDocument, ["entryTitle"], None),
         "api::privacy.privacy": (ApiPrivacyPrivacyDocument, ["entryTitle"], None),
-        "api::product.product": (ApiProductProductDocument, None, {"images": []}),  # Add empty images list
+        "api::product.product": (
+            ApiProductProductDocument,
+            None,
+            {
+                "images": [],
+                "seller": DUMMY_SELLER_DATA,
+                "category": {
+                    "documentId": "dummy-cat-1",
+                    "id": 1,
+                    "slug": "dummy-category",
+                    "publishedAt": "2025-01-01T00:00:00.000Z",
+                    "content": DUMMY_LABEL_DATA,
+                    "image": DUMMY_IMAGE_DATA,
+                    "seoMetadata": DUMMY_SEO_METADATA,
+                },
+            },
+        ),  # Add empty images list, dummy seller, and dummy category with required fields
         "api::product-categories-page.product-categories-page": (
             ApiProductCategoriesPageProductCategoriesPageDocument,
             ["entryTitle"],

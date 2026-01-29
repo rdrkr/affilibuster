@@ -67,7 +67,7 @@ export function ThemeMenu({
   showText = true,
   visible = true,
 }: ThemeMenuProps) {
-  const themes = data.themes ?? []
+  const themes = data.themes
   const [isOpen, setIsOpen] = useState(false)
 
   const handleThemeSelect = useCallback(
@@ -89,10 +89,6 @@ export function ThemeMenu({
       onOpenChange={setIsOpen}
     >
       {themes.map((theme: ApiThemeThemeDocument) => {
-        if (!theme.content) {
-          return null
-        }
-
         const themeMode = cmsTextToThemeMode(theme.themeId)
 
         return (

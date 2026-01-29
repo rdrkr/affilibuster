@@ -57,7 +57,6 @@ import {
   DirectionEnum,
   IconPositionEnum,
   type ApiBlogPostBlogPostDocument,
-  type ApiContributorContributorDocument,
   type ElementsLabelEntry,
 } from '@/lib/generated/types.gen'
 import { renderWithLayout } from '../../../../../utils/renderWithLayout'
@@ -77,14 +76,6 @@ describe('TopicClient', () => {
       tags: [{ tag: { text: 'TestTag' } }],
     } as ApiBlogPostBlogPostDocument,
   ]
-  const mockContributor: ApiContributorContributorDocument = {
-    documentId: 'c1',
-    id: 1,
-    name: 'Default',
-    slug: 'default',
-    bio: 'Bio',
-    publishedAt: '2021-01-01',
-  } as ApiContributorContributorDocument
 
   const mockLabel: ElementsLabelEntry = {
     text: 'Label',
@@ -95,13 +86,7 @@ describe('TopicClient', () => {
 
   it('should render tag header with decoded tag name', () => {
     renderWithLayout(
-      <TopicClient
-        tag="TestTag"
-        posts={mockPosts}
-        defaultContributor={mockContributor}
-        readTimeMinutesLabel={mockLabel}
-        readArticleLabel={mockLabel}
-      />,
+      <TopicClient tag="TestTag" posts={mockPosts} readTimeMinutesLabel={mockLabel} readArticleLabel={mockLabel} />,
       {
         layoutContext: { direction: DirectionEnum.LTR },
       }
@@ -115,7 +100,6 @@ describe('TopicClient', () => {
       <TopicClient
         tag="Eco%20Friendly"
         posts={mockPosts}
-        defaultContributor={mockContributor}
         readTimeMinutesLabel={mockLabel}
         readArticleLabel={mockLabel}
       />,
@@ -129,13 +113,7 @@ describe('TopicClient', () => {
 
   it('should render posts grid when posts exist', () => {
     renderWithLayout(
-      <TopicClient
-        tag="TestTag"
-        posts={mockPosts}
-        defaultContributor={mockContributor}
-        readTimeMinutesLabel={mockLabel}
-        readArticleLabel={mockLabel}
-      />,
+      <TopicClient tag="TestTag" posts={mockPosts} readTimeMinutesLabel={mockLabel} readArticleLabel={mockLabel} />,
       {
         layoutContext: { direction: DirectionEnum.LTR },
       }
@@ -164,7 +142,6 @@ describe('TopicClient', () => {
         tag="EmptyTag"
         posts={[]}
         noItemsFound={noItemsFound}
-        defaultContributor={mockContributor}
         readTimeMinutesLabel={mockLabel}
         readArticleLabel={mockLabel}
       />,
@@ -178,13 +155,7 @@ describe('TopicClient', () => {
 
   it('should render blog cards with correct basePath', () => {
     renderWithLayout(
-      <TopicClient
-        tag="TestTag"
-        posts={mockPosts}
-        defaultContributor={mockContributor}
-        readTimeMinutesLabel={mockLabel}
-        readArticleLabel={mockLabel}
-      />,
+      <TopicClient tag="TestTag" posts={mockPosts} readTimeMinutesLabel={mockLabel} readArticleLabel={mockLabel} />,
       {
         layoutContext: { direction: DirectionEnum.LTR },
       }

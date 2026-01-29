@@ -33,7 +33,7 @@ export interface NavigationProps {
   /** Feature flag: Enable product search */
   enableProductSearch?: boolean
   /** Feature flag: Enable user profile (login/signup) */
-  enableUserProfile?: boolean
+  enableUserProfile: boolean
 }
 
 /**
@@ -51,7 +51,7 @@ export function Navigation({
   languages,
   direction,
   enableProductSearch = false,
-  enableUserProfile = false,
+  enableUserProfile,
 }: NavigationProps) {
   const { theme, setTheme } = useThemeContext()
 

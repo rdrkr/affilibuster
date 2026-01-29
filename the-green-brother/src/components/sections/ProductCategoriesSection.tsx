@@ -60,10 +60,6 @@ export function ProductCategoriesSection({ data, categories, direction }: Produc
           // content is ElementsLabelEntry with icon, text, ariaDescription
           const { content } = category
 
-          if (!content) {
-            return null
-          }
-
           return (
             <Link
               key={category.documentId}

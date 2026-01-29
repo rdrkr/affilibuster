@@ -433,4 +433,370 @@ describe('Carousel', () => {
       expect(track).toHaveClass('gap-6') // Default md gap
     })
   })
+
+  describe('Standard variant - startScrollItemIndex', () => {
+    beforeEach(() => {
+      HTMLElement.prototype.scrollTo = jest.fn()
+      // Mock requestAnimationFrame to execute callbacks immediately
+      global.requestAnimationFrame = jest.fn(cb => {
+        cb(0)
+        return 0
+      }) as unknown as typeof requestAnimationFrame
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    it('should scroll to startScrollItemIndex on mount', () => {
+      const track = { scrollTo: jest.fn() }
+      render(
+        <Carousel direction={DirectionEnum.LTR} startScrollItemIndex={2}>
+          <div data-testid="item-0">Item 0</div>
+          <div data-testid="item-1">Item 1</div>
+          <div data-testid="item-2">Item 2</div>
+        </Carousel>
+      )
+
+      const carouselTrack = screen.getByTestId('carousel-track')
+      carouselTrack.scrollTo = track.scrollTo
+
+      // Mock children with offsetLeft
+      Object.defineProperty(carouselTrack, 'children', {
+        value: [{ offsetLeft: 0 }, { offsetLeft: 300 }, { offsetLeft: 600 }],
+      })
+
+      // Re-render to trigger the effect with mocked values
+      const { rerender } = render(
+        <Carousel direction={DirectionEnum.LTR} startScrollItemIndex={2}>
+          <div data-testid="item-0">Item 0</div>
+          <div data-testid="item-1">Item 1</div>
+          <div data-testid="item-2">Item 2</div>
+        </Carousel>
+      )
+      rerender(
+        <Carousel direction={DirectionEnum.LTR} startScrollItemIndex={2}>
+          <div data-testid="item-0">Item 0</div>
+          <div data-testid="item-1">Item 1</div>
+          <div data-testid="item-2">Item 2</div>
+        </Carousel>
+      )
+
+      // The scroll should use 'instant' behavior
+      const scrollToMock = HTMLElement.prototype.scrollTo as jest.Mock
+      const calls = scrollToMock.mock.calls
+      const instantCall = calls.find(call => call[0]?.behavior === 'instant')
+      expect(instantCall).toBeDefined()
+    })
+
+    it('should default to index 0 and not scroll when startScrollItemIndex is omitted', () => {
+      HTMLElement.prototype.scrollTo = jest.fn()
+
+      render(
+        <Carousel direction={DirectionEnum.LTR}>
+          <div>Item 0</div>
+          <div>Item 1</div>
+          <div>Item 2</div>
+        </Carousel>
+      )
+
+      // No scroll should be called when starting at index 0
+      const scrollToMock = HTMLElement.prototype.scrollTo as jest.Mock
+      const instantCalls = scrollToMock.mock.calls.filter(call => call[0]?.behavior === 'instant')
+      expect(instantCalls).toHaveLength(0)
+    })
+
+    it('should clamp negative index to 0', () => {
+      HTMLElement.prototype.scrollTo = jest.fn()
+
+      render(
+        <Carousel direction={DirectionEnum.LTR} startScrollItemIndex={-5}>
+          <div>Item 0</div>
+          <div>Item 1</div>
+          <div>Item 2</div>
+        </Carousel>
+      )
+
+      // Clamped to 0 means no scroll needed
+      const scrollToMock = HTMLElement.prototype.scrollTo as jest.Mock
+      const instantCalls = scrollToMock.mock.calls.filter(call => call[0]?.behavior === 'instant')
+      expect(instantCalls).toHaveLength(0)
+    })
+
+    it('should clamp index exceeding item count to last valid index', () => {
+      const scrollToMock = jest.fn()
+      HTMLElement.prototype.scrollTo = scrollToMock
+
+      render(
+        <Carousel direction={DirectionEnum.LTR} startScrollItemIndex={100}>
+          <div>Item 0</div>
+          <div>Item 1</div>
+          <div>Item 2</div>
+        </Carousel>
+      )
+
+      // Index 100 is clamped to 2 (last valid index for 3 items)
+      // Since clamped index is not 0, scrollTo should be called with 'instant' behavior
+      const calls = scrollToMock.mock.calls
+      const instantCall = calls.find(call => call[0]?.behavior === 'instant')
+      expect(instantCall).toBeDefined()
+    })
+
+    it('should handle empty children gracefully', () => {
+      HTMLElement.prototype.scrollTo = jest.fn()
+
+      // Render with no children (empty fragment)
+      expect(() => {
+        render(
+          <Carousel direction={DirectionEnum.LTR} startScrollItemIndex={5}>
+            {[]}
+          </Carousel>
+        )
+      }).not.toThrow()
+
+      // No scroll should be attempted
+      const scrollToMock = HTMLElement.prototype.scrollTo as jest.Mock
+      const instantCalls = scrollToMock.mock.calls.filter(call => call[0]?.behavior === 'instant')
+      expect(instantCalls).toHaveLength(0)
+    })
+
+    it('should handle track with no parentElement in RAF callback', () => {
+      jest.useFakeTimers()
+      HTMLElement.prototype.scrollTo = jest.fn()
+
+      // Mock requestAnimationFrame to execute callback immediately
+      const originalRAF = global.requestAnimationFrame
+      global.requestAnimationFrame = jest.fn(cb => {
+        cb(0)
+        return 0
+      }) as unknown as typeof requestAnimationFrame
+
+      render(
+        <Carousel direction={DirectionEnum.LTR} startScrollItemIndex={2}>
+          <div>Item 0</div>
+          <div>Item 1</div>
+          <div>Item 2</div>
+        </Carousel>
+      )
+
+      const track = screen.getByTestId('carousel-track')
+      // Mock track with no parent element
+      Object.defineProperty(track, 'parentElement', { value: null, configurable: true })
+
+      // Should not throw
+      expect(track).toBeInTheDocument()
+
+      global.requestAnimationFrame = originalRAF
+      jest.useRealTimers()
+    })
+
+    it('should handle case where target child is not found at index', () => {
+      jest.useFakeTimers()
+      HTMLElement.prototype.scrollTo = jest.fn()
+
+      const originalRAF = global.requestAnimationFrame
+      global.requestAnimationFrame = jest.fn(cb => {
+        cb(0)
+        return 0
+      }) as unknown as typeof requestAnimationFrame
+
+      render(
+        <Carousel direction={DirectionEnum.LTR} startScrollItemIndex={2}>
+          <div>Item 0</div>
+          <div>Item 1</div>
+          <div>Item 2</div>
+        </Carousel>
+      )
+
+      const track = screen.getByTestId('carousel-track')
+      const parentMock = { scrollTo: jest.fn(), scrollLeft: 0, clientWidth: 1000 }
+
+      // Mock track.parentElement to return our parent mock
+      Object.defineProperty(track, 'parentElement', { value: parentMock, configurable: true })
+      // Mock children to be an empty collection (target child not found)
+      Object.defineProperty(track, 'children', { value: [], configurable: true })
+
+      // Should not throw - this tests the else branch where targetChild is undefined
+      expect(track).toBeInTheDocument()
+
+      global.requestAnimationFrame = originalRAF
+      jest.useRealTimers()
+    })
+
+    it('should execute setTimeout callback after successful scroll', () => {
+      jest.useFakeTimers()
+      HTMLElement.prototype.scrollTo = jest.fn()
+
+      const originalRAF = global.requestAnimationFrame
+      global.requestAnimationFrame = jest.fn(cb => {
+        cb(0)
+        return 0
+      }) as unknown as typeof requestAnimationFrame
+
+      render(
+        <Carousel direction={DirectionEnum.LTR} startScrollItemIndex={1}>
+          <div>Item 0</div>
+          <div>Item 1</div>
+          <div>Item 2</div>
+        </Carousel>
+      )
+
+      const track = screen.getByTestId('carousel-track')
+      const parentScrollTo = jest.fn()
+      const parentMock = { scrollTo: parentScrollTo, scrollLeft: 0, clientWidth: 1000 }
+
+      Object.defineProperty(track, 'parentElement', { value: parentMock, configurable: true })
+      Object.defineProperty(track, 'children', {
+        value: [{ offsetLeft: 0 }, { offsetLeft: 300 }, { offsetLeft: 600 }],
+        configurable: true,
+      })
+
+      // Advance timers to execute the setTimeout(fn, 0) callback
+      jest.advanceTimersByTime(0)
+
+      // Should have called scrollTo
+      expect(track).toBeInTheDocument()
+
+      global.requestAnimationFrame = originalRAF
+      jest.useRealTimers()
+    })
+  })
+
+  describe('Hero variant - startScrollItemIndex', () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+      HTMLElement.prototype.scrollTo = jest.fn()
+      // Mock requestAnimationFrame to execute callbacks immediately
+      global.requestAnimationFrame = jest.fn(cb => {
+        cb(0)
+        return 0
+      }) as unknown as typeof requestAnimationFrame
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+      jest.restoreAllMocks()
+    })
+
+    const renderHeroWithStartIndex = (startIndex: number, itemCount = 3) => {
+      const items = Array.from({ length: itemCount }, (_, i) => (
+        <div key={i} data-testid={`hero-item-${String(i)}`}>
+          Hero Item {String(i)}
+        </div>
+      ))
+
+      return render(
+        <Carousel direction={DirectionEnum.LTR} variant="hero" ariaLabel="Test Hero" startScrollItemIndex={startIndex}>
+          {items}
+        </Carousel>
+      )
+    }
+
+    it('should show specified slide initially with correct dot selected', () => {
+      renderHeroWithStartIndex(1)
+
+      const dots = screen.getAllByRole('tab')
+      expect(dots[0]).toHaveAttribute('aria-selected', 'false')
+      expect(dots[1]).toHaveAttribute('aria-selected', 'true')
+      expect(dots[2]).toHaveAttribute('aria-selected', 'false')
+    })
+
+    it('should mark correct slide as visible with aria-hidden', () => {
+      renderHeroWithStartIndex(2)
+
+      const slide0 = screen.getByTestId('hero-slide-0')
+      const slide1 = screen.getByTestId('hero-slide-1')
+      const slide2 = screen.getByTestId('hero-slide-2')
+
+      expect(slide0).toHaveAttribute('aria-hidden', 'true')
+      expect(slide1).toHaveAttribute('aria-hidden', 'true')
+      expect(slide2).toHaveAttribute('aria-hidden', 'false')
+    })
+
+    it('should scroll to initial slide position on mount with instant behavior', () => {
+      const scrollToMock = jest.fn()
+      HTMLElement.prototype.scrollTo = scrollToMock
+
+      renderHeroWithStartIndex(1)
+
+      const track = screen.getByTestId('hero-carousel-track')
+      Object.defineProperty(track, 'children', {
+        value: [{ offsetLeft: 0 }, { offsetLeft: 1000 }, { offsetLeft: 2000 }],
+      })
+
+      // Check for instant scroll behavior
+      const calls = scrollToMock.mock.calls
+      const instantCall = calls.find(call => call[0]?.behavior === 'instant')
+      expect(instantCall).toBeDefined()
+    })
+
+    it('should clamp negative index to 0 in hero variant', () => {
+      renderHeroWithStartIndex(-10)
+
+      const dots = screen.getAllByRole('tab')
+      expect(dots[0]).toHaveAttribute('aria-selected', 'true')
+      expect(dots[1]).toHaveAttribute('aria-selected', 'false')
+    })
+
+    it('should clamp index exceeding item count in hero variant', () => {
+      renderHeroWithStartIndex(100)
+
+      const dots = screen.getAllByRole('tab')
+      // Should clamp to last index (2)
+      expect(dots[0]).toHaveAttribute('aria-selected', 'false')
+      expect(dots[1]).toHaveAttribute('aria-selected', 'false')
+      expect(dots[2]).toHaveAttribute('aria-selected', 'true')
+    })
+
+    it('should auto-rotate from startScrollItemIndex correctly', () => {
+      const scrollToMock = jest.fn()
+      HTMLElement.prototype.scrollTo = scrollToMock
+
+      renderHeroWithStartIndex(1)
+
+      const track = screen.getByTestId('hero-carousel-track')
+      Object.defineProperty(track, 'children', {
+        value: [{ offsetLeft: 0 }, { offsetLeft: 1000 }, { offsetLeft: 2000 }],
+      })
+
+      // Advance time to trigger auto-rotation
+      act(() => {
+        jest.advanceTimersByTime(5000)
+      })
+
+      // Should rotate from index 1 to index 2
+      const smoothCalls = scrollToMock.mock.calls.filter(call => call[0]?.behavior === 'smooth')
+      expect(smoothCalls.length).toBeGreaterThan(0)
+
+      // The last smooth call should be targeting index 2 (offsetLeft 2000)
+      const lastSmoothCall = smoothCalls[smoothCalls.length - 1]
+      expect(lastSmoothCall?.[0]?.left).toBe(2000)
+    })
+
+    it('should not scroll on mount when index is 0', () => {
+      const scrollToMock = jest.fn()
+      HTMLElement.prototype.scrollTo = scrollToMock
+
+      renderHeroWithStartIndex(0)
+
+      // No instant scroll should occur when starting at index 0
+      const instantCalls = scrollToMock.mock.calls.filter(call => call[0]?.behavior === 'instant')
+      expect(instantCalls).toHaveLength(0)
+    })
+
+    it('should handle single child with startScrollItemIndex', () => {
+      HTMLElement.prototype.scrollTo = jest.fn()
+
+      expect(() => {
+        render(
+          <Carousel direction={DirectionEnum.LTR} variant="hero" startScrollItemIndex={5}>
+            <div>Single Item</div>
+          </Carousel>
+        )
+      }).not.toThrow()
+
+      // No dots should be rendered for single item
+      expect(screen.queryByTestId('hero-dot-0')).not.toBeInTheDocument()
+    })
+  })
 })

@@ -245,7 +245,7 @@ describe('Navigation', () => {
 
   it('should render navigation component', () => {
     const { container } = render(
-      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
     )
 
     // Navigation renders successfully
@@ -253,7 +253,9 @@ describe('Navigation', () => {
   })
 
   it('should render all menus and child components', () => {
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+    render(
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
+    )
 
     // Check that the mocked child components render
     expect(screen.getByTestId('search-menu')).toBeInTheDocument()
@@ -264,33 +266,41 @@ describe('Navigation', () => {
   })
 
   it('should render search menu', () => {
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+    render(
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
+    )
 
     expect(screen.getByTestId('search-menu')).toBeInTheDocument()
   })
 
   it('should NOT render search menu when disabled', () => {
     // Default is enableProductSearch=false, or we can explictly set it
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={false} />)
+    render(
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={false} enableUserProfile={false} />
+    )
 
     expect(screen.queryByTestId('search-menu')).not.toBeInTheDocument()
   })
 
   it('should render theme menu', () => {
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+    render(
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
+    )
 
     expect(screen.getByTestId('theme-menu')).toBeInTheDocument()
   })
 
   it('should render language menu', () => {
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+    render(
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
+    )
 
     expect(screen.getByTestId('language-menu')).toBeInTheDocument()
   })
 
   it('should render with CMS button data', () => {
     const { container } = render(
-      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
     )
 
     // Component renders with all defined button links
@@ -299,7 +309,9 @@ describe('Navigation', () => {
   })
 
   it('should render mobile menu component', () => {
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+    render(
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
+    )
 
     // Mobile menu component is present (though hidden by default)
     // The actual toggle is handled by the MobileMenu mock
@@ -307,7 +319,9 @@ describe('Navigation', () => {
   })
 
   it('should render start navigation group with products menu', () => {
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+    render(
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
+    )
 
     // The start NavigationGroup contains nav links including products
     const startGroup = screen.getByTestId('navigation-group-start')
@@ -316,7 +330,9 @@ describe('Navigation', () => {
   })
 
   it('should render without languages when not provided', () => {
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+    render(
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
+    )
 
     // Should still render without errors
     expect(screen.getByTestId('language-menu')).toBeInTheDocument()
@@ -328,7 +344,14 @@ describe('Navigation', () => {
       { code: CodeEnum.IT, name: 'Italian', displayName: 'Italiano', flag: '/flags/it.png' },
     ]
 
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} languages={languages as unknown as Language[]} />)
+    render(
+      <Navigation
+        direction={DirectionEnum.LTR}
+        data={mockData}
+        languages={languages as unknown as Language[]}
+        enableUserProfile={false}
+      />
+    )
 
     expect(screen.getByTestId('language-menu')).toBeInTheDocument()
   })
@@ -348,7 +371,9 @@ describe('Navigation', () => {
       isReady: true,
     })
 
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+    render(
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
+    )
 
     const toggleButton = screen.getByTestId('mobile-menu-toggle')
 
@@ -380,7 +405,9 @@ describe('Navigation', () => {
       refresh: jest.fn(),
     })
 
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+    render(
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
+    )
 
     // Click the button to change to Italian
     const changeLangButton = screen.getByTestId('change-lang-it')
@@ -403,7 +430,9 @@ describe('Navigation', () => {
       refresh: jest.fn(),
     })
 
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+    render(
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
+    )
 
     // Click the button to "change" to English (same as current)
     const changeLangButton = screen.getByTestId('change-lang-en')
@@ -426,7 +455,9 @@ describe('Navigation', () => {
       refresh: jest.fn(),
     })
 
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+    render(
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
+    )
 
     // Click the button to change to Italian
     const changeLangButton = screen.getByTestId('change-lang-it')
@@ -450,7 +481,9 @@ describe('Navigation', () => {
       refresh: jest.fn(),
     })
 
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+    render(
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
+    )
 
     // Click the button to change to Italian - should default to /it
     const changeLangButton = screen.getByTestId('change-lang-it')
@@ -464,7 +497,9 @@ describe('Navigation', () => {
     const { usePathname } = jest.requireMock<typeof import('next/navigation')>('next/navigation')
     ;(usePathname as jest.Mock).mockReturnValue('/')
 
-    render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+    render(
+      <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
+    )
 
     // Component should render without errors - getLanguageFromPathname returns CodeEnum.EN as default
     expect(screen.getByTestId('language-menu')).toBeInTheDocument()
@@ -472,7 +507,14 @@ describe('Navigation', () => {
 
   describe('responsive visibility', () => {
     it('should call setSearchExpanded when search expands', () => {
-      render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+      render(
+        <Navigation
+          direction={DirectionEnum.LTR}
+          data={mockData}
+          enableProductSearch={true}
+          enableUserProfile={false}
+        />
+      )
 
       const expandButton = screen.getByTestId('expand-search')
       fireEvent.click(expandButton)
@@ -481,7 +523,14 @@ describe('Navigation', () => {
     })
 
     it('should call setSearchExpanded when search collapses', () => {
-      render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+      render(
+        <Navigation
+          direction={DirectionEnum.LTR}
+          data={mockData}
+          enableProductSearch={true}
+          enableUserProfile={false}
+        />
+      )
 
       const collapseButton = screen.getByTestId('collapse-search')
       fireEvent.click(collapseButton)
@@ -490,7 +539,14 @@ describe('Navigation', () => {
     })
 
     it('should pass showText to ThemeMenu', () => {
-      render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+      render(
+        <Navigation
+          direction={DirectionEnum.LTR}
+          data={mockData}
+          enableProductSearch={true}
+          enableUserProfile={false}
+        />
+      )
 
       const themeMenu = screen.getByTestId('theme-menu')
       expect(themeMenu).toHaveAttribute('data-show-text', 'true')
@@ -512,7 +568,14 @@ describe('Navigation', () => {
         isReady: true,
       })
 
-      render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+      render(
+        <Navigation
+          direction={DirectionEnum.LTR}
+          data={mockData}
+          enableProductSearch={true}
+          enableUserProfile={false}
+        />
+      )
 
       // NavigationGroup should have minimal display mode
       const startGroup = screen.getByTestId('navigation-group-start')
@@ -535,7 +598,14 @@ describe('Navigation', () => {
         isReady: true,
       })
 
-      render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+      render(
+        <Navigation
+          direction={DirectionEnum.LTR}
+          data={mockData}
+          enableProductSearch={true}
+          enableUserProfile={false}
+        />
+      )
 
       // Theme menu should STILL be visible - it never collapses to mobile
       expect(screen.getByTestId('theme-menu')).toBeInTheDocument()
@@ -557,7 +627,14 @@ describe('Navigation', () => {
         isReady: true,
       })
 
-      render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+      render(
+        <Navigation
+          direction={DirectionEnum.LTR}
+          data={mockData}
+          enableProductSearch={true}
+          enableUserProfile={false}
+        />
+      )
 
       const themeMenu = screen.getByTestId('theme-menu')
       expect(themeMenu).toHaveAttribute('data-show-text', 'false')
@@ -581,7 +658,14 @@ describe('Navigation', () => {
         setSearchExpanded: mockSetSearchExpanded,
       })
 
-      render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+      render(
+        <Navigation
+          direction={DirectionEnum.LTR}
+          data={mockData}
+          enableProductSearch={true}
+          enableUserProfile={false}
+        />
+      )
 
       const brandButton = screen.getByTestId('desktop-brand-button')
       // When displayMode !== 'minimal', showText should be true
@@ -604,7 +688,14 @@ describe('Navigation', () => {
         setSearchExpanded: mockSetSearchExpanded,
       })
 
-      render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+      render(
+        <Navigation
+          direction={DirectionEnum.LTR}
+          data={mockData}
+          enableProductSearch={true}
+          enableUserProfile={false}
+        />
+      )
 
       const brandButton = screen.getByTestId('desktop-brand-button')
       // When minimal mode, showText should be true (text threshold is SEARCH_ONLY)
@@ -627,7 +718,14 @@ describe('Navigation', () => {
         setSearchExpanded: mockSetSearchExpanded,
       })
 
-      render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+      render(
+        <Navigation
+          direction={DirectionEnum.LTR}
+          data={mockData}
+          enableProductSearch={true}
+          enableUserProfile={false}
+        />
+      )
 
       const brandButton = screen.getByTestId('desktop-brand-button')
       // When search is expanded, brand text should be hidden to prevent overlap
@@ -650,7 +748,14 @@ describe('Navigation', () => {
         setSearchExpanded: mockSetSearchExpanded,
       })
 
-      render(<Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} />)
+      render(
+        <Navigation
+          direction={DirectionEnum.LTR}
+          data={mockData}
+          enableProductSearch={true}
+          enableUserProfile={false}
+        />
+      )
 
       const brandButton = screen.getByTestId('desktop-brand-button')
       // When displayMode is full, there's enough space - brand text stays visible

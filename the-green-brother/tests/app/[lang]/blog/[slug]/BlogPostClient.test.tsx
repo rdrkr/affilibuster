@@ -53,18 +53,21 @@ jest.mock('@/components/elements', () => ({
     )
   },
   ContributorCard: function MockContributorCard({ member, size }: any) {
+    const fullName = member?.lastName ? `${member.firstName} ${member.lastName}` : (member?.firstName ?? '')
     return (
       <div data-testid="contributor-card">
-        <div>{member.name}</div>
+        <div>{fullName}</div>
         <div>
           {/* Mock initials rendering for tests expecting "JD" */}
-          {member.name
-            .split(' ')
-            .map((n: string) => n[0])
-            .join('')
-            .toUpperCase()}
+          {fullName
+            ? fullName
+                .split(' ')
+                .map((n: string) => n[0])
+                .join('')
+                .toUpperCase()
+            : ''}
         </div>
-        {size !== 'xs' && <div>{member.bio}</div>}
+        {size !== 'xs' && <div>{member?.bio}</div>}
       </div>
     )
   },
@@ -113,12 +116,6 @@ describe('BlogPostClient', () => {
       iconPosition: IconPositionEnum.AFTER_TEXT,
       ariaDescription: 'Read time',
     },
-    defaultContributor: {
-      documentId: 'def-1',
-      id: 2,
-      name: 'Default User',
-      slug: 'default-user',
-    },
   } as unknown as ApiBlogBlogDocument
 
   const mockNavigation = {
@@ -163,10 +160,11 @@ describe('BlogPostClient', () => {
     },
     publishedDate: '2024-01-15T00:00:00Z',
     readTimeInMinutes: 5,
-    contributor: {
+    author: {
       documentId: 'auth-1',
       id: 1,
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       slug: 'john-doe',
       bio: 'A passionate writer',
       publishedAt: '2024-01-01',
@@ -270,7 +268,7 @@ describe('BlogPostClient', () => {
   it('should not render author section when author has no bio', () => {
     const postWithoutBio = {
       ...mockPost,
-      contributor: { name: 'Jane' },
+      author: { firstName: 'Jane' },
     } as unknown as ApiBlogPostBlogPostDocument
 
     renderWithLayout(
@@ -309,11 +307,11 @@ describe('BlogPostClient', () => {
     expect(screen.queryByText('January 15, 2024')).not.toBeInTheDocument()
   })
 
-  it('should not render tags when not available', () => {
+  it('should not render tags when empty array', () => {
     const postWithoutTags = {
       ...mockPost,
-      tags: undefined,
-    } as unknown as ApiBlogPostBlogPostDocument
+      tags: [],
+    } as ApiBlogPostBlogPostDocument
 
     renderWithLayout(
       <BlogPostClient
@@ -376,87 +374,20 @@ describe('BlogPostClient', () => {
     expect(screen.queryByText('A subtitle for the post')).not.toBeInTheDocument()
   })
 
-  it('should handle post without author', () => {
-    const postWithoutAuthor = {
-      ...mockPost,
-      contributor: undefined,
-    } as unknown as ApiBlogPostBlogPostDocument
-
-    renderWithLayout(
-      <BlogPostClient
-        post={postWithoutAuthor}
-        blogData={mockBlogData}
-        direction={DirectionEnum.LTR}
-        language={CodeEnum.EN}
-      />,
-      {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
-      }
-    )
-
-    expect(screen.queryByText('John Doe')).not.toBeInTheDocument()
-    expect(screen.queryByText('JD')).not.toBeInTheDocument()
-  })
-
-  it('should use default contributor from blogData when post contributor is missing', () => {
-    const postWithoutAuthor = {
-      ...mockPost,
-      contributor: undefined,
-    } as unknown as ApiBlogPostBlogPostDocument
-
-    renderWithLayout(
-      <BlogPostClient
-        post={postWithoutAuthor}
-        blogData={mockBlogData}
-        direction={DirectionEnum.LTR}
-        language={CodeEnum.EN}
-      />,
-      {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
-      }
-    )
-
-    expect(screen.getAllByText('Default User')[0]).toBeInTheDocument()
-    expect(screen.getByText('DU')).toBeInTheDocument()
-  })
-
-  it('should call notFound when both post contributor and default contributor are missing', () => {
-    const postWithoutAuthor = {
-      ...mockPost,
-      contributor: undefined,
-    } as unknown as ApiBlogPostBlogPostDocument
-
-    const blogDataWithoutDefault = {
-      ...mockBlogData,
-      defaultContributor: undefined,
-    } as unknown as ApiBlogBlogDocument
-
-    try {
-      renderWithLayout(
-        <BlogPostClient
-          post={postWithoutAuthor}
-          blogData={blogDataWithoutDefault}
-          direction={DirectionEnum.LTR}
-          language={CodeEnum.EN}
-        />,
-        {
-          layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
-        }
-      )
-    } catch {
-      // notFound throws an error in Next.js, we catch it here if render crashes or we expect notFound to be called
-    }
-
-    const { notFound } = require('next/navigation')
-    expect(notFound).toHaveBeenCalled()
-  })
-
   it('should render with minimal post data', () => {
     const minimalPost = {
+      ...mockPost,
       documentId: 'min-1',
       slug: 'minimal',
-      content: { header: { header: { text: 'Minimal' } } },
-    } as ApiBlogPostBlogPostDocument
+      content: {
+        header: {
+          header: { text: 'Minimal' },
+          alignment: 'left',
+          promoteHeaderIcon: false,
+        },
+      },
+      tags: [],
+    } as unknown as ApiBlogPostBlogPostDocument
 
     renderWithLayout(
       <BlogPostClient
@@ -516,15 +447,15 @@ describe('BlogPostClient', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Test Blog Post')
   })
 
-  it('should handle tag with null tag object', () => {
-    const postWithNullTag = {
+  it('should render post with single tag', () => {
+    const postWithTag = {
       ...mockPost,
-      tags: [{ tag: null }],
+      tags: [{ tag: { text: 'Science', ariaDescription: 'Science', iconPosition: IconPositionEnum.BEFORE_TEXT } }],
     } as unknown as ApiBlogPostBlogPostDocument
 
     renderWithLayout(
       <BlogPostClient
-        post={postWithNullTag}
+        post={postWithTag}
         blogData={mockBlogData}
         direction={DirectionEnum.LTR}
         language={CodeEnum.EN}
@@ -534,7 +465,7 @@ describe('BlogPostClient', () => {
       }
     )
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Test Blog Post')
+    expect(screen.getByText('Science')).toBeInTheDocument()
   })
 
   it('should handle missing content.header.header.text', () => {
@@ -588,26 +519,16 @@ describe('BlogPostClient', () => {
 
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
   })
-  it('should use fallback image when featured image is missing', () => {
-    const postWithoutImage = {
-      ...mockPost,
-      featuredImage: undefined,
-    } as unknown as ApiBlogPostBlogPostDocument
-
+  it('should render featured image from post', () => {
     renderWithLayout(
-      <BlogPostClient
-        post={postWithoutImage}
-        blogData={mockBlogData}
-        direction={DirectionEnum.LTR}
-        language={CodeEnum.EN}
-      />,
+      <BlogPostClient post={mockPost} blogData={mockBlogData} direction={DirectionEnum.LTR} language={CodeEnum.EN} />,
       {
         layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
       }
     )
 
     const hero = screen.getByTestId('hero-section')
-    expect(hero).toHaveAttribute('data-image-src', '/images/placeholder.svg')
+    expect(hero).toHaveAttribute('data-image-src', '/images/featured.jpg')
   })
 
   it('should have responsive layout classes for metadata', () => {
