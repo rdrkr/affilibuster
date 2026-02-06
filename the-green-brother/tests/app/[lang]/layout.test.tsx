@@ -183,4 +183,18 @@ describe('LocaleLayout', () => {
 
     expect(screen.getByTestId('hebrew-child')).toBeInTheDocument()
   })
+
+  it('should handle null languages response gracefully', async () => {
+    mockGetLanguages.mockResolvedValue(null)
+
+    const Component = await LocaleLayout({
+      children: <div data-testid="child">Content</div>,
+      params: Promise.resolve({ lang: CodeEnum.EN }),
+    })
+
+    render(Component)
+
+    // Should still render without errors
+    expect(screen.getByTestId('child')).toBeInTheDocument()
+  })
 })

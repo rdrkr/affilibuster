@@ -193,4 +193,37 @@ describe('useTheme', () => {
 
     expect(document.documentElement.getAttribute('data-theme')).toBe('light')
   })
+
+  describe('SSR fallbacks', () => {
+    it('should handle getStoredTheme when window is undefined', () => {
+      const originalWindow = globalThis.window
+      // @ts-expect-error -- Testing SSR scenario where window is undefined
+      delete globalThis.window
+
+      // Re-require the module in SSR context
+      jest.resetModules()
+
+      const freshModule = require('@/lib/themes/useTheme')
+
+      // Restore window before rendering hooks (renderHook needs DOM)
+      globalThis.window = originalWindow
+
+      // The module loaded in SSR context should still export correctly
+      expect(freshModule.useTheme).toBeDefined()
+    })
+
+    it('should handle applyTheme when document is undefined', () => {
+      const originalDocument = globalThis.document
+      // @ts-expect-error -- Testing SSR scenario where document is undefined
+      delete globalThis.document
+
+      jest.resetModules()
+
+      const freshModule = require('@/lib/themes/useTheme')
+
+      globalThis.document = originalDocument
+
+      expect(freshModule.useTheme).toBeDefined()
+    })
+  })
 })

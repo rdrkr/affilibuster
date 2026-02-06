@@ -314,6 +314,27 @@ describe('Footer', () => {
     expect(screen.getByText('After Markers')).toBeInTheDocument()
   })
 
+  it('should render text-block column when id is undefined (uses index as fallback key)', async () => {
+    mockGetFooter.mockResolvedValue({
+      columns: [
+        {
+          __component: 'elements.text-block',
+          // No id field - tests the `column.id ?? index` fallback at line 60
+          header: { header: { text: 'No ID Column' } },
+          content: 'Content without explicit id',
+        },
+      ],
+      copyrightsLabel: { text: '© {year}' },
+      quickLinks: [],
+    } as unknown as Awaited<ReturnType<typeof getFooter>>)
+
+    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    render(Component!)
+
+    expect(screen.getByText('No ID Column')).toBeInTheDocument()
+    expect(screen.getByText('Content without explicit id')).toBeInTheDocument()
+  })
+
   it('should apply md:flex-row-reverse to bottom footer section for RTL direction', async () => {
     mockGetFooter.mockResolvedValue({
       columns: [],

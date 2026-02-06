@@ -375,6 +375,52 @@ describe('SearchMenu', () => {
     expect(searchContainer.className).toContain('w-76!')
   })
 
+  it('should ignore mouse leave during expansion transition (isExpandingRef guard)', () => {
+    const onExpandChange = jest.fn()
+    const { container } = render(<SearchMenu {...defaultProps} onExpandChange={onExpandChange} />)
+    const searchContainer = container.firstChild as HTMLElement
+
+    // Mouse enter starts expansion
+    fireEvent.mouseEnter(searchContainer)
+
+    // onExpandChange(true) should have been called immediately
+    expect(onExpandChange).toHaveBeenCalledWith(true)
+    onExpandChange.mockClear()
+
+    // Immediately mouse leave - should be ignored because isExpandingRef is true
+    fireEvent.mouseLeave(searchContainer)
+
+    // The mouse leave during expansion should have been ignored (no safeCloseSearch called)
+    // safeCloseSearch would eventually call onExpandChange(false) after timeouts
+    // Since it was ignored, no close should have been initiated
+    expect(onExpandChange).not.toHaveBeenCalled()
+  })
+
+  it('should clear pending expand lock timeout on repeated mouse enter', () => {
+    const { container } = render(<SearchMenu {...defaultProps} />)
+    const searchContainer = container.firstChild as HTMLElement
+
+    // First mouse enter
+    fireEvent.mouseEnter(searchContainer)
+
+    // Advance partially through the expansion
+    act(() => {
+      jest.advanceTimersByTime(200)
+    })
+
+    // Mouse leave and re-enter quickly - should clear pending timeout
+    fireEvent.mouseLeave(searchContainer)
+    fireEvent.mouseEnter(searchContainer)
+
+    // Complete all timers
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
+
+    // Should still be open after the re-enter
+    expect(searchContainer.className).toContain('w-76!')
+  })
+
   it('should close search when clicking outside', () => {
     const { container } = render(
       <div>

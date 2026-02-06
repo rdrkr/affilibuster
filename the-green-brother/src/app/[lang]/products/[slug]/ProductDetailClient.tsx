@@ -7,13 +7,14 @@ import { useState } from 'react'
 import { ButtonAction, ButtonLink, ImageGallery, Text, TextBlock } from '@/components/elements'
 import { PageClient } from '@/components/layout'
 import { DynamicZone } from '@/components/layout/DynamicZone'
-import { QuantitySelector } from '@/components/product'
+import { ProductCertificatesSection, QuantitySelector } from '@/components/product'
 import { useLayoutContext } from '@/components/providers'
 import {
   DirectionEnum,
   IconPositionEnum,
   type ApiProductProductDocument,
   type ElementsButtonEntry,
+  type ElementsHeaderEntry,
 } from '@/lib/generated/types.gen'
 
 /**
@@ -22,6 +23,8 @@ import {
 interface ProductDetailClientProps {
   /** Product data from CMS */
   product: ApiProductProductDocument
+  /** Certificates section header from ProductCategoriesPage */
+  certificatesHeader: ElementsHeaderEntry
 }
 
 /**
@@ -32,9 +35,10 @@ interface ProductDetailClientProps {
  * Uses reusable CMS-driven components for breadcrumbs, buttons, and images.
  * @param props - Component properties
  * @param props.product - Product data from CMS
+ * @param props.certificatesHeader - Certificates section header from ProductCategoriesPage
  * @returns Product detail UI
  */
-export default function ProductDetailClient({ product }: ProductDetailClientProps) {
+export default function ProductDetailClient({ product, certificatesHeader }: ProductDetailClientProps) {
   const { direction } = useLayoutContext()
   const isRTL = direction === DirectionEnum.RTL
   const [quantity, setQuantity] = useState(1)
@@ -165,6 +169,15 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               />
             </div>
           </div>
+
+          {/* Product Certificates */}
+          {product.certificates && product.certificates.length > 0 && (
+            <ProductCertificatesSection
+              certificates={product.certificates}
+              direction={direction}
+              header={certificatesHeader}
+            />
+          )}
 
           {/* Product Content */}
           <DynamicZone

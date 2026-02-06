@@ -506,4 +506,78 @@ describe('Card', () => {
     const overlayLink = links.find(l => l.getAttribute('href') === '/test-path' && l.className.includes('absolute'))
     expect(overlayLink).toBeUndefined()
   })
+
+  describe('height fit', () => {
+    it('should apply h-fit class when height is fit in horizontal layout', () => {
+      const { container } = render(<Card {...defaultProps} height="fit" layout="ltr" />)
+      const card = container.firstChild as HTMLElement
+      expect(card.className).toContain('h-fit')
+      expect(card.style.height).toBe('')
+    })
+  })
+
+  describe('circle images in horizontal layout', () => {
+    it('should apply self-center and rounded-full for circle imageShape in horizontal layout', () => {
+      render(<Card {...defaultProps} layout="ltr" imageShape="circle" />)
+      const img = screen.getByTestId('mock-image')
+      const wrapper = img.parentElement
+      expect(wrapper).toHaveClass('rounded-full')
+      expect(wrapper).toHaveClass('self-center')
+    })
+
+    it('should apply correct circle size classes for different sizes in horizontal layout', () => {
+      const sizes: CardSize[] = ['xs', 'sm', 'md', 'lg', 'xl']
+      const expectedClasses = ['size-10', 'size-24', 'size-36', 'size-48', 'size-60']
+
+      sizes.forEach((size, index) => {
+        const { unmount } = render(<Card {...defaultProps} layout="ltr" imageShape="circle" size={size} />)
+        const img = screen.getByTestId('mock-image')
+        const wrapper = img.parentElement
+        expect(wrapper).toHaveClass(expectedClasses[index]!)
+        unmount()
+      })
+    })
+  })
+
+  describe('imageMarginClass in horizontal layouts', () => {
+    it('should apply image margin classes for xs rectangle in ltr layout', () => {
+      render(<Card {...defaultProps} layout="ltr" size="xs" imageShape="rectangle" />)
+      const img = screen.getByTestId('mock-image')
+      const wrapper = img.parentElement
+      expect(wrapper).toHaveClass('my-3')
+      expect(wrapper).toHaveClass('ms-3')
+    })
+
+    it('should apply image margin classes for sm rectangle in rtl layout', () => {
+      render(<Card {...defaultProps} layout="rtl" size="sm" imageShape="rectangle" />)
+      const img = screen.getByTestId('mock-image')
+      const wrapper = img.parentElement
+      expect(wrapper).toHaveClass('my-4')
+      expect(wrapper).toHaveClass('me-3')
+    })
+
+    it('should apply image margin classes for md in ltr horizontal layout', () => {
+      render(<Card {...defaultProps} layout="ltr" size="md" imageShape="rectangle" />)
+      const img = screen.getByTestId('mock-image')
+      const wrapper = img.parentElement
+      expect(wrapper).toHaveClass('mb-5')
+    })
+
+    it('should not apply margin for circle images in xs/sm horizontal layout', () => {
+      render(<Card {...defaultProps} layout="ltr" size="xs" imageShape="circle" />)
+      const img = screen.getByTestId('mock-image')
+      const wrapper = img.parentElement
+      // Circle images skip the imageMarginHorizontal logic for xs/sm because the condition checks rectangle
+      expect(wrapper).not.toHaveClass('my-3')
+    })
+  })
+
+  describe('noAnimation in horizontal layout', () => {
+    it('should disable image hover animation in horizontal layout when noAnimation is true', () => {
+      const { container } = render(<Card {...defaultProps} layout="ltr" noAnimation={true} />)
+      // The image inside horizontal layout should not have transition-transform when noAnimation is true
+      const card = container.firstChild as HTMLElement
+      expect(card.className).not.toContain('hover:-translate-y-1')
+    })
+  })
 })

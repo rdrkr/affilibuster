@@ -15,7 +15,7 @@ jest.mock('flags/next', () => ({
   }),
 }))
 
-import { productSearchFlag } from '@/lib/feature-flags/flags'
+import { productSearchFlag, userProfileFlag } from '@/lib/feature-flags/flags'
 
 // Mock the adapter module
 jest.mock('@/lib/feature-flags/adapter', () => ({
@@ -30,6 +30,13 @@ describe('Feature Flags Definitions', () => {
       expect(productSearchFlag).toBeDefined()
       // The flag function returns a callable that evaluates the flag
       expect(typeof productSearchFlag).toBe('function')
+    })
+  })
+
+  describe('userProfileFlag', () => {
+    it('should be defined with correct properties', () => {
+      expect(userProfileFlag).toBeDefined()
+      expect(typeof userProfileFlag).toBe('function')
     })
   })
 })

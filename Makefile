@@ -114,6 +114,35 @@ logs-backend: ## View backend logs only
 logs-the-green-brother: ## View the-green-brother logs only
 	@docker compose logs -f the-green-brother
 
+# Production
+# Helper to pass arguments to docker compose (e.g. make start-prod strapi)
+PROD_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+$(eval $(PROD_ARGS):;@:)
+
+# Production Docker Compose command
+DCP_CMD := docker compose --env-file .env.prod -f docker-compose.prod.yaml
+
+dcp: ## Run generic docker compose production command (e.g. make dcp logs -f)
+	@$(DCP_CMD) $(PROD_ARGS)
+
+setup-vps: ## Setup VPS environment (install Docker, etc.)
+	@bash scripts/setup-vps.sh
+
+generate-env-prod: ## Generate production .env file
+	@bash scripts/generate-env-prod.sh
+
+build-prod: ## Build production services
+	@$(DCP_CMD) build $(PROD_ARGS)
+
+start-prod: ## Start production services
+	@$(DCP_CMD) up -d $(PROD_ARGS)
+
+stop-prod: ## Stop production services
+	@$(DCP_CMD) down $(PROD_ARGS)
+
+logs-prod: ## View production logs
+	@$(DCP_CMD) logs -f $(PROD_ARGS)
+
 test-backend-unit: ## Run backend unit tests only
 	@bash scripts/test.sh backend-unit
 
@@ -242,3 +271,23 @@ import-docker: ## Import strapi cms data (via Docker)
 	@docker compose exec strapi sh -c 'npm run data:import -- --force --file "/data/export.tar"'
 	@rm data/export.tar
 	@echo "✅ Strapi cms data imported"
+
+export-prod: ## Export strapi cms data (production)
+	@echo "💽 Exporting strapi cms data (production)..."
+	@$(DCP_CMD) exec strapi npm run data:export
+	@$(DCP_CMD) exec strapi tar -cf /tmp/export.tar -C /data .
+	@mkdir -p data
+	@$(DCP_CMD) cp strapi:/tmp/export.tar data/export.tar
+	@tar -xf data/export.tar -C data
+	@rm data/export.tar
+	@$(DCP_CMD) exec strapi rm -rf /data /tmp/export.tar
+	@echo "✅ Strapi cms data exported from production"
+
+import-prod: ## Import strapi cms data (production)
+	@echo "💽 Importing strapi cms data (production)..."
+	@tar -cf data/export.tar -C "data" assets entities schemas configuration links metadata.json
+	@$(DCP_CMD) cp data/export.tar strapi:/tmp/export.tar
+	@$(DCP_CMD) exec strapi npm run data:import -- --force --file "/tmp/export.tar"
+	@$(DCP_CMD) exec strapi rm /tmp/export.tar
+	@rm data/export.tar
+	@echo "✅ Strapi cms data imported to production"

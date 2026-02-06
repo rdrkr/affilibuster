@@ -225,4 +225,55 @@ describe('ProductCard', () => {
     // Tag should not be
     expect(screen.queryByText('New Arrival')).not.toBeInTheDocument()
   })
+
+  it('should handle null tags array gracefully', () => {
+    const productNullTags = {
+      ...mockProduct,
+      tags: null,
+    }
+    render(<ProductCard {...defaultProps} product={productNullTags as any} />)
+    // Should render without crashing
+    expect(screen.getByText('$25.50')).toBeInTheDocument()
+    expect(screen.queryByText('New Arrival')).not.toBeInTheDocument()
+  })
+
+  it('should use fallback aria label when header.header.ariaDescription is missing', () => {
+    const productNoAria = {
+      ...mockProduct,
+      header: {
+        alignment: 'center',
+        promoteHeaderIcon: false,
+        header: {
+          text: 'Eco Water Bottle',
+          iconPosition: IconPositionEnum.BEFORE_TEXT,
+          // no ariaDescription
+        },
+      } as any,
+    }
+    render(<ProductCard {...defaultProps} product={productNoAria} enableUserProfile={true} />)
+    // Should use 'Add to favorites' fallback
+    const favoriteButton = screen.getByRole('button', { name: 'Add to favorites' })
+    expect(favoriteButton).toBeInTheDocument()
+  })
+
+  it('should use header ariaDescription for favorite button when available', () => {
+    render(<ProductCard {...defaultProps} enableUserProfile={true} />)
+    // mockProduct has ariaDescription: 'Product Title'
+    const favoriteButton = screen.getByRole('button', { name: 'Product Title' })
+    expect(favoriteButton).toBeInTheDocument()
+  })
+
+  it('should handle product with no header.header (null content)', () => {
+    const productNoHeaderHeader = {
+      ...mockProduct,
+      header: {
+        alignment: 'center',
+        promoteHeaderIcon: false,
+      } as any,
+    }
+    render(<ProductCard {...defaultProps} product={productNoHeaderHeader} />)
+    // Content slot should be empty/falsy since header.header is undefined
+    const content = screen.getByTestId('mock-content')
+    expect(content).toBeEmptyDOMElement()
+  })
 })

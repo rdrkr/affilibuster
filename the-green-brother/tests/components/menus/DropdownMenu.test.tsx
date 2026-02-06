@@ -49,6 +49,47 @@ describe('Dropdown', () => {
     expect(container).toHaveClass('sm:left-auto')
   })
 
+  it('should apply LTR start positioning (right-auto)', () => {
+    render(
+      <Dropdown isVisible={true} direction={DirectionEnum.LTR} align="start">
+        <div>Test Content</div>
+      </Dropdown>
+    )
+    const container = screen.getByText('Test Content').closest('.fixed')
+    expect(container).toHaveClass('sm:right-auto')
+  })
+
+  it('should apply LTR end positioning (left-auto)', () => {
+    render(
+      <Dropdown isVisible={true} direction={DirectionEnum.LTR} align="end">
+        <div>Test Content</div>
+      </Dropdown>
+    )
+    const container = screen.getByText('Test Content').closest('.fixed')
+    expect(container).toHaveClass('sm:left-auto')
+  })
+
+  it('should apply RTL end positioning (right-auto)', () => {
+    render(
+      <Dropdown isVisible={true} direction={DirectionEnum.RTL} align="end">
+        <div>Test Content</div>
+      </Dropdown>
+    )
+    const container = screen.getByText('Test Content').closest('.fixed')
+    expect(container).toHaveClass('sm:right-auto')
+  })
+
+  it('should use inline positioning when inlineOnMobile is true', () => {
+    render(
+      <Dropdown isVisible={true} inlineOnMobile={true}>
+        <div>Test Content</div>
+      </Dropdown>
+    )
+    const container = screen.getByText('Test Content').closest('.absolute')
+    expect(container).toHaveClass('absolute')
+    expect(container).toHaveClass('top-full')
+  })
+
   it('should apply custom width style', () => {
     render(
       <Dropdown isVisible={true} width="300px">
@@ -282,5 +323,46 @@ describe('DropdownMenu', () => {
     // Should call onSelect and close
     expect(mockOnSelect).toHaveBeenCalledTimes(1)
     expect(triggerButton).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('should not open dropdown when children is empty (no content)', () => {
+    render(
+      <DropdownMenu triggerData={mockTriggerData} direction={DirectionEnum.LTR} testId="test-menu">
+        {null}
+      </DropdownMenu>
+    )
+    const container = screen.getByTestId('test-menu')
+    const button = screen.getByRole('button', { name: 'Open menu' })
+
+    // Hover should not open dropdown because there's no content
+    fireEvent.mouseEnter(container)
+    expect(button).toHaveAttribute('aria-expanded', 'false')
+
+    // Click should not toggle either
+    fireEvent.click(button)
+    expect(button).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('should render trigger as ButtonLink when triggerType is "link"', () => {
+    render(
+      <DropdownMenu triggerData={mockTriggerData} direction={DirectionEnum.LTR} testId="test-menu" triggerType="link">
+        <div>Dropdown Content</div>
+      </DropdownMenu>
+    )
+    // ButtonLink renders as an anchor, ButtonAction renders as button
+    const link = screen.getByRole('link', { name: 'Open menu' })
+    expect(link).toBeInTheDocument()
+  })
+})
+
+/**
+ * Tests for backwards compatibility re-exports
+ */
+describe('DropdownPanel (backwards compatibility)', () => {
+  it('should export DropdownPanel as alias for Dropdown', () => {
+    // Verify re-export exists and is the same component
+    const { DropdownPanel } = require('@/components/menus/DropdownMenu')
+    expect(DropdownPanel).toBeDefined()
+    expect(DropdownPanel).toBe(Dropdown)
   })
 })

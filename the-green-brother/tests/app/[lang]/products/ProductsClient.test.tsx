@@ -49,8 +49,22 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/components/product', () => {
   const MockProductCard = ({ product }: { product: ApiProductProductDocument }) => (
     <div data-testid={`product-card-${product.documentId}`}>
-      <span>{product.header.header ? product.header.header.text : ''}</span>
-      <span data-testid="product-price">{product.prices[0]?.amount}</span>
+      {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+      <span>{product.header?.header ? product.header.header.text : ''}</span>
+      <span data-testid="product-price">
+        {(() => {
+          try {
+            const prices = product.prices as any
+
+            const price = prices?.[0]
+
+            return price?.amount ?? ''
+          } catch (_e) {
+            console.error('Error rendering price for product:', product)
+            return ''
+          }
+        })()}
+      </span>
     </div>
   )
 
@@ -798,6 +812,187 @@ describe('ProductsClient', () => {
       // First option (Best Sellers) should be active by default
       expect(dropdownBestSellers).toHaveAttribute('aria-pressed', 'true')
       expect(newArrivalsButton).toHaveAttribute('aria-pressed', 'false')
+    })
+  })
+
+  describe('Sorting with missing prices', () => {
+    it('should handle products with no prices when sorting by price low to high', () => {
+      const productNoPrices = createMockProduct({
+        documentId: 'prod-no-price',
+        id: 99,
+        slug: 'product-no-price',
+        publishedAt: '2025-01-04T10:00:00Z',
+        header: {
+          alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+          promoteHeaderIcon: false,
+          header: {
+            text: 'No Price Product',
+            iconPosition: IconPositionEnum.BEFORE_TEXT,
+            ariaDescription: 'No Price Product',
+          },
+        } as ElementsHeaderEntry,
+        prices: [],
+        category: createMockCategory({
+          documentId: 'cat-1',
+          slug: 'electronics',
+          content: { text: 'Electronics', ariaDescription: 'Electronics', iconPosition: IconPositionEnum.BEFORE_TEXT },
+        }),
+        images: [{ url: '/images/noprice.jpg' } as PluginUploadFileDocument],
+        disclaimerLabel: {
+          text: 'Disclaimer',
+          iconPosition: IconPositionEnum.BEFORE_TEXT,
+          ariaDescription: 'Disclaimer',
+        },
+      })
+
+      const productsWithMissing = [...mockProducts, productNoPrices]
+
+      renderWithLayout(
+        <ProductsClient
+          pageData={mockPageData}
+          products={productsWithMissing}
+          categories={mockCategories}
+          enableUserProfile={false}
+        />
+      )
+
+      // Sort by price low to high
+      const sortButton = screen.getByRole('button', { name: /Sort by|Best Sellers/i })
+      fireEvent.click(sortButton)
+      const priceLowOption = screen.getByRole('button', { name: /Price: Low to High/i })
+      fireEvent.click(priceLowOption)
+
+      // Product with no prices should sort as 0 (cheapest)
+      const productCards = screen.getAllByTestId(/product-card-/)
+      expect(productCards[0]).toHaveAttribute('data-testid', 'product-card-prod-no-price')
+    })
+
+    it('should handle products with no prices when sorting by price high to low', () => {
+      const productNoPrices = createMockProduct({
+        documentId: 'prod-no-price-high',
+        id: 100,
+        slug: 'product-no-price-high',
+        publishedAt: '2025-01-04T10:00:00Z',
+        header: {
+          alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+          promoteHeaderIcon: false,
+          header: {
+            text: 'No Price Product High',
+            iconPosition: IconPositionEnum.BEFORE_TEXT,
+            ariaDescription: 'No Price Product High',
+          },
+        } as ElementsHeaderEntry,
+        prices: [],
+        category: createMockCategory({
+          documentId: 'cat-1',
+          slug: 'electronics',
+          content: { text: 'Electronics', ariaDescription: 'Electronics', iconPosition: IconPositionEnum.BEFORE_TEXT },
+        }),
+        images: [{ url: '/images/noprice.jpg' } as PluginUploadFileDocument],
+        disclaimerLabel: {
+          text: 'Disclaimer',
+          iconPosition: IconPositionEnum.BEFORE_TEXT,
+          ariaDescription: 'Disclaimer',
+        },
+      })
+
+      const productsWithMissing = [...mockProducts, productNoPrices]
+
+      renderWithLayout(
+        <ProductsClient
+          pageData={mockPageData}
+          products={productsWithMissing}
+          categories={mockCategories}
+          enableUserProfile={false}
+        />
+      )
+
+      // Sort by price high to low
+      const sortButton = screen.getByRole('button', { name: /Sort by|Best Sellers/i })
+      fireEvent.click(sortButton)
+      const priceHighOption = screen.getByRole('button', { name: /Price: High to Low/i })
+      fireEvent.click(priceHighOption)
+
+      // Product with no prices should sort as 0 (last in high to low)
+      const productCards = screen.getAllByTestId(/product-card-/)
+      expect(productCards[productCards.length - 1]).toHaveAttribute('data-testid', 'product-card-prod-no-price-high')
+    })
+
+    it('should handle products with price object but missing amount', () => {
+      const productMissingAmount = createMockProduct({
+        documentId: 'prod-no-amount',
+        id: 101,
+        slug: 'prod-no-amount',
+        prices: [{ id: 1 } as any], // Price object exists but no amount
+        publishedAt: '2025-01-05T10:00:00Z',
+      })
+
+      const products = [...mockProducts, productMissingAmount]
+
+      renderWithLayout(
+        <ProductsClient
+          pageData={mockPageData}
+          products={products}
+          categories={mockCategories}
+          enableUserProfile={false}
+        />
+      )
+
+      // Sort by price low to high
+      const sortButton = screen.getByRole('button', { name: /Sort by|Best Sellers/i })
+      fireEvent.click(sortButton)
+      const priceLowOption = screen.getByRole('button', { name: /Price: Low to High/i })
+      fireEvent.click(priceLowOption)
+
+      // Should sort as 0
+      const productCards = screen.getAllByTestId(/product-card-/)
+      expect(productCards[0]).toHaveAttribute('data-testid', 'product-card-prod-no-amount')
+    })
+  })
+
+  describe('Search with missing header', () => {
+    it('should handle products with null header.header when searching', () => {
+      const productNoHeader = createMockProduct({
+        documentId: 'prod-no-header',
+        id: 98,
+        slug: 'product-no-header',
+        publishedAt: '2025-01-04T10:00:00Z',
+        header: {
+          alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+          promoteHeaderIcon: false,
+        } as ElementsHeaderEntry,
+        prices: [{ id: 98, amount: 15.0, currency: { symbol: '$', code: 'USD' } as any } as ElementsPriceEntry],
+        category: createMockCategory({
+          documentId: 'cat-1',
+          slug: 'electronics',
+          content: { text: 'Electronics', ariaDescription: 'Electronics', iconPosition: IconPositionEnum.BEFORE_TEXT },
+        }),
+        images: [{ url: '/images/noheader.jpg' } as PluginUploadFileDocument],
+        disclaimerLabel: {
+          text: 'Disclaimer',
+          iconPosition: IconPositionEnum.BEFORE_TEXT,
+          ariaDescription: 'Disclaimer',
+        },
+      })
+
+      const productsWithMissing = [...mockProducts, productNoHeader]
+
+      // Set search term
+      mockSearchParams.set('search', 'Product')
+
+      renderWithLayout(
+        <ProductsClient
+          pageData={mockPageData}
+          products={productsWithMissing}
+          categories={mockCategories}
+          enableUserProfile={false}
+        />
+      )
+
+      // Product without header.header should not match search (p.header.header?.text is undefined)
+      expect(screen.queryByTestId('product-card-prod-no-header')).not.toBeInTheDocument()
+      // Other products that match should still show
+      expect(screen.getByTestId('product-card-prod-1')).toBeInTheDocument()
     })
   })
 

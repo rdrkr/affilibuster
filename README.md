@@ -28,7 +28,7 @@ architecture.**
 
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable-next-line MD013 -->
-[Features](#-features) • [Architecture](#️-architecture) • [Quick Start](#-quick-start) • [Development](#️-development) • [Testing](#-testing)
+[Features](#-features) • [Architecture](#️-architecture) • [Quick Start](#-quick-start) • [Production](#-production-deployment-hetzner-vps) • [Development](#️-development) • [Testing](#-testing)
 <!-- prettier-ignore-end -->
 
 </div>
@@ -174,6 +174,7 @@ affilibuster/                        # Monorepo root
 │ │ ├── i18n/                        # Internationalization configuration
 │ │ └── styles/                      # Global styles and theme
 │ ├── Dockerfile                     # TheGreenBrother dev server container
+│ ├── Dockerfile.prod                # Production 3-stage build (standalone Next.js)
 │ └── Dockerfile.test-runner         # Lightweight Playwright test container
 │
 ├── cms/                             # Strapi 5 headless CMS
@@ -207,12 +208,18 @@ affilibuster/                        # Monorepo root
 ├── specs/                           # Feature specifications & designs
 ├── scripts/                         # Development & deployment scripts
 │ ├── audit.sh                       # Security audit
+│ ├── backup-db.sh                   # Production PostgreSQL backup (30-day retention)
 │ ├── build.sh                       # Build all services
 │ ├── clean.sh                       # Clean build artifacts
 │ ├── format.sh                      # Format code
 │ ├── lint.sh                        # Lint code
 │ ├── setup.sh                       # Development setup
 │ └── test.sh                        # Run tests
+│
+├── .github/
+│ └── workflows/
+│   ├── ci.yaml                      # CI pipeline (tests, lint, type-check)
+│   └── deploy.yaml                  # CD pipeline (SSH deploy to Hetzner VPS)
 │
 ├── .specify/                        # SpecKit project configuration
 │ ├── memory/constitution.md         # Project constitution & principles
@@ -230,9 +237,15 @@ affilibuster/                        # Monorepo root
 │ └── links/                         # Link data
 │
 ├── docs/                            # Project documentation
-│ └── eco-friendly-affiliate-website-prd.md
+│ ├── eco-friendly-affiliate-website-prd.md
+│ └── specs/
+│   └── 008-hetzner-vps-migration/   # VPS migration plan & status
+│     ├── plan.md                    # Full migration plan
+│     └── implementation-status.md   # Phase-by-phase progress
 │
-└── docker-compose.yaml              # Local development environment
+├── Caddyfile                        # Production reverse proxy (auto SSL, routing, security headers)
+├── docker-compose.yaml              # Local development environment
+└── docker-compose.prod.yaml         # Production environment (Hetzner VPS)
 ```
 
 ### 🛠️ Technology Stack
@@ -240,7 +253,7 @@ affilibuster/                        # Monorepo root
 - **TheGreenBrother**: Next.js 16, React 19, TypeScript 5.7+, Tailwind CSS 4, next-intl
 - **Backend**: FastAPI 0.120+, Python 3.13+, PostgreSQL 15+, Redis, Alembic
 - **CMS**: Strapi 5+, PostgreSQL 15+, i18n plugin
-- **Infrastructure**: Docker & Docker Compose
+- **Infrastructure**: Docker & Docker Compose, Caddy (production reverse proxy + auto SSL)
 
 ---
 
@@ -344,6 +357,93 @@ This ensures:
 - **Testability** - inner layers can be tested independently
 - **Flexibility** - frameworks can be replaced without affecting business logic
 - **Maintainability** - clear separation of concerns
+
+## 🚢 Production Deployment (Hetzner VPS)
+
+Affilibuster runs on a self-hosted Hetzner VPS with Docker, Caddy for automatic SSL, and GitHub Actions for continuous
+deployment. Full migration plan: [`docs/specs/008-hetzner-vps-migration/plan.md`](docs/specs/008-hetzner-vps-migration/plan.md).
+
+### Production Architecture
+
+<!-- prettier-ignore -->
+```markdown
+Internet
+  │
+  ▼
+Caddy (ports 80/443) ── automatic Let's Encrypt SSL
+  ├── thegreenbrother.com       → the-green-brother:3000 (Next.js standalone)
+  ├── thegreenbrother.com/api/* → backend:8000 (FastAPI, /api prefix stripped)
+  └── cms.thegreenbrother.com   → strapi:1337 (Strapi CMS)
+
+Internal Docker network (HTTP only):
+  ├── postgres:5432
+  ├── redis:6379
+  ├── strapi:1337
+  ├── backend:8000
+  └── the-green-brother:3000
+```
+
+All inter-service communication is plain HTTP inside Docker. Caddy terminates SSL at the edge.
+
+### Production Files
+
+| File                                | Purpose                                                |
+| ----------------------------------- | ------------------------------------------------------ |
+| `docker-compose.prod.yaml`          | Caddy, resource limits, restart policies, log rotation |
+| `Caddyfile`                         | Auto SSL, path-based routing, security headers         |
+| `cms/Dockerfile.prod`               | Multi-stage Strapi (node:22-alpine, non-root)          |
+| `backend/Dockerfile.prod`           | Multi-stage FastAPI (python:3.13-slim, non-root)       |
+| `backend/docker-entrypoint.prod.sh` | Wait for PG, alembic migrate, uvicorn                  |
+| `the-green-brother/Dockerfile.prod` | 3-stage Next.js standalone (non-root)                  |
+| `.env.prod.example`                 | Production env template                                |
+| `.github/workflows/deploy.yaml`     | CD: SSH deploy, health checks, image prune             |
+| `scripts/setup-vps.sh`              | Server hardening + Docker installation                 |
+| `scripts/generate-env-prod.sh`      | Interactive .env.prod generator with auto secrets      |
+| `scripts/backup-db.sh`              | Daily pg_dump, 30-day retention                        |
+
+### Build & Deploy
+
+```bash
+# On the VPS:
+
+# 1. Setup environment (install Docker, etc.)
+make setup-vps
+
+# 2. Generate production secrets
+make generate-env-prod
+
+# 3. Build and Start
+make build-prod
+make start-prod
+
+# View logs
+make logs-prod
+
+# Stop services
+make stop-prod
+
+# Check service health
+curl -sf https://thegreenbrother.com
+curl -sf https://thegreenbrother.com/api/v1/health
+curl -sf https://cms.thegreenbrother.com/api/health
+```
+
+### Automated Deployment (CI/CD)
+
+Pushing to `main` triggers:
+
+1. **CI** (`.github/workflows/ci.yaml`): Tests, lint, type-check
+2. **CD** (`.github/workflows/deploy.yaml`): SSH into VPS, pull, build, deploy, health check, prune old images
+
+Required GitHub secrets: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_SSH_KNOWN_HOSTS`.
+
+### Backup Strategy
+
+- **Daily DB backups**: `scripts/backup-db.sh` via cron at 3 AM UTC to Hetzner Cloud Volume (`/mnt/backups/`)
+- **30-day retention** with automatic cleanup
+- **Hetzner server snapshots**: Built-in full server backup
+
+---
 
 ## 🛠️ Development
 
@@ -664,6 +764,8 @@ maintainers of the following projects:
   structure store
 - **[Docker](https://www.docker.com/)** ([Apache 2.0](https://github.com/docker/docker/blob/master/LICENSE)) -
   Containerization platform
+- **[Caddy](https://caddyserver.com/)** ([Apache 2.0](https://github.com/caddyserver/caddy/blob/master/LICENSE)) -
+  Production reverse proxy with automatic HTTPS
 
 ### Backend Dependencies (Python)
 
@@ -751,6 +853,8 @@ maintainers of the following projects:
   ** ([MIT](https://github.com/actions/upload-artifact/blob/main/LICENSE)) - Upload build artifacts
 - **[actions/cache](https://github.com/actions/cache)** ([MIT](https://github.com/actions/cache/blob/main/LICENSE)) -
   Cache dependencies
+- **[appleboy/ssh-action](https://github.com/appleboy/ssh-action)
+  ** ([MIT](https://github.com/appleboy/ssh-action/blob/master/LICENSE)) - SSH remote commands for deployment
 
 ### Additional Libraries
 

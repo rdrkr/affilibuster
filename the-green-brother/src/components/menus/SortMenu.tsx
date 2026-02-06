@@ -110,7 +110,7 @@ export function SortMenu({
       direction={direction}
       variant="ghost-1"
       size="sm"
-      dropdownClassName={className}
+      dropdownClassName={`flex flex-col ${className}`}
       isOpen={isOpen}
       onOpenChange={setIsOpen}
       align={isRTL ? 'end' : 'start'}

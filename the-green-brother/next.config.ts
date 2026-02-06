@@ -26,6 +26,9 @@ const getPort = (port?: string, protocol?: string): string => {
 }
 
 const nextConfig: NextConfig = {
+  // Standalone output for production Docker deployment (self-contained server.js with minimal node_modules)
+  // Only affects `next build` output, not `next dev`
+  output: 'standalone',
   reactStrictMode: true,
   allowedDevOrigins: ['localhost', '127.0.0.1', 'host.docker.internal', 'rdrkr-mbp-m1.local'],
   // Treat TypeScript errors strictly

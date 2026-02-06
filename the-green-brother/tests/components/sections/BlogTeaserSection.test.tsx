@@ -632,6 +632,45 @@ describe('BlogTeaserSection', () => {
     expect(carousel).toHaveAttribute('dir', 'rtl')
   })
 
+  it('should set dir="rtl" on section element for RTL direction', () => {
+    const { DirectionEnum } =
+      jest.requireActual<typeof import('@/lib/generated/types.gen')>('@/lib/generated/types.gen')
+
+    const { container } = render(
+      <BlogTeaserSection {...defaultProps} data={mockSectionDataWithPosts} direction={DirectionEnum.RTL} />
+    )
+
+    const section = container.querySelector('section')
+    expect(section).toHaveAttribute('dir', 'rtl')
+  })
+
+  it('should set dir="ltr" on section element for LTR direction', () => {
+    const { container } = render(
+      <BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={mockSectionDataWithPosts} />
+    )
+
+    const section = container.querySelector('section')
+    expect(section).toHaveAttribute('dir', 'ltr')
+  })
+
+  it('should handle header with undefined header object (ariaDescription fallback on Carousel)', () => {
+    const dataWithoutHeader: BlogTeaserSectionProps['data'] = {
+      ...mockSectionData,
+      blogPosts: mockBlogPosts,
+      header: {
+        ...mockSectionData.header,
+        header: undefined,
+      },
+    } as unknown as BlogTeaserSectionProps['data']
+
+    const { container } = render(
+      <BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={dataWithoutHeader} />
+    )
+
+    const section = container.querySelector('section')
+    expect(section).toHaveAttribute('aria-label', '')
+  })
+
   it('should apply dir ltr to carousel for LTR direction', () => {
     const { container } = render(
       <BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={mockSectionDataWithPosts} />

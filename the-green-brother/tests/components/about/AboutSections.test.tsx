@@ -175,4 +175,19 @@ describe('AboutSections', () => {
     expect(dynamicZone).toBeInTheDocument()
     expect(dynamicZone.children).toHaveLength(0)
   })
+
+  it('should use default empty contributors array when not provided', () => {
+    const sections: AboutSection[] = [
+      {
+        __component: 'sections.team-grid',
+        id: 1,
+      } as AboutSection,
+    ]
+
+    // Render without contributors prop to test the default parameter
+    render(<AboutSections direction={DirectionEnum.LTR} sections={sections} />)
+
+    expect(screen.getByTestId('team-section-1')).toBeInTheDocument()
+    expect(screen.getByText('Team Section')).toBeInTheDocument()
+  })
 })

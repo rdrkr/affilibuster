@@ -333,6 +333,30 @@ describe('LanguageMenu', () => {
     // Component should render text without icon
     expect(screen.getByText('Language')).toBeInTheDocument()
   })
+
+  it('should handle missing label in buttonData (line 106 else branch)', () => {
+    const mockDataNoLabel = {
+      ...mockData,
+      menuButton: {
+        url: '#',
+        openInNewTab: false,
+        // No label property at all
+      },
+    } as unknown as LanguageMenuProps['data']
+    render(
+      <LanguageMenu
+        data={mockDataNoLabel}
+        languages={mockLanguages}
+        selectedLang={CodeEnum.EN}
+        onLanguageChange={mockOnLanguageChange}
+        direction={DirectionEnum.LTR}
+        showText={true}
+      />
+    )
+    // Component should still render without crashing
+    const container = screen.getByTestId('language-menu-container')
+    expect(container).toBeInTheDocument()
+  })
   it('should toggle menu open state on button click', () => {
     render(
       <LanguageMenu

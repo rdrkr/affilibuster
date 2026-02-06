@@ -227,6 +227,23 @@ describe('TextBlock', () => {
     })
   })
 
+  describe('code element edge cases', () => {
+    it('should handle code element with non-string and non-array children', () => {
+      // Empty code blocks produce undefined children in the mock,
+      // which exercises the else branch in the code handler
+      const emptyCodeBlock = '```\n```'
+      const dataWithEmptyCode = createTextBlockData({
+        content: emptyCodeBlock,
+      })
+      render(<TextBlock data={dataWithEmptyCode} direction={DirectionEnum.LTR} />)
+
+      // The code handler should convert undefined children to empty string via String(undefined ?? '')
+      // This renders a Label with empty text
+      const labels = screen.queryAllByTestId('mock-label')
+      expect(labels.length).toBeGreaterThanOrEqual(1)
+    })
+  })
+
   describe('center tag rendering', () => {
     it('should render content inside center tags as centered', () => {
       const dataWithCenter = createTextBlockData({

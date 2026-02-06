@@ -1288,11 +1288,6 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ApiBlogPostBlogPostDocument'
-                      blogPosts:
-                        description: A relational field
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ApiBlogPostBlogPostDocument'
                       pagination:
                         description: A component field
                         $ref: '#/components/schemas/CallToActionsPaginationCtaEntry'
@@ -8596,6 +8591,9 @@ paths:
                       productsSorter:
                         description: A component field
                         $ref: '#/components/schemas/SortersProductsSorterEntry'
+                      certificatesSectionHeader:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
                       relatedProductsSectionHeader:
                         description: A component field
                         $ref: '#/components/schemas/ElementsHeaderEntry'
@@ -8647,6 +8645,7 @@ paths:
                       - header
                       - productsFilter
                       - productsSorter
+                      - certificatesSectionHeader
                       - relatedProductsSectionHeader
                       - pagination
                       - seoMetadata
@@ -13931,11 +13930,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ApiBlogPostBlogPostDocument'
-        blogPosts:
-          description: A relational field
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiBlogPostBlogPostDocument'
         pagination:
           description: A component field
           $ref: '#/components/schemas/CallToActionsPaginationCtaEntry'
@@ -15729,6 +15723,9 @@ components:
         productsSorter:
           description: A component field
           $ref: '#/components/schemas/SortersProductsSorterEntry'
+        certificatesSectionHeader:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
         relatedProductsSectionHeader:
           description: A component field
           $ref: '#/components/schemas/ElementsHeaderEntry'
@@ -15780,6 +15777,7 @@ components:
         - header
         - productsFilter
         - productsSorter
+        - certificatesSectionHeader
         - relatedProductsSectionHeader
         - pagination
         - seoMetadata

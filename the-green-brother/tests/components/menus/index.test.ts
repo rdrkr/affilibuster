@@ -7,6 +7,11 @@
 import * as menus from '@/components/menus'
 
 describe('components/menus barrel exports', () => {
+  it('should export Dropdown and DropdownMenu components', () => {
+    expect(menus.Dropdown).toBeDefined()
+    expect(menus.DropdownMenu).toBeDefined()
+  })
+
   it('should export LanguageMenu component', () => {
     expect(menus.LanguageMenu).toBeDefined()
   })
@@ -17,6 +22,10 @@ describe('components/menus barrel exports', () => {
 
   it('should export SearchMenu component', () => {
     expect(menus.SearchMenu).toBeDefined()
+  })
+
+  it('should export SortMenu component', () => {
+    expect(menus.SortMenu).toBeDefined()
   })
 
   it('should export ThemeMenu component', () => {

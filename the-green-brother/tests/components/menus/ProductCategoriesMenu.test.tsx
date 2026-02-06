@@ -410,6 +410,28 @@ describe('ProductCategoriesMenu', () => {
     })
   })
 
+  describe('Language extraction from pathname', () => {
+    it('should fallback to "en" when pathname does not match language regex', () => {
+      // Override mockPathname for this test - need to use a non-matching pathname
+      // The mock returns '/en/products' by default which matches.
+      // We need to test the fallback when langMatch is null.
+      // Since the mock is module-level, we need to re-mock for this specific case.
+
+      jest.spyOn(require('next/navigation'), 'usePathname').mockReturnValue('/')
+
+      render(<ProductCategoriesMenu data={mockData} isActive={false} direction={DirectionEnum.LTR} />)
+      // Open menu
+      fireEvent.click(screen.getByRole('link', { name: 'View all products' }))
+
+      // Should fallback to 'en'
+      const kitchenLink = screen.getByText('Kitchen').closest('a')
+      expect(kitchenLink).toHaveAttribute('href', '/en/products?category=kitchen')
+
+      // Restore
+      jest.spyOn(require('next/navigation'), 'usePathname').mockReturnValue(mockPathname)
+    })
+  })
+
   describe('Search param preservation', () => {
     it('should include search param in category links when search param exists', () => {
       mockSearchParams.set('search', 'bamboo')

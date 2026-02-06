@@ -208,4 +208,32 @@ describe('Label', () => {
     const { container } = render(<Label direction={DirectionEnum.LTR} data={mockLabelData} />)
     expect(container.firstChild).toHaveAttribute('aria-label', 'Test label description')
   })
+
+  describe('showText prop (animated text visibility)', () => {
+    it('should render animated text with visible classes when showText is true', () => {
+      render(<Label direction={DirectionEnum.LTR} data={mockLabelData} showText={true} />)
+      const text = screen.getByTestId('mock-text')
+      expect(text).toBeInTheDocument()
+      expect(text.className).toContain('whitespace-nowrap')
+      expect(text.className).toContain('max-w-96')
+      expect(text.className).toContain('opacity-100')
+    })
+
+    it('should render animated text with hidden classes when showText is false', () => {
+      render(<Label direction={DirectionEnum.LTR} data={mockLabelData} showText={false} />)
+      const text = screen.getByTestId('mock-text')
+      expect(text).toBeInTheDocument()
+      expect(text.className).toContain('whitespace-nowrap')
+      expect(text.className).toContain('max-w-0')
+      expect(text.className).toContain('opacity-0')
+    })
+
+    it('should render non-animated text when showText is undefined (default)', () => {
+      render(<Label direction={DirectionEnum.LTR} data={mockLabelData} />)
+      const text = screen.getByTestId('mock-text')
+      expect(text).toBeInTheDocument()
+      // Should NOT have animated text classes
+      expect(text.className).not.toContain('whitespace-nowrap')
+    })
+  })
 })

@@ -19,7 +19,6 @@
     "preflight": "npm run build:plugins && strapi ts:generate-types && npm run openapi:generate && npm run format:fix && npm run lint:fix",
     "dev": "npm run preflight && strapi develop",
     "develop": "npm run dev",
-    "prebuild": "npm run preflight",
     "build": "strapi build",
     "clean": "npm run clean:plugins && rm -rf coverage node_modules build .tmp .strapi dist",
     "start": "strapi start",

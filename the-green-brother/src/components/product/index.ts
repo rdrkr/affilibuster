@@ -4,5 +4,6 @@
  * Product components barrel export
  */
 export { ProductCard, type ProductCardProps } from './ProductCard'
+export { ProductCertificatesSection, type ProductCertificatesSectionProps } from './ProductCertificatesSection'
 export { ProductsGrid, type ProductsGridProps } from './ProductsGrid'
 export { QuantitySelector, type QuantitySelectorProps } from './QuantitySelector'

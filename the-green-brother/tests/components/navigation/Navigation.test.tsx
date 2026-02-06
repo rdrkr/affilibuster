@@ -762,4 +762,41 @@ describe('Navigation', () => {
       expect(brandButton).toHaveAttribute('data-show-text', 'true')
     })
   })
+
+  describe('loading state', () => {
+    it('should render with opacity-0 when not ready', () => {
+      const { useNavigationResize } = jest.requireMock<typeof import('@/lib/navigation')>('@/lib/navigation')
+      ;(useNavigationResize as jest.Mock).mockReturnValue({
+        navRef: { current: null },
+        visibility: {
+          startGroupMode: 'full' as const,
+          endGroupMode: 'full' as const,
+          collapsedItems: [] as string[],
+          searchMaxWidth: 256,
+          navWidth: 1024,
+        },
+        isSearchExpanded: false,
+        isReady: false,
+        setSearchExpanded: mockSetSearchExpanded,
+        setStartHasIcons: jest.fn(),
+        setEndHasIcons: jest.fn(),
+      })
+
+      const { container } = render(
+        <Navigation
+          direction={DirectionEnum.LTR}
+          data={mockData}
+          enableProductSearch={true}
+          enableUserProfile={false}
+        />
+      )
+
+      // The content div should have opacity-0 class when not ready
+      const contentDiv = container.querySelector('.opacity-0')
+      expect(contentDiv).toBeInTheDocument()
+
+      // Navigation groups should NOT be rendered when not ready
+      expect(screen.queryByTestId('navigation-group-start')).not.toBeInTheDocument()
+    })
+  })
 })

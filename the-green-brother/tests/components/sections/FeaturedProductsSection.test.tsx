@@ -152,6 +152,27 @@ describe('FeaturedProductsSection', () => {
     expect(cards[0]).toHaveAttribute('data-favorites-enabled', 'true')
   })
 
+  it('should render section with empty aria-label when ariaDescription is undefined', () => {
+    const dataWithoutAria: FeaturedProductsSectionProps['data'] = {
+      ...mockSectionDataWithProducts,
+      header: {
+        ...mockSectionDataWithProducts.header,
+        header: {
+          ...mockSectionDataWithProducts.header.header!,
+          ariaDescription: undefined,
+        },
+      },
+    } as unknown as FeaturedProductsSectionProps['data']
+
+    const { container } = render(
+      <FeaturedProductsSection direction={DirectionEnum.LTR} data={dataWithoutAria} enableUserProfile={false} />
+    )
+
+    const section = container.querySelector('section')
+    expect(section).toBeInTheDocument()
+    expect(section).toHaveAttribute('aria-label', '')
+  })
+
   it('should not render if products list is empty', () => {
     const { container } = render(
       <FeaturedProductsSection direction={DirectionEnum.LTR} data={mockSectionData} enableUserProfile={false} />

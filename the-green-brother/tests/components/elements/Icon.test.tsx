@@ -216,4 +216,33 @@ describe('Icon', () => {
     // Check mask-image via style attribute or property
     expect(mask.getAttribute('style')).toContain('mask-image: url(/icons/social.svg)')
   })
+
+  it('should render masked icon with promoted flag and circular background', () => {
+    const { container } = render(<Icon icon="social.svg" masked promoted ariaLabel="Social Icon" />)
+
+    // Should be wrapped in a promoted container with circular background
+    const wrapper = container.querySelector('.rounded-full')
+    expect(wrapper).toBeInTheDocument()
+    expect(wrapper).toHaveClass('bg-primary/10')
+
+    // The mask element should be inside the promoted wrapper
+    const mask = screen.getByRole('img', { name: 'Social Icon' })
+    expect(mask.tagName).toBe('SPAN')
+    expect(mask).toHaveClass('bg-current')
+    expect(wrapper).toContainElement(mask)
+
+    // When promoted, className should NOT be on the mask element itself but on the wrapper
+    expect(mask).not.toHaveClass('custom-class')
+  })
+
+  it('should not apply className to masked icon element when promoted', () => {
+    const { container } = render(<Icon icon="social.svg" masked promoted className="custom-class" />)
+
+    // className should be on the promoted wrapper, not on the mask element itself
+    const wrapper = container.querySelector('.rounded-full')
+    expect(wrapper).toHaveClass('custom-class')
+
+    const mask = container.querySelector('[role="img"]')
+    expect(mask).not.toHaveClass('custom-class')
+  })
 })

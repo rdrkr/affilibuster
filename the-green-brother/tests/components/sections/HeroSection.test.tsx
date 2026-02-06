@@ -381,6 +381,59 @@ describe('HeroSection', () => {
       expect(contentDiv).toHaveClass('text-right')
     })
 
+    it('should render TEXT_ABOVE_BACKGROUND with CENTER alignment (items-center class)', () => {
+      const data = {
+        ...mockBaseData,
+        variant: VariantEnum.TEXT_ABOVE_BACKGROUND,
+        header: { ...mockBaseData.header, alignment: AlignmentEnum.CENTER },
+      }
+      const { container } = render(<HeroSection direction={DirectionEnum.LTR} data={data} />)
+      const section = container.firstChild as HTMLElement
+      expect(section).toHaveClass('items-center')
+    })
+
+    it('should fallback to empty aria-label in TEXT_OVER_BACKGROUND when ariaDescription is undefined', () => {
+      const data = {
+        ...mockBaseData,
+        variant: VariantEnum.TEXT_OVER_BACKGROUND,
+        header: {
+          ...mockBaseData.header,
+          header: { ...mockBaseData.header.header, ariaDescription: undefined },
+        },
+      } as unknown as HeroSectionProps['data']
+      const { container } = render(<HeroSection direction={DirectionEnum.LTR} data={data} />)
+      const section = container.querySelector('section')
+      expect(section).toHaveAttribute('aria-label', '')
+    })
+
+    it('should fallback to empty aria-label in TEXT_ABOVE_BACKGROUND when ariaDescription is undefined', () => {
+      const data = {
+        ...mockBaseData,
+        variant: VariantEnum.TEXT_ABOVE_BACKGROUND,
+        header: {
+          ...mockBaseData.header,
+          header: { ...mockBaseData.header.header, ariaDescription: undefined },
+        },
+      } as unknown as HeroSectionProps['data']
+      const { container } = render(<HeroSection direction={DirectionEnum.LTR} data={data} />)
+      const section = container.querySelector('section')
+      expect(section).toHaveAttribute('aria-label', '')
+    })
+
+    it('should fallback to empty aria-label in TEXT_BELOW_BACKGROUND when ariaDescription is undefined', () => {
+      const data = {
+        ...mockBaseData,
+        variant: VariantEnum.TEXT_BELOW_BACKGROUND,
+        header: {
+          ...mockBaseData.header,
+          header: { ...mockBaseData.header.header, ariaDescription: undefined },
+        },
+      } as unknown as HeroSectionProps['data']
+      const { container } = render(<HeroSection direction={DirectionEnum.LTR} data={data} />)
+      const section = container.querySelector('section')
+      expect(section).toHaveAttribute('aria-label', '')
+    })
+
     it('should render TEXT_OVER_BACKGROUND with LTR alignment (checking overlay margin)', () => {
       const data = {
         ...mockBaseData,

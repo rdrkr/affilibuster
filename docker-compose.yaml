@@ -63,6 +63,9 @@ services:
       dockerfile: Dockerfile
       args:
         CMS_PORT: ${CMS_PORT}
+        CMS_HOST: ${CMS_HOST}
+        CMS_PROTOCOL: ${CMS_PROTOCOL}
+        APP_KEYS: ${APP_KEYS}
     restart: 'no'
     depends_on:
       postgres:

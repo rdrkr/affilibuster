@@ -118,4 +118,26 @@ describe('NewsletterSignupCTA', () => {
     const form = container.querySelector('form')
     expect(form).toHaveClass('flex', 'gap-2')
   })
+
+  it('should render submit button and handle click without errors', () => {
+    render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+    // Find the submit button by its aria label and click it
+    const button = screen.getByRole('button', { name: /Submit newsletter signup/i })
+    expect(button).toBeInTheDocument()
+
+    // Click should not throw - the onClick is an intentionally empty handler
+    expect(() => {
+      fireEvent.click(button)
+    }).not.toThrow()
+  })
+
+  it('should have proper email input attributes', () => {
+    render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+    const emailInput = screen.getByPlaceholderText('Enter your email')
+    expect(emailInput).toHaveAttribute('id', 'newsletter-email')
+    expect(emailInput).toHaveAttribute('name', 'email')
+    expect(emailInput).toHaveAttribute('autocomplete', 'email')
+  })
 })

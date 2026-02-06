@@ -86,4 +86,13 @@ describe('TopicPage', () => {
 
     expect(screen.getByTestId('posts-count')).toHaveTextContent('0')
   })
+
+  it('should return null when getBlog returns null', async () => {
+    mockGetBlogPosts.mockResolvedValue({ data: [{ documentId: 'post-1' }] })
+    mockGetBlog.mockResolvedValue(null)
+
+    const Component = await TopicPage({ params: Promise.resolve({ lang: CodeEnum.EN, tag: 'Test' }) })
+
+    expect(Component).toBeNull()
+  })
 })

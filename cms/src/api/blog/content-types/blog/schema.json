@@ -43,11 +43,6 @@
       "relation": "oneToMany",
       "target": "api::blog-post.blog-post"
     },
-    "blogPosts": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::blog-post.blog-post"
-    },
     "pagination": {
       "type": "component",
       "pluginOptions": {

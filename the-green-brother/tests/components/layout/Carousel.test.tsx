@@ -564,10 +564,11 @@ describe('Carousel', () => {
       jest.useFakeTimers()
       HTMLElement.prototype.scrollTo = jest.fn()
 
-      // Mock requestAnimationFrame to execute callback immediately
+      // Capture the RAF callback so we can run it AFTER modifying the DOM
+      let rafCallback: FrameRequestCallback | null = null
       const originalRAF = global.requestAnimationFrame
       global.requestAnimationFrame = jest.fn(cb => {
-        cb(0)
+        rafCallback = cb
         return 0
       }) as unknown as typeof requestAnimationFrame
 
@@ -580,8 +581,12 @@ describe('Carousel', () => {
       )
 
       const track = screen.getByTestId('carousel-track')
-      // Mock track with no parent element
+      // Mock track with no parent element BEFORE running the RAF callback
       Object.defineProperty(track, 'parentElement', { value: null, configurable: true })
+
+      // Now execute the RAF callback - should hit the "no track or parent" branch
+      expect(rafCallback).toBeTruthy()
+      ;(rafCallback as unknown as FrameRequestCallback)(0)
 
       // Should not throw
       expect(track).toBeInTheDocument()
@@ -594,9 +599,11 @@ describe('Carousel', () => {
       jest.useFakeTimers()
       HTMLElement.prototype.scrollTo = jest.fn()
 
+      // Capture the RAF callback so we can run it AFTER modifying the DOM
+      let rafCallback: FrameRequestCallback | null = null
       const originalRAF = global.requestAnimationFrame
       global.requestAnimationFrame = jest.fn(cb => {
-        cb(0)
+        rafCallback = cb
         return 0
       }) as unknown as typeof requestAnimationFrame
 
@@ -611,10 +618,14 @@ describe('Carousel', () => {
       const track = screen.getByTestId('carousel-track')
       const parentMock = { scrollTo: jest.fn(), scrollLeft: 0, clientWidth: 1000 }
 
-      // Mock track.parentElement to return our parent mock
+      // Mock track.parentElement and children BEFORE running the RAF callback
       Object.defineProperty(track, 'parentElement', { value: parentMock, configurable: true })
       // Mock children to be an empty collection (target child not found)
       Object.defineProperty(track, 'children', { value: [], configurable: true })
+
+      // Now execute the RAF callback - should hit the "target child not found" branch
+      expect(rafCallback).toBeTruthy()
+      ;(rafCallback as unknown as FrameRequestCallback)(0)
 
       // Should not throw - this tests the else branch where targetChild is undefined
       expect(track).toBeInTheDocument()

@@ -40,6 +40,13 @@ jest.mock('@/components/elements', () => ({
   ButtonLink: function MockButtonLink({ data }: { data: { label: { text: string }; url: string } }) {
     return <a href={data.url}>{data.label.text}</a>
   },
+  Icon: function MockIcon({ icon, size, className }: { icon?: string; size?: string; className?: string }) {
+    return (
+      <span data-testid="mock-icon" data-size={size} className={className}>
+        {icon}
+      </span>
+    )
+  },
 }))
 
 // Mock BlogCard component
@@ -221,6 +228,143 @@ describe('BlogClient', () => {
     expect(screen.queryByTestId('mock-carousel')).not.toBeInTheDocument()
     // Headers and tags should still be there
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
+  })
+
+  it('should render empty state when tagFilters is null or empty', () => {
+    const dataWithNoTags = {
+      ...mockBlogPageData,
+      tagFilters: [],
+      pagination: {
+        ...mockBlogPageData.pagination,
+        noItemsFound: {
+          header: {
+            text: 'No items found',
+            icon: 'search_off',
+            iconPosition: 'left',
+            ariaDescription: 'No items',
+          },
+        },
+      },
+    } as unknown as ApiBlogBlogDocument
+    renderWithLayout(<BlogClient blogPageData={dataWithNoTags} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+    // Should render empty state header
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('No items found')
+  })
+
+  it('should render empty state when tagFilters is undefined (null)', () => {
+    const dataWithNullTags = {
+      ...mockBlogPageData,
+      tagFilters: undefined,
+      pagination: {
+        ...mockBlogPageData.pagination,
+        noItemsFound: {
+          header: {
+            text: 'Nothing here',
+            iconPosition: 'left',
+            ariaDescription: 'Empty',
+          },
+        },
+      },
+    } as unknown as ApiBlogBlogDocument
+    renderWithLayout(<BlogClient blogPageData={dataWithNullTags} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+    // Should render empty state without icon (no icon property)
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Nothing here')
+  })
+
+  it('should skip tag sections where tagName is empty', () => {
+    const dataWithEmptyTag = {
+      ...mockBlogPageData,
+      tagFilters: [
+        { documentId: 'tag-empty', tag: { text: '' } },
+        { documentId: 'tag-1', tag: { text: 'Sustainability' } },
+      ],
+    } as unknown as ApiBlogBlogDocument
+    renderWithLayout(<BlogClient blogPageData={dataWithEmptyTag} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+    // Sustainability section should render, empty tag should be skipped
+    expect(screen.getAllByText('Sustainability').length).toBeGreaterThan(0)
+  })
+
+  it('should skip tag sections where no posts match the tag', () => {
+    const dataWithUnmatchedTag = {
+      ...mockBlogPageData,
+      tagFilters: [{ documentId: 'tag-nomatch', tag: { text: 'NonExistentTag' } }],
+    } as unknown as ApiBlogBlogDocument
+    renderWithLayout(<BlogClient blogPageData={dataWithUnmatchedTag} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+    // No cards should render in the tag section since no posts match
+    expect(screen.queryByText('NonExistentTag')).not.toBeInTheDocument()
+  })
+
+  it('should handle section with only one post (no secondPost)', () => {
+    const singlePostPerTag = [mockPosts[1]] as ApiBlogPostBlogPostDocument[]
+    const dataWithOnePostTag = {
+      ...mockBlogPageData,
+      tagFilters: [{ documentId: 'tag-2', tag: { text: 'EcoFriendly' } }],
+    } as unknown as ApiBlogBlogDocument
+    renderWithLayout(<BlogClient blogPageData={dataWithOnePostTag} posts={singlePostPerTag} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+    // Should render the section header and first post
+    expect(screen.getAllByText('EcoFriendly').length).toBeGreaterThan(0)
+    // The remaining posts grid should not render (no secondPost and no remaining)
+    expect(screen.getAllByTestId('mock-blog-card').length).toBeGreaterThan(0)
+  })
+
+  it('should handle pagination.nextButton.label without icon and id', () => {
+    const dataWithMinimalPagination = {
+      ...mockBlogPageData,
+      pagination: {
+        itemsPerPage: 6,
+        nextButton: {
+          label: {
+            text: 'View All',
+            iconPosition: 'right',
+            ariaDescription: 'View More',
+          },
+          openInNewTab: false,
+        },
+        noItemsFound: { header: { text: 'No items' } },
+      },
+    } as unknown as ApiBlogBlogDocument
+    renderWithLayout(<BlogClient blogPageData={dataWithMinimalPagination} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+    // Should still render view all buttons without crashing
+    const viewAllLinks = screen.getAllByText(/View All/)
+    expect(viewAllLinks.length).toBeGreaterThan(0)
+  })
+
+  it('should handle pagination.nextButton.label with icon and id', () => {
+    const dataWithFullPagination = {
+      ...mockBlogPageData,
+      pagination: {
+        itemsPerPage: 6,
+        nextButton: {
+          label: {
+            text: 'View All',
+            iconPosition: 'right',
+            ariaDescription: 'View More',
+            icon: 'arrow_forward',
+            id: 'btn-label-id',
+          },
+          openInNewTab: false,
+          id: 'btn-id',
+        },
+        noItemsFound: { header: { text: 'No items' } },
+      },
+    } as unknown as ApiBlogBlogDocument
+    renderWithLayout(<BlogClient blogPageData={dataWithFullPagination} posts={mockPosts} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+    const viewAllLinks = screen.getAllByText(/View All/)
+    expect(viewAllLinks.length).toBeGreaterThan(0)
   })
 
   it('should render detailed grid layout for remaining posts (more than 2 posts in a tag)', () => {

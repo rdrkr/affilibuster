@@ -197,4 +197,42 @@ describe('ContributorCard', () => {
     // Bio is NOT shown for xs size - only the name header is in content
     expect(content).not.toHaveTextContent('Test Bio')
   })
+
+  it('should render full name without lastName when lastName is missing', () => {
+    const memberWithoutLastName = { ...mockMember, lastName: undefined }
+    render(<ContributorCard {...defaultProps} member={memberWithoutLastName as any} />)
+
+    // Should display only firstName
+    expect(screen.getByText('John')).toBeInTheDocument()
+    // Initials should be just the first letter of firstName
+    const overlay = screen.getByTestId('card-overlay')
+    expect(overlay).toHaveTextContent('J')
+  })
+
+  it('should not render social links footer when no social links exist', () => {
+    const memberWithoutSocials = {
+      ...mockMember,
+      twitter: undefined,
+      linkedin: undefined,
+      github: undefined,
+      instagram: undefined,
+    }
+    render(<ContributorCard {...defaultProps} member={memberWithoutSocials as any} />)
+
+    // Footer should be empty since no social links exist
+    const footer = screen.getByTestId('card-footer')
+    expect(footer).toBeEmptyDOMElement()
+  })
+
+  it('should not render initials placeholder when profilePicture exists', () => {
+    const memberWithPicture = {
+      ...mockMember,
+      profilePicture: { url: '/images/profile.jpg', alternativeText: 'Profile' },
+    }
+    render(<ContributorCard {...defaultProps} member={memberWithPicture as any} />)
+
+    // Overlay should not contain initials when profilePicture is provided
+    const overlay = screen.getByTestId('card-overlay')
+    expect(overlay).toBeEmptyDOMElement()
+  })
 })

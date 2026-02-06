@@ -1,0 +1,66 @@
+# Copyright (c) 2026 Affilibuster by Ronen Druker.
+#
+# Caddy reverse proxy configuration for production.
+# Handles automatic Let's Encrypt SSL for all domains.
+# All upstream services communicate via plain HTTP inside Docker.
+
+# Main site: thegreenbrother.com
+thegreenbrother.com, www.thegreenbrother.com {
+	# API requests: strip /api prefix and proxy to backend
+	handle_path /api/* {
+		reverse_proxy backend:{$BACKEND_PORT}
+	}
+
+	# All other requests go to Next.js frontend
+	reverse_proxy the-green-brother:{$THE_GREEN_BROTHER_PORT}
+
+	# Security headers
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		# Remove server identification
+		-Server
+	}
+
+	# Compression
+	encode zstd gzip
+}
+
+# CMS admin: cms.thegreenbrother.com
+cms.thegreenbrother.com {
+	reverse_proxy strapi:{$CMS_PORT}
+
+	# Security headers
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	# Compression
+	encode zstd gzip
+}
+
+# Monitoring: uptime.thegreenbrother.com
+uptime.thegreenbrother.com {
+	reverse_proxy uptime-kuma:3001
+
+	# Security headers
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	# Compression
+	encode zstd gzip
+}

@@ -88,7 +88,7 @@ export interface ElementsPrice extends Struct.ComponentSchema {
         },
         number
       >
-    currency: Schema.Attribute.Relation<'oneToOne', 'api::currency.currency'> & Schema.Attribute.Required
+    currency: Schema.Attribute.Relation<'manyToOne', 'api::currency.currency'> & Schema.Attribute.Required
   }
 }
 

@@ -36,6 +36,7 @@ jest.mock('@/components/elements', () => ({
     image?: { url?: string; alternativeText?: string } | string
     fallbackAlt?: string
   }) {
+    // ... logic for image mock ...
     const getImageUrl = () => {
       if (!image) return '/images/placeholder.svg'
       if (typeof image === 'string') return image
@@ -58,6 +59,33 @@ jest.mock('@/components/elements', () => ({
       <div data-testid="mock-header">
         <Tag>{data.header?.text}</Tag>
         {data.subheader?.text && <p>{data.subheader.text}</p>}
+      </div>
+    )
+  },
+  ShortcutsGrid: function MockShortcutsGrid({
+    header,
+    items,
+  }: {
+    header: any
+    items: { id: number; url: string; label: any }[]
+  }) {
+    return (
+      <div data-testid="shortcuts-grid">
+        {header && <div data-testid="grid-header">{header.header?.text}</div>}
+        {header?.subheader && <div data-testid="grid-subheader">{header.subheader.text}</div>}
+        <div data-testid="grid-items">
+          {items.map(item => (
+            <div
+              key={item.id}
+              data-testid="grid-item"
+              data-label={item.label?.text}
+              data-icon={item.label?.icon}
+              data-href={item.url}
+            >
+              {item.label?.text}
+            </div>
+          ))}
+        </div>
       </div>
     )
   },
@@ -179,7 +207,7 @@ describe('ProductCategoriesSection', () => {
       <ProductCategoriesSection direction={DirectionEnum.LTR} data={mockSectionData} categories={mockCategories} />
     )
 
-    expect(screen.getByRole('heading', { level: 3, name: 'Shop by Category' })).toBeInTheDocument()
+    expect(screen.getByTestId('grid-header')).toHaveTextContent('Shop by Category')
   })
 
   it('should render subheader when provided', () => {
@@ -187,7 +215,7 @@ describe('ProductCategoriesSection', () => {
       <ProductCategoriesSection direction={DirectionEnum.LTR} data={mockSectionData} categories={mockCategories} />
     )
 
-    expect(screen.getByText('Find what you need by category')).toBeInTheDocument()
+    expect(screen.getByTestId('grid-subheader')).toHaveTextContent('Find what you need by category')
   })
 
   it('should not render subheader when not provided', () => {
@@ -201,7 +229,7 @@ describe('ProductCategoriesSection', () => {
       <ProductCategoriesSection direction={DirectionEnum.LTR} data={dataWithoutSubheader} categories={mockCategories} />
     )
 
-    expect(screen.queryByText('Find what you need by category')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('grid-subheader')).not.toBeInTheDocument()
   })
 
   it('should render all categories', () => {
@@ -209,9 +237,11 @@ describe('ProductCategoriesSection', () => {
       <ProductCategoriesSection direction={DirectionEnum.LTR} data={mockSectionData} categories={mockCategories} />
     )
 
-    expect(screen.getByText('Home')).toBeInTheDocument()
-    expect(screen.getByText('Fashion')).toBeInTheDocument()
-    expect(screen.getByText('Tech')).toBeInTheDocument()
+    const items = screen.getAllByTestId('grid-item')
+    expect(items).toHaveLength(3)
+    expect(items[0]).toHaveTextContent('Home')
+    expect(items[1]).toHaveTextContent('Fashion')
+    expect(items[2]).toHaveTextContent('Tech')
   })
 
   it('should render category links with correct href', () => {
@@ -219,26 +249,21 @@ describe('ProductCategoriesSection', () => {
       <ProductCategoriesSection direction={DirectionEnum.LTR} data={mockSectionData} categories={mockCategories} />
     )
 
-    const homeLink = screen.getByRole('link', { name: /Home category/i })
-    expect(homeLink).toHaveAttribute('href', '/products?category=home')
-
-    const fashionLink = screen.getByRole('link', { name: /Fashion category/i })
-    expect(fashionLink).toHaveAttribute('href', '/products?category=fashion')
-
-    const techLink = screen.getByRole('link', { name: /Tech category/i })
-    expect(techLink).toHaveAttribute('href', '/products?category=tech')
+    const items = screen.getAllByTestId('grid-item')
+    expect(items[0]).toHaveAttribute('data-href', '/products?category=home')
+    expect(items[1]).toHaveAttribute('data-href', '/products?category=fashion')
+    expect(items[2]).toHaveAttribute('data-href', '/products?category=tech')
   })
 
-  it('should render category icons', () => {
+  it('should pass icon prop correctly', () => {
     render(
       <ProductCategoriesSection direction={DirectionEnum.LTR} data={mockSectionData} categories={mockCategories} />
     )
 
-    const icons = screen.getAllByTestId('mock-icon')
-    expect(icons).toHaveLength(3)
-    expect(icons[0]).toHaveAttribute('data-icon', 'home')
-    expect(icons[1]).toHaveAttribute('data-icon', 'styler')
-    expect(icons[2]).toHaveAttribute('data-icon', 'bolt')
+    const items = screen.getAllByTestId('grid-item')
+    expect(items[0]).toHaveAttribute('data-icon', 'home')
+    expect(items[1]).toHaveAttribute('data-icon', 'styler')
+    expect(items[2]).toHaveAttribute('data-icon', 'bolt')
   })
 
   it('should not render when categories array is empty', () => {
@@ -246,39 +271,6 @@ describe('ProductCategoriesSection', () => {
       <ProductCategoriesSection direction={DirectionEnum.LTR} data={mockSectionData} categories={[]} />
     )
 
-    expect(container.querySelector('section')).not.toBeInTheDocument()
-  })
-
-  it('should have correct aria-label on section', () => {
-    render(
-      <ProductCategoriesSection direction={DirectionEnum.LTR} data={mockSectionData} categories={mockCategories} />
-    )
-
-    const section = screen.getByRole('region', { name: 'Product categories section' })
-    expect(section).toBeInTheDocument()
-  })
-
-  it('should have correct aria-label on category links', () => {
-    render(
-      <ProductCategoriesSection direction={DirectionEnum.LTR} data={mockSectionData} categories={mockCategories} />
-    )
-
-    const links = screen.getAllByRole('link')
-    expect(links[0]).toHaveAttribute('aria-label', 'Home category')
-    expect(links[1]).toHaveAttribute('aria-label', 'Fashion category')
-    expect(links[2]).toHaveAttribute('aria-label', 'Tech category')
-  })
-
-  it('should render all categories with content', () => {
-    render(
-      <ProductCategoriesSection direction={DirectionEnum.LTR} data={mockSectionData} categories={mockCategories} />
-    )
-
-    // Should render the 3 categories
-    const links = screen.getAllByRole('link')
-    expect(links).toHaveLength(3)
-    expect(screen.getByText('Home')).toBeInTheDocument()
-    expect(screen.getByText('Fashion')).toBeInTheDocument()
-    expect(screen.getByText('Tech')).toBeInTheDocument()
+    expect(container).toBeEmptyDOMElement()
   })
 })

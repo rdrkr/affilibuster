@@ -8,9 +8,7 @@
  * Uses Header composite for section title and Label for category items.
  */
 
-import Link from 'next/link'
-
-import { Header, Icon, Text } from '@/components/elements'
+import { ShortcutsGrid } from '@/components/elements'
 import {
   DirectionEnum,
   type ApiProductCategoryProductCategoryDocument,
@@ -47,59 +45,12 @@ export function ProductCategoriesSection({ data, categories, direction }: Produc
     return null
   }
 
-  return (
-    <section aria-label={header.header?.ariaDescription ?? ''}>
-      <Header data={header} level={3} direction={direction} />
-      <div
-        className={`
-        mt-12 flex flex-wrap justify-center
-        gap-8 md:gap-16
-      `}
-      >
-        {categories.map(category => {
-          // content is ElementsLabelEntry with icon, text, ariaDescription
-          const { content } = category
+  const items = categories.map(category => ({
+    id: typeof category.id === 'number' ? category.id : -1,
+    url: `/products?category=${category.slug}`,
+    openInNewTab: false,
+    label: category.content,
+  }))
 
-          return (
-            <Link
-              key={category.documentId}
-              href={`/products?category=${category.slug}`}
-              className="group flex w-28 flex-col items-center gap-3"
-              aria-label={content.ariaDescription}
-            >
-              <div
-                className={`
-                  flex size-24 transform items-center justify-center
-                  rounded-full border border-neutral-200 bg-white shadow-lg
-                  transition-all duration-300
-                  group-hover:scale-110 group-hover:border-primary
-                  group-hover:bg-primary
-                  dark:border-white/10 dark:bg-surface-dark
-                `}
-              >
-                <Icon
-                  icon={content.icon ?? 'category'}
-                  size="4xl"
-                  className={`
-                    text-neutral-500 transition-colors
-                    group-hover:text-background-dark dark:text-text-secondary-dark
-                  `}
-                />
-              </div>
-              <Text
-                text={content.text}
-                as="span"
-                className={`
-                  text-center font-semibold text-neutral-600
-                  transition-colors
-                  group-hover:text-neutral-800 dark:text-text-secondary-dark
-                  dark:group-hover:text-white
-                `}
-              />
-            </Link>
-          )
-        })}
-      </div>
-    </section>
-  )
+  return <ShortcutsGrid header={header} items={items} direction={direction} noAnimation={false} buttonSize="lg" />
 }

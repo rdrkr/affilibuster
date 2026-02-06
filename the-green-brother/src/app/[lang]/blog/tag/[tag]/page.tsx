@@ -22,7 +22,6 @@ export default async function TopicPage({ params }: { params: Promise<{ lang: Co
     getBlogPosts({
       pagination: { page: 1, pageSize: 100 },
       locale: lang,
-
       filters: {
         tags: {
           tag: {

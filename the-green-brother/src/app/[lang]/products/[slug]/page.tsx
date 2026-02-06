@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-import { getProductBySlug } from '@/lib/client'
+import { getProductBySlug, getProductCategoriesPage } from '@/lib/client'
 import { CodeEnum } from '@/lib/generated/types.gen'
 import { notFound } from 'next/navigation'
 import ProductDetailClient from './ProductDetailClient'
@@ -19,12 +19,15 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const { lang, slug } = resolvedParams
 
   // Fetch product by Slug
-  const product = await getProductBySlug(slug, { locale: lang })
+  const [product, productCategoriesPage] = await Promise.all([
+    getProductBySlug(slug, { locale: lang }),
+    getProductCategoriesPage(lang),
+  ])
 
   // Return 404 if product not found
-  if (!product) {
+  if (!product || !productCategoriesPage) {
     notFound()
   }
 
-  return <ProductDetailClient product={product} />
+  return <ProductDetailClient product={product} certificatesHeader={productCategoriesPage.certificatesSectionHeader} />
 }

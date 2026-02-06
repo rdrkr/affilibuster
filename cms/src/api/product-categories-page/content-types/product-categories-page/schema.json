@@ -55,6 +55,17 @@
       "repeatable": false,
       "required": true
     },
+    "certificatesSectionHeader": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
+    },
     "relatedProductsSectionHeader": {
       "type": "component",
       "pluginOptions": {

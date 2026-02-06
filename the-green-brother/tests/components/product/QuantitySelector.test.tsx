@@ -86,4 +86,20 @@ describe('QuantitySelector', () => {
     render(<QuantitySelector {...defaultProps} direction={DirectionEnum.RTL} />)
     expect(screen.getByText('1')).toBeInTheDocument()
   })
+
+  it('should not disable increment button when max is not provided', () => {
+    render(<QuantitySelector {...defaultProps} quantity={100} />)
+    // Without max prop, increment should never be disabled
+    expect(screen.getByLabelText('add')).not.toBeDisabled()
+  })
+
+  it('should not disable increment button when quantity is below max', () => {
+    render(<QuantitySelector {...defaultProps} quantity={5} max={10} />)
+    expect(screen.getByLabelText('add')).not.toBeDisabled()
+  })
+
+  it('should enable decrement button when quantity is above min', () => {
+    render(<QuantitySelector {...defaultProps} quantity={3} min={1} />)
+    expect(screen.getByLabelText('remove')).not.toBeDisabled()
+  })
 })

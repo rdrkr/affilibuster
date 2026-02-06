@@ -460,6 +460,76 @@ describe('BrandFeaturesSection', () => {
     })
   })
 
+  it('should fallback to empty aria-label when headerAriaDescription is undefined in standalone mode', () => {
+    const { headerAriaDescription: _desc, ...restData } = mockSectionData
+    const dataWithoutDesc: BrandFeaturesSectionProps['data'] = {
+      ...restData,
+      showHeader: false,
+    } as BrandFeaturesSectionProps['data']
+
+    const { container } = render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithoutDesc} />)
+
+    // The div (not section) should have empty aria-label
+    const grid = container.querySelector('.grid')
+    expect(grid).toHaveAttribute('aria-label', '')
+  })
+
+  it('should use index as key fallback when feature.id is undefined in standalone mode', () => {
+    const featuresWithoutId = mockSectionData.features.map(f => {
+      const { id: _id, ...rest } = f
+      return rest
+    })
+    const dataWithoutFeatureIds: BrandFeaturesSectionProps['data'] = {
+      ...mockSectionData,
+      showHeader: false,
+      features: featuresWithoutId,
+    } as unknown as BrandFeaturesSectionProps['data']
+
+    const { container } = render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithoutFeatureIds} />)
+
+    // Should render without errors, using index as key
+    const featureContainers = container.querySelectorAll('.bg-white.rounded-xl')
+    expect(featureContainers.length).toBe(4)
+  })
+
+  it('should use index as key fallback when feature.id is undefined in header mode', () => {
+    const featuresWithoutId = mockSectionData.features.map(f => {
+      const { id: _id, ...rest } = f
+      return rest
+    })
+    const dataWithoutFeatureIds: BrandFeaturesSectionProps['data'] = {
+      ...mockSectionData,
+      features: featuresWithoutId,
+    } as unknown as BrandFeaturesSectionProps['data']
+
+    render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithoutFeatureIds} />)
+
+    // Should render all features without errors
+    expect(screen.getByText('Vetted Brands')).toBeInTheDocument()
+    expect(screen.getByText('Support the Planet')).toBeInTheDocument()
+  })
+
+  it('should fallback to LANGUAGE_DIRECTION when headerAlignment is undefined', () => {
+    const { headerAlignment: _alignment, ...restData } = mockSectionData
+    const dataWithoutAlignment = restData as BrandFeaturesSectionProps['data']
+
+    const { container } = render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithoutAlignment} />)
+
+    // Should render correctly with fallback alignment
+    const section = container.querySelector('section')
+    expect(section).toBeInTheDocument()
+  })
+
+  it('should fallback to false when learnMoreButtonOpenInNewTab is undefined', () => {
+    const { learnMoreButtonOpenInNewTab: _openInNewTab, ...restData } = mockSectionData
+    const dataWithoutNewTab = restData as BrandFeaturesSectionProps['data']
+
+    render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithoutNewTab} />)
+
+    const link = screen.getByRole('link', { name: /Navigate to about page/i })
+    expect(link).not.toHaveAttribute('target', '_blank')
+  })
+
   it('should use justify-end alignment for standalone features in RTL', () => {
     const dataWithoutHeader: BrandFeaturesSectionProps['data'] = {
       ...mockSectionData,

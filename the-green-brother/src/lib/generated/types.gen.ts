@@ -1020,10 +1020,6 @@ export type ApiBlogBlogDocument = {
      */
     featuredBlogPosts?: Array<ApiBlogPostBlogPostDocument>;
     /**
-     * A relational field
-     */
-    blogPosts?: Array<ApiBlogPostBlogPostDocument>;
-    /**
      * A component field
      */
     pagination: CallToActionsPaginationCtaEntry;
@@ -2387,6 +2383,10 @@ export type ApiProductCategoriesPageProductCategoriesPageDocument = {
     /**
      * A component field
      */
+    certificatesSectionHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
     relatedProductsSectionHeader: ElementsHeaderEntry;
     /**
      * A component field
@@ -3522,10 +3522,6 @@ export type ApiBlogBlogDocumentWritable = {
      */
     featuredBlogPosts?: Array<ApiBlogPostBlogPostDocumentWritable>;
     /**
-     * A relational field
-     */
-    blogPosts?: Array<ApiBlogPostBlogPostDocumentWritable>;
-    /**
      * A component field
      */
     pagination: CallToActionsPaginationCtaEntry;
@@ -4356,6 +4352,10 @@ export type ApiProductCategoriesPageProductCategoriesPageDocumentWritable = {
      * A component field
      */
     productsSorter: SortersProductsSorterEntry;
+    /**
+     * A component field
+     */
+    certificatesSectionHeader: ElementsHeaderEntry;
     /**
      * A component field
      */
@@ -5423,10 +5423,6 @@ export type BlogGetBlogResponses = {
              * A relational field
              */
             featuredBlogPosts?: Array<ApiBlogPostBlogPostDocument>;
-            /**
-             * A relational field
-             */
-            blogPosts?: Array<ApiBlogPostBlogPostDocument>;
             /**
              * A component field
              */
@@ -9795,6 +9791,10 @@ export type ProductCategoriesPageGetProductCategoriesPageResponses = {
              * A component field
              */
             productsSorter: SortersProductsSorterEntry;
+            /**
+             * A component field
+             */
+            certificatesSectionHeader: ElementsHeaderEntry;
             /**
              * A component field
              */

@@ -93,4 +93,33 @@ describe('TabbedDynamicZone', () => {
     // After initial render, first tab should be active
     expect(screen.getByTestId('tab-tab1')).toHaveAttribute('aria-selected', 'true')
   })
+
+  it('should fallback to first tab when tabs change and current active key becomes invalid', () => {
+    const { rerender } = render(<TabbedDynamicZone tabs={mockTabs} direction={DirectionEnum.LTR} />)
+
+    // Click third tab to make it active
+    fireEvent.click(screen.getByTestId('tab-tab3'))
+    expect(screen.getByTestId('tab-tab3')).toHaveAttribute('aria-selected', 'true')
+
+    // Re-render with different tabs that don't include 'tab3'
+    const newTabs = [
+      { key: 'tabA', label: 'Tab A', content: <div data-testid="content-A">Content A</div> },
+      { key: 'tabB', label: 'Tab B', content: <div data-testid="content-B">Content B</div> },
+    ]
+
+    rerender(<TabbedDynamicZone tabs={newTabs} direction={DirectionEnum.LTR} />)
+
+    // 'tab3' is no longer valid, should fallback to first tab 'tabA'
+    expect(screen.getByTestId('tab-tabA')).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByTestId('content-A')).toBeInTheDocument()
+  })
+
+  it('should handle single tab gracefully', () => {
+    const singleTab = [{ key: 'only', label: 'Only Tab', content: <div data-testid="content-only">Only</div> }]
+
+    render(<TabbedDynamicZone tabs={singleTab} direction={DirectionEnum.LTR} />)
+
+    expect(screen.getByTestId('tab-only')).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByTestId('content-only')).toBeInTheDocument()
+  })
 })

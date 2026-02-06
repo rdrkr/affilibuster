@@ -465,6 +465,19 @@ describe('TeamSection', () => {
     expect(screen.getByText('CEO, Founder & Artist')).toBeInTheDocument()
   })
 
+  it('should return member as-is when roles array is empty (line 74 else branch)', () => {
+    const contributorNoRoles = {
+      ...mockContributor,
+      roles: [],
+    }
+    const contributorsNoRoles = [contributorNoRoles] as unknown as TeamSectionProps['contributors']
+
+    render(<TeamSection direction={DirectionEnum.LTR} data={mockBaseData} contributors={contributorsNoRoles} />)
+
+    // Should render the member name but no role text
+    expect(screen.getByText('John Doe')).toBeInTheDocument()
+  })
+
   it('should display only roles provided (filtering happens in page component)', () => {
     // Note: Role filtering (excluding author/seller) happens in page component before passing to TeamSection
     const contributorWithFilteredRoles = {

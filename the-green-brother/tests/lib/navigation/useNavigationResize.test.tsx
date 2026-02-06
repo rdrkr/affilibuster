@@ -659,6 +659,35 @@ describe('useNavigationResize', () => {
       expect(mockResizeObserverInstance?.disconnect).toHaveBeenCalled()
     })
 
+    it('should cancel pending RAF when rapid consecutive resize events fire', () => {
+      render(<TestComponent />)
+
+      const cancelSpy = window.cancelAnimationFrame as jest.Mock
+
+      // First resize triggers a RAF
+      act(() => {
+        mockResizeObserverInstance?._triggerResize(800)
+      })
+
+      // Do NOT flush RAF - leave it pending
+
+      // Second resize should cancel the pending RAF and schedule a new one
+      act(() => {
+        mockResizeObserverInstance?._triggerResize(600)
+      })
+
+      // cancelAnimationFrame should have been called (cancelling the first pending RAF)
+      expect(cancelSpy).toHaveBeenCalled()
+
+      // Now flush to process the second (latest) resize
+      act(() => {
+        flushRaf()
+      })
+
+      // Should reflect the latest resize (600px -> minimal for start)
+      expect(screen.getByTestId('start-mode')).toHaveTextContent('minimal')
+    })
+
     it('should NOT recreate ResizeObserver when search expansion changes (uses ref)', async () => {
       render(<TestComponent />)
 

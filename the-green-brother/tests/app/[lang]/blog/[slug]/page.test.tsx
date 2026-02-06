@@ -116,4 +116,31 @@ describe('BlogPostPage', () => {
 
     expect(mockNotFound).toHaveBeenCalled()
   })
+
+  it('should call notFound when blogData is null', async () => {
+    const mockPost = { documentId: 'post-1', slug: 'post-slug', content: { header: {} } }
+    mockGetBlogPostBySlug.mockResolvedValue(mockPost as Awaited<ReturnType<typeof getBlogPostBySlug>>)
+    mockGetNavigation.mockResolvedValue(mockNavigation as any)
+
+    // getBlog is mocked via @/lib/content, need to set it to return null
+    const { getBlog } = require('@/lib/content') as { getBlog: jest.Mock }
+    getBlog.mockResolvedValue(null)
+
+    await BlogPostPage({ params: Promise.resolve({ lang: CodeEnum.EN, slug: 'post-slug' }) })
+
+    expect(mockNotFound).toHaveBeenCalled()
+  })
+
+  it('should use default LTR direction when language is not found', async () => {
+    const mockPost = { documentId: 'post-1', slug: 'post-slug', content: { header: {} } }
+    mockGetBlogPostBySlug.mockResolvedValue(mockPost as Awaited<ReturnType<typeof getBlogPostBySlug>>)
+    mockGetLanguages.mockResolvedValue([] as any) // No languages found
+    const { getBlog } = require('@/lib/content') as { getBlog: jest.Mock }
+    getBlog.mockResolvedValue({ id: 1 } as any)
+
+    const Component = await BlogPostPage({ params: Promise.resolve({ lang: CodeEnum.EN, slug: 'post-slug' }) })
+    render(Component)
+
+    expect(screen.getByTestId('blog-post-client')).toBeInTheDocument()
+  })
 })

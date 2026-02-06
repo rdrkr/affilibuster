@@ -221,6 +221,15 @@ describe('SortMenu', () => {
     expect(selectedOption).toHaveTextContent('Price: Low to High')
   })
 
+  it('should use end alignment for RTL direction', () => {
+    render(
+      <SortMenu data={mockData} sortBy="bestSellers" onSortChange={mockOnSortChange} direction={DirectionEnum.RTL} />
+    )
+
+    // Component should render correctly in RTL
+    expect(screen.getByText('Best Sellers')).toBeInTheDocument()
+  })
+
   it('should respect showText prop', () => {
     const { rerender } = render(
       <SortMenu

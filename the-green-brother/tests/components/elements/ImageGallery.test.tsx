@@ -192,6 +192,46 @@ describe('ImageGallery', () => {
     })
   })
 
+  describe('Thumbnail Accessibility', () => {
+    it('should use fallback aria-label when image has no alternativeText', () => {
+      const imagesWithoutAlt: PluginUploadFileDocument[] = [
+        {
+          documentId: 'img-no-alt-1',
+          id: 10,
+          url: '/images/no-alt1.jpg',
+          alternativeText: null,
+          name: 'no-alt1.jpg',
+          hash: 'hash-no-alt1',
+          ext: '.jpg',
+          mime: 'image/jpeg',
+          size: 100,
+          provider: 'local',
+          publishedAt: '2025-01-01',
+        } as unknown as PluginUploadFileDocument,
+        {
+          documentId: 'img-no-alt-2',
+          id: 11,
+          url: '/images/no-alt2.jpg',
+          alternativeText: null,
+          name: 'no-alt2.jpg',
+          hash: 'hash-no-alt2',
+          ext: '.jpg',
+          mime: 'image/jpeg',
+          size: 100,
+          provider: 'local',
+          publishedAt: '2025-01-01',
+        } as unknown as PluginUploadFileDocument,
+      ]
+
+      renderWithLayout(<ImageGallery images={imagesWithoutAlt} direction={DirectionEnum.LTR} />)
+
+      // Thumbnails should use fallback aria-label "View image N"
+      const buttons = screen.getAllByRole('button')
+      expect(buttons[0]).toHaveAttribute('aria-label', 'View image 1')
+      expect(buttons[1]).toHaveAttribute('aria-label', 'View image 2')
+    })
+  })
+
   describe('Placeholder', () => {
     it('should render placeholder icon when images array is empty', () => {
       renderWithLayout(<ImageGallery images={[]} direction={DirectionEnum.LTR} placeholderIcon="image" />)

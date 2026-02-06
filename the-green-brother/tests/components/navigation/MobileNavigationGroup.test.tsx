@@ -309,4 +309,21 @@ describe('MobileNavigationGroup', () => {
     const container = screen.getByTestId('mobile-navigation-group-container')
     expect(container).toHaveAttribute('aria-hidden', 'false')
   })
+
+  it('should use empty string fallback when navLink text is undefined', () => {
+    const linksWithUndefinedText: MobileNavigationGroupProps['navLinks'] = [
+      { href: '/no-text', text: undefined, isActive: false },
+      { href: '/has-text', text: 'Has Text', isActive: false },
+    ]
+    render(<MobileNavigationGroup {...defaultProps} isOpen={true} navLinks={linksWithUndefinedText} />)
+
+    // The link with defined text should render its text
+    expect(screen.getByText('Has Text')).toBeInTheDocument()
+
+    // The link with undefined text uses '' as fallback for both text and ariaDescription
+    // so no visible text is rendered for it, but the button should exist
+    const buttons = screen.getAllByRole('button')
+    // 1 toggle button + 2 nav buttons = 3
+    expect(buttons).toHaveLength(3)
+  })
 })

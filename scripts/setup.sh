@@ -3,6 +3,19 @@
 
 set -e
 
+# Parse arguments
+SKIP_SSL=false
+for arg in "$@"; do
+  case "${arg}" in
+  --skip-ssl)
+    SKIP_SSL=true
+    ;;
+  *)
+    # Ignore other arguments
+    ;;
+  esac
+done
+
 echo "🔧 Setting up development environment..."
 
 # Detect OS
@@ -76,6 +89,7 @@ if [[ "${OS}" = "macos" ]]; then
   install_brew "checkmake"
   install_brew "mkcert"
   install_brew "git-lfs"
+  install_brew "node@22"
 
   # Python dependency manager and tools
   install_brew "uv"
@@ -102,12 +116,21 @@ else
     echo "  ✅ checkmake already installed"
   fi
 
+  # Node.js (required for Redocly and frontend dependencies)
+  if ! command -v node >/dev/null 2>&1; then
+    echo "  Installing Node.js..."
+    curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - >/dev/null
+    sudo apt-get install -y nodejs >/dev/null || echo "  ⚠️  Failed to install Node.js"
+  else
+    echo "  ✅ Node.js already installed"
+  fi
+
   # Python dependency manager (not in apt, use official installer)
   if ! command -v uv >/dev/null 2>&1; then
     echo "  Installing uv..."
     curl -LsSf https://astral.sh/uv/install.sh | sh >/dev/null || echo "  ⚠️  Failed to install uv"
     # Add uv to PATH for this session
-    export PATH="/root/.cargo/bin:${PATH}"
+    export PATH="${HOME}/.local/bin:${HOME}/.cargo/bin:${PATH}"
   else
     echo "  ✅ uv already installed"
   fi
@@ -115,67 +138,72 @@ else
   # OpenAPI validation and linting (not in apt, use npm)
   if ! command -v redocly &>/dev/null; then
     echo "  Installing redocly-cli..."
-    npm install -g @redocly/cli >/dev/null || echo "  ⚠️  Failed to install redocly-cli"
+    sudo npm install -g @redocly/cli >/dev/null || echo "  ⚠️  Failed to install redocly-cli"
   else
     echo "  ✅ redocly-cli already installed"
   fi
 fi
 
-echo "🔐 Generating HTTPS certificates for development..."
-
-# Create certs directory if it doesn't exist
-if [[ ! -d "certs" ]]; then
-  mkdir -p certs
-  echo "  ✅ Created certs directory"
-fi
-
-# Generate SSL certificates if they don't exist
-if [[ ! -f "certs/localhost.pem" ]] || [[ ! -f "certs/localhost-key.pem" ]]; then
-  if command -v mkcert >/dev/null 2>&1; then
-    echo "  Installing mkcert root CA (may require sudo password)..."
-    mkcert -install || echo "  ⚠️  Failed to install mkcert CA (continuing anyway)"
-
-    echo "  Generating localhost certificates with Docker hostnames..."
-    cd certs
-    mkcert localhost 127.0.0.1 ::1 backend the-green-brother strapi strapi-proxy || {
-      echo "  ❌ Failed to generate certificates"
-      cd ..
-      exit 1
-    }
-
-    # Rename files to simpler names
-    mv localhost+6.pem localhost.pem 2>/dev/null || true
-    mv localhost+6-key.pem localhost-key.pem 2>/dev/null || true
-    cd ..
-
-    echo "  ✅ SSL certificates generated successfully"
-  else
-    echo "  ⚠️  mkcert not installed - skipping certificate generation"
-    echo "     Run 'brew install mkcert' (macOS) or 'sudo apt install mkcert' (Linux)"
-  fi
+# Generate SSL certificates (skip if --skip-ssl flag was passed)
+if [[ "${SKIP_SSL}" == "true" ]]; then
+  echo "🔐 Skipping HTTPS certificate generation (--skip-ssl flag)"
 else
-  echo "  ✅ SSL certificates already exist"
-fi
+  echo "🔐 Generating HTTPS certificates for development..."
 
-# Copy mkcert root CA if it doesn't exist
-if [[ ! -f "certs/rootCA.pem" ]]; then
-  if command -v mkcert >/dev/null 2>&1; then
-    echo "  Copying mkcert root CA certificate..."
-    CAROOT=$(mkcert -CAROOT)
-    if [[ -f "${CAROOT}/rootCA.pem" ]]; then
-      cp "${CAROOT}/rootCA.pem" certs/rootCA.pem || {
-        echo "  ⚠️  Failed to copy root CA certificate"
+  # Create certs directory if it doesn't exist
+  if [[ ! -d "certs" ]]; then
+    mkdir -p certs
+    echo "  ✅ Created certs directory"
+  fi
+
+  # Generate SSL certificates if they don't exist
+  if [[ ! -f "certs/localhost.pem" ]] || [[ ! -f "certs/localhost-key.pem" ]]; then
+    if command -v mkcert >/dev/null 2>&1; then
+      echo "  Installing mkcert root CA (may require sudo password)..."
+      mkcert -install || echo "  ⚠️  Failed to install mkcert CA (continuing anyway)"
+
+      echo "  Generating localhost certificates with Docker hostnames..."
+      cd certs
+      mkcert localhost 127.0.0.1 ::1 backend the-green-brother strapi strapi-proxy || {
+        echo "  ❌ Failed to generate certificates"
+        cd ..
+        exit 1
       }
-      echo "  ✅ Root CA certificate copied successfully"
+
+      # Rename files to simpler names
+      mv localhost+6.pem localhost.pem 2>/dev/null || true
+      mv localhost+6-key.pem localhost-key.pem 2>/dev/null || true
+      cd ..
+
+      echo "  ✅ SSL certificates generated successfully"
     else
-      echo "  ⚠️  Root CA certificate not found at ${CAROOT}/rootCA.pem"
+      echo "  ⚠️  mkcert not installed - skipping certificate generation"
+      echo "     Run 'brew install mkcert' (macOS) or 'sudo apt install mkcert' (Linux)"
     fi
   else
-    echo "  ⚠️  mkcert not installed - skipping root CA copy"
+    echo "  ✅ SSL certificates already exist"
   fi
-else
-  echo "  ✅ Root CA certificate already exists"
-fi
+
+  # Copy mkcert root CA if it doesn't exist
+  if [[ ! -f "certs/rootCA.pem" ]]; then
+    if command -v mkcert >/dev/null 2>&1; then
+      echo "  Copying mkcert root CA certificate..."
+      CAROOT=$(mkcert -CAROOT)
+      if [[ -f "${CAROOT}/rootCA.pem" ]]; then
+        cp "${CAROOT}/rootCA.pem" certs/rootCA.pem || {
+          echo "  ⚠️  Failed to copy root CA certificate"
+        }
+        echo "  ✅ Root CA certificate copied successfully"
+      else
+        echo "  ⚠️  Root CA certificate not found at ${CAROOT}/rootCA.pem"
+      fi
+    else
+      echo "  ⚠️  mkcert not installed - skipping root CA copy"
+    fi
+  else
+    echo "  ✅ Root CA certificate already exists"
+  fi
+fi # End of SKIP_SSL else block
 
 echo "📦 Installing project dependencies..."
 

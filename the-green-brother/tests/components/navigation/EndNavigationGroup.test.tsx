@@ -252,6 +252,27 @@ describe('EndNavigationGroup', () => {
   })
 
   describe('Login Text Logic Extended', () => {
+    it('should keep login text hidden when already hidden and not forced (Case 3)', () => {
+      // Case 3: nowHidden=true, wasVisible=false (was already hidden prop-wise),
+      // effectiveShow=false (not forced visible). newEffective = false.
+      // Start with login text hidden (minimal + partial => shouldShowLoginText=false)
+      render(<EndNavigationGroup {...defaultProps} startGroupMode="minimal" displayMode="partial" />)
+      const loginBtn = screen.getByTestId('login-button')
+
+      // Initially hidden
+      expect(loginBtn).toHaveAttribute('data-show-text', 'false')
+
+      // Expand search - this changes isSearchExpanded but shouldShowLoginText stays false
+      // prevShow=false (was hidden), nowHidden=true (still hidden)
+      // wasVisible=false, effectiveShow=false => hits Case 3 => newEffective=false
+      fireEvent.click(screen.getByText('Expand'))
+      expect(loginBtn).toHaveAttribute('data-show-text', 'false')
+
+      // Collapse search - still hidden, same Case 3 path
+      fireEvent.click(screen.getByText('Collapse'))
+      expect(loginBtn).toHaveAttribute('data-show-text', 'false')
+    })
+
     it('should handle complex state transition for Login Text (Case 2 coverage)', () => {
       // Goal: Trigger Case 2: else if (loginTextState.effectiveShow) -> newEffective = isSearchExpanded
       // Steps:

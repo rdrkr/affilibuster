@@ -327,9 +327,11 @@ pnpm-debug.log*
 ###################
 # Project Specific
 ###################
-# Keep .env.dev.example files
+# Keep .env example files, ignore actual env files
 !.env.dev.example
+!.env.prod.example
 !**/.env.example
+.env.prod
 
 # Generated documentation
 docs/_build/

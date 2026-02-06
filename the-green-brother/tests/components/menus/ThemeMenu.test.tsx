@@ -472,6 +472,47 @@ describe('ThemeMenu', () => {
     })
   })
 
+  it('should map unknown theme text to system mode (cmsTextToThemeMode fallback)', () => {
+    const mockDataWithUnknownTheme = {
+      ...mockData,
+      themes: [
+        ...mockData.themes,
+        {
+          id: 4,
+          documentId: 'theme-4',
+          themeId: 'unknown-value',
+          publishedAt: '2024-01-01',
+          content: {
+            text: 'Auto',
+            icon: 'auto_mode',
+            iconPosition: IconPositionEnum.BEFORE_TEXT,
+            ariaDescription: 'Auto theme',
+          },
+        },
+      ],
+    } as unknown as ThemeMenuProps['data']
+
+    render(
+      <ThemeMenu
+        data={mockDataWithUnknownTheme}
+        selectedTheme="system"
+        onThemeChange={mockOnThemeChange}
+        direction={DirectionEnum.LTR}
+      />
+    )
+
+    // Open menu
+    fireEvent.click(screen.getByRole('button', { name: 'Select theme' }))
+
+    // The "Auto" theme should be mapped to 'system' mode and be highlighted
+    const autoButton = screen.getByRole('button', { name: 'Auto theme' })
+    expect(autoButton.className).toContain('bg-white/5')
+
+    // Click it to verify it calls onThemeChange with 'system'
+    fireEvent.click(autoButton)
+    expect(mockOnThemeChange).toHaveBeenCalledWith('system')
+  })
+
   describe('visible prop', () => {
     it('should be visible by default', () => {
       render(

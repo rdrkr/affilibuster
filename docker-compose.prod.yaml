@@ -1,0 +1,251 @@
+# Copyright (c) 2026 Affilibuster by Ronen Druker.
+#
+# Production Docker Compose for Hetzner VPS deployment.
+# Caddy handles SSL termination - all internal communication is plain HTTP.
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp' # HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    env_file:
+      - .env.prod
+    depends_on:
+      the-green-brother:
+        condition: service_healthy
+      strapi:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    healthcheck:
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:80']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  postgres:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM postgres:18-alpine
+        RUN cat > /docker-entrypoint-initdb.d/init-db.sh <<'EOF'
+        set -e
+        psql -v ON_ERROR_STOP=1 --username "$$POSTGRES_USER" --dbname "$$POSTGRES_DB" <<-EOSQL
+            SELECT 'CREATE DATABASE "$$POSTGRES_DB"'
+            WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$$POSTGRES_DB')\gexec
+            GRANT ALL PRIVILEGES ON DATABASE "$$POSTGRES_DB" TO "$$POSTGRES_USER";
+        EOSQL
+        psql -v ON_ERROR_STOP=1 --username "$$POSTGRES_USER" --dbname "$$POSTGRES_DB" <<-EOSQL
+            CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+        EOSQL
+        echo "Database initialized successfully!"
+        EOF
+        RUN chmod +x /docker-entrypoint-initdb.d/init-db.sh
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    environment:
+      PGPORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+    command: postgres -p ${POSTGRES_PORT}
+    expose:
+      - '${POSTGRES_PORT}'
+    volumes:
+      - postgres_lib:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 10s
+      timeout: 10s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    command: redis-server --port ${REDIS_PORT} --maxmemory 128mb --maxmemory-policy allkeys-lru
+    expose:
+      - '${REDIS_PORT}'
+    volumes:
+      - redis_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-p', '${REDIS_PORT}', 'ping']
+      interval: 10s
+      timeout: 10s
+      retries: 30
+
+  strapi:
+    build:
+      context: ./cms
+      dockerfile: Dockerfile.prod
+      args:
+        CMS_PORT: ${CMS_PORT}
+        CMS_HOST: ${CMS_HOST}
+        CMS_PROTOCOL: ${CMS_PROTOCOL}
+        APP_KEYS: ${APP_KEYS}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env.prod
+    environment:
+      NODE_ENV: production
+      POSTGRES_HOST: ${INTERNAL_POSTGRES_HOST}
+    expose:
+      - '${CMS_PORT}'
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:${CMS_PORT}/api/health']
+      interval: 15s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+      args:
+        BACKEND_PORT: ${BACKEND_PORT}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      strapi:
+        condition: service_healthy
+    env_file:
+      - .env.prod
+    environment:
+      POSTGRES_HOST: ${INTERNAL_POSTGRES_HOST}
+      REDIS_HOST: ${INTERNAL_REDIS_HOST}
+      CMS_HOST: ${INTERNAL_CMS_HOST}
+      CMS_PROTOCOL: http # Internal Docker communication is plain HTTP (Caddy handles HTTPS)
+    expose:
+      - '${BACKEND_PORT}'
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:${BACKEND_PORT}/health']
+      interval: 15s
+      timeout: 10s
+      retries: 30
+      start_period: 30s
+
+  the-green-brother:
+    build:
+      context: ./the-green-brother
+      dockerfile: Dockerfile.prod
+      args:
+        THE_GREEN_BROTHER_PORT: ${THE_GREEN_BROTHER_PORT}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        NEXT_PUBLIC_CMS_URL: ${NEXT_PUBLIC_CMS_URL}
+        NEXT_PUBLIC_GA_ID: ${NEXT_PUBLIC_GA_ID:-}
+        NEXT_PUBLIC_GTM_ID: ${NEXT_PUBLIC_GTM_ID:-}
+        BACKEND_PROTOCOL: ${BACKEND_PROTOCOL}
+        BACKEND_HOST: ${BACKEND_HOST}
+        BACKEND_PORT: ${BACKEND_PORT}
+        CMS_PROTOCOL: ${CMS_PROTOCOL}
+        CMS_HOST: ${CMS_HOST}
+        CMS_PORT: ${CMS_PORT}
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    env_file:
+      - .env.prod
+    environment:
+      PORT: ${THE_GREEN_BROTHER_PORT}
+      NEXT_SERVER_SIDE_API_URL: 'http://${INTERNAL_BACKEND_HOST}:${BACKEND_PORT}/v1'
+    expose:
+      - '${THE_GREEN_BROTHER_PORT}'
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:${THE_GREEN_BROTHER_PORT}']
+      interval: 15s
+      timeout: 10s
+      retries: 30
+      start_period: 30s
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    restart: unless-stopped
+    expose:
+      - '3001'
+    volumes:
+      - uptime-kuma-data:/app/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+volumes:
+  caddy_data:
+  caddy_config:
+  postgres_lib:
+  postgres_data:
+  redis_data:
+  uptime-kuma-data:

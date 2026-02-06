@@ -311,4 +311,41 @@ describe('Header', () => {
     const subheaderText = screen.getByTestId('mock-label-p-text')
     expect(subheaderText).toHaveClass('line-clamp-3')
   })
+
+  it('should apply text-left on header and subheader in promoted layout with LTR LANGUAGE_DIRECTION alignment', () => {
+    const dataWithPromotedLTR = {
+      ...mockHeaderData,
+      promoteHeaderIcon: true,
+      alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+    }
+    render(<Header data={dataWithPromotedLTR} direction={DirectionEnum.LTR} />)
+
+    // The header label should have text-left in LTR promoted layout
+    const headerLabel = screen.getByTestId('mock-label-h2')
+    expect(headerLabel.className).toContain('text-left')
+    // The subheader should also have text-left
+    const subheaderLabel = screen.getByTestId('mock-label-p')
+    expect(subheaderLabel.className).toContain('text-left')
+  })
+
+  it('should apply text-right on header and subheader in promoted layout with RTL LANGUAGE_DIRECTION alignment', () => {
+    const dataWithPromotedRTL = {
+      ...mockHeaderData,
+      promoteHeaderIcon: true,
+      alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+    }
+    render(<Header data={dataWithPromotedRTL} direction={DirectionEnum.RTL} />)
+
+    // The header label should have text-right in RTL promoted layout
+    const headerLabel = screen.getByTestId('mock-label-h2')
+    expect(headerLabel.className).toContain('text-right')
+    // The subheader should also have text-right
+    const subheaderLabel = screen.getByTestId('mock-label-p')
+    expect(subheaderLabel.className).toContain('text-right')
+  })
+
+  it('should render null when visible is false', () => {
+    const { container } = render(<Header data={mockHeaderData} direction={DirectionEnum.LTR} visible={false} />)
+    expect(container.firstChild).toBeNull()
+  })
 })

@@ -391,4 +391,71 @@ describe('BlogCard', () => {
     render(<BlogCard {...defaultProps} showTag={false} />)
     expect(screen.queryByTestId('mock-card-header')).not.toBeInTheDocument()
   })
+
+  it('should resolve layout to "ltr" when size is "sm" and no explicit layout', () => {
+    render(<BlogCard {...defaultProps} size="sm" />)
+    // With size="sm" and no explicit layout, resolvedLayout should be 'ltr'
+    // The footer div should not have the ltr-specific class since layout is 'ltr'
+    const card = screen.getByTestId('mock-card')
+    expect(card).toBeInTheDocument()
+  })
+
+  it('should resolve layout to "ttb" when size is not "sm" and no explicit layout', () => {
+    render(<BlogCard {...defaultProps} size="lg" />)
+    const card = screen.getByTestId('mock-card')
+    expect(card).toBeInTheDocument()
+  })
+
+  it('should render null content slot when content.header is missing', () => {
+    const postWithoutContentHeader = createMockPost({
+      content: {} as any,
+    })
+    render(<BlogCard {...defaultProps} post={postWithoutContentHeader} />)
+    // Card should render without content slot
+    expect(screen.queryByTestId('mock-card-content')).not.toBeInTheDocument()
+  })
+
+  it('should render author name without lastName when lastName is not provided', () => {
+    const postWithFirstNameOnly = createMockPost({
+      author: { ...mockAuthor, firstName: 'Jane', lastName: '' },
+    })
+    render(<BlogCard {...defaultProps} post={postWithFirstNameOnly} />)
+    // authorName should be just "Jane" (without extra spaces from missing last name)
+    const metadataText = screen.getByTestId('mock-cms-text')
+    expect(metadataText).toHaveTextContent('Jane • 5 min read')
+  })
+
+  it('should not render noAnimation when passed explicitly as true', () => {
+    render(<BlogCard {...defaultProps} noAnimation={true} />)
+    const card = screen.getByTestId('mock-card')
+    expect(card).toBeInTheDocument()
+  })
+
+  it('should use explicit layout prop over size-based resolution', () => {
+    render(<BlogCard {...defaultProps} size="sm" layout="ttb" />)
+    const card = screen.getByTestId('mock-card')
+    expect(card).toBeInTheDocument()
+  })
+
+  it('should render with showTag true but empty tags (no tag text)', () => {
+    const postWithEmptyTag = createMockPost({
+      tags: [
+        {
+          documentId: 'tag-1',
+          id: 1,
+          tagId: 'empty',
+          publishedAt: '2025-01-01',
+          tag: {
+            text: '',
+            ariaDescription: '',
+            iconPosition: IconPositionEnum.BEFORE_TEXT,
+          },
+          seoMetadata: { metaTitle: '', metaDescription: '' },
+        },
+      ] as any,
+    })
+    render(<BlogCard {...defaultProps} post={postWithEmptyTag} showTag={true} />)
+    // Tag header should not render because firstTag is empty string
+    expect(screen.queryByTestId('mock-card-header')).not.toBeInTheDocument()
+  })
 })

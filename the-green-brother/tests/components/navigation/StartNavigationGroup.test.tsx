@@ -217,6 +217,18 @@ describe('StartNavigationGroup', () => {
     })
   })
 
+  describe('RTL Support', () => {
+    it('should apply ml-3 class to brand button when direction is RTL and brand text is visible', () => {
+      mockUsePathname.mockReturnValue('/')
+      render(<StartNavigationGroup data={mockData} displayMode="full" direction={DirectionEnum.RTL} navWidth={1200} />)
+
+      const brandLink = screen.getByText('Brand')
+      // In RTL mode with brand text visible, className should include 'ml-3' instead of 'mr-3'
+      expect(brandLink.className).toContain('ml-3')
+      expect(brandLink.className).not.toContain('mr-3')
+    })
+  })
+
   describe('Icon Detection Logic', () => {
     it('should call onHasIconsChange with true when all items have icons', () => {
       const mockOnHasIconsChange = jest.fn()

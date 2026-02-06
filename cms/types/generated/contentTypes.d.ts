@@ -791,7 +791,6 @@ export interface ApiBlogBlog extends Struct.SingleTypeSchema {
           localized: true
         }
       }>
-    blogPosts: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     entryTitle: Schema.Attribute.String &
@@ -1705,6 +1704,13 @@ export interface ApiProductCategoriesPageProductCategoriesPage extends Struct.Si
     }
   }
   attributes: {
+    certificatesSectionHeader: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     entryTitle: Schema.Attribute.String &

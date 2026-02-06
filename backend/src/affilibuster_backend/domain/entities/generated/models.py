@@ -1001,10 +1001,6 @@ class ApiBlogBlogDocument(BaseModel):
     """
     A relational field
     """
-    blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="blogPosts")
-    """
-    A relational field
-    """
     pagination: CallToActionsPaginationCtaEntry
     """
     A component field
@@ -2593,10 +2589,6 @@ class Data2(BaseModel):
     A relational field
     """
     featured_blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="featuredBlogPosts")
-    """
-    A relational field
-    """
-    blog_posts: list[ApiBlogPostBlogPostDocument] | None = Field(None, alias="blogPosts")
     """
     A relational field
     """
@@ -8714,6 +8706,10 @@ class ApiProductCategoriesPageProductCategoriesPageDocument(BaseModel):
     """
     A component field
     """
+    certificates_section_header: ElementsHeaderEntry = Field(..., alias="certificatesSectionHeader")
+    """
+    A component field
+    """
     related_products_section_header: ElementsHeaderEntry = Field(..., alias="relatedProductsSectionHeader")
     """
     A component field
@@ -9070,6 +9066,10 @@ class Data19(BaseModel):
     A component field
     """
     products_sorter: SortersProductsSorterEntry = Field(..., alias="productsSorter")
+    """
+    A component field
+    """
+    certificates_section_header: ElementsHeaderEntry = Field(..., alias="certificatesSectionHeader")
     """
     A component field
     """

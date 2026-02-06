@@ -1,0 +1,59 @@
+# Copyright (c) 2026 Affilibuster by Ronen Druker.
+
+# ============================================
+# Stage 1: Builder - Install all deps
+# ============================================
+FROM python:3.13-slim AS builder
+
+WORKDIR /app
+
+# Install uv package manager
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
+
+# Copy dependency files first for layer caching
+COPY pyproject.toml uv.lock ./
+
+# Install production dependencies only (no dev tools)
+RUN uv sync --frozen --no-install-project --no-dev
+
+# ============================================
+# Stage 2: Runtime - Lean production image
+# ============================================
+FROM python:3.13-slim AS runtime
+
+WORKDIR /app
+
+# Install runtime system dependencies
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv (needed for `uv run` in entrypoint)
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
+
+# Copy virtual environment from builder
+ENV UV_PROJECT_ENVIRONMENT=/app/.venv
+COPY --from=builder /app/.venv /app/.venv
+
+# Copy application source
+COPY . .
+
+# Copy production entrypoint
+COPY docker-entrypoint.prod.sh ./docker-entrypoint.prod.sh
+RUN chmod +x /app/docker-entrypoint.prod.sh
+
+# Non-root user for security
+RUN groupadd -g 1001 backend && \
+    useradd -u 1001 -g backend -s /bin/sh -m backend && \
+    chown -R backend:backend /app
+
+USER backend
+
+ARG BACKEND_PORT=8000
+EXPOSE ${BACKEND_PORT}
+
+ENTRYPOINT ["/app/docker-entrypoint.prod.sh"]

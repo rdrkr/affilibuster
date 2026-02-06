@@ -152,5 +152,68 @@ describe('Feature Flags Adapter', () => {
 
       expect(result).toBe(true)
     })
+
+    it('should use productionEnabled when NODE_ENV is production', async () => {
+      const originalNodeEnv = process.env.NODE_ENV
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'production',
+        writable: true,
+      })
+
+      const mockResponse: FeatureFlagsResponse = {
+        data: [
+          createMockFlag({
+            key: 'prod-flag',
+            developmentEnabled: true,
+            productionEnabled: false,
+          }),
+        ],
+        meta: {},
+      }
+      mockGetFeatureFlags.mockResolvedValueOnce(mockResponse)
+
+      const adapter = cmsAdapter()
+      const decide = adapter.decide as DecideFunction
+      const result = await decide({ key: 'prod-flag' })
+
+      // Should use productionEnabled (false), not developmentEnabled (true)
+      expect(result).toBe(false)
+
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: originalNodeEnv,
+        writable: true,
+      })
+    })
+
+    it('should return true for enabled production flag', async () => {
+      const originalNodeEnv = process.env.NODE_ENV
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'production',
+        writable: true,
+      })
+
+      const mockResponse: FeatureFlagsResponse = {
+        data: [
+          createMockFlag({
+            key: 'prod-enabled-flag',
+            developmentEnabled: false,
+            productionEnabled: true,
+          }),
+        ],
+        meta: {},
+      }
+      mockGetFeatureFlags.mockResolvedValueOnce(mockResponse)
+
+      const adapter = cmsAdapter()
+      const decide = adapter.decide as DecideFunction
+      const result = await decide({ key: 'prod-enabled-flag' })
+
+      expect(result).toBe(true)
+
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: originalNodeEnv,
+        writable: true,
+      })
+    })
   })
 })

@@ -8,6 +8,7 @@
  */
 
 import { act, fireEvent, render, screen } from '@testing-library/react'
+import React from 'react'
 
 import { ScrollableTableWrapper, type ScrollableTableWrapperProps } from '@/components/elements/ScrollableTableWrapper'
 import { DirectionEnum } from '@/lib/generated/types.gen'
@@ -589,6 +590,51 @@ describe('ScrollableTableWrapper', () => {
 
       // ResizeObserver.observe is called during useEffect on the table
       expect(mockResizeObserverObserve).toHaveBeenCalled()
+    })
+  })
+
+  describe('providedTableRef', () => {
+    it('should use provided tableRef instead of querySelector', async () => {
+      /**
+       * Component that provides a tableRef to ScrollableTableWrapper
+       * @returns JSX.Element
+       */
+      function TestWithTableRef() {
+        const tableRef = React.useRef<HTMLTableElement>(null)
+        return (
+          <ScrollableTableWrapper direction={DirectionEnum.LTR} tableRef={tableRef}>
+            <table ref={tableRef} data-testid="ref-table" />
+          </ScrollableTableWrapper>
+        )
+      }
+
+      render(<TestWithTableRef />)
+
+      const table = screen.getByTestId('ref-table')
+      mockScrollProperties(table, 0, 1000, 500)
+      await triggerScrollUpdate(table)
+
+      // Right arrow should be visible since there is overflow
+      const rightButton = screen.getByTestId('scroll-right-button')
+      expect(isButtonVisible(rightButton)).toBe(true)
+    })
+
+    it('should handle providedTableRef with null current', async () => {
+      const emptyRef = React.createRef<HTMLTableElement>()
+
+      render(
+        <ScrollableTableWrapper direction={DirectionEnum.LTR} tableRef={emptyRef as any}>
+          <div data-testid="no-table-child">Content</div>
+        </ScrollableTableWrapper>
+      )
+
+      // Wait for effect
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 100))
+      })
+
+      // Should render without errors, both arrows hidden
+      expect(screen.getByTestId('scroll-wrapper')).toBeInTheDocument()
     })
   })
 
