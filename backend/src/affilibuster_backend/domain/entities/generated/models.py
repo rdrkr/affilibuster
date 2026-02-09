@@ -6138,6 +6138,7 @@ class ProductCategoriesGetResponse(BaseModel):
 
 
 class Field26(StrEnum):
+    BY_SELLER_TEXT = "bySellerText"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -6145,7 +6146,7 @@ class Field26(StrEnum):
 
 
 class ProductCategoriesPageGetParametersQuery(BaseModel):
-    fields: list[Field26] | None = Field(None, examples=[["createdAt", "updatedAt", "publishedAt"]])
+    fields: list[Field26] | None = Field(None, examples=[["bySellerText", "createdAt", "updatedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
@@ -8678,6 +8679,10 @@ class ApiProductCategoriesPageProductCategoriesPageDocument(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
+    by_seller_text: str = Field(..., alias="bySellerText")
+    """
+    A string field
+    """
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
@@ -9041,6 +9046,10 @@ class Data19(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
+    by_seller_text: str = Field(..., alias="bySellerText")
+    """
+    A string field
+    """
     created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.

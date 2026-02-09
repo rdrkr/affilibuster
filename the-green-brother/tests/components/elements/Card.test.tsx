@@ -189,40 +189,40 @@ describe('Card', () => {
       const { container } = render(<Card {...defaultProps} size="xs" />)
 
       const card = container.firstChild as HTMLElement
-      expect(card.style.height).toBe('var(--height-card-xs)')
-      expect(card.style.width).toBe('var(--width-card-xs)')
+      expect(card.style.height).toBe('var(--height-card-y-xs)')
+      expect(card.style.width).toBe('var(--width-card-y-xs)')
     })
 
     it('should apply md size dimensions by default via inline style', () => {
       const { container } = render(<Card {...defaultProps} />)
 
       const card = container.firstChild as HTMLElement
-      expect(card.style.height).toBe('var(--height-card-md)')
-      expect(card.style.width).toBe('var(--width-card-md)')
+      expect(card.style.height).toBe('var(--height-card-y-md)')
+      expect(card.style.width).toBe('var(--width-card-y-md)')
     })
 
     it('should apply sm size dimensions via inline style', () => {
       const { container } = render(<Card {...defaultProps} size="sm" />)
 
       const card = container.firstChild as HTMLElement
-      expect(card.style.height).toBe('var(--height-card-sm)')
-      expect(card.style.width).toBe('var(--width-card-sm)')
+      expect(card.style.height).toBe('var(--height-card-y-sm)')
+      expect(card.style.width).toBe('var(--width-card-y-sm)')
     })
 
     it('should apply lg size dimensions via inline style', () => {
       const { container } = render(<Card {...defaultProps} size="lg" />)
 
       const card = container.firstChild as HTMLElement
-      expect(card.style.height).toBe('var(--height-card-lg)')
-      expect(card.style.width).toBe('var(--width-card-lg)')
+      expect(card.style.height).toBe('var(--height-card-y-lg)')
+      expect(card.style.width).toBe('var(--width-card-y-lg)')
     })
 
     it('should apply xl size dimensions via inline style', () => {
       const { container } = render(<Card {...defaultProps} size="xl" />)
 
       const card = container.firstChild as HTMLElement
-      expect(card.style.height).toBe('var(--height-card-xl)')
-      expect(card.style.width).toBe('var(--width-card-xl)')
+      expect(card.style.height).toBe('var(--height-card-y-xl)')
+      expect(card.style.width).toBe('var(--width-card-y-xl)')
     })
 
     it('should have CardSize type exported', () => {
@@ -236,7 +236,7 @@ describe('Card', () => {
     it('should apply CSS variable width via inline style when width is fixed (default)', () => {
       const { container } = render(<Card {...defaultProps} size="md" width="fixed" />)
       const card = container.firstChild as HTMLElement
-      expect(card.style.width).toBe('var(--width-card-md)')
+      expect(card.style.width).toBe('var(--width-card-y-md)')
     })
 
     it('should apply w-full class when width is full', () => {
@@ -249,7 +249,7 @@ describe('Card', () => {
     it('should maintain CSS variable height via inline style when width is full', () => {
       const { container } = render(<Card {...defaultProps} size="lg" width="full" />)
       const card = container.firstChild as HTMLElement
-      expect(card.style.height).toBe('var(--height-card-lg)')
+      expect(card.style.height).toBe('var(--height-card-y-lg)')
       expect(card.className).toContain('w-full')
     })
 
@@ -263,7 +263,7 @@ describe('Card', () => {
     it('should maintain CSS variable height via inline style when width is fit', () => {
       const { container } = render(<Card {...defaultProps} size="lg" width="fit" />)
       const card = container.firstChild as HTMLElement
-      expect(card.style.height).toBe('var(--height-card-lg)')
+      expect(card.style.height).toBe('var(--height-card-y-lg)')
       expect(card.className).toContain('w-fit')
     })
   })
@@ -272,7 +272,7 @@ describe('Card', () => {
     it('should apply CSS variable height via inline style when height is fixed (default)', () => {
       const { container } = render(<Card {...defaultProps} size="md" height="fixed" />)
       const card = container.firstChild as HTMLElement
-      expect(card.style.height).toBe('var(--height-card-md)')
+      expect(card.style.height).toBe('var(--height-card-y-md)')
     })
 
     it('should apply h-full class when height is full', () => {
@@ -292,7 +292,7 @@ describe('Card', () => {
     it('should maintain CSS variable width via inline style when height is fit', () => {
       const { container } = render(<Card {...defaultProps} size="lg" height="fit" />)
       const card = container.firstChild as HTMLElement
-      expect(card.style.width).toBe('var(--width-card-lg)')
+      expect(card.style.width).toBe('var(--width-card-y-lg)')
       expect(card.className).toContain('h-fit')
     })
   })
@@ -346,9 +346,9 @@ describe('Card', () => {
       expect(screen.queryByTestId('mock-image')).not.toBeInTheDocument()
     })
 
-    it('should hide image for sm size in ttb layout', () => {
+    it('should show image for sm size in ttb layout', () => {
       render(<Card {...defaultProps} layout="ttb" size="sm" />)
-      expect(screen.queryByTestId('mock-image')).not.toBeInTheDocument()
+      expect(screen.getByTestId('mock-image')).toBeInTheDocument()
     })
 
     it('should show image for md size in ttb layout', () => {
@@ -361,9 +361,9 @@ describe('Card', () => {
       expect(screen.queryByTestId('mock-image')).not.toBeInTheDocument()
     })
 
-    it('should hide image for sm size in btt layout', () => {
+    it('should show image for sm size in btt layout', () => {
       render(<Card {...defaultProps} layout="btt" size="sm" />)
-      expect(screen.queryByTestId('mock-image')).not.toBeInTheDocument()
+      expect(screen.getByTestId('mock-image')).toBeInTheDocument()
     })
 
     it('should show image for xs size in ltr layout (horizontal)', () => {
@@ -480,6 +480,22 @@ describe('Card', () => {
     const card = container.firstChild as HTMLElement
     expect(card.className).not.toContain('hover:-translate-y-1')
     expect(card.className).not.toContain('hover:transform')
+  })
+
+  it('should apply background classes by default (showBackground=true)', () => {
+    const { container } = render(<Card {...defaultProps} />)
+    const card = container.firstChild as HTMLElement
+    expect(card.className).toContain('bg-white')
+    expect(card.className).toContain('shadow-md')
+    expect(card.className).toContain('border-neutral-200')
+  })
+
+  it('should not apply background classes when showBackground is false', () => {
+    const { container } = render(<Card {...defaultProps} showBackground={false} />)
+    const card = container.firstChild as HTMLElement
+    expect(card.className).not.toContain('bg-white')
+    expect(card.className).not.toContain('shadow-md')
+    expect(card.className).not.toContain('border-neutral-200')
   })
 
   it('should render absolute link overlay when asLink is true (default)', () => {

@@ -24,6 +24,7 @@ export type ButtonVariant =
   | 'ghost-3'
   | 'link-1'
   | 'link-2'
+  | 'scroll-arrow'
 
 /**
  * Button size options
@@ -151,6 +152,16 @@ export function getVariantClasses(
           : 'transition-all duration-300 hover:scale-105 hover:text-shadow-shimmer disabled:hover:scale-100'
       }
     `,
+    'scroll-arrow': `
+      cursor-pointer
+      rounded-full! border
+      border-neutral-200 bg-white/50
+      shadow-lg backdrop-blur-sm
+      transition-opacity duration-300 ease-in-out
+      hover:bg-white/70
+      dark:border-white/10 dark:bg-neutral-800/30
+      dark:hover:bg-neutral-800/50
+    `,
   }
   return variants[variant]
 }
@@ -162,7 +173,7 @@ export function getVariantClasses(
  */
 export function getSizeDimensions(size: ButtonSize): string {
   const sizes: Record<ButtonSize, string> = {
-    xs: 'py-0.5 px-2 rounded-lg min-w-[38x] min-h-[38px]',
+    xs: 'py-0.5 px-2 rounded-lg min-w-[38px] min-h-[38px]',
     sm: 'py-1.5 px-3 rounded-xl min-w-[46px] min-h-[46px]',
     md: 'py-2 px-4 rounded-xl min-w-[52px] min-h-[52px]',
     lg: 'py-3 px-5 rounded-xl min-w-[62px] min-h-[62px]',
@@ -237,7 +248,7 @@ export function getVisibilityClasses(
   }
 
   return visible
-    ? 'opacity-100 translate-x-0'
+    ? 'translate-x-0'
     : `w-0! min-w-0! !p-0 !m-0 opacity-0 overflow-hidden pointer-events-none ${translateClass}`
 }
 

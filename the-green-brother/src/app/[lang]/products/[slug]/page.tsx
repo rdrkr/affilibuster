@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-import { getProductBySlug, getProductCategoriesPage } from '@/lib/client'
+import { getProductBySlug, getProductCategoriesPage, getProducts } from '@/lib/client'
+import { userProfileFlag } from '@/lib/feature-flags'
 import { CodeEnum } from '@/lib/generated/types.gen'
 import { notFound } from 'next/navigation'
 import ProductDetailClient from './ProductDetailClient'
@@ -19,9 +20,10 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const { lang, slug } = resolvedParams
 
   // Fetch product by Slug
-  const [product, productCategoriesPage] = await Promise.all([
+  const [product, productCategoriesPage, userProfileEnabled] = await Promise.all([
     getProductBySlug(slug, { locale: lang }),
     getProductCategoriesPage(lang),
+    userProfileFlag(),
   ])
 
   // Return 404 if product not found
@@ -29,5 +31,34 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     notFound()
   }
 
-  return <ProductDetailClient product={product} certificatesHeader={productCategoriesPage.certificatesSectionHeader} />
+  // Fetch related products (same category, exclude current)
+  // Use explicit type casting for filters as 'category' is missing from generated ItemsEnum12 but supported by API
+  const relatedProductsResponse = await getProducts({
+    filters: {
+      category: {
+        slug: {
+          $eq: product.category.slug,
+        },
+      },
+      slug: {
+        $ne: slug,
+      },
+    } as NonNullable<NonNullable<Parameters<typeof getProducts>[0]>['filters']>,
+    pagination: {
+      page: 1,
+      pageSize: 10,
+    },
+    locale: lang,
+  })
+
+  return (
+    <ProductDetailClient
+      product={product}
+      certificatesHeader={productCategoriesPage.certificatesSectionHeader}
+      relatedProducts={relatedProductsResponse?.data ?? []}
+      relatedProductsHeader={productCategoriesPage.relatedProductsSectionHeader}
+      enableUserProfile={userProfileEnabled}
+      bySellerText={productCategoriesPage.bySellerText}
+    />
+  )
 }

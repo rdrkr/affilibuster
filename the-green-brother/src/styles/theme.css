@@ -181,16 +181,29 @@
   /* ============================================
    * COMPONENT DIMENSIONS
    * ============================================ */
-  --height-card-xs: 120px;
-  --height-card-sm: 164px;
-  --height-card-md: 428px;
-  --height-card-lg: 500px;
-  --height-card-xl: 500px;
-  --width-card-xs: 320px;
-  --width-card-sm: 360px;
-  --width-card-md: 316px;
-  --width-card-lg: 420px;
-  --width-card-xl: 820px;
+  /* Card Heights - Vertical (y) and Horizontal (x) */
+  --height-card-y-xs: 120px;
+  --height-card-x-xs: 120px;
+  --height-card-y-sm: 336px;
+  --height-card-x-sm: 164px;
+  --height-card-y-md: 428px;
+  --height-card-x-md: 428px;
+  --height-card-y-lg: 500px;
+  --height-card-x-lg: 500px;
+  --height-card-y-xl: 500px;
+  --height-card-x-xl: 500px;
+
+  /* Card Widths - Vertical (y) and Horizontal (x) */
+  --width-card-y-xs: 320px;
+  --width-card-x-xs: 320px;
+  --width-card-y-sm: 240px;
+  --width-card-x-sm: 360px;
+  --width-card-y-md: 316px;
+  --width-card-x-md: 316px;
+  --width-card-y-lg: 420px;
+  --width-card-x-lg: 420px;
+  --width-card-y-xl: 820px;
+  --width-card-x-xl: 820px;
 
   /* ============================================
    * BORDER RADIUS SCALE

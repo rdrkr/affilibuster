@@ -191,13 +191,13 @@ nano .env.prod  # Fill in values from Render dashboard
 
 After completing all steps, verify:
 
-- [ ] SSH works as `deploy` user: `ssh deploy@<server-ip>`
-- [ ] Docker is installed: `docker --version`
-- [ ] Docker Compose works: `docker compose version`
-- [ ] UFW is active: `sudo ufw status` (shows ports 22, 80, 443)
-- [ ] fail2ban is running: `sudo systemctl status fail2ban`
-- [ ] Swap is active: `free -h` (shows swap)
-- [ ] `.env.prod` exists and has all secrets filled in
+- [x] SSH works as `deploy` user: `ssh deploy@<server-ip>`
+- [x] Docker is installed: `docker --version`
+- [x] Docker Compose works: `docker compose version`
+- [x] UFW is active: `sudo ufw status` (shows ports 22, 80, 443)
+- [x] fail2ban is running: `sudo systemctl status fail2ban`
+- [x] Swap is active: `free -h` (shows swap)
+- [x] `.env.prod` exists and has all secrets filled in
 
 ---
 

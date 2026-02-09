@@ -49,7 +49,8 @@ export function Breadcrumbs({
   navigation,
   className = '',
   customLastCrumbLabel,
-}: BreadcrumbsProps) {
+  ...props
+}: BreadcrumbsProps & React.HTMLAttributes<HTMLElement>) {
   const segments = pathname.split('/').filter(Boolean)
   const ignoredSegments = [lang, 'tag'].map(s => s.toLowerCase())
   const pathSegments = segments.filter(s => !ignoredSegments.includes(s.toLowerCase()))
@@ -108,6 +109,7 @@ export function Breadcrumbs({
         ${defaultClassName}
         ${className}
       `}
+      {...props}
     >
       {crumbs.map((crumb, _) => {
         const isLastAndCustom = crumb.isLast && customLastCrumbLabel

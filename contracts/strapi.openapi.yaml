@@ -7881,14 +7881,15 @@ paths:
             items:
               type: string
               enum:
+                - bySellerText
                 - createdAt
                 - updatedAt
                 - publishedAt
                 - locale
             example:
+              - bySellerText
               - createdAt
               - updatedAt
-              - publishedAt
           x-strapi-serialize: querystring
           description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
         - name: filters
@@ -7901,6 +7902,7 @@ paths:
             propertyNames:
               type: string
               enum:
+                - bySellerText
                 - createdAt
                 - updatedAt
                 - publishedAt
@@ -7972,6 +7974,9 @@ paths:
                         anyOf:
                           - type: string
                           - type: number
+                      bySellerText:
+                        description: A string field
+                        type: string
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -8047,6 +8052,7 @@ paths:
                     required:
                       - documentId
                       - id
+                      - bySellerText
                       - publishedAt
                       - header
                       - productsFilter
@@ -14611,6 +14617,9 @@ components:
           anyOf:
             - type: string
             - type: number
+        bySellerText:
+          description: A string field
+          type: string
         createdAt:
           description: Timestamp when this entry was first created in the CMS.
           type: string
@@ -14686,6 +14695,7 @@ components:
       required:
         - documentId
         - id
+        - bySellerText
         - publishedAt
         - header
         - productsFilter

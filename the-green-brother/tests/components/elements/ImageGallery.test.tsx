@@ -4,7 +4,7 @@
  * Unit tests for ImageGallery component
  */
 
-import { fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 
 import ImageGallery from '@/components/elements/ImageGallery'
 import { DirectionEnum, type PluginUploadFileDocument } from '@/lib/generated/types.gen'
@@ -116,6 +116,14 @@ describe('ImageGallery', () => {
 
       expect(container.firstChild).toHaveClass('custom-class')
     })
+
+    it('should render current image with fade-in animation', () => {
+      renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} />)
+
+      const currentImage = screen.getByTestId('gallery-current-image')
+      expect(currentImage).toBeInTheDocument()
+      expect(currentImage).toHaveClass('animate-fade-in')
+    })
   })
 
   describe('Image Selection', () => {
@@ -137,6 +145,56 @@ describe('ImageGallery', () => {
       const thumbnailButtons = screen.getAllByRole('button')
       expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
       expect(thumbnailButtons[1]!).not.toHaveClass('border-primary-500')
+    })
+
+    it('should show previous image fading out when thumbnail is clicked', () => {
+      renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} />)
+
+      // Click on second thumbnail
+      const thumbnailButtons = screen.getAllByRole('button')
+      fireEvent.click(thumbnailButtons[1]!)
+
+      // Previous image should be visible during crossfade
+      const prevImage = screen.getByTestId('gallery-prev-image')
+      expect(prevImage).toBeInTheDocument()
+      expect(prevImage).toHaveClass('animate-fade-out')
+    })
+
+    it('should clean up previous image after fade-out animation ends', () => {
+      renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} />)
+
+      // Click on second thumbnail
+      const thumbnailButtons = screen.getAllByRole('button')
+      fireEvent.click(thumbnailButtons[1]!)
+
+      // Previous image should exist during animation
+      const prevImage = screen.getByTestId('gallery-prev-image')
+      expect(prevImage).toBeInTheDocument()
+
+      // Simulate animation end
+      fireEvent.animationEnd(prevImage)
+
+      // Previous image should be removed
+      expect(screen.queryByTestId('gallery-prev-image')).not.toBeInTheDocument()
+    })
+
+    it('should not trigger crossfade when clicking currently selected thumbnail', () => {
+      renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} />)
+
+      // Click on first thumbnail (already selected)
+      const thumbnailButtons = screen.getAllByRole('button')
+      fireEvent.click(thumbnailButtons[0]!)
+
+      // No previous image should appear
+      expect(screen.queryByTestId('gallery-prev-image')).not.toBeInTheDocument()
+    })
+
+    it('should apply transition-all duration-300 to thumbnails for animated border', () => {
+      renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} />)
+
+      const thumbnailButtons = screen.getAllByRole('button')
+      expect(thumbnailButtons[0]!).toHaveClass('transition-all')
+      expect(thumbnailButtons[0]!).toHaveClass('duration-300')
     })
   })
 
@@ -246,6 +304,200 @@ describe('ImageGallery', () => {
 
       const icon = screen.getByTestId('mock-icon')
       expect(icon).toHaveAttribute('data-icon', 'image')
+    })
+  })
+
+  describe('Wishlist Button', () => {
+    it('should render wishlist button when enableUserProfile is true', () => {
+      renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} enableUserProfile={true} />)
+
+      const wishlistButton = screen.getByRole('button', { name: 'Add to favorites' })
+      expect(wishlistButton).toBeInTheDocument()
+    })
+
+    it('should not render wishlist button when enableUserProfile is false', () => {
+      renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} enableUserProfile={false} />)
+
+      expect(screen.queryByRole('button', { name: 'Add to favorites' })).not.toBeInTheDocument()
+    })
+
+    it('should not render wishlist button by default', () => {
+      renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} />)
+
+      expect(screen.queryByRole('button', { name: 'Add to favorites' })).not.toBeInTheDocument()
+    })
+
+    it('should call onWishlistClick when wishlist button is clicked', () => {
+      const onWishlistClick = jest.fn()
+      renderWithLayout(
+        <ImageGallery
+          images={mockImages}
+          direction={DirectionEnum.LTR}
+          enableUserProfile={true}
+          onWishlistClick={onWishlistClick}
+        />
+      )
+
+      const wishlistButton = screen.getByRole('button', { name: 'Add to favorites' })
+      fireEvent.click(wishlistButton)
+
+      expect(onWishlistClick).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not throw when wishlist button clicked without onWishlistClick handler', () => {
+      renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} enableUserProfile={true} />)
+
+      const wishlistButton = screen.getByRole('button', { name: 'Add to favorites' })
+      expect(() => {
+        fireEvent.click(wishlistButton)
+      }).not.toThrow()
+    })
+  })
+
+  describe('Auto-rotation', () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it('should auto-rotate to next image after default interval (5000ms)', () => {
+      renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} />)
+
+      const thumbnailButtons = screen.getAllByRole('button')
+      // First thumbnail should be selected initially
+      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
+      expect(thumbnailButtons[1]!).not.toHaveClass('border-primary-500')
+
+      // Fast-forward 5 seconds
+      act(() => {
+        jest.advanceTimersByTime(5000)
+      })
+
+      // Second thumbnail should now be selected
+      expect(thumbnailButtons[0]!).not.toHaveClass('border-primary-500')
+      expect(thumbnailButtons[1]!).toHaveClass('border-primary-500')
+    })
+
+    it('should respect custom autoRotateInterval', () => {
+      renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} autoRotateInterval={2000} />)
+
+      const thumbnailButtons = screen.getAllByRole('button')
+      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
+
+      // 2 seconds should trigger rotation
+      act(() => {
+        jest.advanceTimersByTime(2000)
+      })
+      expect(thumbnailButtons[1]!).toHaveClass('border-primary-500')
+    })
+
+    it('should disable auto-rotation when autoRotateInterval is 0', () => {
+      renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} autoRotateInterval={0} />)
+
+      const thumbnailButtons = screen.getAllByRole('button')
+      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
+
+      // Even after 10 seconds, should not auto-rotate
+      act(() => {
+        jest.advanceTimersByTime(10000)
+      })
+      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
+    })
+
+    it('should pause auto-rotation on mouse enter', () => {
+      const { container } = renderWithLayout(
+        <ImageGallery images={mockImages} direction={DirectionEnum.LTR} autoRotateInterval={1000} />
+      )
+
+      const thumbnailButtons = screen.getAllByRole('button')
+      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
+
+      // Mouse enter to pause
+      const gallery = container.querySelector('[role="region"]')!
+      fireEvent.mouseEnter(gallery)
+
+      // Should not rotate even after interval
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
+    })
+
+    it('should resume auto-rotation on mouse leave', () => {
+      const { container } = renderWithLayout(
+        <ImageGallery images={mockImages} direction={DirectionEnum.LTR} autoRotateInterval={1000} />
+      )
+
+      const thumbnailButtons = screen.getAllByRole('button')
+      const gallery = container.querySelector('[role="region"]')!
+
+      // Mouse enter then leave
+      fireEvent.mouseEnter(gallery)
+      fireEvent.mouseLeave(gallery)
+
+      // Should rotate after interval
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      expect(thumbnailButtons[1]!).toHaveClass('border-primary-500')
+    })
+
+    it('should not auto-rotate when there is only one image', () => {
+      renderWithLayout(<ImageGallery images={[mockImages[0]!]} direction={DirectionEnum.LTR} />)
+
+      // With only one image, no thumbnails are shown
+      const thumbnailButtons = screen.queryAllByRole('button')
+      expect(thumbnailButtons).toHaveLength(0)
+
+      // Even after interval, no error should occur
+      act(() => {
+        jest.advanceTimersByTime(5000)
+      })
+      // Component should still be rendering without errors
+      expect(screen.getByTestId('mock-image-/images/product1.jpg')).toBeInTheDocument()
+    })
+
+    it('should wrap around to first image after last', () => {
+      renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} autoRotateInterval={1000} />)
+
+      const thumbnailButtons = screen.getAllByRole('button')
+
+      // Rotate through all images
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      }) // -> 2nd
+      expect(thumbnailButtons[1]!).toHaveClass('border-primary-500')
+
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      }) // -> 3rd
+      expect(thumbnailButtons[2]!).toHaveClass('border-primary-500')
+
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      }) // -> 1st (wrap around)
+      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
+    })
+
+    it('should trigger crossfade animation during auto-rotation', () => {
+      renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} autoRotateInterval={1000} />)
+
+      // Fast-forward to trigger rotation
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+
+      // Previous image should be visible during crossfade
+      const prevImage = screen.getByTestId('gallery-prev-image')
+      expect(prevImage).toBeInTheDocument()
+      expect(prevImage).toHaveClass('animate-fade-out')
+
+      // Current image should be fading in
+      const currentImage = screen.getByTestId('gallery-current-image')
+      expect(currentImage).toHaveClass('animate-fade-in')
     })
   })
 })

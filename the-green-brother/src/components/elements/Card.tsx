@@ -73,6 +73,8 @@ export interface CardProps {
   direction: DirectionEnum
   /** Whether to preload image (for LCP optimization) */
   preload?: boolean
+  /** Whether to show the card background, border, and shadow (default: true) */
+  showBackground?: boolean
 }
 
 const sizeConfig: Record<
@@ -96,7 +98,7 @@ const sizeConfig: Record<
   },
   sm: {
     imageHorizontal: 'aspect-square w-[3/7] shrink-0 grow-0',
-    imageVertical: 'h-40 w-full shrink-0 grow-0',
+    imageVertical: 'aspect-square w-full shrink-0 grow-0',
     paddingClasses: 'p-4',
     imageMarginHorizontal: 'my-4',
   },
@@ -155,6 +157,7 @@ function getSizeClasses(size: CardSize, layout: CardLayout) {
  * @param props.direction - Language direction for RTL support
  * @param props.noAnimation - Whether to disable hover animations
  * @param props.preload - Whether to preload image (for LCP optimization)
+ * @param props.showBackground - Whether to show the card background/shadow (default: true)
  * @returns Card component or null if not visible
  */
 export function Card({
@@ -176,6 +179,7 @@ export function Card({
   direction,
   noAnimation = false,
   preload = false,
+  showBackground = true,
 }: CardProps) {
   if (visible === false) {
     return null
@@ -186,7 +190,7 @@ export function Card({
   const isVerticalLayout = layout === 'ttb' || layout === 'btt'
 
   // Hide image for xs/sm sizes in vertical layouts due to insufficient height for content
-  const shouldHideImage = isVerticalLayout && (size === 'xs' || size === 'sm')
+  const shouldHideImage = isVerticalLayout && size === 'xs'
 
   const animationClasses = noAnimation
     ? ''
@@ -198,8 +202,7 @@ export function Card({
 
   const cardClasses = `
     flex group relative isolate flex shrink-0 snap-start overflow-hidden
-    rounded-xl border border-neutral-200 bg-white shadow-md
-    dark:border-white/5 dark:bg-surface-dark dark:shadow-none
+    ${showBackground ? 'rounded-xl border border-neutral-200 bg-white shadow-md dark:border-white/5 dark:bg-surface-dark dark:shadow-none' : ''}
     ${animationClasses}
     ${width === 'full' ? 'w-full' : width === 'fit' ? 'w-fit' : ''}
     ${height === 'full' ? 'h-full' : height === 'fit' ? 'h-fit' : ''}
@@ -209,8 +212,8 @@ export function Card({
 
   // Inline styles for CSS variable dimensions (Tailwind doesn't interpolate template strings in classes)
   const cardStyle: React.CSSProperties = {
-    height: height === 'fixed' ? `var(--height-card-${size})` : undefined,
-    width: width === 'fixed' ? `var(--width-card-${size})` : undefined,
+    height: height === 'fixed' ? `var(--height-card-${isVerticalLayout ? 'y' : 'x'}-${size})` : undefined,
+    width: width === 'fixed' ? `var(--width-card-${isVerticalLayout ? 'y' : 'x'}-${size})` : undefined,
   }
 
   const isRTL = direction === DirectionEnum.RTL

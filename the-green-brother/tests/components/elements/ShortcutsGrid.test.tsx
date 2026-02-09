@@ -175,4 +175,30 @@ describe('ShortcutsGrid', () => {
     const homeLinkLg = screen.getByRole('link', { name: 'Go Home' })
     expect(homeLinkLg).toHaveClass('w-32')
   })
+
+  it('should treat "#" url as static content', () => {
+    const itemsWithHash = [
+      {
+        ...mockItems[0],
+        url: '#',
+        openInNewTab: false,
+      },
+    ]
+    render(<ShortcutsGrid direction={DirectionEnum.LTR} items={itemsWithHash} />)
+
+    // Should verify it renders the item but NOT as a link
+    // The link role check ensures it's not an <a> tag
+    const link = screen.queryByRole('link')
+    expect(link).not.toBeInTheDocument()
+    // But text should be present
+    expect(screen.getByText('Home')).toBeInTheDocument()
+  })
+
+  it('should skip items without label', () => {
+    const items = [{ id: 99, url: '#' } as any]
+    render(<ShortcutsGrid direction={DirectionEnum.LTR} items={items} />)
+    // Should render nothing inside the grid for this item
+    expect(screen.queryByTestId('mock-icon')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('mock-text')).not.toBeInTheDocument()
+  })
 })

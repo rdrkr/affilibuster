@@ -11,8 +11,9 @@
 
 import { useState } from 'react'
 
-import { TabbedView, type Tab } from '@/components/elements'
 import { DirectionEnum } from '@/lib/generated/types.gen'
+import { TabbedView } from './TabbedView'
+import type { BackgroundVariant, Tab, TabLayout } from './tabbed-view-types'
 
 /**
  * Props for the TabbedDynamicZone component
@@ -24,6 +25,10 @@ export interface TabbedDynamicZoneProps {
   direction: DirectionEnum
   /** Additional className for the container */
   className?: string
+  /** Tab bar layout mode: 'scroll' for carousel, 'fill' for full-width adaptive buttons (default: 'scroll') */
+  tabLayout?: TabLayout
+  /** Background variant: 'none' (default), 'tabs' (tab bar only), 'content' (panel only), 'separate' (each in own container), 'all' (shared container) */
+  backgroundVariant?: BackgroundVariant
 }
 
 /**
@@ -33,9 +38,17 @@ export interface TabbedDynamicZoneProps {
  * @param props.tabs - Pre-rendered tabs from parent
  * @param props.direction - Text direction for RTL/LTR layout
  * @param props.className - Additional CSS classes
+ * @param props.tabLayout - Tab bar layout: 'scroll' for carousel, 'fill' for full-width buttons (default: 'scroll')
+ * @param props.backgroundVariant - Background styling: 'none', 'tabs' (tab bar only), 'content' (panel only), 'separate' (each in own container), 'all' (shared container) (default: 'none')
  * @returns Tabbed view with state management
  */
-export function TabbedDynamicZone({ tabs, direction, className = '' }: TabbedDynamicZoneProps) {
+export function TabbedDynamicZone({
+  tabs,
+  direction,
+  className = '',
+  tabLayout,
+  backgroundVariant,
+}: TabbedDynamicZoneProps) {
   const [activeTabKey, setActiveTabKey] = useState<string>(tabs[0]?.key ?? '')
   const isRTL = direction === DirectionEnum.RTL
 
@@ -44,7 +57,14 @@ export function TabbedDynamicZone({ tabs, direction, className = '' }: TabbedDyn
 
   return (
     <div className={className} dir={isRTL ? 'rtl' : 'ltr'}>
-      <TabbedView tabs={tabs} activeKey={validActiveKey} onTabChange={setActiveTabKey} direction={direction} />
+      <TabbedView
+        tabs={tabs}
+        activeKey={validActiveKey}
+        onTabChange={setActiveTabKey}
+        direction={direction}
+        {...(tabLayout !== undefined && { tabLayout })}
+        {...(backgroundVariant !== undefined && { backgroundVariant })}
+      />
     </div>
   )
 }

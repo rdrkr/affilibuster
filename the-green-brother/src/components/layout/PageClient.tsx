@@ -7,7 +7,7 @@ import { type HTMLAttributes, type ReactNode, useEffect, useState } from 'react'
 
 import { useLayoutContext } from '@/components/providers'
 import { DirectionEnum } from '../../lib/generated'
-import { Breadcrumbs, type BreadcrumbsProps } from '../elements'
+import { Breadcrumbs, type BreadcrumbsProps } from '../elements/Breadcrumbs'
 
 /**
  * Layout variants for PageClient

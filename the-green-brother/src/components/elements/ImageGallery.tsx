@@ -5,12 +5,12 @@
  *
  * Reusable image gallery component for product detail pages.
  * Features a main image display with thumbnail grid for image selection.
- * Supports RTL layout and dark mode.
+ * Supports RTL layout, dark mode, and auto-rotation with animated transitions.
  */
 
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { DirectionEnum, type PluginUploadFileDocument } from '@/lib/generated/types.gen'
 
@@ -37,6 +37,12 @@ export interface ImageGalleryProps {
   placeholderIcon?: string
   /** Aria label for the gallery region */
   ariaLabel?: string
+  /** Feature flag: Enable user profile features (favorites) */
+  enableUserProfile?: boolean
+  /** Callback when wishlist button is clicked */
+  onWishlistClick?: () => void
+  /** Auto-rotation interval in milliseconds (default: 5000, 0 to disable) */
+  autoRotateInterval?: number
 }
 
 /**
@@ -53,11 +59,14 @@ const thumbnailColsMap = {
  *
  * Features:
  * - Main image display with aspect-square container
- * - Thumbnail grid for image selection
+ * - Animated crossfade transitions between images
+ * - Auto-rotation with configurable interval (default: 5 seconds)
+ * - Thumbnail grid with animated border indicator
  * - RTL support via direction prop
  * - Dark mode support via Tailwind dark: variants
  * - Accessibility with role="region" and aria-labels
  * - Placeholder icon for missing images
+ * - Optional wishlist button overlay (requires enableUserProfile)
  * @param props - Component properties
  * @param props.images - Array of images from CMS
  * @param props.direction - Text direction for RTL/LTR layout
@@ -67,6 +76,9 @@ const thumbnailColsMap = {
  * @param props.thumbnailCols - Number of columns for thumbnail grid
  * @param props.placeholderIcon - Icon to show when no images available
  * @param props.ariaLabel - Accessibility label for the gallery
+ * @param props.enableUserProfile - Whether to show wishlist button
+ * @param props.onWishlistClick - Callback when wishlist button is clicked
+ * @param props.autoRotateInterval - Auto-rotation interval in ms (default: 5000, 0 to disable)
  * @returns Image gallery component
  */
 export function ImageGallery({
@@ -78,22 +90,88 @@ export function ImageGallery({
   thumbnailCols = 4,
   placeholderIcon = 'image',
   ariaLabel = 'Image gallery',
+  enableUserProfile = false,
+  onWishlistClick,
+  autoRotateInterval = 5000,
 }: ImageGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const [prevImage, setPrevImage] = useState<PluginUploadFileDocument | null>(null)
+  const [isPaused, setIsPaused] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const prevIndexRef = useRef(0)
 
   const selectedImage = images[selectedImageIndex]
   const showThumbnails = images.length > 1
+  const itemCount = images.length
+
+  /**
+   * Trigger crossfade: capture outgoing image before updating index
+   * @param newIndex - The new image index to switch to
+   */
+  const changeImage = useCallback(
+    (newIndex: number) => {
+      if (newIndex === prevIndexRef.current) return
+      const outgoing = images[prevIndexRef.current]
+      if (outgoing) {
+        setPrevImage(outgoing)
+      }
+      prevIndexRef.current = newIndex
+      setSelectedImageIndex(newIndex)
+    },
+    [images]
+  )
+
+  /**
+   * Navigate to the next image (wraps around)
+   */
+  const nextImage = useCallback(() => {
+    if (itemCount <= 1) return
+    const next = (prevIndexRef.current + 1) % itemCount
+    changeImage(next)
+  }, [itemCount, changeImage])
 
   /**
    * Handles thumbnail click to select a new image
    * @param index - Index of the clicked thumbnail
    */
   const handleThumbnailClick = (index: number) => {
-    setSelectedImageIndex(index)
+    changeImage(index)
   }
 
+  /**
+   * Handle wishlist button click
+   */
+  const handleWishlistClick = () => {
+    onWishlistClick?.()
+  }
+
+  // Auto-rotation effect
+  useEffect(() => {
+    if (itemCount <= 1 || isPaused || autoRotateInterval <= 0) {
+      return
+    }
+
+    timerRef.current = setTimeout(nextImage, autoRotateInterval)
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
+    }
+  }, [selectedImageIndex, itemCount, autoRotateInterval, nextImage, isPaused])
+
   return (
-    <div role="region" aria-label={ariaLabel} className={`space-y-4 ${className}`}>
+    <div
+      role="region"
+      aria-label={ariaLabel}
+      className={`space-y-4 ${className}`}
+      onMouseEnter={() => {
+        setIsPaused(true)
+      }}
+      onMouseLeave={() => {
+        setIsPaused(false)
+      }}
+    >
       {/* Main Image */}
       <div
         className={`
@@ -103,11 +181,53 @@ export function ImageGallery({
         `}
       >
         {selectedImage ? (
-          // eslint-disable-next-line @typescript-eslint/no-deprecated -- Using priority prop for LCP optimization
-          <Image image={selectedImage} className="object-cover" fill sizes={sizes} priority={preload} />
+          <>
+            {/* Previous image – fades out */}
+            {prevImage && (
+              <div
+                key={`prev-${prevImage.documentId}`}
+                className="absolute inset-0 z-0 animate-fade-out"
+                style={{ animationFillMode: 'forwards' }}
+                onAnimationEnd={() => {
+                  setPrevImage(null)
+                }}
+                data-testid="gallery-prev-image"
+              >
+                <Image image={prevImage} className="object-cover" fill sizes={sizes} />
+              </div>
+            )}
+            {/* Current image – fades in */}
+            <div
+              key={`current-${selectedImage.documentId}`}
+              className="relative z-10 size-full animate-fade-in"
+              data-testid="gallery-current-image"
+            >
+              {/* eslint-disable-next-line @typescript-eslint/no-deprecated -- Using priority prop for LCP optimization */}
+              <Image image={selectedImage} className="object-cover" fill sizes={sizes} priority={preload} />
+            </div>
+          </>
         ) : (
           <div className="flex size-full items-center justify-center">
             <Icon icon={placeholderIcon} size="6xl" className="text-tertiary-600" />
+          </div>
+        )}
+
+        {/* Wishlist Button Overlay */}
+        {enableUserProfile && (
+          <div className="absolute top-3 right-3 z-20">
+            <button
+              type="button"
+              onClick={handleWishlistClick}
+              className={`
+                flex size-10 items-center justify-center rounded-full
+                bg-white/50 text-neutral-800 backdrop-blur-md
+                transition-colors hover:bg-primary hover:text-black
+                dark:bg-background-dark/50 dark:text-white
+              `}
+              aria-label="Add to favorites"
+            >
+              <Icon icon="favorite_border" size="lg" />
+            </button>
           </div>
         )}
       </div>
@@ -125,7 +245,7 @@ export function ImageGallery({
               className={`
                 aspect-square overflow-hidden rounded-xl border-2
                 ${index === selectedImageIndex ? 'border-primary-500' : 'border-transparent'}
-                relative bg-white transition-colors hover:border-primary-500/50
+                relative bg-white transition-all duration-300 hover:border-primary-500/50
                 dark:bg-tertiary-800
               `}
               aria-label={img.alternativeText ?? `View image ${String(index + 1)}`}

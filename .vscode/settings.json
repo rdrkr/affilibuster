@@ -222,6 +222,7 @@
     "genhtml",
     "geninfo",
     "geolocation",
+    "ghcup",
     "Grayscale",
     "healthcheck",
     "healthchecks",
@@ -332,6 +333,7 @@
     "worksteal",
     "worktree",
     "xdist",
+    "zstd",
     "אודות",
     "עברית"
   ],

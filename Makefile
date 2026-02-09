@@ -116,8 +116,14 @@ logs-the-green-brother: ## View the-green-brother logs only
 
 # Production
 # Helper to pass arguments to docker compose (e.g. make start-prod strapi)
-PROD_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
-$(eval $(PROD_ARGS):;@:)
+# Only capture extra args when running production commands to avoid conflicts with other targets
+PROD_GOALS := dcp build-prod start-prod stop-prod logs-prod export-prod import-prod
+ifneq ($(filter $(PROD_GOALS),$(firstword $(MAKECMDGOALS))),)
+  ifeq ($(origin PROD_ARGS),undefined)
+    PROD_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+    $(eval $(PROD_ARGS):;@:)
+  endif
+endif
 
 # Production Docker Compose command
 DCP_CMD := docker compose --env-file .env.prod -f docker-compose.prod.yaml
@@ -280,7 +286,7 @@ export-prod: ## Export strapi cms data (production)
 	@$(DCP_CMD) cp strapi:/tmp/export.tar data/export.tar
 	@tar -xf data/export.tar -C data
 	@rm data/export.tar
-	@$(DCP_CMD) exec strapi rm -rf /data /tmp/export.tar
+	@$(DCP_CMD) exec -u root strapi rm -rf /data /tmp/export.tar
 	@echo "✅ Strapi cms data exported from production"
 
 import-prod: ## Import strapi cms data (production)
@@ -288,6 +294,6 @@ import-prod: ## Import strapi cms data (production)
 	@tar -cf data/export.tar -C "data" assets entities schemas configuration links metadata.json
 	@$(DCP_CMD) cp data/export.tar strapi:/tmp/export.tar
 	@$(DCP_CMD) exec strapi npm run data:import -- --force --file "/tmp/export.tar"
-	@$(DCP_CMD) exec strapi rm /tmp/export.tar
-	@rm data/export.tar
+	@$(DCP_CMD) exec -u root strapi rm -f /tmp/export.tar
+	@rm -f data/export.tar
 	@echo "✅ Strapi cms data imported to production"

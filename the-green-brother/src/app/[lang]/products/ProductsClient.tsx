@@ -74,9 +74,10 @@ export default function ProductsClient({ pageData, products, categories, enableU
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  // Use URL params directly as source of truth for category and search
+  // Use URL params directly as source of truth for category, search, and scroll intent
   const activeCategory = searchParams.get('category') ?? 'all'
   const searchTerm = searchParams.get('search') ?? ''
+  const hasNoScroll = searchParams.has('noScroll')
 
   // State for sorting (not in URL)
   const [sortBy, setSortBy] = useState<SortOption>('bestSellers')
@@ -93,17 +94,21 @@ export default function ProductsClient({ pageData, products, categories, enableU
   }, [categories])
 
   /**
-   * Updates URL params for category and search.
+   * Updates URL params for category, search, and scroll intent.
    * @param category - The category slug ('all' excludes it from URL)
    * @param search - The search term (empty excludes it from URL)
+   * @param noScroll - When true, adds noScroll param to suppress auto-scroll to active tab
    */
-  const updateUrlParams = (category: string, search: string) => {
+  const updateUrlParams = (category: string, search: string, noScroll = false) => {
     const params = new URLSearchParams()
     if (category && category !== 'all') {
       params.set('category', category)
     }
     if (search) {
       params.set('search', search)
+    }
+    if (noScroll) {
+      params.set('noScroll', '1')
     }
     const queryString = params.toString()
     router.push(queryString ? `${pathname}?${queryString}` : pathname)
@@ -150,11 +155,11 @@ export default function ProductsClient({ pageData, products, categories, enableU
   }
 
   /**
-   * Handle category selection - updates URL params.
+   * Handle category selection from tab click - updates URL params with noScroll intent.
    * @param categorySlug - Category slug ('all' for all categories, or specific category slug)
    */
   const handleCategorySelect = (categorySlug: string) => {
-    updateUrlParams(categorySlug, searchTerm)
+    updateUrlParams(categorySlug, searchTerm, true)
   }
 
   /**
@@ -178,6 +183,7 @@ export default function ProductsClient({ pageData, products, categories, enableU
         carouselGap="sm"
         showPanel={false}
         className="mt-6"
+        autoScroll={!hasNoScroll}
         afterTabBar={
           /* Active Filters Row: Search Term + Sort */
           <div className="flex items-center justify-between gap-2">

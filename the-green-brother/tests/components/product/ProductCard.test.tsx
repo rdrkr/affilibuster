@@ -2,7 +2,7 @@
 
 import { ProductCard } from '@/components/product/ProductCard'
 import { DirectionEnum, IconPositionEnum, type ApiProductProductDocument } from '@/lib/generated/types.gen'
-import { render, screen } from '@testing-library/react'
+import { createEvent, fireEvent, render, screen } from '@testing-library/react'
 
 /**
  * Unit tests for ProductCard component
@@ -204,6 +204,21 @@ describe('ProductCard', () => {
     expect(overlay).toContainElement(icon)
   })
 
+  it('should stop propagation when favorite button is clicked', () => {
+    render(<ProductCard {...defaultProps} enableUserProfile={true} />)
+    const button = screen.getByRole('button', { name: 'Product Title' })
+
+    // Create a mock event with spies
+    const mockEvent = createEvent.click(button)
+    jest.spyOn(mockEvent, 'preventDefault')
+    jest.spyOn(mockEvent, 'stopPropagation')
+
+    fireEvent(button, mockEvent)
+
+    expect(mockEvent.preventDefault).toHaveBeenCalled()
+    expect(mockEvent.stopPropagation).toHaveBeenCalled()
+  })
+
   it('should handle empty prices array gracefully', () => {
     const productNoPrices = {
       ...mockProduct,
@@ -275,5 +290,54 @@ describe('ProductCard', () => {
     // Content slot should be empty/falsy since header.header is undefined
     const content = screen.getByTestId('mock-content')
     expect(content).toBeEmptyDOMElement()
+  })
+
+  describe('xs size vertical layout', () => {
+    it('should NOT render header (tags/price) or footer (CTA)', () => {
+      render(<ProductCard {...defaultProps} size="xs" layout="ttb" />)
+
+      // Header slot should be empty (null)
+      const header = screen.getByTestId('mock-header')
+      expect(header).toBeEmptyDOMElement()
+
+      // Footer slot should be empty (null)
+      const footer = screen.getByTestId('mock-footer')
+      expect(footer).toBeEmptyDOMElement()
+    })
+
+    it('should render simplified content (title only)', () => {
+      render(<ProductCard {...defaultProps} size="xs" layout="ttb" />)
+
+      // Content slot should contain title
+      const content = screen.getByTestId('mock-content')
+      expect(content).toHaveTextContent('Eco Water Bottle')
+
+      // Should not contain price as subheader (since it's not sm)
+      expect(content).not.toHaveTextContent('$25.50')
+    })
+  })
+
+  describe('sm size vertical layout', () => {
+    it('should NOT render header (tags/top price) or footer (CTA)', () => {
+      render(<ProductCard {...defaultProps} size="sm" layout="ttb" />)
+
+      // Header slot should be empty (null)
+      const header = screen.getByTestId('mock-header')
+      expect(header).toBeEmptyDOMElement()
+
+      // Footer slot should be empty (null)
+      const footer = screen.getByTestId('mock-footer')
+      expect(footer).toBeEmptyDOMElement()
+    })
+
+    it('should render content with title AND price subheader', () => {
+      render(<ProductCard {...defaultProps} size="sm" layout="ttb" />)
+
+      const content = screen.getByTestId('mock-content')
+      // Title
+      expect(content).toHaveTextContent('Eco Water Bottle')
+      // Price
+      expect(content).toHaveTextContent('$25.50')
+    })
   })
 })

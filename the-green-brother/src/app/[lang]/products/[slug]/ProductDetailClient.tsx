@@ -2,20 +2,12 @@
 
 'use client'
 
-import { useState } from 'react'
-
-import { ButtonAction, ButtonLink, ImageGallery, Text, TextBlock } from '@/components/elements'
-import { PageClient } from '@/components/layout'
+import { ButtonLink, Header, ImageGallery, Label, Text, TextBlock } from '@/components/elements'
+import { Carousel, PageClient } from '@/components/layout'
 import { DynamicZone } from '@/components/layout/DynamicZone'
-import { ProductCertificatesSection, QuantitySelector } from '@/components/product'
+import { ProductCard, ProductCertificatesSection } from '@/components/product'
 import { useLayoutContext } from '@/components/providers'
-import {
-  DirectionEnum,
-  IconPositionEnum,
-  type ApiProductProductDocument,
-  type ElementsButtonEntry,
-  type ElementsHeaderEntry,
-} from '@/lib/generated/types.gen'
+import { DirectionEnum, type ApiProductProductDocument, type ElementsHeaderEntry } from '@/lib/generated/types.gen'
 
 /**
  * Props for the ProductDetailClient component
@@ -25,6 +17,14 @@ interface ProductDetailClientProps {
   product: ApiProductProductDocument
   /** Certificates section header from ProductCategoriesPage */
   certificatesHeader: ElementsHeaderEntry
+  /** Related products (same category) */
+  relatedProducts: ApiProductProductDocument[]
+  /** Header for related products section */
+  relatedProductsHeader: ElementsHeaderEntry
+  /** Feature flag: Enable user profile features (favorites) */
+  enableUserProfile: boolean
+  /** CMS text to prefix before seller name (e.g., "by") */
+  bySellerText: string
 }
 
 /**
@@ -36,57 +36,35 @@ interface ProductDetailClientProps {
  * @param props - Component properties
  * @param props.product - Product data from CMS
  * @param props.certificatesHeader - Certificates section header from ProductCategoriesPage
+ * @param props.relatedProducts - Related products from CMS
+ * @param props.relatedProductsHeader - Header for related products section
+ * @param props.enableUserProfile - Feature flag for user profile features
+ * @param props.bySellerText - CMS text to prefix before seller name
  * @returns Product detail UI
  */
-export default function ProductDetailClient({ product, certificatesHeader }: ProductDetailClientProps) {
+export default function ProductDetailClient({
+  product,
+  certificatesHeader,
+  relatedProducts,
+  relatedProductsHeader,
+  enableUserProfile,
+  bySellerText,
+}: ProductDetailClientProps) {
   const { direction } = useLayoutContext()
   const isRTL = direction === DirectionEnum.RTL
-  const [quantity, setQuantity] = useState(1)
 
   const productTitle = product.header.header?.text ?? ''
-
-  /**
-   * Increment product quantity.
-   */
-  const incrementQuantity = () => {
-    setQuantity(prev => prev + 1)
-  }
-
-  /**
-   * Decrement product quantity (minimum 1).
-   */
-  const decrementQuantity = () => {
-    setQuantity(prev => Math.max(1, prev - 1))
-  }
-
-  /**
-   * Handle wishlist button click.
-   */
-  const handleWishlistClick = () => {
-    console.log('Added to wishlist')
-  }
-
-  // Create wishlist button data
-  const wishlistButtonData: ElementsButtonEntry = {
-    label: {
-      icon: 'favorite_border',
-      text: '',
-      iconPosition: IconPositionEnum.BEFORE_TEXT,
-      ariaDescription: 'Add to wishlist',
-    },
-    url: '',
-    openInNewTab: false,
-  }
 
   return (
     <PageClient
       breadcrumbs={{
         customLastCrumbLabel: <Text text={productTitle} />,
       }}
+      childrenClassName="gap-10!"
     >
       <div
         className={`
-          mb-16 grid grid-cols-1 gap-12
+          grid grid-cols-1 gap-12
           lg:grid-cols-2
         `}
         dir={isRTL ? 'rtl' : 'ltr'}
@@ -99,18 +77,25 @@ export default function ProductDetailClient({ product, certificatesHeader }: Pro
           sizes="(max-width: 768px) 100vw, 600px"
           placeholderIcon="image"
           ariaLabel={`${productTitle} images`}
+          enableUserProfile={enableUserProfile}
         />
 
         {/* Info */}
-        <div className="mb-6 flex flex-col gap-12">
+        <div className="flex flex-col gap-10">
           <div>
-            <Text
-              text={product.category.content.text}
-              as="p"
-              className={`
-                mb-2 text-sm font-bold tracking-wider text-primary-500 uppercase
-              `}
-            />
+            {/* Seller and Category Row */}
+            <div className="mb-2 flex items-center justify-between">
+              <Text
+                text={product.category.content.text}
+                as="p"
+                className="text-sm font-bold tracking-wider text-primary-500 uppercase"
+              />
+              <Text
+                text={`${bySellerText} ${product.seller.firstName}${product.seller.lastName ? ` ${product.seller.lastName}` : ''}`}
+                as="p"
+                className="text-sm text-neutral-600 dark:text-tertiary-400"
+              />
+            </div>
 
             <Text
               text={productTitle}
@@ -141,31 +126,21 @@ export default function ProductDetailClient({ product, certificatesHeader }: Pro
               />
             )}
 
-            <div className="mb-8 flex gap-4">
-              {/* Quantity Selector */}
-              <QuantitySelector
-                quantity={quantity}
-                onIncrement={incrementQuantity}
-                onDecrement={decrementQuantity}
-                direction={direction}
-              />
-
+            <div className="flex flex-col items-center gap-4">
               {/* Affiliate Link */}
               <ButtonLink
                 data={product.affiliateButton}
                 direction={direction}
                 variant="primary"
                 size="lg"
-                className="flex-1"
+                className="w-full"
               />
 
-              {/* Wishlist Button */}
-              <ButtonAction
-                data={wishlistButtonData}
+              {/* Disclaimer Label */}
+              <Label
+                data={product.disclaimerLabel}
                 direction={direction}
-                variant="ghost-3"
-                size="lg"
-                onClick={handleWishlistClick}
+                className="text-center text-xs text-neutral-500"
               />
             </div>
           </div>
@@ -185,7 +160,8 @@ export default function ProductDetailClient({ product, certificatesHeader }: Pro
             direction={direction}
             verticalAlignment="center"
             layout="tabbed"
-            className="mb-16"
+            tabLayout="fill"
+            backgroundVariant="tabs"
             renderSection={section => {
               switch (section.__component) {
                 case 'elements.text-block':
@@ -198,6 +174,28 @@ export default function ProductDetailClient({ product, certificatesHeader }: Pro
           />
         </div>
       </div>
+
+      {/* Related Products Section */}
+      {relatedProducts.length > 0 && (
+        <section className="flex flex-col gap-8" dir={isRTL ? 'rtl' : 'ltr'}>
+          <Header data={relatedProductsHeader} level={4} direction={direction} />
+          <Carousel direction={direction} gap="md">
+            {relatedProducts.map(relatedProduct => (
+              <ProductCard
+                key={relatedProduct.documentId}
+                product={relatedProduct}
+                direction={direction}
+                size="sm"
+                layout="ttb"
+                width="fixed"
+                asLink={true}
+                noAnimation={true}
+                enableUserProfile={enableUserProfile}
+              />
+            ))}
+          </Carousel>
+        </section>
+      )}
     </PageClient>
   )
 }

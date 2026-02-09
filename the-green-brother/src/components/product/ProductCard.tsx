@@ -74,6 +74,90 @@ export function ProductCard({
   const primaryPrice = product.prices[0]
   const priceDisplay = primaryPrice ? `${primaryPrice.currency.symbol}${primaryPrice.amount.toFixed(2)}` : ''
 
+  // Determine effective layout logic
+  // 'sm' size traditionally used side-by-side (ltr) if not specified, matching BlogCard logic
+  // But here we respect passed layout or default 'ttb'
+  const isVertical = layout === 'ttb' || layout === 'btt'
+
+  // Refined Logic for XS and SM in Vertical Layouts
+  const isXsVertical = isVertical && size === 'xs'
+  const isSmVertical = isVertical && size === 'sm'
+
+  const showBackground = !isSmVertical
+
+  // Header Slot
+  // - Hidden for XS vertical
+  // - Hidden for SM vertical
+  const headerSlot =
+    isXsVertical || isSmVertical ? null : (
+      <div className="mb-2 flex items-center justify-between">
+        {tagText && (
+          <Text
+            text={tagText}
+            as="span"
+            className={`
+              text-xs font-bold tracking-wider
+              text-primary uppercase text-shadow-sm dark:text-shadow-none
+            `}
+          />
+        )}
+        <span
+          className={`
+            rounded-md bg-neutral-100 px-2 py-1 text-sm font-bold
+            text-neutral-800 dark:bg-white/10 dark:text-white
+            ${!tagText ? 'ms-auto' : ''}
+          `}
+        >
+          {priceDisplay}
+        </span>
+      </div>
+    )
+
+  const contentHeader = product.header.header ? (
+    <Text
+      text={product.header.header.text}
+      as="h4"
+      className={`
+        line-clamp-2 text-lg font-bold text-neutral-800
+        transition-colors
+        group-hover:text-primary group-hover:text-shadow-sm
+        dark:text-white dark:group-hover:text-shadow-none
+      `}
+    />
+  ) : null
+
+  // Content Slot
+  // - XS Vertical: Product Name only
+  // - SM Vertical: Product Name (Header) + Price (Subheader)
+  // - Others: Product Name (Header) only
+  const contentSlot =
+    isXsVertical || isSmVertical ? (
+      <div className="flex flex-col gap-1">
+        {contentHeader}
+        {isSmVertical && priceDisplay && (
+          <Text text={priceDisplay} as="span" className="font-bold text-neutral-500 dark:text-neutral-400" />
+        )}
+      </div>
+    ) : (
+      contentHeader
+    )
+
+  // Footer Slot
+  // - Hidden for XS vertical and SM vertical
+  const footerSlot =
+    isXsVertical || isSmVertical ? null : (
+      <ButtonLink
+        data={{
+          label: product.viewDetailsLabel,
+          url: productUrl,
+          openInNewTab: false,
+        }}
+        variant="secondary"
+        className="mt-auto w-full py-3 text-center"
+        direction={direction}
+      />
+    )
+
   return (
     <Card
       size={size}
@@ -88,73 +172,33 @@ export function ProductCard({
       imageSizes={imageSizes}
       noAnimation={noAnimation}
       preload={preload}
+      showBackground={showBackground}
       imageOverlay={
         enableUserProfile && (
-          <div className="absolute top-3 right-3">
+          <div className="absolute top-3 right-3 z-20">
             <button
               type="button"
               className={`
-                flex size-10 items-center justify-center rounded-full
-                bg-white/50 text-neutral-800 backdrop-blur-md
-                transition-colors hover:bg-primary hover:text-black
-                dark:bg-background-dark/50 dark:text-white
+                z-20 flex size-10 items-center justify-center
+                rounded-full bg-white/50 text-neutral-800
+                backdrop-blur-md transition-colors hover:bg-primary
+                hover:text-black dark:bg-background-dark/50
+                dark:text-white
               `}
               aria-label={product.header.header?.ariaDescription ?? 'Add to favorites'}
+              onClick={e => {
+                e.preventDefault()
+                e.stopPropagation()
+              }}
             >
               <Icon icon="favorite_border" size="lg" />
             </button>
           </div>
         )
       }
-      header={
-        <div className="mb-2 flex items-center justify-between">
-          {tagText && (
-            <Text
-              text={tagText}
-              as="span"
-              className={`
-                text-xs font-bold tracking-wider
-                text-primary uppercase text-shadow-sm dark:text-shadow-none
-              `}
-            />
-          )}
-          <span
-            className={`
-              rounded-md bg-neutral-100 px-2 py-1 text-sm font-bold
-              text-neutral-800 dark:bg-white/10 dark:text-white
-              ${!tagText ? 'ms-auto' : ''}
-            `}
-          >
-            {priceDisplay}
-          </span>
-        </div>
-      }
-      content={
-        product.header.header && (
-          <Text
-            text={product.header.header.text}
-            as="h4"
-            className={`
-              line-clamp-2 text-lg font-bold text-neutral-800
-              transition-colors
-              group-hover:text-primary group-hover:text-shadow-sm
-              dark:text-white dark:group-hover:text-shadow-none
-            `}
-          />
-        )
-      }
-      footer={
-        <ButtonLink
-          data={{
-            label: product.viewDetailsLabel,
-            url: productUrl,
-            openInNewTab: false,
-          }}
-          variant="secondary"
-          className="mt-auto w-full py-3 text-center"
-          direction={direction}
-        />
-      }
+      header={headerSlot}
+      content={contentSlot}
+      footer={footerSlot}
     />
   )
 }

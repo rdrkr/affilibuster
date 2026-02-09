@@ -192,8 +192,8 @@ describe('BlogPostClient', () => {
       }
     )
 
-    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/en')
-    expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute('href', '/en/blog')
+    expect(screen.getByRole('link', { name: 'Go home' })).toHaveAttribute('href', '/en')
+    expect(screen.getByRole('link', { name: 'Go to blog' })).toHaveAttribute('href', '/en/blog')
   })
 
   it('should render author name and initials', () => {

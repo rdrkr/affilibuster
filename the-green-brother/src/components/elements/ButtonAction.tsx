@@ -71,6 +71,10 @@ export interface ButtonActionProps {
   id?: string
   /** Test ID for testing purposes */
   'data-testid'?: string
+  /** Accessible label for the button */
+  'aria-label'?: string
+  /** Whether the element should be inert (non-interactive and hidden from AT) */
+  inert?: boolean
 }
 
 /**
@@ -125,6 +129,8 @@ export const ButtonAction = forwardRef<HTMLButtonElement, ButtonActionProps>(
       'aria-controls': ariaControls,
       id,
       'data-testid': dataTestId,
+      'aria-label': propsAriaLabel,
+      inert,
     },
     ref
   ) => {
@@ -158,8 +164,8 @@ export const ButtonAction = forwardRef<HTMLButtonElement, ButtonActionProps>(
       return null
     }
 
-    // Get aria-label from prop or nested label
-    const ariaLabel = label?.ariaDescription
+    // Get aria-label from prop or nested label (prop takes precedence)
+    const ariaLabel = propsAriaLabel ?? label?.ariaDescription
 
     const visibilityClasses = getVisibilityClasses(visible, direction, slideDirection)
 
@@ -178,6 +184,7 @@ export const ButtonAction = forwardRef<HTMLButtonElement, ButtonActionProps>(
         aria-controls={ariaControls}
         id={id}
         data-testid={dataTestId}
+        inert={inert ?? (!visible ? true : undefined)}
       >
         {content}
       </button>

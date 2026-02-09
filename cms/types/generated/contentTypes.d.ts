@@ -1704,6 +1704,13 @@ export interface ApiProductCategoriesPageProductCategoriesPage extends Struct.Si
     }
   }
   attributes: {
+    bySellerText: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     certificatesSectionHeader: Schema.Attribute.Component<'elements.header', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{

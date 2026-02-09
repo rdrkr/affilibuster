@@ -232,10 +232,10 @@ jobs:
       # ========================================
       # 6. Build & Test Project
       # ========================================
-      - name: Run make all
+      - name: Run make all-fast
         run: |
           echo "🔨 Building project..."
-          make all
+          make all-fast
 
       # ========================================
       # 7. Show Docker Logs (on failure)

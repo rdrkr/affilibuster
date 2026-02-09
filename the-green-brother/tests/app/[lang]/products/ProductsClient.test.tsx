@@ -38,6 +38,7 @@ const mockRouterPush = jest.fn((url: string) => {
 jest.mock('next/navigation', () => ({
   useSearchParams: () => ({
     get: (key: string) => mockSearchParams.get(key) ?? null,
+    has: (key: string) => mockSearchParams.has(key),
   }),
   usePathname: () => '/en/products',
   useRouter: () => ({
@@ -545,8 +546,8 @@ describe('ProductsClient', () => {
       // Click Electronics category tab
       fireEvent.click(screen.getByRole('tab', { name: /Electronics/i }))
 
-      // Should call router.push with category param
-      expect(mockRouterPush).toHaveBeenCalledWith('/en/products?category=electronics')
+      // Should call router.push with category param and noScroll intent
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/products?category=electronics&noScroll=1')
     })
 
     it('should show all products when no category URL param is set', () => {
@@ -589,8 +590,8 @@ describe('ProductsClient', () => {
         fireEvent.click(allButton)
       }
 
-      // Should navigate to URL without category param
-      expect(mockRouterPush).toHaveBeenCalledWith('/en/products')
+      // Should navigate to URL without category param but with noScroll intent
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/products?noScroll=1')
     })
 
     it('should set aria-selected attribute on active category based on URL param', () => {
@@ -1121,8 +1122,8 @@ describe('ProductsClient', () => {
       // Click Clothing category - this calls router.push which updates mockSearchParams
       fireEvent.click(screen.getByRole('tab', { name: /Clothing/i }))
 
-      // Verify URL navigation was called correctly
-      expect(mockRouterPush).toHaveBeenCalledWith('/en/products?category=clothing')
+      // Verify URL navigation was called correctly with noScroll intent
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/products?category=clothing&noScroll=1')
     })
 
     it('should update URL when category is clicked', () => {
@@ -1138,8 +1139,8 @@ describe('ProductsClient', () => {
       // Click Electronics category
       fireEvent.click(screen.getByRole('tab', { name: /Electronics/i }))
 
-      // Should update URL with category param
-      expect(mockRouterPush).toHaveBeenCalledWith('/en/products?category=electronics')
+      // Should update URL with category param and noScroll intent
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/products?category=electronics&noScroll=1')
     })
 
     it('should remove category param from URL when "All" is selected', () => {
@@ -1162,8 +1163,8 @@ describe('ProductsClient', () => {
         fireEvent.click(allButton)
       }
 
-      // Should update URL without category param
-      expect(mockRouterPush).toHaveBeenCalledWith('/en/products')
+      // Should update URL without category param but with noScroll intent
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/products?noScroll=1')
     })
 
     it('should set active category when category is set via URL', async () => {
@@ -1295,8 +1296,8 @@ describe('ProductsClient', () => {
       // Click Electronics category
       fireEvent.click(screen.getByRole('tab', { name: /Electronics/i }))
 
-      // Should update URL with both category and search params
-      expect(mockRouterPush).toHaveBeenCalledWith('/en/products?category=electronics&search=Product')
+      // Should update URL with both category and search params, plus noScroll intent
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/products?category=electronics&search=Product&noScroll=1')
     })
 
     it('should filter products by search term (case insensitive)', () => {

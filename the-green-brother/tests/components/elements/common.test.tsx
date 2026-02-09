@@ -62,7 +62,6 @@ describe('common utilities', () => {
   describe('getVisibilityClasses', () => {
     it('should return visible classes when visible is true', () => {
       const classes = getVisibilityClasses(true)
-      expect(classes).toContain('opacity-100')
       expect(classes).toContain('translate-x-0')
     })
 

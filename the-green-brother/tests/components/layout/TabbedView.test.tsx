@@ -6,7 +6,8 @@
 
 import { fireEvent, render, screen } from '@testing-library/react'
 
-import { TabbedView, type Tab } from '@/components/elements/TabbedView'
+import { TabbedView } from '@/components/layout/TabbedView'
+import type { Tab } from '@/components/layout/tabbed-view-types'
 import { DirectionEnum } from '@/lib/generated/types.gen'
 
 // Mock Carousel component
@@ -50,6 +51,13 @@ jest.mock('@/components/elements/ButtonAction', () => ({
         {children}
       </button>
     )
+  },
+}))
+
+// Mock Icon component
+jest.mock('@/components/elements/Icon', () => ({
+  Icon: function MockIcon({ icon, size }: { icon: string; size?: string }) {
+    return <span data-testid={`mock-icon-${icon}`} data-size={size} />
   },
 }))
 
@@ -318,6 +326,173 @@ describe('TabbedView', () => {
 
       expect(screen.getByTestId('after-tab-bar')).toBeInTheDocument()
       expect(screen.queryByRole('tabpanel')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Content Fade Animation', () => {
+    it('should apply animate-fade-in class to tab panel', () => {
+      render(<TabbedView {...defaultProps} />)
+
+      const tabpanel = screen.getByRole('tabpanel')
+      expect(tabpanel).toHaveClass('animate-fade-in')
+    })
+
+    it('should apply animate-fade-in for all background variants', () => {
+      const { rerender } = render(<TabbedView {...defaultProps} backgroundVariant="none" />)
+      expect(screen.getByRole('tabpanel')).toHaveClass('animate-fade-in')
+
+      rerender(<TabbedView {...defaultProps} backgroundVariant="content" />)
+      expect(screen.getByRole('tabpanel')).toHaveClass('animate-fade-in')
+
+      rerender(<TabbedView {...defaultProps} backgroundVariant="all" />)
+      expect(screen.getByRole('tabpanel')).toHaveClass('animate-fade-in')
+    })
+  })
+
+  describe('Container Tab Bar (Apple-style)', () => {
+    it('should render container tab bar for tabs backgroundVariant', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="tabs" />)
+
+      expect(screen.getByTestId('container-tab-bar')).toBeInTheDocument()
+    })
+
+    it('should render container tab bar for separate backgroundVariant', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="separate" />)
+
+      expect(screen.getByTestId('container-tab-bar')).toBeInTheDocument()
+    })
+
+    it('should not render container tab bar for none backgroundVariant', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="none" />)
+
+      expect(screen.queryByTestId('container-tab-bar')).not.toBeInTheDocument()
+    })
+
+    it('should not render container tab bar for content backgroundVariant', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="content" />)
+
+      expect(screen.queryByTestId('container-tab-bar')).not.toBeInTheDocument()
+    })
+
+    it('should render container tab bar for all backgroundVariant', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="all" />)
+
+      expect(screen.getByTestId('container-tab-bar')).toBeInTheDocument()
+    })
+
+    it('should render sliding pill with frosted glass Navigation style', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="tabs" />)
+
+      const pill = screen.getByTestId('tab-pill-indicator')
+      expect(pill).toBeInTheDocument()
+      expect(pill).toHaveClass('transition-all', 'duration-300', 'backdrop-blur-sm')
+    })
+
+    it('should render tab scroll container', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="tabs" />)
+
+      expect(screen.getByTestId('tab-scroll-container')).toBeInTheDocument()
+    })
+
+    it('should render plain text buttons in container style', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="tabs" />)
+
+      const activeTab = screen.getByTestId('tab-tab1')
+      // Container style uses plain HTML buttons, not ButtonAction
+      expect(activeTab.tagName).toBe('BUTTON')
+      expect(activeTab).toHaveClass('text-neutral-900')
+    })
+
+    it('should apply inactive text color to non-selected tabs in container style', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="tabs" />)
+
+      const inactiveTab = screen.getByTestId('tab-tab2')
+      expect(inactiveTab).toHaveClass('text-neutral-700')
+      expect(inactiveTab).not.toHaveClass('text-neutral-900')
+    })
+
+    it('should have Card-style background on container tab bar', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="tabs" />)
+
+      const container = screen.getByTestId('container-tab-bar')
+      expect(container).toHaveClass('rounded-xl', 'bg-white', 'shadow-md')
+    })
+
+    it('should call onTabChange when container tab is clicked', () => {
+      const onTabChange = jest.fn()
+      render(<TabbedView {...defaultProps} onTabChange={onTabChange} backgroundVariant="tabs" />)
+
+      fireEvent.click(screen.getByTestId('tab-tab2'))
+
+      expect(onTabChange).toHaveBeenCalledWith('tab2')
+    })
+
+    it('should maintain tablist role and aria-label for container tab bar', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="tabs" />)
+
+      const tablist = screen.getByRole('tablist')
+      expect(tablist).toHaveAttribute('aria-label', 'Tab navigation')
+    })
+
+    it('should set aria-selected on container tabs', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="tabs" activeKey="tab2" />)
+
+      expect(screen.getByTestId('tab-tab1')).toHaveAttribute('aria-selected', 'false')
+      expect(screen.getByTestId('tab-tab2')).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByTestId('tab-tab3')).toHaveAttribute('aria-selected', 'false')
+    })
+
+    it('should set aria-controls on container tabs', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="tabs" />)
+
+      expect(screen.getByTestId('tab-tab1')).toHaveAttribute('aria-controls', 'tabpanel-tab1')
+    })
+  })
+
+  describe('Background Variant Rendering', () => {
+    it('should not apply background classes for none variant', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="none" />)
+
+      const tabpanel = screen.getByRole('tabpanel')
+      expect(tabpanel).not.toHaveClass('shadow-md')
+    })
+
+    it('should apply background classes to content panel for content variant', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="content" />)
+
+      const tabpanel = screen.getByRole('tabpanel')
+      expect(tabpanel).toHaveClass('shadow-md')
+    })
+
+    it('should wrap everything in shared container for all variant', () => {
+      const { container } = render(<TabbedView {...defaultProps} backgroundVariant="all" />)
+
+      // The outer div should have a child with bgClasses
+      const wrapper = container.firstChild?.firstChild
+      expect(wrapper).toHaveClass('shadow-md')
+    })
+
+    it('should apply background to tab panel for separate variant', () => {
+      render(<TabbedView {...defaultProps} backgroundVariant="separate" />)
+
+      const tabpanel = screen.getByRole('tabpanel')
+      expect(tabpanel).toHaveClass('shadow-md')
+    })
+  })
+
+  describe('Tab Layout', () => {
+    it('should render with carousel for scroll layout (default)', () => {
+      render(<TabbedView {...defaultProps} tabLayout="scroll" />)
+
+      expect(screen.getByTestId('mock-carousel')).toBeInTheDocument()
+    })
+
+    it('should render fill-width tabs for fill layout', () => {
+      render(<TabbedView {...defaultProps} tabLayout="fill" />)
+
+      expect(screen.queryByTestId('mock-carousel')).not.toBeInTheDocument()
+      const tablist = screen.getByRole('tablist')
+      expect(tablist).toHaveClass('flex')
     })
   })
 })

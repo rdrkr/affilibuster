@@ -12,6 +12,7 @@
 import type { ReactNode } from 'react'
 
 import { Label } from '@/components/elements/Label'
+import type { BackgroundVariant, TabLayout } from '@/components/layout'
 import { DirectionEnum, type ElementsTextBlockEntry } from '@/lib/generated/types.gen'
 import { TabbedDynamicZone } from './TabbedDynamicZone'
 
@@ -59,6 +60,10 @@ export interface DynamicZoneProps<T extends DynamicSection> {
   layout?: DynamicZoneLayout
   /** Function to extract tab labels from sections (for tabbed layout) */
   getTabLabel?: (section: T) => ReactNode
+  /** Tab bar layout mode for tabbed layout: 'scroll' for carousel, 'fill' for full-width buttons (default: 'scroll') */
+  tabLayout?: TabLayout
+  /** Background variant: 'none' (default), 'tabs' (tab bar only), 'content' (panel only), 'separate' (each in own container), 'all' (shared container) */
+  backgroundVariant?: BackgroundVariant
 }
 
 /**
@@ -167,6 +172,8 @@ export const getAlignmentClass = (alignment: VerticalAlignment): string => {
  * @param props.verticalAlignment - Vertical alignment for horizontal groups
  * @param props.layout - Layout mode: vertical, horizontal, or tabbed
  * @param props.getTabLabel - Function to extract tab labels from sections
+ * @param props.tabLayout - Tab bar layout for tabbed mode: 'scroll' or 'fill' (default: 'scroll')
+ * @param props.backgroundVariant - Background styling: 'none', 'tabs' (tab bar only), 'content' (panel only), 'separate' (each in own container), 'all' (shared container) (default: 'none')
  * @returns Rendered dynamic zone with horizontal groups
  * @example
  * ```tsx
@@ -186,6 +193,8 @@ export function DynamicZone<T extends DynamicSection>({
   verticalAlignment,
   layout,
   getTabLabel,
+  tabLayout,
+  backgroundVariant,
 }: DynamicZoneProps<T>) {
   // Filter out marker sections for tabbed mode
   const renderableSections = sections.filter(
@@ -226,7 +235,15 @@ export function DynamicZone<T extends DynamicSection>({
       }
     })
 
-    return <TabbedDynamicZone tabs={tabs} direction={direction} className={className} />
+    return (
+      <TabbedDynamicZone
+        tabs={tabs}
+        direction={direction}
+        className={className}
+        {...(tabLayout !== undefined && { tabLayout })}
+        {...(backgroundVariant !== undefined && { backgroundVariant })}
+      />
+    )
   }
 
   // Default: vertical/horizontal grouping mode

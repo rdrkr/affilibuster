@@ -1227,7 +1227,7 @@ export default function StyleGuideClient(): React.ReactElement {
                                       iconPosition: IconPositionEnum.AFTER_TEXT,
                                       ariaDescription: 'Read article',
                                     },
-                                    contributor: mockLabels.mockAuthor,
+                                    author: mockLabels.mockAuthor,
                                   } as unknown as ApiBlogPostBlogPostDocument
                                 }
                               />

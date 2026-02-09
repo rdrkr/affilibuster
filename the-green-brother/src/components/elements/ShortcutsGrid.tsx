@@ -180,7 +180,7 @@ export function ShortcutsGrid({
 
           const containerClassName = `group flex flex-col items-center ${widthClass}`
 
-          if (item.url) {
+          if (item.url && item.url !== '#') {
             return (
               <Link
                 key={item.id}

@@ -20,9 +20,10 @@
 // Primitive Components
 export { Icon, type IconProps, type ResolvedIcon } from './Icon'
 export { DEFAULT_IMAGE, Image, type ImageProps } from './Image'
-export { Text, resolveTextFormatHtml, type TextProps } from './Text'
+export { resolveTextFormatHtml, Text, type TextProps } from './Text'
 
 // Composite Components
+export { TabbedView, type BackgroundVariant, type Tab, type TabbedViewProps, type TabLayout } from '@/components/layout'
 export { Breadcrumbs, type BreadcrumbsProps } from './Breadcrumbs'
 export { ButtonAction, type ButtonActionProps } from './ButtonAction'
 export { ButtonLink, type ButtonLinkProps } from './ButtonLink'
@@ -34,5 +35,4 @@ export { ImageGallery, type ImageGalleryProps } from './ImageGallery'
 export { Label, type LabelProps } from './Label'
 export { ScrollableTableWrapper, type ScrollableTableWrapperProps } from './ScrollableTableWrapper'
 export { ShortcutsGrid, type ShortcutsGridProps } from './ShortcutsGrid'
-export { TabbedView, type Tab, type TabbedViewProps } from './TabbedView'
 export { TextBlock, type TextBlockProps } from './TextBlock'

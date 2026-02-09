@@ -14,8 +14,8 @@
 import type { ReactNode, RefObject } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { DirectionEnum } from '@/lib/generated/types.gen'
-import { Icon } from './Icon'
+import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
+import { ButtonAction } from './ButtonAction'
 
 /**
  * Scroll state tracking which directions can be scrolled
@@ -25,6 +25,8 @@ interface ScrollState {
   canScrollStart: boolean
   /** Whether content can be scrolled toward the end (right in LTR, left in RTL) */
   canScrollEnd: boolean
+  /** Whether the table has overflow content */
+  hasOverflow: boolean
 }
 
 /**
@@ -79,6 +81,7 @@ export function ScrollableTableWrapper({
   const [scrollState, setScrollState] = useState<ScrollState>({
     canScrollStart: false,
     canScrollEnd: false,
+    hasOverflow: false,
   })
   const isRTL = direction === DirectionEnum.RTL
 
@@ -113,7 +116,7 @@ export function ScrollableTableWrapper({
         const hasOverflow = scrollWidth > clientWidth
 
         if (!hasOverflow) {
-          setScrollState({ canScrollStart: false, canScrollEnd: false })
+          setScrollState({ canScrollStart: false, canScrollEnd: false, hasOverflow: false })
           return
         }
 
@@ -126,6 +129,7 @@ export function ScrollableTableWrapper({
         setScrollState({
           canScrollStart: isRTL ? !atEnd : !atStart,
           canScrollEnd: isRTL ? !atStart : !atEnd,
+          hasOverflow,
         })
       }, SCROLL_DEBOUNCE_MS)
     }
@@ -164,58 +168,65 @@ export function ScrollableTableWrapper({
     [isRTL]
   )
 
-  const showLeftArrow = scrollState.canScrollStart
-  const showRightArrow = scrollState.canScrollEnd
-
   return (
     <div ref={wrapperRef} className={`relative ${className}`} data-testid="scroll-wrapper" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Left scroll button - always rendered for animation, visibility controlled by opacity */}
-      <button
-        type="button"
+      {/* Left scroll button */}
+      <ButtonAction
+        direction={direction}
+        variant="scroll-arrow"
+        size="xs"
+        iconSize="xl"
+        data={{
+          url: '',
+          openInNewTab: false,
+          label: {
+            text: '',
+            icon: 'chevron_left',
+            iconPosition: IconPositionEnum.BEFORE_TEXT,
+            ariaDescription: 'Scroll left',
+          },
+        }}
         onClick={() => {
           handleScroll(isRTL ? 'end' : 'start')
         }}
-        className={`
-          absolute top-1/2 left-2 z-10 flex
-          size-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border
-          border-neutral-200 bg-white/50
-          shadow-lg backdrop-blur-sm
-          transition-opacity duration-300 ease-in-out
-          hover:bg-white/70
-          dark:border-white/10 dark:bg-neutral-800/30
-          dark:hover:bg-neutral-800/50
-          ${showLeftArrow ? 'opacity-100' : 'pointer-events-none opacity-0'}
-        `}
-        aria-label="Scroll left"
-        inert={!showLeftArrow ? true : undefined}
+        className={`absolute top-1/2 left-2 z-10 aspect-square! -translate-y-1/2 justify-center ${
+          scrollState.canScrollStart ? 'opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+        visible={true}
+        inert={!scrollState.canScrollStart}
         data-testid="scroll-left-button"
-      >
-        <Icon icon="chevron_left" size="lg" />
-      </button>
+        aria-label="Scroll left"
+        disabled={!scrollState.canScrollStart}
+      />
 
-      {/* Right scroll button - always rendered for animation, visibility controlled by opacity */}
-      <button
-        type="button"
+      {/* Right scroll button */}
+      <ButtonAction
+        direction={direction}
+        variant="scroll-arrow"
+        size="xs"
+        iconSize="xl"
+        data={{
+          url: '',
+          openInNewTab: false,
+          label: {
+            text: '',
+            icon: 'chevron_right',
+            iconPosition: IconPositionEnum.BEFORE_TEXT,
+            ariaDescription: 'Scroll right',
+          },
+        }}
         onClick={() => {
           handleScroll(isRTL ? 'start' : 'end')
         }}
-        className={`
-          absolute top-1/2 right-2 z-10
-          flex size-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full
-          border border-neutral-200 bg-white/50
-          shadow-lg backdrop-blur-sm
-          transition-opacity duration-300 ease-in-out
-          hover:bg-white/70
-          dark:border-white/10 dark:bg-neutral-800/30
-          dark:hover:bg-neutral-800/50
-          ${showRightArrow ? 'opacity-100' : 'pointer-events-none opacity-0'}
-        `}
-        aria-label="Scroll right"
-        inert={!showRightArrow ? true : undefined}
+        className={`absolute top-1/2 right-2 z-10 aspect-square! -translate-y-1/2 justify-center ${
+          scrollState.canScrollEnd ? 'opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+        visible={true}
+        inert={!scrollState.canScrollEnd}
         data-testid="scroll-right-button"
-      >
-        <Icon icon="chevron_right" size="lg" />
-      </button>
+        aria-label="Scroll right"
+        disabled={!scrollState.canScrollEnd}
+      />
 
       {/* Table container - table inside handles its own scroll via prose-table:overflow-x-auto */}
       {children}

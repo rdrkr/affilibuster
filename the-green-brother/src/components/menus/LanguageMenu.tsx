@@ -90,10 +90,9 @@ export function LanguageMenu({
       {/* Badge positioned at bottom-right of icon */}
       <span
         className={`
-          pointer-events-none absolute right-0.5 bottom-1 flex min-w-[14px]
-          items-center justify-center rounded-sm bg-primary px-0.5 text-[10px]
-          leading-none font-bold text-black transition-colors
-          group-hover:bg-text-secondary-dark
+          pointer-events-none absolute right-0.5 bottom-0.5 flex min-w-[14px]
+          items-center justify-center rounded-sm bg-primary p-0.5 text-[9px] leading-none
+          font-bold text-black transition-colors group-hover:bg-text-secondary-dark
         `}
       >
         {languages.find(lang => lang.code === selectedLang)?.name.substring(0, 2)}

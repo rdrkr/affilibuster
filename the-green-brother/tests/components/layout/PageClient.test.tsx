@@ -9,8 +9,7 @@ jest.mock('@/components/providers', () => ({
   useLayoutContext: jest.fn(),
 }))
 
-// Mock Breadcrumbs
-jest.mock('@/components/elements', () => ({
+jest.mock('@/components/elements/Breadcrumbs', () => ({
   Breadcrumbs: jest.fn(() => <div data-testid="breadcrumbs" />),
 }))
 

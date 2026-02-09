@@ -457,10 +457,10 @@ describe('ScrollableTableWrapper', () => {
       const leftButton = screen.getByTestId('scroll-left-button')
       const rightButton = screen.getByTestId('scroll-right-button')
 
-      expect(leftButton).toHaveClass('size-12')
-      expect(leftButton).toHaveClass('rounded-full')
-      expect(rightButton).toHaveClass('size-12')
-      expect(rightButton).toHaveClass('rounded-full')
+      expect(leftButton).toHaveClass('min-w-[38px]')
+      expect(leftButton).toHaveClass('rounded-full!')
+      expect(rightButton).toHaveClass('min-w-[38px]')
+      expect(rightButton).toHaveClass('rounded-full!')
     })
 
     it('should have fade transition animation classes', () => {

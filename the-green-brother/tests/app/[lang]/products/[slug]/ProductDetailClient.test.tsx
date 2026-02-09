@@ -4,7 +4,7 @@
  * Unit tests for ProductDetailClient component
  */
 
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 
 import ProductDetailClient from '@/app/[lang]/products/[slug]/ProductDetailClient'
 import {
@@ -16,6 +16,12 @@ import {
 } from '@/lib/generated/types.gen'
 import { renderWithLayout } from '../../../../utils/renderWithLayout'
 // ... (skip lines) ...
+
+// Mock layout components
+jest.mock('@/components/layout', () => ({
+  PageClient: ({ children }: { children: React.ReactNode }) => <div data-testid="mock-page-client">{children}</div>,
+  Carousel: ({ children }: { children: React.ReactNode }) => <div data-testid="mock-carousel">{children}</div>,
+}))
 
 // Mock content components
 jest.mock('@/components/layout/DynamicZone', () => ({
@@ -80,7 +86,15 @@ jest.mock('@/components/elements', () => ({
   Icon: function MockIcon({ icon }: { icon: string }) {
     return <span data-testid="mock-icon">{icon}</span>
   },
-  ImageGallery: function MockImageGallery({ images, ariaLabel }: { images: unknown[]; ariaLabel?: string }) {
+  ImageGallery: function MockImageGallery({
+    images,
+    ariaLabel,
+    enableUserProfile,
+  }: {
+    images: unknown[]
+    ariaLabel?: string
+    enableUserProfile?: boolean
+  }) {
     return (
       <div data-testid="mock-image-gallery" aria-label={ariaLabel}>
         {images.length > 0 ? (
@@ -88,7 +102,15 @@ jest.mock('@/components/elements', () => ({
         ) : (
           <div data-testid="gallery-placeholder">No images</div>
         )}
+        {enableUserProfile && <button data-testid="gallery-wishlist-button">Wishlist</button>}
       </div>
+    )
+  },
+  Label: function MockLabel({ data, className }: { data?: { text?: string }; className?: string }) {
+    return (
+      <span data-testid="mock-label" className={className}>
+        {data?.text ?? ''}
+      </span>
     )
   },
   Text: function MockText({
@@ -107,29 +129,8 @@ jest.mock('@/components/elements', () => ({
   },
 }))
 
-// Mock QuantitySelector component
+// Mock Product components
 jest.mock('@/components/product', () => ({
-  QuantitySelector: function MockQuantitySelector({
-    quantity,
-    onIncrement,
-    onDecrement,
-  }: {
-    quantity: number
-    onIncrement: () => void
-    onDecrement: () => void
-  }) {
-    return (
-      <div data-testid="mock-quantity-selector">
-        <button onClick={onDecrement} data-testid="quantity-decrement">
-          -
-        </button>
-        <span data-testid="quantity-value">{quantity}</span>
-        <button onClick={onIncrement} data-testid="quantity-increment">
-          +
-        </button>
-      </div>
-    )
-  },
   ProductCertificatesSection: function MockProductCertificatesSection({
     certificates,
     header,
@@ -143,6 +144,9 @@ jest.mock('@/components/product', () => ({
         {header && <div data-testid="certificates-header">{header.header?.text}</div>}
       </div>
     )
+  },
+  ProductCard: function MockProductCard({ product }: { product: any }) {
+    return <div data-testid="mock-product-card">{product.header?.header?.text ?? 'Product Card'}</div>
   },
 }))
 
@@ -162,6 +166,12 @@ describe('ProductDetailClient', () => {
     ],
     prices: [{ id: 1, amount: 49.99, currency: { symbol: '$', code: 'USD' } }],
     category: { content: { text: 'Electronics' } },
+    seller: {
+      documentId: 'seller-1',
+      firstName: 'Green',
+      lastName: 'Seller',
+      slug: 'green-seller',
+    },
     images: [{ url: '/images/prod1.jpg' }, { url: '/images/prod2.jpg' }],
     affiliateButton: { url: 'https://affiliate.example.com/buy', label: { text: 'Buy Now' } },
     disclaimerLabel: {
@@ -181,25 +191,48 @@ describe('ProductDetailClient', () => {
     promoteHeaderIcon: false,
   }
 
+  const mockRelatedProductsHeader = {
+    header: {
+      text: 'Related Products',
+      iconPosition: IconPositionEnum.BEFORE_TEXT,
+      ariaDescription: 'Related products section',
+    },
+    alignment: AlignmentEnum.CENTER,
+    promoteHeaderIcon: false,
+  }
+
+  const mockRelatedProducts: ApiProductProductDocument[] = [
+    {
+      documentId: 'prod-2',
+      slug: 'related-product-1',
+      header: { header: { text: 'Related Product 1' } },
+    } as unknown as ApiProductProductDocument,
+    {
+      documentId: 'prod-3',
+      slug: 'related-product-2',
+      header: { header: { text: 'Related Product 2' } },
+    } as unknown as ApiProductProductDocument,
+  ]
+
+  const defaultProps = {
+    product: mockProduct,
+    certificatesHeader: mockCertificatesHeader,
+    relatedProducts: mockRelatedProducts,
+    relatedProductsHeader: mockRelatedProductsHeader,
+    enableUserProfile: true,
+    bySellerText: 'by',
+  }
+
   it('should render product title', () => {
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={mockProduct} />, {
+    renderWithLayout(<ProductDetailClient {...defaultProps} />, {
       layoutContext: { lang: CodeEnum.EN },
     })
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Eco Product')
   })
 
-  it('should render QuantitySelector component', () => {
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={mockProduct} />, {
-      layoutContext: { lang: CodeEnum.EN },
-    })
-
-    expect(screen.getByTestId('mock-quantity-selector')).toBeInTheDocument()
-    expect(screen.getByTestId('quantity-value')).toHaveTextContent('1')
-  })
-
   it('should render product price', () => {
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={mockProduct} />, {
+    renderWithLayout(<ProductDetailClient {...defaultProps} />, {
       layoutContext: { lang: CodeEnum.EN },
     })
 
@@ -207,15 +240,23 @@ describe('ProductDetailClient', () => {
   })
 
   it('should render category', () => {
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={mockProduct} />, {
+    renderWithLayout(<ProductDetailClient {...defaultProps} />, {
       layoutContext: { lang: CodeEnum.EN },
     })
 
     expect(screen.getByText('Electronics')).toBeInTheDocument()
   })
 
+  it('should render seller name', () => {
+    renderWithLayout(<ProductDetailClient {...defaultProps} />, {
+      layoutContext: { lang: CodeEnum.EN },
+    })
+
+    expect(screen.getByText('by Green Seller')).toBeInTheDocument()
+  })
+
   it('should render affiliate link when affiliateButton has URL', () => {
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={mockProduct} />, {
+    renderWithLayout(<ProductDetailClient {...defaultProps} />, {
       layoutContext: { lang: CodeEnum.EN },
     })
 
@@ -224,8 +265,16 @@ describe('ProductDetailClient', () => {
     expect(buyLink).toHaveAttribute('target', '_blank')
   })
 
+  it('should render disclaimer label', () => {
+    renderWithLayout(<ProductDetailClient {...defaultProps} />, {
+      layoutContext: { lang: CodeEnum.EN },
+    })
+
+    expect(screen.getByTestId('mock-label')).toHaveTextContent('Disclaimer')
+  })
+
   it('should render ImageGallery component', () => {
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={mockProduct} />, {
+    renderWithLayout(<ProductDetailClient {...defaultProps} />, {
       layoutContext: { lang: CodeEnum.EN },
     })
 
@@ -234,7 +283,7 @@ describe('ProductDetailClient', () => {
   })
 
   it('should render ImageGallery with aria-label including product title', () => {
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={mockProduct} />, {
+    renderWithLayout(<ProductDetailClient {...defaultProps} />, {
       layoutContext: { lang: CodeEnum.EN },
     })
 
@@ -242,56 +291,24 @@ describe('ProductDetailClient', () => {
     expect(gallery).toHaveAttribute('aria-label', 'Eco Product images')
   })
 
-  it('should increment quantity', () => {
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={mockProduct} />, {
+  it('should render ImageGallery wishlist button when enableUserProfile is true', () => {
+    renderWithLayout(<ProductDetailClient {...defaultProps} enableUserProfile={true} />, {
       layoutContext: { lang: CodeEnum.EN },
     })
 
-    const incrementButton = screen.getByTestId('quantity-increment')
-    fireEvent.click(incrementButton)
-
-    expect(screen.getByTestId('quantity-value')).toHaveTextContent('2')
+    expect(screen.getByTestId('gallery-wishlist-button')).toBeInTheDocument()
   })
 
-  it('should decrement quantity but not below 1', () => {
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={mockProduct} />, {
+  it('should not render ImageGallery wishlist button when enableUserProfile is false', () => {
+    renderWithLayout(<ProductDetailClient {...defaultProps} enableUserProfile={false} />, {
       layoutContext: { lang: CodeEnum.EN },
     })
 
-    const decrementButton = screen.getByTestId('quantity-decrement')
-    fireEvent.click(decrementButton)
-
-    // Should still be 1
-    expect(screen.getByTestId('quantity-value')).toHaveTextContent('1')
-  })
-
-  it('should render wishlist button with favorite_border icon', () => {
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={mockProduct} />, {
-      layoutContext: { lang: CodeEnum.EN },
-    })
-
-    expect(screen.getByText('favorite_border')).toBeInTheDocument()
-  })
-
-  it('should handle wishlist click', () => {
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {
-      return
-    })
-
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={mockProduct} />, {
-      layoutContext: { lang: CodeEnum.EN },
-    })
-
-    const wishlistIcon = screen.getByText('favorite_border')
-    const wishlistButton = wishlistIcon.closest('button')!
-    fireEvent.click(wishlistButton)
-
-    expect(consoleSpy).toHaveBeenCalledWith('Added to wishlist')
-    consoleSpy.mockRestore()
+    expect(screen.queryByTestId('gallery-wishlist-button')).not.toBeInTheDocument()
   })
 
   it('should render product content section with Header', () => {
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={mockProduct} />, {
+    renderWithLayout(<ProductDetailClient {...defaultProps} />, {
       layoutContext: { lang: CodeEnum.EN },
     })
 
@@ -312,12 +329,9 @@ describe('ProductDetailClient', () => {
       ],
     } as unknown as ApiProductProductDocument
 
-    renderWithLayout(
-      <ProductDetailClient certificatesHeader={mockCertificatesHeader} product={productWithUnknownSection} />,
-      {
-        layoutContext: { lang: CodeEnum.EN },
-      }
-    )
+    renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithUnknownSection} />, {
+      layoutContext: { lang: CodeEnum.EN },
+    })
 
     expect(screen.getByTestId('mock-dynamic-zone')).toBeInTheDocument()
     // The section container is rendered by the mock, but the content should be null (empty)
@@ -326,7 +340,7 @@ describe('ProductDetailClient', () => {
   })
 
   it('should render subheader when available', () => {
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={mockProduct} />, {
+    renderWithLayout(<ProductDetailClient {...defaultProps} />, {
       layoutContext: { lang: CodeEnum.EN },
     })
 
@@ -339,12 +353,9 @@ describe('ProductDetailClient', () => {
       images: [],
     } as ApiProductProductDocument
 
-    renderWithLayout(
-      <ProductDetailClient certificatesHeader={mockCertificatesHeader} product={productWithNoImages} />,
-      {
-        layoutContext: { lang: CodeEnum.EN },
-      }
-    )
+    renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithNoImages} />, {
+      layoutContext: { lang: CodeEnum.EN },
+    })
 
     expect(screen.getByTestId('gallery-placeholder')).toHaveTextContent('No images')
   })
@@ -355,7 +366,7 @@ describe('ProductDetailClient', () => {
       prices: [{ id: 1, amount: 49.99, currency: { symbol: '€', code: 'EUR' } }],
     } as ApiProductProductDocument
 
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={productWithEuro} />, {
+    renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithEuro} />, {
       layoutContext: { lang: CodeEnum.EN },
     })
 
@@ -377,12 +388,9 @@ describe('ProductDetailClient', () => {
       description: [],
     } as ApiProductProductDocument
 
-    renderWithLayout(
-      <ProductDetailClient certificatesHeader={mockCertificatesHeader} product={productWithoutContent} />,
-      {
-        layoutContext: { lang: CodeEnum.EN },
-      }
-    )
+    renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithoutContent} />, {
+      layoutContext: { lang: CodeEnum.EN },
+    })
 
     // Should not render the DynamicZone if empty (technically the component renders empty div if empty array pass, depending on usage)
     // Actually our ProductDetailClient renders <div className="mb-16 max-w-3xl">...</div> wrapping DynamicZone.
@@ -401,12 +409,9 @@ describe('ProductDetailClient', () => {
       prices: [],
     } as unknown as ApiProductProductDocument
 
-    renderWithLayout(
-      <ProductDetailClient certificatesHeader={mockCertificatesHeader} product={productWithoutPrice} />,
-      {
-        layoutContext: { lang: CodeEnum.EN },
-      }
-    )
+    renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithoutPrice} />, {
+      layoutContext: { lang: CodeEnum.EN },
+    })
 
     expect(screen.queryByText('$49.99')).not.toBeInTheDocument()
   })
@@ -418,12 +423,9 @@ describe('ProductDetailClient', () => {
       description: [{ __component: 'elements.text-block', text: 'Content' }],
     } as unknown as ApiProductProductDocument
 
-    renderWithLayout(
-      <ProductDetailClient certificatesHeader={mockCertificatesHeader} product={productWithoutSubheader} />,
-      {
-        layoutContext: { lang: CodeEnum.EN },
-      }
-    )
+    renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithoutSubheader} />, {
+      layoutContext: { lang: CodeEnum.EN },
+    })
 
     expect(screen.queryByText('A sustainable product')).not.toBeInTheDocument()
   })
@@ -434,7 +436,7 @@ describe('ProductDetailClient', () => {
       prices: [{ id: 1, amount: 49.99, currency: { symbol: '$', code: 'USD' } }],
     } as ApiProductProductDocument
 
-    renderWithLayout(<ProductDetailClient certificatesHeader={mockCertificatesHeader} product={productWithUSD} />, {
+    renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithUSD} />, {
       layoutContext: { lang: CodeEnum.EN },
     })
 
@@ -450,12 +452,9 @@ describe('ProductDetailClient', () => {
       },
     } as unknown as ApiProductProductDocument
 
-    renderWithLayout(
-      <ProductDetailClient certificatesHeader={mockCertificatesHeader} product={productWithNoHeader} />,
-      {
-        layoutContext: { lang: CodeEnum.EN },
-      }
-    )
+    renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithNoHeader} />, {
+      layoutContext: { lang: CodeEnum.EN },
+    })
 
     // productTitle should be '' and page should render without crashing
     // The h1 should have empty text content
@@ -468,12 +467,9 @@ describe('ProductDetailClient', () => {
       prices: [{ id: 1, amount: 49.99, currency: { symbol: '$', code: '' } }],
     } as ApiProductProductDocument
 
-    renderWithLayout(
-      <ProductDetailClient certificatesHeader={mockCertificatesHeader} product={productWithEmptyCode} />,
-      {
-        layoutContext: { lang: CodeEnum.EN },
-      }
-    )
+    renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithEmptyCode} />, {
+      layoutContext: { lang: CodeEnum.EN },
+    })
 
     // Price should render but no currency code span
     expect(screen.getByText('$49.99')).toBeInTheDocument()
@@ -488,12 +484,9 @@ describe('ProductDetailClient', () => {
       ],
     } as unknown as ApiProductProductDocument
 
-    renderWithLayout(
-      <ProductDetailClient product={productWithCertificates} certificatesHeader={mockCertificatesHeader} />,
-      {
-        layoutContext: { lang: CodeEnum.EN },
-      }
-    )
+    renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithCertificates} />, {
+      layoutContext: { lang: CodeEnum.EN },
+    })
 
     expect(screen.getByTestId('mock-product-certificates')).toBeInTheDocument()
     expect(screen.getByTestId('mock-product-certificates')).toHaveTextContent('2 certificates')
@@ -501,14 +494,30 @@ describe('ProductDetailClient', () => {
   })
 
   it('should render in RTL direction', () => {
-    const { container } = renderWithLayout(
-      <ProductDetailClient certificatesHeader={mockCertificatesHeader} product={mockProduct} />,
-      {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.RTL },
-      }
-    )
+    const { container } = renderWithLayout(<ProductDetailClient {...defaultProps} />, {
+      layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.RTL },
+    })
 
     const rtlContainer = container.querySelector('[dir="rtl"]')
     expect(rtlContainer).toBeInTheDocument()
+  })
+
+  it('should render related products carousel when related products are present', () => {
+    renderWithLayout(<ProductDetailClient {...defaultProps} />, {
+      layoutContext: { lang: CodeEnum.EN },
+    })
+
+    expect(screen.getByText('Related Products')).toBeInTheDocument()
+    expect(screen.getByTestId('mock-carousel')).toBeInTheDocument()
+    expect(screen.getAllByTestId('mock-product-card')).toHaveLength(2)
+  })
+
+  it('should not render related products section when related products are empty', () => {
+    renderWithLayout(<ProductDetailClient {...defaultProps} relatedProducts={[]} />, {
+      layoutContext: { lang: CodeEnum.EN },
+    })
+
+    expect(screen.queryByText('Related Products')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('mock-carousel')).not.toBeInTheDocument()
   })
 })
