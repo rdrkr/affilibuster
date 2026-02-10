@@ -108,7 +108,7 @@ export function NewsletterSignupCTA({ data, direction }: NewsletterSignupCTAProp
               className={`
                 rounded-full bg-primary px-6 py-2.5 text-sm font-bold
                 whitespace-nowrap text-background-dark shadow-lg
-                hover:bg-primary-hover
+                hover:bg-primary-hover active:bg-primary-800
               `}
               onClick={() => {
                 // Submit is handled by form onSubmit, but onClick is required by ButtonAction

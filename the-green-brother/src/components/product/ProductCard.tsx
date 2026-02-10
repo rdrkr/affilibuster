@@ -182,8 +182,8 @@ export function ProductCard({
                 z-20 flex size-10 items-center justify-center
                 rounded-full bg-white/50 text-neutral-800
                 backdrop-blur-md transition-colors hover:bg-primary
-                hover:text-black dark:bg-background-dark/50
-                dark:text-white
+                hover:text-black active:bg-primary-600 active:text-black
+                dark:bg-background-dark/50 dark:text-white dark:active:bg-primary-600
               `}
               aria-label={product.header.header?.ariaDescription ?? 'Add to favorites'}
               onClick={e => {

@@ -301,7 +301,7 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
             }}
             className={`
               flex shrink-0
-              hover:text-white
+              transition-transform hover:text-white active:scale-95
             `}
             aria-label="Close search"
           >
@@ -377,6 +377,7 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
                         className={`
                         material-symbols-outlined text-neutral-500
                         group-hover:text-primary group-hover:text-shadow-sm
+                        group-active:text-primary-700
                         dark:text-text-secondary-dark dark:group-hover:text-shadow-none
                       `}
                       >
@@ -406,7 +407,8 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
                     href="/products"
                     className={`
                       flex items-center gap-4 px-4 py-3 transition-colors
-                      hover:bg-neutral-100 dark:hover:bg-white/5
+                      hover:bg-neutral-100 active:bg-neutral-200
+                      dark:hover:bg-white/5 dark:active:bg-white/10
                     `}
                   >
                     <NextImage

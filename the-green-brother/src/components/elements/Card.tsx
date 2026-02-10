@@ -91,31 +91,31 @@ const sizeConfig: Record<
   }
 > = {
   xs: {
-    imageHorizontal: 'h-24 w-24 shrink-0 grow-0',
-    imageVertical: 'h-24 w-full shrink-0 grow-0',
+    imageHorizontal: 'rounded-3xl h-24 w-24 shrink-0 grow-0',
+    imageVertical: 'rounded-3xl h-24 w-full shrink-0 grow-0',
     paddingClasses: 'ps-3 pe-0',
     imageMarginHorizontal: 'my-3',
   },
   sm: {
-    imageHorizontal: 'aspect-square w-[3/7] shrink-0 grow-0',
-    imageVertical: 'aspect-square w-full shrink-0 grow-0',
+    imageHorizontal: 'rounded-lg aspect-square w-[3/7] shrink-0 grow-0',
+    imageVertical: 'rounded-3xl aspect-square w-full shrink-0 grow-0',
     paddingClasses: 'p-4',
     imageMarginHorizontal: 'my-4',
   },
   md: {
-    imageHorizontal: 'md:w-1/2 shrink-0 grow-0',
-    imageVertical: 'h-48 w-full shrink-0 grow-0',
+    imageHorizontal: 'rounded-3xl md:w-1/2 shrink-0 grow-0',
+    imageVertical: 'rounded-3xl h-48 w-full shrink-0 grow-0',
     paddingClasses: 'p-5',
     imageMarginHorizontal: 'mb-5',
   },
   lg: {
-    imageHorizontal: 'h-full md:w-1/2 shrink-0 grow-0',
-    imageVertical: 'h-64 w-full shrink-0 grow-0',
+    imageHorizontal: 'rounded-3xl h-full md:w-1/2 shrink-0 grow-0',
+    imageVertical: 'rounded-3xl h-64 w-full shrink-0 grow-0',
     paddingClasses: 'p-5',
   },
   xl: {
-    imageHorizontal: 'h-64 md:h-[500px] md:w-1/2 shrink-0 grow-0',
-    imageVertical: 'h-64 w-full shrink-0 grow-0',
+    imageHorizontal: 'rounded-3xl h-64 md:h-[500px] md:w-1/2 shrink-0 grow-0',
+    imageVertical: 'rounded-3xl h-64 w-full shrink-0 grow-0',
     paddingClasses: 'p-8 md:p-12',
   },
 }
@@ -198,6 +198,7 @@ export function Card({
     m-1 transition-all duration-300
     hover:-translate-y-1 hover:transform hover:border-primary/30
     dark:hover:border-primary/30
+    active:scale-[0.98] active:translate-y-0
     `
 
   const cardClasses = `
@@ -232,7 +233,7 @@ export function Card({
       ? isHorizontalLayout
         ? `self-center ${circleImageSizeClasses[size]} rounded-full`
         : `mx-auto mt-6 ${circleImageSizeClasses[size]} rounded-full`
-      : `rounded-3xl ${sizeClasses.imageClasses}`
+      : sizeClasses.imageClasses
 
   // Apply margin to image in horizontal mode for xs and sm sizes
   // For circle images, skip vertical margin as centering is handled by flex items-center

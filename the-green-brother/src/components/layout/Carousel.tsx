@@ -369,7 +369,7 @@ function HeroCarousel({
               className={`size-1.5 cursor-pointer rounded-full transition-colors duration-200 md:size-3 ${
                 index === activeIndex
                   ? 'bg-primary-600'
-                  : 'bg-neutral-300 hover:bg-neutral-400 dark:bg-neutral-600 dark:hover:bg-neutral-500'
+                  : 'bg-neutral-300 hover:bg-neutral-400 active:bg-neutral-500 dark:bg-neutral-600 dark:hover:bg-neutral-500 dark:active:bg-neutral-400'
               }`}
               onClick={() => {
                 scrollToSlide(index)

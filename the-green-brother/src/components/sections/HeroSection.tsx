@@ -107,7 +107,7 @@ export function HeroSection({
           className={`
             mt-10
             shadow-lg shadow-primary/20
-            hover:scale-105
+            hover:scale-105 active:scale-95
           `}
         />
       )}

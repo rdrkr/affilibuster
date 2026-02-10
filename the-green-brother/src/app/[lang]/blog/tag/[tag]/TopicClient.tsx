@@ -67,7 +67,6 @@ export default function TopicClient({
     showTag: false,
     noAnimation: true,
     asLink: true,
-
     readTimeMinutesLabel: readTimeMinutesLabel,
     readArticleLabel: readArticleLabel,
     layout: 'rtl' as CardLayout,

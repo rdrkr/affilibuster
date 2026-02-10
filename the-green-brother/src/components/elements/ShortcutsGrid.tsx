@@ -84,6 +84,7 @@ export function ShortcutsGrid({
       border border-neutral-200 dark:border-white/10
       group-hover:scale-110 group-hover:border-primary
       group-hover:bg-primary
+      group-active:scale-95 group-active:bg-primary-600 group-active:border-primary-600
     `
 
   const iconAnimation = noAnimation
@@ -91,6 +92,7 @@ export function ShortcutsGrid({
     : `
       transition-colors
       group-hover:text-background-dark
+      group-active:text-white
     `
 
   const textAnimation = noAnimation
@@ -98,6 +100,7 @@ export function ShortcutsGrid({
     : `
       mt-3 font-semibold
       transition-colors group-hover:text-neutral-800 dark:group-hover:text-white
+      group-active:text-neutral-900 dark:group-active:text-white
     `
 
   const gapSizeClasses: Record<HeaderLevel, string> = {

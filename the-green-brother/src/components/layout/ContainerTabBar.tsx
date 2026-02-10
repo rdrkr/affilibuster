@@ -252,7 +252,7 @@ export function ContainerTabBar<T = unknown>({ tabs, activeKey, onTabChange, dir
                 ${
                   isActive
                     ? 'text-neutral-900 dark:text-white'
-                    : 'text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white'
+                    : 'text-neutral-700 hover:text-neutral-900 active:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:active:text-white'
                 }
               `}
             >

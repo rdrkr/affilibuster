@@ -127,7 +127,8 @@ export function BlogCard({
         headerClassName={`
           line-clamp-2 leading-snug
           text-neutral-800 transition-colors group-hover:text-primary group-hover:text-shadow-sm
-          dark:text-white dark:group-hover:text-shadow-none
+          active:text-primary-700
+          dark:text-white dark:group-hover:text-shadow-none dark:active:text-primary-400
         `}
         subheaderTextClassName="line-clamp-3"
       />
@@ -164,7 +165,9 @@ export function BlogCard({
             ? `
             text-neutral-800! transition-colors!
             group-hover:text-primary! group-hover:text-shadow-sm!
+            group-active:text-primary-700!
             dark:text-white! dark:group-hover:text-shadow-none!
+            dark:group-active:text-primary-400!
             `
             : 'pointer-events-auto'
         }

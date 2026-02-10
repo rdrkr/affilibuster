@@ -122,22 +122,22 @@ export default function StyleGuideClient(): React.ReactElement {
                 <h3 className="mb-4 text-xl font-bold text-primary">Elements</h3>
                 <ul className="space-y-2 text-text-secondary-dark">
                   <li>
-                    <a href="#blog-card" className="hover:text-primary-hover">
+                    <a href="#blog-card" className="hover:text-primary-hover active:text-primary-700">
                       • BlogCard - Blog post preview
                     </a>
                   </li>
                   <li>
-                    <a href="#product-card" className="hover:text-primary-hover">
+                    <a href="#product-card" className="hover:text-primary-hover active:text-primary-700">
                       • ProductCard - Product display
                     </a>
                   </li>
                   <li>
-                    <a href="#contributor-card" className="hover:text-primary-hover">
+                    <a href="#contributor-card" className="hover:text-primary-hover active:text-primary-700">
                       • ContributorCard - Team member profile
                     </a>
                   </li>
                   <li>
-                    <a href="#card-heights" className="hover:text-primary-hover">
+                    <a href="#card-heights" className="hover:text-primary-hover active:text-primary-700">
                       • Card Height Variants - Full/Fixed height examples
                     </a>
                   </li>

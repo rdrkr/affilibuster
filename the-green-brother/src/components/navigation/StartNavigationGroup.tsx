@@ -148,7 +148,7 @@ export function StartNavigationGroup({
             slideDirection="end-to-start"
             iconPriority
             className={`
-              text-black! hover:text-black
+              text-black! hover:text-black active:scale-95
               dark:text-white! dark:hover:text-white
               ${isBrandTextVisible ? (direction === DirectionEnum.RTL ? 'ml-3' : 'mr-3') : ''}
               [&]:inline-flex [&]:overflow-hidden [&]:whitespace-nowrap

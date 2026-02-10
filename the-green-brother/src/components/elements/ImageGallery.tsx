@@ -222,6 +222,7 @@ export function ImageGallery({
                 flex size-10 items-center justify-center rounded-full
                 bg-white/50 text-neutral-800 backdrop-blur-md
                 transition-colors hover:bg-primary hover:text-black
+                active:bg-primary-600
                 dark:bg-background-dark/50 dark:text-white
               `}
               aria-label="Add to favorites"
@@ -246,6 +247,7 @@ export function ImageGallery({
                 aspect-square overflow-hidden rounded-xl border-2
                 ${index === selectedImageIndex ? 'border-primary-500' : 'border-transparent'}
                 relative bg-white transition-all duration-300 hover:border-primary-500/50
+                active:border-primary-600
                 dark:bg-tertiary-800
               `}
               aria-label={img.alternativeText ?? `View image ${String(index + 1)}`}

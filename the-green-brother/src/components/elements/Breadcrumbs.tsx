@@ -145,7 +145,7 @@ export function Breadcrumbs({
                   direction={direction}
                   variant="link-1"
                   size="sm"
-                  className={`${defaultClassName} hover:text-primary-500!`}
+                  className={`${defaultClassName} hover:text-primary-500! active:text-primary-700!`}
                   data={linkButtonData}
                   noAnimation
                 />

@@ -68,21 +68,21 @@ export function getVariantClasses(
       cursor-pointer transform
       ${isRTL ? 'ms-0.5 me-1.5' : 'ms-1.5 me-0.5'}
       bg-primary text-background-dark font-bold
-      hover:bg-primary-hover
+      hover:bg-primary-hover active:bg-primary-700
       disabled:bg-tertiary-500 disabled:cursor-not-allowed
     `,
     secondary: `
       cursor-pointer
       bg-black/5 text-primary font-semibold text-shadow-sm
       dark:bg-white/5 dark:text-shadow-none
-      hover:bg-primary hover:text-background-dark
+      hover:bg-primary hover:text-background-dark active:bg-primary-600
       disabled:bg-tertiary-500 disabled:text-tertiary-500 disabled:cursor-not-allowed
     `,
     outline: `
       cursor-pointer
       border-2 border-primary text-primary font-bold text-shadow-sm
       dark:text-shadow-none
-      hover:bg-primary hover:text-background-dark
+      hover:bg-primary hover:text-background-dark active:bg-primary-600
       disabled:border-tertiary-500 disabled:text-tertiary-500 disabled:cursor-not-allowed
     `,
     'ghost-1': `
@@ -95,6 +95,7 @@ export function getVariantClasses(
           : `text-black dark:text-text-secondary-dark`
       }
       hover:bg-transparent hover:text-primary hover:text-shadow-sm dark:hover:text-shadow-none
+      active:text-primary-600 dark:active:text-primary-400
       disabled:text-tertiary-500 disabled:cursor-not-allowed
       ${
         noAnimation
@@ -116,6 +117,7 @@ export function getVariantClasses(
       transition-colors text-neutral-700 dark:text-white
       ${isActive ? `bg-neutral-100 dark:bg-white/5` : `bg-transparent`}
       hover:bg-neutral-100 dark:hover:bg-white/10
+      active:bg-neutral-200 dark:active:bg-white/20
       disabled:text-tertiary-500 disabled:cursor-not-allowed
     `,
     'ghost-3': `
@@ -124,32 +126,33 @@ export function getVariantClasses(
       transition-colors
       ${
         isActive
-          ? `bg-primary text-background-dark hover:bg-primary-hover`
-          : `bg-neutral-100 text-neutral-700 dark:bg-white/5 dark:text-white hover:bg-neutral-200 dark:hover:bg-white/10`
+          ? `bg-primary text-background-dark hover:bg-primary-hover active:bg-primary-700`
+          : `bg-neutral-100 text-neutral-700 dark:bg-white/5 dark:text-white hover:bg-neutral-200 dark:hover:bg-white/10 active:bg-neutral-300 dark:active:bg-white/20`
       }
       disabled:text-tertiary-500 disabled:cursor-not-allowed
     `,
     'link-1': `
       cursor-pointer
       font-medium font-semibold no-underline
-      text-primary text-shadow-sm hover:text-primary-hover
-      dark:text-primary dark:text-shadow-none dark:hover:text-primary-hover
+      text-primary text-shadow-sm hover:text-primary-hover active:text-primary-600
+      dark:text-primary dark:text-shadow-none dark:hover:text-primary-hover dark:active:text-primary-400
       disabled:text-tertiary-500 disabled:cursor-not-allowed
       ${
         noAnimation
           ? ''
-          : 'transition-all duration-300 hover:scale-105 hover:text-shadow-shimmer disabled:hover:scale-100'
+          : 'transition-all duration-300 hover:scale-105 hover:text-shadow-shimmer disabled:hover:scale-100 active:scale-95'
       }
     `,
     'link-2': `
       cursor-pointer
       font-medium no-underline
-      text-neutral-600 hover:text-neutral-800 dark:text-text-secondary-dark dark:hover:text-text-main-dark
+      text-neutral-600 hover:text-neutral-800 active:text-neutral-900
+      dark:text-text-secondary-dark dark:hover:text-text-main-dark dark:active:text-white
       disabled:text-tertiary-500 disabled:cursor-not-allowed
       ${
         noAnimation
           ? ''
-          : 'transition-all duration-300 hover:scale-105 hover:text-shadow-shimmer disabled:hover:scale-100'
+          : 'transition-all duration-300 hover:scale-105 hover:text-shadow-shimmer disabled:hover:scale-100 active:scale-95'
       }
     `,
     'scroll-arrow': `
@@ -158,9 +161,9 @@ export function getVariantClasses(
       border-neutral-200 bg-white/50
       shadow-lg backdrop-blur-sm
       transition-opacity duration-300 ease-in-out
-      hover:bg-white/70
+      hover:bg-white/70 active:bg-white/90
       dark:border-white/10 dark:bg-neutral-800/30
-      dark:hover:bg-neutral-800/50
+      dark:hover:bg-neutral-800/50 dark:active:bg-neutral-800/70
     `,
   }
   return variants[variant]
