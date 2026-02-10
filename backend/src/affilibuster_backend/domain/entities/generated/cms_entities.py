@@ -43,6 +43,12 @@ from affilibuster_backend.domain.entities.generated.models import (
     BlogPostTagsGetResponse,
     BlogPostTagsIdGetParametersQuery,
     BlogPostTagsIdGetResponse,
+    ConsentCategoriesGetParametersQuery,
+    ConsentCategoriesGetResponse,
+    ConsentCategoriesIdGetParametersQuery,
+    ConsentCategoriesIdGetResponse,
+    ConsentGetParametersQuery,
+    ConsentGetResponse,
     ContactUsGetParametersQuery,
     ContactUsGetResponse,
     ContributorRolesGetParametersQuery,
@@ -55,6 +61,8 @@ from affilibuster_backend.domain.entities.generated.models import (
     ContributorsIdGetResponse,
     ContributorsSlugSlugGetParametersQuery,
     ContributorsSlugSlugGetResponse,
+    CookiePolicyGetParametersQuery,
+    CookiePolicyGetResponse,
     CurrenciesGetParametersQuery,
     CurrenciesGetResponse,
     CurrenciesIdGetParametersQuery,
@@ -159,12 +167,16 @@ CMSRequest = (
     | BlogPostsSlugSlugGetParametersQuery
     | BlogPostTagsGetParametersQuery
     | BlogPostTagsIdGetParametersQuery
+    | ConsentCategoriesGetParametersQuery
+    | ConsentCategoriesIdGetParametersQuery
+    | ConsentGetParametersQuery
     | ContactUsGetParametersQuery
     | ContributorRolesGetParametersQuery
     | ContributorRolesIdGetParametersQuery
     | ContributorsGetParametersQuery
     | ContributorsIdGetParametersQuery
     | ContributorsSlugSlugGetParametersQuery
+    | CookiePolicyGetParametersQuery
     | CurrenciesGetParametersQuery
     | CurrenciesIdGetParametersQuery
     | Error404GetParametersQuery
@@ -207,12 +219,16 @@ CMSResponse = (
     | BlogPostsSlugSlugGetResponse
     | BlogPostTagsGetResponse
     | BlogPostTagsIdGetResponse
+    | ConsentCategoriesGetResponse
+    | ConsentCategoriesIdGetResponse
+    | ConsentGetResponse
     | ContactUsGetResponse
     | ContributorRolesGetResponse
     | ContributorRolesIdGetResponse
     | ContributorsGetResponse
     | ContributorsIdGetResponse
     | ContributorsSlugSlugGetResponse
+    | CookiePolicyGetResponse
     | CurrenciesGetResponse
     | CurrenciesIdGetResponse
     | Error404GetResponse

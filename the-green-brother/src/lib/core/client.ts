@@ -160,7 +160,7 @@ function serializeQuery(query?: Record<string, unknown>): string {
  * ```typescript
  * // GET request with query params
  * const request: HomepageGetHomepageData = {
- *   query: { locale: CodeEnum.EN, populate: '*' },
+ *   query: { locale: LanguageCode.EN, populate: '*' },
  *   url: '/homepage'  // Single source of truth
  * }
  * const response = await apiRequest<HomepageGetHomepageResponses[200]>(request)

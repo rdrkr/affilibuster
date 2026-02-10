@@ -20,7 +20,7 @@ jest.mock('@/app/[lang]/blog/BlogClient', () => ({
   default: function MockBlogClient(props: {
     blogPageData: unknown
     posts: unknown[]
-    lang: CodeEnum
+    lang: LanguageCode
     direction: DirectionEnum
   }) {
     return (
@@ -36,7 +36,7 @@ jest.mock('@/app/[lang]/blog/BlogClient', () => ({
 
 import BlogPage from '@/app/[lang]/blog/page'
 import { getBlog, getBlogPosts } from '@/lib/content'
-import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
+import { LanguageCode, DirectionEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
 import { render, screen } from '@testing-library/react'
 
@@ -48,8 +48,8 @@ describe('BlogPage', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockGetLanguages.mockResolvedValue([
-      { code: CodeEnum.EN, direction: DirectionEnum.LTR },
-      { code: CodeEnum.IT, direction: DirectionEnum.LTR },
+      { code: LanguageCode.EN, direction: DirectionEnum.LTR },
+      { code: LanguageCode.IT, direction: DirectionEnum.LTR },
     ] as unknown as Awaited<ReturnType<typeof getLanguages>>)
   })
 
@@ -60,13 +60,13 @@ describe('BlogPage', () => {
     mockGetBlog.mockResolvedValue(mockBlogData as Awaited<ReturnType<typeof getBlog>>)
     mockGetBlogPosts.mockResolvedValue(mockPosts as Awaited<ReturnType<typeof getBlogPosts>>)
 
-    const Component = await BlogPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+    const Component = await BlogPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
-    expect(mockGetBlog).toHaveBeenCalledWith(CodeEnum.EN)
+    expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.EN)
     expect(mockGetBlogPosts).toHaveBeenCalledWith({
       pagination: { page: 1, pageSize: 100 },
-      locale: CodeEnum.EN,
+      locale: LanguageCode.EN,
     })
     expect(screen.getByTestId('blog-client')).toBeInTheDocument()
     expect(screen.getByTestId('blog-client').getAttribute('data-post-count')).toBe('2')
@@ -76,7 +76,7 @@ describe('BlogPage', () => {
     mockGetBlog.mockResolvedValue(null)
     mockGetBlogPosts.mockResolvedValue(null)
 
-    const Component = await BlogPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+    const Component = await BlogPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
     expect(screen.getByTestId('blog-client').getAttribute('data-post-count')).toBe('0')

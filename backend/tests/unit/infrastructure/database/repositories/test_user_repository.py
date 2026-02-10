@@ -429,6 +429,64 @@ class TestUserRepositoryToEntity:
 
 
 @pytest.mark.unit
+class TestUserRepositoryGetSoftDeletedBefore:
+    """Test UserRepository.get_soft_deleted_before() method."""
+
+    async def test_returns_user_ids_past_cutoff(self) -> None:
+        """Test returns IDs of users soft-deleted before cutoff."""
+        mock_session = AsyncMock()
+
+        user_id_1 = uuid4()
+        user_id_2 = uuid4()
+
+        mock_scalars = MagicMock()
+        mock_scalars.all.return_value = [user_id_1, user_id_2]
+        mock_result = MagicMock()
+        mock_result.scalars.return_value = mock_scalars
+        mock_session.execute.return_value = mock_result
+
+        repo = UserRepository(mock_session)
+        cutoff = datetime.now(UTC)
+        result = await repo.get_soft_deleted_before(cutoff)
+
+        assert result == [user_id_1, user_id_2]
+        mock_session.execute.assert_called_once()
+
+    async def test_returns_empty_list_when_no_soft_deleted_users(self) -> None:
+        """Test returns empty list when no soft-deleted users exist."""
+        mock_session = AsyncMock()
+
+        mock_scalars = MagicMock()
+        mock_scalars.all.return_value = []
+        mock_result = MagicMock()
+        mock_result.scalars.return_value = mock_scalars
+        mock_session.execute.return_value = mock_result
+
+        repo = UserRepository(mock_session)
+        cutoff = datetime.now(UTC)
+        result = await repo.get_soft_deleted_before(cutoff)
+
+        assert result == []
+
+    async def test_returns_empty_list_when_users_within_retention(self) -> None:
+        """Test returns empty list when all soft-deleted users are within retention period."""
+        mock_session = AsyncMock()
+
+        mock_scalars = MagicMock()
+        mock_scalars.all.return_value = []
+        mock_result = MagicMock()
+        mock_result.scalars.return_value = mock_scalars
+        mock_session.execute.return_value = mock_result
+
+        repo = UserRepository(mock_session)
+        cutoff = datetime.now(UTC)
+        result = await repo.get_soft_deleted_before(cutoff)
+
+        assert result == []
+        mock_session.execute.assert_called_once()
+
+
+@pytest.mark.unit
 class TestUserRepositoryEdgeCases:
     """Test UserRepository edge cases and error handling."""
 

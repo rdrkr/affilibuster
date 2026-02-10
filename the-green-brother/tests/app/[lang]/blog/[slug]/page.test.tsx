@@ -34,7 +34,7 @@ jest.mock('@/app/[lang]/blog/[slug]/BlogPostClient', () => ({
 
 import BlogPostPage from '@/app/[lang]/blog/[slug]/page'
 import { getBlogPostBySlug, getNavigation } from '@/lib/content'
-import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
+import { LanguageCode, DirectionEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages'
 import { render, screen } from '@testing-library/react'
 
@@ -45,7 +45,7 @@ const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigat
 describe('BlogPostPage', () => {
   const mockLanguages = [
     {
-      code: CodeEnum.EN,
+      code: LanguageCode.EN,
       displayName: 'English',
       nativeName: 'English',
       flag: '🇬🇧',
@@ -56,7 +56,7 @@ describe('BlogPostPage', () => {
       isDefault: true,
     },
     {
-      code: CodeEnum.IT,
+      code: LanguageCode.IT,
       displayName: 'Italian',
       nativeName: 'Italiano',
       flag: '🇮🇹',
@@ -90,19 +90,19 @@ describe('BlogPostPage', () => {
     const mockPost = { documentId: 'post-1', slug: 'post-slug', content: { header: {} } }
     mockGetBlogPostBySlug.mockResolvedValue(mockPost as Awaited<ReturnType<typeof getBlogPostBySlug>>)
 
-    const Component = await BlogPostPage({ params: Promise.resolve({ lang: CodeEnum.EN, slug: 'post-slug' }) })
+    const Component = await BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'post-slug' }) })
     render(Component)
 
-    expect(mockGetBlogPostBySlug).toHaveBeenCalledWith('post-slug', { locale: CodeEnum.EN })
+    expect(mockGetBlogPostBySlug).toHaveBeenCalledWith('post-slug', { locale: LanguageCode.EN })
     expect(mockGetLanguages).toHaveBeenCalled()
-    expect(mockGetNavigation).toHaveBeenCalledWith(CodeEnum.EN)
+    expect(mockGetNavigation).toHaveBeenCalledWith(LanguageCode.EN)
     expect(screen.getByTestId('blog-post-client')).toBeInTheDocument()
   })
 
   it('should call notFound when post is null', async () => {
     mockGetBlogPostBySlug.mockResolvedValue(null)
 
-    await BlogPostPage({ params: Promise.resolve({ lang: CodeEnum.EN, slug: 'non-existent' }) })
+    await BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'non-existent' }) })
 
     expect(mockNotFound).toHaveBeenCalled()
   })
@@ -112,7 +112,7 @@ describe('BlogPostPage', () => {
     mockGetBlogPostBySlug.mockResolvedValue(mockPost as Awaited<ReturnType<typeof getBlogPostBySlug>>)
     mockGetNavigation.mockResolvedValue(null)
 
-    await BlogPostPage({ params: Promise.resolve({ lang: CodeEnum.EN, slug: 'post-slug' }) })
+    await BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'post-slug' }) })
 
     expect(mockNotFound).toHaveBeenCalled()
   })
@@ -126,7 +126,7 @@ describe('BlogPostPage', () => {
     const { getBlog } = require('@/lib/content') as { getBlog: jest.Mock }
     getBlog.mockResolvedValue(null)
 
-    await BlogPostPage({ params: Promise.resolve({ lang: CodeEnum.EN, slug: 'post-slug' }) })
+    await BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'post-slug' }) })
 
     expect(mockNotFound).toHaveBeenCalled()
   })
@@ -138,7 +138,7 @@ describe('BlogPostPage', () => {
     const { getBlog } = require('@/lib/content') as { getBlog: jest.Mock }
     getBlog.mockResolvedValue({ id: 1 } as any)
 
-    const Component = await BlogPostPage({ params: Promise.resolve({ lang: CodeEnum.EN, slug: 'post-slug' }) })
+    const Component = await BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'post-slug' }) })
     render(Component)
 
     expect(screen.getByTestId('blog-post-client')).toBeInTheDocument()

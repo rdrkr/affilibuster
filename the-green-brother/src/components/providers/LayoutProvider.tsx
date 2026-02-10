@@ -2,12 +2,12 @@
 
 'use client'
 
-import { ApiNavigationNavigationDocument, CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
+import { ApiNavigationNavigationDocument, LanguageCode, DirectionEnum } from '@/lib/generated/types.gen'
 import { createContext, ReactNode, useContext } from 'react'
 
 interface LayoutContextType {
   /** Current language code */
-  lang: CodeEnum
+  lang: LanguageCode
   /** Text direction for RTL/LTR layout */
   direction: DirectionEnum
   /** Navigation data from CMS */

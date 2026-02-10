@@ -7,7 +7,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 
 import { LanguageMenu, type LanguageMenuProps } from '@/components/menus/LanguageMenu'
-import { CodeEnum, DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
+import { LanguageCode, DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 
 // Mock the CMS element components
 jest.mock('@/components/elements', () => ({
@@ -120,9 +120,9 @@ describe('LanguageMenu', () => {
   }
 
   const mockLanguages: LanguageMenuProps['languages'] = [
-    { name: 'English', flag: '🇺🇸', code: CodeEnum.EN },
-    { name: 'Italiano', flag: '🇮🇹', code: CodeEnum.IT },
-    { name: 'עברית', flag: '🇮🇱', code: CodeEnum.HE },
+    { name: 'English', flag: '🇺🇸', code: LanguageCode.EN },
+    { name: 'Italiano', flag: '🇮🇹', code: LanguageCode.IT },
+    { name: 'עברית', flag: '🇮🇱', code: LanguageCode.HE },
   ]
 
   beforeEach(() => {
@@ -134,7 +134,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -149,7 +149,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -167,7 +167,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -185,7 +185,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -200,7 +200,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -210,7 +210,7 @@ describe('LanguageMenu', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Select language' }))
     const italianButton = screen.getByText(/Italiano/).closest('button')
     fireEvent.click(italianButton!)
-    expect(mockOnLanguageChange).toHaveBeenCalledWith(CodeEnum.IT)
+    expect(mockOnLanguageChange).toHaveBeenCalledWith(LanguageCode.IT)
   })
 
   it('should highlight selected language', () => {
@@ -218,7 +218,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.IT}
+        selectedLang={LanguageCode.IT}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -235,7 +235,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -252,7 +252,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -272,7 +272,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.RTL}
         showText={true}
@@ -298,7 +298,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockDataIconAfter}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -324,7 +324,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockDataNoIcon}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -347,7 +347,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockDataNoLabel}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -362,7 +362,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -387,7 +387,7 @@ describe('LanguageMenu', () => {
         <LanguageMenu
           data={mockData}
           languages={mockLanguages}
-          selectedLang={CodeEnum.EN}
+          selectedLang={LanguageCode.EN}
           onLanguageChange={mockOnLanguageChange}
           direction={DirectionEnum.LTR}
           showText={true}
@@ -410,7 +410,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -433,7 +433,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -468,7 +468,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -492,7 +492,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -517,7 +517,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -545,7 +545,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={true}
@@ -559,7 +559,7 @@ describe('LanguageMenu', () => {
       <LanguageMenu
         data={mockData}
         languages={mockLanguages}
-        selectedLang={CodeEnum.EN}
+        selectedLang={LanguageCode.EN}
         onLanguageChange={mockOnLanguageChange}
         direction={DirectionEnum.LTR}
         showText={false}
@@ -574,7 +574,7 @@ describe('LanguageMenu', () => {
         <LanguageMenu
           data={mockData}
           languages={mockLanguages}
-          selectedLang={CodeEnum.EN}
+          selectedLang={LanguageCode.EN}
           onLanguageChange={mockOnLanguageChange}
           direction={DirectionEnum.LTR}
           showText={true}
@@ -588,7 +588,7 @@ describe('LanguageMenu', () => {
         <LanguageMenu
           data={mockData}
           languages={mockLanguages}
-          selectedLang={CodeEnum.EN}
+          selectedLang={LanguageCode.EN}
           onLanguageChange={mockOnLanguageChange}
           direction={DirectionEnum.LTR}
           showText={true}

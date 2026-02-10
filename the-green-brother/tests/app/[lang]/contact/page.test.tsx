@@ -19,7 +19,7 @@ jest.mock('@/app/[lang]/contact/ContactClient', () => ({
 
 import ContactPage from '@/app/[lang]/contact/page'
 import { getContactUs } from '@/lib/content'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 
 const mockGetContactUs = getContactUs as jest.MockedFunction<typeof getContactUs>
@@ -33,10 +33,10 @@ describe('ContactPage', () => {
     const mockContactData = { title: 'Contact Us', subtitle: 'Get in touch' }
     mockGetContactUs.mockResolvedValue(mockContactData as Awaited<ReturnType<typeof getContactUs>>)
 
-    const Component = await ContactPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+    const Component = await ContactPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
-    expect(mockGetContactUs).toHaveBeenCalledWith(CodeEnum.EN)
+    expect(mockGetContactUs).toHaveBeenCalledWith(LanguageCode.EN)
     expect(screen.getByTestId('contact-client')).toBeInTheDocument()
     expect(screen.getByTestId('contact-client').getAttribute('data-has-data')).toBe('true')
   })
@@ -44,7 +44,7 @@ describe('ContactPage', () => {
   it('should pass null when contact data is not available', async () => {
     mockGetContactUs.mockResolvedValue(null)
 
-    const Component = await ContactPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+    const Component = await ContactPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
     expect(screen.getByTestId('contact-client').getAttribute('data-has-data')).toBe('false')
@@ -53,8 +53,8 @@ describe('ContactPage', () => {
   it('should work with Italian locale', async () => {
     mockGetContactUs.mockResolvedValue({ title: 'Contattaci' } as Awaited<ReturnType<typeof getContactUs>>)
 
-    await ContactPage({ params: Promise.resolve({ lang: CodeEnum.IT }) })
+    await ContactPage({ params: Promise.resolve({ lang: LanguageCode.IT }) })
 
-    expect(mockGetContactUs).toHaveBeenCalledWith(CodeEnum.IT)
+    expect(mockGetContactUs).toHaveBeenCalledWith(LanguageCode.IT)
   })
 })

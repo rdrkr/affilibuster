@@ -6,7 +6,7 @@ import {
   DirectionEnum,
   IconPositionEnum,
   type ApiNavigationNavigationDocument,
-  type CodeEnum,
+  type LanguageCode,
   type ElementsButtonEntry,
 } from '@/lib/generated/types.gen'
 
@@ -15,7 +15,7 @@ import { Text } from './Text'
 
 export interface BreadcrumbsProps {
   /** Current language code */
-  lang: CodeEnum
+  lang: LanguageCode
   /** Current pathname (pass from server or client parent) */
   pathname: string
   /** Text direction for RTL/LTR layout */

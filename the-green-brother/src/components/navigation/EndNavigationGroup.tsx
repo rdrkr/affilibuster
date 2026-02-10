@@ -14,7 +14,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState, type SyntheticEvent } from 'react'
 
 import type { ApiNavigationNavigationDocument } from '@/lib/generated/types.gen'
-import { CodeEnum, DirectionEnum, type Language } from '@/lib/generated/types.gen'
+import { LanguageCode, DirectionEnum, type Language } from '@/lib/generated/types.gen'
 import { THRESHOLDS } from '@/lib/navigation'
 import { ThemeMode } from '@/lib/themes'
 
@@ -28,13 +28,13 @@ import { buildStartNavLinks } from './StartNavigationGroup'
  * @param pathname - The current URL pathname
  * @returns The language code
  */
-function getLanguageFromPathname(pathname: string): CodeEnum {
+function getLanguageFromPathname(pathname: string): LanguageCode {
   const segments = pathname.split('/').filter(Boolean)
   const firstSegment = segments[0]
   if (firstSegment?.length === 2) {
-    return firstSegment as CodeEnum
+    return firstSegment as LanguageCode
   }
-  return CodeEnum.EN
+  return LanguageCode.EN
 }
 
 /**
@@ -43,7 +43,7 @@ function getLanguageFromPathname(pathname: string): CodeEnum {
  * @param newLang - The new language code to use
  * @returns The pathname with the language segment replaced
  */
-function replaceLanguageInPathname(pathname: string, newLang: CodeEnum): string {
+function replaceLanguageInPathname(pathname: string, newLang: LanguageCode): string {
   const segments = pathname.split('/').filter(Boolean)
   const firstSegment = segments[0]
   if (firstSegment?.length === 2) {
@@ -158,7 +158,7 @@ export function EndNavigationGroup({
    * Handles language change by navigating to the new locale path
    */
   const handleLanguageChange = useCallback(
-    (langCode: CodeEnum): void => {
+    (langCode: LanguageCode): void => {
       if (langCode !== currentLang) {
         const newPath = replaceLanguageInPathname(pathname, langCode)
         router.push(newPath)

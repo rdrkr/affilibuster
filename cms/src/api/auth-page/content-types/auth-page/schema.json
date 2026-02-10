@@ -22,50 +22,38 @@
       "default": "Auth Page",
       "required": true
     },
-    "loginTitle": {
-      "type": "string",
+    "loginHeader": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
     },
-    "loginSubtitle": {
-      "type": "text",
+    "signupHeader": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
-    },
-    "signupTitle": {
-      "type": "string",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "required": false
-    },
-    "signupSubtitle": {
-      "type": "text",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "required": false
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
     },
     "emailLabel": {
-      "type": "string",
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
     },
     "emailPlaceholder": {
       "type": "string",
@@ -74,16 +62,18 @@
           "localized": true
         }
       },
-      "required": false
+      "required": true
     },
     "passwordLabel": {
-      "type": "string",
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
     },
     "passwordPlaceholder": {
       "type": "string",
@@ -92,16 +82,18 @@
           "localized": true
         }
       },
-      "required": false
+      "required": true
     },
     "nameLabel": {
-      "type": "string",
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
     },
     "namePlaceholder": {
       "type": "string",
@@ -110,34 +102,40 @@
           "localized": true
         }
       },
-      "required": false
+      "required": true
     },
     "loginButton": {
-      "type": "string",
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
     },
     "signupButton": {
-      "type": "string",
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
     },
-    "forgotPasswordLink": {
-      "type": "string",
+    "forgotPasswordButton": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
     },
     "noAccountText": {
       "type": "string",
@@ -146,7 +144,7 @@
           "localized": true
         }
       },
-      "required": false
+      "required": true
     },
     "signupLinkText": {
       "type": "string",
@@ -155,7 +153,7 @@
           "localized": true
         }
       },
-      "required": false
+      "required": true
     },
     "haveAccountText": {
       "type": "string",
@@ -164,7 +162,7 @@
           "localized": true
         }
       },
-      "required": false
+      "required": true
     },
     "loginLinkText": {
       "type": "string",
@@ -173,7 +171,7 @@
           "localized": true
         }
       },
-      "required": false
+      "required": true
     },
     "orDividerText": {
       "type": "string",
@@ -182,25 +180,29 @@
           "localized": true
         }
       },
-      "required": false
+      "required": true
     },
     "googleButton": {
-      "type": "string",
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
     },
     "appleButton": {
-      "type": "string",
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
     },
     "termsCheckboxText": {
       "type": "string",
@@ -209,7 +211,7 @@
           "localized": true
         }
       },
-      "required": false
+      "required": true
     },
     "termsLinkText": {
       "type": "string",
@@ -218,7 +220,7 @@
           "localized": true
         }
       },
-      "required": false
+      "required": true
     },
     "privacyLinkText": {
       "type": "string",
@@ -227,7 +229,83 @@
           "localized": true
         }
       },
-      "required": false
+      "required": true
+    },
+    "showPasswordLabel": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "hidePasswordLabel": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "emailRequiredError": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "emailInvalidError": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "passwordRequiredError": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "nameRequiredError": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "termsRequiredError": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "termsText": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
     },
     "seoMetadata": {
       "type": "component",

@@ -10,11 +10,19 @@
 
 import type { ReactNode } from 'react'
 
+import { CookieSettingsButton } from '@/components/consent'
 import { ButtonLink, Label, Text, TextBlock } from '@/components/elements'
 import { DynamicZone } from '@/components/layout/DynamicZone'
 import { getFooter } from '@/lib/content/api'
 import type { ApiFooterFooterDocument } from '@/lib/generated/types.gen'
 import { DirectionEnum } from '@/lib/generated/types.gen'
+
+/**
+ * Special URL convention for cookie settings quick link.
+ * When a footer quickLink has this URL, it renders as a CookieSettingsButton
+ * instead of a regular navigation link.
+ */
+const COOKIE_SETTINGS_URL = '#cookie-settings'
 
 /**
  * Union type for footer column components with their discriminators.
@@ -109,13 +117,17 @@ export default async function Footer({ lang, direction }: FooterProps) {
 
         <div
           className={`
-            mt-4 flex gap-6
+            mt-4 flex items-center gap-6
             md:mt-0
           `}
         >
-          {quickLinks.map((link, index) => (
-            <ButtonLink key={link.id ?? index} data={link} variant="link-2" size="xs" direction={direction} />
-          ))}
+          {quickLinks.map((link, index) =>
+            link.url === COOKIE_SETTINGS_URL ? (
+              <CookieSettingsButton key={link.id ?? index} label={link.label?.text ?? ''} />
+            ) : (
+              <ButtonLink key={link.id ?? index} data={link} variant="link-2" size="xs" direction={direction} />
+            )
+          )}
         </div>
       </div>
     </footer>

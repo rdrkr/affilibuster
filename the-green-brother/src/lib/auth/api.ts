@@ -21,6 +21,10 @@ import { ApiError, apiRequest, createApiRequest } from '@/lib/core/client'
 import type {
   ChangePasswordData,
   ChangePasswordResponses,
+  DeleteAccountData,
+  DeleteAccountResponses,
+  ExportUserDataData,
+  ExportUserDataResponses,
   ForgotPasswordData,
   ForgotPasswordResponses,
   GetUserProfileData,
@@ -259,6 +263,44 @@ export async function changePassword(
     })
   } catch (error) {
     console.error('Failed to change password:', error)
+    return null
+  }
+}
+
+/**
+ * Delete the current user's account (GDPR Right to Deletion)
+ * @param body - Password for verification
+ * @returns Success response or null if deletion fails
+ */
+export async function deleteAccount(
+  body: NonNullable<DeleteAccountData['body']>
+): Promise<DeleteAccountResponses[200] | null> {
+  try {
+    const request = createApiRequest<DeleteAccountData>('/auth/profile', {
+      body,
+    })
+    return await apiRequest<DeleteAccountResponses[200]>(request, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+  } catch (error) {
+    console.error('Failed to delete account:', error)
+    return null
+  }
+}
+
+/**
+ * Export the current user's data (GDPR DSAR)
+ * @returns User data export or null if export fails
+ */
+export async function exportUserData(): Promise<ExportUserDataResponses[200] | null> {
+  try {
+    const request = createApiRequest<ExportUserDataData>('/auth/profile/export', {})
+    return await apiRequest<ExportUserDataResponses[200]>(request, {
+      credentials: 'include',
+    })
+  } catch (error) {
+    console.error('Failed to export user data:', error)
     return null
   }
 }

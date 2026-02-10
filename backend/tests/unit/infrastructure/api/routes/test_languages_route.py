@@ -15,9 +15,9 @@ import pytest
 from affilibuster_backend.domain.entities import Language
 from affilibuster_backend.domain.entities.generated.cms_entities import LocalesResponse
 from affilibuster_backend.domain.entities.generated.models import (
-    Code,
     CurrencyCode,
     Direction,
+    LanguageCode,
 )
 from affilibuster_backend.infrastructure.api.routes.languages import transform_strapi_locales_to_languages
 
@@ -57,7 +57,7 @@ class TestTransformStrapiLocalesToLanguages:
         # Assertions
         assert len(languages) == 2
         assert isinstance(languages[0], Language)
-        assert languages[0].code == Code.EN
+        assert languages[0].code == LanguageCode.EN
         assert languages[0].is_default is True
 
     async def test_transform_with_unknown_language_code(self) -> None:
@@ -74,7 +74,7 @@ class TestTransformStrapiLocalesToLanguages:
 
         # Should fallback to EN for unknown code
         assert len(languages) == 1
-        assert languages[0].code == Code.EN
+        assert languages[0].code == LanguageCode.EN
 
     async def test_transform_with_pycountry_lookup_error(self) -> None:
         """Test transformation handles pycountry lookup errors."""
@@ -163,9 +163,9 @@ class TestTransformStrapiLocalesToLanguages:
         languages = await transform_strapi_locales_to_languages(locale_data)
 
         # Check currency mappings
-        it_lang = next(lang for lang in languages if lang.code == Code.IT)
-        he_lang = next(lang for lang in languages if lang.code == Code.HE)
-        en_lang = next(lang for lang in languages if lang.code == Code.EN)
+        it_lang = next(lang for lang in languages if lang.code == LanguageCode.IT)
+        he_lang = next(lang for lang in languages if lang.code == LanguageCode.HE)
+        en_lang = next(lang for lang in languages if lang.code == LanguageCode.EN)
 
         assert it_lang.default_currency == CurrencyCode.EUR
         assert he_lang.default_currency == CurrencyCode.ILS
@@ -186,7 +186,7 @@ class TestTransformStrapiLocalesToLanguages:
         languages = await transform_strapi_locales_to_languages(locale_data)
 
         # English should be first
-        assert languages[0].code == Code.EN
+        assert languages[0].code == LanguageCode.EN
 
     async def test_transform_with_empty_locale_list(self) -> None:
         """Test transformation handles empty locale list."""
@@ -213,8 +213,8 @@ class TestTransformStrapiLocalesToLanguages:
         languages = await transform_strapi_locales_to_languages(locale_data)
 
         # Check URL prefixes
-        en_lang = next(lang for lang in languages if lang.code == Code.EN)
-        it_lang = next(lang for lang in languages if lang.code == Code.IT)
+        en_lang = next(lang for lang in languages if lang.code == LanguageCode.EN)
+        it_lang = next(lang for lang in languages if lang.code == LanguageCode.IT)
 
         assert en_lang.url_prefix == "/en"
         assert it_lang.url_prefix == "/it"

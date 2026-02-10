@@ -107,6 +107,23 @@ class UserPreferencesRepository(IUserPreferencesRepository):
         # rowcount is an attribute of CursorResult returned by execute
         return (result.rowcount or 0) > 0  # type: ignore[attr-defined]
 
+    async def delete_by_user_id(self, user_id: str) -> int:
+        """
+        Delete all preferences for a user (for account deletion).
+
+        Args:
+            user_id: User identifier.
+
+        Returns:
+            The number of deleted preference records.
+
+        """
+        stmt = delete(UserPreferencesModel).where(UserPreferencesModel.user_id == user_id)
+        result = await self.session.execute(stmt)
+        await self.session.flush()
+        # rowcount is an attribute of CursorResult returned by execute
+        return result.rowcount or 0  # type: ignore[attr-defined]
+
     def _to_entity(self, model: UserPreferencesModel) -> UserPreferences:
         """Convert SQLAlchemy model to domain entity."""
         # Ensure datetimes are timezone-aware (SQLite returns naive datetimes)

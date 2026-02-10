@@ -8,6 +8,7 @@ Implementations are provided in the infrastructure layer.
 """
 
 from abc import ABC, abstractmethod
+from datetime import datetime
 from uuid import UUID
 
 from affilibuster_backend.domain.entities.user import Email, UserEntity
@@ -93,6 +94,21 @@ class IUserRepository(ABC):
 
         Raises:
             ValueError: If the user does not exist.
+        """
+        ...
+
+    @abstractmethod
+    async def get_soft_deleted_before(self, cutoff: datetime) -> list[UUID]:
+        """
+        Get IDs of soft-deleted users whose deletion date is before the cutoff.
+
+        Used by data retention cleanup to find users eligible for hard deletion.
+
+        Args:
+            cutoff: Users soft-deleted before this datetime are returned.
+
+        Returns:
+            List of user IDs eligible for hard deletion.
         """
         ...
 

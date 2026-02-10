@@ -30,7 +30,7 @@
   },
   "peerDependencies": {
     "@strapi/sdk-plugin": "^5.4.0",
-    "@strapi/strapi": "^5.35.0"
+    "@strapi/strapi": "^5.36.1"
   },
   "strapi": {
     "kind": "plugin",

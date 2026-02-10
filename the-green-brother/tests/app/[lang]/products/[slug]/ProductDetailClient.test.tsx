@@ -9,7 +9,7 @@ import { screen } from '@testing-library/react'
 import ProductDetailClient from '@/app/[lang]/products/[slug]/ProductDetailClient'
 import {
   AlignmentEnum,
-  CodeEnum,
+  LanguageCode,
   DirectionEnum,
   IconPositionEnum,
   type ApiProductProductDocument,
@@ -225,7 +225,7 @@ describe('ProductDetailClient', () => {
 
   it('should render product title', () => {
     renderWithLayout(<ProductDetailClient {...defaultProps} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Eco Product')
@@ -233,7 +233,7 @@ describe('ProductDetailClient', () => {
 
   it('should render product price', () => {
     renderWithLayout(<ProductDetailClient {...defaultProps} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.getByText('$49.99')).toBeInTheDocument()
@@ -241,7 +241,7 @@ describe('ProductDetailClient', () => {
 
   it('should render category', () => {
     renderWithLayout(<ProductDetailClient {...defaultProps} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.getByText('Electronics')).toBeInTheDocument()
@@ -249,7 +249,7 @@ describe('ProductDetailClient', () => {
 
   it('should render seller name', () => {
     renderWithLayout(<ProductDetailClient {...defaultProps} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.getByText('by Green Seller')).toBeInTheDocument()
@@ -257,7 +257,7 @@ describe('ProductDetailClient', () => {
 
   it('should render affiliate link when affiliateButton has URL', () => {
     renderWithLayout(<ProductDetailClient {...defaultProps} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     const buyLink = screen.getByRole('link', { name: 'Buy Now' })
@@ -267,7 +267,7 @@ describe('ProductDetailClient', () => {
 
   it('should render disclaimer label', () => {
     renderWithLayout(<ProductDetailClient {...defaultProps} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.getByTestId('mock-label')).toHaveTextContent('Disclaimer')
@@ -275,7 +275,7 @@ describe('ProductDetailClient', () => {
 
   it('should render ImageGallery component', () => {
     renderWithLayout(<ProductDetailClient {...defaultProps} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.getByTestId('mock-image-gallery')).toBeInTheDocument()
@@ -284,7 +284,7 @@ describe('ProductDetailClient', () => {
 
   it('should render ImageGallery with aria-label including product title', () => {
     renderWithLayout(<ProductDetailClient {...defaultProps} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     const gallery = screen.getByTestId('mock-image-gallery')
@@ -293,7 +293,7 @@ describe('ProductDetailClient', () => {
 
   it('should render ImageGallery wishlist button when enableUserProfile is true', () => {
     renderWithLayout(<ProductDetailClient {...defaultProps} enableUserProfile={true} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.getByTestId('gallery-wishlist-button')).toBeInTheDocument()
@@ -301,7 +301,7 @@ describe('ProductDetailClient', () => {
 
   it('should not render ImageGallery wishlist button when enableUserProfile is false', () => {
     renderWithLayout(<ProductDetailClient {...defaultProps} enableUserProfile={false} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.queryByTestId('gallery-wishlist-button')).not.toBeInTheDocument()
@@ -309,7 +309,7 @@ describe('ProductDetailClient', () => {
 
   it('should render product content section with Header', () => {
     renderWithLayout(<ProductDetailClient {...defaultProps} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     // Should render the description via DynamicZone
@@ -330,7 +330,7 @@ describe('ProductDetailClient', () => {
     } as unknown as ApiProductProductDocument
 
     renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithUnknownSection} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.getByTestId('mock-dynamic-zone')).toBeInTheDocument()
@@ -341,7 +341,7 @@ describe('ProductDetailClient', () => {
 
   it('should render subheader when available', () => {
     renderWithLayout(<ProductDetailClient {...defaultProps} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.getByText('A sustainable product')).toBeInTheDocument()
@@ -354,7 +354,7 @@ describe('ProductDetailClient', () => {
     } as ApiProductProductDocument
 
     renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithNoImages} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.getByTestId('gallery-placeholder')).toHaveTextContent('No images')
@@ -367,7 +367,7 @@ describe('ProductDetailClient', () => {
     } as ApiProductProductDocument
 
     renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithEuro} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.getByText('EUR')).toBeInTheDocument()
@@ -389,7 +389,7 @@ describe('ProductDetailClient', () => {
     } as ApiProductProductDocument
 
     renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithoutContent} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     // Should not render the DynamicZone if empty (technically the component renders empty div if empty array pass, depending on usage)
@@ -410,7 +410,7 @@ describe('ProductDetailClient', () => {
     } as unknown as ApiProductProductDocument
 
     renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithoutPrice} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.queryByText('$49.99')).not.toBeInTheDocument()
@@ -424,7 +424,7 @@ describe('ProductDetailClient', () => {
     } as unknown as ApiProductProductDocument
 
     renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithoutSubheader} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.queryByText('A sustainable product')).not.toBeInTheDocument()
@@ -437,7 +437,7 @@ describe('ProductDetailClient', () => {
     } as ApiProductProductDocument
 
     renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithUSD} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     // USD code should not be displayed
@@ -453,7 +453,7 @@ describe('ProductDetailClient', () => {
     } as unknown as ApiProductProductDocument
 
     renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithNoHeader} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     // productTitle should be '' and page should render without crashing
@@ -468,7 +468,7 @@ describe('ProductDetailClient', () => {
     } as ApiProductProductDocument
 
     renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithEmptyCode} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     // Price should render but no currency code span
@@ -485,7 +485,7 @@ describe('ProductDetailClient', () => {
     } as unknown as ApiProductProductDocument
 
     renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithCertificates} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.getByTestId('mock-product-certificates')).toBeInTheDocument()
@@ -495,7 +495,7 @@ describe('ProductDetailClient', () => {
 
   it('should render in RTL direction', () => {
     const { container } = renderWithLayout(<ProductDetailClient {...defaultProps} />, {
-      layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.RTL },
+      layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.RTL },
     })
 
     const rtlContainer = container.querySelector('[dir="rtl"]')
@@ -504,7 +504,7 @@ describe('ProductDetailClient', () => {
 
   it('should render related products carousel when related products are present', () => {
     renderWithLayout(<ProductDetailClient {...defaultProps} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.getByText('Related Products')).toBeInTheDocument()
@@ -514,7 +514,7 @@ describe('ProductDetailClient', () => {
 
   it('should not render related products section when related products are empty', () => {
     renderWithLayout(<ProductDetailClient {...defaultProps} relatedProducts={[]} />, {
-      layoutContext: { lang: CodeEnum.EN },
+      layoutContext: { lang: LanguageCode.EN },
     })
 
     expect(screen.queryByText('Related Products')).not.toBeInTheDocument()

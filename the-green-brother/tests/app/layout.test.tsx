@@ -16,7 +16,7 @@ jest.mock('@/lib/content/api', () => ({
 
 import RootLayout, { generateMetadata } from '@/app/layout'
 import { getNavigation } from '@/lib/content/api'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 
 const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 
@@ -49,7 +49,7 @@ describe('RootLayout', () => {
 
   it('should set lang attribute to en', () => {
     const element = RootLayout({ children: <div>Content</div> })
-    expect(element.props.lang).toBe(CodeEnum.EN)
+    expect(element.props.lang).toBe(LanguageCode.EN)
   })
 })
 

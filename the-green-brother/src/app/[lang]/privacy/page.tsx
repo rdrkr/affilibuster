@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Affilibuster by Ronen Druker.
 
 import { getPrivacy } from '@/lib/client'
-import type { CodeEnum } from '@/lib/generated/types.gen'
+import type { LanguageCode } from '@/lib/generated/types.gen'
 import PrivacyPolicyClient from './PrivacyPolicyClient'
 
 /**
@@ -12,7 +12,7 @@ import PrivacyPolicyClient from './PrivacyPolicyClient'
  * @param params.params - Promise containing route parameters with lang
  * @returns Server-rendered privacy policy page
  */
-export default async function PrivacyPage({ params }: { params: Promise<{ lang: CodeEnum }> }) {
+export default async function PrivacyPage({ params }: { params: Promise<{ lang: LanguageCode }> }) {
   const resolvedParams = await params
   const lang = resolvedParams.lang
 

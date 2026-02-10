@@ -20,7 +20,7 @@ import type {
 } from '@/lib/generated/types.gen'
 import {
   AlignmentEnum,
-  CodeEnum,
+  LanguageCode,
   CurrencyCode,
   DirectionEnum,
   IconPositionEnum,
@@ -500,7 +500,7 @@ export function createMockProduct(overrides: Partial<ApiProductProductDocument> 
     description: [],
     createdAt: '2025-01-01T00:00:00.000Z',
     updatedAt: '2025-01-01T00:00:00.000Z',
-    locale: CodeEnum.EN,
+    locale: LanguageCode.EN,
     ...overrides,
   } as ApiProductProductDocument
 }
@@ -511,11 +511,11 @@ export function createMockProduct(overrides: Partial<ApiProductProductDocument> 
  * @param overrides - Partial Language object to override default values
  * @returns Complete Language object suitable for testing
  * @example
- * const lang = createMockLanguage({ code: CodeEnum.IT, displayName: 'Italian' })
+ * const lang = createMockLanguage({ code: LanguageCode.IT, displayName: 'Italian' })
  */
 export function createMockLanguage(overrides: Partial<Language> = {}): Language {
   return {
-    code: CodeEnum.EN,
+    code: LanguageCode.EN,
     displayName: 'English',
     nativeName: 'English',
     flag: '🇬🇧',
@@ -539,7 +539,7 @@ export function createMockLanguage(overrides: Partial<Language> = {}): Language 
 export function createMockLanguages(): Language[] {
   return [
     createMockLanguage({
-      code: CodeEnum.EN,
+      code: LanguageCode.EN,
       displayName: 'English',
       nativeName: 'English',
       flag: '🇬🇧',
@@ -550,7 +550,7 @@ export function createMockLanguages(): Language[] {
       isDefault: true,
     }),
     createMockLanguage({
-      code: CodeEnum.IT,
+      code: LanguageCode.IT,
       displayName: 'Italian',
       nativeName: 'Italiano',
       flag: '🇮🇹',
@@ -561,7 +561,7 @@ export function createMockLanguages(): Language[] {
       isDefault: false,
     }),
     createMockLanguage({
-      code: CodeEnum.HE,
+      code: LanguageCode.HE,
       displayName: 'Hebrew',
       nativeName: 'עברית',
       flag: '🇮🇱',

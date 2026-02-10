@@ -5,7 +5,7 @@
  */
 
 import { apiRequest } from '@/lib/core/client'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import { getProductTagById, getProductTags } from '@/lib/product-tags/api'
 
 // Mock the core client module
@@ -50,12 +50,12 @@ describe('product-tags API', () => {
       const mockResponse = { data: [] }
       mockApiRequest.mockResolvedValueOnce(mockResponse as unknown as Awaited<ReturnType<typeof apiRequest>>)
 
-      const query = { locale: CodeEnum.EN }
+      const query = { locale: LanguageCode.EN }
       await getProductTags(query)
 
       expect(mockApiRequest).toHaveBeenCalledWith(
         expect.objectContaining({
-          query: expect.objectContaining({ locale: CodeEnum.EN, customPopulate: 'nested' }),
+          query: expect.objectContaining({ locale: LanguageCode.EN, customPopulate: 'nested' }),
         })
       )
     })
@@ -92,11 +92,11 @@ describe('product-tags API', () => {
       const mockResponse = { data: { id: '1' } }
       mockApiRequest.mockResolvedValueOnce(mockResponse as unknown as Awaited<ReturnType<typeof apiRequest>>)
 
-      await getProductTagById('tag-123', { locale: CodeEnum.IT })
+      await getProductTagById('tag-123', { locale: LanguageCode.IT })
 
       expect(mockApiRequest).toHaveBeenCalledWith(
         expect.objectContaining({
-          query: expect.objectContaining({ locale: CodeEnum.IT, customPopulate: 'nested' }),
+          query: expect.objectContaining({ locale: LanguageCode.IT, customPopulate: 'nested' }),
         })
       )
     })

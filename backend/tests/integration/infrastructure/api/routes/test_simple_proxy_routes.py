@@ -45,7 +45,7 @@ class TestAboutRoute:
 
     async def test_about_get_returns_200(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
         """Test GET /about returns 200 with real Strapi data."""
-        response = await integration_client.get("/v1/about?customPopulate=nested")
+        response = await integration_client.get("/v1/about?custom_populate=nested")
         assert response.status_code == 200
         data = AboutGetResponse(**response.json())
         assert data.data is not None
@@ -59,7 +59,7 @@ class TestContactRoute:
 
     async def test_contact_get_returns_200(self, integration_client: AsyncClient) -> None:
         """Test GET /contact-us returns 200."""
-        response = await integration_client.get("/v1/contact-us?customPopulate=nested")
+        response = await integration_client.get("/v1/contact-us?custom_populate=nested")
         assert response.status_code == 200
         data = ContactUsGetResponse(**response.json())
         assert data.data is not None
@@ -73,7 +73,7 @@ class TestError404Route:
 
     async def test_error_404_get_returns_200(self, integration_client: AsyncClient) -> None:
         """Test GET /error-404 returns 200."""
-        response = await integration_client.get("/v1/error-404?customPopulate=nested")
+        response = await integration_client.get("/v1/error-404?custom_populate=nested")
         assert response.status_code == 200
         data = Error404GetResponse(**response.json())
         assert data.data is not None
@@ -87,7 +87,7 @@ class TestError410Route:
 
     async def test_error_410_get_returns_200(self, integration_client: AsyncClient) -> None:
         """Test GET /error-410 returns 200."""
-        response = await integration_client.get("/v1/error-410?customPopulate=nested")
+        response = await integration_client.get("/v1/error-410?custom_populate=nested")
         assert response.status_code == 200
         data = Error410GetResponse(**response.json())
         assert data.data is not None
@@ -102,7 +102,7 @@ class TestFooterRoute:
 
     async def test_footer_get_returns_200(self, integration_client: AsyncClient) -> None:
         """Test GET /footer returns 200."""
-        response = await integration_client.get("/v1/footer?customPopulate=nested")
+        response = await integration_client.get("/v1/footer?custom_populate=nested")
         assert response.status_code == 200
         data = FooterGetResponse(**response.json())
         assert data.data is not None
@@ -116,7 +116,7 @@ class TestHomepageRoute:
 
     async def test_homepage_get_returns_200(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
         """Test GET /homepage returns 200 with real Strapi data."""
-        response = await integration_client.get("/v1/homepage?customPopulate=nested")
+        response = await integration_client.get("/v1/homepage?custom_populate=nested")
         assert response.status_code == 200
         data = HomepageGetResponse(**response.json())
         assert data.data is not None
@@ -130,7 +130,7 @@ class TestNavigationRoute:
 
     async def test_navigation_get_returns_200(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
         """Test GET /navigation returns 200 with real Strapi data."""
-        response = await integration_client.get("/v1/navigation?customPopulate=nested&locale=en")
+        response = await integration_client.get("/v1/navigation?custom_populate=nested&locale=en")
         assert response.status_code == 200
         data = NavigationGetResponse(**response.json())
         assert data.data is not None
@@ -144,7 +144,7 @@ class TestPrivacyRoute:
 
     async def test_privacy_get_returns_200(self, integration_client: AsyncClient) -> None:
         """Test GET /privacy returns 200."""
-        response = await integration_client.get("/v1/privacy?customPopulate=nested")
+        response = await integration_client.get("/v1/privacy?custom_populate=nested")
         assert response.status_code == 200
         data = PrivacyGetResponse(**response.json())
         assert data.data is not None
@@ -158,7 +158,7 @@ class TestProductPageRoute:
 
     async def test_product_page_get_returns_200(self, integration_client: AsyncClient) -> None:
         """Test GET /product-categories-page returns 200."""
-        response = await integration_client.get("/v1/product-categories-page?customPopulate=nested")
+        response = await integration_client.get("/v1/product-categories-page?custom_populate=nested")
         assert response.status_code == 200
         data = ProductCategoriesPageGetResponse(**response.json())
         assert data.data is not None
@@ -172,7 +172,7 @@ class TestTermRoute:
 
     async def test_term_get_returns_200(self, integration_client: AsyncClient) -> None:
         """Test GET /term returns 200."""
-        response = await integration_client.get("/v1/term?customPopulate=nested")
+        response = await integration_client.get("/v1/term?custom_populate=nested")
         assert response.status_code == 200
         data = TermGetResponse(**response.json())
         assert data.data is not None

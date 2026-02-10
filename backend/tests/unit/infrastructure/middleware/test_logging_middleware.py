@@ -12,24 +12,28 @@ from typing import Never
 import pytest
 from fastapi import FastAPI
 from starlette.requests import Request
+from starlette.responses import Response
 from starlette.testclient import TestClient
 from starlette.types import Receive, Scope, Send
 
-from affilibuster_backend.infrastructure.middleware.request_logging import RequestLoggingMiddleware
+from affilibuster_backend.infrastructure.middleware.request_logging import (
+    SENSITIVE_HEADERS,
+    RequestLoggingMiddleware,
+)
 
 
 async def noop_app(scope: Scope, receive: Receive, send: Send) -> None:
     """No-op ASGI app for testing middleware in isolation."""
 
 
-def create_mock_request(method: str, path: str) -> Request:
+def create_mock_request(method: str, path: str, headers: list[tuple[bytes, bytes]] | None = None) -> Request:
     """Create a mock Request object for testing middleware."""
     scope = {
         "type": "http",
         "method": method,
         "path": path,
         "query_string": b"",
-        "headers": [],
+        "headers": headers or [],
         "server": ("testserver", 80),
         "client": ("127.0.0.1", 8000),
         "scheme": "http",
@@ -237,3 +241,88 @@ class TestRequestLoggingMiddlewareDirectDispatch:
         # Exception should propagate up
         with pytest.raises(ValueError, match="Must be re-raised"):
             await middleware.dispatch(request, failing_call_next)
+
+
+@pytest.mark.unit
+class TestRequestLoggingMiddlewareHeaderSanitization:
+    """Test that sensitive headers are sanitized in log output."""
+
+    @pytest.mark.asyncio
+    async def test_sensitive_headers_are_redacted(self, caplog):
+        """Test that authorization, cookie, and session headers are masked."""
+        import logging
+
+        middleware = RequestLoggingMiddleware(app=noop_app)
+        request = create_mock_request(
+            "GET",
+            "/test-sanitize",
+            headers=[
+                (b"authorization", b"Bearer secret-token-123"),
+                (b"cookie", b"access_token=jwt-secret"),
+                (b"x-session-id", b"sess-abc123"),
+                (b"x-api-key", b"api-key-secret"),
+                (b"x-csrf-token", b"csrf-token-secret"),
+                (b"user-agent", b"TestAgent/1.0"),
+                (b"accept", b"application/json"),
+            ],
+        )
+
+        async def success_call_next(_: Request) -> Response:
+            return Response(status_code=200)
+
+        with caplog.at_level(logging.DEBUG):
+            await middleware.dispatch(request, success_call_next)
+
+        # Find the debug log record that contains headers
+        debug_records = [r for r in caplog.records if r.levelname == "DEBUG" and hasattr(r, "headers")]
+        assert len(debug_records) > 0
+
+        logged_headers = debug_records[0].headers
+
+        # Sensitive headers should be masked
+        assert logged_headers["authorization"] == "***"
+        assert logged_headers["cookie"] == "***"
+        assert logged_headers["x-session-id"] == "***"
+        assert logged_headers["x-api-key"] == "***"
+        assert logged_headers["x-csrf-token"] == "***"
+
+        # Non-sensitive headers should be preserved
+        assert logged_headers["user-agent"] == "TestAgent/1.0"
+        assert logged_headers["accept"] == "application/json"
+
+    @pytest.mark.asyncio
+    async def test_non_sensitive_headers_are_not_redacted(self, caplog):
+        """Test that regular headers like content-type are logged as-is."""
+        import logging
+
+        middleware = RequestLoggingMiddleware(app=noop_app)
+        request = create_mock_request(
+            "GET",
+            "/test-pass-through",
+            headers=[
+                (b"content-type", b"application/json"),
+                (b"accept-language", b"en-US"),
+            ],
+        )
+
+        async def success_call_next(_: Request) -> Response:
+            return Response(status_code=200)
+
+        with caplog.at_level(logging.DEBUG):
+            await middleware.dispatch(request, success_call_next)
+
+        debug_records = [r for r in caplog.records if r.levelname == "DEBUG" and hasattr(r, "headers")]
+        assert len(debug_records) > 0
+
+        logged_headers = debug_records[0].headers
+        assert logged_headers["content-type"] == "application/json"
+        assert logged_headers["accept-language"] == "en-US"
+
+    def test_sensitive_headers_constant_is_frozen_set(self):
+        """Test that SENSITIVE_HEADERS is an immutable frozenset."""
+        assert isinstance(SENSITIVE_HEADERS, frozenset)
+        assert "authorization" in SENSITIVE_HEADERS
+        assert "cookie" in SENSITIVE_HEADERS
+        assert "x-session-id" in SENSITIVE_HEADERS
+        assert "x-api-key" in SENSITIVE_HEADERS
+        assert "x-csrf-token" in SENSITIVE_HEADERS

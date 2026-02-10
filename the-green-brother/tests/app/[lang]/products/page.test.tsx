@@ -37,7 +37,7 @@ jest.mock('@/app/[lang]/products/ProductsClient', () => ({
 
 import ProductsPage from '@/app/[lang]/products/page'
 import { getProductCategories, getProductCategoriesPage, getProducts } from '@/lib/content'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 
 const mockGetProductCategoriesPage = getProductCategoriesPage as jest.MockedFunction<typeof getProductCategoriesPage>
@@ -69,14 +69,12 @@ describe('ProductsPage', () => {
         noItemsFound: { header: { text: 'No products found' } },
       },
     } as unknown as Awaited<ReturnType<typeof getProductCategoriesPage>>)
-    mockGetProducts.mockResolvedValue({ data: [{ id: 1 }, { id: 2 }], meta: {} } as Awaited<
-      ReturnType<typeof getProducts>
-    >)
-    mockGetProductCategories.mockResolvedValue({ data: [{ id: 1 }], meta: {} } as Awaited<
+    mockGetProducts.mockResolvedValue([{ id: 1 }, { id: 2 }] as unknown as Awaited<ReturnType<typeof getProducts>>)
+    mockGetProductCategories.mockResolvedValue([{ id: 1 }] as unknown as Awaited<
       ReturnType<typeof getProductCategories>
     >)
 
-    const Component = await ProductsPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+    const Component = await ProductsPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
     expect(screen.getByTestId('products-client')).toBeInTheDocument()
@@ -90,7 +88,7 @@ describe('ProductsPage', () => {
     mockGetProducts.mockResolvedValue(null)
     mockGetProductCategories.mockResolvedValue(null)
 
-    const Component = await ProductsPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+    const Component = await ProductsPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
     expect(screen.getByTestId('products-client').getAttribute('data-product-count')).toBe('0')
@@ -100,14 +98,12 @@ describe('ProductsPage', () => {
 
   it('should call APIs with correct locale', async () => {
     mockGetProductCategoriesPage.mockResolvedValue(null)
-    mockGetProducts.mockResolvedValue({ data: [], meta: {} } as Awaited<ReturnType<typeof getProducts>>)
-    mockGetProductCategories.mockResolvedValue({ data: [], meta: {} } as Awaited<
-      ReturnType<typeof getProductCategories>
-    >)
+    mockGetProducts.mockResolvedValue([] as Awaited<ReturnType<typeof getProducts>>)
+    mockGetProductCategories.mockResolvedValue([] as Awaited<ReturnType<typeof getProductCategories>>)
 
-    await ProductsPage({ params: Promise.resolve({ lang: CodeEnum.IT }) })
+    await ProductsPage({ params: Promise.resolve({ lang: LanguageCode.IT }) })
 
-    expect(mockGetProductCategoriesPage).toHaveBeenCalledWith(CodeEnum.IT)
-    expect(mockGetProducts).toHaveBeenCalledWith(expect.objectContaining({ locale: CodeEnum.IT }))
+    expect(mockGetProductCategoriesPage).toHaveBeenCalledWith(LanguageCode.IT)
+    expect(mockGetProducts).toHaveBeenCalledWith(expect.objectContaining({ locale: LanguageCode.IT }))
   })
 })

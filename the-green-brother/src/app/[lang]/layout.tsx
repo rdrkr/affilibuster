@@ -1,12 +1,13 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
+import { CookieConsentBanner } from '@/components/consent'
 import Footer from '@/components/footer'
 import Navigation from '@/components/navigation'
 import BackToTopButton from '@/components/navigation/BackToTopButton'
 import { LayoutProvider } from '@/components/providers'
 import { getNavigation } from '@/lib/content/api'
 import { productSearchFlag, userProfileFlag } from '@/lib/feature-flags'
-import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
+import { DirectionEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
 import { LanguageCode } from '@/lib/types'
 import '@/styles/globals.css'
@@ -16,7 +17,7 @@ import { notFound } from 'next/navigation'
 
 interface Props {
   children: React.ReactNode
-  params: Promise<{ lang: CodeEnum }>
+  params: Promise<{ lang: LanguageCode }>
 }
 
 /**
@@ -71,6 +72,7 @@ async function LocaleLayout({ children, params }: Props) {
           </div>
 
           <BackToTopButton direction={direction} />
+          <CookieConsentBanner lang={lang} direction={direction} />
         </div>
       </LayoutProvider>
     </NextIntlClientProvider>

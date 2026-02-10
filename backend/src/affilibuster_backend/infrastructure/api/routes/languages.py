@@ -18,10 +18,9 @@ from affilibuster_backend.domain.entities import (
 )
 from affilibuster_backend.domain.entities.generated.cms_entities import LocalesResponse
 from affilibuster_backend.domain.entities.generated.models import (
-    Code,
     CurrencyCode,
-    DetectedLanguage1,
     Direction,
+    LanguageCode,
     LanguagesDetectPostRequest,
     LanguagesGetResponse,
 )
@@ -85,11 +84,11 @@ async def transform_strapi_locales_to_languages(
         # Access Pydantic model attributes (use snake_case field names)
         code_str = locale.code
 
-        # Convert string code to Code enum - use uppercase for enum lookup
+        # Convert string code to LanguageCode enum - use uppercase for enum lookup
         try:
-            code_enum = Code[code_str.upper()]
+            code_enum = LanguageCode[code_str.upper()]
         except KeyError:
-            code_enum = Code.EN  # Default to EN if unknown
+            code_enum = LanguageCode.EN  # Default to EN if unknown
 
         # Get country code for flag emoji
         country_code = language_to_country.get(code_str, code_str.upper())
@@ -113,7 +112,7 @@ async def transform_strapi_locales_to_languages(
         )
         languages.append(lang)
 
-    return sorted(languages, key=lambda x: (x.code != Code.EN, x.code.value))
+    return sorted(languages, key=lambda x: (x.code != LanguageCode.EN, x.code.value))
 
 
 @router.get("")
@@ -164,21 +163,21 @@ async def detect_language(
         languages = await transform_strapi_locales_to_languages(locale_data)
         available_codes = {lang.code.value for lang in languages}
 
-        # Map string codes to DetectedLanguage1 enum
+        # Map string codes to LanguageCode enum
         detected_lang_map = {
-            Code.EN.value: DetectedLanguage1.EN,
-            Code.IT.value: DetectedLanguage1.IT,
-            Code.HE.value: DetectedLanguage1.HE,
+            LanguageCode.EN.value: LanguageCode.EN,
+            LanguageCode.IT.value: LanguageCode.IT,
+            LanguageCode.HE.value: LanguageCode.HE,
         }
 
         # Find first browser language that's available
-        detected_lang = DetectedLanguage1.EN  # Default
+        detected_lang = LanguageCode.EN  # Default
         confidence = 0.5  # Default low confidence
 
         for idx, browser_lang in enumerate(browser_languages):
             lang_code = browser_lang.split("-")[0].lower()
             if lang_code in available_codes:
-                detected_lang = detected_lang_map.get(lang_code, DetectedLanguage1.EN)
+                detected_lang = detected_lang_map.get(lang_code, LanguageCode.EN)
                 # Higher confidence for languages earlier in Accept-Language list
                 # Use 1.0 for first language, 0.8 for second, etc. to ensure prompting works
                 confidence = max(1.0 - (idx * 0.2), 0.6)

@@ -2,7 +2,7 @@
 
 // Import getContributors
 import { getAbout, getTeamMembers } from '@/lib/client'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import AboutClient from './AboutClient'
 
 /**
@@ -13,7 +13,7 @@ import AboutClient from './AboutClient'
  * @param params.params - Promise containing route parameters with lang
  * @returns Server-rendered about page
  */
-export default async function AboutPage({ params }: { params: Promise<{ lang: CodeEnum }> }) {
+export default async function AboutPage({ params }: { params: Promise<{ lang: LanguageCode }> }) {
   const resolvedParams = await params
   const lang = resolvedParams.lang
 

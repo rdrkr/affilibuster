@@ -26,14 +26,14 @@ class TestGetCurrencies:
 
     async def test_get_currencies_returns_200(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
         """Test that GET /currencies returns 200 status code."""
-        response = await integration_client.get("/v1/currencies?customPopulate=nested")
+        response = await integration_client.get("/v1/currencies?custom_populate=nested")
         assert response.status_code == 200
 
     async def test_get_currencies_returns_data_structure(
         self, integration_client: AsyncClient, strapi_test_data: None
     ) -> None:
         """Test that GET /currencies returns proper data structure with seeded currencies."""
-        response = await integration_client.get("/v1/currencies?customPopulate=nested")
+        response = await integration_client.get("/v1/currencies?custom_populate=nested")
         assert response.status_code == 200
 
         data = CurrenciesGetResponse(**response.json())
@@ -57,7 +57,7 @@ class TestGetCurrencies:
         """Test GET /currencies with pagination parameters."""
         response = await integration_client.get(
             "/v1/currencies",
-            params={"customPopulate": "nested", "pagination[pageSize]": "5", "pagination[page]": "1"},
+            params={"custom_populate": "nested", "pagination[pageSize]": "5", "pagination[page]": "1"},
         )
         assert response.status_code == 200
 
@@ -69,7 +69,7 @@ class TestGetCurrencies:
         # Filter by code which is a valid field on the currency model
         response = await integration_client.get(
             "/v1/currencies",
-            params={"customPopulate": "nested", "filters[code][$eq]": "USD"},
+            params={"custom_populate": "nested", "filters[code][$eq]": "USD"},
         )
         assert response.status_code == 200
 
@@ -85,7 +85,7 @@ class TestGetCurrencies:
         """Test GET /currencies with field selection."""
         response = await integration_client.get(
             "/v1/currencies",
-            params={"customPopulate": "nested", "fields[]": ["code", "name"]},
+            params={"custom_populate": "nested", "fields[]": ["code", "name"]},
         )
         assert response.status_code == 200
 
@@ -93,7 +93,7 @@ class TestGetCurrencies:
         """Test GET /currencies with sorting."""
         response = await integration_client.get(
             "/v1/currencies",
-            params={"customPopulate": "nested", "sort[]": "code:asc"},
+            params={"custom_populate": "nested", "sort[]": "code:asc"},
         )
         assert response.status_code == 200
 
@@ -101,7 +101,7 @@ class TestGetCurrencies:
         self, integration_client: AsyncClient, strapi_test_data: None
     ) -> None:
         """Test that USD currency exists with correct data from seed.ts."""
-        response = await integration_client.get("/v1/currencies?customPopulate=nested")
+        response = await integration_client.get("/v1/currencies?custom_populate=nested")
         assert response.status_code == 200
 
         data = CurrenciesGetResponse(**response.json())
@@ -126,7 +126,7 @@ class TestGetCurrencies:
         """Test that Strapi errors return 502 Bad Gateway."""
         # This test assumes Strapi might be temporarily unavailable
         # In normal operation with Strapi running, this would return 200
-        response = await integration_client.get("/v1/currencies?customPopulate=nested")
+        response = await integration_client.get("/v1/currencies?custom_populate=nested")
         # Should either succeed (200) or fail with 502 if Strapi is down
         assert response.status_code in [200, 502]
 
@@ -142,14 +142,14 @@ class TestGetCurrency:
     ) -> None:
         """Test that GET /currencies/{id} returns 200 for valid ID."""
         # First, get list of currencies to find a valid ID
-        list_response = await integration_client.get("/v1/currencies?customPopulate=nested")
+        list_response = await integration_client.get("/v1/currencies?custom_populate=nested")
         if list_response.status_code == 200:
             data = CurrenciesGetResponse(**list_response.json())
             if data.data and len(data.data) > 0:
                 currency_id = data.data[0].document_id
 
                 # Now get specific currency
-                response = await integration_client.get(f"/v1/currencies/{currency_id}?customPopulate=nested")
+                response = await integration_client.get(f"/v1/currencies/{currency_id}?custom_populate=nested")
                 # Should return 200 for valid ID, or 502 if Strapi has issues
                 assert response.status_code in [200, 404, 502]
 
@@ -158,15 +158,15 @@ class TestGetCurrency:
     ) -> None:
         """Test GET /currencies/{id} with field selection."""
         # Get a valid currency ID first
-        list_response = await integration_client.get("/v1/currencies?customPopulate=nested")
+        list_response = await integration_client.get("/v1/currencies?custom_populate=nested")
         if list_response.status_code == 200:
             data = CurrenciesGetResponse(**list_response.json())
             if data.data and len(data.data) > 0:
                 currency_id = data.data[0].document_id
 
                 response = await integration_client.get(
-                    f"/v1/currencies/{currency_id}?customPopulate=nested",
-                    params={"customPopulate": "nested", "fields[]": ["code", "name"]},
+                    f"/v1/currencies/{currency_id}?custom_populate=nested",
+                    params={"custom_populate": "nested", "fields[]": ["code", "name"]},
                 )
                 assert response.status_code in [200, 404, 502]
 
@@ -174,7 +174,7 @@ class TestGetCurrency:
         self, integration_client: AsyncClient, strapi_test_data: None
     ) -> None:
         """Test that GET /currencies/{id} with invalid ID returns error."""
-        response = await integration_client.get("/v1/currencies/nonexistent-id-99999?customPopulate=nested")
+        response = await integration_client.get("/v1/currencies/nonexistent-id-99999?custom_populate=nested")
         # Should return 404 or 502 (Strapi error)
         assert response.status_code in [404, 502]
 
@@ -182,7 +182,7 @@ class TestGetCurrency:
         self, integration_client: AsyncClient, strapi_test_data: None
     ) -> None:
         """Test that Strapi errors return 502 Bad Gateway."""
-        response = await integration_client.get("/v1/currencies/1?customPopulate=nested")
+        response = await integration_client.get("/v1/currencies/1?custom_populate=nested")
         # Should either succeed or fail with 502 if Strapi has issues
         assert response.status_code in [200, 404, 502]
 
@@ -191,7 +191,7 @@ class TestGetCurrency:
     ) -> None:
         """Test that currency ID path parameter is required."""
         # Trying to access without ID should route to list endpoint
-        response = await integration_client.get("/v1/currencies/?customPopulate=nested")
+        response = await integration_client.get("/v1/currencies/?custom_populate=nested")
         # This redirects to list endpoint (307) or returns list (200)
         assert response.status_code in [200, 307, 404, 502]
 
@@ -204,12 +204,12 @@ class TestCurrenciesErrorHandling:
 
     async def test_get_currencies_handles_strapi_connection_error(self, integration_client: AsyncClient) -> None:
         """Test that connection errors to Strapi are handled gracefully."""
-        response = await integration_client.get("/v1/currencies?customPopulate=nested")
+        response = await integration_client.get("/v1/currencies?custom_populate=nested")
         # Should return either 200 (success) or 502 (Bad Gateway on error)
         assert response.status_code in [200, 502]
 
     async def test_get_currency_handles_strapi_connection_error(self, integration_client: AsyncClient) -> None:
         """Test that connection errors to Strapi are handled gracefully."""
-        response = await integration_client.get("/v1/currencies/1?customPopulate=nested")
+        response = await integration_client.get("/v1/currencies/1?custom_populate=nested")
         # Should return either 200/404 (success) or 502 (Bad Gateway on error)
         assert response.status_code in [200, 404, 502]

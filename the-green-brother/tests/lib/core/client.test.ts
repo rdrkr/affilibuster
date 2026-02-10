@@ -12,7 +12,7 @@
  */
 
 import { ApiError, apiRequest, createApiRequest, getBaseUrl, getSessionId } from '@/lib/core/client'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 
 // Mock fetch globally
 global.fetch = jest.fn()
@@ -97,13 +97,13 @@ describe('getSessionId', () => {
 describe('createApiRequest', () => {
   it('should create request object with URL filled in', () => {
     const request = createApiRequest('/homepage', {
-      query: { locale: CodeEnum.EN, customPopulate: 'nested' },
+      query: { locale: LanguageCode.EN, customPopulate: 'nested' },
 
     } as any)
 
     expect(request).toEqual({
       url: '/homepage',
-      query: { locale: CodeEnum.EN, customPopulate: 'nested' },
+      query: { locale: LanguageCode.EN, customPopulate: 'nested' },
     })
   })
 
@@ -208,7 +208,7 @@ describe('apiRequest', () => {
     } as Response)
 
     const request = createApiRequest('/homepage', {
-      query: { locale: CodeEnum.EN, customPopulate: 'nested' },
+      query: { locale: LanguageCode.EN, customPopulate: 'nested' },
     } as any)
     const response = await apiRequest(request)
 

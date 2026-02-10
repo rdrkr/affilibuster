@@ -1,0 +1,49 @@
+{
+  "kind": "collectionType",
+  "collectionName": "consent_categories",
+  "info": {
+    "singularName": "consent-category",
+    "pluralName": "consent-categories",
+    "displayName": "Cookies Consent Category"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "uid": {
+      "type": "uid",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "content": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.text-block",
+      "repeatable": false,
+      "required": true
+    },
+    "required": {
+      "type": "boolean",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true,
+      "default": true
+    }
+  }
+}

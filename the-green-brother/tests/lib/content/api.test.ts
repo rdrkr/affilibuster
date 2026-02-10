@@ -19,7 +19,8 @@ import {
   getContactUs,
   getContributorBySlug,
   getContributors,
-  getTeamMembers,
+  getCookiePolicy,
+  getCurrencies,
   getError404,
   getError410,
   getFaq,
@@ -35,10 +36,11 @@ import {
   getProductCategoryBySlug,
   getProducts,
   getProfile,
+  getTeamMembers,
   getTerm,
 } from '@/lib/content/api'
 import * as apiClient from '@/lib/core/client'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 
 // Mock the apiRequest and createApiRequest functions
 jest.mock('@/lib/core/client', () => ({
@@ -72,10 +74,10 @@ describe('Content API - Single Types', () => {
       const mockData = { documentId: 'abc', id: 1, entryTitle: 'Home', publishedAt: '2025-01-01' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getHomepage(CodeEnum.IT.toString())
+      const result = await getHomepage(LanguageCode.IT.toString())
 
       expect(mockCreateApiRequest).toHaveBeenCalledWith('/homepage', {
-        query: { locale: CodeEnum.IT, customPopulate: 'nested' },
+        query: { locale: LanguageCode.IT, customPopulate: 'nested' },
       })
       expect(result).toEqual(mockData)
     })
@@ -84,9 +86,9 @@ describe('Content API - Single Types', () => {
       const mockData = { documentId: 'abc', id: 1, entryTitle: 'Homepage', publishedAt: '2025-01-01' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getHomepage(CodeEnum.EN)
+      const result = await getHomepage(LanguageCode.EN)
       expect(mockCreateApiRequest).toHaveBeenCalledWith('/homepage', {
-        query: { locale: CodeEnum.EN, customPopulate: 'nested' },
+        query: { locale: LanguageCode.EN, customPopulate: 'nested' },
       })
       expect(result).toEqual(mockData)
     })
@@ -118,7 +120,7 @@ describe('Content API - Single Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getAbout(CodeEnum.EN)
+      const result = await getAbout(LanguageCode.EN)
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -131,12 +133,37 @@ describe('Content API - Single Types', () => {
       const mockData = { title: 'Contact Us', email: 'test@example.com' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getContactUs(CodeEnum.EN)
+      const result = await getContactUs(LanguageCode.EN)
 
       expect(mockCreateApiRequest).toHaveBeenCalledWith('/contact-us', {
-        query: { locale: CodeEnum.EN, customPopulate: 'nested' },
+        query: { locale: LanguageCode.EN, customPopulate: 'nested' },
       })
       expect(result).toEqual(mockData)
+    })
+  })
+
+  describe('getCookiePolicy', () => {
+    it('should fetch cookie policy page', async () => {
+      const mockData = { title: 'Cookie Policy', content: '...' }
+      mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
+
+      const result = await getCookiePolicy(LanguageCode.EN)
+
+      expect(mockCreateApiRequest).toHaveBeenCalledWith('/cookie-policy', {
+        query: { locale: LanguageCode.EN, customPopulate: 'nested' },
+      })
+      expect(result).toEqual(mockData)
+    })
+
+    it('should return null on error', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
+      mockApiRequest.mockRejectedValueOnce(new Error('API error'))
+
+      const result = await getCookiePolicy(LanguageCode.EN)
+
+      expect(result).toBeNull()
+      expect(consoleErrorSpy).toHaveBeenCalled()
+      consoleErrorSpy.mockRestore()
     })
   })
 
@@ -157,10 +184,10 @@ describe('Content API - Single Types', () => {
       const mockData = { links: [{ title: 'Home', url: '/' }] }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getNavigation(CodeEnum.IT.toString())
+      const result = await getNavigation(LanguageCode.IT.toString())
 
       expect(mockCreateApiRequest).toHaveBeenCalledWith('/navigation', {
-        query: { locale: CodeEnum.IT, customPopulate: 'nested' },
+        query: { locale: LanguageCode.IT, customPopulate: 'nested' },
       })
       expect(result).toEqual(mockData)
     })
@@ -171,7 +198,7 @@ describe('Content API - Single Types', () => {
       const mockData = { copyright: '2025' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getFooter(CodeEnum.EN)
+      const result = await getFooter(LanguageCode.EN)
 
       expect(result).toEqual(mockData)
     })
@@ -180,7 +207,7 @@ describe('Content API - Single Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getFooter(CodeEnum.EN)
+      const result = await getFooter(LanguageCode.EN)
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -193,7 +220,7 @@ describe('Content API - Single Types', () => {
       const mockData = { title: 'Privacy Policy', content: '...' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getPrivacy(CodeEnum.EN)
+      const result = await getPrivacy(LanguageCode.EN)
 
       expect(result).toEqual(mockData)
     })
@@ -202,7 +229,7 @@ describe('Content API - Single Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getPrivacy(CodeEnum.EN)
+      const result = await getPrivacy(LanguageCode.EN)
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -215,7 +242,7 @@ describe('Content API - Single Types', () => {
       const mockData = { title: 'Terms of Service', content: '...' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getTerm(CodeEnum.EN)
+      const result = await getTerm(LanguageCode.EN)
 
       expect(result).toEqual(mockData)
     })
@@ -224,7 +251,7 @@ describe('Content API - Single Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getTerm(CodeEnum.EN)
+      const result = await getTerm(LanguageCode.EN)
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -237,7 +264,7 @@ describe('Content API - Single Types', () => {
       const mockData = { title: '404', message: 'Page not found' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getError404(CodeEnum.EN)
+      const result = await getError404(LanguageCode.EN)
 
       expect(result).toEqual(mockData)
     })
@@ -246,7 +273,7 @@ describe('Content API - Single Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getError404(CodeEnum.EN)
+      const result = await getError404(LanguageCode.EN)
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -259,7 +286,7 @@ describe('Content API - Single Types', () => {
       const mockData = { title: '410', message: 'Gone' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getError410(CodeEnum.EN)
+      const result = await getError410(LanguageCode.EN)
 
       expect(result).toEqual(mockData)
     })
@@ -268,7 +295,7 @@ describe('Content API - Single Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getError410(CodeEnum.EN)
+      const result = await getError410(LanguageCode.EN)
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -281,7 +308,7 @@ describe('Content API - Single Types', () => {
       const mockData = { title: 'FAQ', questions: [] }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getFaq(CodeEnum.EN)
+      const result = await getFaq(LanguageCode.EN)
 
       expect(result).toEqual(mockData)
     })
@@ -290,7 +317,7 @@ describe('Content API - Single Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getFaq(CodeEnum.EN)
+      const result = await getFaq(LanguageCode.EN)
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -303,7 +330,7 @@ describe('Content API - Single Types', () => {
       const mockData = { title: 'Sign In', loginText: 'Welcome back' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getAuthPage(CodeEnum.EN)
+      const result = await getAuthPage(LanguageCode.EN)
 
       expect(result).toEqual(mockData)
     })
@@ -312,7 +339,7 @@ describe('Content API - Single Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getAuthPage(CodeEnum.EN)
+      const result = await getAuthPage(LanguageCode.EN)
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -325,7 +352,7 @@ describe('Content API - Single Types', () => {
       const mockData = { title: 'Blog', description: 'Latest posts' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getBlog(CodeEnum.EN)
+      const result = await getBlog(LanguageCode.EN)
 
       expect(result).toEqual(mockData)
     })
@@ -334,7 +361,7 @@ describe('Content API - Single Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getBlog(CodeEnum.EN)
+      const result = await getBlog(LanguageCode.EN)
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -347,7 +374,7 @@ describe('Content API - Single Types', () => {
       const mockData = { title: 'Categories', description: 'Browse categories' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getProductCategoriesPage(CodeEnum.EN)
+      const result = await getProductCategoriesPage(LanguageCode.EN)
 
       expect(result).toEqual(mockData)
     })
@@ -356,7 +383,7 @@ describe('Content API - Single Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getProductCategoriesPage(CodeEnum.EN)
+      const result = await getProductCategoriesPage(LanguageCode.EN)
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -369,7 +396,7 @@ describe('Content API - Single Types', () => {
       const mockData = { title: 'Profile', welcomeText: 'Welcome' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getProfile(CodeEnum.EN)
+      const result = await getProfile(LanguageCode.EN)
 
       expect(result).toEqual(mockData)
     })
@@ -378,7 +405,7 @@ describe('Content API - Single Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getProfile(CodeEnum.EN)
+      const result = await getProfile(LanguageCode.EN)
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -391,10 +418,10 @@ describe('Content API - Single Types', () => {
       const mockData = { title: 'Contact Us', email: 'test@example.com' }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getContactUs(CodeEnum.EN)
+      const result = await getContactUs(LanguageCode.EN)
 
       expect(mockCreateApiRequest).toHaveBeenCalledWith('/contact-us', {
-        query: { locale: CodeEnum.EN, customPopulate: 'nested' },
+        query: { locale: LanguageCode.EN, customPopulate: 'nested' },
       })
       expect(result).toEqual(mockData)
     })
@@ -403,7 +430,7 @@ describe('Content API - Single Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getContactUs(CodeEnum.EN)
+      const result = await getContactUs(LanguageCode.EN)
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -416,7 +443,7 @@ describe('Content API - Single Types', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
 
-      const result = await getNavigation(CodeEnum.EN)
+      const result = await getNavigation(LanguageCode.EN)
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalled()
@@ -440,7 +467,7 @@ describe('Content API - Collection Types', () => {
       expect(mockCreateApiRequest).toHaveBeenCalledWith('/products', {
         query: { customPopulate: 'nested' },
       })
-      expect(result).toEqual(mockData)
+      expect(result).toEqual(mockData.data)
     })
 
     it('should fetch products with filters and pagination', async () => {
@@ -449,13 +476,13 @@ describe('Content API - Collection Types', () => {
 
       const result = await getProducts({
         pagination: { page: 2, pageSize: 10 },
-        locale: CodeEnum.EN,
+        locale: LanguageCode.EN,
       })
 
       expect(mockCreateApiRequest).toHaveBeenCalledWith('/products', {
-        query: { pagination: { page: 2, pageSize: 10 }, locale: CodeEnum.EN, customPopulate: 'nested' },
+        query: { pagination: { page: 2, pageSize: 10 }, locale: LanguageCode.EN, customPopulate: 'nested' },
       })
-      expect(result).toEqual(mockData)
+      expect(result).toEqual(mockData.data)
     })
 
     it('should return null on error', async () => {
@@ -475,10 +502,10 @@ describe('Content API - Collection Types', () => {
       const mockData = { id: 1, name: 'Product 1', slug: 'product-1', price: 99.99 }
       mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getProductBySlug('product-1', { locale: CodeEnum.EN })
+      const result = await getProductBySlug('product-1', { locale: LanguageCode.EN })
       expect(mockCreateApiRequest).toHaveBeenCalledWith('/products/slug/product-1', {
         path: { slug: 'product-1' },
-        query: { locale: CodeEnum.EN, customPopulate: 'nested' },
+        query: { locale: LanguageCode.EN, customPopulate: 'nested' },
       })
       expect(result).toEqual(mockData)
     })
@@ -504,16 +531,16 @@ describe('Content API - Collection Types', () => {
       expect(mockCreateApiRequest).toHaveBeenCalledWith('/product-categories', {
         query: { customPopulate: 'nested' },
       })
-      expect(result).toEqual(mockData)
+      expect(result).toEqual(mockData.data)
     })
 
     it('should fetch categories with query', async () => {
       const mockData = { data: [], meta: {} }
       mockApiRequest.mockResolvedValueOnce(mockData as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getProductCategories({ locale: CodeEnum.IT })
+      const result = await getProductCategories({ locale: LanguageCode.IT })
 
-      expect(result).toEqual(mockData)
+      expect(result).toEqual(mockData.data)
     })
 
     it('should return null on error', async () => {
@@ -559,10 +586,10 @@ describe('Content API - Collection Types', () => {
       const mockData = { data: [{ id: 1, title: 'Post 1' }], meta: {} }
       mockApiRequest.mockResolvedValueOnce(mockData as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getBlogPosts({ locale: CodeEnum.EN.toString() })
+      const result = await getBlogPosts({ locale: LanguageCode.EN.toString() })
 
       expect(mockCreateApiRequest).toHaveBeenCalledWith('/blog-posts', {
-        query: { locale: CodeEnum.EN, customPopulate: 'nested' },
+        query: { locale: LanguageCode.EN, customPopulate: 'nested' },
       })
       expect(result).toEqual(mockData)
     })
@@ -573,11 +600,11 @@ describe('Content API - Collection Types', () => {
 
       const result = await getBlogPosts({
         pagination: { page: 1, pageSize: 10 },
-        locale: CodeEnum.EN,
+        locale: LanguageCode.EN,
       })
 
       expect(mockCreateApiRequest).toHaveBeenCalledWith('/blog-posts', {
-        query: { pagination: { page: 1, pageSize: 10 }, locale: CodeEnum.EN, customPopulate: 'nested' },
+        query: { pagination: { page: 1, pageSize: 10 }, locale: LanguageCode.EN, customPopulate: 'nested' },
       })
       expect(result).toEqual(mockData)
     })
@@ -673,10 +700,10 @@ describe('Content API - Collection Types', () => {
       const mockData = { data: [{ id: 1, name: 'Contributor 1' }], meta: {} }
       mockApiRequest.mockResolvedValueOnce(mockData as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getContributors(CodeEnum.EN)
+      const result = await getContributors(LanguageCode.EN)
 
       expect(mockCreateApiRequest).toHaveBeenCalledWith('/contributors', {
-        query: { locale: CodeEnum.EN, customPopulate: 'nested' },
+        query: { locale: LanguageCode.EN, customPopulate: 'nested' },
       })
       expect(result).toEqual(mockData.data)
     })
@@ -694,7 +721,7 @@ describe('Content API - Collection Types', () => {
       }
       mockApiRequest.mockResolvedValueOnce(mockContributors as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      const result = await getTeamMembers(CodeEnum.EN)
+      const result = await getTeamMembers(LanguageCode.EN)
 
       // Should filter out 'author' and 'seller' roles
       // Contributor 1 (CEO) keeps their role
@@ -709,7 +736,7 @@ describe('Content API - Collection Types', () => {
       mockApiRequest.mockRejectedValueOnce(new Error('API error'))
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
 
-      const result = await getTeamMembers(CodeEnum.EN)
+      const result = await getTeamMembers(LanguageCode.EN)
 
       expect(result).toEqual([])
       consoleErrorSpy.mockRestore()
@@ -719,11 +746,11 @@ describe('Content API - Collection Types', () => {
       const mockData = { data: [], meta: {} }
       mockApiRequest.mockResolvedValueOnce(mockData as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      await getTeamMembers(CodeEnum.IT)
+      await getTeamMembers(LanguageCode.IT)
 
       expect(mockCreateApiRequest).toHaveBeenCalledWith('/contributors', {
         query: {
-          locale: CodeEnum.IT,
+          locale: LanguageCode.IT,
           filters: { roles: { roleId: { $nei: 'author' } } },
           customPopulate: 'nested',
         },
@@ -734,11 +761,11 @@ describe('Content API - Collection Types', () => {
       const mockData = { data: [], meta: {} }
       mockApiRequest.mockResolvedValueOnce(mockData as unknown as ReturnType<typeof apiClient.apiRequest>)
 
-      await getTeamMembers(CodeEnum.EN, { pagination: { page: 1, pageSize: 10 } })
+      await getTeamMembers(LanguageCode.EN, { pagination: { page: 1, pageSize: 10 } })
 
       expect(mockCreateApiRequest).toHaveBeenCalledWith('/contributors', {
         query: {
-          locale: CodeEnum.EN,
+          locale: LanguageCode.EN,
           pagination: { page: 1, pageSize: 10 },
           filters: { roles: { roleId: { $nei: 'author' } } },
           customPopulate: 'nested',
@@ -840,6 +867,43 @@ describe('Content API - Upload Operations', () => {
 
       expect(result).toBeNull()
       expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to fetch file 999:', expect.any(Error))
+      consoleErrorSpy.mockRestore()
+    })
+  })
+
+  describe('getCurrencies', () => {
+    it('should fetch currencies without params', async () => {
+      const mockData = [{ code: 'USD', name: 'US Dollar' }]
+      mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
+
+      const result = await getCurrencies()
+
+      expect(mockCreateApiRequest).toHaveBeenCalledWith('/currencies', {
+        query: { customPopulate: 'nested' },
+      })
+      expect(result).toEqual(mockData)
+    })
+
+    it('should fetch currencies with locale', async () => {
+      const mockData = [{ code: 'EUR', name: 'Euro' }]
+      mockApiRequest.mockResolvedValueOnce({ data: mockData } as unknown as ReturnType<typeof apiClient.apiRequest>)
+
+      const result = await getCurrencies(LanguageCode.EN)
+
+      expect(mockCreateApiRequest).toHaveBeenCalledWith('/currencies', {
+        query: { locale: LanguageCode.EN, customPopulate: 'nested' },
+      })
+      expect(result).toEqual(mockData)
+    })
+
+    it('should return null on error', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
+      mockApiRequest.mockRejectedValueOnce(new Error('API error'))
+
+      const result = await getCurrencies()
+
+      expect(result).toBeNull()
+      expect(consoleErrorSpy).toHaveBeenCalled()
       consoleErrorSpy.mockRestore()
     })
   })

@@ -1,9 +1,11 @@
-// Copyright (c) 2025 Affilibuster by Ronen Druker.
+// Copyright (c) 2026 Affilibuster by Ronen Druker.
 
 /**
  * Unit tests for wishlist page
  */
 
+import Wishlist from '@/app/[lang]/profile/wishlist/page'
+import { getProfile } from '@/lib/content/api'
 import { render, screen } from '@testing-library/react'
 
 // Mock next/image
@@ -22,55 +24,104 @@ jest.mock('next/link', () => ({
   },
 }))
 
-import Wishlist from '@/app/[lang]/profile/wishlist/page'
+// Mock API
+jest.mock('@/lib/content/api', () => ({
+  getProfile: jest.fn(),
+}))
+
+const mockProfileData = {
+  wishlistHeader: { text: 'Wishlist' },
+  wishlistRemoveButton: { label: { text: 'Remove' } }, // Changed from 'delete' to avoid clash with icon text
+  wishlistAddButton: { label: { text: 'Add to Cart' } },
+  goBackButton: { label: { text: 'Back' } },
+}
 
 describe('Wishlist', () => {
-  it('should render wishlist page', () => {
-    render(<Wishlist />)
+  beforeEach(() => {
+    ;(getProfile as jest.Mock).mockResolvedValue(mockProfileData)
+  })
+
+  it('should render wishlist page', async () => {
+    const ui = await Wishlist({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Wishlist')
   })
 
-  it('should render back button linking to profile', () => {
-    render(<Wishlist />)
+  it('should render back button linking to profile', async () => {
+    const ui = await Wishlist({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
 
-    expect(screen.getByRole('link', { name: /arrow_back/i })).toHaveAttribute('href', '/profile')
+    expect(screen.getByRole('link', { name: /arrow_back/i })).toHaveAttribute('href', '/en/profile')
   })
 
-  it('should render wishlist items', () => {
-    render(<Wishlist />)
+  it('should render wishlist items', async () => {
+    const ui = await Wishlist({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
 
     expect(screen.getByText('Bamboo Toothbrush Set')).toBeInTheDocument()
     expect(screen.getByText('Reusable Coffee Cup')).toBeInTheDocument()
     expect(screen.getByText('Solar Powered Charger')).toBeInTheDocument()
   })
 
-  it('should render item prices', () => {
-    render(<Wishlist />)
+  it('should render item prices', async () => {
+    const ui = await Wishlist({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
 
     expect(screen.getByText('$12.99')).toBeInTheDocument()
     expect(screen.getByText('$25.00')).toBeInTheDocument()
     expect(screen.getByText('$49.50')).toBeInTheDocument()
   })
 
-  it('should render product images', () => {
-    render(<Wishlist />)
+  it('should render product images', async () => {
+    const ui = await Wishlist({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
 
     const images = screen.getAllByRole('img')
     expect(images.length).toBe(3)
   })
 
-  it('should render delete buttons', () => {
-    render(<Wishlist />)
+  it('should render delete buttons', async () => {
+    const ui = await Wishlist({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
 
-    const deleteButtons = screen.getAllByText('delete')
-    expect(deleteButtons.length).toBe(3)
+    // Tests for the icon text 'delete'
+    const deleteIcons = screen.getAllByText('delete')
+    expect(deleteIcons.length).toBe(3)
+
+    // Test for the label text 'Remove'
+    const removeLabels = screen.getAllByText('Remove')
+    expect(removeLabels.length).toBe(3)
   })
 
-  it('should render add to cart buttons', () => {
-    render(<Wishlist />)
+  it('should render add to cart buttons', async () => {
+    const ui = await Wishlist({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
 
     const addToCartButtons = screen.getAllByRole('button', { name: /Add to Cart/i })
     expect(addToCartButtons.length).toBe(3)
+  })
+
+  it('should handle missing header and labels gracefully', async () => {
+    const mockDataMissing = {
+      ...mockProfileData,
+      wishlistHeader: { header: undefined },
+      wishlistRemoveButton: { label: undefined },
+      wishlistAddButton: { label: undefined },
+    }
+    ;(getProfile as jest.Mock).mockResolvedValueOnce(mockDataMissing)
+
+    const ui = await Wishlist({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Wishlist') // Default
+    expect(screen.getAllByText('Remove').length).toBe(3) // Default
+    expect(screen.getAllByText('Add to Cart').length).toBe(3) // Default
+  })
+
+  it('should render correctly in RTL', async () => {
+    const ui = await Wishlist({ params: Promise.resolve({ lang: 'he' }) })
+    render(ui)
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
   })
 })

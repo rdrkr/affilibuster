@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react'
 
 import { Breadcrumbs } from '@/components/elements/Breadcrumbs'
 import {
-  CodeEnum,
+  LanguageCode,
   DirectionEnum,
   IconPositionEnum,
   type ApiNavigationNavigationDocument,
@@ -64,7 +64,7 @@ describe('Breadcrumbs', () => {
   it('should render home crumb and intermediate crumbs as links', () => {
     render(
       <Breadcrumbs
-        lang={CodeEnum.EN}
+        lang={LanguageCode.EN}
         pathname={defaultPath}
         direction={DirectionEnum.LTR}
         navigation={mockNavigation}
@@ -82,7 +82,7 @@ describe('Breadcrumbs', () => {
   it('should render last crumb as text', () => {
     render(
       <Breadcrumbs
-        lang={CodeEnum.EN}
+        lang={LanguageCode.EN}
         pathname={defaultPath}
         direction={DirectionEnum.LTR}
         navigation={mockNavigation}
@@ -95,7 +95,7 @@ describe('Breadcrumbs', () => {
   it('should respect customLastCrumbLabel', () => {
     render(
       <Breadcrumbs
-        lang={CodeEnum.EN}
+        lang={LanguageCode.EN}
         pathname={defaultPath}
         direction={DirectionEnum.LTR}
         navigation={mockNavigation}
@@ -110,7 +110,7 @@ describe('Breadcrumbs', () => {
     const complexPath = '/en/category/sub-category/post'
     render(
       <Breadcrumbs
-        lang={CodeEnum.EN}
+        lang={LanguageCode.EN}
         pathname={complexPath}
         direction={DirectionEnum.LTR}
         navigation={mockNavigation}
@@ -126,7 +126,9 @@ describe('Breadcrumbs', () => {
   })
 
   it('should handle root path', () => {
-    render(<Breadcrumbs lang={CodeEnum.EN} pathname="/en" direction={DirectionEnum.LTR} navigation={mockNavigation} />)
+    render(
+      <Breadcrumbs lang={LanguageCode.EN} pathname="/en" direction={DirectionEnum.LTR} navigation={mockNavigation} />
+    )
     // Only Home crumb, and it is last, so it should be text
     expect(screen.queryByTestId('crumb-link')).not.toBeInTheDocument()
     expect(screen.getByTestId('text-component')).toHaveTextContent('Home')
@@ -135,7 +137,12 @@ describe('Breadcrumbs', () => {
   it('should handle path without lang prefix if that happens', () => {
     const noLangPath = '/blog/post'
     render(
-      <Breadcrumbs lang={CodeEnum.EN} pathname={noLangPath} direction={DirectionEnum.LTR} navigation={mockNavigation} />
+      <Breadcrumbs
+        lang={LanguageCode.EN}
+        pathname={noLangPath}
+        direction={DirectionEnum.LTR}
+        navigation={mockNavigation}
+      />
     )
     const links = screen.getAllByTestId('crumb-link')
     expect(links[0]).toHaveAttribute('href', '/en')
@@ -144,7 +151,12 @@ describe('Breadcrumbs', () => {
   it('should drop "tag" segment from crumbs', () => {
     const tagPath = '/en/blog/tag/my-tag'
     render(
-      <Breadcrumbs lang={CodeEnum.EN} pathname={tagPath} direction={DirectionEnum.LTR} navigation={mockNavigation} />
+      <Breadcrumbs
+        lang={LanguageCode.EN}
+        pathname={tagPath}
+        direction={DirectionEnum.LTR}
+        navigation={mockNavigation}
+      />
     )
 
     const links = screen.getAllByTestId('crumb-link')
@@ -162,7 +174,7 @@ describe('Breadcrumbs', () => {
   it('renders correctly in RTL', () => {
     const { container } = render(
       <Breadcrumbs
-        lang={CodeEnum.HE}
+        lang={LanguageCode.HE}
         pathname="/he/blog/post-1"
         direction={DirectionEnum.RTL}
         navigation={mockNavigation}
@@ -187,7 +199,12 @@ describe('Breadcrumbs', () => {
 
   it('should handle about path correctly', () => {
     render(
-      <Breadcrumbs navigation={mockNavigation} pathname="/en/about" lang={CodeEnum.EN} direction={DirectionEnum.LTR} />
+      <Breadcrumbs
+        navigation={mockNavigation}
+        pathname="/en/about"
+        lang={LanguageCode.EN}
+        direction={DirectionEnum.LTR}
+      />
     )
 
     const links = screen.getAllByTestId('crumb-link')
@@ -204,7 +221,7 @@ describe('Breadcrumbs', () => {
       <Breadcrumbs
         navigation={mockNavigation}
         pathname="/en/products"
-        lang={CodeEnum.EN}
+        lang={LanguageCode.EN}
         direction={DirectionEnum.LTR}
       />
     )
@@ -220,7 +237,7 @@ describe('Breadcrumbs', () => {
 
   it('should handle empty segment (home) correctly', () => {
     const { container } = render(
-      <Breadcrumbs navigation={mockNavigation} pathname="/en/" lang={CodeEnum.EN} direction={DirectionEnum.LTR} />
+      <Breadcrumbs navigation={mockNavigation} pathname="/en/" lang={LanguageCode.EN} direction={DirectionEnum.LTR} />
     )
 
     // When on home page with empty segments, breadcrumbs component should render

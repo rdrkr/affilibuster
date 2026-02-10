@@ -4,7 +4,7 @@
  * Unit tests for StyleGuidePage server component
  */
 
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 
 import StyleGuidePage, { generateMetadata, generateStaticParams } from '@/app/[lang]/style-guide/page'
@@ -27,7 +27,7 @@ describe('StyleGuidePage', () => {
     it('should return all supported language codes', () => {
       const params = generateStaticParams()
 
-      expect(params).toEqual([{ lang: CodeEnum.EN }, { lang: CodeEnum.IT }, { lang: CodeEnum.HE }])
+      expect(params).toEqual([{ lang: LanguageCode.EN }, { lang: LanguageCode.IT }, { lang: LanguageCode.HE }])
     })
 
     it('should return array with correct structure', () => {
@@ -67,7 +67,7 @@ describe('StyleGuidePage', () => {
 
   describe('StyleGuidePage component', () => {
     it('should render StyleGuideClient with English language', async () => {
-      const params = Promise.resolve({ lang: CodeEnum.EN })
+      const params = Promise.resolve({ lang: LanguageCode.EN })
       render(await StyleGuidePage({ params }))
 
       const client = screen.getByTestId('mock-style-guide-client')
@@ -75,7 +75,7 @@ describe('StyleGuidePage', () => {
     })
 
     it('should render StyleGuideClient with Italian language', async () => {
-      const params = Promise.resolve({ lang: CodeEnum.IT })
+      const params = Promise.resolve({ lang: LanguageCode.IT })
       render(await StyleGuidePage({ params }))
 
       const client = screen.getByTestId('mock-style-guide-client')
@@ -83,7 +83,7 @@ describe('StyleGuidePage', () => {
     })
 
     it('should render StyleGuideClient with Hebrew language', async () => {
-      const params = Promise.resolve({ lang: CodeEnum.HE })
+      const params = Promise.resolve({ lang: LanguageCode.HE })
       render(await StyleGuidePage({ params }))
 
       const client = screen.getByTestId('mock-style-guide-client')
@@ -91,7 +91,7 @@ describe('StyleGuidePage', () => {
     })
 
     it('should default to English when lang is missing', async () => {
-      const params = Promise.resolve({ lang: '' as CodeEnum })
+      const params = Promise.resolve({ lang: '' as LanguageCode })
       render(await StyleGuidePage({ params }))
 
       const client = screen.getByTestId('mock-style-guide-client')
@@ -116,15 +116,15 @@ describe('StyleGuidePage', () => {
 
     it('should call setRequestLocale with the correct language', async () => {
       const { setRequestLocale } = await import('next-intl/server')
-      const params = Promise.resolve({ lang: CodeEnum.IT })
+      const params = Promise.resolve({ lang: LanguageCode.IT })
 
       render(await StyleGuidePage({ params }))
 
-      expect(setRequestLocale).toHaveBeenCalledWith(CodeEnum.IT)
+      expect(setRequestLocale).toHaveBeenCalledWith(LanguageCode.IT)
     })
 
     it('should handle invalid language code gracefully', async () => {
-      const params = Promise.resolve({ lang: 'invalid' as CodeEnum })
+      const params = Promise.resolve({ lang: 'invalid' as LanguageCode })
       render(await StyleGuidePage({ params }))
 
       const client = screen.getByTestId('mock-style-guide-client')

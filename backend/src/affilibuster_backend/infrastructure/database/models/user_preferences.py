@@ -13,7 +13,7 @@ from sqlalchemy import Boolean, DateTime, Enum, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from affilibuster_backend.domain.entities.generated.models import CurrencyCode, DetectedLanguage2
+from affilibuster_backend.domain.entities.generated.models import CurrencyCode, LanguageCode
 from affilibuster_backend.infrastructure.database.models import Base
 
 
@@ -38,8 +38,8 @@ class UserPreferencesModel(Base):
     selected_currency: Mapped[CurrencyCode] = mapped_column(
         Enum(CurrencyCode, native_enum=False, length=10), nullable=False, default=CurrencyCode.USD
     )
-    detected_language: Mapped[DetectedLanguage2 | None] = mapped_column(
-        Enum(DetectedLanguage2, native_enum=False, length=10), nullable=True
+    detected_language: Mapped[LanguageCode | None] = mapped_column(
+        Enum(LanguageCode, native_enum=False, length=10), nullable=True
     )
 
     # Preferences

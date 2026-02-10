@@ -76,7 +76,7 @@ VPS provisioned and fully configured.
 ## Phase 3: CI/CD Pipeline - PARTIAL
 
 - [x] Deploy workflow created (`.github/workflows/deploy.yaml`)
-- [ ] Add GitHub secrets (VPS_HOST, VPS_USER, VPS_SSH_KEY, VPS_SSH_KNOWN_HOSTS)
+- [x] Add GitHub secrets (VPS_HOST, VPS_USER, VPS_SSH_KEY, VPS_SSH_KNOWN_HOSTS)
 
 ## Phase 4: DNS Migration - COMPLETE ✅
 
@@ -96,6 +96,6 @@ Services are running with production data.
 
 ## Phase 7: Monitoring - NOT STARTED
 
-- [ ] Deploy Uptime Kuma container
-- [ ] Configure health check endpoints
+- [x] Deploy Uptime Kuma container
+- [x] Configure health check endpoints
 - [ ] Set up Telegram/Email alerts

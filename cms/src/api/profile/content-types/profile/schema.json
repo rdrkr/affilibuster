@@ -22,149 +22,214 @@
       "default": "Profile Page",
       "required": true
     },
-    "profileTitle": {
-      "type": "string",
+    "pageHeader": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
     },
-    "editProfileTitle": {
-      "type": "string",
+    "accountSettingsHeader": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
     },
-    "wishlistTitle": {
-      "type": "string",
+    "editProfileButton": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
     },
-    "wishlistEmptyMessage": {
-      "type": "text",
+    "wishlistHeader": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
     },
-    "currencyTitle": {
-      "type": "string",
+    "wishlistAddButton": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
     },
-    "currencyDescription": {
-      "type": "text",
+    "wishlistRemoveButton": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
     },
-    "deleteAccountTitle": {
-      "type": "string",
+    "currencyHeader": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
     },
-    "deleteAccountWarning": {
-      "type": "text",
+    "deleteAccountHeader": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
-    },
-    "saveButton": {
-      "type": "string",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "required": false
-    },
-    "cancelButton": {
-      "type": "string",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "required": false
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
     },
     "deleteButton": {
-      "type": "string",
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
+    "cancelButton": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
     },
     "confirmButton": {
-      "type": "string",
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
+    "saveButton": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
     },
     "logoutButton": {
-      "type": "string",
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
+    "goBackButton": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
     },
     "nameLabel": {
-      "type": "string",
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
     },
     "emailLabel": {
-      "type": "string",
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
     },
     "passwordLabel": {
-      "type": "string",
+      "type": "component",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "required": false
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "cookieSettingsHeader": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
+    },
+    "exportDataHeader": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.header",
+      "repeatable": false,
+      "required": true
     },
     "seoMetadata": {
       "type": "component",

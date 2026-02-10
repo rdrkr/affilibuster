@@ -2,7 +2,7 @@
 
 import { getProductBySlug, getProductCategoriesPage, getProducts } from '@/lib/client'
 import { userProfileFlag } from '@/lib/feature-flags'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import { notFound } from 'next/navigation'
 import ProductDetailClient from './ProductDetailClient'
 
@@ -15,7 +15,7 @@ import ProductDetailClient from './ProductDetailClient'
  * @param params.params - Promise containing route parameters with lang and slug
  * @returns Server-rendered product detail page
  */
-export default async function ProductDetailPage({ params }: { params: Promise<{ lang: CodeEnum; slug: string }> }) {
+export default async function ProductDetailPage({ params }: { params: Promise<{ lang: LanguageCode; slug: string }> }) {
   const resolvedParams = await params
   const { lang, slug } = resolvedParams
 
@@ -32,30 +32,29 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   }
 
   // Fetch related products (same category, exclude current)
-  // Use explicit type casting for filters as 'category' is missing from generated ItemsEnum12 but supported by API
-  const relatedProductsResponse = await getProducts({
-    filters: {
-      category: {
-        slug: {
-          $eq: product.category.slug,
+  const relatedProductsResponse =
+    (await getProducts({
+      filters: {
+        category: {
+          slug: {
+            $eq: product.category.slug,
+          },
         },
       },
-      slug: {
-        $ne: slug,
+      pagination: {
+        page: 1,
+        pageSize: 10,
       },
-    } as NonNullable<NonNullable<Parameters<typeof getProducts>[0]>['filters']>,
-    pagination: {
-      page: 1,
-      pageSize: 10,
-    },
-    locale: lang,
-  })
+      locale: lang,
+    })) ?? []
+
+  const relatedProducts = relatedProductsResponse.filter(p => p.slug !== slug)
 
   return (
     <ProductDetailClient
       product={product}
       certificatesHeader={productCategoriesPage.certificatesSectionHeader}
-      relatedProducts={relatedProductsResponse?.data ?? []}
+      relatedProducts={relatedProducts}
       relatedProductsHeader={productCategoriesPage.relatedProductsSectionHeader}
       enableUserProfile={userProfileEnabled}
       bySellerText={productCategoriesPage.bySellerText}

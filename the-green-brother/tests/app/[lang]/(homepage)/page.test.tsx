@@ -33,7 +33,7 @@ import HomePage from '@/app/[lang]/(homepage)/page'
 import { HomeSections } from '@/components/homepage'
 import { getBlog, getHomepage, getTeamMembers } from '@/lib/content'
 import { userProfileFlag } from '@/lib/feature-flags'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 
 const mockGetHomepage = getHomepage as jest.MockedFunction<typeof getHomepage>
@@ -60,12 +60,12 @@ describe('HomePage', () => {
     mockUserProfileFlag.mockResolvedValue(false)
     mockGetBlog.mockResolvedValue(mockBlogPage as unknown as Awaited<ReturnType<typeof getBlog>>)
 
-    const Component = await HomePage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+    const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
-    expect(mockGetHomepage).toHaveBeenCalledWith(CodeEnum.EN)
-    expect(mockGetTeamMembers).toHaveBeenCalledWith(CodeEnum.EN)
-    expect(mockGetBlog).toHaveBeenCalledWith(CodeEnum.EN)
+    expect(mockGetHomepage).toHaveBeenCalledWith(LanguageCode.EN)
+    expect(mockGetTeamMembers).toHaveBeenCalledWith(LanguageCode.EN)
+    expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.EN)
     expect(screen.getByTestId('home-client')).toBeInTheDocument()
     expect(screen.getByTestId('home-sections')).toBeInTheDocument()
     expect(mockHomeSections).toHaveBeenCalledWith(
@@ -90,7 +90,7 @@ describe('HomePage', () => {
     mockGetTeamMembers.mockResolvedValue([])
     mockGetBlog.mockResolvedValue(mockBlogPage as unknown as Awaited<ReturnType<typeof getBlog>>)
 
-    const Component = await HomePage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+    const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
     expect(mockHomeSections).toHaveBeenCalledWith(
@@ -112,7 +112,7 @@ describe('HomePage', () => {
     mockGetTeamMembers.mockResolvedValue([])
     mockGetBlog.mockResolvedValue(mockBlogPage as unknown as Awaited<ReturnType<typeof getBlog>>)
 
-    const result = await HomePage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+    const result = await HomePage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
 
     expect(result).toBeNull()
   })
@@ -122,7 +122,7 @@ describe('HomePage', () => {
     mockGetTeamMembers.mockResolvedValue([])
     mockGetBlog.mockResolvedValue(null)
 
-    const result = await HomePage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+    const result = await HomePage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
 
     expect(result).toBeNull()
   })
@@ -137,12 +137,12 @@ describe('HomePage', () => {
     mockGetTeamMembers.mockResolvedValue([])
     mockGetBlog.mockResolvedValue(mockBlogPage as unknown as Awaited<ReturnType<typeof getBlog>>)
 
-    const Component = await HomePage({ params: Promise.resolve({ lang: CodeEnum.IT }) })
+    const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.IT }) })
     render(Component)
 
-    expect(mockGetHomepage).toHaveBeenCalledWith(CodeEnum.IT)
-    expect(mockGetTeamMembers).toHaveBeenCalledWith(CodeEnum.IT)
-    expect(mockGetBlog).toHaveBeenCalledWith(CodeEnum.IT)
+    expect(mockGetHomepage).toHaveBeenCalledWith(LanguageCode.IT)
+    expect(mockGetTeamMembers).toHaveBeenCalledWith(LanguageCode.IT)
+    expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.IT)
   })
 
   it('should fetch team members and pass to HomeSections', async () => {
@@ -159,10 +159,10 @@ describe('HomePage', () => {
     mockGetTeamMembers.mockResolvedValue(mockTeamMembers as unknown as Awaited<ReturnType<typeof getTeamMembers>>)
     mockGetBlog.mockResolvedValue(mockBlogPage as unknown as Awaited<ReturnType<typeof getBlog>>)
 
-    const Component = await HomePage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+    const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
-    expect(mockGetTeamMembers).toHaveBeenCalledWith(CodeEnum.EN)
+    expect(mockGetTeamMembers).toHaveBeenCalledWith(LanguageCode.EN)
     expect(mockHomeSections).toHaveBeenCalledWith(
       expect.objectContaining({
         teamMembers: mockTeamMembers,

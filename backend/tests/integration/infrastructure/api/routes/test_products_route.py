@@ -26,14 +26,14 @@ class TestGetProducts:
 
     async def test_get_products_returns_200(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
         """Test that GET /products returns 200 status code."""
-        response = await integration_client.get("/v1/products?customPopulate=nested")
+        response = await integration_client.get("/v1/products?custom_populate=nested")
         assert response.status_code == 200
 
     async def test_get_products_returns_data_structure(
         self, integration_client: AsyncClient, strapi_test_data: None
     ) -> None:
         """Test that GET /products returns proper data structure with seeded English products."""
-        response = await integration_client.get("/v1/products?customPopulate=nested")
+        response = await integration_client.get("/v1/products?custom_populate=nested")
         assert response.status_code == 200
 
         data = ProductsGetResponse(**response.json())
@@ -55,7 +55,7 @@ class TestGetProducts:
         """Test GET /products with pagination parameters."""
         response = await integration_client.get(
             "/v1/products",
-            params={"customPopulate": "nested", "pagination[pageSize]": "10", "pagination[page]": "1"},
+            params={"custom_populate": "nested", "pagination[pageSize]": "10", "pagination[page]": "1"},
         )
         assert response.status_code == 200
 
@@ -69,7 +69,7 @@ class TestGetProducts:
 
         response = await integration_client.get(
             "/v1/products",
-            params={"customPopulate": "nested", "filters[slug][$eq]": expected_slug},
+            params={"custom_populate": "nested", "filters[slug][$eq]": expected_slug},
         )
         assert response.status_code == 200
 
@@ -85,7 +85,7 @@ class TestGetProducts:
         """Test GET /products with field selection."""
         response = await integration_client.get(
             "/v1/products",
-            params={"customPopulate": "nested", "fields[]": ["title", "slug"]},
+            params={"custom_populate": "nested", "fields[]": ["title", "slug"]},
         )
         assert response.status_code == 200
 
@@ -93,7 +93,7 @@ class TestGetProducts:
         """Test GET /products with sorting."""
         response = await integration_client.get(
             "/v1/products",
-            params={"customPopulate": "nested", "sort[]": "title:asc"},
+            params={"custom_populate": "nested", "sort[]": "title:asc"},
         )
         assert response.status_code == 200
 
@@ -102,7 +102,7 @@ class TestGetProducts:
         # Test English products
         response = await integration_client.get(
             "/v1/products",
-            params={"customPopulate": "nested", "locale": "en"},
+            params={"custom_populate": "nested", "locale": "en"},
         )
         assert response.status_code == 200
 
@@ -115,7 +115,7 @@ class TestGetProducts:
         # Test Italian products
         response_it = await integration_client.get(
             "/v1/products",
-            params={"customPopulate": "nested", "locale": "it"},
+            params={"custom_populate": "nested", "locale": "it"},
         )
         assert response_it.status_code == 200
 
@@ -127,7 +127,7 @@ class TestGetProducts:
 
     async def test_get_products_strapi_error_returns_502(self, integration_client: AsyncClient) -> None:
         """Test that Strapi errors return 502 Bad Gateway."""
-        response = await integration_client.get("/v1/products?customPopulate=nested")
+        response = await integration_client.get("/v1/products?custom_populate=nested")
         # Should either succeed (200) or fail with 502 if Strapi is down
         assert response.status_code in [200, 502]
 
@@ -141,20 +141,20 @@ class TestGetProduct:
     async def test_get_product_by_id_returns_200(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
         """Test that GET /products/{id} returns 200 for valid ID."""
         # First, get list of products to find a valid ID
-        list_response = await integration_client.get("/v1/products?customPopulate=nested")
+        list_response = await integration_client.get("/v1/products?custom_populate=nested")
         if list_response.status_code == 200:
             data = ProductsGetResponse(**list_response.json())
             if data.data and len(data.data) > 0:
                 product_id = data.data[0].document_id
 
                 # Now get specific product
-                response = await integration_client.get(f"/v1/products/{product_id}?customPopulate=nested")
+                response = await integration_client.get(f"/v1/products/{product_id}?custom_populate=nested")
                 # Should return 200 for valid ID, or 502 if Strapi has issues
                 assert response.status_code in [200, 404, 502]
 
     async def test_get_product_by_slug(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
         """Test that GET /products/{slug} works with slug identifier."""
-        response = await integration_client.get("/v1/products/test-product-slug?customPopulate=nested")
+        response = await integration_client.get("/v1/products/test-product-slug?custom_populate=nested")
         # Should return 200, 404, or 502 depending on whether slug exists
         assert response.status_code in [200, 404, 502]
 
@@ -163,31 +163,31 @@ class TestGetProduct:
     ) -> None:
         """Test GET /products/{id} with field selection."""
         # Get a valid product ID first
-        list_response = await integration_client.get("/v1/products?customPopulate=nested")
+        list_response = await integration_client.get("/v1/products?custom_populate=nested")
         if list_response.status_code == 200:
             data = ProductsGetResponse(**list_response.json())
             if data.data and len(data.data) > 0:
                 product_id = data.data[0].document_id
 
                 response = await integration_client.get(
-                    f"/v1/products/{product_id}?customPopulate=nested",
-                    params={"customPopulate": "nested", "fields[]": ["title", "slug"]},
+                    f"/v1/products/{product_id}?custom_populate=nested",
+                    params={"custom_populate": "nested", "fields[]": ["title", "slug"]},
                 )
                 assert response.status_code in [200, 404, 502]
 
     async def test_get_product_with_locale(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
         """Test GET /products/{id} with locale parameter."""
         response = await integration_client.get(
-            "/v1/products/1?customPopulate=nested",
-            params={"customPopulate": "nested", "locale": "en"},
+            "/v1/products/1?custom_populate=nested",
+            params={"custom_populate": "nested", "locale": "en"},
         )
         assert response.status_code in [200, 404, 502]
 
     async def test_get_product_with_populate(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
         """Test GET /products/{id} with populate parameter."""
         response = await integration_client.get(
-            "/v1/products/1?customPopulate=nested",
-            params={"customPopulate": "nested", "populate": "*"},
+            "/v1/products/1?custom_populate=nested",
+            params={"custom_populate": "nested", "populate": "*"},
         )
         assert response.status_code in [200, 404, 502]
 
@@ -195,7 +195,7 @@ class TestGetProduct:
         self, integration_client: AsyncClient, strapi_test_data: None
     ) -> None:
         """Test that GET /products/{id} with invalid ID returns error."""
-        response = await integration_client.get("/v1/products/nonexistent-id-99999?customPopulate=nested")
+        response = await integration_client.get("/v1/products/nonexistent-id-99999?custom_populate=nested")
         # Should return 404 or 502 (Strapi error)
         assert response.status_code in [404, 502]
 
@@ -203,7 +203,7 @@ class TestGetProduct:
         self, integration_client: AsyncClient, strapi_test_data: None
     ) -> None:
         """Test that Strapi errors return 502 Bad Gateway."""
-        response = await integration_client.get("/v1/products/1?customPopulate=nested")
+        response = await integration_client.get("/v1/products/1?custom_populate=nested")
         # Should either succeed or fail with 502 if Strapi has issues
         assert response.status_code in [200, 404, 502]
 
@@ -212,7 +212,7 @@ class TestGetProduct:
     ) -> None:
         """Test that product ID path parameter is required."""
         # Trying to access without ID should redirect to list endpoint
-        response = await integration_client.get("/v1/products/?customPopulate=nested")
+        response = await integration_client.get("/v1/products/?custom_populate=nested")
         # FastAPI redirects /products/ to /products (307 Temporary Redirect)
         assert response.status_code in [200, 307, 404, 502]
 
@@ -225,12 +225,12 @@ class TestProductsErrorHandling:
 
     async def test_get_products_handles_strapi_connection_error(self, integration_client: AsyncClient) -> None:
         """Test that connection errors to Strapi are handled gracefully."""
-        response = await integration_client.get("/v1/products?customPopulate=nested")
+        response = await integration_client.get("/v1/products?custom_populate=nested")
         # Should return either 200 (success) or 502 (Bad Gateway on error)
         assert response.status_code in [200, 502]
 
     async def test_get_product_handles_strapi_connection_error(self, integration_client: AsyncClient) -> None:
         """Test that connection errors to Strapi are handled gracefully."""
-        response = await integration_client.get("/v1/products/1?customPopulate=nested")
+        response = await integration_client.get("/v1/products/1?custom_populate=nested")
         # Should return either 200/404 (success) or 502 (Bad Gateway on error)
         assert response.status_code in [200, 404, 502]

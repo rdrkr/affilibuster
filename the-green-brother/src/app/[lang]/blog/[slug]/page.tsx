@@ -2,7 +2,7 @@
 
 // Import removed: getBlog (added below)
 import { getBlog, getBlogPostBySlug, getLanguages, getNavigation } from '@/lib/client'
-import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
+import { LanguageCode, DirectionEnum } from '@/lib/generated/types.gen'
 import { notFound } from 'next/navigation'
 import BlogPostClient from './BlogPostClient'
 
@@ -15,7 +15,7 @@ import BlogPostClient from './BlogPostClient'
  * @param params.params - Promise containing route parameters with lang and slug
  * @returns Server-rendered blog post detail page
  */
-export default async function BlogPostPage({ params }: { params: Promise<{ lang: CodeEnum; slug: string }> }) {
+export default async function BlogPostPage({ params }: { params: Promise<{ lang: LanguageCode; slug: string }> }) {
   const resolvedParams = await params
   const { lang, slug } = resolvedParams
 

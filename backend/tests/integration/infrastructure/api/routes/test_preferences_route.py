@@ -11,7 +11,7 @@ import uuid
 import pytest
 from httpx import AsyncClient
 
-from affilibuster_backend.domain.entities.generated.models import CurrencyCode, DetectedLanguage2, UserPreferences
+from affilibuster_backend.domain.entities.generated.models import CurrencyCode, LanguageCode, UserPreferences
 
 
 @pytest.mark.integration
@@ -139,7 +139,7 @@ class TestGetPreferences:
 
         data = UserPreferences(**response.json())
         # detectedLanguage can be None for new sessions
-        assert data.detected_language is None or isinstance(data.detected_language, DetectedLanguage2)
+        assert data.detected_language is None or isinstance(data.detected_language, LanguageCode)
 
     async def test_get_preferences_expires_at_is_future(self, integration_client: AsyncClient) -> None:
         """Test that expiresAt is set to future date (30 days)."""
@@ -210,7 +210,7 @@ class TestUpdatePreferences:
         assert response.status_code == 200
 
         data = UserPreferences(**response.json())
-        assert data.detected_language == DetectedLanguage2.IT
+        assert data.detected_language == LanguageCode.IT
 
     async def test_update_preferences_multiple_fields(
         self, integration_client: AsyncClient, strapi_test_data: None
@@ -232,7 +232,7 @@ class TestUpdatePreferences:
         data = UserPreferences(**response.json())
         assert data.selected_currency == CurrencyCode.ILS
         assert data.dismissed_language_prompt is True
-        assert data.detected_language == DetectedLanguage2.HE
+        assert data.detected_language == LanguageCode.HE
 
     async def test_update_preferences_with_invalid_currency(
         self, integration_client: AsyncClient, strapi_test_data: None
@@ -467,7 +467,7 @@ class TestPreferencesEdgeCases:
         assert data.session_id == session_id
         assert data.selected_currency == CurrencyCode.EUR
         assert data.dismissed_language_prompt is True
-        assert data.detected_language == DetectedLanguage2.IT
+        assert data.detected_language == LanguageCode.IT
         # Should have created a new record with an ID
         assert data.id is not None
 
@@ -522,4 +522,4 @@ class TestPreferencesEdgeCases:
 
         data = UserPreferences(**update_response.json())
         assert data.selected_currency == CurrencyCode.USD
-        assert data.detected_language == DetectedLanguage2.EN
+        assert data.detected_language == LanguageCode.EN

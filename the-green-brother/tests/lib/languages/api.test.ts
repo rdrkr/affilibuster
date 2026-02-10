@@ -5,7 +5,7 @@
  */
 
 import { apiRequest } from '@/lib/core/client'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import { detectLanguage, getLanguages } from '@/lib/languages/api'
 
 // Mock the apiRequest and createApiRequest functions
@@ -33,8 +33,8 @@ describe('languages API', () => {
   describe('getLanguages', () => {
     it('should call apiRequest with correct parameters', async () => {
       const mockResponse = [
-        { code: CodeEnum.EN, name: 'English', flag: '🇺🇸' },
-        { code: CodeEnum.IT, name: 'Italiano', flag: '🇮🇹' },
+        { code: LanguageCode.EN, name: 'English', flag: '🇺🇸' },
+        { code: LanguageCode.IT, name: 'Italiano', flag: '🇮🇹' },
       ]
       mockApiRequest.mockResolvedValueOnce(mockResponse as unknown as Awaited<ReturnType<typeof apiRequest>>)
 
@@ -57,7 +57,7 @@ describe('languages API', () => {
 
   describe('detectLanguage', () => {
     it('should call apiRequest with correct parameters', async () => {
-      const mockResponse = { detectedLanguage: CodeEnum.EN, shouldPrompt: false }
+      const mockResponse = { detectedLanguage: LanguageCode.EN, shouldPrompt: false }
       mockApiRequest.mockResolvedValueOnce(mockResponse as unknown as Awaited<ReturnType<typeof apiRequest>>)
 
       const body = { acceptLanguage: 'en-US,en;q=0.9' }
@@ -77,7 +77,7 @@ describe('languages API', () => {
       const error = new Error('Detection failed')
       mockApiRequest.mockRejectedValueOnce(error)
 
-      const result = await detectLanguage({ acceptLanguage: CodeEnum.EN })
+      const result = await detectLanguage({ acceptLanguage: LanguageCode.EN })
 
       expect(result).toBeNull()
       expect(console.error).toHaveBeenCalledWith('Failed to detect language:', error)

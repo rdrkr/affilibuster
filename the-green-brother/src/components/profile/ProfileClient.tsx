@@ -1,0 +1,311 @@
+// Copyright (c) 2026 Affilibuster by Ronen Druker.
+
+'use client'
+
+/**
+ * ProfileClient Component
+ *
+ * Client component for the Profile dashboard.
+ * Renders profile menu/dashboard using CMS data for labels.
+ */
+
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
+import { exportUserData } from '@/lib/auth/api'
+import { openCookieSettings } from '@/lib/consent'
+import { type ApiProfileProfileDocument, DirectionEnum, type ElementsHeaderEntry } from '@/lib/generated/types.gen'
+
+import ButtonLink from '@/components/elements/ButtonLink'
+import Header from '@/components/elements/Header'
+
+interface ProfileClientProps {
+  data: ApiProfileProfileDocument
+  lang: string
+  direction: DirectionEnum
+}
+
+/**
+ * Profile Client component
+ * @param root0 - Component props
+ * @param root0.data - Profile data from CMS
+ * @param root0.lang - Current language code
+ * @param root0.direction - Text direction
+ * @returns React component
+ */
+export default function ProfileClient({ data, lang, direction }: ProfileClientProps) {
+  const router = useRouter()
+  const [isExporting, setIsExporting] = useState(false)
+
+  // Mock user data for now (should come from session/context)
+  const user = {
+    name: 'Ronen Druker',
+    email: 'ronen@example.com',
+    avatar: null,
+  }
+
+  const {
+    pageHeader,
+    accountSettingsHeader,
+    editProfileButton,
+    wishlistHeader,
+    currencyHeader,
+    cookieSettingsHeader,
+    exportDataHeader,
+    deleteAccountHeader,
+    logoutButton,
+  } = data
+
+  // Helper to get text from header component
+  const getHeaderText = (headerEntry: ElementsHeaderEntry | undefined) => headerEntry?.header?.text ?? ''
+
+  /**
+   * Handle export user data button click.
+   * Fetches user data via GDPR DSAR endpoint and triggers a JSON file download.
+   */
+  const handleExportData = async (): Promise<void> => {
+    setIsExporting(true)
+
+    const exportData = await exportUserData()
+
+    if (exportData) {
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'my-data-export.json'
+      link.click()
+      URL.revokeObjectURL(url)
+    }
+
+    setIsExporting(false)
+  }
+
+  const handleLogout = () => {
+    // Implement logout
+    router.push(`/${lang}/login`)
+  }
+
+  const isRtl = direction === DirectionEnum.RTL
+
+  return (
+    <div className="flex min-h-[80vh] items-center justify-center py-12">
+      <div className="w-full max-w-2xl px-4">
+        {/* Page Header */}
+        <Header
+          data={pageHeader}
+          direction={direction}
+          level={1}
+          className="mb-8 text-center"
+          headerClassName="text-3xl font-bold text-neutral-800 dark:text-white"
+          subheaderClassName="text-neutral-600 dark:text-text-secondary-dark"
+        />
+
+        <div
+          className={`
+          overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-xl
+          dark:border-white/5 dark:bg-surface-dark
+        `}
+        >
+          {/* User Info Section */}
+          <div className="border-b border-neutral-100 bg-neutral-50 p-6 dark:border-white/5 dark:bg-white/5">
+            <div className="flex items-center gap-4">
+              <div
+                className={`
+                  flex size-16 items-center justify-center rounded-full
+                  bg-primary text-2xl font-bold text-white shadow-lg shadow-primary/20
+                `}
+              >
+                {user.name.charAt(0)}
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-neutral-800 dark:text-white">{user.name}</h2>
+                <p className="text-sm text-neutral-500 dark:text-text-secondary-dark">{user.email}</p>
+              </div>
+              {/* Edit Profile Button */}
+              {editProfileButton.label && (
+                <ButtonLink
+                  data={editProfileButton}
+                  direction={direction}
+                  variant="outline"
+                  size="sm"
+                  className="ml-auto" // Tailwind 'ms-auto' is better for logical properties but keeping simple for now
+                >
+                  <span className="material-symbols-outlined text-lg">edit</span>
+                </ButtonLink>
+              )}
+            </div>
+          </div>
+
+          <div className="p-6">
+            {/* Account Settings Header */}
+            <Header
+              data={accountSettingsHeader}
+              direction={direction}
+              level={2}
+              className="mb-4"
+              headerClassName="text-lg font-bold text-neutral-800 dark:text-white"
+            />
+
+            <div className="space-y-2">
+              {/* Wishlist Link */}
+              <Link
+                href={`/${lang}/profile/wishlist`}
+                className={`
+                    flex items-center gap-3 rounded-xl p-3
+                    transition-colors hover:bg-neutral-50 dark:hover:bg-white/5
+                  `}
+              >
+                <div
+                  className={`
+                    flex size-10 items-center justify-center rounded-lg
+                    bg-secondary-100 text-secondary-600
+                    dark:bg-secondary-900/30 dark:text-secondary-400
+                  `}
+                >
+                  <span className="material-symbols-outlined">favorite</span>
+                </div>
+                <span className="font-medium text-neutral-700 dark:text-neutral-200">
+                  {getHeaderText(wishlistHeader)}
+                </span>
+                <span
+                  className={`material-symbols-outlined text-neutral-400 ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
+                >
+                  chevron_right
+                </span>
+              </Link>
+
+              {/* Currency Link */}
+              <Link
+                href={`/${lang}/profile/currency`}
+                className={`
+                    flex items-center gap-3 rounded-xl p-3
+                    transition-colors hover:bg-neutral-50 dark:hover:bg-white/5
+                  `}
+              >
+                <div
+                  className={`
+                    flex size-10 items-center justify-center rounded-lg
+                    bg-success-100 text-success-600
+                    dark:bg-success-900/30 dark:text-success-400
+                  `}
+                >
+                  <span className="material-symbols-outlined">attach_money</span>
+                </div>
+                <span className="font-medium text-neutral-700 dark:text-neutral-200">
+                  {getHeaderText(currencyHeader)}
+                </span>
+                <span
+                  className={`material-symbols-outlined text-neutral-400 ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
+                >
+                  chevron_right
+                </span>
+              </Link>
+
+              {/* Export My Data Button (GDPR DSAR) */}
+              <button
+                onClick={() => void handleExportData()}
+                disabled={isExporting}
+                className={`
+                    flex w-full items-center gap-3 rounded-xl p-3
+                    transition-colors hover:bg-neutral-50
+                    disabled:cursor-not-allowed disabled:opacity-50
+                    dark:hover:bg-white/5
+                  `}
+              >
+                <div
+                  className={`
+                    flex size-10 items-center justify-center rounded-lg
+                    bg-primary-100 text-primary-600
+                    dark:bg-primary-900/30 dark:text-primary-400
+                  `}
+                >
+                  <span className="material-symbols-outlined">download</span>
+                </div>
+                <span className="font-medium text-neutral-700 dark:text-neutral-200">
+                  {getHeaderText(exportDataHeader)}
+                </span>
+                <span
+                  className={`material-symbols-outlined text-neutral-400 ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
+                >
+                  chevron_right
+                </span>
+              </button>
+
+              {/* Cookie Settings Button */}
+              <button
+                onClick={openCookieSettings}
+                className={`
+                    flex w-full items-center gap-3 rounded-xl p-3
+                    transition-colors hover:bg-neutral-50
+                    dark:hover:bg-white/5
+                  `}
+              >
+                <div
+                  className={`
+                    flex size-10 items-center justify-center rounded-lg
+                    bg-tertiary-100 text-tertiary-600
+                    dark:bg-tertiary-900/30 dark:text-tertiary-400
+                  `}
+                >
+                  <span className="material-symbols-outlined">cookie</span>
+                </div>
+                <span className="font-medium text-neutral-700 dark:text-neutral-200">
+                  {getHeaderText(cookieSettingsHeader)}
+                </span>
+                <span
+                  className={`material-symbols-outlined text-neutral-400 ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
+                >
+                  chevron_right
+                </span>
+              </button>
+
+              {/* Delete Account Link */}
+              <Link
+                href={`/${lang}/profile/delete`}
+                className={`
+                    flex items-center gap-3 rounded-xl p-3
+                    transition-colors hover:bg-error-50 dark:hover:bg-error-900/10
+                  `}
+              >
+                <div
+                  className={`
+                    flex size-10 items-center justify-center rounded-lg
+                    bg-error-100 text-error-600
+                    dark:bg-error-900/30 dark:text-error-400
+                  `}
+                >
+                  <span className="material-symbols-outlined">delete</span>
+                </div>
+                <span className="font-medium text-error-600 dark:text-error-400">
+                  {getHeaderText(deleteAccountHeader)}
+                </span>
+                <span
+                  className={`material-symbols-outlined text-error-400 ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
+                >
+                  chevron_right
+                </span>
+              </Link>
+            </div>
+
+            <div className="mt-8 border-t border-neutral-100 pt-6 dark:border-white/5">
+              <button
+                onClick={handleLogout}
+                className={`
+                    flex w-full items-center justify-center gap-2 rounded-xl
+                    bg-neutral-100 py-3 font-medium text-neutral-600
+                    transition-colors hover:bg-neutral-200
+                    dark:bg-white/5 dark:text-neutral-300 dark:hover:bg-white/10
+                  `}
+              >
+                <span className="material-symbols-outlined">logout</span>
+                {logoutButton.label?.text}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

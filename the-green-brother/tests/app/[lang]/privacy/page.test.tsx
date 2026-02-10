@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react'
 import PrivacyPage from '@/app/[lang]/privacy/page'
 import { getPrivacy } from '@/lib/content'
 import type { ApiPrivacyPrivacyDocument } from '@/lib/generated/types.gen'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 
 // Mock the client module
 jest.mock('@/lib/content', () => ({
@@ -46,11 +46,11 @@ describe('PrivacyPage', () => {
   })
 
   it('should fetch data and render client component', async () => {
-    const params = Promise.resolve({ lang: CodeEnum.EN })
+    const params = Promise.resolve({ lang: LanguageCode.EN })
     const ui = await PrivacyPage({ params })
     render(ui)
 
-    expect(mockGetPrivacy).toHaveBeenCalledWith(CodeEnum.EN)
+    expect(mockGetPrivacy).toHaveBeenCalledWith(LanguageCode.EN)
 
     const client = screen.getByTestId('privacy-client')
     expect(client).toBeInTheDocument()
@@ -60,11 +60,11 @@ describe('PrivacyPage', () => {
   it('should handle null data', async () => {
     mockGetPrivacy.mockResolvedValue(null)
 
-    const params = Promise.resolve({ lang: CodeEnum.EN })
+    const params = Promise.resolve({ lang: LanguageCode.EN })
     const ui = await PrivacyPage({ params })
     render(ui)
 
-    expect(mockGetPrivacy).toHaveBeenCalledWith(CodeEnum.EN)
+    expect(mockGetPrivacy).toHaveBeenCalledWith(LanguageCode.EN)
 
     const client = screen.getByTestId('privacy-client')
     expect(client).toHaveAttribute('data-has-data', 'false')

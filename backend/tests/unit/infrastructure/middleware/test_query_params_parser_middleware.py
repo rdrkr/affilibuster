@@ -94,8 +94,8 @@ class TestParseQueryStringWithBrackets:
 
     def test_simple_params(self):
         """Test parsing simple query params without brackets."""
-        result = parse_query_string_with_brackets("locale=en&customPopulate=nested")
-        assert result == {"locale": "en", "customPopulate": "nested"}
+        result = parse_query_string_with_brackets("locale=en&custom_populate=nested")
+        assert result == {"locale": "en", "custom_populate": "nested"}
 
     def test_bracket_notation_filter(self):
         """Test parsing bracket notation filter."""
@@ -133,12 +133,12 @@ class TestParseQueryStringWithBrackets:
     def test_mixed_simple_and_bracket_params(self):
         """Test parsing mixed simple and bracket params."""
         result = parse_query_string_with_brackets(
-            "locale=en&filters[roles][roleId][$containsi]=author&customPopulate=nested"
+            "locale=en&filters[roles][roleId][$containsi]=author&custom_populate=nested"
         )
         assert result == {
             "locale": "en",
             "filters": {"roles": {"roleId": {"$containsi": "author"}}},
-            "customPopulate": "nested",
+            "custom_populate": "nested",
         }
 
     def test_pagination_params(self):
@@ -213,12 +213,12 @@ class TestQueryParamsParserMiddleware:
         """Test middleware parses simple query params."""
         client = TestClient(app_with_query_parser_middleware)
 
-        response = client.get("/test?locale=en&customPopulate=nested")
+        response = client.get("/test?locale=en&custom_populate=nested")
 
         assert response.status_code == 200
         data = response.json()
         assert data["parsed_params"]["locale"] == "en"
-        assert data["parsed_params"]["customPopulate"] == "nested"
+        assert data["parsed_params"]["custom_populate"] == "nested"
 
     def test_middleware_parses_bracket_notation(self, app_with_query_parser_middleware):
         """Test middleware parses bracket notation filters."""

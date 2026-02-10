@@ -30,10 +30,7 @@ export default function PrivacyPolicyClient({ data }: PrivacyPolicyClientProps) 
   }
 
   return (
-    <PageClient
-      layout="narrow"
-      breadcrumbs={{ customLastCrumbLabel: data.content.header?.header?.text ?? 'Privacy Policy' }}
-    >
+    <PageClient layout="narrow" breadcrumbs={{ customLastCrumbLabel: data.content.header?.header?.text ?? '' }}>
       <TextBlock
         data={{
           ...data.content,

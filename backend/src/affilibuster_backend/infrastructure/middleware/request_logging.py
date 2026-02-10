@@ -17,6 +17,9 @@ from starlette.responses import Response
 
 logger = logging.getLogger(__name__)
 
+# Headers that contain sensitive data and must not be logged
+SENSITIVE_HEADERS = frozenset({"authorization", "cookie", "x-session-id", "x-api-key", "x-csrf-token"})
+
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """
@@ -52,7 +55,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
                 "path": path,
                 "client_host": client_host,
                 "user_agent": user_agent,
-                "headers": dict(request.headers),
+                "headers": {k: "***" if k.lower() in SENSITIVE_HEADERS else v for k, v in request.headers.items()},
             },
         )
 

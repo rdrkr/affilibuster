@@ -6,6 +6,8 @@
 
 import {
   changePassword,
+  deleteAccount,
+  exportUserData,
   forgotPassword,
   getUserProfile,
   login,
@@ -273,6 +275,56 @@ describe('auth API', () => {
     it('should return null on error', async () => {
       mockApiRequest.mockRejectedValueOnce(new Error('Failed'))
       const result = await changePassword({ currentPassword: 'old', newPassword: 'new' })
+      expect(result).toBeNull()
+    })
+  })
+
+  describe('deleteAccount', () => {
+    it('should call apiRequest with correct parameters', async () => {
+      const mockResponse = { success: true, message: 'Account deleted successfully' }
+      mockApiRequest.mockResolvedValueOnce(mockResponse)
+
+      const result = await deleteAccount({ password: 'MyPassword123!' })
+
+      expect(result).toEqual(mockResponse)
+      expect(mockApiRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: '/auth/profile', body: { password: 'MyPassword123!' } }),
+        {
+          method: 'DELETE',
+          credentials: 'include',
+        }
+      )
+    })
+
+    it('should return null on error', async () => {
+      mockApiRequest.mockRejectedValueOnce(new Error('Failed'))
+      const result = await deleteAccount({ password: 'wrong' })
+      expect(result).toBeNull()
+    })
+  })
+
+  describe('exportUserData', () => {
+    it('should call apiRequest with correct parameters', async () => {
+      const mockResponse = {
+        profile: { id: '1', email: 'test@test.com' },
+        consentRecords: [],
+        preferences: null,
+        activeSessions: [],
+        exportedAt: '2026-02-12T00:00:00Z',
+      }
+      mockApiRequest.mockResolvedValueOnce(mockResponse as unknown as Awaited<ReturnType<typeof apiRequest>>)
+
+      const result = await exportUserData()
+
+      expect(result).toEqual(mockResponse)
+      expect(mockApiRequest).toHaveBeenCalledWith(expect.objectContaining({ url: '/auth/profile/export' }), {
+        credentials: 'include',
+      })
+    })
+
+    it('should return null on error', async () => {
+      mockApiRequest.mockRejectedValueOnce(new Error('Failed'))
+      const result = await exportUserData()
       expect(result).toBeNull()
     })
   })

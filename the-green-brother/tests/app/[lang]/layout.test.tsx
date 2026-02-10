@@ -47,6 +47,13 @@ jest.mock('@/components/footer', () => ({
   },
 }))
 
+// Mock CookieConsentBanner component
+jest.mock('@/components/consent', () => ({
+  CookieConsentBanner: function MockCookieConsentBanner() {
+    return <div data-testid="mock-cookie-consent-banner">Cookie Consent</div>
+  },
+}))
+
 // Mock the content and languages APIs
 jest.mock('@/lib/content/api', () => ({
   getNavigation: jest.fn(),
@@ -64,7 +71,7 @@ jest.mock('@/lib/feature-flags', () => ({
 
 import LocaleLayout from '@/app/[lang]/layout'
 import { getNavigation } from '@/lib/content/api'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
 import { notFound } from 'next/navigation'
 
@@ -79,7 +86,7 @@ describe('LocaleLayout', () => {
       siteTitle: 'Test',
       siteDescription: 'Test',
     } as unknown as Awaited<ReturnType<typeof getNavigation>>)
-    mockGetLanguages.mockResolvedValue([{ code: CodeEnum.EN, name: 'English' }] as unknown as Awaited<
+    mockGetLanguages.mockResolvedValue([{ code: LanguageCode.EN, name: 'English' }] as unknown as Awaited<
       ReturnType<typeof getLanguages>
     >)
   })
@@ -87,7 +94,7 @@ describe('LocaleLayout', () => {
   it('should render children within the layout', async () => {
     const Component = await LocaleLayout({
       children: <div data-testid="child">Test Child</div>,
-      params: Promise.resolve({ lang: CodeEnum.EN }),
+      params: Promise.resolve({ lang: LanguageCode.EN }),
     })
 
     render(Component)
@@ -99,7 +106,7 @@ describe('LocaleLayout', () => {
   it('should render navigation when data is available', async () => {
     const Component = await LocaleLayout({
       children: <div>Content</div>,
-      params: Promise.resolve({ lang: CodeEnum.EN }),
+      params: Promise.resolve({ lang: LanguageCode.EN }),
     })
 
     render(Component)
@@ -110,7 +117,7 @@ describe('LocaleLayout', () => {
   it('should render footer', async () => {
     const Component = await LocaleLayout({
       children: <div>Content</div>,
-      params: Promise.resolve({ lang: CodeEnum.EN }),
+      params: Promise.resolve({ lang: LanguageCode.EN }),
     })
 
     render(Component)
@@ -121,7 +128,7 @@ describe('LocaleLayout', () => {
   it('should render back to top button', async () => {
     const Component = await LocaleLayout({
       children: <div>Content</div>,
-      params: Promise.resolve({ lang: CodeEnum.EN }),
+      params: Promise.resolve({ lang: LanguageCode.EN }),
     })
 
     render(Component)
@@ -129,10 +136,21 @@ describe('LocaleLayout', () => {
     expect(screen.getByTestId('mock-back-to-top')).toBeInTheDocument()
   })
 
+  it('should render cookie consent banner', async () => {
+    const Component = await LocaleLayout({
+      children: <div>Content</div>,
+      params: Promise.resolve({ lang: LanguageCode.EN }),
+    })
+
+    render(Component)
+
+    expect(screen.getByTestId('mock-cookie-consent-banner')).toBeInTheDocument()
+  })
+
   it('should call notFound for invalid language', async () => {
     await LocaleLayout({
       children: <div>Content</div>,
-      params: Promise.resolve({ lang: 'invalid' as CodeEnum }),
+      params: Promise.resolve({ lang: 'invalid' as LanguageCode }),
     })
 
     expect(mockNotFound).toHaveBeenCalled()
@@ -143,7 +161,7 @@ describe('LocaleLayout', () => {
 
     const Component = await LocaleLayout({
       children: <div>Content</div>,
-      params: Promise.resolve({ lang: CodeEnum.EN }),
+      params: Promise.resolve({ lang: LanguageCode.EN }),
     })
 
     render(Component)
@@ -154,7 +172,7 @@ describe('LocaleLayout', () => {
   it('should wrap content with NextIntlClientProvider', async () => {
     const Component = await LocaleLayout({
       children: <div>Content</div>,
-      params: Promise.resolve({ lang: CodeEnum.EN }),
+      params: Promise.resolve({ lang: LanguageCode.EN }),
     })
 
     render(Component)
@@ -165,7 +183,7 @@ describe('LocaleLayout', () => {
   it('should support Italian locale', async () => {
     const Component = await LocaleLayout({
       children: <div data-testid="italian-child">Italian Content</div>,
-      params: Promise.resolve({ lang: CodeEnum.IT }),
+      params: Promise.resolve({ lang: LanguageCode.IT }),
     })
 
     render(Component)
@@ -176,7 +194,7 @@ describe('LocaleLayout', () => {
   it('should support Hebrew locale', async () => {
     const Component = await LocaleLayout({
       children: <div data-testid="hebrew-child">Hebrew Content</div>,
-      params: Promise.resolve({ lang: CodeEnum.HE }),
+      params: Promise.resolve({ lang: LanguageCode.HE }),
     })
 
     render(Component)
@@ -189,7 +207,7 @@ describe('LocaleLayout', () => {
 
     const Component = await LocaleLayout({
       children: <div data-testid="child">Content</div>,
-      params: Promise.resolve({ lang: CodeEnum.EN }),
+      params: Promise.resolve({ lang: LanguageCode.EN }),
     })
 
     render(Component)

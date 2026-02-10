@@ -7,12 +7,14 @@ settings:
   # General settings (optional, can be expanded)
   timezone: 'UTC'
 
-notification_groups:
-  - name: 'Dev Team'
-    # In a real scenario, you'd map these to existing ID's or create them if the API supports it.
-    # For this script, we'll assume we just want to ensure monitors are set up.
-    # Uptime Kuma API for notifications is a bit complex to declarative provision without secrets,
-    # so we'll focus on monitors for now and print a reminder to set up notifications manually or via ENV vars if implemented.
+notifications:
+  - name: 'Telegram Alert'
+    type: 'telegram'
+    # Bot token and chat ID are read from environment variables:
+    #   UPTIME_KUMA_TELEGRAM_BOT_TOKEN - Telegram bot token from @BotFather
+    #   UPTIME_KUMA_TELEGRAM_CHAT_ID   - Target chat/group/channel ID
+    isDefault: true
+    applyExisting: true
 
 monitor_groups:
   - name: 'Critical Services'
@@ -24,18 +26,24 @@ monitor_groups:
         retryInterval: 60
         maxretries: 1
         upsideDown: false # Default
+        notificationNames:
+          - 'Telegram Alert'
 
       - name: 'Backend API Health'
         type: 'http'
         url: 'https://thegreenbrother.com/api/health'
         interval: 60
         maxretries: 3
+        notificationNames:
+          - 'Telegram Alert'
 
       - name: 'CMS Admin Panel'
         type: 'http'
         url: 'https://cms.thegreenbrother.com/admin'
         interval: 60
         maxretries: 3
+        notificationNames:
+          - 'Telegram Alert'
 
   - name: 'Content Verification'
     monitors:
@@ -45,6 +53,8 @@ monitor_groups:
         keyword: 'TheGreenBrother'
         interval: 120
         maxretries: 2
+        notificationNames:
+          - 'Telegram Alert'
 
   - name: 'Internal Infrastructure'
     monitors:
@@ -52,3 +62,5 @@ monitor_groups:
         type: 'http'
         url: 'http://uptime-kuma:3001' # Internal Docker URL
         interval: 60
+        notificationNames:
+          - 'Telegram Alert'

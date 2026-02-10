@@ -5,7 +5,7 @@
  */
 
 import { apiRequest } from '@/lib/core/client'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import { getThemeById, getThemes } from '@/lib/themes/api'
 
 // Mock the core client module
@@ -50,11 +50,11 @@ describe('themes API', () => {
       const mockResponse = { data: [] }
       mockApiRequest.mockResolvedValueOnce(mockResponse as unknown as Awaited<ReturnType<typeof apiRequest>>)
 
-      await getThemes({ locale: CodeEnum.EN })
+      await getThemes({ locale: LanguageCode.EN })
 
       expect(mockApiRequest).toHaveBeenCalledWith(
         expect.objectContaining({
-          query: expect.objectContaining({ locale: CodeEnum.EN, customPopulate: 'nested' }),
+          query: expect.objectContaining({ locale: LanguageCode.EN, customPopulate: 'nested' }),
         })
       )
     })
@@ -91,11 +91,11 @@ describe('themes API', () => {
       const mockResponse = { data: { id: '1' } }
       mockApiRequest.mockResolvedValueOnce(mockResponse as unknown as Awaited<ReturnType<typeof apiRequest>>)
 
-      await getThemeById('theme-123', { locale: CodeEnum.IT })
+      await getThemeById('theme-123', { locale: LanguageCode.IT })
 
       expect(mockApiRequest).toHaveBeenCalledWith(
         expect.objectContaining({
-          query: expect.objectContaining({ locale: CodeEnum.IT, customPopulate: 'nested' }),
+          query: expect.objectContaining({ locale: LanguageCode.IT, customPopulate: 'nested' }),
         })
       )
     })

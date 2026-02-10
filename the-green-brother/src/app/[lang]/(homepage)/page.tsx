@@ -3,7 +3,7 @@
 import { HomeSections } from '@/components/homepage'
 import { getBlog, getHomepage, getTeamMembers } from '@/lib/content'
 import { userProfileFlag } from '@/lib/feature-flags'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import HomeClient from './HomeClient'
 
 /**
@@ -15,7 +15,7 @@ import HomeClient from './HomeClient'
  * @param props.params - Promise containing route parameters with lang
  * @returns Homepage with server-fetched CMS data
  */
-async function HomePage({ params }: { params: Promise<{ lang: CodeEnum }> }) {
+async function HomePage({ params }: { params: Promise<{ lang: LanguageCode }> }) {
   const resolvedParams = await params
   const lang = resolvedParams.lang
 

@@ -8,34 +8,34 @@ authors = [{ name = "Affilibuster Team" }]
 requires-python = ">=3.13"
 readme = "../README.md"
 dependencies = [
-  "fastapi==0.128.7",
-  "uvicorn[standard]==0.40.0",
+  "fastapi==0.131.0",
+  "uvicorn[standard]==0.41.0",
   "sqlalchemy==2.0.46",
   "alembic==1.18.4",
   "pydantic==2.12.5",
-  "pydantic-settings==2.12.0",
+  "pydantic-settings==2.13.1",
   "psycopg2-binary==2.9.11",
   "asyncpg==0.31.0",
-  "redis==7.1.1",
+  "redis==7.2.0",
   "httpx==0.28.1",
   "python-jose[cryptography]==3.5.0",
   "passlib[bcrypt]==1.7.4",
   "python-multipart==0.0.22",
-  "datamodel-code-generator==0.48.0", # 0.49.0 creates a regression where generation gets stuck
+  "datamodel-code-generator==0.54.0",
   "email-validator==2.3.0",
   "aiosqlite==0.22.1",
   "pyyaml==6.0.3",
-  "greenlet==3.3.1",
+  "greenlet==3.3.2",
   "pytest==9.0.2",
   "pytest-asyncio==1.3.0",
   "pytest-cov==7.0.0",
   "pytest-xdist==3.8.0",
   "pytest-mock==3.15.1",
-  "ruff==0.15.0",
+  "ruff==0.15.2",
   "mypy==1.19.1",
   "taskipy==1.14.1",
   "types-pyyaml==6.0.12.20250915",
-  "pycountry==24.6.1",
+  "pycountry==26.2.16",
   "uptime-kuma-api==1.2.1",
 ]
 
@@ -62,6 +62,7 @@ openapi-generate = { cmd = """\
     """, help = "generates Python models from OpenAPI specification" }
 generate-cms-api = { cmd = "PYTHONPATH=src:. python scripts/generate_cms_api.py", help = "auto-generates cms_routes.py and cms_entities.py from generated models" }
 seed = { cmd = "PYTHONPATH=src:. python -m scripts.seed", help = "seeds PostgreSQL database with data from backend-seed.jsonl" }
+cleanup = { cmd = "python -m affilibuster_backend.scripts.cleanup_data", cwd = "src", help = "runs data retention cleanup (hard-delete soft-deleted users, purge expired sessions)" }
 migrate = { cmd = "alembic upgrade head", help = "runs database migrations to latest version" }
 migrate-create = { cmd = "alembic revision --autogenerate -m", help = "creates a new migration (usage: uv run task migrate-create 'description')" }
 migrate-downgrade = { cmd = "alembic downgrade -1", help = "downgrades database by one migration" }
@@ -78,10 +79,10 @@ extend-exclude = ["src/affilibuster_backend/domain/entities/generated"]
 select = ["ALL"]
 extend-ignore = [
   "TRY003", # Avoid specifying long messages outside the exception class
-  "EM102", # Exception must not use an f-string literal, assign to variable first
-  "EM101", # Exception must not use a string literal, assign to variable first
-  "D203", # 1 blank line required before class docstring (use D211 instead)
-  "D212", # Multi-line docstring summary should start at the first line
+  "EM102",  # Exception must not use an f-string literal, assign to variable first
+  "EM101",  # Exception must not use a string literal, assign to variable first
+  "D203",   # 1 blank line required before class docstring (use D211 instead)
+  "D212",   # Multi-line docstring summary should start at the first line
   "COM812", # Missing trailing comma in a list or tuple
 ]
 
@@ -94,27 +95,27 @@ extend-ignore = [
 ]
 "tests/**/*.py" = [
   "PLC0415", # `import` should be at the top-level of a file
-  "S101", # Use of assert detected,
-  "S105", # Possible hardcoded password (test tokens)
-  "S106", # Possible hardcoded password (test tokens)
-  "ANN201", # Missing return type annotation for public function
-  "ANN202", # Missing return type annotation for private function
-  "ANN001", # Missing type annotation for function argument (pytest fixtures)
-  "ARG001", # Unused function argument (pytest fixtures can be unused)
-  "ARG002", # Unused function argument
-  "SLF001", # Private member accessed
+  "S101",    # Use of assert detected,
+  "S105",    # Possible hardcoded password (test tokens)
+  "S106",    # Possible hardcoded password (test tokens)
+  "ANN201",  # Missing return type annotation for public function
+  "ANN202",  # Missing return type annotation for private function
+  "ANN001",  # Missing type annotation for function argument (pytest fixtures)
+  "ARG001",  # Unused function argument (pytest fixtures can be unused)
+  "ARG002",  # Unused function argument
+  "SLF001",  # Private member accessed
   "PLR2004", # Magic value used in comparison
-  "D104", # Missing docstring in public package (test __init__.py files)
-  "PTH123", # Use of open() in tests is acceptable
+  "D104",    # Missing docstring in public package (test __init__.py files)
+  "PTH123",  # Use of open() in tests is acceptable
   "PERF401", # List comprehension optimization in test fixtures
-  "ERA001", # Commented-out code (useful for documenting alternatives in tests)
-  "FBT003", # Boolean positional value in function call (tests can use booleans)
-  "PT011", # pytest.raises can be broad in tests
-  "N815", # mixedCase variable names (for matching API responses)
-  "SIM117", # Multiple with statements are clearer in tests
-  "SIM105", # contextlib.suppress is less clear in tests
-  "DTZ001", # Naive datetime creation needed for testing timezone handling
-  "DTZ007", # strptime without timezone needed for testing
+  "ERA001",  # Commented-out code (useful for documenting alternatives in tests)
+  "FBT003",  # Boolean positional value in function call (tests can use booleans)
+  "PT011",   # pytest.raises can be broad in tests
+  "N815",    # mixedCase variable names (for matching API responses)
+  "SIM117",  # Multiple with statements are clearer in tests
+  "SIM105",  # contextlib.suppress is less clear in tests
+  "DTZ001",  # Naive datetime creation needed for testing timezone handling
+  "DTZ007",  # strptime without timezone needed for testing
 ]
 
 [tool.ruff.lint.flake8-builtins]
@@ -137,16 +138,17 @@ output-model-type = "pydantic_v2.BaseModel"
 formatters = ["ruff-format", "ruff-check"]
 openapi-scopes = ["schemas", "paths", "tags", "parameters"]
 allow-population-by-field-name = true
+capitalize-enum-members = true
+disable-future-imports = true
 field-constraints = true
+no-alias = false
 snake-case-field = true
-no-alias = false # allow camelCase aliases
 strict-nullable = false
 strip-default-none = false
 use-default = true
 use-default-factory-for-optional-nested-models = true
-use-schema-description = true
 use-field-description = true
-capitalize-enum-members = true
+use-schema-description = true
 
 [tool.mypy]
 python_version = "3.13"
@@ -206,7 +208,7 @@ filterwarnings = [
   # Treat all warnings as errors
   "error",
   # Ignore specific warnings
-  "ignore::pytest.PytestUnraisableExceptionWarning"
+  "ignore::pytest.PytestUnraisableExceptionWarning",
 ]
 
 # Asyncio mode
@@ -256,7 +258,7 @@ exclude_lines = [
   "raise NotImplementedError",
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
-  "@abstractmethod"
+  "@abstractmethod",
 ]
 
 # see https://alembic.sqlalchemy.org/en/latest/tutorial.html#using-pep-621
@@ -266,7 +268,7 @@ file_template = "%%(year)d%%(month).2d%%(day).2d_%%(hour).2d%%(minute).2d_%%(rev
 prepend_sys_path = "src"
 timezone = "UTC"
 truncate_slug_length = 40
-version_path_separator = "os"  # Use os.pathsep. Default configuration used for new projects.
+version_path_separator = "os"                                                                 # Use os.pathsep. Default configuration used for new projects.
 
 # Logging configuration
 [[tool.alembic.loggers]]

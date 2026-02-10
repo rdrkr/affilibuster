@@ -79,6 +79,10 @@ class Settings(BaseSettings):
     jwt_refresh_token_expire_days: int = 7
     jwt_refresh_token_remember_me_expire_days: int = 30
 
+    # Data Retention (GDPR Art. 5(1)(e))
+    user_retention_days: int = 30
+    session_retention_days: int = 0
+
     # Email / SMTP
     smtp_host: str = "localhost"
     smtp_port: int = 587

@@ -736,6 +736,8 @@ function addStrapiTags(spec: OpenAPISpec): OpenAPISpec {
     { name: 'blog-post-tag', description: 'Blog post tags for categorization' },
     { name: 'contributor', description: 'Contributor profiles, their roles and blog posts' },
     { name: 'contributor-role', description: 'Contributor roles' },
+    { name: 'consent', description: 'Cookie consent page content and configuration' },
+    { name: 'consent-category', description: 'Cookie consent category definitions' },
     { name: 'contact-us', description: 'Contact page content and contact information' },
     { name: 'currency', description: 'Currency configuration and exchange rates' },
     { name: 'error-404', description: '404 Not Found error page content' },
@@ -905,45 +907,108 @@ function replacePopulateWithNestedPopulator(spec: OpenAPISpec): OpenAPISpec {
 }
 
 /**
- * Add 'roles' to the filters enum for the /contributors endpoint.
+ * Add relational fields to the filters enum for all endpoints.
  *
  * Strapi's OpenAPI plugin excludes relational fields from the filters enum,
- * but filtering by roles (e.g., filters[roles][name][$eq]=...) is supported.
- * This function manually injects 'roles' into the allowed filter keys.
+ * but filtering by relations (e.g., filters[category][name][$eq]=...) is supported.
+ * This function automatically detects relational fields in the response schema
+ * (marked with description "A relational field") and adds them to the allowed filter keys.
  * @param spec - OpenAPI specification to modify
- * @returns Specification with updated contributor filters
+ * @returns Specification with updated filters
  */
-function fixContributorFilters(spec: OpenAPISpec): OpenAPISpec {
+function addRelationalFieldsToFilters(spec: OpenAPISpec): OpenAPISpec {
   const processed = JSON.parse(JSON.stringify(spec)) as OpenAPISpec
-  const contributorsPath = processed.paths['/contributors'] as Record<string, unknown> | undefined
 
-  if (contributorsPath?.get) {
-    const operation = contributorsPath.get as Record<string, unknown>
-    if (operation.parameters && Array.isArray(operation.parameters)) {
-      const filtersParam = operation.parameters.find(p => {
-        if (p && typeof p === 'object') {
-          const param = p as Record<string, unknown>
-          return param.name === 'filters' && param.in === 'query'
+  Object.values(processed.paths).forEach(pathItem => {
+    if (pathItem && typeof pathItem === 'object') {
+      const operation = (pathItem as Record<string, unknown>).get as Record<string, unknown> | undefined
+
+      // Only process GET operations
+      if (operation) {
+        // 1. Find relational fields in the response schema
+        const relationalFields: string[] = []
+
+        if (operation.responses && typeof operation.responses === 'object') {
+          const responses = operation.responses as Record<string, unknown>
+          const successResponse = responses['200'] as Record<string, unknown> | undefined
+
+          if (successResponse?.content) {
+            const content = successResponse.content as Record<string, unknown>
+            const jsonContent = content['application/json'] as Record<string, unknown> | undefined
+
+            if (jsonContent?.schema) {
+              const schema = jsonContent.schema as Record<string, unknown>
+
+              // Check for data property
+              if (schema.properties && typeof schema.properties === 'object') {
+                const properties = schema.properties as Record<string, unknown>
+                const data = properties.data as Record<string, unknown> | undefined
+
+                if (data) {
+                  let attributes: Record<string, unknown> | undefined
+
+                  // Handle collection response (data is array of items)
+                  if (data.type === 'array' && data.items && typeof data.items === 'object') {
+                    const items = data.items as Record<string, unknown>
+                    if (items.properties && typeof items.properties === 'object') {
+                      attributes = items.properties as Record<string, unknown>
+                    }
+                  }
+                  // Handle single response (data is object)
+                  else if (data.type === 'object' && data.properties && typeof data.properties === 'object') {
+                    attributes = data.properties as Record<string, unknown>
+                  }
+
+                  // Extract relational fields
+                  if (attributes) {
+                    Object.entries(attributes).forEach(([key, value]) => {
+                      if (value && typeof value === 'object') {
+                        const attr = value as Record<string, unknown>
+                        if (attr.description === 'A relational field') {
+                          relationalFields.push(key)
+                        }
+                      }
+                    })
+                  }
+                }
+              }
+            }
+          }
         }
-        return false
-      }) as Record<string, unknown> | undefined
 
-      if (filtersParam?.schema && typeof filtersParam.schema === 'object') {
-        const schema = filtersParam.schema as Record<string, unknown>
-        if (schema.propertyNames && typeof schema.propertyNames === 'object') {
-          const propertyNames = schema.propertyNames as Record<string, unknown>
-          if (propertyNames.enum && Array.isArray(propertyNames.enum)) {
-            const enums = propertyNames.enum as string[]
-            if (!enums.includes('roles')) {
-              enums.push('roles')
-              // Sort for consistency
-              propertyNames.enum = enums.sort()
+        // 2. Add found relational fields to filters enum
+        if (relationalFields.length > 0 && operation.parameters && Array.isArray(operation.parameters)) {
+          const filtersParam = operation.parameters.find(p => {
+            if (p && typeof p === 'object') {
+              const param = p as Record<string, unknown>
+              return param.name === 'filters' && param.in === 'query'
+            }
+            return false
+          }) as Record<string, unknown> | undefined
+
+          if (filtersParam?.schema && typeof filtersParam.schema === 'object') {
+            const schema = filtersParam.schema as Record<string, unknown>
+            if (schema.propertyNames && typeof schema.propertyNames === 'object') {
+              const propertyNames = schema.propertyNames as Record<string, unknown>
+              if (propertyNames.enum && Array.isArray(propertyNames.enum)) {
+                const enums = propertyNames.enum as string[]
+
+                // Add missing fields
+                relationalFields.forEach(field => {
+                  if (!enums.includes(field)) {
+                    enums.push(field)
+                  }
+                })
+
+                // Sort for consistency
+                propertyNames.enum = enums.sort()
+              }
             }
           }
         }
       }
     }
-  }
+  })
 
   return processed
 }
@@ -2514,9 +2579,9 @@ function mergeOpenAPISpecs(): void {
     console.log('✅ Dynamic zone schemas enhanced with discriminated unions')
 
     // Inject missing filter keys (e.g., roles for contributors)
-    console.log('🔧 Fixing contributor filters...')
-    strapi = fixContributorFilters(strapi)
-    console.log('✅ Contributor filters fixed (added "roles")')
+    console.log('🔧 Adding relational fields to filters...')
+    strapi = addRelationalFieldsToFilters(strapi)
+    console.log('✅ Relational fields added to filters')
 
     // Enrich Strapi spec with metadata
     console.log('✨ Enriching Strapi spec with metadata...')

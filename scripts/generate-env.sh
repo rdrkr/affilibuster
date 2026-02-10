@@ -23,6 +23,8 @@
 #     -s SECRET     Cloudinary Secret
 #     -u USER       Uptime Kuma User
 #     -p PASS       Uptime Kuma Password
+#     -b TOKEN      Uptime Kuma Telegram Bot Token
+#     -c CHAT_ID    Uptime Kuma Telegram Chat ID
 #     -g GA_ID      Google Analytics ID
 #     -t GTM_ID     Google Tag Manager ID
 #     -h            Show help
@@ -45,6 +47,8 @@ OPTIONS:
   -s SECRET      Cloudinary API Secret
   -u USER        Uptime Kuma Username
   -p PASS        Uptime Kuma Password
+  -b TOKEN       Uptime Kuma Telegram Bot Token
+  -c CHAT_ID     Uptime Kuma Telegram Chat ID
   -g GA_ID       Google Analytics ID
   -t GTM_ID      Google Tag Manager ID
 
@@ -78,18 +82,22 @@ CLOUDINARY_KEY=""
 CLOUDINARY_SECRET=""
 UPTIME_KUMA_USER=""
 UPTIME_KUMA_PASS=""
+UPTIME_KUMA_TELEGRAM_BOT_TOKEN=""
+UPTIME_KUMA_TELEGRAM_CHAT_ID=""
 GA_ID=""
 GTM_ID=""
 
 # Parse flags
 OPTIND=1
-while getopts "n:k:s:u:p:g:t:h" opt; do
+while getopts "n:k:s:u:p:b:c:g:t:h" opt; do
   case ${opt} in
   n) CLOUDINARY_NAME="${OPTARG}" ;;
   k) CLOUDINARY_KEY="${OPTARG}" ;;
   s) CLOUDINARY_SECRET="${OPTARG}" ;;
   u) UPTIME_KUMA_USER="${OPTARG}" ;;
   p) UPTIME_KUMA_PASS="${OPTARG}" ;;
+  b) UPTIME_KUMA_TELEGRAM_BOT_TOKEN="${OPTARG}" ;;
+  c) UPTIME_KUMA_TELEGRAM_CHAT_ID="${OPTARG}" ;;
   g) GA_ID="${OPTARG}" ;;
   t) GTM_ID="${OPTARG}" ;;
   h) show_help ;;
@@ -246,6 +254,8 @@ main() {
   echo "Uptime Kuma"
   UPTIME_KUMA_USER=$(prompt_required "Admin Username:" "${UPTIME_KUMA_USER}")
   UPTIME_KUMA_PASS=$(prompt_required "Admin Password:" "${UPTIME_KUMA_PASS}")
+  UPTIME_KUMA_TELEGRAM_BOT_TOKEN=$(prompt_optional "Telegram Bot Token:" "" "${UPTIME_KUMA_TELEGRAM_BOT_TOKEN}")
+  UPTIME_KUMA_TELEGRAM_CHAT_ID=$(prompt_optional "Telegram Chat ID:" "" "${UPTIME_KUMA_TELEGRAM_CHAT_ID}")
 
   log_info "Creating ${OUTPUT_FILE}..."
 
@@ -419,6 +429,8 @@ PLAYWRIGHT_REPORT_PORT=9323
 UPTIME_KUMA_URL=${UPTIME_KUMA_URL_VAL}
 UPTIME_KUMA_USER=${UPTIME_KUMA_USER}
 UPTIME_KUMA_PASS=${UPTIME_KUMA_PASS}
+UPTIME_KUMA_TELEGRAM_BOT_TOKEN=${UPTIME_KUMA_TELEGRAM_BOT_TOKEN}
+UPTIME_KUMA_TELEGRAM_CHAT_ID=${UPTIME_KUMA_TELEGRAM_CHAT_ID}
 EOF
 
   log_success "${OUTPUT_FILE} created successfully!"

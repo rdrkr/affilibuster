@@ -1,14 +1,14 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import createMiddleware from 'next-intl/middleware'
 
 export default createMiddleware({
   // A list of all locales that are supported
-  locales: Object.values(CodeEnum),
+  locales: Object.values(LanguageCode),
 
   // Used when no locale matches
-  defaultLocale: CodeEnum.EN,
+  defaultLocale: LanguageCode.EN,
 })
 
 export const config = {

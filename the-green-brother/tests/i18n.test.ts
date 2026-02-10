@@ -10,7 +10,7 @@ jest.mock('next-intl/server', () => ({
 }))
 
 import i18nConfig from '@/i18n'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 
 describe('i18n configuration', () => {
   it('should export a valid configuration function', () => {
@@ -20,7 +20,7 @@ describe('i18n configuration', () => {
   it('should return locale en by default', () => {
     const config = i18nConfig as unknown as () => { locale: string; messages: Record<string, unknown> }
     const result = config()
-    expect(result.locale).toBe(CodeEnum.EN)
+    expect(result.locale).toBe(LanguageCode.EN)
   })
 
   it('should return empty messages object by default', () => {

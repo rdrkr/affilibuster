@@ -11,7 +11,7 @@ from uuid import uuid4
 
 import pytest
 
-from affilibuster_backend.domain.entities.generated.models import CurrencyCode, DetectedLanguage2, UserPreferences
+from affilibuster_backend.domain.entities.generated.models import CurrencyCode, LanguageCode, UserPreferences
 from affilibuster_backend.domain.use_cases.preferences.migrate_preferences_to_user_use_case import (
     MigratePreferencesRequest,
     MigratePreferencesToUserUseCase,
@@ -59,7 +59,7 @@ class TestMigratePreferencesToUserUseCase:
             session_id=session_id,
             selected_currency=CurrencyCode.EUR,
             dismissed_language_prompt=False,
-            detected_language=DetectedLanguage2.IT,
+            detected_language=LanguageCode.IT,
         )
 
         preferences_repo.get_by_session.return_value = session_prefs
@@ -71,7 +71,7 @@ class TestMigratePreferencesToUserUseCase:
             user_id=str(user_id),
             selected_currency=CurrencyCode.EUR,
             dismissed_language_prompt=False,
-            detected_language=DetectedLanguage2.IT,
+            detected_language=LanguageCode.IT,
         )
         preferences_repo.upsert.return_value = migrated_prefs
 
@@ -104,7 +104,7 @@ class TestMigratePreferencesToUserUseCase:
             user_id=str(user_id),
             selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=True,
-            detected_language=DetectedLanguage2.EN,
+            detected_language=LanguageCode.EN,
         )
 
         preferences_repo = AsyncMock()

@@ -16,7 +16,7 @@ from httpx import ASGITransport, AsyncClient
 
 from affilibuster_backend.domain.entities.generated.models import (
     CurrencyCode,
-    DetectedLanguage2,
+    LanguageCode,
     UserPreferences,
 )
 from affilibuster_backend.infrastructure.api.routes.preferences import router, validate_currency_code
@@ -364,7 +364,7 @@ class TestUpdatePreferencesRoute:
             session_id="test-session",
             selected_currency=CurrencyCode.USD,  # unchanged
             dismissed_language_prompt=False,  # unchanged
-            detected_language=DetectedLanguage2.IT,  # changed
+            detected_language=LanguageCode.IT,  # changed
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),
             expires_at=datetime.now(UTC) + timedelta(days=30),
@@ -388,7 +388,7 @@ class TestUpdatePreferencesRoute:
         assert data["detectedLanguage"] == "it"
 
         # Verify existing preferences object was updated
-        assert existing_prefs.detected_language == DetectedLanguage2.IT
+        assert existing_prefs.detected_language == LanguageCode.IT
 
     @pytest.mark.asyncio
     async def test_update_all_fields_on_existing_preferences(
@@ -420,7 +420,7 @@ class TestUpdatePreferencesRoute:
             session_id="test-session",
             selected_currency=CurrencyCode.EUR,
             dismissed_language_prompt=True,
-            detected_language=DetectedLanguage2.HE,
+            detected_language=LanguageCode.HE,
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),
             expires_at=datetime.now(UTC) + timedelta(days=30),
@@ -452,7 +452,7 @@ class TestUpdatePreferencesRoute:
         # Verify all fields were updated
         assert existing_prefs.selected_currency == CurrencyCode.EUR
         assert existing_prefs.dismissed_language_prompt is True
-        assert existing_prefs.detected_language == DetectedLanguage2.HE
+        assert existing_prefs.detected_language == LanguageCode.HE
 
     @pytest.mark.asyncio
     async def test_update_preferences_with_invalid_currency_raises_400(

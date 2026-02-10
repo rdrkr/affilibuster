@@ -65,7 +65,7 @@ class TestGetStrapiContentUseCase:
         mock_strapi.get.return_value = mock_response
 
         use_case = GetCMSContentUseCase(mock_strapi)
-        params = AboutGetParametersQuery(locale="en", customPopulate="nested")
+        params = AboutGetParametersQuery(locale="en", custom_populate="nested")
 
         # Act
         await use_case.execute("/about", params=params, response_model=LocalesResponse)

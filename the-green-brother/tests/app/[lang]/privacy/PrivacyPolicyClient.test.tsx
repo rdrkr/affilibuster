@@ -8,7 +8,7 @@ import { act, screen } from '@testing-library/react'
 
 import PrivacyPolicyClient from '@/app/[lang]/privacy/PrivacyPolicyClient'
 import type { ApiPrivacyPrivacyDocument } from '@/lib/generated/types.gen'
-import { DirectionEnum } from '@/lib/generated/types.gen'
+import { AlignmentEnum, DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 import { renderWithLayout } from '../../../utils/renderWithLayout'
 
 describe('PrivacyPolicyClient', () => {
@@ -19,6 +19,15 @@ describe('PrivacyPolicyClient', () => {
     content: {
       id: 1,
       content: '# Privacy Policy\n\nThis is the privacy policy.',
+      header: {
+        alignment: AlignmentEnum.LANGUAGE_DIRECTION,
+        promoteHeaderIcon: false,
+        header: {
+          text: 'Privacy Policy',
+          iconPosition: IconPositionEnum.BEFORE_TEXT,
+          ariaDescription: 'Privacy Policy',
+        },
+      },
     },
     seoMetadata: {
       id: 1,
@@ -85,6 +94,7 @@ describe('PrivacyPolicyClient', () => {
       jest.runAllTimers()
     })
 
-    expect(screen.getByText('Privacy Policy', { selector: 'span' })).toBeInTheDocument()
+    const breadcrumbNav = screen.getByRole('navigation')
+    expect(breadcrumbNav).toHaveTextContent('Privacy Policy')
   })
 })

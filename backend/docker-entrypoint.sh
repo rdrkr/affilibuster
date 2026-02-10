@@ -23,6 +23,9 @@ uv run task openapi-generate
 echo "  📝 Generating CMS API code..."
 uv run task generate-cms-api
 
+echo "  📝 Formatting code..."
+uv run task format-fix
+
 # Function to wait for database
 wait_for_db() {
   echo "  ⏳ Waiting for PostgreSQL to be ready..."

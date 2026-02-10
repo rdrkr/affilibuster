@@ -5,7 +5,12 @@
  */
 
 import { EndNavigationGroup, type EndNavigationGroupProps } from '@/components/navigation/EndNavigationGroup'
-import { CodeEnum, DirectionEnum, type ApiNavigationNavigationDocument, type Language } from '@/lib/generated/types.gen'
+import {
+  LanguageCode,
+  DirectionEnum,
+  type ApiNavigationNavigationDocument,
+  type Language,
+} from '@/lib/generated/types.gen'
 import { fireEvent, render, screen } from '@testing-library/react'
 
 // Mock child components
@@ -110,9 +115,9 @@ describe('EndNavigationGroup', () => {
     setTheme: mockSetTheme,
     onSearchExpandChange: mockOnSearchExpandChange,
     apiLanguages: [
-      { code: CodeEnum.EN, displayName: 'English', flag: '🇺🇸' },
-      { code: CodeEnum.EN, displayName: 'English', flag: '🇺🇸' },
-      { code: CodeEnum.IT, displayName: 'Italiano', flag: '🇮🇹' },
+      { code: LanguageCode.EN, displayName: 'English', flag: '🇺🇸' },
+      { code: LanguageCode.EN, displayName: 'English', flag: '🇺🇸' },
+      { code: LanguageCode.IT, displayName: 'Italiano', flag: '🇮🇹' },
     ] as Language[],
     enableProductSearch: true,
     enableUserProfile: true,

@@ -8,7 +8,7 @@ import { render, renderHook, screen } from '@testing-library/react'
 
 import { LayoutProvider, useLayoutContext } from '@/components/providers/LayoutProvider'
 import type { ApiNavigationNavigationDocument } from '@/lib/generated/types.gen'
-import { CodeEnum, DirectionEnum } from '@/lib/generated/types.gen'
+import { LanguageCode, DirectionEnum } from '@/lib/generated/types.gen'
 
 describe('LayoutProvider', () => {
   const mockNavigation = {
@@ -32,7 +32,7 @@ describe('LayoutProvider', () => {
     }
 
     render(
-      <LayoutProvider lang={CodeEnum.EN} direction={DirectionEnum.LTR} navigation={mockNavigation}>
+      <LayoutProvider lang={LanguageCode.EN} direction={DirectionEnum.LTR} navigation={mockNavigation}>
         <TestConsumer />
       </LayoutProvider>
     )
@@ -53,7 +53,7 @@ describe('LayoutProvider', () => {
     }
 
     render(
-      <LayoutProvider lang={CodeEnum.EN} direction={DirectionEnum.LTR} navigation={null}>
+      <LayoutProvider lang={LanguageCode.EN} direction={DirectionEnum.LTR} navigation={null}>
         <TestConsumer />
       </LayoutProvider>
     )

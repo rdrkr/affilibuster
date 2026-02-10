@@ -415,7 +415,7 @@ class TestGetEdgeCases:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
-            params = AboutGetParametersQuery(locale="en", customPopulate="nested")
+            params = AboutGetParametersQuery(locale="en", custom_populate="nested")
             _result = await repo.get("/about", params=params, response_model=CurrenciesGetResponse)
 
             mock_client.get.assert_called_once_with(
@@ -525,7 +525,7 @@ class TestPostEdgeCases:
             return_value=mock_client,
         ):
             repo = StrapiRepositoryImpl(base_url="http://strapi:1337", api_token="test-token")
-            params = AboutGetParametersQuery(locale="en", customPopulate="nested")
+            params = AboutGetParametersQuery(locale="en", custom_populate="nested")
             data = LanguagesDetectPostRequest(accept_language="en-US")
             _result = await repo.post(
                 "/languages/detect", data=data, params=params, response_model=CurrenciesGetResponse

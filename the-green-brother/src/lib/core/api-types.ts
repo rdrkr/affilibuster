@@ -34,8 +34,20 @@ import type {
     ChangePasswordResponses,
     CheckRedirectData,
     CheckRedirectResponses,
+    DeleteAccountData,
+    DeleteAccountResponses,
+    ExportUserDataData,
+    ExportUserDataResponses,
+    ConsentCategoryGetConsentCategoriesByIdData,
+    ConsentCategoryGetConsentCategoriesByIdResponses,
+    ConsentCategoryGetConsentCategoriesData,
+    ConsentCategoryGetConsentCategoriesResponses,
+    ConsentGetConsentData,
+    ConsentGetConsentResponses,
     ContactUsGetContactUsData,
     ContactUsGetContactUsResponses,
+    CookiePolicyGetCookiePolicyData,
+    CookiePolicyGetCookiePolicyResponses,
     ContributorGetContributorsBySlugData,
     ContributorGetContributorsBySlugResponses,
     ContributorGetContributorsData,
@@ -130,7 +142,9 @@ export type ApiRequest =
   | AboutGetAboutData
   | AuthPageGetAuthPageData
   | BlogGetBlogData
+  | ConsentGetConsentData
   | ContactUsGetContactUsData
+  | CookiePolicyGetCookiePolicyData
   | Error404GetError404Data
   | Error410GetError410Data
   | FaqGetFaqData
@@ -142,6 +156,8 @@ export type ApiRequest =
   | ProfileGetProfileData
   | TermGetTermData
   // Content collection operations (query params for filters/pagination/sort)
+  | ConsentCategoryGetConsentCategoriesData
+  | ConsentCategoryGetConsentCategoriesByIdData
   | ContributorGetContributorsData
   | ContributorGetContributorsBySlugData
   | BlogPostGetBlogPostsData
@@ -170,6 +186,8 @@ export type ApiRequest =
   | GetLanguagesData
   // Auth operations
   | ChangePasswordData
+  | DeleteAccountData
+  | ExportUserDataData
   | ForgotPasswordData
   | GetUserProfileData
   | LoginUserData
@@ -199,7 +217,9 @@ export type ApiResponse =
   | AboutGetAboutResponses[200]
   | AuthPageGetAuthPageResponses[200]
   | BlogGetBlogResponses[200]
+  | ConsentGetConsentResponses[200]
   | ContactUsGetContactUsResponses[200]
+  | CookiePolicyGetCookiePolicyResponses[200]
   | Error404GetError404Responses[200]
   | Error410GetError410Responses[200]
   | FaqGetFaqResponses[200]
@@ -211,6 +231,8 @@ export type ApiResponse =
   | ProfileGetProfileResponses[200]
   | TermGetTermResponses[200]
   // Content collection operations
+  | ConsentCategoryGetConsentCategoriesResponses[200]
+  | ConsentCategoryGetConsentCategoriesByIdResponses[200]
   | ContributorGetContributorsResponses[200]
   | ContributorGetContributorsBySlugResponses[200]
   | BlogPostGetBlogPostsResponses[200]
@@ -239,6 +261,8 @@ export type ApiResponse =
   | GetLanguagesResponses[200]
   // Auth operations (200 or 201 for register)
   | ChangePasswordResponses[200]
+  | DeleteAccountResponses[200]
+  | ExportUserDataResponses[200]
   | ForgotPasswordResponses[200]
   | GetUserProfileResponses[200]
   | LoginUserResponses[200]

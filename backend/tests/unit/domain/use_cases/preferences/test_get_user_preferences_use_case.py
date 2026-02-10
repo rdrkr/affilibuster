@@ -14,7 +14,7 @@ import pytest
 
 from affilibuster_backend.domain.entities.generated.models import (
     CurrencyCode,
-    DetectedLanguage2,
+    LanguageCode,
     UserPreferences,
 )
 from affilibuster_backend.domain.use_cases.preferences.get_user_preferences_use_case import GetUserPreferencesUseCase
@@ -146,7 +146,7 @@ class TestGetUserPreferencesExecute:
             user_id="user-123",
             selected_currency=CurrencyCode.EUR,
             dismissed_language_prompt=True,
-            detected_language=DetectedLanguage2.EN,
+            detected_language=LanguageCode.EN,
         )
         cache_service.get.return_value = prefs.model_dump_json()
 
@@ -155,7 +155,7 @@ class TestGetUserPreferencesExecute:
         assert result.user_id == "user-123"
         assert result.selected_currency == CurrencyCode.EUR
         assert result.dismissed_language_prompt is True
-        assert result.detected_language == DetectedLanguage2.EN
+        assert result.detected_language == LanguageCode.EN
 
     async def test_execute_with_null_detected_language_from_cache(
         self,
@@ -200,7 +200,7 @@ class TestGetUserPreferencesSerialize:
             user_id="user-123",
             selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=True,
-            detected_language=DetectedLanguage2.EN,
+            detected_language=LanguageCode.EN,
             created_at=now,
             updated_at=now,
             expires_at=now + timedelta(days=30),
@@ -259,7 +259,7 @@ class TestGetUserPreferencesDeserialize:
             user_id="user-123",
             selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=True,
-            detected_language=DetectedLanguage2.EN,
+            detected_language=LanguageCode.EN,
         )
         serialized = prefs.model_dump_json()
 
@@ -302,7 +302,7 @@ class TestGetUserPreferencesDeserialize:
             user_id="unique-user-abc",
             selected_currency=CurrencyCode.GBP,
             dismissed_language_prompt=True,
-            detected_language=DetectedLanguage2.IT,
+            detected_language=LanguageCode.IT,
             created_at=now,
             updated_at=now,
             expires_at=now + timedelta(days=30),

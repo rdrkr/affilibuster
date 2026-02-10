@@ -34,6 +34,10 @@ import type {
   ContributorGetContributorsBySlugResponses,
   ContributorGetContributorsData,
   ContributorGetContributorsResponses,
+  CookiePolicyGetCookiePolicyData,
+  CookiePolicyGetCookiePolicyResponses,
+  CurrencyGetCurrenciesData,
+  CurrencyGetCurrenciesResponses,
   Error404GetError404Data,
   Error404GetError404Responses,
   Error410GetError410Data,
@@ -74,7 +78,7 @@ import type {
 
 /**
  * Get homepage content
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param params - Additional query parameters (excluding locale and customPopulate)
  * @returns The homepage content data or null if the request fails
  */
@@ -100,7 +104,7 @@ export async function getHomepage(
 
 /**
  * Get about page content
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param params - Additional query parameters (excluding locale and customPopulate)
  * @returns The about page content data or null if the request fails
  */
@@ -126,7 +130,7 @@ export async function getAbout(
 
 /**
  * Get contact us page content
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param params - Additional query parameters (excluding locale and customPopulate)
  * @returns The contact us page content data or null if the request fails
  */
@@ -151,8 +155,34 @@ export async function getContactUs(
 }
 
 /**
+ * Get cookie policy page content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
+ * @param params - Additional query parameters (excluding locale and customPopulate)
+ * @returns The cookie policy page content data or null if the request fails
+ */
+export async function getCookiePolicy(
+  locale?: NonNullable<CookiePolicyGetCookiePolicyData['query']>['locale'],
+  params?: Omit<NonNullable<CookiePolicyGetCookiePolicyData['query']>, 'locale' | 'customPopulate'>
+): Promise<CookiePolicyGetCookiePolicyResponses[200]['data'] | null> {
+  try {
+    const request = createApiRequest<CookiePolicyGetCookiePolicyData>('/cookie-policy', {
+      query: {
+        ...(locale !== undefined && { locale }),
+        customPopulate: 'nested',
+        ...params,
+      },
+    })
+    const response = await apiRequest<CookiePolicyGetCookiePolicyResponses[200]>(request)
+    return response.data
+  } catch (error) {
+    console.error('Failed to fetch cookie policy:', error)
+    return null
+  }
+}
+
+/**
  * Get auth page content
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param params - Additional query parameters (excluding locale and customPopulate)
  * @returns The auth page content data or null if the request fails
  */
@@ -178,7 +208,7 @@ export async function getAuthPage(
 
 /**
  * Get blog page content
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param params - Additional query parameters (excluding locale and customPopulate)
  * @returns The blog page content data or null if the request fails
  */
@@ -204,7 +234,7 @@ export async function getBlog(
 
 /**
  * Get product categories page content
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param params - Additional query parameters (excluding locale and customPopulate)
  * @returns The product categories page content data or null if the request fails
  */
@@ -230,7 +260,7 @@ export async function getProductCategoriesPage(
 
 /**
  * Get profile page content
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param params - Additional query parameters (excluding locale and customPopulate)
  * @returns The profile page content data or null if the request fails
  */
@@ -259,7 +289,7 @@ export async function getProfile(
  *
  * Uses auto-generated deep populate configuration from populate.gen.ts.
  * The populate structure is generated at build-time by analyzing TypeScript types.
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param params - Additional query parameters (excluding locale and customPopulate)
  * @returns The navigation menu content data or null if the request fails
  */
@@ -285,7 +315,7 @@ export async function getNavigation(
 
 /**
  * Get footer content
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param params - Additional query parameters (excluding locale and customPopulate)
  * @returns The footer content data or null if the request fails
  */
@@ -311,7 +341,7 @@ export async function getFooter(
 
 /**
  * Get privacy page content
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param params - Additional query parameters (excluding locale and customPopulate)
  * @returns The privacy page content data or null if the request fails
  */
@@ -337,7 +367,7 @@ export async function getPrivacy(
 
 /**
  * Get terms of service content
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param params - Additional query parameters (excluding locale and customPopulate)
  * @returns The terms of service content data or null if the request fails
  */
@@ -363,7 +393,7 @@ export async function getTerm(
 
 /**
  * Get 404 error page content
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param params - Additional query parameters (excluding locale and customPopulate)
  * @returns The 404 error page content data or null if the request fails
  */
@@ -389,7 +419,7 @@ export async function getError404(
 
 /**
  * Get 410 error page content
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param params - Additional query parameters (excluding locale and customPopulate)
  * @returns The 410 error page content data or null if the request fails
  */
@@ -415,7 +445,7 @@ export async function getError410(
 
 /**
  * Get FAQ page content
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param params - Additional query parameters (excluding locale and customPopulate)
  * @returns The FAQ page content data or null if the request fails
  */
@@ -450,7 +480,7 @@ export async function getFaq(
  */
 export async function getProducts(
   query?: Omit<NonNullable<ProductGetProductsData['query']>, 'customPopulate'>
-): Promise<ProductGetProductsResponses[200] | null> {
+): Promise<ProductGetProductsResponses[200]['data'] | null> {
   try {
     const request = createApiRequest<ProductGetProductsData>('/products', {
       query: {
@@ -458,7 +488,8 @@ export async function getProducts(
         customPopulate: 'nested',
       },
     })
-    return await apiRequest<ProductGetProductsResponses[200]>(request)
+    const response = await apiRequest<ProductGetProductsResponses[200]>(request)
+    return response.data
   } catch (error) {
     console.error('Failed to fetch products:', error)
     return null
@@ -498,7 +529,7 @@ export async function getProductBySlug(
  */
 export async function getProductCategories(
   query?: Omit<NonNullable<ProductCategoryGetProductCategoriesData['query']>, 'customPopulate'>
-): Promise<ProductCategoryGetProductCategoriesResponses[200] | null> {
+): Promise<ProductCategoryGetProductCategoriesResponses[200]['data'] | null> {
   try {
     const request = createApiRequest<ProductCategoryGetProductCategoriesData>('/product-categories', {
       query: {
@@ -506,7 +537,8 @@ export async function getProductCategories(
         customPopulate: 'nested',
       },
     })
-    return await apiRequest<ProductCategoryGetProductCategoriesResponses[200]>(request)
+    const response = await apiRequest<ProductCategoryGetProductCategoriesResponses[200]>(request)
+    return response.data
   } catch (error) {
     console.error('Failed to fetch product categories:', error)
     return null
@@ -592,7 +624,7 @@ export async function getBlogPostBySlug(
 
 /**
  * Get contributors (collection type)
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param query - Optional query parameters including locale, filters, pagination, sort, and populate
  * @returns The contributors data or null if the request fails
  */
@@ -616,7 +648,7 @@ export async function getContributors(
 }
 /**
  * Get team members (collection type)
- * @param locale - Optional locale code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) to fetch localized content
+ * @param locale - Optional locale code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) to fetch localized content
  * @param query - Optional query parameters including locale, filters, pagination, sort, and populate
  * @returns The team members data or null if the request fails
  */
@@ -711,6 +743,32 @@ export async function getFileById(id: number): Promise<UploadGetFilesByIdRespons
     return await apiRequest<UploadGetFilesByIdResponses[200]>(request)
   } catch (error) {
     console.error(`Failed to fetch file ${String(id)}:`, error)
+    return null
+  }
+}
+
+/**
+ * Get configured currencies
+ * @param locale - Optional locale code
+ * @param query - Optional query parameters
+ * @returns The currencies data or null if the request fails
+ */
+export async function getCurrencies(
+  locale?: NonNullable<CurrencyGetCurrenciesData['query']>['locale'],
+  query?: Omit<NonNullable<CurrencyGetCurrenciesData['query']>, 'customPopulate'>
+): Promise<CurrencyGetCurrenciesResponses[200]['data'] | null> {
+  try {
+    const request = createApiRequest<CurrencyGetCurrenciesData>('/currencies', {
+      query: {
+        ...(locale !== undefined && { locale }),
+        ...query,
+        customPopulate: 'nested',
+      },
+    })
+    const response = await apiRequest<CurrencyGetCurrenciesResponses[200]>(request)
+    return response.data
+  } catch (error) {
+    console.error('Failed to fetch currencies:', error)
     return null
   }
 }

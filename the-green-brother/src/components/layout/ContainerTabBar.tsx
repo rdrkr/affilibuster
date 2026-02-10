@@ -217,7 +217,7 @@ export function ContainerTabBar<T = unknown>({ tabs, activeKey, onTabChange, dir
         {/* Sliding pill indicator – Navigation frosted glass style */}
         <div
           className={`
-            absolute top-0 bottom-0 my-auto h-[calc(100%-4px)] rounded-full
+            absolute inset-y-0 my-auto h-[calc(100%-4px)] rounded-full
             border border-neutral-200 bg-white/50 shadow-lg backdrop-blur-sm
             transition-all duration-300 ease-in-out
             dark:border-white/10 dark:bg-white/10

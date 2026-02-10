@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 // Learn more: https://github.com/testing-library/jest-dom
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import '@testing-library/jest-dom'
 
 // Mock remark (ESM-only package that Jest can't parse)
@@ -40,7 +40,7 @@ jest.mock('next/navigation', () => ({
 // Mock next-intl
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
-  useLocale: () => CodeEnum.EN,
+  useLocale: () => LanguageCode.EN,
 }))
 
 // Mock window.matchMedia for theme tests

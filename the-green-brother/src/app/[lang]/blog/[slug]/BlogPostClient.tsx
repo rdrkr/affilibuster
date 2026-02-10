@@ -8,7 +8,7 @@ import { HeroSection } from '@/components/sections/HeroSection'
 
 import {
   AlignmentEnum,
-  CodeEnum,
+  LanguageCode,
   DirectionEnum,
   IconPositionEnum,
   SectionsHeroEntry,
@@ -28,7 +28,7 @@ interface BlogPostClientProps {
   post: ApiBlogPostBlogPostDocument
   blogData: ApiBlogBlogDocument
   direction: DirectionEnum
-  language: CodeEnum
+  language: LanguageCode
 }
 
 /**

@@ -113,13 +113,13 @@ jest.mock('@/components/elements', () => ({
 
 // Mock menus
 jest.mock('@/components/menus', () => ({
-  LanguageMenu: function MockLanguageMenu({ onLanguageChange }: { onLanguageChange?: (lang: CodeEnum) => void }) {
+  LanguageMenu: function MockLanguageMenu({ onLanguageChange }: { onLanguageChange?: (lang: LanguageCode) => void }) {
     return (
       <div data-testid="language-menu">
-        <button data-testid="change-lang-it" onClick={() => onLanguageChange?.(CodeEnum.IT)}>
+        <button data-testid="change-lang-it" onClick={() => onLanguageChange?.(LanguageCode.IT)}>
           Change to Italian
         </button>
-        <button data-testid="change-lang-en" onClick={() => onLanguageChange?.(CodeEnum.EN)}>
+        <button data-testid="change-lang-en" onClick={() => onLanguageChange?.(LanguageCode.EN)}>
           Change to English
         </button>
       </div>
@@ -192,7 +192,7 @@ jest.mock('@/components/providers', () => ({
 }))
 
 import { Navigation } from '@/components/navigation/Navigation'
-import { ApiNavigationNavigationDocument, CodeEnum, DirectionEnum, Language } from '@/lib/generated/types.gen'
+import { ApiNavigationNavigationDocument, LanguageCode, DirectionEnum, Language } from '@/lib/generated/types.gen'
 
 describe('Navigation', () => {
   beforeEach(() => {
@@ -340,8 +340,8 @@ describe('Navigation', () => {
 
   it('should render with languages when provided', () => {
     const languages = [
-      { code: CodeEnum.EN, name: 'English', displayName: 'English', flag: '/flags/en.png' },
-      { code: CodeEnum.IT, name: 'Italian', displayName: 'Italiano', flag: '/flags/it.png' },
+      { code: LanguageCode.EN, name: 'English', displayName: 'English', flag: '/flags/en.png' },
+      { code: LanguageCode.IT, name: 'Italian', displayName: 'Italiano', flag: '/flags/it.png' },
     ]
 
     render(
@@ -501,7 +501,7 @@ describe('Navigation', () => {
       <Navigation direction={DirectionEnum.LTR} data={mockData} enableProductSearch={true} enableUserProfile={false} />
     )
 
-    // Component should render without errors - getLanguageFromPathname returns CodeEnum.EN as default
+    // Component should render without errors - getLanguageFromPathname returns LanguageCode.EN as default
     expect(screen.getByTestId('language-menu')).toBeInTheDocument()
   })
 

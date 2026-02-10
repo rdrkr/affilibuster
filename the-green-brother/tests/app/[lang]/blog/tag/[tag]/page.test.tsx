@@ -6,7 +6,7 @@
 
 import { render, screen } from '@testing-library/react'
 
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 
 // Mock API functions
 jest.mock('@/lib/content', () => ({
@@ -53,7 +53,7 @@ describe('TopicPage', () => {
       readArticleLabel: { text: 'Read' },
     })
 
-    const Component = await TopicPage({ params: Promise.resolve({ lang: CodeEnum.EN, tag: 'TestTag' }) })
+    const Component = await TopicPage({ params: Promise.resolve({ lang: LanguageCode.EN, tag: 'TestTag' }) })
     render(Component)
 
     expect(screen.getByTestId('mock-topic-client')).toBeInTheDocument()
@@ -68,7 +68,7 @@ describe('TopicPage', () => {
     })
 
     const Component = await TopicPage({
-      params: Promise.resolve({ lang: CodeEnum.EN, tag: 'Eco%20Friendly' }),
+      params: Promise.resolve({ lang: LanguageCode.EN, tag: 'Eco%20Friendly' }),
     })
     render(Component)
 
@@ -81,7 +81,7 @@ describe('TopicPage', () => {
       pagination: {},
     })
 
-    const Component = await TopicPage({ params: Promise.resolve({ lang: CodeEnum.EN, tag: 'Test' }) })
+    const Component = await TopicPage({ params: Promise.resolve({ lang: LanguageCode.EN, tag: 'Test' }) })
     render(Component)
 
     expect(screen.getByTestId('posts-count')).toHaveTextContent('0')
@@ -91,7 +91,7 @@ describe('TopicPage', () => {
     mockGetBlogPosts.mockResolvedValue({ data: [{ documentId: 'post-1' }] })
     mockGetBlog.mockResolvedValue(null)
 
-    const Component = await TopicPage({ params: Promise.resolve({ lang: CodeEnum.EN, tag: 'Test' }) })
+    const Component = await TopicPage({ params: Promise.resolve({ lang: LanguageCode.EN, tag: 'Test' }) })
 
     expect(Component).toBeNull()
   })

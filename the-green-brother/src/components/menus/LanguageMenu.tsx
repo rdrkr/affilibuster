@@ -12,7 +12,7 @@
 
 import { useCallback, useState } from 'react'
 
-import type { CodeEnum, MenusLanguageSelectorEntry } from '@/lib/generated/types.gen'
+import type { LanguageCode, MenusLanguageSelectorEntry } from '@/lib/generated/types.gen'
 import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
 
 import { ButtonAction, Icon } from '../elements'
@@ -26,8 +26,8 @@ export interface LanguageOption {
   name: string
   /** Flag emoji or icon */
   flag: string
-  /** Language code (e.g., CodeEnum.EN, CodeEnum.IT, CodeEnum.HE) */
-  code: CodeEnum
+  /** Language code (e.g., LanguageCode.EN, LanguageCode.IT, LanguageCode.HE) */
+  code: LanguageCode
 }
 
 /**
@@ -39,9 +39,9 @@ export interface LanguageMenuProps {
   /** Available language options */
   languages: LanguageOption[]
   /** Currently selected language code */
-  selectedLang: CodeEnum
+  selectedLang: LanguageCode
   /** Callback when language is selected */
-  onLanguageChange: (langCode: CodeEnum) => void
+  onLanguageChange: (langCode: LanguageCode) => void
   /** Text direction for RTL support */
   direction: DirectionEnum
   /** Whether to show the text label (for responsive collapse). Defaults to true. */
@@ -76,7 +76,7 @@ export function LanguageMenu({
   const [isOpen, setIsOpen] = useState(false)
 
   const handleLanguageSelect = useCallback(
-    (langCode: CodeEnum) => {
+    (langCode: LanguageCode) => {
       onLanguageChange(langCode)
       setIsOpen(false)
     },

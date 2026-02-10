@@ -103,7 +103,7 @@ export function Dropdown({
     <div
       className={`
       ${mobilePositionClasses} z-50 mt-4
-      sm:absolute sm:top-[calc(var(--nav-top,1.5rem))] sm:right-0 sm:left-0
+      sm:absolute sm:inset-x-0 sm:top-[calc(var(--nav-top,1.5rem))]
       ${positionClasses}
       ${isVisible ? 'visible' : 'pointer-events-none'}
     `}

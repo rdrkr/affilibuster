@@ -35,10 +35,7 @@ class RedisCacheService(ICacheService):
     async def _get_client(self) -> redis.Redis:
         """Get or create Redis client."""
         if self._client is None:
-            # Cast to avoid mypy error on untyped from_url
-            self._client = await redis.from_url(  # type: ignore[no-untyped-call]
-                self.redis_url, decode_responses=True
-            )
+            self._client = await redis.from_url(self.redis_url, decode_responses=True)
         return self._client
 
     async def get(self, key: str) -> str | None:

@@ -6,14 +6,13 @@
  * Available in all languages
  */
 
-import { CodeEnum } from '@/lib/generated/types.gen'
 import { LanguageCode, SUPPORTED_LANGUAGE_CODES, isLanguageCode } from '@/lib/types'
 import type { Metadata } from 'next'
 import { setRequestLocale } from 'next-intl/server'
 import StyleGuideClient from './StyleGuideClient'
 
 interface Props {
-  params: Promise<{ lang: CodeEnum }>
+  params: Promise<{ lang: LanguageCode }>
 }
 
 /**
@@ -63,7 +62,7 @@ async function StyleGuidePage({ params }: Props): Promise<React.ReactElement> {
     resolvedParams = await params
   } catch (error) {
     console.error('Error resolving params:', error)
-    resolvedParams = { lang: CodeEnum.EN }
+    resolvedParams = { lang: LanguageCode.EN }
   }
   let lang: LanguageCode = LanguageCode.EN
   if (isLanguageCode(resolvedParams.lang as unknown as string)) {

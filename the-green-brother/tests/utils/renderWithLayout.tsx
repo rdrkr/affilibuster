@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Affilibuster by Ronen Druker.
 
 import { LayoutProvider } from '@/components/providers'
-import { CodeEnum, DirectionEnum, type ApiNavigationNavigationDocument } from '@/lib/generated/types.gen'
+import { LanguageCode, DirectionEnum, type ApiNavigationNavigationDocument } from '@/lib/generated/types.gen'
 import { render, type RenderOptions } from '@testing-library/react'
 import type { ReactElement } from 'react'
 
@@ -12,7 +12,7 @@ const mockNavigation = {
 
 interface CustomRenderOptions extends RenderOptions {
   layoutContext?: {
-    lang?: CodeEnum
+    lang?: LanguageCode
     direction?: DirectionEnum
     navigation?: ApiNavigationNavigationDocument
   }
@@ -21,7 +21,7 @@ interface CustomRenderOptions extends RenderOptions {
 export const renderWithLayout = (ui: ReactElement, options: CustomRenderOptions = {}) => {
   const {
     layoutContext = {
-      lang: CodeEnum.EN,
+      lang: LanguageCode.EN,
       direction: DirectionEnum.LTR,
       navigation: mockNavigation,
     },
@@ -30,7 +30,7 @@ export const renderWithLayout = (ui: ReactElement, options: CustomRenderOptions 
 
   return render(
     <LayoutProvider
-      lang={layoutContext.lang ?? CodeEnum.EN}
+      lang={layoutContext.lang ?? LanguageCode.EN}
       direction={layoutContext.direction ?? DirectionEnum.LTR}
       navigation={layoutContext.navigation ?? mockNavigation}
     >

@@ -132,7 +132,14 @@ def _get_parsed_params(request: Request, params_model: type[CMSRequest]) -> CMSR
     # Construct the params model from parsed params
     # Use model_validate to handle any type coercion
     parsed_params.setdefault("pagination", None)
-    return params_model.model_validate(parsed_params)
+
+    # Normalize snake_case field names to camelCase aliases for model_validate.
+    # Query params may arrive as snake_case (e.g., custom_populate) but generated
+    # models without populate_by_name require alias keys (e.g., customPopulate).
+    field_to_alias = {name: info.alias for name, info in params_model.model_fields.items() if info.alias}
+    normalized = {field_to_alias.get(key, key): value for key, value in parsed_params.items()}
+
+    return params_model.model_validate(normalized)
 
 
 def _make_single_type_endpoint(

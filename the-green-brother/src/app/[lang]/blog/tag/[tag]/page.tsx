@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Affilibuster by Ronen Druker.
 
 import { getBlog, getBlogPosts } from '@/lib/client'
-import { type BlogPostGetBlogPostsData, CodeEnum } from '@/lib/generated/types.gen'
+import { type BlogPostGetBlogPostsData, LanguageCode } from '@/lib/generated/types.gen'
 import TopicClient from './TopicClient'
 
 /**
@@ -12,7 +12,7 @@ import TopicClient from './TopicClient'
  * @param props.params - Promise containing route parameters with lang and tag
  * @returns Server-rendered tag detail page
  */
-export default async function TopicPage({ params }: { params: Promise<{ lang: CodeEnum; tag: string }> }) {
+export default async function TopicPage({ params }: { params: Promise<{ lang: LanguageCode; tag: string }> }) {
   const resolvedParams = await params
   const { lang, tag } = resolvedParams
   const decodedTag = decodeURIComponent(tag)

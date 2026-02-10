@@ -20,6 +20,7 @@ class Base(DeclarativeBase):
 
 # Import all models to ensure they are registered with SQLAlchemy
 from .api_config import ApiConfigModel  # noqa: E402
+from .consent_record import ConsentRecordModel  # noqa: E402
 from .email_verification_token import EmailVerificationTokenModel  # noqa: E402
 from .password_reset_token import PasswordResetTokenModel  # noqa: E402
 from .url_redirect import URLRedirectModel  # noqa: E402
@@ -30,6 +31,7 @@ from .user_session import UserSessionModel  # noqa: E402
 __all__ = [
     "ApiConfigModel",
     "Base",
+    "ConsentRecordModel",
     "EmailVerificationTokenModel",
     "PasswordResetTokenModel",
     "URLRedirectModel",

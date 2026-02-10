@@ -85,7 +85,7 @@ class TestSingleTypeRouterErrorHandling:
         mock_use_case.execute.side_effect = Exception("CMS connection failed")
 
         # Create a mock request with parsed query params (include required fields)
-        mock_request = create_mock_request({"customPopulate": "nested"})
+        mock_request = create_mock_request({"custom_populate": "nested"})
 
         # Call the handler and expect HTTPException
         with pytest.raises(HTTPException) as exc_info:
@@ -125,7 +125,7 @@ class TestCollectionRouterErrorHandling:
         mock_use_case.execute.side_effect = Exception("Database timeout")
 
         # Create a mock request with parsed query params (include required fields)
-        mock_request = create_mock_request({"customPopulate": "nested"})
+        mock_request = create_mock_request({"custom_populate": "nested"})
 
         # Call the handler and expect HTTPException
         with pytest.raises(HTTPException) as exc_info:
@@ -161,7 +161,7 @@ class TestCollectionRouterErrorHandling:
         mock_use_case.execute.side_effect = Exception("Product not found in CMS")
 
         # Create a mock request with parsed query params (include required fields)
-        mock_request = create_mock_request({"customPopulate": "nested"})
+        mock_request = create_mock_request({"custom_populate": "nested"})
 
         # Call the handler and expect HTTPException
         with pytest.raises(HTTPException) as exc_info:
@@ -265,7 +265,7 @@ class TestSlugRouterErrorHandling:
         mock_use_case.execute.side_effect = Exception("Blog post not found in CMS")
 
         # Create a mock request with parsed query params (include required fields)
-        mock_request = create_mock_request({"customPopulate": "nested"})
+        mock_request = create_mock_request({"custom_populate": "nested"})
 
         # Call the handler and expect HTTPException
         with pytest.raises(HTTPException) as exc_info:

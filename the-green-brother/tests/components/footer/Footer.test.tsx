@@ -35,6 +35,13 @@ jest.mock('@/components/elements', () => ({
   },
 }))
 
+// Mock CookieSettingsButton
+jest.mock('@/components/consent', () => ({
+  CookieSettingsButton: function MockCookieSettingsButton({ label }: { label: string }) {
+    return <button data-testid="cookie-settings-button">{label}</button>
+  },
+}))
+
 // Mock getFooter API
 jest.mock('@/lib/content/api', () => ({
   getFooter: jest.fn(),
@@ -42,7 +49,7 @@ jest.mock('@/lib/content/api', () => ({
 
 import Footer from '@/components/footer/Footer'
 import { getFooter } from '@/lib/content/api'
-import { CodeEnum, DirectionEnum } from '../../../src/lib/generated'
+import { LanguageCode, DirectionEnum } from '../../../src/lib/generated'
 
 const mockGetFooter = getFooter as jest.MockedFunction<typeof getFooter>
 
@@ -54,7 +61,7 @@ describe('Footer', () => {
   it('should return null when footerData is null', async () => {
     mockGetFooter.mockResolvedValue(null)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
 
     expect(Component).toBeNull()
   })
@@ -66,7 +73,7 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
     expect(screen.getByText(content => content.includes('© {year}'))).toBeInTheDocument()
@@ -86,7 +93,7 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
     expect(screen.getByText('About Us')).toBeInTheDocument()
@@ -107,7 +114,7 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
     expect(screen.getByText('Stay Updated')).toBeInTheDocument()
@@ -136,7 +143,7 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
     expect(screen.getByText('Column 1')).toBeInTheDocument()
@@ -153,7 +160,7 @@ describe('Footer', () => {
       ],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
     // Quick links are rendered as Button components
@@ -174,7 +181,7 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
     expect(screen.getByText('Just content no header')).toBeInTheDocument()
@@ -193,7 +200,7 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
     // Should render without error, unknown types return null
@@ -207,7 +214,7 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
     expect(screen.getByText(content => content.includes('© {year}'))).toBeInTheDocument()
@@ -235,7 +242,7 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
     expect(screen.getByText('Horizontal Col')).toBeInTheDocument()
@@ -256,7 +263,7 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
     expect(screen.getByText('Just plain text with no links')).toBeInTheDocument()
@@ -284,7 +291,7 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
     expect(screen.getByText('Vertical First')).toBeInTheDocument()
@@ -307,7 +314,7 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
     // Should render the text-block but skip markers
@@ -328,7 +335,7 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
     expect(screen.getByText('No ID Column')).toBeInTheDocument()
@@ -342,7 +349,7 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.RTL })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.RTL })
     render(Component!)
 
     // Find the container for copyright and quick links (it has flex-col by default)
@@ -360,7 +367,7 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.LTR })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
     render(Component!)
 
     // Verify literal string is passed (logic moved/removed)
@@ -390,36 +397,81 @@ describe('Footer', () => {
       quickLinks: [],
     } as unknown as Awaited<ReturnType<typeof getFooter>>)
 
-    const Component = await Footer({ lang: CodeEnum.EN, direction: DirectionEnum.RTL })
+    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.RTL })
     render(Component!)
 
     const firstHeader = screen.getByText('First')
     const secondHeader = screen.getByText('Second')
 
-    // In RTL, the array is reversed in memory before rendering
-    // Since we mock Layout markers grouping, let's verify if the render order is swapped
-    // or if the implementation creates reversed array logic.
-    // The implementation specifically does: const elements = isRTL ? [...group.elements].reverse() : group.elements
-    // So 'Second' should appear before 'First' in the DOM if we look at their parent container order?
-    // Testing specific DOM order is tricky without layout.
-    // However, if we access parent.children, they should be in reversed order.
-
-    // DynamicZone uses flexbox for horizontal layout, not grid
-    // It applies md:flex-row (relying on dir="rtl" for visual reversal)
     const parent = firstHeader.closest('.md\\:flex-row')
     expect(parent).toBeInTheDocument()
 
-    // Check if the parent (DynamicZone horizontal group) has children in correct order?
-    // DynamicZone renders: group.sections.map(...) div>element
-    // In RTL, DynamicZone does NOT reverse the array for flex layout?
-    // Wait, DynamicZone.tsx DOES NOT reverse array. It relies on `flex-row-reverse`.
-    // Let's check DynamicZone.tsx again.
-    // It says: ${isRTL ? 'md:flex-row-reverse' : ''}
-    // So the DOM order remains same (1, 2, 3), but visual order is reversed.
-    // So parent.children[0] should contain "First", and children[1] should contain "Second".
-    // Visual order is handled by CSS.
-
     expect(parent?.children[0]).toContainElement(firstHeader as HTMLElement)
     expect(parent?.children[1]).toContainElement(secondHeader as HTMLElement)
+  })
+
+  describe('cookie settings quick link', () => {
+    it('should render CookieSettingsButton for links with #cookie-settings URL', async () => {
+      mockGetFooter.mockResolvedValue({
+        columns: [],
+        copyrightsLabel: { text: '© {year}' },
+        quickLinks: [
+          { id: 1, label: { text: 'Privacy' }, url: '/privacy', openInNewTab: false },
+          { id: 2, label: { text: 'Cookie Settings' }, url: '#cookie-settings', openInNewTab: false },
+        ],
+      } as unknown as Awaited<ReturnType<typeof getFooter>>)
+
+      const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
+      render(Component!)
+
+      // Privacy link should be a regular link
+      expect(screen.getByText('Privacy')).toBeInTheDocument()
+      expect(screen.getByText('Privacy').tagName).toBe('A')
+
+      // Cookie Settings should be rendered as CookieSettingsButton (mocked as button)
+      expect(screen.getByTestId('cookie-settings-button')).toBeInTheDocument()
+      expect(screen.getByTestId('cookie-settings-button').textContent).toBe('Cookie Settings')
+    })
+
+    it('should render CookieSettingsButton with empty label when label text is missing', async () => {
+      mockGetFooter.mockResolvedValue({
+        columns: [],
+        copyrightsLabel: { text: '© {year}' },
+        quickLinks: [{ id: 1, label: {}, url: '#cookie-settings', openInNewTab: false }],
+      } as unknown as Awaited<ReturnType<typeof getFooter>>)
+
+      const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
+      render(Component!)
+
+      const cookieButton = screen.getByTestId('cookie-settings-button')
+      expect(cookieButton).toBeInTheDocument()
+      expect(cookieButton.textContent).toBe('')
+    })
+
+    it('should use link id for key when present on cookie settings link', async () => {
+      mockGetFooter.mockResolvedValue({
+        columns: [],
+        copyrightsLabel: { text: '© {year}' },
+        quickLinks: [{ id: 42, label: { text: 'Cookies' }, url: '#cookie-settings', openInNewTab: false }],
+      } as unknown as Awaited<ReturnType<typeof getFooter>>)
+
+      const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
+      render(Component!)
+
+      expect(screen.getByTestId('cookie-settings-button')).toBeInTheDocument()
+    })
+
+    it('should use index as fallback key when cookie settings link has no id', async () => {
+      mockGetFooter.mockResolvedValue({
+        columns: [],
+        copyrightsLabel: { text: '© {year}' },
+        quickLinks: [{ label: { text: 'Cookies' }, url: '#cookie-settings', openInNewTab: false }],
+      } as unknown as Awaited<ReturnType<typeof getFooter>>)
+
+      const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
+      render(Component!)
+
+      expect(screen.getByTestId('cookie-settings-button')).toBeInTheDocument()
+    })
   })
 })

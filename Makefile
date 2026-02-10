@@ -5,7 +5,7 @@
 NPROCS := $(shell sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4)
 MAKEFLAGS += --output-sync=target
 
-.PHONY: help all all-fast dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-backend-unit test-backend-integration test-the-green-brother test-the-green-brother-unit test-performance test-all-unit test-all-integration test-parallel test-fast test-all audit clean clean-coverage coverage-merge coverage-view playwright-report ci-test install install-backend install-cms setup upgrade upgrade-cms upgrade-backend ps pre-commit export import export-docker import-docker generate-env-dev generate-env-prod
+.PHONY: help all all-fast dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-backend-unit test-backend-integration test-the-green-brother test-the-green-brother-unit test-performance test-all-unit test-all-integration test-parallel test-fast test-all audit clean clean-coverage coverage-merge coverage-view playwright-report ci-test install install-backend install-cms setup upgrade upgrade-cms upgrade-backend upgrade-pre-commit ps pre-commit export import export-docker import-docker generate-env-dev generate-env-prod backup-prod
 
 # Default target
 .DEFAULT_GOAL := help
@@ -248,7 +248,10 @@ upgrade-the-green-brother: ## Update the-green-brother dependencies only
 upgrade-backend: ## Update backend dependencies only
 	@cd backend && uv sync --upgrade
 
-upgrade: upgrade-backend upgrade-the-green-brother upgrade-cms ## Update all dependencies to latest
+upgrade-pre-commit: ## Update pre-commit hooks only
+	@pre-commit autoupdate
+
+upgrade: upgrade-backend upgrade-the-green-brother upgrade-cms upgrade-pre-commit ## Update all dependencies to latest
 	@echo "✅ All dependencies updated"
 
 clean: ## Clean up containers, volumes, and all build artifacts (zero state)
@@ -283,6 +286,7 @@ import-docker: ## Import strapi cms data (via Docker)
 
 export-prod: ## Export strapi cms data (production)
 	@echo "💽 Exporting strapi cms data (production)..."
+	@$(DCP_CMD) exec -u root strapi sh -c 'rm -rf /data && mkdir -p /data && chown strapi:strapi /data'
 	@$(DCP_CMD) exec strapi npm run data:export
 	@$(DCP_CMD) exec strapi tar -cf /tmp/export.tar -C /data .
 	@mkdir -p data
@@ -291,6 +295,9 @@ export-prod: ## Export strapi cms data (production)
 	@rm data/export.tar
 	@$(DCP_CMD) exec -u root strapi rm -rf /data /tmp/export.tar
 	@echo "✅ Strapi cms data exported from production"
+
+backup-prod: ## Run full production backup (Strapi + PostgreSQL + git push)
+	@bash scripts/backup.sh
 
 import-prod: ## Import strapi cms data (production)
 	@echo "💽 Importing strapi cms data (production)..."

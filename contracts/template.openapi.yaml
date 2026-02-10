@@ -29,6 +29,8 @@ servers:
 tags:
   - name: auth
     description: User authentication and authorization
+  - name: consent
+    description: GDPR-compliant consent management
   - name: languages
     description: Language detection and management
   - name: preferences
@@ -419,6 +421,83 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    delete:
+      operationId: deleteAccount
+      summary: Delete user account
+      description: Permanently deletes the authenticated user's account (soft delete). Requires password confirmation.
+      tags: [auth]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  format: password
+                  example: 'MyPassword123!'
+              required:
+                - password
+      responses:
+        '200':
+          description: Account deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Account deleted successfully'
+                required:
+                  - success
+                  - message
+        '400':
+          description: Wrong password or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/profile/export:
+    get:
+      operationId: exportUserData
+      summary: Export user data (DSAR)
+      description: Exports all user data for GDPR Data Subject Access Request (Articles 15/20).
+      tags: [auth]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User data exported successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDataExport'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /auth/profile/change-password:
     post:
@@ -626,6 +705,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  # Consent API
+  /consent:
+    post:
+      operationId: recordConsent
+      summary: Record a consent event
+      description: |
+        Records a user's consent decision for GDPR compliance.
+        Creates an immutable audit trail entry for the consent action.
+        Can be called by both authenticated and anonymous users.
+      tags: [consent]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordConsentRequest'
+      responses:
+        '201':
+          description: Consent recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordConsentResponse'
+        '400':
+          description: Validation error (invalid consent data)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   # System Endpoints
   /:
     get:
@@ -825,13 +934,17 @@ components:
       description: ISO 4217 currency codes
       example: 'USD'
 
+    LanguageCode:
+      type: string
+      enum: [en, it, he]
+      description: ISO 639-1 language codes supported by the platform
+      example: 'en'
+
     Language:
       type: object
       properties:
         code:
-          type: string
-          enum: [en, it, he]
-          example: 'it'
+          $ref: '#/components/schemas/LanguageCode'
         displayName:
           type: string
           example: 'Italian'
@@ -872,9 +985,7 @@ components:
       type: object
       properties:
         detectedLanguage:
-          type: string
-          enum: [en, it, he]
-          example: 'it'
+          $ref: '#/components/schemas/LanguageCode'
         confidence:
           type: number
           format: float
@@ -913,9 +1024,7 @@ components:
           type: boolean
           example: true
         detectedLanguage:
-          type: string
-          enum: [en, it, he]
-          example: 'it'
+          $ref: '#/components/schemas/LanguageCode'
         createdAt:
           type: string
           format: date-time
@@ -945,9 +1054,7 @@ components:
           type: boolean
           example: true
         detectedLanguage:
-          type: string
-          enum: [en, it, he]
-          example: 'it'
+          $ref: '#/components/schemas/LanguageCode'
 
     RedirectCheckResponse:
       type: object
@@ -1033,6 +1140,163 @@ components:
           example: '550e8400-e29b-41d4-a716-446655440000'
       required:
         - userId
+
+    # Consent Schemas
+    ConsentCategories:
+      type: object
+      description: Consent category selections (true = accepted, false = rejected)
+      properties:
+        necessary:
+          type: boolean
+          description: Essential cookies (always true, cannot be disabled)
+          example: true
+        analytics:
+          type: boolean
+          description: Analytics and performance tracking cookies
+          example: false
+        marketing:
+          type: boolean
+          description: Marketing and advertising cookies
+          example: false
+        functional:
+          type: boolean
+          description: Functional cookies for enhanced user experience features
+          example: false
+      required:
+        - necessary
+
+    ConsentAction:
+      type: string
+      description: The type of consent action taken by the user
+      enum: [accept_all, reject_all, custom, revoke]
+      example: 'accept_all'
+
+    ConsentType:
+      type: string
+      description: The type of consent being recorded
+      enum: [cookie, terms, privacy]
+      example: 'cookie'
+
+    RecordConsentRequest:
+      type: object
+      description: Request body for recording a consent event
+      properties:
+        consentType:
+          $ref: '#/components/schemas/ConsentType'
+        categories:
+          $ref: '#/components/schemas/ConsentCategories'
+        action:
+          $ref: '#/components/schemas/ConsentAction'
+        consentVersion:
+          type: string
+          description: Version identifier of the consent policy
+          example: '1.0'
+      required:
+        - consentType
+        - categories
+        - action
+
+    RecordConsentResponse:
+      type: object
+      description: Response after recording a consent event
+      properties:
+        success:
+          type: boolean
+          example: true
+        consentId:
+          type: string
+          format: uuid
+          description: Unique identifier for the recorded consent
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        message:
+          type: string
+          example: 'Consent recorded successfully'
+      required:
+        - success
+        - consentId
+        - message
+
+    # GDPR Data Export Schemas
+    UserDataExport:
+      type: object
+      description: Complete user data export for GDPR DSAR (Articles 15/20)
+      properties:
+        profile:
+          $ref: '#/components/schemas/UserProfile'
+        consentRecords:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentRecordExport'
+        preferences:
+          oneOf:
+            - type: object
+            - type: 'null'
+          description: User preferences (nullable if none set)
+        activeSessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionInfo'
+        exportedAt:
+          type: string
+          format: date-time
+          example: '2026-02-12T10:00:00Z'
+      required:
+        - profile
+        - consentRecords
+        - preferences
+        - activeSessions
+        - exportedAt
+
+    ConsentRecordExport:
+      type: object
+      description: Consent record for data export (PII-safe)
+      properties:
+        id:
+          type: string
+          format: uuid
+        consentType:
+          type: string
+          example: 'cookie'
+        categories:
+          type: object
+        action:
+          type: string
+          example: 'accept_all'
+        consentVersion:
+          oneOf:
+            - type: string
+            - type: 'null'
+          example: '1.0'
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - consentType
+        - categories
+        - action
+        - createdAt
+
+    SessionInfo:
+      type: object
+      description: Session metadata for data export (no sensitive token data)
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        rememberMe:
+          type: boolean
+      required:
+        - id
+        - createdAt
+        - expiresAt
+        - rememberMe
 
     RootResponse:
       type: object

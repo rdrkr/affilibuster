@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Affilibuster by Ronen Druker.
 
 import { getTerm } from '@/lib/client'
-import type { CodeEnum } from '@/lib/generated/types.gen'
+import type { LanguageCode } from '@/lib/generated/types.gen'
 import TermsOfServiceClient from './TermsOfServiceClient'
 
 /**
@@ -12,7 +12,7 @@ import TermsOfServiceClient from './TermsOfServiceClient'
  * @param params.params - Promise containing route parameters with lang
  * @returns Server-rendered terms of service page
  */
-export default async function TermsPage({ params }: { params: Promise<{ lang: CodeEnum }> }) {
+export default async function TermsPage({ params }: { params: Promise<{ lang: LanguageCode }> }) {
   const resolvedParams = await params
   const lang = resolvedParams.lang
 

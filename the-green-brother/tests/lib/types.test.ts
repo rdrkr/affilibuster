@@ -4,7 +4,7 @@
  * Unit tests for lib/types.ts
  */
 
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode as GeneratedLanguageCode } from '@/lib/generated/types.gen'
 import {
   CurrencyCode,
   DEFAULT_LANGUAGE_CODE,
@@ -17,15 +17,15 @@ import {
 describe('types module', () => {
   describe('LanguageCode', () => {
     it('should export EN language code', () => {
-      expect(LanguageCode.EN).toBe(CodeEnum.EN)
+      expect(LanguageCode.EN).toBe(GeneratedLanguageCode.EN)
     })
 
     it('should export IT language code', () => {
-      expect(LanguageCode.IT).toBe(CodeEnum.IT)
+      expect(LanguageCode.IT).toBe(GeneratedLanguageCode.IT)
     })
 
     it('should export HE language code', () => {
-      expect(LanguageCode.HE).toBe(CodeEnum.HE)
+      expect(LanguageCode.HE).toBe(GeneratedLanguageCode.HE)
     })
   })
 
@@ -59,35 +59,35 @@ describe('types module', () => {
     })
 
     it('should include english', () => {
-      expect(SUPPORTED_LANGUAGE_CODES).toContain(CodeEnum.EN)
+      expect(SUPPORTED_LANGUAGE_CODES).toContain(LanguageCode.EN)
     })
 
     it('should include italian', () => {
-      expect(SUPPORTED_LANGUAGE_CODES).toContain(CodeEnum.IT)
+      expect(SUPPORTED_LANGUAGE_CODES).toContain(LanguageCode.IT)
     })
 
     it('should include hebrew', () => {
-      expect(SUPPORTED_LANGUAGE_CODES).toContain(CodeEnum.HE)
+      expect(SUPPORTED_LANGUAGE_CODES).toContain(LanguageCode.HE)
     })
   })
 
   describe('DEFAULT_LANGUAGE_CODE', () => {
     it('should be english (en)', () => {
-      expect(DEFAULT_LANGUAGE_CODE).toBe(CodeEnum.EN)
+      expect(DEFAULT_LANGUAGE_CODE).toBe(LanguageCode.EN)
     })
   })
 
   describe('isLanguageCode', () => {
     it('should return true for valid language code (en)', () => {
-      expect(isLanguageCode(CodeEnum.EN)).toBe(true)
+      expect(isLanguageCode(LanguageCode.EN)).toBe(true)
     })
 
     it('should return true for valid language code (it)', () => {
-      expect(isLanguageCode(CodeEnum.IT)).toBe(true)
+      expect(isLanguageCode(LanguageCode.IT)).toBe(true)
     })
 
     it('should return true for valid language code (he)', () => {
-      expect(isLanguageCode(CodeEnum.HE)).toBe(true)
+      expect(isLanguageCode(LanguageCode.HE)).toBe(true)
     })
 
     it('should return false for invalid language code', () => {

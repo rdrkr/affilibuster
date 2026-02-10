@@ -17,7 +17,10 @@ from pydantic import SecretStr
 from affilibuster_backend.domain.entities.generated.models import (
     AuthProfileChangePasswordPostRequest,
     AuthProfileChangePasswordPostResponse,
+    AuthProfileDeleteRequest,
+    AuthProfileDeleteResponse,
     AuthProfilePatchRequest,
+    UserDataExport,
 )
 from affilibuster_backend.domain.entities.user import (
     Email,
@@ -27,6 +30,8 @@ from affilibuster_backend.domain.entities.user import (
 )
 from affilibuster_backend.infrastructure.api.routes.profile import (
     change_password,
+    delete_account,
+    export_user_data,
     get_profile,
     update_profile,
 )
@@ -215,3 +220,139 @@ class TestChangePasswordUnit:
         assert result.message == "Password changed successfully. Please log in again."
         user_repo.update.assert_called_once()
         session_repo.delete_all_by_user_id.assert_called_once_with(user_id)
+
+
+@pytest.mark.asyncio
+class TestDeleteAccountUnit:
+    """Unit tests for delete_account route handler."""
+
+    async def test_delete_account_success_returns_message(self):
+        """Test delete_account returns success response."""
+        # Arrange
+        user_id = uuid4()
+        current_user = create_test_user(user_id=user_id)
+        body = AuthProfileDeleteRequest(password=SecretStr("CorrectPassword123!"))
+
+        user_repo = AsyncMock()
+        user_repo.get_by_id.return_value = current_user
+        user_repo.update.return_value = current_user
+
+        session_repo = AsyncMock()
+        consent_repo = AsyncMock()
+        consent_repo.anonymize_by_user_id.return_value = 0
+
+        preferences_repo = AsyncMock()
+        preferences_repo.delete_by_user_id.return_value = 0
+
+        password_hasher = Mock()
+        password_hasher.verify_password.return_value = True
+
+        # Act
+        result = await delete_account(
+            body, current_user, user_repo, session_repo, consent_repo, preferences_repo, password_hasher
+        )
+
+        # Assert
+        assert isinstance(result, AuthProfileDeleteResponse)
+        assert result.success is True
+        assert result.message == "Account deleted successfully"
+
+    async def test_delete_account_wrong_password_raises_400(self):
+        """Test delete_account raises 400 when password is wrong."""
+        # Arrange
+        current_user = create_test_user()
+        body = AuthProfileDeleteRequest(password=SecretStr("WrongPassword123!"))
+
+        user_repo = AsyncMock()
+        user_repo.get_by_id.return_value = current_user
+
+        session_repo = AsyncMock()
+        consent_repo = AsyncMock()
+        preferences_repo = AsyncMock()
+
+        password_hasher = Mock()
+        password_hasher.verify_password.return_value = False
+
+        # Act & Assert
+        with pytest.raises(HTTPException) as exc_info:
+            await delete_account(
+                body, current_user, user_repo, session_repo, consent_repo, preferences_repo, password_hasher
+            )
+
+        assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
+        assert "Password is incorrect" in str(exc_info.value.detail)
+
+    async def test_delete_account_user_not_found_raises_400(self):
+        """Test delete_account raises 400 when user not found."""
+        # Arrange
+        current_user = create_test_user()
+        body = AuthProfileDeleteRequest(password=SecretStr("AnyPassword123!"))
+
+        user_repo = AsyncMock()
+        user_repo.get_by_id.return_value = None
+
+        session_repo = AsyncMock()
+        consent_repo = AsyncMock()
+        preferences_repo = AsyncMock()
+        password_hasher = Mock()
+
+        # Act & Assert
+        with pytest.raises(HTTPException) as exc_info:
+            await delete_account(
+                body, current_user, user_repo, session_repo, consent_repo, preferences_repo, password_hasher
+            )
+
+        assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
+        assert "User not found" in str(exc_info.value.detail)
+
+
+@pytest.mark.asyncio
+class TestExportUserDataUnit:
+    """Unit tests for export_user_data route handler."""
+
+    async def test_export_user_data_success(self):
+        """Test export_user_data returns UserDataExport."""
+        # Arrange
+        user_id = uuid4()
+        current_user = create_test_user(user_id=user_id)
+
+        user_repo = AsyncMock()
+        user_repo.get_by_id.return_value = current_user
+
+        session_repo = AsyncMock()
+        session_repo.get_active_sessions_by_user_id.return_value = []
+
+        consent_repo = AsyncMock()
+        consent_repo.get_all_by_user_id.return_value = []
+
+        preferences_repo = AsyncMock()
+        preferences_repo.get_by_user.return_value = None
+
+        # Act
+        result = await export_user_data(current_user, user_repo, session_repo, consent_repo, preferences_repo)
+
+        # Assert
+        assert isinstance(result, UserDataExport)
+        assert result.profile.id == user_id
+        assert result.consent_records == []
+        assert result.preferences is None
+        assert result.active_sessions == []
+
+    async def test_export_user_data_not_found_raises_404(self):
+        """Test export_user_data raises 404 when user not found."""
+        # Arrange
+        current_user = create_test_user()
+
+        user_repo = AsyncMock()
+        user_repo.get_by_id.return_value = None
+
+        session_repo = AsyncMock()
+        consent_repo = AsyncMock()
+        preferences_repo = AsyncMock()
+
+        # Act & Assert
+        with pytest.raises(HTTPException) as exc_info:
+            await export_user_data(current_user, user_repo, session_repo, consent_repo, preferences_repo)
+
+        assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
+        assert "User not found" in str(exc_info.value.detail)

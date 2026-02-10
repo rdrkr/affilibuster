@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Affilibuster by Ronen Druker.
 
 import { getBlog, getBlogPosts } from '@/lib/client'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import BlogClient from './BlogClient'
 
 /**
@@ -13,7 +13,7 @@ import BlogClient from './BlogClient'
  * @param params.params - Promise containing route parameters with lang
  * @returns Server-rendered blog listing page
  */
-export default async function BlogPage({ params }: { params: Promise<{ lang: CodeEnum }> }) {
+export default async function BlogPage({ params }: { params: Promise<{ lang: LanguageCode }> }) {
   const resolvedParams = await params
   const lang = resolvedParams.lang
 

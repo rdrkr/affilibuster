@@ -483,7 +483,8 @@ export interface ApiAuthPageAuthPage extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
-    appleButton: Schema.Attribute.String &
+    appleButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -491,13 +492,29 @@ export interface ApiAuthPageAuthPage extends Struct.SingleTypeSchema {
       }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    emailLabel: Schema.Attribute.String &
+    emailInvalidError: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    emailLabel: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     emailPlaceholder: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    emailRequiredError: Schema.Attribute.String &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -507,19 +524,29 @@ export interface ApiAuthPageAuthPage extends Struct.SingleTypeSchema {
       Schema.Attribute.Required &
       Schema.Attribute.Private &
       Schema.Attribute.DefaultTo<'Auth Page'>
-    forgotPasswordLink: Schema.Attribute.String &
+    forgotPasswordButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    googleButton: Schema.Attribute.String &
+    googleButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     haveAccountText: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    hidePasswordLabel: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -527,67 +554,85 @@ export interface ApiAuthPageAuthPage extends Struct.SingleTypeSchema {
       }>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::auth-page.auth-page'>
-    loginButton: Schema.Attribute.String &
+    loginButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    loginHeader: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     loginLinkText: Schema.Attribute.String &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    loginSubtitle: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    loginTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    nameLabel: Schema.Attribute.String &
+    nameLabel: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     namePlaceholder: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    nameRequiredError: Schema.Attribute.String &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     noAccountText: Schema.Attribute.String &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     orDividerText: Schema.Attribute.String &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    passwordLabel: Schema.Attribute.String &
+    passwordLabel: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     passwordPlaceholder: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    passwordRequiredError: Schema.Attribute.String &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     privacyLinkText: Schema.Attribute.String &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -601,37 +646,57 @@ export interface ApiAuthPageAuthPage extends Struct.SingleTypeSchema {
           localized: true
         }
       }>
-    signupButton: Schema.Attribute.String &
+    showPasswordLabel: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    signupButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    signupHeader: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     signupLinkText: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    signupSubtitle: Schema.Attribute.Text &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    signupTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     termsCheckboxText: Schema.Attribute.String &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     termsLinkText: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    termsRequiredError: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    termsText: Schema.Attribute.String &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -837,6 +902,139 @@ export interface ApiBlogBlog extends Struct.SingleTypeSchema {
         }
       }>
     tagFilters: Schema.Attribute.Relation<'oneToMany', 'api::blog-post-tag.blog-post-tag'>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiConsentCategoryConsentCategory extends Struct.CollectionTypeSchema {
+  collectionName: 'consent_categories'
+  info: {
+    displayName: 'Cookies Consent Category'
+    pluralName: 'consent-categories'
+    singularName: 'consent-category'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    content: Schema.Attribute.Component<'elements.text-block', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::consent-category.consent-category'>
+    publishedAt: Schema.Attribute.DateTime
+    required: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }> &
+      Schema.Attribute.DefaultTo<true>
+    uid: Schema.Attribute.UID &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiConsentConsent extends Struct.SingleTypeSchema {
+  collectionName: 'consents'
+  info: {
+    displayName: 'Cookies Consent Page'
+    pluralName: 'consents'
+    singularName: 'consent'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    acceptAllButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    consentInformation: Schema.Attribute.Component<'elements.text-block', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    consentVersion: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    doNotTrackNotice: Schema.Attribute.Component<'elements.text-block', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    entryTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }> &
+      Schema.Attribute.DefaultTo<'Cookies Consent Page'>
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::consent.consent'>
+    publishedAt: Schema.Attribute.DateTime
+    rejectAllButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    saveButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    settingsButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
   }
@@ -1087,6 +1285,51 @@ export interface ApiContributorContributor extends Struct.CollectionTypeSchema {
           localized: false
         }
       }>
+  }
+}
+
+export interface ApiCookiePolicyCookiePolicy extends Struct.SingleTypeSchema {
+  collectionName: 'cookie_policies'
+  info: {
+    description: 'Cookie policy page with rich text content and SEO metadata for GDPR compliance'
+    displayName: 'Cookie Policy Page'
+    pluralName: 'cookie-policies'
+    singularName: 'cookie-policy'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  pluginOptions: {
+    i18n: {
+      localized: true
+    }
+  }
+  attributes: {
+    content: Schema.Attribute.Component<'elements.text-block', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    entryTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<'Cookie Policy Page'>
+    locale: Schema.Attribute.String
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::cookie-policy.cookie-policy'>
+    publishedAt: Schema.Attribute.DateTime
+    seoMetadata: Schema.Attribute.Component<'elements.seo-metadata', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
   }
 }
 
@@ -2055,13 +2298,29 @@ export interface ApiProfileProfile extends Struct.SingleTypeSchema {
     }
   }
   attributes: {
-    cancelButton: Schema.Attribute.String &
+    accountSettingsHeader: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    confirmButton: Schema.Attribute.String &
+    cancelButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    confirmButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    cookieSettingsHeader: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -2069,43 +2328,36 @@ export interface ApiProfileProfile extends Struct.SingleTypeSchema {
       }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    currencyDescription: Schema.Attribute.Text &
+    currencyHeader: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    currencyTitle: Schema.Attribute.String &
+    deleteAccountHeader: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    deleteAccountTitle: Schema.Attribute.String &
+    deleteButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    deleteAccountWarning: Schema.Attribute.Text &
+    editProfileButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    deleteButton: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    editProfileTitle: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true
-        }
-      }>
-    emailLabel: Schema.Attribute.String &
+    emailLabel: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -2115,34 +2367,53 @@ export interface ApiProfileProfile extends Struct.SingleTypeSchema {
       Schema.Attribute.Required &
       Schema.Attribute.Private &
       Schema.Attribute.DefaultTo<'Profile Page'>
+    exportDataHeader: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    goBackButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::profile.profile'>
-    logoutButton: Schema.Attribute.String &
+    logoutButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    nameLabel: Schema.Attribute.String &
+    nameLabel: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    passwordLabel: Schema.Attribute.String &
+    pageHeader: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    profileTitle: Schema.Attribute.String &
+    passwordLabel: Schema.Attribute.Component<'elements.label', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
     publishedAt: Schema.Attribute.DateTime
-    saveButton: Schema.Attribute.String &
+    saveButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -2157,13 +2428,22 @@ export interface ApiProfileProfile extends Struct.SingleTypeSchema {
       }>
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    wishlistEmptyMessage: Schema.Attribute.Text &
+    wishlistAddButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    wishlistTitle: Schema.Attribute.String &
+    wishlistHeader: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
+    wishlistRemoveButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
@@ -2560,9 +2840,12 @@ declare module '@strapi/strapi' {
       'api::blog-post-tag.blog-post-tag': ApiBlogPostTagBlogPostTag
       'api::blog-post.blog-post': ApiBlogPostBlogPost
       'api::blog.blog': ApiBlogBlog
+      'api::consent-category.consent-category': ApiConsentCategoryConsentCategory
+      'api::consent.consent': ApiConsentConsent
       'api::contact-us.contact-us': ApiContactUsContactUs
       'api::contributor-role.contributor-role': ApiContributorRoleContributorRole
       'api::contributor.contributor': ApiContributorContributor
+      'api::cookie-policy.cookie-policy': ApiCookiePolicyCookiePolicy
       'api::currency.currency': ApiCurrencyCurrency
       'api::error-404.error-404': ApiError404Error404
       'api::error-410.error-410': ApiError410Error410

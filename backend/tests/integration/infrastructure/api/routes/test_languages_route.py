@@ -11,11 +11,10 @@ import pytest
 from httpx import AsyncClient
 
 from affilibuster_backend.domain.entities.generated.models import (
-    Code,
     DetectedLanguage,
-    DetectedLanguage1,
     Direction,
     Language,
+    LanguageCode,
 )
 from tests.fixtures.expected_seed_data import EXPECTED_LOCALE_CODES, EXPECTED_LOCALE_COUNT
 
@@ -57,7 +56,7 @@ class TestLanguagesRoute:
 
         languages = [Language(**item) for item in response.json()]
         codes = [lang.code for lang in languages]
-        assert Code.EN in codes
+        assert LanguageCode.EN in codes
 
     async def test_get_languages_structure(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
         """Test that language objects have required fields."""
@@ -84,7 +83,7 @@ class TestLanguagesRoute:
 
         languages = [Language(**item) for item in response.json()]
         if len(languages) > 0:
-            assert languages[0].code == Code.EN
+            assert languages[0].code == LanguageCode.EN
 
     async def test_get_languages_direction_values(
         self, integration_client: AsyncClient, strapi_test_data: None
@@ -120,7 +119,7 @@ class TestLanguageDetection:
         assert response.status_code == 200
 
         data = DetectedLanguage(**response.json())
-        assert data.detected_language == DetectedLanguage1.EN
+        assert data.detected_language == LanguageCode.EN
         assert data.confidence is not None
         assert data.should_prompt is not None
         assert isinstance(data.confidence, float)
@@ -136,7 +135,7 @@ class TestLanguageDetection:
 
         data = DetectedLanguage(**response.json())
         # Should detect Italian if available, otherwise fallback to English
-        assert data.detected_language in [DetectedLanguage1.IT, DetectedLanguage1.EN]
+        assert data.detected_language in [LanguageCode.IT, LanguageCode.EN]
         assert 0.0 <= data.confidence <= 1.0
 
     async def test_detect_language_with_hebrew(self, integration_client: AsyncClient, strapi_test_data: None) -> None:
@@ -149,7 +148,7 @@ class TestLanguageDetection:
 
         data = DetectedLanguage(**response.json())
         # Should detect Hebrew if available, otherwise fallback to English
-        assert data.detected_language in [DetectedLanguage1.HE, DetectedLanguage1.EN]
+        assert data.detected_language in [LanguageCode.HE, LanguageCode.EN]
         assert 0.0 <= data.confidence <= 1.0
 
     async def test_detect_language_with_empty_accept_language(
@@ -164,7 +163,7 @@ class TestLanguageDetection:
 
         data = DetectedLanguage(**response.json())
         # Should default to English with low confidence
-        assert data.detected_language == DetectedLanguage1.EN
+        assert data.detected_language == LanguageCode.EN
         assert data.confidence <= 0.6
 
     async def test_detect_language_with_null_accept_language(
@@ -181,7 +180,7 @@ class TestLanguageDetection:
         if response.status_code == 200:
             data = DetectedLanguage(**response.json())
             # Should default to English
-            assert data.detected_language == DetectedLanguage1.EN
+            assert data.detected_language == LanguageCode.EN
 
     async def test_detect_language_with_multiple_languages(
         self, integration_client: AsyncClient, strapi_test_data: None
@@ -195,7 +194,7 @@ class TestLanguageDetection:
 
         data = DetectedLanguage(**response.json())
         # Should detect English (first in list) with high confidence
-        assert data.detected_language == DetectedLanguage1.EN
+        assert data.detected_language == LanguageCode.EN
         assert data.confidence >= 0.8
 
     async def test_detect_language_with_unsupported_language(
@@ -210,7 +209,7 @@ class TestLanguageDetection:
 
         data = DetectedLanguage(**response.json())
         # Should fallback to English with low confidence
-        assert data.detected_language == DetectedLanguage1.EN
+        assert data.detected_language == LanguageCode.EN
         assert data.confidence <= 0.6
 
     async def test_detect_language_confidence_range(
@@ -254,9 +253,9 @@ class TestLanguageDetection:
 
         data = DetectedLanguage(**response.json())
         assert data.detected_language in [
-            DetectedLanguage1.EN,
-            DetectedLanguage1.IT,
-            DetectedLanguage1.HE,
+            LanguageCode.EN,
+            LanguageCode.IT,
+            LanguageCode.HE,
         ]
 
     async def test_detect_language_with_malformed_header(
@@ -271,7 +270,7 @@ class TestLanguageDetection:
 
         data = DetectedLanguage(**response.json())
         # Should fallback to English
-        assert data.detected_language == DetectedLanguage1.EN
+        assert data.detected_language == LanguageCode.EN
 
     async def test_detect_language_suggested_url_is_optional(
         self, integration_client: AsyncClient, strapi_test_data: None

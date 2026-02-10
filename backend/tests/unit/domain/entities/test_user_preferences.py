@@ -6,7 +6,7 @@ Unit tests for UserPreferences generated Pydantic model.
 Covers:
 - Valid user preferences creation with required fields
 - Optional field handling
-- Enum validation (CurrencyCode, DetectedLanguage2)
+- Enum validation (CurrencyCode, LanguageCode)
 - Field aliases (camelCase vs snake_case)
 """
 
@@ -16,7 +16,7 @@ from uuid import uuid4
 import pytest
 from pydantic import ValidationError
 
-from affilibuster_backend.domain.entities.generated.models import CurrencyCode, DetectedLanguage2, UserPreferences
+from affilibuster_backend.domain.entities.generated.models import CurrencyCode, LanguageCode, UserPreferences
 
 
 @pytest.mark.unit
@@ -55,7 +55,7 @@ class TestUserPreferencesCreation:
             session_id="session-xyz-789",
             user_id="user-456",
             selected_currency=CurrencyCode.EUR,
-            detected_language=DetectedLanguage2.IT,
+            detected_language=LanguageCode.IT,
             dismissed_language_prompt=True,
             created_at=created,
             updated_at=updated,
@@ -66,7 +66,7 @@ class TestUserPreferencesCreation:
         assert prefs.session_id == "session-xyz-789"
         assert prefs.user_id == "user-456"
         assert prefs.selected_currency == CurrencyCode.EUR
-        assert prefs.detected_language == DetectedLanguage2.IT
+        assert prefs.detected_language == LanguageCode.IT
         assert prefs.dismissed_language_prompt is True
         assert prefs.created_at == created
         assert prefs.updated_at == updated
@@ -87,7 +87,7 @@ class TestUserPreferencesCreation:
 
     def test_different_detected_languages(self):
         """Test creating preferences with different detected languages."""
-        languages = [DetectedLanguage2.EN, DetectedLanguage2.IT, DetectedLanguage2.HE]
+        languages = [LanguageCode.EN, LanguageCode.IT, LanguageCode.HE]
 
         for lang in languages:
             prefs = UserPreferences(
@@ -140,9 +140,9 @@ class TestUserPreferencesOptionalFields:
             session_id="session-123",
             selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=False,
-            detected_language=DetectedLanguage2.EN,
+            detected_language=LanguageCode.EN,
         )
-        assert prefs_with_lang.detected_language == DetectedLanguage2.EN
+        assert prefs_with_lang.detected_language == LanguageCode.EN
 
     def test_timestamps_optional(self):
         """Test that timestamp fields are optional."""
@@ -169,13 +169,13 @@ class TestUserPreferencesFieldAliases:
             user_id="user-456",
             selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=True,
-            detected_language=DetectedLanguage2.EN,
+            detected_language=LanguageCode.EN,
         )
         assert prefs.session_id == "session-123"
         assert prefs.user_id == "user-456"
         assert prefs.selected_currency == CurrencyCode.USD
         assert prefs.dismissed_language_prompt is True
-        assert prefs.detected_language == DetectedLanguage2.EN
+        assert prefs.detected_language == LanguageCode.EN
 
     def test_serialization_uses_camel_case(self):
         """Test that model serializes to camelCase."""

@@ -55,7 +55,7 @@ jest.mock('@/app/[lang]/products/[slug]/ProductDetailClient', () => ({
 import ProductDetailPage from '@/app/[lang]/products/[slug]/page'
 import { getProductBySlug, getProductCategoriesPage, getProducts } from '@/lib/content'
 import { userProfileFlag } from '@/lib/feature-flags'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 
 const mockGetProductBySlug = getProductBySlug as jest.MockedFunction<typeof getProductBySlug>
@@ -67,7 +67,7 @@ describe('ProductDetailPage', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     // Default mock implementation
-    mockGetProducts.mockResolvedValue({ data: [], meta: { pagination: { page: 1, pageSize: 10, total: 0 } } })
+    mockGetProducts.mockResolvedValue([])
     mockUserProfileFlag.mockResolvedValue(true)
   })
 
@@ -89,27 +89,23 @@ describe('ProductDetailPage', () => {
     mockGetProductCategoriesPage.mockResolvedValue(
       mockCategoriesPage as unknown as Awaited<ReturnType<typeof getProductCategoriesPage>>
     )
-    mockGetProducts.mockResolvedValue({
-      data: mockRelatedProducts as any[],
-      meta: { pagination: { page: 1, pageSize: 10, pageCount: 1, total: 1 } },
-    } as any)
+    mockGetProducts.mockResolvedValue(mockRelatedProducts as any[])
 
     // Act
-    const jsx = await ProductDetailPage({ params: Promise.resolve({ lang: CodeEnum.EN, slug: 'prod-slug' }) })
+    const jsx = await ProductDetailPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'prod-slug' }) })
     render(jsx)
 
     // Assert
-    expect(mockGetProductBySlug).toHaveBeenCalledWith('prod-slug', { locale: CodeEnum.EN })
-    expect(mockGetProductCategoriesPage).toHaveBeenCalledWith(CodeEnum.EN)
+    expect(mockGetProductBySlug).toHaveBeenCalledWith('prod-slug', { locale: LanguageCode.EN })
+    expect(mockGetProductCategoriesPage).toHaveBeenCalledWith(LanguageCode.EN)
     expect(mockUserProfileFlag).toHaveBeenCalled()
     expect(mockGetProducts).toHaveBeenCalledWith(
       expect.objectContaining({
         filters: expect.objectContaining({
           category: { slug: { $eq: 'electronics' } },
-          slug: { $ne: 'prod-slug' },
         }),
         pagination: { page: 1, pageSize: 10 },
-        locale: CodeEnum.EN,
+        locale: LanguageCode.EN,
       })
     )
 
@@ -129,7 +125,7 @@ describe('ProductDetailPage', () => {
     // Ensure we await the async component if it throws or returns promise (server component)
     // Server components are async functions.
     await expect(
-      ProductDetailPage({ params: Promise.resolve({ lang: CodeEnum.EN, slug: 'non-existent' }) })
+      ProductDetailPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'non-existent' }) })
     ).rejects.toThrow('NEXT_NOT_FOUND')
 
     expect(mockNotFound).toHaveBeenCalled()

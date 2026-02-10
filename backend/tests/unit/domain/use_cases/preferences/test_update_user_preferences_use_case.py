@@ -14,7 +14,7 @@ import pytest
 
 from affilibuster_backend.domain.entities.generated.models import (
     CurrencyCode,
-    DetectedLanguage2,
+    LanguageCode,
     UserPreferences,
 )
 from affilibuster_backend.domain.use_cases.preferences.update_user_preferences_use_case import (
@@ -126,7 +126,7 @@ class TestUpdateUserPreferencesExecute:
             user_id="user-123",
             selected_currency=CurrencyCode.EUR,
             dismissed_language_prompt=True,
-            detected_language=DetectedLanguage2.EN,
+            detected_language=LanguageCode.EN,
         )
         preferences_repository.upsert.return_value = updated_prefs
 
@@ -159,7 +159,7 @@ class TestUpdateUserPreferencesExecute:
             user_id="user-456",
             selected_currency=CurrencyCode.JPY,
             dismissed_language_prompt=False,
-            detected_language=DetectedLanguage2.IT,
+            detected_language=LanguageCode.IT,
         )
         preferences_repository.upsert.return_value = prefs
 
@@ -213,7 +213,7 @@ class TestUpdateUserPreferencesSerialize:
             user_id="user-123",
             selected_currency=CurrencyCode.USD,
             dismissed_language_prompt=True,
-            detected_language=DetectedLanguage2.EN,
+            detected_language=LanguageCode.EN,
             created_at=now,
             updated_at=now,
             expires_at=now + timedelta(days=30),

@@ -41,6 +41,10 @@ tags:
     description: Blog posts and articles
   - name: blog-post-tag
     description: Blog post tags for categorization
+  - name: consent
+    description: GDPR-compliant consent management
+  - name: consent-category
+    description: Cookie consent category definitions
   - name: contact-us
     description: Contact page content and contact information
   - name: contributor
@@ -150,9 +154,10 @@ paths:
               type: string
               enum:
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -434,37 +439,31 @@ paths:
             items:
               type: string
               enum:
-                - loginTitle
-                - loginSubtitle
-                - signupTitle
-                - signupSubtitle
-                - emailLabel
                 - emailPlaceholder
-                - passwordLabel
                 - passwordPlaceholder
-                - nameLabel
                 - namePlaceholder
-                - loginButton
-                - signupButton
-                - forgotPasswordLink
                 - noAccountText
                 - signupLinkText
                 - haveAccountText
                 - loginLinkText
                 - orDividerText
-                - googleButton
-                - appleButton
                 - termsCheckboxText
                 - termsLinkText
                 - privacyLinkText
+                - emailRequiredError
+                - emailInvalidError
+                - passwordRequiredError
+                - nameRequiredError
+                - termsRequiredError
+                - termsText
                 - createdAt
                 - updatedAt
                 - publishedAt
                 - locale
             example:
-              - loginTitle
-              - loginSubtitle
-              - signupTitle
+              - emailPlaceholder
+              - passwordPlaceholder
+              - namePlaceholder
           x-strapi-serialize: querystring
           description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
         - name: filters
@@ -477,33 +476,28 @@ paths:
             propertyNames:
               type: string
               enum:
-                - loginTitle
-                - loginSubtitle
-                - signupTitle
-                - signupSubtitle
-                - emailLabel
+                - createdAt
+                - emailInvalidError
                 - emailPlaceholder
-                - passwordLabel
-                - passwordPlaceholder
-                - nameLabel
-                - namePlaceholder
-                - loginButton
-                - signupButton
-                - forgotPasswordLink
-                - noAccountText
-                - signupLinkText
+                - emailRequiredError
                 - haveAccountText
+                - locale
+                - localizations
                 - loginLinkText
+                - namePlaceholder
+                - nameRequiredError
+                - noAccountText
                 - orDividerText
-                - googleButton
-                - appleButton
+                - passwordPlaceholder
+                - passwordRequiredError
+                - privacyLinkText
+                - publishedAt
+                - signupLinkText
                 - termsCheckboxText
                 - termsLinkText
-                - privacyLinkText
-                - createdAt
+                - termsRequiredError
+                - termsText
                 - updatedAt
-                - publishedAt
-                - locale
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -571,43 +565,13 @@ paths:
                         anyOf:
                           - type: string
                           - type: number
-                      loginTitle:
-                        description: A string field
-                        type: string
-                      loginSubtitle:
-                        description: A text field
-                        type: string
-                      signupTitle:
-                        description: A string field
-                        type: string
-                      signupSubtitle:
-                        description: A text field
-                        type: string
-                      emailLabel:
-                        description: A string field
-                        type: string
                       emailPlaceholder:
-                        description: A string field
-                        type: string
-                      passwordLabel:
                         description: A string field
                         type: string
                       passwordPlaceholder:
                         description: A string field
                         type: string
-                      nameLabel:
-                        description: A string field
-                        type: string
                       namePlaceholder:
-                        description: A string field
-                        type: string
-                      loginButton:
-                        description: A string field
-                        type: string
-                      signupButton:
-                        description: A string field
-                        type: string
-                      forgotPasswordLink:
                         description: A string field
                         type: string
                       noAccountText:
@@ -625,12 +589,6 @@ paths:
                       orDividerText:
                         description: A string field
                         type: string
-                      googleButton:
-                        description: A string field
-                        type: string
-                      appleButton:
-                        description: A string field
-                        type: string
                       termsCheckboxText:
                         description: A string field
                         type: string
@@ -638,6 +596,24 @@ paths:
                         description: A string field
                         type: string
                       privacyLinkText:
+                        description: A string field
+                        type: string
+                      emailRequiredError:
+                        description: A string field
+                        type: string
+                      emailInvalidError:
+                        description: A string field
+                        type: string
+                      passwordRequiredError:
+                        description: A string field
+                        type: string
+                      nameRequiredError:
+                        description: A string field
+                        type: string
+                      termsRequiredError:
+                        description: A string field
+                        type: string
+                      termsText:
                         description: A string field
                         type: string
                       createdAt:
@@ -656,6 +632,42 @@ paths:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
                         type: string
                         example: en
+                      loginHeader:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
+                      signupHeader:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
+                      emailLabel:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsLabelEntry'
+                      passwordLabel:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsLabelEntry'
+                      nameLabel:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsLabelEntry'
+                      loginButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      signupButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      forgotPasswordButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      googleButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      appleButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      showPasswordLabel:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsLabelEntry'
+                      hidePasswordLabel:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsLabelEntry'
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -697,7 +709,36 @@ paths:
                     required:
                       - documentId
                       - id
+                      - emailPlaceholder
+                      - passwordPlaceholder
+                      - namePlaceholder
+                      - noAccountText
+                      - signupLinkText
+                      - haveAccountText
+                      - loginLinkText
+                      - orDividerText
+                      - termsCheckboxText
+                      - termsLinkText
+                      - privacyLinkText
+                      - emailRequiredError
+                      - emailInvalidError
+                      - passwordRequiredError
+                      - nameRequiredError
+                      - termsRequiredError
+                      - termsText
                       - publishedAt
+                      - loginHeader
+                      - signupHeader
+                      - emailLabel
+                      - passwordLabel
+                      - nameLabel
+                      - loginButton
+                      - signupButton
+                      - forgotPasswordButton
+                      - googleButton
+                      - appleButton
+                      - showPasswordLabel
+                      - hidePasswordLabel
                       - seoMetadata
                     additionalProperties: false
                   meta:
@@ -905,6 +946,56 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    delete:
+      operationId: deleteAccount
+      summary: Delete user account
+      description: Permanently deletes the authenticated user's account (soft delete). Requires password confirmation.
+      tags:
+        - auth
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  format: password
+                  example: MyPassword123!
+              required:
+                - password
+      responses:
+        '200':
+          description: Account deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Account deleted successfully
+                required:
+                  - success
+                  - message
+        '400':
+          description: Wrong password or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /auth/profile/change-password:
     post:
       operationId: changePassword
@@ -952,6 +1043,34 @@ paths:
                 $ref: '#/components/schemas/Error'
         '401':
           description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/profile/export:
+    get:
+      operationId: exportUserData
+      summary: Export user data (DSAR)
+      description: Exports all user data for GDPR Data Subject Access Request (Articles 15/20).
+      tags:
+        - auth
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User data exported successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDataExport'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
           content:
             application/json:
               schema:
@@ -1189,9 +1308,12 @@ paths:
               type: string
               enum:
                 - createdAt
-                - updatedAt
-                - publishedAt
+                - featuredBlogPosts
                 - locale
+                - localizations
+                - publishedAt
+                - tagFilters
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -1405,11 +1527,12 @@ paths:
             propertyNames:
               type: string
               enum:
-                - tagId
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - tagId
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -1725,11 +1848,12 @@ paths:
             propertyNames:
               type: string
               enum:
-                - tagId
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - tagId
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -1979,13 +2103,16 @@ paths:
             propertyNames:
               type: string
               enum:
-                - slug
-                - readTimeInMinutes
-                - publishedDate
+                - author
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - publishedDate
+                - readTimeInMinutes
+                - slug
+                - tags
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -2335,13 +2462,16 @@ paths:
             propertyNames:
               type: string
               enum:
-                - slug
-                - readTimeInMinutes
-                - publishedDate
+                - author
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - publishedDate
+                - readTimeInMinutes
+                - slug
+                - tags
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -2631,13 +2761,16 @@ paths:
             propertyNames:
               type: string
               enum:
-                - slug
-                - readTimeInMinutes
-                - publishedDate
+                - author
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - publishedDate
+                - readTimeInMinutes
+                - slug
+                - tags
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -2882,6 +3015,805 @@ paths:
         - blog-post
       summary: Blog Post Get Blog Posts By Id
       description: Retrieves Blog Post content from the CMS. Supports field selection, population, and localization.
+  /consent:
+    get:
+      operationId: consent/get/consent
+      parameters:
+        - name: fields
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+            readOnly: true
+            type: array
+            items:
+              type: string
+              enum:
+                - createdAt
+                - updatedAt
+                - publishedAt
+                - locale
+            example:
+              - createdAt
+              - updatedAt
+              - publishedAt
+          x-strapi-serialize: querystring
+          description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
+        - name: filters
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filters to apply to the query
+            type: object
+            propertyNames:
+              type: string
+              enum:
+                - createdAt
+                - locale
+                - localizations
+                - publishedAt
+                - updatedAt
+            additionalProperties: {}
+          x-strapi-serialize: querystring
+          description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
+        - name: locale
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Select a locale
+            type: string
+            example: en
+          x-strapi-serialize: querystring
+          description: Select content for a specific locale when using Strapi Internationalization (i18n). Defaults to the default locale if not specified.
+        - name: status
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Fetch documents based on their status. Default to "published" if not specified.
+            type: string
+            enum:
+              - draft
+              - published
+            example: published
+          x-strapi-serialize: querystring
+          description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: customPopulate
+          in: query
+          description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+          required: true
+          schema:
+            type: string
+            default: nested
+        - name: customDepth
+          in: query
+          description: Maximum depth for population (override plugin default)
+          required: false
+          schema:
+            type: integer
+        - name: customIgnored
+          in: query
+          description: Fields to ignore during population
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $schema: https://json-schema.org/draft/2020-12/schema
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      documentId:
+                        description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                        type: string
+                        example: 550e8400-e29b-41d4-a716-446655440000
+                      id:
+                        anyOf:
+                          - type: string
+                          - type: number
+                      createdAt:
+                        description: Timestamp when this entry was first created in the CMS.
+                        type: string
+                        example: '2025-10-30T17:41:47.696Z'
+                      updatedAt:
+                        description: Timestamp when this entry was last modified.
+                        type: string
+                        example: '2025-10-30T18:23:15.432Z'
+                      publishedAt:
+                        description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                        type: string
+                        example: '2025-10-30T17:41:47.696Z'
+                      locale:
+                        description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                        type: string
+                        example: en
+                      consentInformation:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsTextBlockEntry'
+                      acceptAllButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      rejectAllButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      settingsButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      saveButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      doNotTrackNotice:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsTextBlockEntry'
+                      localizations:
+                        description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
+                          properties:
+                            id:
+                              type: number
+                            documentId:
+                              type: string
+                              description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                              example: 550e8400-e29b-41d4-a716-446655440000
+                            locale:
+                              type: string
+                              description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                              example: en
+                            createdAt:
+                              type: string
+                              description: Timestamp when this entry was first created in the CMS.
+                              example: '2025-10-30T17:41:47.696Z'
+                            updatedAt:
+                              type: string
+                              description: Timestamp when this entry was last modified.
+                              example: '2025-10-30T18:23:15.432Z'
+                            publishedAt:
+                              type: string
+                              description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                              example: '2025-10-30T17:41:47.696Z'
+                          required:
+                            - id
+                            - documentId
+                            - locale
+                          additionalProperties: true
+                    required:
+                      - documentId
+                      - id
+                      - publishedAt
+                      - consentInformation
+                      - acceptAllButton
+                      - rejectAllButton
+                      - settingsButton
+                      - saveButton
+                      - doNotTrackNotice
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    description: Metadata object containing pagination and other response metadata
+                required:
+                  - data
+                additionalProperties: false
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      tags:
+        - consent
+      summary: Consent Get Consent
+      description: Retrieves Consent content from the CMS. Supports field selection, population, and localization.
+  /consent-categories:
+    get:
+      operationId: consent-category/get/consent_categories
+      parameters:
+        - name: fields
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+            readOnly: true
+            type: array
+            items:
+              type: string
+              enum:
+                - uid
+                - required
+                - createdAt
+                - updatedAt
+                - publishedAt
+                - locale
+            example:
+              - uid
+              - required
+              - createdAt
+          x-strapi-serialize: querystring
+          description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
+        - name: filters
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filters to apply to the query
+            type: object
+            propertyNames:
+              type: string
+              enum:
+                - createdAt
+                - locale
+                - localizations
+                - publishedAt
+                - required
+                - uid
+                - updatedAt
+            additionalProperties: {}
+          x-strapi-serialize: querystring
+          description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
+        - name: _q
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            type: string
+            example: search terms
+          x-strapi-serialize: querystring
+          description: Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
+        - name: pagination
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Pagination parameters
+            allOf:
+              - type: object
+                properties:
+                  withCount:
+                    description: Include total count in response
+                    type: boolean
+                additionalProperties: false
+              - anyOf:
+                  - description: Page-based pagination
+                    type: object
+                    properties:
+                      page:
+                        description: Page number (1-based)
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                      pageSize:
+                        description: Number of entries per page
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                    required:
+                      - page
+                      - pageSize
+                    additionalProperties: false
+                  - description: Offset-based pagination
+                    type: object
+                    properties:
+                      start:
+                        description: Number of entries to skip
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                      limit:
+                        description: Maximum number of entries to return
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                    required:
+                      - start
+                      - limit
+                    additionalProperties: false
+          x-strapi-serialize: querystring
+          description: Control pagination of collection results. Supports both page-based pagination (page/pageSize) and offset-based pagination (start/limit). Optionally include total count with withCount parameter.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Sort the result
+            anyOf:
+              - type: string
+                enum:
+                  - uid
+                  - required
+                  - createdAt
+                  - updatedAt
+                  - publishedAt
+                  - locale
+              - type: array
+                items:
+                  type: string
+                  enum:
+                    - uid
+                    - required
+                    - createdAt
+                    - updatedAt
+                    - publishedAt
+                    - locale
+              - type: object
+                propertyNames:
+                  type: string
+                  enum:
+                    - uid
+                    - required
+                    - createdAt
+                    - updatedAt
+                    - publishedAt
+                    - locale
+                additionalProperties:
+                  type: string
+                  enum:
+                    - asc
+                    - desc
+              - type: array
+                items:
+                  type: object
+                  propertyNames:
+                    type: string
+                    enum:
+                      - uid
+                      - required
+                      - createdAt
+                      - updatedAt
+                      - publishedAt
+                      - locale
+                  additionalProperties:
+                    type: string
+                    enum:
+                      - asc
+                      - desc
+            example: uid
+          x-strapi-serialize: querystring
+          description: Sort the result set by one or more fields. Use field name for ascending order or prefix with "-" for descending (e.g., "-createdAt"). Supports multiple sort criteria.
+        - name: locale
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Select a locale
+            type: string
+            example: en
+          x-strapi-serialize: querystring
+          description: Select content for a specific locale when using Strapi Internationalization (i18n). Defaults to the default locale if not specified.
+        - name: status
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Fetch documents based on their status. Default to "published" if not specified.
+            type: string
+            enum:
+              - draft
+              - published
+            example: published
+          x-strapi-serialize: querystring
+          description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: customPopulate
+          in: query
+          description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+          required: true
+          schema:
+            type: string
+            default: nested
+        - name: customDepth
+          in: query
+          description: Maximum depth for population (override plugin default)
+          required: false
+          schema:
+            type: integer
+        - name: customIgnored
+          in: query
+          description: Fields to ignore during population
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $schema: https://json-schema.org/draft/2020-12/schema
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        documentId:
+                          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                          type: string
+                          example: 550e8400-e29b-41d4-a716-446655440000
+                        id:
+                          anyOf:
+                            - type: string
+                            - type: number
+                        uid:
+                          description: A UID field
+                          type: string
+                        required:
+                          description: A boolean field
+                          default: true
+                          anyOf:
+                            - type: boolean
+                            - type: 'null'
+                        createdAt:
+                          description: Timestamp when this entry was first created in the CMS.
+                          type: string
+                          example: '2025-10-30T17:41:47.696Z'
+                        updatedAt:
+                          description: Timestamp when this entry was last modified.
+                          type: string
+                          example: '2025-10-30T18:23:15.432Z'
+                        publishedAt:
+                          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                          type: string
+                          example: '2025-10-30T17:41:47.696Z'
+                        locale:
+                          description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                          type: string
+                          example: en
+                        content:
+                          description: A component field
+                          $ref: '#/components/schemas/ElementsTextBlockEntry'
+                        localizations:
+                          description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+                          readOnly: true
+                          type: array
+                          items:
+                            type: object
+                            description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
+                            properties:
+                              id:
+                                type: number
+                              documentId:
+                                type: string
+                                description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                                example: 550e8400-e29b-41d4-a716-446655440000
+                              locale:
+                                type: string
+                                description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                                example: en
+                              createdAt:
+                                type: string
+                                description: Timestamp when this entry was first created in the CMS.
+                                example: '2025-10-30T17:41:47.696Z'
+                              updatedAt:
+                                type: string
+                                description: Timestamp when this entry was last modified.
+                                example: '2025-10-30T18:23:15.432Z'
+                              publishedAt:
+                                type: string
+                                description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                                example: '2025-10-30T17:41:47.696Z'
+                            required:
+                              - id
+                              - documentId
+                              - locale
+                            additionalProperties: true
+                      required:
+                        - documentId
+                        - id
+                        - uid
+                        - required
+                        - publishedAt
+                        - content
+                      additionalProperties: false
+                  meta:
+                    type: object
+                    description: Metadata object containing pagination and other response metadata
+                required:
+                  - data
+                additionalProperties: false
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      tags:
+        - consent-category
+      summary: Consent Category Get Consent Categories
+      description: Retrieves a list of Consent Category entries from the CMS. Supports filtering, pagination, and sorting.
+  /consent-categories/{id}:
+    get:
+      operationId: consent-category/get/consent_categories_by_id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: The document ID, represented by a UUID
+            type: string
+        - name: fields
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+            readOnly: true
+            type: array
+            items:
+              type: string
+              enum:
+                - uid
+                - required
+                - createdAt
+                - updatedAt
+                - publishedAt
+                - locale
+            example:
+              - uid
+              - required
+              - createdAt
+          x-strapi-serialize: querystring
+          description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
+        - name: filters
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filters to apply to the query
+            type: object
+            propertyNames:
+              type: string
+              enum:
+                - createdAt
+                - locale
+                - localizations
+                - publishedAt
+                - required
+                - uid
+                - updatedAt
+            additionalProperties: {}
+          x-strapi-serialize: querystring
+          description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Sort the result
+            anyOf:
+              - type: string
+                enum:
+                  - uid
+                  - required
+                  - createdAt
+                  - updatedAt
+                  - publishedAt
+                  - locale
+              - type: array
+                items:
+                  type: string
+                  enum:
+                    - uid
+                    - required
+                    - createdAt
+                    - updatedAt
+                    - publishedAt
+                    - locale
+              - type: object
+                propertyNames:
+                  type: string
+                  enum:
+                    - uid
+                    - required
+                    - createdAt
+                    - updatedAt
+                    - publishedAt
+                    - locale
+                additionalProperties:
+                  type: string
+                  enum:
+                    - asc
+                    - desc
+              - type: array
+                items:
+                  type: object
+                  propertyNames:
+                    type: string
+                    enum:
+                      - uid
+                      - required
+                      - createdAt
+                      - updatedAt
+                      - publishedAt
+                      - locale
+                  additionalProperties:
+                    type: string
+                    enum:
+                      - asc
+                      - desc
+            example: uid
+          x-strapi-serialize: querystring
+          description: Sort the result set by one or more fields. Use field name for ascending order or prefix with "-" for descending (e.g., "-createdAt"). Supports multiple sort criteria.
+        - name: locale
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Select a locale
+            type: string
+            example: en
+          x-strapi-serialize: querystring
+          description: Select content for a specific locale when using Strapi Internationalization (i18n). Defaults to the default locale if not specified.
+        - name: status
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Fetch documents based on their status. Default to "published" if not specified.
+            type: string
+            enum:
+              - draft
+              - published
+            example: published
+          x-strapi-serialize: querystring
+          description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: customPopulate
+          in: query
+          description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+          required: true
+          schema:
+            type: string
+            default: nested
+        - name: customDepth
+          in: query
+          description: Maximum depth for population (override plugin default)
+          required: false
+          schema:
+            type: integer
+        - name: customIgnored
+          in: query
+          description: Fields to ignore during population
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $schema: https://json-schema.org/draft/2020-12/schema
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      documentId:
+                        description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                        type: string
+                        example: 550e8400-e29b-41d4-a716-446655440000
+                      id:
+                        anyOf:
+                          - type: string
+                          - type: number
+                      uid:
+                        description: A UID field
+                        type: string
+                      required:
+                        description: A boolean field
+                        default: true
+                        anyOf:
+                          - type: boolean
+                          - type: 'null'
+                      createdAt:
+                        description: Timestamp when this entry was first created in the CMS.
+                        type: string
+                        example: '2025-10-30T17:41:47.696Z'
+                      updatedAt:
+                        description: Timestamp when this entry was last modified.
+                        type: string
+                        example: '2025-10-30T18:23:15.432Z'
+                      publishedAt:
+                        description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                        type: string
+                        example: '2025-10-30T17:41:47.696Z'
+                      locale:
+                        description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                        type: string
+                        example: en
+                      content:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsTextBlockEntry'
+                      localizations:
+                        description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
+                          properties:
+                            id:
+                              type: number
+                            documentId:
+                              type: string
+                              description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                              example: 550e8400-e29b-41d4-a716-446655440000
+                            locale:
+                              type: string
+                              description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                              example: en
+                            createdAt:
+                              type: string
+                              description: Timestamp when this entry was first created in the CMS.
+                              example: '2025-10-30T17:41:47.696Z'
+                            updatedAt:
+                              type: string
+                              description: Timestamp when this entry was last modified.
+                              example: '2025-10-30T18:23:15.432Z'
+                            publishedAt:
+                              type: string
+                              description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                              example: '2025-10-30T17:41:47.696Z'
+                          required:
+                            - id
+                            - documentId
+                            - locale
+                          additionalProperties: true
+                    required:
+                      - documentId
+                      - id
+                      - uid
+                      - required
+                      - publishedAt
+                      - content
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    description: Metadata object containing pagination and other response metadata
+                required:
+                  - data
+                additionalProperties: false
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      tags:
+        - consent-category
+      summary: Consent Category Get Consent Categories By Id
+      description: Retrieves Consent Category content from the CMS. Supports field selection, population, and localization.
   /contact-us:
     get:
       operationId: contact-us/get/contact_us
@@ -2928,21 +3860,22 @@ paths:
             propertyNames:
               type: string
               enum:
-                - title
-                - subtitle
                 - contactTabLabel
-                - faqTabLabel
-                - nameLabel
-                - namePlaceholder
+                - createdAt
                 - emailLabel
                 - emailPlaceholder
+                - faqTabLabel
+                - locale
+                - localizations
                 - messageLabel
                 - messagePlaceholder
-                - submitButton
-                - createdAt
-                - updatedAt
+                - nameLabel
+                - namePlaceholder
                 - publishedAt
-                - locale
+                - submitButton
+                - subtitle
+                - title
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -3160,12 +4093,13 @@ paths:
             propertyNames:
               type: string
               enum:
-                - roleId
-                - name
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - name
+                - publishedAt
+                - roleId
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -3482,12 +4416,13 @@ paths:
             propertyNames:
               type: string
               enum:
-                - roleId
-                - name
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - name
+                - publishedAt
+                - roleId
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -3753,6 +4688,7 @@ paths:
                 - lastName
                 - linkedin
                 - locale
+                - localizations
                 - publishedAt
                 - roles
                 - slug
@@ -4154,20 +5090,22 @@ paths:
             propertyNames:
               type: string
               enum:
-                - slug
-                - firstName
-                - lastName
                 - bio
+                - createdAt
                 - email
-                - website
-                - twitter
-                - linkedin
+                - firstName
                 - github
                 - instagram
-                - createdAt
-                - updatedAt
-                - publishedAt
+                - lastName
+                - linkedin
                 - locale
+                - localizations
+                - publishedAt
+                - roles
+                - slug
+                - twitter
+                - updatedAt
+                - website
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -4503,20 +5441,22 @@ paths:
             propertyNames:
               type: string
               enum:
-                - slug
-                - firstName
-                - lastName
                 - bio
+                - createdAt
                 - email
-                - website
-                - twitter
-                - linkedin
+                - firstName
                 - github
                 - instagram
-                - createdAt
-                - updatedAt
-                - publishedAt
+                - lastName
+                - linkedin
                 - locale
+                - localizations
+                - publishedAt
+                - roles
+                - slug
+                - twitter
+                - updatedAt
+                - website
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -4800,6 +5740,197 @@ paths:
         - contributor
       summary: Contributor Get Contributors By Id
       description: Retrieves Contributor content from the CMS. Supports field selection, population, and localization.
+  /cookie-policy:
+    get:
+      operationId: cookie-policy/get/cookie_policy
+      parameters:
+        - name: fields
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+            readOnly: true
+            type: array
+            items:
+              type: string
+              enum:
+                - createdAt
+                - updatedAt
+                - publishedAt
+                - locale
+            example:
+              - createdAt
+              - updatedAt
+              - publishedAt
+          x-strapi-serialize: querystring
+          description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
+        - name: filters
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filters to apply to the query
+            type: object
+            propertyNames:
+              type: string
+              enum:
+                - createdAt
+                - locale
+                - localizations
+                - publishedAt
+                - updatedAt
+            additionalProperties: {}
+          x-strapi-serialize: querystring
+          description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
+        - name: locale
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Select a locale
+            type: string
+            example: en
+          x-strapi-serialize: querystring
+          description: Select content for a specific locale when using Strapi Internationalization (i18n). Defaults to the default locale if not specified.
+        - name: status
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Fetch documents based on their status. Default to "published" if not specified.
+            type: string
+            enum:
+              - draft
+              - published
+            example: published
+          x-strapi-serialize: querystring
+          description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: customPopulate
+          in: query
+          description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+          required: true
+          schema:
+            type: string
+            default: nested
+        - name: customDepth
+          in: query
+          description: Maximum depth for population (override plugin default)
+          required: false
+          schema:
+            type: integer
+        - name: customIgnored
+          in: query
+          description: Fields to ignore during population
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $schema: https://json-schema.org/draft/2020-12/schema
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      documentId:
+                        description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                        type: string
+                        example: 550e8400-e29b-41d4-a716-446655440000
+                      id:
+                        anyOf:
+                          - type: string
+                          - type: number
+                      createdAt:
+                        description: Timestamp when this entry was first created in the CMS.
+                        type: string
+                        example: '2025-10-30T17:41:47.696Z'
+                      updatedAt:
+                        description: Timestamp when this entry was last modified.
+                        type: string
+                        example: '2025-10-30T18:23:15.432Z'
+                      publishedAt:
+                        description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                        type: string
+                        example: '2025-10-30T17:41:47.696Z'
+                      locale:
+                        description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                        type: string
+                        example: en
+                      content:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsTextBlockEntry'
+                      seoMetadata:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsSeoMetadataEntry'
+                      localizations:
+                        description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
+                          properties:
+                            id:
+                              type: number
+                            documentId:
+                              type: string
+                              description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                              example: 550e8400-e29b-41d4-a716-446655440000
+                            locale:
+                              type: string
+                              description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                              example: en
+                            createdAt:
+                              type: string
+                              description: Timestamp when this entry was first created in the CMS.
+                              example: '2025-10-30T17:41:47.696Z'
+                            updatedAt:
+                              type: string
+                              description: Timestamp when this entry was last modified.
+                              example: '2025-10-30T18:23:15.432Z'
+                            publishedAt:
+                              type: string
+                              description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                              example: '2025-10-30T17:41:47.696Z'
+                          required:
+                            - id
+                            - documentId
+                            - locale
+                          additionalProperties: true
+                    required:
+                      - documentId
+                      - id
+                      - publishedAt
+                      - content
+                      - seoMetadata
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    description: Metadata object containing pagination and other response metadata
+                required:
+                  - data
+                additionalProperties: false
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      tags:
+        - cookie-policy
+      summary: Cookie Policy Get Cookie Policy
+      description: Retrieves Cookie Policy content from the CMS. Supports field selection, population, and localization.
   /currencies:
     get:
       operationId: currency/get/currencies
@@ -4844,17 +5975,18 @@ paths:
               type: string
               enum:
                 - code
-                - name
-                - symbol
+                - createdAt
                 - decimalPlaces
-                - symbolPosition
-                - thousandsSeparator
                 - decimalSeparator
                 - exchangeRate
-                - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - name
+                - publishedAt
+                - symbol
+                - symbolPosition
+                - thousandsSeparator
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -5242,17 +6374,18 @@ paths:
               type: string
               enum:
                 - code
-                - name
-                - symbol
+                - createdAt
                 - decimalPlaces
-                - symbolPosition
-                - thousandsSeparator
                 - decimalSeparator
                 - exchangeRate
-                - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - name
+                - publishedAt
+                - symbol
+                - symbolPosition
+                - thousandsSeparator
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -5564,9 +6697,10 @@ paths:
               type: string
               enum:
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -5754,9 +6888,10 @@ paths:
               type: string
               enum:
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -5948,15 +7083,16 @@ paths:
             propertyNames:
               type: string
               enum:
-                - title
-                - subtitle
-                - description
-                - contactPrompt
                 - contactButtonText
+                - contactPrompt
                 - createdAt
-                - updatedAt
-                - publishedAt
+                - description
                 - locale
+                - localizations
+                - publishedAt
+                - subtitle
+                - title
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -7115,9 +8251,10 @@ paths:
               type: string
               enum:
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -7384,9 +8521,10 @@ paths:
               type: string
               enum:
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -7751,12 +8889,13 @@ paths:
             propertyNames:
               type: string
               enum:
-                - siteTitle
-                - siteDescription
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - siteDescription
+                - siteTitle
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -7989,9 +9128,10 @@ paths:
               type: string
               enum:
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -8179,11 +9319,12 @@ paths:
             propertyNames:
               type: string
               enum:
-                - slug
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - slug
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -8498,9 +9639,10 @@ paths:
               enum:
                 - bySellerText
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -8718,11 +9860,12 @@ paths:
             propertyNames:
               type: string
               enum:
-                - slug
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - slug
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -8981,11 +10124,12 @@ paths:
             propertyNames:
               type: string
               enum:
-                - slug
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - slug
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -9239,9 +10383,10 @@ paths:
               enum:
                 - certificateId
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -9559,9 +10704,10 @@ paths:
               enum:
                 - certificateId
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -9809,11 +10955,12 @@ paths:
             propertyNames:
               type: string
               enum:
-                - tagId
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - tagId
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -10129,11 +11276,12 @@ paths:
             propertyNames:
               type: string
               enum:
-                - tagId
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - tagId
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -10381,11 +11529,16 @@ paths:
             propertyNames:
               type: string
               enum:
-                - slug
+                - category
+                - certificates
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - seller
+                - slug
+                - tags
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -10785,11 +11938,16 @@ paths:
             propertyNames:
               type: string
               enum:
-                - slug
+                - category
+                - certificates
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - seller
+                - slug
+                - tags
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -11129,11 +12287,16 @@ paths:
             propertyNames:
               type: string
               enum:
-                - slug
+                - category
+                - certificates
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - seller
+                - slug
+                - tags
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -11445,30 +12608,14 @@ paths:
             items:
               type: string
               enum:
-                - profileTitle
-                - editProfileTitle
-                - wishlistTitle
-                - wishlistEmptyMessage
-                - currencyTitle
-                - currencyDescription
-                - deleteAccountTitle
-                - deleteAccountWarning
-                - saveButton
-                - cancelButton
-                - deleteButton
-                - confirmButton
-                - logoutButton
-                - nameLabel
-                - emailLabel
-                - passwordLabel
                 - createdAt
                 - updatedAt
                 - publishedAt
                 - locale
             example:
-              - profileTitle
-              - editProfileTitle
-              - wishlistTitle
+              - createdAt
+              - updatedAt
+              - publishedAt
           x-strapi-serialize: querystring
           description: Select specific fields to return in the response (field projection). Only scalar fields can be selected; relations, components, files, and dynamic zones must be populated separately.
         - name: filters
@@ -11481,26 +12628,11 @@ paths:
             propertyNames:
               type: string
               enum:
-                - profileTitle
-                - editProfileTitle
-                - wishlistTitle
-                - wishlistEmptyMessage
-                - currencyTitle
-                - currencyDescription
-                - deleteAccountTitle
-                - deleteAccountWarning
-                - saveButton
-                - cancelButton
-                - deleteButton
-                - confirmButton
-                - logoutButton
-                - nameLabel
-                - emailLabel
-                - passwordLabel
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -11568,54 +12700,6 @@ paths:
                         anyOf:
                           - type: string
                           - type: number
-                      profileTitle:
-                        description: A string field
-                        type: string
-                      editProfileTitle:
-                        description: A string field
-                        type: string
-                      wishlistTitle:
-                        description: A string field
-                        type: string
-                      wishlistEmptyMessage:
-                        description: A text field
-                        type: string
-                      currencyTitle:
-                        description: A string field
-                        type: string
-                      currencyDescription:
-                        description: A text field
-                        type: string
-                      deleteAccountTitle:
-                        description: A string field
-                        type: string
-                      deleteAccountWarning:
-                        description: A text field
-                        type: string
-                      saveButton:
-                        description: A string field
-                        type: string
-                      cancelButton:
-                        description: A string field
-                        type: string
-                      deleteButton:
-                        description: A string field
-                        type: string
-                      confirmButton:
-                        description: A string field
-                        type: string
-                      logoutButton:
-                        description: A string field
-                        type: string
-                      nameLabel:
-                        description: A string field
-                        type: string
-                      emailLabel:
-                        description: A string field
-                        type: string
-                      passwordLabel:
-                        description: A string field
-                        type: string
                       createdAt:
                         description: Timestamp when this entry was first created in the CMS.
                         type: string
@@ -11632,6 +12716,63 @@ paths:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
                         type: string
                         example: en
+                      pageHeader:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
+                      accountSettingsHeader:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
+                      editProfileButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      wishlistHeader:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
+                      wishlistAddButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      wishlistRemoveButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      currencyHeader:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
+                      deleteAccountHeader:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
+                      deleteButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      cancelButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      confirmButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      saveButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      logoutButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      goBackButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
+                      nameLabel:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsLabelEntry'
+                      emailLabel:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsLabelEntry'
+                      passwordLabel:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsLabelEntry'
+                      cookieSettingsHeader:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
+                      exportDataHeader:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -11674,6 +12815,25 @@ paths:
                       - documentId
                       - id
                       - publishedAt
+                      - pageHeader
+                      - accountSettingsHeader
+                      - editProfileButton
+                      - wishlistHeader
+                      - wishlistAddButton
+                      - wishlistRemoveButton
+                      - currencyHeader
+                      - deleteAccountHeader
+                      - deleteButton
+                      - cancelButton
+                      - confirmButton
+                      - saveButton
+                      - logoutButton
+                      - goBackButton
+                      - nameLabel
+                      - emailLabel
+                      - passwordLabel
+                      - cookieSettingsHeader
+                      - exportDataHeader
                       - seoMetadata
                     additionalProperties: false
                   meta:
@@ -11760,9 +12920,10 @@ paths:
               type: string
               enum:
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -11950,11 +13111,12 @@ paths:
             propertyNames:
               type: string
               enum:
-                - themeId
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - themeId
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -12270,11 +13432,12 @@ paths:
             propertyNames:
               type: string
               enum:
-                - themeId
                 - createdAt
-                - updatedAt
-                - publishedAt
                 - locale
+                - localizations
+                - publishedAt
+                - themeId
+                - updatedAt
             additionalProperties: {}
           x-strapi-serialize: querystring
           description: Filter entries using Strapi query operators. Supports comparison ($eq, $ne, $lt, $lte, $gt, $gte), containment ($in, $notIn), text search ($contains, $notContains, $startsWith, $endsWith), logical operators ($and, $or, $not), and more.
@@ -12716,16 +13879,19 @@ components:
         - CNY
       description: ISO 4217 currency codes
       example: USD
+    LanguageCode:
+      type: string
+      enum:
+        - en
+        - it
+        - he
+      description: ISO 639-1 language codes supported by the platform
+      example: en
     Language:
       type: object
       properties:
         code:
-          type: string
-          enum:
-            - en
-            - it
-            - he
-          example: it
+          $ref: '#/components/schemas/LanguageCode'
         displayName:
           type: string
           example: Italian
@@ -12767,12 +13933,7 @@ components:
       type: object
       properties:
         detectedLanguage:
-          type: string
-          enum:
-            - en
-            - it
-            - he
-          example: it
+          $ref: '#/components/schemas/LanguageCode'
         confidence:
           type: number
           format: float
@@ -12812,12 +13973,7 @@ components:
           type: boolean
           example: true
         detectedLanguage:
-          type: string
-          enum:
-            - en
-            - it
-            - he
-          example: it
+          $ref: '#/components/schemas/LanguageCode'
         createdAt:
           type: string
           format: date-time
@@ -12846,12 +14002,7 @@ components:
           type: boolean
           example: true
         detectedLanguage:
-          type: string
-          enum:
-            - en
-            - it
-            - he
-          example: it
+          $ref: '#/components/schemas/LanguageCode'
     RedirectCheckResponse:
       type: object
       description: Response from redirect check endpoint
@@ -12931,6 +14082,168 @@ components:
           example: 550e8400-e29b-41d4-a716-446655440000
       required:
         - userId
+    ConsentCategories:
+      type: object
+      description: Consent category selections (true = accepted, false = rejected)
+      properties:
+        necessary:
+          type: boolean
+          description: Essential cookies (always true, cannot be disabled)
+          example: true
+        analytics:
+          type: boolean
+          description: Analytics and performance tracking cookies
+          example: false
+        marketing:
+          type: boolean
+          description: Marketing and advertising cookies
+          example: false
+        functional:
+          type: boolean
+          description: Functional cookies for enhanced user experience features
+          example: false
+      required:
+        - necessary
+    ConsentAction:
+      type: string
+      description: The type of consent action taken by the user
+      enum:
+        - accept_all
+        - reject_all
+        - custom
+        - revoke
+      example: accept_all
+    ConsentType:
+      type: string
+      description: The type of consent being recorded
+      enum:
+        - cookie
+        - terms
+        - privacy
+      example: cookie
+    RecordConsentRequest:
+      type: object
+      description: Request body for recording a consent event
+      properties:
+        consentType:
+          $ref: '#/components/schemas/ConsentType'
+        categories:
+          $ref: '#/components/schemas/ConsentCategories'
+        action:
+          $ref: '#/components/schemas/ConsentAction'
+        consentVersion:
+          type: string
+          description: Version identifier of the consent policy
+          example: '1.0'
+      required:
+        - consentType
+        - categories
+        - action
+    RecordConsentResponse:
+      type: object
+      description: Response after recording a consent event
+      properties:
+        success:
+          type: boolean
+          example: true
+        consentId:
+          type: string
+          format: uuid
+          description: Universally Unique Identifier (UUID) in standard 8-4-4-4-12 hexadecimal format, supporting versions 1-8.
+          example: 550e8400-e29b-41d4-a716-446655440000
+        message:
+          type: string
+          example: Consent recorded successfully
+      required:
+        - success
+        - consentId
+        - message
+    UserDataExport:
+      type: object
+      description: Complete user data export for GDPR DSAR (Articles 15/20)
+      properties:
+        profile:
+          $ref: '#/components/schemas/UserProfile'
+        consentRecords:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentRecordExport'
+        preferences:
+          oneOf:
+            - type: object
+            - type: 'null'
+          description: User preferences (nullable if none set)
+        activeSessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionInfo'
+        exportedAt:
+          type: string
+          format: date-time
+          example: '2026-02-12T10:00:00Z'
+      required:
+        - profile
+        - consentRecords
+        - preferences
+        - activeSessions
+        - exportedAt
+    ConsentRecordExport:
+      type: object
+      description: Consent record for data export (PII-safe)
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Universally Unique Identifier (UUID) in standard 8-4-4-4-12 hexadecimal format, supporting versions 1-8.
+          example: 550e8400-e29b-41d4-a716-446655440000
+        consentType:
+          type: string
+          example: cookie
+        categories:
+          type: object
+        action:
+          type: string
+          example: accept_all
+        consentVersion:
+          oneOf:
+            - type: string
+            - type: 'null'
+          example: '1.0'
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when this entry was first created in the CMS.
+          example: '2025-10-30T17:41:47.696Z'
+      required:
+        - id
+        - consentType
+        - categories
+        - action
+        - createdAt
+    SessionInfo:
+      type: object
+      description: Session metadata for data export (no sensitive token data)
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Universally Unique Identifier (UUID) in standard 8-4-4-4-12 hexadecimal format, supporting versions 1-8.
+          example: 550e8400-e29b-41d4-a716-446655440000
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when this entry was first created in the CMS.
+          example: '2025-10-30T17:41:47.696Z'
+        expiresAt:
+          type: string
+          format: date-time
+        rememberMe:
+          type: boolean
+      required:
+        - id
+        - createdAt
+        - expiresAt
+        - rememberMe
     RootResponse:
       type: object
       description: API root endpoint response
@@ -13162,148 +14475,6 @@ components:
         - seoMetadata
       additionalProperties: false
       id: ApiAboutAboutDocument
-    ApiAuthPageAuthPageDocument:
-      $schema: https://json-schema.org/draft/2020-12/schema
-      type: object
-      properties:
-        documentId:
-          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-          type: string
-          example: 550e8400-e29b-41d4-a716-446655440000
-        id:
-          anyOf:
-            - type: string
-            - type: number
-        loginTitle:
-          description: A string field
-          type: string
-        loginSubtitle:
-          description: A text field
-          type: string
-        signupTitle:
-          description: A string field
-          type: string
-        signupSubtitle:
-          description: A text field
-          type: string
-        emailLabel:
-          description: A string field
-          type: string
-        emailPlaceholder:
-          description: A string field
-          type: string
-        passwordLabel:
-          description: A string field
-          type: string
-        passwordPlaceholder:
-          description: A string field
-          type: string
-        nameLabel:
-          description: A string field
-          type: string
-        namePlaceholder:
-          description: A string field
-          type: string
-        loginButton:
-          description: A string field
-          type: string
-        signupButton:
-          description: A string field
-          type: string
-        forgotPasswordLink:
-          description: A string field
-          type: string
-        noAccountText:
-          description: A string field
-          type: string
-        signupLinkText:
-          description: A string field
-          type: string
-        haveAccountText:
-          description: A string field
-          type: string
-        loginLinkText:
-          description: A string field
-          type: string
-        orDividerText:
-          description: A string field
-          type: string
-        googleButton:
-          description: A string field
-          type: string
-        appleButton:
-          description: A string field
-          type: string
-        termsCheckboxText:
-          description: A string field
-          type: string
-        termsLinkText:
-          description: A string field
-          type: string
-        privacyLinkText:
-          description: A string field
-          type: string
-        createdAt:
-          description: Timestamp when this entry was first created in the CMS.
-          type: string
-          example: '2025-10-30T17:41:47.696Z'
-        updatedAt:
-          description: Timestamp when this entry was last modified.
-          type: string
-          example: '2025-10-30T18:23:15.432Z'
-        publishedAt:
-          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
-          example: '2025-10-30T17:41:47.696Z'
-        locale:
-          description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-          type: string
-          example: en
-        seoMetadata:
-          description: A component field
-          $ref: '#/components/schemas/ElementsSeoMetadataEntry'
-        localizations:
-          description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-          readOnly: true
-          type: array
-          items:
-            type: object
-            description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
-            properties:
-              id:
-                type: number
-              documentId:
-                type: string
-                description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-                example: 550e8400-e29b-41d4-a716-446655440000
-              locale:
-                type: string
-                description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-                example: en
-              createdAt:
-                type: string
-                description: Timestamp when this entry was first created in the CMS.
-                example: '2025-10-30T17:41:47.696Z'
-              updatedAt:
-                type: string
-                description: Timestamp when this entry was last modified.
-                example: '2025-10-30T18:23:15.432Z'
-              publishedAt:
-                type: string
-                description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                example: '2025-10-30T17:41:47.696Z'
-            required:
-              - id
-              - documentId
-              - locale
-            additionalProperties: true
-      required:
-        - documentId
-        - id
-        - publishedAt
-        - seoMetadata
-      additionalProperties: false
-      id: ApiAuthPageAuthPageDocument
     ElementsLabelEntry:
       $schema: https://json-schema.org/draft/2020-12/schema
       type: object
@@ -13364,6 +14535,219 @@ components:
         - promoteHeaderIcon
       additionalProperties: false
       id: ElementsHeaderEntry
+    ElementsButtonEntry:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        url:
+          description: A string field
+          type: string
+        openInNewTab:
+          description: A boolean field
+          default: false
+          anyOf:
+            - type: boolean
+            - type: 'null'
+        label:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        id:
+          type: integer
+          description: Component instance ID
+      required:
+        - url
+        - openInNewTab
+      additionalProperties: false
+      id: ElementsButtonEntry
+    ApiAuthPageAuthPageDocument:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        documentId:
+          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        id:
+          anyOf:
+            - type: string
+            - type: number
+        emailPlaceholder:
+          description: A string field
+          type: string
+        passwordPlaceholder:
+          description: A string field
+          type: string
+        namePlaceholder:
+          description: A string field
+          type: string
+        noAccountText:
+          description: A string field
+          type: string
+        signupLinkText:
+          description: A string field
+          type: string
+        haveAccountText:
+          description: A string field
+          type: string
+        loginLinkText:
+          description: A string field
+          type: string
+        orDividerText:
+          description: A string field
+          type: string
+        termsCheckboxText:
+          description: A string field
+          type: string
+        termsLinkText:
+          description: A string field
+          type: string
+        privacyLinkText:
+          description: A string field
+          type: string
+        emailRequiredError:
+          description: A string field
+          type: string
+        emailInvalidError:
+          description: A string field
+          type: string
+        passwordRequiredError:
+          description: A string field
+          type: string
+        nameRequiredError:
+          description: A string field
+          type: string
+        termsRequiredError:
+          description: A string field
+          type: string
+        termsText:
+          description: A string field
+          type: string
+        createdAt:
+          description: Timestamp when this entry was first created in the CMS.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        updatedAt:
+          description: Timestamp when this entry was last modified.
+          type: string
+          example: '2025-10-30T18:23:15.432Z'
+        publishedAt:
+          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        locale:
+          description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+          type: string
+          example: en
+        loginHeader:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        signupHeader:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        emailLabel:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        passwordLabel:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        nameLabel:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        loginButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        signupButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        forgotPasswordButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        googleButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        appleButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        showPasswordLabel:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        hidePasswordLabel:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        seoMetadata:
+          description: A component field
+          $ref: '#/components/schemas/ElementsSeoMetadataEntry'
+        localizations:
+          description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+          readOnly: true
+          type: array
+          items:
+            type: object
+            description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
+            properties:
+              id:
+                type: number
+              documentId:
+                type: string
+                description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                example: 550e8400-e29b-41d4-a716-446655440000
+              locale:
+                type: string
+                description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                example: en
+              createdAt:
+                type: string
+                description: Timestamp when this entry was first created in the CMS.
+                example: '2025-10-30T17:41:47.696Z'
+              updatedAt:
+                type: string
+                description: Timestamp when this entry was last modified.
+                example: '2025-10-30T18:23:15.432Z'
+              publishedAt:
+                type: string
+                description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                example: '2025-10-30T17:41:47.696Z'
+            required:
+              - id
+              - documentId
+              - locale
+            additionalProperties: true
+      required:
+        - documentId
+        - id
+        - emailPlaceholder
+        - passwordPlaceholder
+        - namePlaceholder
+        - noAccountText
+        - signupLinkText
+        - haveAccountText
+        - loginLinkText
+        - orDividerText
+        - termsCheckboxText
+        - termsLinkText
+        - privacyLinkText
+        - emailRequiredError
+        - emailInvalidError
+        - passwordRequiredError
+        - nameRequiredError
+        - termsRequiredError
+        - termsText
+        - publishedAt
+        - loginHeader
+        - signupHeader
+        - emailLabel
+        - passwordLabel
+        - nameLabel
+        - loginButton
+        - signupButton
+        - forgotPasswordButton
+        - googleButton
+        - appleButton
+        - showPasswordLabel
+        - hidePasswordLabel
+        - seoMetadata
+      additionalProperties: false
+      id: ApiAuthPageAuthPageDocument
     ApiBlogPostTagBlogPostTagDocument:
       $schema: https://json-schema.org/draft/2020-12/schema
       type: object
@@ -13843,30 +15227,6 @@ components:
         - seoMetadata
       additionalProperties: false
       id: ApiBlogPostBlogPostDocument
-    ElementsButtonEntry:
-      $schema: https://json-schema.org/draft/2020-12/schema
-      type: object
-      properties:
-        url:
-          description: A string field
-          type: string
-        openInNewTab:
-          description: A boolean field
-          default: false
-          anyOf:
-            - type: boolean
-            - type: 'null'
-        label:
-          description: A component field
-          $ref: '#/components/schemas/ElementsLabelEntry'
-        id:
-          type: integer
-          description: Component instance ID
-      required:
-        - url
-        - openInNewTab
-      additionalProperties: false
-      id: ElementsButtonEntry
     CallToActionsPaginationCtaEntry:
       $schema: https://json-schema.org/draft/2020-12/schema
       type: object
@@ -13998,6 +15358,183 @@ components:
         - seoMetadata
       additionalProperties: false
       id: ApiBlogBlogDocument
+    ApiConsentConsentDocument:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        documentId:
+          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        id:
+          anyOf:
+            - type: string
+            - type: number
+        createdAt:
+          description: Timestamp when this entry was first created in the CMS.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        updatedAt:
+          description: Timestamp when this entry was last modified.
+          type: string
+          example: '2025-10-30T18:23:15.432Z'
+        publishedAt:
+          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        locale:
+          description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+          type: string
+          example: en
+        consentInformation:
+          description: A component field
+          $ref: '#/components/schemas/ElementsTextBlockEntry'
+        acceptAllButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        rejectAllButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        settingsButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        saveButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        doNotTrackNotice:
+          description: A component field
+          $ref: '#/components/schemas/ElementsTextBlockEntry'
+        localizations:
+          description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+          readOnly: true
+          type: array
+          items:
+            type: object
+            description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
+            properties:
+              id:
+                type: number
+              documentId:
+                type: string
+                description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                example: 550e8400-e29b-41d4-a716-446655440000
+              locale:
+                type: string
+                description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                example: en
+              createdAt:
+                type: string
+                description: Timestamp when this entry was first created in the CMS.
+                example: '2025-10-30T17:41:47.696Z'
+              updatedAt:
+                type: string
+                description: Timestamp when this entry was last modified.
+                example: '2025-10-30T18:23:15.432Z'
+              publishedAt:
+                type: string
+                description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                example: '2025-10-30T17:41:47.696Z'
+            required:
+              - id
+              - documentId
+              - locale
+            additionalProperties: true
+      required:
+        - documentId
+        - id
+        - publishedAt
+        - consentInformation
+        - acceptAllButton
+        - rejectAllButton
+        - settingsButton
+        - saveButton
+        - doNotTrackNotice
+      additionalProperties: false
+      id: ApiConsentConsentDocument
+    ApiConsentCategoryConsentCategoryDocument:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        documentId:
+          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        id:
+          anyOf:
+            - type: string
+            - type: number
+        uid:
+          description: A UID field
+          type: string
+        required:
+          description: A boolean field
+          default: true
+          anyOf:
+            - type: boolean
+            - type: 'null'
+        createdAt:
+          description: Timestamp when this entry was first created in the CMS.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        updatedAt:
+          description: Timestamp when this entry was last modified.
+          type: string
+          example: '2025-10-30T18:23:15.432Z'
+        publishedAt:
+          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        locale:
+          description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+          type: string
+          example: en
+        content:
+          description: A component field
+          $ref: '#/components/schemas/ElementsTextBlockEntry'
+        localizations:
+          description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+          readOnly: true
+          type: array
+          items:
+            type: object
+            description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
+            properties:
+              id:
+                type: number
+              documentId:
+                type: string
+                description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                example: 550e8400-e29b-41d4-a716-446655440000
+              locale:
+                type: string
+                description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                example: en
+              createdAt:
+                type: string
+                description: Timestamp when this entry was first created in the CMS.
+                example: '2025-10-30T17:41:47.696Z'
+              updatedAt:
+                type: string
+                description: Timestamp when this entry was last modified.
+                example: '2025-10-30T18:23:15.432Z'
+              publishedAt:
+                type: string
+                description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                example: '2025-10-30T17:41:47.696Z'
+            required:
+              - id
+              - documentId
+              - locale
+            additionalProperties: true
+      required:
+        - documentId
+        - id
+        - uid
+        - required
+        - publishedAt
+        - content
+      additionalProperties: false
+      id: ApiConsentCategoryConsentCategoryDocument
     ApiContactUsContactUsDocument:
       $schema: https://json-schema.org/draft/2020-12/schema
       type: object
@@ -14104,6 +15641,83 @@ components:
         - seoMetadata
       additionalProperties: false
       id: ApiContactUsContactUsDocument
+    ApiCookiePolicyCookiePolicyDocument:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        documentId:
+          description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        id:
+          anyOf:
+            - type: string
+            - type: number
+        createdAt:
+          description: Timestamp when this entry was first created in the CMS.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        updatedAt:
+          description: Timestamp when this entry was last modified.
+          type: string
+          example: '2025-10-30T18:23:15.432Z'
+        publishedAt:
+          description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+          type: string
+          example: '2025-10-30T17:41:47.696Z'
+        locale:
+          description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+          type: string
+          example: en
+        content:
+          description: A component field
+          $ref: '#/components/schemas/ElementsTextBlockEntry'
+        seoMetadata:
+          description: A component field
+          $ref: '#/components/schemas/ElementsSeoMetadataEntry'
+        localizations:
+          description: Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+          readOnly: true
+          type: array
+          items:
+            type: object
+            description: Simplified localization reference as returned by Strapi (scalar fields only, no components)
+            properties:
+              id:
+                type: number
+              documentId:
+                type: string
+                description: The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                example: 550e8400-e29b-41d4-a716-446655440000
+              locale:
+                type: string
+                description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                example: en
+              createdAt:
+                type: string
+                description: Timestamp when this entry was first created in the CMS.
+                example: '2025-10-30T17:41:47.696Z'
+              updatedAt:
+                type: string
+                description: Timestamp when this entry was last modified.
+                example: '2025-10-30T18:23:15.432Z'
+              publishedAt:
+                type: string
+                description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                example: '2025-10-30T17:41:47.696Z'
+            required:
+              - id
+              - documentId
+              - locale
+            additionalProperties: true
+      required:
+        - documentId
+        - id
+        - publishedAt
+        - content
+        - seoMetadata
+      additionalProperties: false
+      id: ApiCookiePolicyCookiePolicyDocument
     ApiCurrencyCurrencyDocument:
       $schema: https://json-schema.org/draft/2020-12/schema
       type: object
@@ -15805,54 +17419,6 @@ components:
           anyOf:
             - type: string
             - type: number
-        profileTitle:
-          description: A string field
-          type: string
-        editProfileTitle:
-          description: A string field
-          type: string
-        wishlistTitle:
-          description: A string field
-          type: string
-        wishlistEmptyMessage:
-          description: A text field
-          type: string
-        currencyTitle:
-          description: A string field
-          type: string
-        currencyDescription:
-          description: A text field
-          type: string
-        deleteAccountTitle:
-          description: A string field
-          type: string
-        deleteAccountWarning:
-          description: A text field
-          type: string
-        saveButton:
-          description: A string field
-          type: string
-        cancelButton:
-          description: A string field
-          type: string
-        deleteButton:
-          description: A string field
-          type: string
-        confirmButton:
-          description: A string field
-          type: string
-        logoutButton:
-          description: A string field
-          type: string
-        nameLabel:
-          description: A string field
-          type: string
-        emailLabel:
-          description: A string field
-          type: string
-        passwordLabel:
-          description: A string field
-          type: string
         createdAt:
           description: Timestamp when this entry was first created in the CMS.
           type: string
@@ -15869,6 +17435,63 @@ components:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
           type: string
           example: en
+        pageHeader:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        accountSettingsHeader:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        editProfileButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        wishlistHeader:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        wishlistAddButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        wishlistRemoveButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        currencyHeader:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        deleteAccountHeader:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        deleteButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        cancelButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        confirmButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        saveButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        logoutButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        goBackButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
+        nameLabel:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        emailLabel:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        passwordLabel:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        cookieSettingsHeader:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
+        exportDataHeader:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
         seoMetadata:
           description: A component field
           $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -15911,6 +17534,25 @@ components:
         - documentId
         - id
         - publishedAt
+        - pageHeader
+        - accountSettingsHeader
+        - editProfileButton
+        - wishlistHeader
+        - wishlistAddButton
+        - wishlistRemoveButton
+        - currencyHeader
+        - deleteAccountHeader
+        - deleteButton
+        - cancelButton
+        - confirmButton
+        - saveButton
+        - logoutButton
+        - goBackButton
+        - nameLabel
+        - emailLabel
+        - passwordLabel
+        - cookieSettingsHeader
+        - exportDataHeader
         - seoMetadata
       additionalProperties: false
       id: ApiProfileProfileDocument

@@ -357,12 +357,17 @@ print_summary() {
   echo "  4. Start production services:"
   echo "     docker compose -f docker-compose.prod.yaml up -d"
   echo ""
+  echo -e "  5. ${YELLOW}Add the deploy key to GitHub:${NC}"
+  echo "     Go to: https://github.com/rdrkr/affilibuster/settings/keys"
+  echo "     Click 'Add deploy key', paste the public key above, and check 'Allow write access'"
+  echo ""
   echo "Security summary:"
   echo "  - SSH: Root login disabled, password auth disabled"
   echo "  - Firewall: Only ports 22, 80, 443 open"
   echo "  - fail2ban: SSH brute-force protection (24h ban)"
   echo "  - Auto-updates: Security patches applied automatically"
   echo "  - Swap: ${SWAP_SIZE_GB}GB as memory safety net"
+  echo "  - Backup: Daily at 3 AM UTC (Strapi + PostgreSQL + git push)"
   echo ""
   echo -e "${YELLOW}⚠️  IMPORTANT: Test SSH as '${DEPLOY_USER}' before closing this session!${NC}"
   echo ""
@@ -389,6 +394,112 @@ run_dev_setup() {
   log_success "Development tools installed"
 }
 
+# Setup SSH deploy key for backup git push
+setup_deploy_key() {
+  log_info "Setting up SSH deploy key for backup..."
+
+  local deploy_home="/home/${DEPLOY_USER}"
+  local key_file="${deploy_home}/.ssh/backup_key"
+  local ssh_config="${deploy_home}/.ssh/config"
+  local repo_dir="${deploy_home}/affilibuster"
+
+  # Generate deploy key if it doesn't exist
+  if [[ -f "${key_file}" ]]; then
+    log_warn "Deploy key already exists at ${key_file}, skipping generation"
+  else
+    log_info "Generating SSH deploy key..."
+    sudo -u "${DEPLOY_USER}" ssh-keygen -t ed25519 -C "affilibuster-backup" -f "${key_file}" -N ""
+    log_success "Deploy key generated"
+  fi
+
+  # Configure SSH to use the deploy key for GitHub
+  if [[ -f "${ssh_config}" ]] && grep -qF "affilibuster-backup" "${ssh_config}"; then
+    log_warn "SSH config for GitHub deploy key already exists, skipping"
+  else
+    cat >>"${ssh_config}" <<EOF
+
+# GitHub deploy key for backup git push
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ${key_file}
+  IdentitiesOnly yes
+EOF
+    chown "${DEPLOY_USER}:${DEPLOY_USER}" "${ssh_config}"
+    chmod 600 "${ssh_config}"
+    log_success "SSH config updated for GitHub deploy key"
+  fi
+
+  # Switch git remote to SSH (if repo exists and uses HTTPS)
+  if [[ -d "${repo_dir}/.git" ]]; then
+    local current_remote
+    current_remote=$(sudo -u "${DEPLOY_USER}" git -C "${repo_dir}" remote get-url origin 2>/dev/null || true)
+    if [[ "${current_remote}" == https://* ]]; then
+      sudo -u "${DEPLOY_USER}" git -C "${repo_dir}" remote set-url origin git@github.com:rdrkr/affilibuster.git
+      log_success "Git remote switched from HTTPS to SSH"
+    else
+      log_warn "Git remote already uses SSH, skipping"
+    fi
+  fi
+
+  # Print the public key for the user to add to GitHub
+  echo ""
+  echo -e "${YELLOW}═══════════════════════════════════════════════════${NC}"
+  echo -e "${YELLOW}  ADD THIS DEPLOY KEY TO GITHUB (with write access):${NC}"
+  echo -e "${YELLOW}  https://github.com/rdrkr/affilibuster/settings/keys${NC}"
+  echo -e "${YELLOW}═══════════════════════════════════════════════════${NC}"
+  echo ""
+  cat "${key_file}.pub"
+  echo ""
+  echo -e "${YELLOW}═══════════════════════════════════════════════════${NC}"
+  echo ""
+}
+
+# Setup daily backup cron job + logrotate
+setup_backup_cron() {
+  log_info "Setting up daily backup cron job..."
+
+  local backup_script="/home/${DEPLOY_USER}/affilibuster/scripts/backup.sh"
+  local backup_log="/var/log/affilibuster-backup.log"
+  local cron_entry="0 3 * * * ${backup_script} >> ${backup_log} 2>&1"
+
+  # Create log file with correct ownership
+  touch "${backup_log}"
+  chown "${DEPLOY_USER}:${DEPLOY_USER}" "${backup_log}"
+
+  # Create backup directory
+  mkdir -p /mnt/backups/postgres
+  chown "${DEPLOY_USER}:${DEPLOY_USER}" /mnt/backups/postgres
+
+  # Install cron job for deploy user (idempotent)
+  local existing_cron
+  existing_cron=$(crontab -u "${DEPLOY_USER}" -l 2>/dev/null || true)
+  if echo "${existing_cron}" | grep -qF "backup.sh"; then
+    log_warn "Backup cron job already exists, skipping"
+  else
+    (
+      echo "${existing_cron}"
+      echo "${cron_entry}"
+    ) | crontab -u "${DEPLOY_USER}" -
+    log_success "Backup cron job installed (daily at 3 AM UTC)"
+  fi
+
+  # Setup logrotate
+  cat >/etc/logrotate.d/affilibuster-backup <<EOF
+${backup_log} {
+    weekly
+    rotate 4
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 ${DEPLOY_USER} ${DEPLOY_USER}
+}
+EOF
+
+  log_success "Logrotate configured for backup logs"
+}
+
 # Main execution
 main() {
   echo ""
@@ -408,6 +519,8 @@ main() {
   install_docker
   install_utilities
   run_dev_setup
+  setup_deploy_key
+  setup_backup_cron
   cleanup
   print_summary
 }

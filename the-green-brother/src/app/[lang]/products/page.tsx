@@ -2,7 +2,7 @@
 
 import { getProductCategories, getProductCategoriesPage, getProducts } from '@/lib/client'
 import { userProfileFlag } from '@/lib/feature-flags'
-import { CodeEnum } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/generated/types.gen'
 import ProductsClient from './ProductsClient'
 
 /**
@@ -14,7 +14,7 @@ import ProductsClient from './ProductsClient'
  * @param params.params - Promise containing route parameters with lang
  * @returns Server-rendered products page
  */
-export default async function ProductsPage({ params }: { params: Promise<{ lang: CodeEnum }> }) {
+export default async function ProductsPage({ params }: { params: Promise<{ lang: LanguageCode }> }) {
   const resolvedParams = await params
   const lang = resolvedParams.lang
 
@@ -35,8 +35,8 @@ export default async function ProductsPage({ params }: { params: Promise<{ lang:
   return (
     <ProductsClient
       pageData={pageData}
-      products={productsResponse?.data ?? []}
-      categories={categoriesResponse?.data ?? []}
+      products={productsResponse ?? []}
+      categories={categoriesResponse ?? []}
       enableUserProfile={enableUserProfile}
     />
   )

@@ -1,7 +1,8 @@
 # Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 config:
-  MD013:
+  line-length: # MD013
     line_length: 120
+  no-inline-html: false
 
 fix: true

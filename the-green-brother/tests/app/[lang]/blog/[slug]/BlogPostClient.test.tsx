@@ -94,7 +94,7 @@ jest.mock('next/navigation', () => ({
 
 import BlogPostClient from '@/app/[lang]/blog/[slug]/BlogPostClient'
 import {
-  CodeEnum,
+  LanguageCode,
   DirectionEnum,
   IconPositionEnum,
   type ApiBlogBlogDocument,
@@ -175,9 +175,14 @@ describe('BlogPostClient', () => {
 
   it('should render post title', () => {
     renderWithLayout(
-      <BlogPostClient post={mockPost} blogData={mockBlogData} direction={DirectionEnum.LTR} language={CodeEnum.EN} />,
+      <BlogPostClient
+        post={mockPost}
+        blogData={mockBlogData}
+        direction={DirectionEnum.LTR}
+        language={LanguageCode.EN}
+      />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR, navigation: mockNavigation },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR, navigation: mockNavigation },
       }
     )
 
@@ -186,9 +191,14 @@ describe('BlogPostClient', () => {
 
   it('should render breadcrumbs with correct links', () => {
     renderWithLayout(
-      <BlogPostClient post={mockPost} blogData={mockBlogData} direction={DirectionEnum.LTR} language={CodeEnum.EN} />,
+      <BlogPostClient
+        post={mockPost}
+        blogData={mockBlogData}
+        direction={DirectionEnum.LTR}
+        language={LanguageCode.EN}
+      />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR, navigation: mockNavigation },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR, navigation: mockNavigation },
       }
     )
 
@@ -198,9 +208,14 @@ describe('BlogPostClient', () => {
 
   it('should render author name and initials', () => {
     renderWithLayout(
-      <BlogPostClient post={mockPost} blogData={mockBlogData} direction={DirectionEnum.LTR} language={CodeEnum.EN} />,
+      <BlogPostClient
+        post={mockPost}
+        blogData={mockBlogData}
+        direction={DirectionEnum.LTR}
+        language={LanguageCode.EN}
+      />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -210,9 +225,14 @@ describe('BlogPostClient', () => {
 
   it('should render formatted published date', () => {
     renderWithLayout(
-      <BlogPostClient post={mockPost} blogData={mockBlogData} direction={DirectionEnum.LTR} language={CodeEnum.EN} />,
+      <BlogPostClient
+        post={mockPost}
+        blogData={mockBlogData}
+        direction={DirectionEnum.LTR}
+        language={LanguageCode.EN}
+      />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -221,9 +241,14 @@ describe('BlogPostClient', () => {
 
   it('should render read time', () => {
     renderWithLayout(
-      <BlogPostClient post={mockPost} blogData={mockBlogData} direction={DirectionEnum.LTR} language={CodeEnum.EN} />,
+      <BlogPostClient
+        post={mockPost}
+        blogData={mockBlogData}
+        direction={DirectionEnum.LTR}
+        language={LanguageCode.EN}
+      />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -232,9 +257,14 @@ describe('BlogPostClient', () => {
 
   it('should render tag', () => {
     renderWithLayout(
-      <BlogPostClient post={mockPost} blogData={mockBlogData} direction={DirectionEnum.LTR} language={CodeEnum.EN} />,
+      <BlogPostClient
+        post={mockPost}
+        blogData={mockBlogData}
+        direction={DirectionEnum.LTR}
+        language={LanguageCode.EN}
+      />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -243,9 +273,14 @@ describe('BlogPostClient', () => {
 
   it('should render author bio section', () => {
     renderWithLayout(
-      <BlogPostClient post={mockPost} blogData={mockBlogData} direction={DirectionEnum.LTR} language={CodeEnum.EN} />,
+      <BlogPostClient
+        post={mockPost}
+        blogData={mockBlogData}
+        direction={DirectionEnum.LTR}
+        language={LanguageCode.EN}
+      />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -255,9 +290,14 @@ describe('BlogPostClient', () => {
 
   it('should render article content as HTML', () => {
     renderWithLayout(
-      <BlogPostClient post={mockPost} blogData={mockBlogData} direction={DirectionEnum.LTR} language={CodeEnum.EN} />,
+      <BlogPostClient
+        post={mockPost}
+        blogData={mockBlogData}
+        direction={DirectionEnum.LTR}
+        language={LanguageCode.EN}
+      />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -276,10 +316,10 @@ describe('BlogPostClient', () => {
         post={postWithoutBio}
         blogData={mockBlogData}
         direction={DirectionEnum.LTR}
-        language={CodeEnum.EN}
+        language={LanguageCode.EN}
       />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -297,10 +337,10 @@ describe('BlogPostClient', () => {
         post={postWithoutDate}
         blogData={mockBlogData}
         direction={DirectionEnum.LTR}
-        language={CodeEnum.EN}
+        language={LanguageCode.EN}
       />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -318,10 +358,10 @@ describe('BlogPostClient', () => {
         post={postWithoutTags}
         blogData={mockBlogData}
         direction={DirectionEnum.LTR}
-        language={CodeEnum.EN}
+        language={LanguageCode.EN}
       />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -339,10 +379,10 @@ describe('BlogPostClient', () => {
         post={postWithoutImage}
         blogData={mockBlogData}
         direction={DirectionEnum.LTR}
-        language={CodeEnum.EN}
+        language={LanguageCode.EN}
       />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -364,10 +404,10 @@ describe('BlogPostClient', () => {
         post={postWithoutSubheader}
         blogData={mockBlogData}
         direction={DirectionEnum.LTR}
-        language={CodeEnum.EN}
+        language={LanguageCode.EN}
       />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -394,10 +434,10 @@ describe('BlogPostClient', () => {
         post={minimalPost}
         blogData={mockBlogData}
         direction={DirectionEnum.LTR}
-        language={CodeEnum.EN}
+        language={LanguageCode.EN}
       />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -415,10 +455,10 @@ describe('BlogPostClient', () => {
         post={postEmptyTags}
         blogData={mockBlogData}
         direction={DirectionEnum.LTR}
-        language={CodeEnum.EN}
+        language={LanguageCode.EN}
       />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -436,10 +476,10 @@ describe('BlogPostClient', () => {
         post={postWithNullTagText}
         blogData={mockBlogData}
         direction={DirectionEnum.LTR}
-        language={CodeEnum.EN}
+        language={LanguageCode.EN}
       />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -458,10 +498,10 @@ describe('BlogPostClient', () => {
         post={postWithTag}
         blogData={mockBlogData}
         direction={DirectionEnum.LTR}
-        language={CodeEnum.EN}
+        language={LanguageCode.EN}
       />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -485,10 +525,10 @@ describe('BlogPostClient', () => {
         post={postMissingHeaderText}
         blogData={mockBlogData}
         direction={DirectionEnum.LTR}
-        language={CodeEnum.EN}
+        language={LanguageCode.EN}
       />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -510,10 +550,10 @@ describe('BlogPostClient', () => {
         post={postMissingHeader}
         blogData={mockBlogData}
         direction={DirectionEnum.LTR}
-        language={CodeEnum.EN}
+        language={LanguageCode.EN}
       />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -521,9 +561,14 @@ describe('BlogPostClient', () => {
   })
   it('should render featured image from post', () => {
     renderWithLayout(
-      <BlogPostClient post={mockPost} blogData={mockBlogData} direction={DirectionEnum.LTR} language={CodeEnum.EN} />,
+      <BlogPostClient
+        post={mockPost}
+        blogData={mockBlogData}
+        direction={DirectionEnum.LTR}
+        language={LanguageCode.EN}
+      />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 
@@ -533,9 +578,14 @@ describe('BlogPostClient', () => {
 
   it('should have responsive layout classes for metadata', () => {
     renderWithLayout(
-      <BlogPostClient post={mockPost} blogData={mockBlogData} direction={DirectionEnum.LTR} language={CodeEnum.EN} />,
+      <BlogPostClient
+        post={mockPost}
+        blogData={mockBlogData}
+        direction={DirectionEnum.LTR}
+        language={LanguageCode.EN}
+      />,
       {
-        layoutContext: { lang: CodeEnum.EN, direction: DirectionEnum.LTR },
+        layoutContext: { lang: LanguageCode.EN, direction: DirectionEnum.LTR },
       }
     )
 

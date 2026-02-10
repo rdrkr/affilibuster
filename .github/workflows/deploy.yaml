@@ -84,6 +84,8 @@ jobs:
               -s "${{ secrets.CLOUDINARY_SECRET }}" \
               -u "${{ secrets.UPTIME_KUMA_USER }}" \
               -p "${{ secrets.UPTIME_KUMA_PASS }}" \
+              -b "${{ secrets.UPTIME_KUMA_TELEGRAM_BOT_TOKEN }}" \
+              -c "${{ secrets.UPTIME_KUMA_TELEGRAM_CHAT_ID }}" \
               -g "${{ vars.GA_ID }}" \
               -t "${{ vars.GTM_ID }}"
 

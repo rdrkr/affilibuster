@@ -11,22 +11,17 @@
 export type { DetectedLanguage, Language, UpdatePreferences, UserPreferences } from './generated/types.gen'
 
 // Import enums from generated types
-import { CodeEnum, CurrencyCode as CurrencyCodeEnum, DirectionEnum } from './generated/types.gen'
+import { LanguageCode, CurrencyCode as CurrencyCodeEnum, DirectionEnum } from './generated/types.gen'
 
 /**
- * Language code enum - alias for OpenAPI generated CodeEnum.
+ * Language code enum - re-exported from OpenAPI generated LanguageCode.
  * Use this enum for type-safe language code operations.
  * @example
  * ```typescript
  * const code = LanguageCode.EN
  * ```
  */
-export const LanguageCode = CodeEnum
-
-/**
- * Language code type for type annotations.
- */
-export type LanguageCode = CodeEnum
+export { LanguageCode }
 
 /**
  * Text direction enum - alias for OpenAPI generated DirectionEnum.

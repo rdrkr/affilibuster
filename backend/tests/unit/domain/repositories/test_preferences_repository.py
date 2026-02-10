@@ -14,7 +14,7 @@ import pytest
 
 from affilibuster_backend.domain.entities.generated.models import (
     CurrencyCode,
-    DetectedLanguage2,
+    LanguageCode,
     UserPreferences,
 )
 from affilibuster_backend.infrastructure.database.models.user_preferences import UserPreferencesModel
@@ -311,7 +311,7 @@ class TestUserPreferencesRepositoryToEntity:
         mock_model.user_id = "user-xyz"
         mock_model.selected_currency = CurrencyCode.GBP
         mock_model.dismissed_language_prompt = True
-        mock_model.detected_language = DetectedLanguage2.EN
+        mock_model.detected_language = LanguageCode.EN
         mock_model.created_at = datetime.now(UTC).replace(tzinfo=None)
         mock_model.updated_at = datetime.now(UTC).replace(tzinfo=None)
         mock_model.expires_at = datetime.now(UTC).replace(tzinfo=None) + timedelta(days=30)
@@ -330,7 +330,7 @@ class TestUserPreferencesRepositoryToEntity:
         assert retrieved.user_id == "user-xyz"
         assert retrieved.selected_currency == CurrencyCode.GBP
         assert retrieved.dismissed_language_prompt is True
-        assert retrieved.detected_language == DetectedLanguage2.EN
+        assert retrieved.detected_language == LanguageCode.EN
 
 
 @pytest.mark.unit
@@ -436,7 +436,7 @@ class TestUserPreferencesRepositoryEdgeCases:
             user_id="full-user",
             selected_currency=CurrencyCode.ILS,
             dismissed_language_prompt=True,
-            detected_language=DetectedLanguage2.HE,
+            detected_language=LanguageCode.HE,
             created_at=now - timedelta(days=5),
             updated_at=now,
             expires_at=now + timedelta(days=25),
@@ -448,6 +448,54 @@ class TestUserPreferencesRepositoryEdgeCases:
         assert result.session_id == "full-session"
         assert result.user_id == "full-user"
         assert result.selected_currency == CurrencyCode.ILS
-        assert result.detected_language == DetectedLanguage2.HE
+        assert result.detected_language == LanguageCode.HE
         mock_session.add.assert_called_once()
         mock_session.commit.assert_called_once()
+
+
+@pytest.mark.unit
+class TestUserPreferencesRepositoryDeleteByUserId:
+    """Test UserPreferencesRepository.delete_by_user_id() method."""
+
+    async def test_delete_by_user_id_returns_count(self) -> None:
+        """Test delete_by_user_id returns count of deleted records."""
+        mock_session = AsyncMock()
+
+        mock_result = MagicMock()
+        mock_result.rowcount = 2
+        mock_session.execute.return_value = mock_result
+
+        repo = UserPreferencesRepository(mock_session)
+        count = await repo.delete_by_user_id("user-123")
+
+        assert isinstance(count, int)
+        assert count == 2
+        mock_session.execute.assert_called_once()
+        mock_session.flush.assert_called_once()
+
+    async def test_delete_by_user_id_returns_zero_when_none(self) -> None:
+        """Test delete_by_user_id returns 0 when no records found."""
+        mock_session = AsyncMock()
+
+        mock_result = MagicMock()
+        mock_result.rowcount = 0
+        mock_session.execute.return_value = mock_result
+
+        repo = UserPreferencesRepository(mock_session)
+        count = await repo.delete_by_user_id("non-existent-user")
+
+        assert count == 0
+        mock_session.execute.assert_called_once()
+
+    async def test_delete_by_user_id_handles_none_rowcount(self) -> None:
+        """Test delete_by_user_id handles None rowcount gracefully."""
+        mock_session = AsyncMock()
+
+        mock_result = MagicMock()
+        mock_result.rowcount = None
+        mock_session.execute.return_value = mock_result
+
+        repo = UserPreferencesRepository(mock_session)
+        count = await repo.delete_by_user_id("user-xyz")
+
+        assert count == 0

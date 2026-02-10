@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from affilibuster_backend.domain.repositories.cache_service import ICacheService
 from affilibuster_backend.domain.repositories.cms_repository import ICMSRepository
+from affilibuster_backend.domain.repositories.consent_repository import IConsentRepository
 from affilibuster_backend.domain.repositories.email_verification_token_repository import (
     IEmailVerificationTokenRepository,
 )
@@ -23,6 +24,7 @@ from affilibuster_backend.domain.repositories.preferences_repository import IUse
 from affilibuster_backend.domain.repositories.url_redirect_repository import IURLRedirectRepository
 from affilibuster_backend.domain.use_cases.cms.get_cms_content_use_case import GetCMSContentUseCase
 from affilibuster_backend.domain.use_cases.cms.get_url_redirect_use_case import GetURLRedirectUseCase
+from affilibuster_backend.domain.use_cases.consent.record_consent_use_case import RecordConsentUseCase
 from affilibuster_backend.domain.use_cases.preferences.get_user_preferences_use_case import GetUserPreferencesUseCase
 from affilibuster_backend.domain.use_cases.preferences.update_user_preferences_use_case import (
     UpdateUserPreferencesUseCase,
@@ -161,6 +163,26 @@ def get_url_redirect_use_case(
     return GetURLRedirectUseCase(redirect_repo)
 
 
+def get_consent_repo(
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> IConsentRepository:
+    """
+    Provide consent repository instance.
+
+    Creates a new repository instance with the current database session.
+    """
+    from affilibuster_backend.infrastructure.database.repositories.consent_repository import ConsentRepository
+
+    return ConsentRepository(db)
+
+
+def get_record_consent_use_case(
+    consent_repo: Annotated[IConsentRepository, Depends(get_consent_repo)],
+) -> RecordConsentUseCase:
+    """Provide RecordConsentUseCase instance."""
+    return RecordConsentUseCase(consent_repo)
+
+
 # Type aliases for use in route signatures
 CMSRepoDep = Annotated[ICMSRepository, Depends(get_cms_repo)]
 GetCMSContentUseCaseDep = Annotated[GetCMSContentUseCase, Depends(get_cms_content_use_case)]
@@ -170,3 +192,5 @@ GetUserPreferencesUseCaseDep = Annotated[GetUserPreferencesUseCase, Depends(get_
 UpdateUserPreferencesUseCaseDep = Annotated[UpdateUserPreferencesUseCase, Depends(get_update_user_preferences_use_case)]
 URLRedirectRepoDep = Annotated[IURLRedirectRepository, Depends(get_url_redirect_repo)]
 GetURLRedirectUseCaseDep = Annotated[GetURLRedirectUseCase, Depends(get_url_redirect_use_case)]
+ConsentRepoDep = Annotated[IConsentRepository, Depends(get_consent_repo)]
+RecordConsentUseCaseDep = Annotated[RecordConsentUseCase, Depends(get_record_consent_use_case)]

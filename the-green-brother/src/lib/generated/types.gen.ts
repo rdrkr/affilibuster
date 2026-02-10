@@ -101,8 +101,17 @@ export enum CurrencyCode {
     CNY = 'CNY'
 }
 
+/**
+ * ISO 639-1 language codes supported by the platform
+ */
+export enum LanguageCode {
+    EN = 'en',
+    IT = 'it',
+    HE = 'he'
+}
+
 export type Language = {
-    code: CodeEnum;
+    code: LanguageCode;
     displayName: string;
     nativeName: string;
     /**
@@ -117,7 +126,7 @@ export type Language = {
 };
 
 export type DetectedLanguage = {
-    detectedLanguage: CodeEnum;
+    detectedLanguage: LanguageCode;
     confidence: number;
     /**
      * Whether to show language switch prompt
@@ -138,7 +147,7 @@ export type UserPreferences = {
     userId?: string;
     selectedCurrency: CurrencyCode;
     dismissedLanguagePrompt: boolean;
-    detectedLanguage?: CodeEnum;
+    detectedLanguage?: LanguageCode;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -153,7 +162,7 @@ export type UserPreferences = {
 export type UpdatePreferences = {
     selectedCurrency?: CurrencyCode;
     dismissedLanguagePrompt?: boolean;
-    detectedLanguage?: CodeEnum;
+    detectedLanguage?: LanguageCode;
 };
 
 /**
@@ -207,6 +216,124 @@ export type AuthResendVerificationPostRequest = {
      * Universally Unique Identifier (UUID) in standard 8-4-4-4-12 hexadecimal format, supporting versions 1-8.
      */
     userId: string;
+};
+
+/**
+ * Consent category selections (true = accepted, false = rejected)
+ */
+export type ConsentCategories = {
+    /**
+     * Essential cookies (always true, cannot be disabled)
+     */
+    necessary: boolean;
+    /**
+     * Analytics and performance tracking cookies
+     */
+    analytics?: boolean;
+    /**
+     * Marketing and advertising cookies
+     */
+    marketing?: boolean;
+    /**
+     * Functional cookies for enhanced user experience features
+     */
+    functional?: boolean;
+};
+
+/**
+ * The type of consent action taken by the user
+ */
+export enum ConsentAction {
+    ACCEPT_ALL = 'accept_all',
+    REJECT_ALL = 'reject_all',
+    CUSTOM = 'custom',
+    REVOKE = 'revoke'
+}
+
+/**
+ * The type of consent being recorded
+ */
+export enum ConsentType {
+    COOKIE = 'cookie',
+    TERMS = 'terms',
+    PRIVACY = 'privacy'
+}
+
+/**
+ * Request body for recording a consent event
+ */
+export type RecordConsentRequest = {
+    consentType: ConsentType;
+    categories: ConsentCategories;
+    action: ConsentAction;
+    /**
+     * Version identifier of the consent policy
+     */
+    consentVersion?: string;
+};
+
+/**
+ * Response after recording a consent event
+ */
+export type RecordConsentResponse = {
+    success: boolean;
+    /**
+     * Universally Unique Identifier (UUID) in standard 8-4-4-4-12 hexadecimal format, supporting versions 1-8.
+     */
+    consentId: string;
+    message: string;
+};
+
+/**
+ * Complete user data export for GDPR DSAR (Articles 15/20)
+ */
+export type UserDataExport = {
+    profile: UserProfile;
+    consentRecords: Array<ConsentRecordExport>;
+    /**
+     * User preferences (nullable if none set)
+     */
+    preferences: {
+        [key: string]: unknown;
+    } | null;
+    activeSessions: Array<SessionInfo>;
+    exportedAt: string;
+};
+
+/**
+ * Consent record for data export (PII-safe)
+ */
+export type ConsentRecordExport = {
+    /**
+     * Universally Unique Identifier (UUID) in standard 8-4-4-4-12 hexadecimal format, supporting versions 1-8.
+     */
+    id: string;
+    consentType: string;
+    categories: {
+        [key: string]: unknown;
+    };
+    action: string;
+    consentVersion?: string | null;
+    /**
+     * Timestamp when this entry was first created in the CMS.
+     */
+    createdAt: string;
+};
+
+/**
+ * Session metadata for data export (no sensitive token data)
+ */
+export type SessionInfo = {
+    /**
+     * Universally Unique Identifier (UUID) in standard 8-4-4-4-12 hexadecimal format, supporting versions 1-8.
+     */
+    id: string;
+    /**
+     * Timestamp when this entry was first created in the CMS.
+     */
+    createdAt: string;
+    expiresAt: string;
+    rememberMe: boolean;
 };
 
 /**
@@ -352,153 +479,6 @@ export type ApiAboutAboutDocument = {
     }>;
 };
 
-export type ApiAuthPageAuthPageDocument = {
-    /**
-     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-     */
-    documentId: string;
-    id: string | number;
-    /**
-     * A string field
-     */
-    loginTitle?: string;
-    /**
-     * A text field
-     */
-    loginSubtitle?: string;
-    /**
-     * A string field
-     */
-    signupTitle?: string;
-    /**
-     * A text field
-     */
-    signupSubtitle?: string;
-    /**
-     * A string field
-     */
-    emailLabel?: string;
-    /**
-     * A string field
-     */
-    emailPlaceholder?: string;
-    /**
-     * A string field
-     */
-    passwordLabel?: string;
-    /**
-     * A string field
-     */
-    passwordPlaceholder?: string;
-    /**
-     * A string field
-     */
-    nameLabel?: string;
-    /**
-     * A string field
-     */
-    namePlaceholder?: string;
-    /**
-     * A string field
-     */
-    loginButton?: string;
-    /**
-     * A string field
-     */
-    signupButton?: string;
-    /**
-     * A string field
-     */
-    forgotPasswordLink?: string;
-    /**
-     * A string field
-     */
-    noAccountText?: string;
-    /**
-     * A string field
-     */
-    signupLinkText?: string;
-    /**
-     * A string field
-     */
-    haveAccountText?: string;
-    /**
-     * A string field
-     */
-    loginLinkText?: string;
-    /**
-     * A string field
-     */
-    orDividerText?: string;
-    /**
-     * A string field
-     */
-    googleButton?: string;
-    /**
-     * A string field
-     */
-    appleButton?: string;
-    /**
-     * A string field
-     */
-    termsCheckboxText?: string;
-    /**
-     * A string field
-     */
-    termsLinkText?: string;
-    /**
-     * A string field
-     */
-    privacyLinkText?: string;
-    /**
-     * Timestamp when this entry was first created in the CMS.
-     */
-    createdAt?: string;
-    /**
-     * Timestamp when this entry was last modified.
-     */
-    updatedAt?: string;
-    /**
-     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-     */
-    publishedAt: string;
-    /**
-     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-     */
-    locale?: string;
-    /**
-     * A component field
-     */
-    seoMetadata: ElementsSeoMetadataEntry;
-    /**
-     * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-     */
-    readonly localizations?: Array<{
-        id: number;
-        /**
-         * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-         */
-        documentId: string;
-        /**
-         * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-         */
-        locale: string;
-        /**
-         * Timestamp when this entry was first created in the CMS.
-         */
-        createdAt?: string;
-        /**
-         * Timestamp when this entry was last modified.
-         */
-        updatedAt?: string;
-        /**
-         * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-         */
-        publishedAt?: string;
-        [key: string]: unknown | number | string | undefined;
-    }>;
-};
-
 export type ElementsLabelEntry = {
     /**
      * A string field
@@ -537,6 +517,196 @@ export type ElementsHeaderEntry = {
      * Component instance ID
      */
     id?: number;
+};
+
+export type ElementsButtonEntry = {
+    /**
+     * A string field
+     */
+    url: string;
+    /**
+     * A boolean field
+     */
+    openInNewTab: boolean | null;
+    /**
+     * A component field
+     */
+    label?: ElementsLabelEntry;
+    /**
+     * Component instance ID
+     */
+    id?: number;
+};
+
+export type ApiAuthPageAuthPageDocument = {
+    /**
+     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+     */
+    documentId: string;
+    id: string | number;
+    /**
+     * A string field
+     */
+    emailPlaceholder: string;
+    /**
+     * A string field
+     */
+    passwordPlaceholder: string;
+    /**
+     * A string field
+     */
+    namePlaceholder: string;
+    /**
+     * A string field
+     */
+    noAccountText: string;
+    /**
+     * A string field
+     */
+    signupLinkText: string;
+    /**
+     * A string field
+     */
+    haveAccountText: string;
+    /**
+     * A string field
+     */
+    loginLinkText: string;
+    /**
+     * A string field
+     */
+    orDividerText: string;
+    /**
+     * A string field
+     */
+    termsCheckboxText: string;
+    /**
+     * A string field
+     */
+    termsLinkText: string;
+    /**
+     * A string field
+     */
+    privacyLinkText: string;
+    /**
+     * A string field
+     */
+    emailRequiredError: string;
+    /**
+     * A string field
+     */
+    emailInvalidError: string;
+    /**
+     * A string field
+     */
+    passwordRequiredError: string;
+    /**
+     * A string field
+     */
+    nameRequiredError: string;
+    /**
+     * A string field
+     */
+    termsRequiredError: string;
+    /**
+     * A string field
+     */
+    termsText: string;
+    /**
+     * Timestamp when this entry was first created in the CMS.
+     */
+    createdAt?: string;
+    /**
+     * Timestamp when this entry was last modified.
+     */
+    updatedAt?: string;
+    /**
+     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+     */
+    publishedAt: string;
+    /**
+     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+     */
+    locale?: string;
+    /**
+     * A component field
+     */
+    loginHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    signupHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    emailLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    passwordLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    nameLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    loginButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    signupButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    forgotPasswordButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    googleButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    appleButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    showPasswordLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    hidePasswordLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    seoMetadata: ElementsSeoMetadataEntry;
+    /**
+     * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+     */
+    readonly localizations?: Array<{
+        id: number;
+        /**
+         * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+         */
+        documentId: string;
+        /**
+         * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+         */
+        locale: string;
+        /**
+         * Timestamp when this entry was first created in the CMS.
+         */
+        createdAt?: string;
+        /**
+         * Timestamp when this entry was last modified.
+         */
+        updatedAt?: string;
+        /**
+         * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+         */
+        publishedAt?: string;
+        [key: string]: unknown | number | string | undefined;
+    }>;
 };
 
 export type ApiBlogPostTagBlogPostTagDocument = {
@@ -943,25 +1113,6 @@ export type ApiBlogPostBlogPostDocument = {
     }>;
 };
 
-export type ElementsButtonEntry = {
-    /**
-     * A string field
-     */
-    url: string;
-    /**
-     * A boolean field
-     */
-    openInNewTab: boolean | null;
-    /**
-     * A component field
-     */
-    label?: ElementsLabelEntry;
-    /**
-     * Component instance ID
-     */
-    id?: number;
-};
-
 export type CallToActionsPaginationCtaEntry = {
     /**
      * An integer field
@@ -1068,6 +1219,144 @@ export type ApiBlogBlogDocument = {
     }>;
 };
 
+export type ApiConsentConsentDocument = {
+    /**
+     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+     */
+    documentId: string;
+    id: string | number;
+    /**
+     * Timestamp when this entry was first created in the CMS.
+     */
+    createdAt?: string;
+    /**
+     * Timestamp when this entry was last modified.
+     */
+    updatedAt?: string;
+    /**
+     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+     */
+    publishedAt: string;
+    /**
+     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+     */
+    locale?: string;
+    /**
+     * A component field
+     */
+    consentInformation: ElementsTextBlockEntry;
+    /**
+     * A component field
+     */
+    acceptAllButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    rejectAllButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    settingsButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    saveButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    doNotTrackNotice: ElementsTextBlockEntry;
+    /**
+     * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+     */
+    readonly localizations?: Array<{
+        id: number;
+        /**
+         * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+         */
+        documentId: string;
+        /**
+         * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+         */
+        locale: string;
+        /**
+         * Timestamp when this entry was first created in the CMS.
+         */
+        createdAt?: string;
+        /**
+         * Timestamp when this entry was last modified.
+         */
+        updatedAt?: string;
+        /**
+         * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+         */
+        publishedAt?: string;
+        [key: string]: unknown | number | string | undefined;
+    }>;
+};
+
+export type ApiConsentCategoryConsentCategoryDocument = {
+    /**
+     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+     */
+    documentId: string;
+    id: string | number;
+    /**
+     * A UID field
+     */
+    uid: string;
+    /**
+     * A boolean field
+     */
+    required: boolean | null;
+    /**
+     * Timestamp when this entry was first created in the CMS.
+     */
+    createdAt?: string;
+    /**
+     * Timestamp when this entry was last modified.
+     */
+    updatedAt?: string;
+    /**
+     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+     */
+    publishedAt: string;
+    /**
+     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+     */
+    locale?: string;
+    /**
+     * A component field
+     */
+    content: ElementsTextBlockEntry;
+    /**
+     * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+     */
+    readonly localizations?: Array<{
+        id: number;
+        /**
+         * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+         */
+        documentId: string;
+        /**
+         * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+         */
+        locale: string;
+        /**
+         * Timestamp when this entry was first created in the CMS.
+         */
+        createdAt?: string;
+        /**
+         * Timestamp when this entry was last modified.
+         */
+        updatedAt?: string;
+        /**
+         * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+         */
+        publishedAt?: string;
+        [key: string]: unknown | number | string | undefined;
+    }>;
+};
+
 export type ApiContactUsContactUsDocument = {
     /**
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
@@ -1134,6 +1423,65 @@ export type ApiContactUsContactUsDocument = {
      * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
      */
     locale?: string;
+    /**
+     * A component field
+     */
+    seoMetadata: ElementsSeoMetadataEntry;
+    /**
+     * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+     */
+    readonly localizations?: Array<{
+        id: number;
+        /**
+         * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+         */
+        documentId: string;
+        /**
+         * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+         */
+        locale: string;
+        /**
+         * Timestamp when this entry was first created in the CMS.
+         */
+        createdAt?: string;
+        /**
+         * Timestamp when this entry was last modified.
+         */
+        updatedAt?: string;
+        /**
+         * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+         */
+        publishedAt?: string;
+        [key: string]: unknown | number | string | undefined;
+    }>;
+};
+
+export type ApiCookiePolicyCookiePolicyDocument = {
+    /**
+     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+     */
+    documentId: string;
+    id: string | number;
+    /**
+     * Timestamp when this entry was first created in the CMS.
+     */
+    createdAt?: string;
+    /**
+     * Timestamp when this entry was last modified.
+     */
+    updatedAt?: string;
+    /**
+     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+     */
+    publishedAt: string;
+    /**
+     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+     */
+    locale?: string;
+    /**
+     * A component field
+     */
+    content: ElementsTextBlockEntry;
     /**
      * A component field
      */
@@ -2436,70 +2784,6 @@ export type ApiProfileProfileDocument = {
     documentId: string;
     id: string | number;
     /**
-     * A string field
-     */
-    profileTitle?: string;
-    /**
-     * A string field
-     */
-    editProfileTitle?: string;
-    /**
-     * A string field
-     */
-    wishlistTitle?: string;
-    /**
-     * A text field
-     */
-    wishlistEmptyMessage?: string;
-    /**
-     * A string field
-     */
-    currencyTitle?: string;
-    /**
-     * A text field
-     */
-    currencyDescription?: string;
-    /**
-     * A string field
-     */
-    deleteAccountTitle?: string;
-    /**
-     * A text field
-     */
-    deleteAccountWarning?: string;
-    /**
-     * A string field
-     */
-    saveButton?: string;
-    /**
-     * A string field
-     */
-    cancelButton?: string;
-    /**
-     * A string field
-     */
-    deleteButton?: string;
-    /**
-     * A string field
-     */
-    confirmButton?: string;
-    /**
-     * A string field
-     */
-    logoutButton?: string;
-    /**
-     * A string field
-     */
-    nameLabel?: string;
-    /**
-     * A string field
-     */
-    emailLabel?: string;
-    /**
-     * A string field
-     */
-    passwordLabel?: string;
-    /**
      * Timestamp when this entry was first created in the CMS.
      */
     createdAt?: string;
@@ -2515,6 +2799,82 @@ export type ApiProfileProfileDocument = {
      * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
      */
     locale?: string;
+    /**
+     * A component field
+     */
+    pageHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    accountSettingsHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    editProfileButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    wishlistHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    wishlistAddButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    wishlistRemoveButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    currencyHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    deleteAccountHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    deleteButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    cancelButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    confirmButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    saveButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    logoutButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    goBackButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    nameLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    emailLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    passwordLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    cookieSettingsHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    exportDataHeader: ElementsHeaderEntry;
     /**
      * A component field
      */
@@ -2822,6 +3182,14 @@ export enum ItemsEnum {
     LOCALE = 'locale'
 }
 
+export enum PropertyNamesEnum {
+    CREATED_AT = 'createdAt',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    PUBLISHED_AT = 'publishedAt',
+    UPDATED_AT = 'updatedAt'
+}
+
 /**
  * Fetch documents based on their status. Default to "published" if not specified.
  */
@@ -2831,33 +3199,62 @@ export enum SchemaEnum {
 }
 
 export enum ItemsEnum2 {
-    LOGIN_TITLE = 'loginTitle',
-    LOGIN_SUBTITLE = 'loginSubtitle',
-    SIGNUP_TITLE = 'signupTitle',
-    SIGNUP_SUBTITLE = 'signupSubtitle',
-    EMAIL_LABEL = 'emailLabel',
     EMAIL_PLACEHOLDER = 'emailPlaceholder',
-    PASSWORD_LABEL = 'passwordLabel',
     PASSWORD_PLACEHOLDER = 'passwordPlaceholder',
-    NAME_LABEL = 'nameLabel',
     NAME_PLACEHOLDER = 'namePlaceholder',
-    LOGIN_BUTTON = 'loginButton',
-    SIGNUP_BUTTON = 'signupButton',
-    FORGOT_PASSWORD_LINK = 'forgotPasswordLink',
     NO_ACCOUNT_TEXT = 'noAccountText',
     SIGNUP_LINK_TEXT = 'signupLinkText',
     HAVE_ACCOUNT_TEXT = 'haveAccountText',
     LOGIN_LINK_TEXT = 'loginLinkText',
     OR_DIVIDER_TEXT = 'orDividerText',
-    GOOGLE_BUTTON = 'googleButton',
-    APPLE_BUTTON = 'appleButton',
     TERMS_CHECKBOX_TEXT = 'termsCheckboxText',
     TERMS_LINK_TEXT = 'termsLinkText',
     PRIVACY_LINK_TEXT = 'privacyLinkText',
+    EMAIL_REQUIRED_ERROR = 'emailRequiredError',
+    EMAIL_INVALID_ERROR = 'emailInvalidError',
+    PASSWORD_REQUIRED_ERROR = 'passwordRequiredError',
+    NAME_REQUIRED_ERROR = 'nameRequiredError',
+    TERMS_REQUIRED_ERROR = 'termsRequiredError',
+    TERMS_TEXT = 'termsText',
     CREATED_AT = 'createdAt',
     UPDATED_AT = 'updatedAt',
     PUBLISHED_AT = 'publishedAt',
     LOCALE = 'locale'
+}
+
+export enum PropertyNamesEnum2 {
+    CREATED_AT = 'createdAt',
+    EMAIL_INVALID_ERROR = 'emailInvalidError',
+    EMAIL_PLACEHOLDER = 'emailPlaceholder',
+    EMAIL_REQUIRED_ERROR = 'emailRequiredError',
+    HAVE_ACCOUNT_TEXT = 'haveAccountText',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    LOGIN_LINK_TEXT = 'loginLinkText',
+    NAME_PLACEHOLDER = 'namePlaceholder',
+    NAME_REQUIRED_ERROR = 'nameRequiredError',
+    NO_ACCOUNT_TEXT = 'noAccountText',
+    OR_DIVIDER_TEXT = 'orDividerText',
+    PASSWORD_PLACEHOLDER = 'passwordPlaceholder',
+    PASSWORD_REQUIRED_ERROR = 'passwordRequiredError',
+    PRIVACY_LINK_TEXT = 'privacyLinkText',
+    PUBLISHED_AT = 'publishedAt',
+    SIGNUP_LINK_TEXT = 'signupLinkText',
+    TERMS_CHECKBOX_TEXT = 'termsCheckboxText',
+    TERMS_LINK_TEXT = 'termsLinkText',
+    TERMS_REQUIRED_ERROR = 'termsRequiredError',
+    TERMS_TEXT = 'termsText',
+    UPDATED_AT = 'updatedAt'
+}
+
+export enum PropertyNamesEnum3 {
+    CREATED_AT = 'createdAt',
+    FEATURED_BLOG_POSTS = 'featuredBlogPosts',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    PUBLISHED_AT = 'publishedAt',
+    TAG_FILTERS = 'tagFilters',
+    UPDATED_AT = 'updatedAt'
 }
 
 export enum ItemsEnum3 {
@@ -2866,6 +3263,15 @@ export enum ItemsEnum3 {
     UPDATED_AT = 'updatedAt',
     PUBLISHED_AT = 'publishedAt',
     LOCALE = 'locale'
+}
+
+export enum PropertyNamesEnum4 {
+    CREATED_AT = 'createdAt',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    PUBLISHED_AT = 'publishedAt',
+    TAG_ID = 'tagId',
+    UPDATED_AT = 'updatedAt'
 }
 
 export enum AdditionalPropertiesEnum {
@@ -2883,7 +3289,39 @@ export enum ItemsEnum4 {
     LOCALE = 'locale'
 }
 
+export enum PropertyNamesEnum5 {
+    AUTHOR = 'author',
+    CREATED_AT = 'createdAt',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    PUBLISHED_AT = 'publishedAt',
+    PUBLISHED_DATE = 'publishedDate',
+    READ_TIME_IN_MINUTES = 'readTimeInMinutes',
+    SLUG = 'slug',
+    TAGS = 'tags',
+    UPDATED_AT = 'updatedAt'
+}
+
 export enum ItemsEnum5 {
+    UID = 'uid',
+    REQUIRED = 'required',
+    CREATED_AT = 'createdAt',
+    UPDATED_AT = 'updatedAt',
+    PUBLISHED_AT = 'publishedAt',
+    LOCALE = 'locale'
+}
+
+export enum PropertyNamesEnum6 {
+    CREATED_AT = 'createdAt',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    PUBLISHED_AT = 'publishedAt',
+    REQUIRED = 'required',
+    UID = 'uid',
+    UPDATED_AT = 'updatedAt'
+}
+
+export enum ItemsEnum6 {
     TITLE = 'title',
     SUBTITLE = 'subtitle',
     CONTACT_TAB_LABEL = 'contactTabLabel',
@@ -2901,7 +3339,26 @@ export enum ItemsEnum5 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum6 {
+export enum PropertyNamesEnum7 {
+    CONTACT_TAB_LABEL = 'contactTabLabel',
+    CREATED_AT = 'createdAt',
+    EMAIL_LABEL = 'emailLabel',
+    EMAIL_PLACEHOLDER = 'emailPlaceholder',
+    FAQ_TAB_LABEL = 'faqTabLabel',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    MESSAGE_LABEL = 'messageLabel',
+    MESSAGE_PLACEHOLDER = 'messagePlaceholder',
+    NAME_LABEL = 'nameLabel',
+    NAME_PLACEHOLDER = 'namePlaceholder',
+    PUBLISHED_AT = 'publishedAt',
+    SUBMIT_BUTTON = 'submitButton',
+    SUBTITLE = 'subtitle',
+    TITLE = 'title',
+    UPDATED_AT = 'updatedAt'
+}
+
+export enum ItemsEnum7 {
     ROLE_ID = 'roleId',
     NAME = 'name',
     CREATED_AT = 'createdAt',
@@ -2910,7 +3367,17 @@ export enum ItemsEnum6 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum7 {
+export enum PropertyNamesEnum8 {
+    CREATED_AT = 'createdAt',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    NAME = 'name',
+    PUBLISHED_AT = 'publishedAt',
+    ROLE_ID = 'roleId',
+    UPDATED_AT = 'updatedAt'
+}
+
+export enum ItemsEnum8 {
     SLUG = 'slug',
     FIRST_NAME = 'firstName',
     LAST_NAME = 'lastName',
@@ -2927,7 +3394,7 @@ export enum ItemsEnum7 {
     LOCALE = 'locale'
 }
 
-export enum PropertyNamesEnum {
+export enum PropertyNamesEnum9 {
     BIO = 'bio',
     CREATED_AT = 'createdAt',
     EMAIL = 'email',
@@ -2937,6 +3404,7 @@ export enum PropertyNamesEnum {
     LAST_NAME = 'lastName',
     LINKEDIN = 'linkedin',
     LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
     PUBLISHED_AT = 'publishedAt',
     ROLES = 'roles',
     SLUG = 'slug',
@@ -2945,7 +3413,7 @@ export enum PropertyNamesEnum {
     WEBSITE = 'website'
 }
 
-export enum ItemsEnum8 {
+export enum ItemsEnum9 {
     CODE = 'code',
     NAME = 'name',
     SYMBOL = 'symbol',
@@ -2960,6 +3428,22 @@ export enum ItemsEnum8 {
     LOCALE = 'locale'
 }
 
+export enum PropertyNamesEnum10 {
+    CODE = 'code',
+    CREATED_AT = 'createdAt',
+    DECIMAL_PLACES = 'decimalPlaces',
+    DECIMAL_SEPARATOR = 'decimalSeparator',
+    EXCHANGE_RATE = 'exchangeRate',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    NAME = 'name',
+    PUBLISHED_AT = 'publishedAt',
+    SYMBOL = 'symbol',
+    SYMBOL_POSITION = 'symbolPosition',
+    THOUSANDS_SEPARATOR = 'thousandsSeparator',
+    UPDATED_AT = 'updatedAt'
+}
+
 /**
  * An enum field
  */
@@ -2968,7 +3452,7 @@ export enum SymbolPositionEnum {
     AFTER = 'after'
 }
 
-export enum ItemsEnum9 {
+export enum ItemsEnum10 {
     TITLE = 'title',
     SUBTITLE = 'subtitle',
     DESCRIPTION = 'description',
@@ -2980,7 +3464,20 @@ export enum ItemsEnum9 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum10 {
+export enum PropertyNamesEnum11 {
+    CONTACT_BUTTON_TEXT = 'contactButtonText',
+    CONTACT_PROMPT = 'contactPrompt',
+    CREATED_AT = 'createdAt',
+    DESCRIPTION = 'description',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    PUBLISHED_AT = 'publishedAt',
+    SUBTITLE = 'subtitle',
+    TITLE = 'title',
+    UPDATED_AT = 'updatedAt'
+}
+
+export enum ItemsEnum11 {
     KEY = 'key',
     NAME = 'name',
     DESCRIPTION = 'description',
@@ -2991,7 +3488,7 @@ export enum ItemsEnum10 {
     PUBLISHED_AT = 'publishedAt'
 }
 
-export enum ItemsEnum11 {
+export enum ItemsEnum12 {
     SITE_TITLE = 'siteTitle',
     SITE_DESCRIPTION = 'siteDescription',
     CREATED_AT = 'createdAt',
@@ -3000,7 +3497,17 @@ export enum ItemsEnum11 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum12 {
+export enum PropertyNamesEnum12 {
+    CREATED_AT = 'createdAt',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    PUBLISHED_AT = 'publishedAt',
+    SITE_DESCRIPTION = 'siteDescription',
+    SITE_TITLE = 'siteTitle',
+    UPDATED_AT = 'updatedAt'
+}
+
+export enum ItemsEnum13 {
     SLUG = 'slug',
     CREATED_AT = 'createdAt',
     UPDATED_AT = 'updatedAt',
@@ -3008,7 +3515,16 @@ export enum ItemsEnum12 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum13 {
+export enum PropertyNamesEnum13 {
+    CREATED_AT = 'createdAt',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    PUBLISHED_AT = 'publishedAt',
+    SLUG = 'slug',
+    UPDATED_AT = 'updatedAt'
+}
+
+export enum ItemsEnum14 {
     BY_SELLER_TEXT = 'bySellerText',
     CREATED_AT = 'createdAt',
     UPDATED_AT = 'updatedAt',
@@ -3016,7 +3532,16 @@ export enum ItemsEnum13 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum14 {
+export enum PropertyNamesEnum14 {
+    BY_SELLER_TEXT = 'bySellerText',
+    CREATED_AT = 'createdAt',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    PUBLISHED_AT = 'publishedAt',
+    UPDATED_AT = 'updatedAt'
+}
+
+export enum ItemsEnum15 {
     CERTIFICATE_ID = 'certificateId',
     CREATED_AT = 'createdAt',
     UPDATED_AT = 'updatedAt',
@@ -3024,27 +3549,26 @@ export enum ItemsEnum14 {
     LOCALE = 'locale'
 }
 
-export enum ItemsEnum15 {
-    PROFILE_TITLE = 'profileTitle',
-    EDIT_PROFILE_TITLE = 'editProfileTitle',
-    WISHLIST_TITLE = 'wishlistTitle',
-    WISHLIST_EMPTY_MESSAGE = 'wishlistEmptyMessage',
-    CURRENCY_TITLE = 'currencyTitle',
-    CURRENCY_DESCRIPTION = 'currencyDescription',
-    DELETE_ACCOUNT_TITLE = 'deleteAccountTitle',
-    DELETE_ACCOUNT_WARNING = 'deleteAccountWarning',
-    SAVE_BUTTON = 'saveButton',
-    CANCEL_BUTTON = 'cancelButton',
-    DELETE_BUTTON = 'deleteButton',
-    CONFIRM_BUTTON = 'confirmButton',
-    LOGOUT_BUTTON = 'logoutButton',
-    NAME_LABEL = 'nameLabel',
-    EMAIL_LABEL = 'emailLabel',
-    PASSWORD_LABEL = 'passwordLabel',
+export enum PropertyNamesEnum15 {
+    CERTIFICATE_ID = 'certificateId',
     CREATED_AT = 'createdAt',
-    UPDATED_AT = 'updatedAt',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
     PUBLISHED_AT = 'publishedAt',
-    LOCALE = 'locale'
+    UPDATED_AT = 'updatedAt'
+}
+
+export enum PropertyNamesEnum16 {
+    CATEGORY = 'category',
+    CERTIFICATES = 'certificates',
+    CREATED_AT = 'createdAt',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    PUBLISHED_AT = 'publishedAt',
+    SELLER = 'seller',
+    SLUG = 'slug',
+    TAGS = 'tags',
+    UPDATED_AT = 'updatedAt'
 }
 
 export enum ItemsEnum16 {
@@ -3055,16 +3579,19 @@ export enum ItemsEnum16 {
     LOCALE = 'locale'
 }
 
+export enum PropertyNamesEnum17 {
+    CREATED_AT = 'createdAt',
+    LOCALE = 'locale',
+    LOCALIZATIONS = 'localizations',
+    PUBLISHED_AT = 'publishedAt',
+    THEME_ID = 'themeId',
+    UPDATED_AT = 'updatedAt'
+}
+
 export enum StatusEnum {
     ACTIVE = 'active',
     LOCKED = 'locked',
     DELETED = 'deleted'
-}
-
-export enum CodeEnum {
-    EN = 'en',
-    IT = 'it',
-    HE = 'he'
 }
 
 export enum DirectionEnum {
@@ -3188,95 +3715,71 @@ export type ApiAuthPageAuthPageDocumentWritable = {
     /**
      * A string field
      */
-    loginTitle?: string;
-    /**
-     * A text field
-     */
-    loginSubtitle?: string;
+    emailPlaceholder: string;
     /**
      * A string field
      */
-    signupTitle?: string;
-    /**
-     * A text field
-     */
-    signupSubtitle?: string;
+    passwordPlaceholder: string;
     /**
      * A string field
      */
-    emailLabel?: string;
+    namePlaceholder: string;
     /**
      * A string field
      */
-    emailPlaceholder?: string;
+    noAccountText: string;
     /**
      * A string field
      */
-    passwordLabel?: string;
+    signupLinkText: string;
     /**
      * A string field
      */
-    passwordPlaceholder?: string;
+    haveAccountText: string;
     /**
      * A string field
      */
-    nameLabel?: string;
+    loginLinkText: string;
     /**
      * A string field
      */
-    namePlaceholder?: string;
+    orDividerText: string;
     /**
      * A string field
      */
-    loginButton?: string;
+    termsCheckboxText: string;
     /**
      * A string field
      */
-    signupButton?: string;
+    termsLinkText: string;
     /**
      * A string field
      */
-    forgotPasswordLink?: string;
+    privacyLinkText: string;
     /**
      * A string field
      */
-    noAccountText?: string;
+    emailRequiredError: string;
     /**
      * A string field
      */
-    signupLinkText?: string;
+    emailInvalidError: string;
     /**
      * A string field
      */
-    haveAccountText?: string;
+    passwordRequiredError: string;
     /**
      * A string field
      */
-    loginLinkText?: string;
+    nameRequiredError: string;
     /**
      * A string field
      */
-    orDividerText?: string;
+    termsRequiredError: string;
     /**
      * A string field
      */
-    googleButton?: string;
-    /**
-     * A string field
-     */
-    appleButton?: string;
-    /**
-     * A string field
-     */
-    termsCheckboxText?: string;
-    /**
-     * A string field
-     */
-    termsLinkText?: string;
-    /**
-     * A string field
-     */
-    privacyLinkText?: string;
+    termsText: string;
     /**
      * Timestamp when this entry was first created in the CMS.
      */
@@ -3293,6 +3796,54 @@ export type ApiAuthPageAuthPageDocumentWritable = {
      * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
      */
     locale?: string;
+    /**
+     * A component field
+     */
+    loginHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    signupHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    emailLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    passwordLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    nameLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    loginButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    signupButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    forgotPasswordButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    googleButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    appleButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    showPasswordLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    hidePasswordLabel: ElementsLabelEntry;
     /**
      * A component field
      */
@@ -3555,6 +4106,90 @@ export type ApiBlogBlogDocumentWritable = {
     seoMetadata: ElementsSeoMetadataEntry;
 };
 
+export type ApiConsentConsentDocumentWritable = {
+    /**
+     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+     */
+    documentId: string;
+    id: string | number;
+    /**
+     * Timestamp when this entry was first created in the CMS.
+     */
+    createdAt?: string;
+    /**
+     * Timestamp when this entry was last modified.
+     */
+    updatedAt?: string;
+    /**
+     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+     */
+    publishedAt: string;
+    /**
+     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+     */
+    locale?: string;
+    /**
+     * A component field
+     */
+    consentInformation: ElementsTextBlockEntry;
+    /**
+     * A component field
+     */
+    acceptAllButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    rejectAllButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    settingsButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    saveButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    doNotTrackNotice: ElementsTextBlockEntry;
+};
+
+export type ApiConsentCategoryConsentCategoryDocumentWritable = {
+    /**
+     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+     */
+    documentId: string;
+    id: string | number;
+    /**
+     * A UID field
+     */
+    uid: string;
+    /**
+     * A boolean field
+     */
+    required: boolean | null;
+    /**
+     * Timestamp when this entry was first created in the CMS.
+     */
+    createdAt?: string;
+    /**
+     * Timestamp when this entry was last modified.
+     */
+    updatedAt?: string;
+    /**
+     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+     */
+    publishedAt: string;
+    /**
+     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+     */
+    locale?: string;
+    /**
+     * A component field
+     */
+    content: ElementsTextBlockEntry;
+};
+
 export type ApiContactUsContactUsDocumentWritable = {
     /**
      * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
@@ -3621,6 +4256,38 @@ export type ApiContactUsContactUsDocumentWritable = {
      * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
      */
     locale?: string;
+    /**
+     * A component field
+     */
+    seoMetadata: ElementsSeoMetadataEntry;
+};
+
+export type ApiCookiePolicyCookiePolicyDocumentWritable = {
+    /**
+     * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+     */
+    documentId: string;
+    id: string | number;
+    /**
+     * Timestamp when this entry was first created in the CMS.
+     */
+    createdAt?: string;
+    /**
+     * Timestamp when this entry was last modified.
+     */
+    updatedAt?: string;
+    /**
+     * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+     */
+    publishedAt: string;
+    /**
+     * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+     */
+    locale?: string;
+    /**
+     * A component field
+     */
+    content: ElementsTextBlockEntry;
     /**
      * A component field
      */
@@ -4393,70 +5060,6 @@ export type ApiProfileProfileDocumentWritable = {
     documentId: string;
     id: string | number;
     /**
-     * A string field
-     */
-    profileTitle?: string;
-    /**
-     * A string field
-     */
-    editProfileTitle?: string;
-    /**
-     * A string field
-     */
-    wishlistTitle?: string;
-    /**
-     * A text field
-     */
-    wishlistEmptyMessage?: string;
-    /**
-     * A string field
-     */
-    currencyTitle?: string;
-    /**
-     * A text field
-     */
-    currencyDescription?: string;
-    /**
-     * A string field
-     */
-    deleteAccountTitle?: string;
-    /**
-     * A text field
-     */
-    deleteAccountWarning?: string;
-    /**
-     * A string field
-     */
-    saveButton?: string;
-    /**
-     * A string field
-     */
-    cancelButton?: string;
-    /**
-     * A string field
-     */
-    deleteButton?: string;
-    /**
-     * A string field
-     */
-    confirmButton?: string;
-    /**
-     * A string field
-     */
-    logoutButton?: string;
-    /**
-     * A string field
-     */
-    nameLabel?: string;
-    /**
-     * A string field
-     */
-    emailLabel?: string;
-    /**
-     * A string field
-     */
-    passwordLabel?: string;
-    /**
      * Timestamp when this entry was first created in the CMS.
      */
     createdAt?: string;
@@ -4472,6 +5075,82 @@ export type ApiProfileProfileDocumentWritable = {
      * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
      */
     locale?: string;
+    /**
+     * A component field
+     */
+    pageHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    accountSettingsHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    editProfileButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    wishlistHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    wishlistAddButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    wishlistRemoveButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    currencyHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    deleteAccountHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    deleteButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    cancelButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    confirmButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    saveButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    logoutButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    goBackButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    nameLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    emailLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    passwordLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    cookieSettingsHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
+    exportDataHeader: ElementsHeaderEntry;
     /**
      * A component field
      */
@@ -4609,7 +5288,7 @@ export type AboutGetAboutData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum]?: unknown;
+            [key in PropertyNamesEnum]?: unknown;
         };
         /**
          * Select a locale
@@ -4794,7 +5473,7 @@ export type AuthPageGetAuthPageData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum2]?: unknown;
+            [key in PropertyNamesEnum2]?: unknown;
         };
         /**
          * Select a locale
@@ -4857,95 +5536,71 @@ export type AuthPageGetAuthPageResponses = {
             /**
              * A string field
              */
-            loginTitle?: string;
-            /**
-             * A text field
-             */
-            loginSubtitle?: string;
+            emailPlaceholder: string;
             /**
              * A string field
              */
-            signupTitle?: string;
-            /**
-             * A text field
-             */
-            signupSubtitle?: string;
+            passwordPlaceholder: string;
             /**
              * A string field
              */
-            emailLabel?: string;
+            namePlaceholder: string;
             /**
              * A string field
              */
-            emailPlaceholder?: string;
+            noAccountText: string;
             /**
              * A string field
              */
-            passwordLabel?: string;
+            signupLinkText: string;
             /**
              * A string field
              */
-            passwordPlaceholder?: string;
+            haveAccountText: string;
             /**
              * A string field
              */
-            nameLabel?: string;
+            loginLinkText: string;
             /**
              * A string field
              */
-            namePlaceholder?: string;
+            orDividerText: string;
             /**
              * A string field
              */
-            loginButton?: string;
+            termsCheckboxText: string;
             /**
              * A string field
              */
-            signupButton?: string;
+            termsLinkText: string;
             /**
              * A string field
              */
-            forgotPasswordLink?: string;
+            privacyLinkText: string;
             /**
              * A string field
              */
-            noAccountText?: string;
+            emailRequiredError: string;
             /**
              * A string field
              */
-            signupLinkText?: string;
+            emailInvalidError: string;
             /**
              * A string field
              */
-            haveAccountText?: string;
+            passwordRequiredError: string;
             /**
              * A string field
              */
-            loginLinkText?: string;
+            nameRequiredError: string;
             /**
              * A string field
              */
-            orDividerText?: string;
+            termsRequiredError: string;
             /**
              * A string field
              */
-            googleButton?: string;
-            /**
-             * A string field
-             */
-            appleButton?: string;
-            /**
-             * A string field
-             */
-            termsCheckboxText?: string;
-            /**
-             * A string field
-             */
-            termsLinkText?: string;
-            /**
-             * A string field
-             */
-            privacyLinkText?: string;
+            termsText: string;
             /**
              * Timestamp when this entry was first created in the CMS.
              */
@@ -4962,6 +5617,54 @@ export type AuthPageGetAuthPageResponses = {
              * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
              */
             locale?: string;
+            /**
+             * A component field
+             */
+            loginHeader: ElementsHeaderEntry;
+            /**
+             * A component field
+             */
+            signupHeader: ElementsHeaderEntry;
+            /**
+             * A component field
+             */
+            emailLabel: ElementsLabelEntry;
+            /**
+             * A component field
+             */
+            passwordLabel: ElementsLabelEntry;
+            /**
+             * A component field
+             */
+            nameLabel: ElementsLabelEntry;
+            /**
+             * A component field
+             */
+            loginButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            signupButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            forgotPasswordButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            googleButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            appleButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            showPasswordLabel: ElementsLabelEntry;
+            /**
+             * A component field
+             */
+            hidePasswordLabel: ElementsLabelEntry;
             /**
              * A component field
              */
@@ -5096,6 +5799,40 @@ export type LogoutUserResponses = {
 
 export type LogoutUserResponse = LogoutUserResponses[keyof LogoutUserResponses];
 
+export type DeleteAccountData = {
+    body: {
+        password: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/auth/profile';
+};
+
+export type DeleteAccountErrors = {
+    /**
+     * Wrong password or validation error
+     */
+    400: Error;
+    /**
+     * Not authenticated
+     */
+    401: Error;
+};
+
+export type DeleteAccountError = DeleteAccountErrors[keyof DeleteAccountErrors];
+
+export type DeleteAccountResponses = {
+    /**
+     * Account deleted successfully
+     */
+    200: {
+        success: boolean;
+        message: string;
+    };
+};
+
+export type DeleteAccountResponse = DeleteAccountResponses[keyof DeleteAccountResponses];
+
 export type GetUserProfileData = {
     body?: never;
     path?: never;
@@ -5185,6 +5922,35 @@ export type ChangePasswordResponses = {
 };
 
 export type ChangePasswordResponse = ChangePasswordResponses[keyof ChangePasswordResponses];
+
+export type ExportUserDataData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/profile/export';
+};
+
+export type ExportUserDataErrors = {
+    /**
+     * Not authenticated
+     */
+    401: Error;
+    /**
+     * User not found
+     */
+    404: Error;
+};
+
+export type ExportUserDataError = ExportUserDataErrors[keyof ExportUserDataErrors];
+
+export type ExportUserDataResponses = {
+    /**
+     * User data exported successfully
+     */
+    200: UserDataExport;
+};
+
+export type ExportUserDataResponse = ExportUserDataResponses[keyof ExportUserDataResponses];
 
 export type RefreshTokenData = {
     body?: never;
@@ -5351,7 +6117,7 @@ export type BlogGetBlogData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum]?: unknown;
+            [key in PropertyNamesEnum3]?: unknown;
         };
         /**
          * Select a locale
@@ -5510,7 +6276,7 @@ export type BlogPostTagGetBlogPostTagsData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum3]?: unknown;
+            [key in PropertyNamesEnum4]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -5693,7 +6459,7 @@ export type BlogPostTagGetBlogPostTagsByIdData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum3]?: unknown;
+            [key in PropertyNamesEnum4]?: unknown;
         };
         /**
          * Sort the result
@@ -5840,7 +6606,7 @@ export type BlogPostGetBlogPostsData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum4]?: unknown;
+            [key in PropertyNamesEnum5]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -6043,7 +6809,7 @@ export type BlogPostGetBlogPostsBySlugData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum4]?: unknown;
+            [key in PropertyNamesEnum5]?: unknown;
         };
         /**
          * Sort the result
@@ -6215,7 +6981,7 @@ export type BlogPostGetBlogPostsByIdData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum4]?: unknown;
+            [key in PropertyNamesEnum5]?: unknown;
         };
         /**
          * Sort the result
@@ -6370,7 +7136,158 @@ export type BlogPostGetBlogPostsByIdResponses = {
 
 export type BlogPostGetBlogPostsByIdResponse = BlogPostGetBlogPostsByIdResponses[keyof BlogPostGetBlogPostsByIdResponses];
 
-export type ContactUsGetContactUsData = {
+export type ConsentGetConsentData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+         */
+        readonly fields?: Array<ItemsEnum>;
+        /**
+         * Filters to apply to the query
+         */
+        filters?: {
+            [key in PropertyNamesEnum]?: unknown;
+        };
+        /**
+         * Select a locale
+         */
+        locale?: string;
+        /**
+         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+         */
+        status?: SchemaEnum;
+        /**
+         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+         */
+        customPopulate: string;
+        /**
+         * Maximum depth for population (override plugin default)
+         */
+        customDepth?: number;
+        /**
+         * Fields to ignore during population
+         */
+        customIgnored?: Array<string>;
+    };
+    url: '/consent';
+};
+
+export type ConsentGetConsentErrors = {
+    /**
+     * Bad request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type ConsentGetConsentResponses = {
+    /**
+     * OK
+     */
+    200: {
+        data: {
+            /**
+             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+             */
+            documentId: string;
+            id: string | number;
+            /**
+             * Timestamp when this entry was first created in the CMS.
+             */
+            createdAt?: string;
+            /**
+             * Timestamp when this entry was last modified.
+             */
+            updatedAt?: string;
+            /**
+             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+             */
+            publishedAt: string;
+            /**
+             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+             */
+            locale?: string;
+            /**
+             * A component field
+             */
+            consentInformation: ElementsTextBlockEntry;
+            /**
+             * A component field
+             */
+            acceptAllButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            rejectAllButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            settingsButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            saveButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            doNotTrackNotice: ElementsTextBlockEntry;
+            /**
+             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+             */
+            readonly localizations?: Array<{
+                id: number;
+                /**
+                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                 */
+                documentId: string;
+                /**
+                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                 */
+                locale: string;
+                /**
+                 * Timestamp when this entry was first created in the CMS.
+                 */
+                createdAt?: string;
+                /**
+                 * Timestamp when this entry was last modified.
+                 */
+                updatedAt?: string;
+                /**
+                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                 */
+                publishedAt?: string;
+                [key: string]: unknown | number | string | undefined;
+            }>;
+        };
+        /**
+         * Metadata object containing pagination and other response metadata
+         */
+        meta?: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type ConsentGetConsentResponse = ConsentGetConsentResponses[keyof ConsentGetConsentResponses];
+
+export type ConsentCategoryGetConsentCategoriesData = {
     body?: never;
     path?: never;
     query: {
@@ -6382,7 +7299,337 @@ export type ContactUsGetContactUsData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum5]?: unknown;
+            [key in PropertyNamesEnum6]?: unknown;
+        };
+        /**
+         * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
+         */
+        _q?: string;
+        /**
+         * Pagination parameters
+         */
+        pagination?: {
+            /**
+             * Include total count in response
+             */
+            withCount?: boolean;
+        } & ({
+            /**
+             * Page number (1-based)
+             */
+            page: number;
+            /**
+             * Number of entries per page
+             */
+            pageSize: number;
+        } | {
+            /**
+             * Number of entries to skip
+             */
+            start: number;
+            /**
+             * Maximum number of entries to return
+             */
+            limit: number;
+        });
+        /**
+         * Sort the result
+         */
+        sort?: ItemsEnum5 | Array<ItemsEnum5> | {
+            [key in ItemsEnum5]?: AdditionalPropertiesEnum;
+        } | Array<{
+            [key in ItemsEnum5]?: AdditionalPropertiesEnum;
+        }>;
+        /**
+         * Select a locale
+         */
+        locale?: string;
+        /**
+         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+         */
+        status?: SchemaEnum;
+        /**
+         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+         */
+        customPopulate: string;
+        /**
+         * Maximum depth for population (override plugin default)
+         */
+        customDepth?: number;
+        /**
+         * Fields to ignore during population
+         */
+        customIgnored?: Array<string>;
+    };
+    url: '/consent-categories';
+};
+
+export type ConsentCategoryGetConsentCategoriesErrors = {
+    /**
+     * Bad request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type ConsentCategoryGetConsentCategoriesResponses = {
+    /**
+     * OK
+     */
+    200: {
+        data: Array<{
+            /**
+             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+             */
+            documentId: string;
+            id: string | number;
+            /**
+             * A UID field
+             */
+            uid: string;
+            /**
+             * A boolean field
+             */
+            required: boolean | null;
+            /**
+             * Timestamp when this entry was first created in the CMS.
+             */
+            createdAt?: string;
+            /**
+             * Timestamp when this entry was last modified.
+             */
+            updatedAt?: string;
+            /**
+             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+             */
+            publishedAt: string;
+            /**
+             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+             */
+            locale?: string;
+            /**
+             * A component field
+             */
+            content: ElementsTextBlockEntry;
+            /**
+             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+             */
+            readonly localizations?: Array<{
+                id: number;
+                /**
+                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                 */
+                documentId: string;
+                /**
+                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                 */
+                locale: string;
+                /**
+                 * Timestamp when this entry was first created in the CMS.
+                 */
+                createdAt?: string;
+                /**
+                 * Timestamp when this entry was last modified.
+                 */
+                updatedAt?: string;
+                /**
+                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                 */
+                publishedAt?: string;
+                [key: string]: unknown | number | string | undefined;
+            }>;
+        }>;
+        /**
+         * Metadata object containing pagination and other response metadata
+         */
+        meta?: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type ConsentCategoryGetConsentCategoriesResponse = ConsentCategoryGetConsentCategoriesResponses[keyof ConsentCategoryGetConsentCategoriesResponses];
+
+export type ConsentCategoryGetConsentCategoriesByIdData = {
+    body?: never;
+    path: {
+        /**
+         * The document ID, represented by a UUID
+         */
+        id: string;
+    };
+    query: {
+        /**
+         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+         */
+        readonly fields?: Array<ItemsEnum5>;
+        /**
+         * Filters to apply to the query
+         */
+        filters?: {
+            [key in PropertyNamesEnum6]?: unknown;
+        };
+        /**
+         * Sort the result
+         */
+        sort?: ItemsEnum5 | Array<ItemsEnum5> | {
+            [key in ItemsEnum5]?: AdditionalPropertiesEnum;
+        } | Array<{
+            [key in ItemsEnum5]?: AdditionalPropertiesEnum;
+        }>;
+        /**
+         * Select a locale
+         */
+        locale?: string;
+        /**
+         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+         */
+        status?: SchemaEnum;
+        /**
+         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+         */
+        customPopulate: string;
+        /**
+         * Maximum depth for population (override plugin default)
+         */
+        customDepth?: number;
+        /**
+         * Fields to ignore during population
+         */
+        customIgnored?: Array<string>;
+    };
+    url: '/consent-categories/{id}';
+};
+
+export type ConsentCategoryGetConsentCategoriesByIdErrors = {
+    /**
+     * Bad request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type ConsentCategoryGetConsentCategoriesByIdResponses = {
+    /**
+     * OK
+     */
+    200: {
+        data: {
+            /**
+             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+             */
+            documentId: string;
+            id: string | number;
+            /**
+             * A UID field
+             */
+            uid: string;
+            /**
+             * A boolean field
+             */
+            required: boolean | null;
+            /**
+             * Timestamp when this entry was first created in the CMS.
+             */
+            createdAt?: string;
+            /**
+             * Timestamp when this entry was last modified.
+             */
+            updatedAt?: string;
+            /**
+             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+             */
+            publishedAt: string;
+            /**
+             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+             */
+            locale?: string;
+            /**
+             * A component field
+             */
+            content: ElementsTextBlockEntry;
+            /**
+             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+             */
+            readonly localizations?: Array<{
+                id: number;
+                /**
+                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                 */
+                documentId: string;
+                /**
+                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                 */
+                locale: string;
+                /**
+                 * Timestamp when this entry was first created in the CMS.
+                 */
+                createdAt?: string;
+                /**
+                 * Timestamp when this entry was last modified.
+                 */
+                updatedAt?: string;
+                /**
+                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                 */
+                publishedAt?: string;
+                [key: string]: unknown | number | string | undefined;
+            }>;
+        };
+        /**
+         * Metadata object containing pagination and other response metadata
+         */
+        meta?: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type ConsentCategoryGetConsentCategoriesByIdResponse = ConsentCategoryGetConsentCategoriesByIdResponses[keyof ConsentCategoryGetConsentCategoriesByIdResponses];
+
+export type ContactUsGetContactUsData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+         */
+        readonly fields?: Array<ItemsEnum6>;
+        /**
+         * Filters to apply to the query
+         */
+        filters?: {
+            [key in PropertyNamesEnum7]?: unknown;
         };
         /**
          * Select a locale
@@ -6552,12 +7799,12 @@ export type ContributorRoleGetContributorRolesData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum6>;
+        readonly fields?: Array<ItemsEnum7>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum6]?: unknown;
+            [key in PropertyNamesEnum8]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -6593,10 +7840,10 @@ export type ContributorRoleGetContributorRolesData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum6 | Array<ItemsEnum6> | {
-            [key in ItemsEnum6]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum7 | Array<ItemsEnum7> | {
+            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum6]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -6731,20 +7978,20 @@ export type ContributorRoleGetContributorRolesByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum6>;
+        readonly fields?: Array<ItemsEnum7>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum6]?: unknown;
+            [key in PropertyNamesEnum8]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum6 | Array<ItemsEnum6> | {
-            [key in ItemsEnum6]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum7 | Array<ItemsEnum7> | {
+            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum6]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -6874,12 +8121,12 @@ export type ContributorGetContributorsData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum7>;
+        readonly fields?: Array<ItemsEnum8>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in PropertyNamesEnum]?: unknown;
+            [key in PropertyNamesEnum9]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -6915,10 +8162,10 @@ export type ContributorGetContributorsData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum7 | Array<ItemsEnum7> | {
-            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum8 | Array<ItemsEnum8> | {
+            [key in ItemsEnum8]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum8]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -7097,20 +8344,20 @@ export type ContributorGetContributorsBySlugData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum7>;
+        readonly fields?: Array<ItemsEnum8>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum7]?: unknown;
+            [key in PropertyNamesEnum9]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum7 | Array<ItemsEnum7> | {
-            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum8 | Array<ItemsEnum8> | {
+            [key in ItemsEnum8]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum8]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -7289,20 +8536,20 @@ export type ContributorGetContributorsByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum7>;
+        readonly fields?: Array<ItemsEnum8>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum7]?: unknown;
+            [key in PropertyNamesEnum9]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum7 | Array<ItemsEnum7> | {
-            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum8 | Array<ItemsEnum8> | {
+            [key in ItemsEnum8]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum7]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum8]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -7469,6 +8716,141 @@ export type ContributorGetContributorsByIdResponses = {
 
 export type ContributorGetContributorsByIdResponse = ContributorGetContributorsByIdResponses[keyof ContributorGetContributorsByIdResponses];
 
+export type CookiePolicyGetCookiePolicyData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+         */
+        readonly fields?: Array<ItemsEnum>;
+        /**
+         * Filters to apply to the query
+         */
+        filters?: {
+            [key in PropertyNamesEnum]?: unknown;
+        };
+        /**
+         * Select a locale
+         */
+        locale?: string;
+        /**
+         * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+         */
+        status?: SchemaEnum;
+        /**
+         * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
+         */
+        customPopulate: string;
+        /**
+         * Maximum depth for population (override plugin default)
+         */
+        customDepth?: number;
+        /**
+         * Fields to ignore during population
+         */
+        customIgnored?: Array<string>;
+    };
+    url: '/cookie-policy';
+};
+
+export type CookiePolicyGetCookiePolicyErrors = {
+    /**
+     * Bad request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type CookiePolicyGetCookiePolicyResponses = {
+    /**
+     * OK
+     */
+    200: {
+        data: {
+            /**
+             * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+             */
+            documentId: string;
+            id: string | number;
+            /**
+             * Timestamp when this entry was first created in the CMS.
+             */
+            createdAt?: string;
+            /**
+             * Timestamp when this entry was last modified.
+             */
+            updatedAt?: string;
+            /**
+             * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+             */
+            publishedAt: string;
+            /**
+             * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+             */
+            locale?: string;
+            /**
+             * A component field
+             */
+            content: ElementsTextBlockEntry;
+            /**
+             * A component field
+             */
+            seoMetadata: ElementsSeoMetadataEntry;
+            /**
+             * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+             */
+            readonly localizations?: Array<{
+                id: number;
+                /**
+                 * The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+                 */
+                documentId: string;
+                /**
+                 * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+                 */
+                locale: string;
+                /**
+                 * Timestamp when this entry was first created in the CMS.
+                 */
+                createdAt?: string;
+                /**
+                 * Timestamp when this entry was last modified.
+                 */
+                updatedAt?: string;
+                /**
+                 * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+                 */
+                publishedAt?: string;
+                [key: string]: unknown | number | string | undefined;
+            }>;
+        };
+        /**
+         * Metadata object containing pagination and other response metadata
+         */
+        meta?: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type CookiePolicyGetCookiePolicyResponse = CookiePolicyGetCookiePolicyResponses[keyof CookiePolicyGetCookiePolicyResponses];
+
 export type CurrencyGetCurrenciesData = {
     body?: never;
     path?: never;
@@ -7476,12 +8858,12 @@ export type CurrencyGetCurrenciesData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum8>;
+        readonly fields?: Array<ItemsEnum9>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum8]?: unknown;
+            [key in PropertyNamesEnum10]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -7517,10 +8899,10 @@ export type CurrencyGetCurrenciesData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum8 | Array<ItemsEnum8> | {
-            [key in ItemsEnum8]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum9 | Array<ItemsEnum9> | {
+            [key in ItemsEnum9]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum8]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum9]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -7680,20 +9062,20 @@ export type CurrencyGetCurrenciesByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum8>;
+        readonly fields?: Array<ItemsEnum9>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum8]?: unknown;
+            [key in PropertyNamesEnum10]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum8 | Array<ItemsEnum8> | {
-            [key in ItemsEnum8]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum9 | Array<ItemsEnum9> | {
+            [key in ItemsEnum9]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum8]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum9]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -7853,7 +9235,7 @@ export type Error404GetError404Data = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum]?: unknown;
+            [key in PropertyNamesEnum]?: unknown;
         };
         /**
          * Select a locale
@@ -7988,7 +9370,7 @@ export type Error410GetError410Data = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum]?: unknown;
+            [key in PropertyNamesEnum]?: unknown;
         };
         /**
          * Select a locale
@@ -8118,12 +9500,12 @@ export type FaqGetFaqData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum9>;
+        readonly fields?: Array<ItemsEnum10>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum9]?: unknown;
+            [key in PropertyNamesEnum11]?: unknown;
         };
         /**
          * Select a locale
@@ -8269,12 +9651,12 @@ export type FeatureFlagGetFeatureFlagsData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum10>;
+        readonly fields?: Array<ItemsEnum11>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum10]?: unknown;
+            [key in ItemsEnum11]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -8310,10 +9692,10 @@ export type FeatureFlagGetFeatureFlagsData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum10 | Array<ItemsEnum10> | {
-            [key in ItemsEnum10]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum11 | Array<ItemsEnum11> | {
+            [key in ItemsEnum11]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum10]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum11]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
@@ -8425,20 +9807,20 @@ export type FeatureFlagGetFeatureFlagsByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum10>;
+        readonly fields?: Array<ItemsEnum11>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum10]?: unknown;
+            [key in ItemsEnum11]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum10 | Array<ItemsEnum10> | {
-            [key in ItemsEnum10]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum11 | Array<ItemsEnum11> | {
+            [key in ItemsEnum11]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum10]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum11]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
@@ -8793,7 +10175,7 @@ export type FooterGetFooterData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum]?: unknown;
+            [key in PropertyNamesEnum]?: unknown;
         };
         /**
          * Select a locale
@@ -8981,7 +10363,7 @@ export type HomepageGetHomepageData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum]?: unknown;
+            [key in PropertyNamesEnum]?: unknown;
         };
         /**
          * Select a locale
@@ -9218,12 +10600,12 @@ export type NavigationGetNavigationData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum11>;
+        readonly fields?: Array<ItemsEnum12>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum11]?: unknown;
+            [key in PropertyNamesEnum12]?: unknown;
         };
         /**
          * Select a locale
@@ -9402,7 +10784,7 @@ export type PrivacyGetPrivacyData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum]?: unknown;
+            [key in PropertyNamesEnum]?: unknown;
         };
         /**
          * Select a locale
@@ -9532,12 +10914,12 @@ export type ProductCategoryGetProductCategoriesData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum12>;
+        readonly fields?: Array<ItemsEnum13>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum12]?: unknown;
+            [key in PropertyNamesEnum13]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -9573,10 +10955,10 @@ export type ProductCategoryGetProductCategoriesData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum12 | Array<ItemsEnum12> | {
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum13 | Array<ItemsEnum13> | {
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -9714,12 +11096,12 @@ export type ProductCategoriesPageGetProductCategoriesPageData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum13>;
+        readonly fields?: Array<ItemsEnum14>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum13]?: unknown;
+            [key in PropertyNamesEnum14]?: unknown;
         };
         /**
          * Select a locale
@@ -9878,20 +11260,20 @@ export type ProductCategoryGetProductCategoriesBySlugData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum12>;
+        readonly fields?: Array<ItemsEnum13>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum12]?: unknown;
+            [key in PropertyNamesEnum13]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum12 | Array<ItemsEnum12> | {
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum13 | Array<ItemsEnum13> | {
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -10034,20 +11416,20 @@ export type ProductCategoryGetProductCategoriesByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum12>;
+        readonly fields?: Array<ItemsEnum13>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum12]?: unknown;
+            [key in PropertyNamesEnum13]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum12 | Array<ItemsEnum12> | {
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum13 | Array<ItemsEnum13> | {
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -10185,12 +11567,12 @@ export type ProductCertificateGetProductCertificatesData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum14>;
+        readonly fields?: Array<ItemsEnum15>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum14]?: unknown;
+            [key in PropertyNamesEnum15]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -10226,10 +11608,10 @@ export type ProductCertificateGetProductCertificatesData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum14 | Array<ItemsEnum14> | {
-            [key in ItemsEnum14]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum15 | Array<ItemsEnum15> | {
+            [key in ItemsEnum15]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum14]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum15]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -10368,20 +11750,20 @@ export type ProductCertificateGetProductCertificatesByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum14>;
+        readonly fields?: Array<ItemsEnum15>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum14]?: unknown;
+            [key in PropertyNamesEnum15]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum14 | Array<ItemsEnum14> | {
-            [key in ItemsEnum14]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum15 | Array<ItemsEnum15> | {
+            [key in ItemsEnum15]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum14]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum15]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -10520,7 +11902,7 @@ export type ProductTagGetProductTagsData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum3]?: unknown;
+            [key in PropertyNamesEnum4]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -10703,7 +12085,7 @@ export type ProductTagGetProductTagsByIdData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum3]?: unknown;
+            [key in PropertyNamesEnum4]?: unknown;
         };
         /**
          * Sort the result
@@ -10845,12 +12227,12 @@ export type ProductGetProductsData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum12>;
+        readonly fields?: Array<ItemsEnum13>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum12]?: unknown;
+            [key in PropertyNamesEnum16]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -10886,10 +12268,10 @@ export type ProductGetProductsData = {
         /**
          * Sort the result
          */
-        sort?: ItemsEnum12 | Array<ItemsEnum12> | {
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum13 | Array<ItemsEnum13> | {
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -11083,20 +12465,20 @@ export type ProductGetProductsBySlugData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum12>;
+        readonly fields?: Array<ItemsEnum13>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum12]?: unknown;
+            [key in PropertyNamesEnum16]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum12 | Array<ItemsEnum12> | {
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum13 | Array<ItemsEnum13> | {
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -11290,20 +12672,20 @@ export type ProductGetProductsByIdData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum12>;
+        readonly fields?: Array<ItemsEnum13>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum12]?: unknown;
+            [key in PropertyNamesEnum16]?: unknown;
         };
         /**
          * Sort the result
          */
-        sort?: ItemsEnum12 | Array<ItemsEnum12> | {
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+        sort?: ItemsEnum13 | Array<ItemsEnum13> | {
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         } | Array<{
-            [key in ItemsEnum12]?: AdditionalPropertiesEnum;
+            [key in ItemsEnum13]?: AdditionalPropertiesEnum;
         }>;
         /**
          * Select a locale
@@ -11492,12 +12874,12 @@ export type ProfileGetProfileData = {
         /**
          * The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
          */
-        readonly fields?: Array<ItemsEnum15>;
+        readonly fields?: Array<ItemsEnum>;
         /**
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum15]?: unknown;
+            [key in PropertyNamesEnum]?: unknown;
         };
         /**
          * Select a locale
@@ -11558,70 +12940,6 @@ export type ProfileGetProfileResponses = {
             documentId: string;
             id: string | number;
             /**
-             * A string field
-             */
-            profileTitle?: string;
-            /**
-             * A string field
-             */
-            editProfileTitle?: string;
-            /**
-             * A string field
-             */
-            wishlistTitle?: string;
-            /**
-             * A text field
-             */
-            wishlistEmptyMessage?: string;
-            /**
-             * A string field
-             */
-            currencyTitle?: string;
-            /**
-             * A text field
-             */
-            currencyDescription?: string;
-            /**
-             * A string field
-             */
-            deleteAccountTitle?: string;
-            /**
-             * A text field
-             */
-            deleteAccountWarning?: string;
-            /**
-             * A string field
-             */
-            saveButton?: string;
-            /**
-             * A string field
-             */
-            cancelButton?: string;
-            /**
-             * A string field
-             */
-            deleteButton?: string;
-            /**
-             * A string field
-             */
-            confirmButton?: string;
-            /**
-             * A string field
-             */
-            logoutButton?: string;
-            /**
-             * A string field
-             */
-            nameLabel?: string;
-            /**
-             * A string field
-             */
-            emailLabel?: string;
-            /**
-             * A string field
-             */
-            passwordLabel?: string;
-            /**
              * Timestamp when this entry was first created in the CMS.
              */
             createdAt?: string;
@@ -11637,6 +12955,82 @@ export type ProfileGetProfileResponses = {
              * The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
              */
             locale?: string;
+            /**
+             * A component field
+             */
+            pageHeader: ElementsHeaderEntry;
+            /**
+             * A component field
+             */
+            accountSettingsHeader: ElementsHeaderEntry;
+            /**
+             * A component field
+             */
+            editProfileButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            wishlistHeader: ElementsHeaderEntry;
+            /**
+             * A component field
+             */
+            wishlistAddButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            wishlistRemoveButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            currencyHeader: ElementsHeaderEntry;
+            /**
+             * A component field
+             */
+            deleteAccountHeader: ElementsHeaderEntry;
+            /**
+             * A component field
+             */
+            deleteButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            cancelButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            confirmButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            saveButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            logoutButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            goBackButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            nameLabel: ElementsLabelEntry;
+            /**
+             * A component field
+             */
+            emailLabel: ElementsLabelEntry;
+            /**
+             * A component field
+             */
+            passwordLabel: ElementsLabelEntry;
+            /**
+             * A component field
+             */
+            cookieSettingsHeader: ElementsHeaderEntry;
+            /**
+             * A component field
+             */
+            exportDataHeader: ElementsHeaderEntry;
             /**
              * A component field
              */
@@ -11722,7 +13116,7 @@ export type TermGetTermData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum]?: unknown;
+            [key in PropertyNamesEnum]?: unknown;
         };
         /**
          * Select a locale
@@ -11857,7 +13251,7 @@ export type ThemeGetThemesData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum16]?: unknown;
+            [key in PropertyNamesEnum17]?: unknown;
         };
         /**
          * Full-text search query across searchable fields. Performs case-insensitive search using database-specific text search capabilities.
@@ -12040,7 +13434,7 @@ export type ThemeGetThemesByIdData = {
          * Filters to apply to the query
          */
         filters?: {
-            [key in ItemsEnum16]?: unknown;
+            [key in PropertyNamesEnum17]?: unknown;
         };
         /**
          * Sort the result

@@ -79,3 +79,16 @@ class IUserPreferencesRepository(ABC):
             bool: True if deleted, False if not found
 
         """
+
+    @abstractmethod
+    async def delete_by_user_id(self, user_id: str) -> int:
+        """
+        Delete all preferences for a user (for account deletion).
+
+        Args:
+            user_id: User identifier.
+
+        Returns:
+            The number of deleted preference records.
+
+        """

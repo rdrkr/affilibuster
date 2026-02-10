@@ -43,7 +43,7 @@ jest.mock('@/app/[lang]/about/AboutClient', () => ({
 
 import AboutPage from '@/app/[lang]/about/page'
 import { getAbout, getTeamMembers } from '@/lib/content'
-import { CodeEnum, CurrencyCode, DirectionEnum } from '@/lib/generated/types.gen'
+import { LanguageCode, CurrencyCode, DirectionEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
 import { render, screen } from '@testing-library/react'
 
@@ -57,7 +57,7 @@ describe('AboutPage', () => {
     // Default languages mock with all required Language properties
     mockGetLanguages.mockResolvedValue([
       {
-        code: CodeEnum.EN,
+        code: LanguageCode.EN,
         direction: DirectionEnum.LTR,
         flag: '🇺🇸',
         displayName: 'English',
@@ -68,7 +68,7 @@ describe('AboutPage', () => {
         isDefault: true,
       },
       {
-        code: CodeEnum.IT,
+        code: LanguageCode.IT,
         direction: DirectionEnum.LTR,
         flag: '🇮🇹',
         displayName: 'Italiano',
@@ -79,7 +79,7 @@ describe('AboutPage', () => {
         isDefault: false,
       },
       {
-        code: CodeEnum.HE,
+        code: LanguageCode.HE,
         direction: DirectionEnum.RTL,
         flag: '🇮🇱',
         displayName: 'עברית',
@@ -99,11 +99,11 @@ describe('AboutPage', () => {
     mockGetAbout.mockResolvedValue(mockAboutData as unknown as Awaited<ReturnType<typeof getAbout>>)
     mockGetTeamMembers.mockResolvedValue(mockTeamMembersData as unknown as Awaited<ReturnType<typeof getTeamMembers>>)
 
-    const Component = await AboutPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+    const Component = await AboutPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
-    expect(mockGetAbout).toHaveBeenCalledWith(CodeEnum.EN)
-    expect(mockGetTeamMembers).toHaveBeenCalledWith(CodeEnum.EN)
+    expect(mockGetAbout).toHaveBeenCalledWith(LanguageCode.EN)
+    expect(mockGetTeamMembers).toHaveBeenCalledWith(LanguageCode.EN)
     expect(screen.getByTestId('about-client')).toBeInTheDocument()
     expect(screen.getByTestId('about-client').getAttribute('data-has-data')).toBe('true')
   })
@@ -112,7 +112,7 @@ describe('AboutPage', () => {
     mockGetAbout.mockResolvedValue(null)
     mockGetTeamMembers.mockResolvedValue([])
 
-    const Component = await AboutPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+    const Component = await AboutPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
     expect(screen.getByTestId('about-client').getAttribute('data-has-data')).toBe('false')
@@ -122,9 +122,9 @@ describe('AboutPage', () => {
     mockGetAbout.mockResolvedValue({ sections: [] } as unknown as Awaited<ReturnType<typeof getAbout>>)
     mockGetTeamMembers.mockResolvedValue([])
 
-    await AboutPage({ params: Promise.resolve({ lang: CodeEnum.IT }) })
+    await AboutPage({ params: Promise.resolve({ lang: LanguageCode.IT }) })
 
-    expect(mockGetAbout).toHaveBeenCalledWith(CodeEnum.IT)
+    expect(mockGetAbout).toHaveBeenCalledWith(LanguageCode.IT)
   })
 
   it('should pass through contributors from API response', async () => {
@@ -141,7 +141,7 @@ describe('AboutPage', () => {
     mockGetAbout.mockResolvedValue(mockAboutData as unknown as Awaited<ReturnType<typeof getAbout>>)
     mockGetTeamMembers.mockResolvedValue(mockTeamMembersData as unknown as Awaited<ReturnType<typeof getTeamMembers>>)
 
-    const Component = await AboutPage({ params: Promise.resolve({ lang: CodeEnum.EN }) })
+    const Component = await AboutPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
     // Should show team members returned by getTeamMembers (filtering happens inside getTeamMembers)
@@ -151,6 +151,6 @@ describe('AboutPage', () => {
     expect(screen.getByText('Team And Author')).toBeInTheDocument()
 
     // Verify getTeamMembers was called with just the locale
-    expect(mockGetTeamMembers).toHaveBeenCalledWith(CodeEnum.EN)
+    expect(mockGetTeamMembers).toHaveBeenCalledWith(LanguageCode.EN)
   })
 })

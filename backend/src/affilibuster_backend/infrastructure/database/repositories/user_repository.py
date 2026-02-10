@@ -6,7 +6,7 @@ UserEntity repository implementation using SQLAlchemy.
 Implements IUserRepository interface with PostgreSQL persistence.
 """
 
-from datetime import UTC
+from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy import delete, select
@@ -107,6 +107,16 @@ class UserRepository(IUserRepository):
             raise ValueError(f"UserEntity with ID {user_id} does not exist")
 
         await self.session.commit()
+
+    async def get_soft_deleted_before(self, cutoff: datetime) -> list[UUID]:
+        """Get IDs of soft-deleted users whose deletion date is before the cutoff."""
+        cutoff_naive = cutoff.replace(tzinfo=None)
+        stmt = select(UserModel.id).where(
+            UserModel.deleted_at.isnot(None),
+            UserModel.deleted_at < cutoff_naive,
+        )
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
 
     async def exists_by_email(self, email: Email) -> bool:
         """Check if a user with the given email exists."""
