@@ -58,8 +58,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          # Note: npm cache disabled because package-lock.json files are not committed
-          # They will be generated during npm install in the build process
 
       - name: Install uv (Python package manager)
         uses: astral-sh/setup-uv@v5
@@ -84,17 +82,13 @@ jobs:
           echo "🔍 Validating required secrets and variables..."
           MISSING_VARS=()
 
-          # Critical configuration that must be defined
+          # Critical configuration that must be defined in GitHub Secrets
           REQUIRED_VARS=(
-            "POSTGRES_USER"
-            "POSTGRES_PASSWORD"
-            "ADMIN_JWT_SECRET"
-            "API_TOKEN_SALT"
-            "API_TOKEN_ENCRYPTION_KEY"
-            "TRANSFER_TOKEN_SALT"
-            "APP_KEYS"
-            "JWT_SECRET"
-            "REVALIDATE_SECRET"
+            "CLOUDINARY_NAME"
+            "CLOUDINARY_KEY"
+            "CLOUDINARY_SECRET"
+            "UPTIME_KUMA_USER"
+            "UPTIME_KUMA_PASS"
           )
 
           for var in "${REQUIRED_VARS[@]}"; do
@@ -108,113 +102,35 @@ jobs:
             printf '  - %s\n' "${MISSING_VARS[@]}"
             echo ""
             echo "Please define these in GitHub repository settings:"
-            echo "Settings → Secrets and variables → Actions"
-            echo "- Secrets: passwords, tokens, JWT secrets"
-            echo "- Variables: usernames, non-sensitive config"
+            echo "Settings → Secrets and variables → Actions → Secrets"
             exit 1
           fi
 
-          echo "✅ All required configuration is defined"
+          echo "✅ All required external secrets are defined"
         env:
-          POSTGRES_USER: ${{ vars.POSTGRES_USER || secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          ADMIN_JWT_SECRET: ${{ secrets.ADMIN_JWT_SECRET }}
-          API_TOKEN_SALT: ${{ secrets.API_TOKEN_SALT }}
-          API_TOKEN_ENCRYPTION_KEY: ${{ secrets.API_TOKEN_ENCRYPTION_KEY }}
-          TRANSFER_TOKEN_SALT: ${{ secrets.TRANSFER_TOKEN_SALT }}
-          APP_KEYS: ${{ secrets.APP_KEYS }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+          CLOUDINARY_NAME: ${{ secrets.CLOUDINARY_NAME }}
+          CLOUDINARY_KEY: ${{ secrets.CLOUDINARY_KEY }}
+          CLOUDINARY_SECRET: ${{ secrets.CLOUDINARY_SECRET }}
+          UPTIME_KUMA_USER: ${{ secrets.UPTIME_KUMA_USER }}
+          UPTIME_KUMA_PASS: ${{ secrets.UPTIME_KUMA_PASS }}
 
       # ========================================
       # 4. Create Environment Configuration
       # ========================================
       - name: Create .env file from secrets and variables
         run: |
-          cat > .env <<EOF
-          # Copyright (c) 2025 Affilibuster by Ronen Druker.
-          # Auto-generated for CI/CD
+          echo "Generating environment configuration..."
 
-          # ======================================
-          # SHARED INFRASTRUCTURE
-          # ======================================
-          POSTGRES_PROTOCOL=${{ vars.POSTGRES_PROTOCOL }}
-          POSTGRES_HOST=${{ vars.POSTGRES_HOST }}
-          INTERNAL_POSTGRES_HOST=${{ vars.INTERNAL_POSTGRES_HOST }}
-          POSTGRES_PORT=${{ vars.POSTGRES_PORT }}
-          POSTGRES_USER=${{ vars.POSTGRES_USER }}
-          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB=${{ vars.POSTGRES_DB }}
-          POSTGRES_SSL=${{ vars.POSTGRES_SSL }}
-          POSTGRES_SSL_REJECT_UNAUTHORIZED=${{ vars.POSTGRES_SSL_REJECT_UNAUTHORIZED }}
-
-          REDIS_PROTOCOL=${{ vars.REDIS_PROTOCOL }}
-          REDIS_HOST=${{ vars.REDIS_HOST }}
-          INTERNAL_REDIS_HOST=${{ vars.INTERNAL_REDIS_HOST }}
-          REDIS_PORT=${{ vars.REDIS_PORT }}
-          REDIS_TTL_PREFERENCES=${{ vars.REDIS_TTL_PREFERENCES }}
-
-          # ======================================
-          # CMS (Strapi 5)
-          # ======================================
-          CMS_PROTOCOL=${{ vars.CMS_PROTOCOL }}
-          CMS_PORT=${{ vars.CMS_PORT }}
-          CMS_HOST=${{ vars.CMS_HOST }}
-          INTERNAL_CMS_HOST=${{ vars.INTERNAL_CMS_HOST }}
-          CMS_URL_PROD=${{ vars.CMS_URL_PROD }}
-          CMS_URL_DEV=${{ vars.CMS_URL_DEV }}
-
-          # SSL Certificate Paths (for Docker HTTPS)
-          SSL_CERT_PATH=${{ vars.SSL_CERT_PATH }}
-          SSL_KEY_PATH=${{ vars.SSL_KEY_PATH }}
-
-          # Cloudinary Configuration (for CMS image uploads)
-          CLOUDINARY_NAME=${{ secrets.CLOUDINARY_NAME }}
-          CLOUDINARY_KEY=${{ secrets.CLOUDINARY_KEY }}
-          CLOUDINARY_SECRET=${{ secrets.CLOUDINARY_SECRET }}
-
-          # Security Keys
-          ADMIN_JWT_SECRET=${{ secrets.ADMIN_JWT_SECRET }}
-          API_TOKEN_SALT=${{ secrets.API_TOKEN_SALT }}
-          API_TOKEN_ENCRYPTION_KEY=${{ secrets.API_TOKEN_ENCRYPTION_KEY }}
-          TRANSFER_TOKEN_SALT=${{ secrets.TRANSFER_TOKEN_SALT }}
-          APP_KEYS=${{ secrets.APP_KEYS }}
-
-          # ======================================
-          # BACKEND (FastAPI)
-          # ======================================
-          APP_ENV=${{ vars.APP_ENV }}
-          DEBUG=${{ vars.DEBUG }}
-          LOG_LEVEL=${{ vars.LOG_LEVEL }}
-
-          BACKEND_PROTOCOL=${{ vars.BACKEND_PROTOCOL }}
-          BACKEND_PORT=${{ vars.BACKEND_PORT }}
-          BACKEND_HOST=${{ vars.BACKEND_HOST }}
-          INTERNAL_BACKEND_HOST=${{ vars.INTERNAL_BACKEND_HOST }}
-          BACKEND_URL_PROD=${{ vars.BACKEND_URL_PROD }}
-          BACKEND_URL_DEV=${{ vars.BACKEND_URL_DEV }}
-
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
-
-          # ======================================
-          # THE_GREEN_BROTHER (Next.js)
-          # ======================================
-          NODE_ENV=${{ vars.NODE_ENV }}
-          NODE_EXTRA_CA_CERTS=${{ vars.NODE_EXTRA_CA_CERTS }}
-          NEXT_TELEMETRY_DISABLED=${{ vars.NEXT_TELEMETRY_DISABLED }}
-
-          THE_GREEN_BROTHER_PROTOCOL=${{ vars.THE_GREEN_BROTHER_PROTOCOL }}
-          THE_GREEN_BROTHER_PORT=${{ vars.THE_GREEN_BROTHER_PORT }}
-          THE_GREEN_BROTHER_HOST=${{ vars.THE_GREEN_BROTHER_HOST }}
-          INTERNAL_THE_GREEN_BROTHER_HOST=${{ vars.INTERNAL_THE_GREEN_BROTHER_HOST }}
-          NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
-          NEXT_SERVER_SIDE_API_URL=${{ vars.NEXT_SERVER_SIDE_API_URL }}
-          NEXT_PUBLIC_CMS_URL=${{ vars.NEXT_PUBLIC_CMS_URL }}
-          PLAYWRIGHT_REPORT_PORT=${{ vars.PLAYWRIGHT_REPORT_PORT }}
-          REVALIDATE_SECRET=${{ secrets.REVALIDATE_SECRET }}
-          NEXT_PUBLIC_GA_ID=
-          NEXT_PUBLIC_GTM_ID=
-          EOF
+          # Generate .env.prod using the script with available secrets
+          # Note: Most vars are internal defaults in the script, so we only pass external secrets
+          bash scripts/generate-env.sh development \
+            -n "${{ secrets.CLOUDINARY_NAME }}" \
+            -k "${{ secrets.CLOUDINARY_KEY }}" \
+            -s "${{ secrets.CLOUDINARY_SECRET }}" \
+            -u "${{ secrets.UPTIME_KUMA_USER }}" \
+            -p "${{ secrets.UPTIME_KUMA_PASS }}" \
+            -g "" \
+            -t ""
 
           echo "✅ .env file created"
 

@@ -398,7 +398,7 @@ All inter-service communication is plain HTTP inside Docker. Caddy terminates SS
 | `.env.prod.example`                 | Production env template                                |
 | `.github/workflows/deploy.yaml`     | CD: SSH deploy, health checks, image prune             |
 | `scripts/setup-vps.sh`              | Server hardening + Docker installation                 |
-| `scripts/generate-env-prod.sh`      | Interactive .env.prod generator with auto secrets      |
+| `scripts/generate-env.sh`           | Interactive .env.prod generator with auto secrets      |
 | `scripts/backup-db.sh`              | Daily pg_dump, 30-day retention                        |
 
 ### Build & Deploy
@@ -410,7 +410,7 @@ All inter-service communication is plain HTTP inside Docker. Caddy terminates SS
 make setup-vps
 
 # 2. Generate production secrets
-make generate-env-prod
+make generate-env
 
 # 3. Build and Start
 make build-prod
@@ -442,6 +442,34 @@ Required GitHub secrets: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_SSH_KNOWN_H
 - **Daily DB backups**: `scripts/backup-db.sh` via cron at 3 AM UTC to Hetzner Cloud Volume (`/mnt/backups/`)
 - **30-day retention** with automatic cleanup
 - **Hetzner server snapshots**: Built-in full server backup
+
+---
+
+## 📊 Monitoring (Uptime Kuma)
+
+Affilibuster uses **Uptime Kuma** for self-hosted monitoring of all services.
+
+- **URL**: `https://uptime.thegreenbrother.com`
+- **Configuration**: Defined in code at `uptime-kuma-monitors.yaml`
+- **Auto-Provisioning**: Monitors are automatically synced on every deployment via `scripts/provision_uptime.py`.
+
+### adding New Monitors
+
+1. Edit `uptime-kuma-monitors.yaml` in the root directory.
+2. Commit and push your changes.
+3. The deployment pipeline will automatically update Uptime Kuma.
+
+### Manual Provisioning
+
+If you need to sync monitors manually without a full deployment:
+
+```bash
+# SSH into VPS
+make ssh
+
+# Run provisioning script
+docker compose -f docker-compose.prod.yaml exec backend /app/.venv/bin/python scripts/provision_uptime.py
+```
 
 ---
 

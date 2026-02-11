@@ -61,11 +61,11 @@ VPS provisioned and fully configured.
 
 ### Automation Files
 
-| File                           | Status | Description                                  |
-| ------------------------------ | ------ | -------------------------------------------- |
-| `scripts/setup-vps.sh`         | Done   | Server hardening + Docker (run on fresh VPS) |
-| `scripts/generate-env-prod.sh` | Done   | Interactive .env.prod generator              |
-| `phase-1-guide.md`             | Done   | Step-by-step guide: Hetzner, secrets         |
+| File                      | Status | Description                                  |
+| ------------------------- | ------ | -------------------------------------------- |
+| `scripts/setup-vps.sh`    | Done   | Server hardening + Docker (run on fresh VPS) |
+| `scripts/generate-env.sh` | Done   | Interactive .env.prod generator              |
+| `phase-1-guide.md`        | Done   | Step-by-step guide: Hetzner, secrets         |
 
 ### Completed Tasks
 

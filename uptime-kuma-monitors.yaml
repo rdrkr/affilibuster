@@ -1,0 +1,54 @@
+# Copyright (c) 2026 Affilibuster by Ronen Druker.
+
+# Uptime Kuma Configuration
+# This file serves as the source of truth for Uptime Kuma monitors.
+
+settings:
+  # General settings (optional, can be expanded)
+  timezone: 'UTC'
+
+notification_groups:
+  - name: 'Dev Team'
+    # In a real scenario, you'd map these to existing ID's or create them if the API supports it.
+    # For this script, we'll assume we just want to ensure monitors are set up.
+    # Uptime Kuma API for notifications is a bit complex to declarative provision without secrets,
+    # so we'll focus on monitors for now and print a reminder to set up notifications manually or via ENV vars if implemented.
+
+monitor_groups:
+  - name: 'Critical Services'
+    monitors:
+      - name: 'TheGreenBrother Frontend'
+        type: 'http'
+        url: 'https://thegreenbrother.com'
+        interval: 60
+        retryInterval: 60
+        maxretries: 1
+        upsideDown: false # Default
+
+      - name: 'Backend API Health'
+        type: 'http'
+        url: 'https://thegreenbrother.com/api/health'
+        interval: 60
+        maxretries: 3
+
+      - name: 'CMS Admin Panel'
+        type: 'http'
+        url: 'https://cms.thegreenbrother.com/admin'
+        interval: 60
+        maxretries: 3
+
+  - name: 'Content Verification'
+    monitors:
+      - name: 'Homepage Keyword'
+        type: 'keyword'
+        url: 'https://thegreenbrother.com'
+        keyword: 'TheGreenBrother'
+        interval: 120
+        maxretries: 2
+
+  - name: 'Internal Infrastructure'
+    monitors:
+      - name: 'Uptime Kuma Health (Self)'
+        type: 'http'
+        url: 'http://uptime-kuma:3001' # Internal Docker URL
+        interval: 60

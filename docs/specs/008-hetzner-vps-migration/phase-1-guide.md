@@ -163,7 +163,7 @@ cd affilibuster
 Run the interactive script to generate `.env.prod`:
 
 ```bash
-./scripts/generate-env-prod.sh
+./scripts/generate-env.sh
 ```
 
 The script will:
@@ -174,7 +174,7 @@ The script will:
 - Create a complete `.env.prod` file
 
 > [!TIP]
-> Run `./scripts/generate-env-prod.sh --help` to see all options.
+> Run `./scripts/generate-env.sh --help` to see all options.
 
 **Alternative: Manual Configuration**
 

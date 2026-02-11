@@ -5,7 +5,7 @@
 NPROCS := $(shell sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4)
 MAKEFLAGS += --output-sync=target
 
-.PHONY: help all all-fast dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-backend-unit test-backend-integration test-the-green-brother test-the-green-brother-unit test-performance test-all-unit test-all-integration test-parallel test-fast test-all audit clean clean-coverage coverage-merge coverage-view playwright-report ci-test install install-backend install-cms setup upgrade upgrade-cms upgrade-backend ps pre-commit export import export-docker import-docker
+.PHONY: help all all-fast dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-backend-unit test-backend-integration test-the-green-brother test-the-green-brother-unit test-performance test-all-unit test-all-integration test-parallel test-fast test-all audit clean clean-coverage coverage-merge coverage-view playwright-report ci-test install install-backend install-cms setup upgrade upgrade-cms upgrade-backend ps pre-commit export import export-docker import-docker generate-env-dev generate-env-prod
 
 # Default target
 .DEFAULT_GOAL := help
@@ -134,8 +134,11 @@ dcp: ## Run generic docker compose production command (e.g. make dcp logs -f)
 setup-vps: ## Setup VPS environment (install Docker, etc.)
 	@bash scripts/setup-vps.sh
 
-generate-env-prod: ## Generate production .env file
-	@bash scripts/generate-env-prod.sh
+generate-env-dev: ## Generate development .env file
+	@bash scripts/generate-env.sh development
+
+generate-env-prod: ## Generate production .env.prod file
+	@bash scripts/generate-env.sh production
 
 build-prod: ## Build production services
 	@$(DCP_CMD) build $(PROD_ARGS)

@@ -32,7 +32,7 @@ services:
         max-size: '10m'
         max-file: '3'
     healthcheck:
-      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:80']
+      test: ['CMD', 'nc', '-z', 'localhost', '80']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -163,9 +163,10 @@ services:
       POSTGRES_HOST: ${INTERNAL_POSTGRES_HOST}
       REDIS_HOST: ${INTERNAL_REDIS_HOST}
       CMS_HOST: ${INTERNAL_CMS_HOST}
-      CMS_PROTOCOL: http # Internal Docker communication is plain HTTP (Caddy handles HTTPS)
     expose:
       - '${BACKEND_PORT}'
+    volumes:
+      - ./uptime-kuma-monitors.yaml:/app/uptime-kuma-monitors.yaml:ro
     deploy:
       resources:
         limits:
@@ -242,6 +243,11 @@ services:
       options:
         max-size: '10m'
         max-file: '3'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3001']
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   caddy_data:
