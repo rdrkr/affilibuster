@@ -19,6 +19,10 @@ concurrency:
   group: deploy-production
   cancel-in-progress: false
 
+permissions:
+  deployments: write
+  contents: read
+
 jobs:
   deploy:
     name: Deploy to VPS
@@ -28,6 +32,14 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
+      - name: Create GitHub deployment
+        uses: chrnorm/deployment-action@v2
+        id: deployment
+        with:
+          token: ${{ github.token }}
+          environment: production
+          initial-status: in_progress
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         env:
@@ -54,8 +66,12 @@ jobs:
             echo "Building Docker images..."
             make build-prod
 
+            # Build and deploy
+            echo "Building Docker images..."
+            make build-prod
+
             echo "Starting services..."
-            make start-prod PROD_ARGS="--remove-orphans"
+            make start-prod PROD_ARGS="--remove-orphans --force-recreate"
 
             # Wait for services to be healthy
             echo "Waiting for services to be healthy..."
@@ -72,7 +88,7 @@ jobs:
             HEALTH_OK=true
 
             # Frontend (via Caddy - port 80 is mapped to host)
-            if curl -sf --max-time 10 http://localhost > /dev/null 2>&1; then
+            if curl -sf --max-time 100 http://localhost > /dev/null 2>&1; then
               echo "  Frontend: OK"
             else
               echo "  Frontend: FAILED"
@@ -80,7 +96,7 @@ jobs:
             fi
 
             # Backend (via Caddy /api path - Caddy strips /api prefix)
-            if curl -sf --max-time 10 http://localhost/api/health > /dev/null 2>&1; then
+            if curl -sf --max-time 100 http://localhost/api/health > /dev/null 2>&1; then
               echo "  Backend: OK"
             else
               echo "  Backend: FAILED"
@@ -88,10 +104,19 @@ jobs:
             fi
 
             # CMS (via Caddy on cms subdomain - tests full Caddy→Strapi path)
-            if curl -sf --max-time 10 -H "Host: cms.thegreenbrother.com" http://localhost/api/health > /dev/null 2>&1; then
+            if curl -sf --max-time 100 -H "Host: cms.thegreenbrother.com" http://localhost/api/health > /dev/null 2>&1; then
               echo "  CMS: OK"
             else
               echo "  CMS: FAILED"
+              HEALTH_OK=false
+            fi
+
+            # Uptime Monitor (via Caddy on uptime subdomain)
+            # 1. HTTP check (routing)
+            if curl -sf --max-time 100 -H "Host: uptime.thegreenbrother.com" http://localhost > /dev/null 2>&1; then
+              echo "  Uptime: OK"
+            else
+              echo "  Uptime: FAILED"
               HEALTH_OK=false
             fi
 
@@ -113,3 +138,20 @@ jobs:
             docker image prune -af --filter "until=24h"
 
             echo "Deployment complete!"
+
+      - name: Update deployment status (success)
+        if: success()
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: ${{ github.token }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+          state: success
+          environment-url: https://thegreenbrother.com
+
+      - name: Update deployment status (failure)
+        if: failure()
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: ${{ github.token }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+          state: failure

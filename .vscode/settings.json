@@ -197,6 +197,7 @@
     "changeprocesscwd",
     "checkmake",
     "choco",
+    "chrnorm",
     "classnames",
     "codegen",
     "Consolas",
