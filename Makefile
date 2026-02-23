@@ -5,7 +5,7 @@
 NPROCS := $(shell sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4)
 MAKEFLAGS += --output-sync=target
 
-.PHONY: help all all-fast dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-backend-unit test-backend-integration test-the-green-brother test-the-green-brother-unit test-performance test-all-unit test-all-integration test-parallel test-fast test-all audit clean clean-coverage coverage-merge coverage-view playwright-report ci-test install install-backend install-cms setup upgrade upgrade-cms upgrade-backend upgrade-pre-commit ps pre-commit export import export-docker import-docker generate-env-dev generate-env-prod backup-prod
+.PHONY: help all all-fast dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-backend-unit test-backend-integration test-the-green-brother test-the-green-brother-unit test-performance test-all-unit test-all-integration test-parallel test-fast test-all audit clean clean-coverage coverage-merge coverage-view playwright-report ci-test install install-backend install-cms setup upgrade upgrade-cms upgrade-backend upgrade-pre-commit ps pre-commit export import export-docker import-docker generate-env-dev generate-env-prod backup-prod build-remote start-remote stop-remote logs-remote dev-remote
 
 # Default target
 .DEFAULT_GOAL := help
@@ -151,6 +151,29 @@ stop-prod: ## Stop production services
 
 logs-prod: ## View production logs
 	@$(DCP_CMD) logs -f $(PROD_ARGS)
+
+# Remote (local frontend against production backend & CMS)
+# Docker Compose command for remote-backend development
+DCR_CMD := docker compose --env-file .env.prod -f docker-compose.remote.yaml
+
+build-remote: ## Build frontend for remote-backend development
+	@$(DCR_CMD) build
+
+start-remote: ## Start frontend against production backend & CMS
+	@echo "🚀 Starting frontend (remote backend mode)..."
+	@$(DCR_CMD) up -d
+	@echo "✅ Frontend running at http://localhost:3000 → production backend"
+
+stop-remote: ## Stop remote-backend frontend
+	@$(DCR_CMD) down
+
+logs-remote: ## View remote-backend frontend logs
+	@$(DCR_CMD) logs -f
+
+dev-remote: ## Start frontend against production backend & CMS (with logs)
+	@echo "🚀 Starting frontend (remote backend mode)..."
+	@$(DCR_CMD) up -d
+	@$(DCR_CMD) logs -f
 
 test-backend-unit: ## Run backend unit tests only
 	@bash scripts/test.sh backend-unit

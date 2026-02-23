@@ -204,7 +204,7 @@ jobs:
       # 9. Telegram Notifications
       # ========================================
       - name: Notify Telegram (success)
-        if: success()
+        if: false # to enable: success()
         env:
           TELEGRAM_TOKEN: ${{ secrets.UPTIME_KUMA_TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.UPTIME_KUMA_TELEGRAM_CHAT_ID }}

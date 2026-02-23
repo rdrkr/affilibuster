@@ -1,0 +1,21 @@
+# Copyright (c) 2026 Affilibuster by Ronen Druker.
+#
+# Local Caddy reverse proxy for remote-backend development.
+# Mirrors the production routing pattern: /api/* → production backend,
+# everything else → local Next.js frontend.
+# This eliminates CORS issues since the browser only talks to localhost.
+# Uses mkcert certificates for HTTPS parity with the dev environment.
+
+https://localhost:{$THE_GREEN_BROTHER_PORT} {
+	tls /certs/localhost.pem /certs/localhost-key.pem
+
+	# Backend API requests: proxy to production (keeps /api prefix, matching prod Caddy)
+	handle /api/* {
+		reverse_proxy https://thegreenbrother.com {
+			header_up Host thegreenbrother.com
+		}
+	}
+
+	# All other requests go to local Next.js frontend
+	reverse_proxy the-green-brother:{$THE_GREEN_BROTHER_PORT}
+}

@@ -15,7 +15,7 @@ info:
     Service APIs (preferences, language detection) are defined here.
   contact:
     name: Affilibuster API Support
-    email: api@thegreenbrother.com
+    email: support@thegreenbrother.com
   license:
     name: Proprietary
     url: https://thegreenbrother.com/license
@@ -23,7 +23,7 @@ info:
 servers:
   - url: http://localhost:8000
     description: Local development server
-  - url: https://api.thegreenbrother.com
+  - url: https://thegreenbrother.com/api
     description: Production server
 
 tags:

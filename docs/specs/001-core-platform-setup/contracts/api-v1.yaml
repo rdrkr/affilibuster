@@ -12,7 +12,7 @@ info:
     email: api@thegreenbrother.com
 
 servers:
-  - url: https://api.thegreenbrother.com/v1
+  - url: https://thegreenbrother.com/api/v1
     description: Production
   - url: http://localhost:8000/v1
     description: Local development

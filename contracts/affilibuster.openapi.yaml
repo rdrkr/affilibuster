@@ -19,12 +19,12 @@ info:
     Service APIs (preferences, language detection) are defined here.
   contact:
     name: Affilibuster API Support
-    email: api@thegreenbrother.com
+    email: support@thegreenbrother.com
   license:
     name: Proprietary
     url: https://thegreenbrother.com/license
 servers:
-  - url: https://api.thegreenbrother.com:8000/v1
+  - url: https://thegreenbrother.com/api/v1
     description: Production Backend
   - url: https://localhost:8000/v1
     description: Development Backend

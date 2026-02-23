@@ -324,9 +324,9 @@ main() {
     INTERNAL_BACKEND_HOST_VAL="backend"
 
     # URLs
-    CMS_URL_PROD_VAL="https://cms.thegreenbrother.com:1337"
+    CMS_URL_PROD_VAL="https://cms.thegreenbrother.com"
     CMS_URL_DEV_VAL="https://localhost:1337"
-    BACKEND_URL_PROD_VAL="https://api.thegreenbrother.com:8000/v1"
+    BACKEND_URL_PROD_VAL="https://thegreenbrother.com/api/v1"
     BACKEND_URL_DEV_VAL="https://localhost:8000/v1"
     NEXT_PUBLIC_API_URL_VAL="https://localhost:8000/v1"
     NEXT_PUBLIC_CMS_URL_VAL="https://localhost:1337"

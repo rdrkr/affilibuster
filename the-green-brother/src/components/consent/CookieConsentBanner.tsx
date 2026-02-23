@@ -82,6 +82,7 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
   const [isClosing, setIsClosing] = useState(false)
+  const [prevIsSettingsOpen, setPrevIsSettingsOpen] = useState(false)
 
   /** Duration of the slide-down exit animation in milliseconds. */
   const CLOSE_ANIMATION_MS = 300
@@ -97,6 +98,7 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
   // Fetch CMS data when banner should be visible
   useEffect(() => {
     if (!shouldShow) return
+    if (consentPage && categories.length > 0) return // Skip fetching if already loaded
 
     const fetchData = async (): Promise<void> => {
       const [pageResult, categoriesResult] = await Promise.all([getConsentPage(lang), getConsentCategories(lang)])
@@ -108,11 +110,9 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
       if (categoriesResult?.data) {
         setCategories(categoriesResult.data)
 
-        // Pre-select required categories (first visit) or saved categories (edit mode)
-        if (isEditMode) {
-          setSelectedCategories(new Set(acceptedCategories))
-          setShowSettings(true)
-        } else {
+        // Pre-select required categories on first visit
+        // Edit mode state is handled synchronously in a separate effect below
+        if (!isEditMode) {
           const requiredUids = new Set(categoriesResult.data.filter(c => c.required).map(c => c.uid))
           setSelectedCategories(requiredUids)
         }
@@ -122,7 +122,16 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
     }
 
     void fetchData()
-  }, [shouldShow, lang, isEditMode, acceptedCategories])
+  }, [shouldShow, lang, isEditMode, consentPage, categories.length])
+
+  // Synchronously set up edit mode state to prevent settings panel pop-in
+  if (isSettingsOpen && !prevIsSettingsOpen && categories.length > 0) {
+    setPrevIsSettingsOpen(true)
+    setShowSettings(true)
+    setSelectedCategories(new Set(acceptedCategories))
+  } else if (!isSettingsOpen && prevIsSettingsOpen) {
+    setPrevIsSettingsOpen(false)
+  }
 
   // Auto-reject when Do Not Track is enabled and user has not yet consented
   useEffect(() => {

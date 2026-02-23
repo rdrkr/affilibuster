@@ -1,0 +1,68 @@
+# Copyright (c) 2026 Affilibuster by Ronen Druker.
+#
+# Remote-backend Docker Compose for local frontend development against production backend & CMS.
+# Runs the-green-brother (Next.js) locally with a Caddy reverse proxy that routes API calls
+# to the live production services — mirroring the production routing pattern exactly.
+# No CORS issues since the browser only talks to localhost.
+#
+# Usage:
+#   make start-remote        # Start frontend against production backend
+#   make stop-remote         # Stop frontend
+#   make logs-remote         # View frontend logs
+#
+# Requires: .env.prod (production environment variables)
+
+services:
+  caddy-remote:
+    image: caddy:2-alpine
+    restart: 'no'
+    ports:
+      - '${THE_GREEN_BROTHER_PORT}:${THE_GREEN_BROTHER_PORT}'
+    volumes:
+      - ./Caddyfile.remote:/etc/caddy/Caddyfile:ro
+      - ./certs:/certs:ro
+    env_file:
+      - .env.prod
+    depends_on:
+      the-green-brother:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'nc', '-z', 'localhost', '${THE_GREEN_BROTHER_PORT}']
+      interval: 5s
+      timeout: 10s
+      retries: 30
+
+  the-green-brother:
+    build:
+      context: ./the-green-brother
+      dockerfile: Dockerfile
+      args:
+        THE_GREEN_BROTHER_PORT: ${THE_GREEN_BROTHER_PORT}
+    restart: 'no'
+    env_file:
+      - .env.prod
+    environment:
+      NODE_ENV: development
+      PORT: ${THE_GREEN_BROTHER_PORT}
+      # HTTP locally; Caddy handles the public-facing side
+      THE_GREEN_BROTHER_PROTOCOL: http
+      THE_GREEN_BROTHER_HOST: localhost
+      # Browser calls go through local Caddy proxy (same origin, no CORS)
+      NEXT_PUBLIC_API_URL: /api/v1
+      NEXT_PUBLIC_CMS_URL: ${CMS_URL_PROD}
+      NEXT_PUBLIC_SITE_URL: 'https://localhost:${THE_GREEN_BROTHER_PORT}'
+      # Server-side calls go directly to production backend
+      NEXT_SERVER_SIDE_API_URL: ${BACKEND_URL_PROD}
+      # No local SSL certs needed
+      NODE_EXTRA_CA_CERTS: ''
+    expose:
+      - '${THE_GREEN_BROTHER_PORT}'
+    volumes:
+      - ./the-green-brother:/app
+      - ./contracts:/contracts
+      - ./data:/data
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:${THE_GREEN_BROTHER_PORT}']
+      interval: 5s
+      timeout: 10s
+      retries: 50

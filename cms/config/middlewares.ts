@@ -22,7 +22,7 @@ export default [
             'res.cloudinary.com',
             'thegreenbrother.com',
             'www.thegreenbrother.com',
-            'affilibuster-production-the-green-brother.onrender.com',
+            'cms.thegreenbrother.com',
           ],
           'media-src': ["'self'", 'data:', 'blob:'],
           upgradeInsecureRequests: null,

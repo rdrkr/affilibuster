@@ -29,7 +29,7 @@
     "@material-symbols/font-400": "^0.40.2",
     "@material-symbols/font-700": "^0.40.2",
     "@playwright/test": "^1.58.2",
-    "@tailwindcss/postcss": "^4.2.0",
+    "@tailwindcss/postcss": "^4.2.1",
     "@tailwindcss/typography": "^0.5.19",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -43,7 +43,7 @@
     "eslint-config-next": "^16.1.6",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-better-tailwindcss": "^4.3.0",
-    "eslint-plugin-jsdoc": "^62.7.0",
+    "eslint-plugin-jsdoc": "^62.7.1",
     "flags": "^4.0.3",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
@@ -65,7 +65,7 @@
     "tailwindcss": "^4.1.18",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.0",
+    "typescript-eslint": "^8.56.1",
     "uuid": "^13.0.0"
   },
   "lint-staged": {

@@ -21,7 +21,8 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 // Configuration
-const BASE_URL = process.env.BASE_URL ?? `https://localhost:${process.env.THE_GREEN_BROTHER_PORT ?? '3000'}`
+const protocol = process.env.THE_GREEN_BROTHER_PROTOCOL ?? 'https'
+const BASE_URL = process.env.BASE_URL ?? `${protocol}://localhost:${process.env.THE_GREEN_BROTHER_PORT ?? '3000'}`
 const LANGUAGES = ['en', 'it', 'he']
 const CONCURRENCY = 5
 const TIMEOUT_MS = 30000

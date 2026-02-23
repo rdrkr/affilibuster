@@ -16965,7 +16965,7 @@ components:
         - id
       additionalProperties: false
 servers:
-  - url: https://cms.thegreenbrother.com:1337
+  - url: https://cms.thegreenbrother.com
     description: Production Strapi CMS
   - url: https://localhost:1337
     description: Development Strapi CMS

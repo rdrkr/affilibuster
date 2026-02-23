@@ -244,7 +244,9 @@ affilibuster/                        # Monorepo root
 │     └── implementation-status.md   # Phase-by-phase progress
 │
 ├── Caddyfile                        # Production reverse proxy (auto SSL, routing, security headers)
-├── docker-compose.yaml              # Local development environment
+├── Caddyfile.remote                 # Local proxy for remote-backend development
+├── docker-compose.yaml              # Local development environment (all services)
+├── docker-compose.remote.yaml       # Remote-backend development (local frontend → prod backend)
 └── docker-compose.prod.yaml         # Production environment (Hetzner VPS)
 ```
 
@@ -390,7 +392,9 @@ All inter-service communication is plain HTTP inside Docker. Caddy terminates SS
 | File                                | Purpose                                                |
 | ----------------------------------- | ------------------------------------------------------ |
 | `docker-compose.prod.yaml`          | Caddy, resource limits, restart policies, log rotation |
+| `docker-compose.remote.yaml`        | Local frontend + Caddy proxy → production backend      |
 | `Caddyfile`                         | Auto SSL, path-based routing, security headers         |
+| `Caddyfile.remote`                  | Local proxy: `/api/*` → prod, rest → local frontend    |
 | `cms/Dockerfile.prod`               | Multi-stage Strapi (node:22-alpine, non-root)          |
 | `backend/Dockerfile.prod`           | Multi-stage FastAPI (python:3.13-slim, non-root)       |
 | `backend/docker-entrypoint.prod.sh` | Wait for PG, alembic migrate, uvicorn                  |
@@ -505,6 +509,36 @@ make logs-the-green-brother       # TheGreenBrother only
 make ps
 make health
 ```
+
+### Remote-Backend Development
+
+Develop the frontend locally while using the **production backend and CMS**. A local Caddy proxy mirrors
+the production routing pattern (`/api/*` → production backend), eliminating CORS issues.
+
+```bash
+# Start frontend against production backend & CMS
+make start-remote
+
+# Start with log tailing
+make dev-remote
+
+# View logs
+make logs-remote
+
+# Stop
+make stop-remote
+
+# Rebuild frontend image
+make build-remote
+```
+
+**How it works**: A local Caddy reverse proxy listens on `localhost:3000` and routes `/api/*` requests to
+`thegreenbrother.com` (production), while all other requests go to the local Next.js dev server with hot reload.
+
+| File                       | Purpose                                        |
+| -------------------------- | ---------------------------------------------- |
+| `docker-compose.remote.yaml` | Frontend + local Caddy proxy                |
+| `Caddyfile.remote`         | Routes `/api/*` to prod, rest to local frontend |
 
 ### Development Workflow
 
