@@ -13,6 +13,7 @@ import {
   IconPositionEnum,
   type ElementsLabelEntry,
   type ElementsTextBlockEntry,
+  type PluginUploadFileDocument,
 } from '@/lib/generated/types.gen'
 import { type ComponentPropsWithoutRef } from 'react'
 import ReactMarkdown, { type Components } from 'react-markdown'
@@ -22,6 +23,7 @@ import remarkGfm from 'remark-gfm'
 import { ButtonLink } from './ButtonLink'
 import { isIconSize } from './common'
 import { Header, type HeaderLevel } from './Header'
+import { Image } from './Image'
 import { Label } from './Label'
 import { ScrollableTableWrapper } from './ScrollableTableWrapper'
 
@@ -116,25 +118,54 @@ function Markdown({ content, direction }: MarkdownProps) {
       const { src, alt, title } = props
       // src can be string or Blob, only use if string
       const safeSrc = typeof src === 'string' ? src : ''
-      // alt is used as the image icon size
-      const iconSize = isIconSize(alt) ? alt : 'xl'
       const safeTitle = title ?? ''
 
-      const labelData: ElementsLabelEntry = {
-        icon: safeSrc.split('/').pop() ?? '',
-        iconPosition: IconPositionEnum.BEFORE_TEXT,
-        text: safeTitle,
-        ariaDescription: safeTitle,
+      // When alt text is a valid icon size (e.g. "xl", "2xl"), treat the image as an
+      // inline icon rendered via Label. Otherwise render as a responsive blog image.
+      if (isIconSize(alt)) {
+        const labelData: ElementsLabelEntry = {
+          icon: safeSrc.split('/').pop() ?? '',
+          iconPosition: IconPositionEnum.BEFORE_TEXT,
+          text: safeTitle,
+          ariaDescription: safeTitle,
+        }
+
+        return (
+          <Label
+            data={labelData}
+            direction={direction}
+            display="inline"
+            className="-mt-1 align-middle"
+            iconClassName={isRTL ? 'ml-2' : 'mr-2'}
+            iconSize={alt}
+          />
+        )
+      }
+
+      if (!safeSrc) return null
+
+      const imageDoc: PluginUploadFileDocument = {
+        documentId: safeSrc,
+        id: safeSrc,
+        name: alt ?? '',
+        hash: '',
+        mime: '',
+        size: 0,
+        url: safeSrc,
+        provider: '',
+        publishedAt: '',
+        ...(alt ? { alternativeText: alt } : {}),
       }
 
       return (
-        <Label
-          data={labelData}
-          direction={direction}
-          display="inline"
-          className="-mt-1 align-middle"
-          iconClassName={isRTL ? 'ml-2' : 'mr-2'}
-          iconSize={iconSize}
+        <Image
+          image={imageDoc}
+          title={safeTitle || undefined}
+          width={1000}
+          height={500}
+          sizes="100vw"
+          style={{ width: '100%', height: 'auto' }}
+          className="rounded-xl"
         />
       )
     },

@@ -49,6 +49,30 @@ jest.mock('@/components/elements/Label', () => ({
   },
 }))
 
+// Mock CmsImage component
+jest.mock('@/components/elements/Image', () => ({
+  __esModule: true,
+  Image: function MockCmsImage(props: {
+    image?: { url?: string; alternativeText?: string }
+    className?: string
+    title?: string
+    style?: React.CSSProperties
+    width?: number
+    height?: number
+    sizes?: string
+  }) {
+    return (
+      <img
+        src={props.image?.url}
+        alt={props.image?.alternativeText}
+        className={props.className}
+        title={props.title}
+        data-testid="mock-cms-image"
+      />
+    )
+  },
+}))
+
 // Mock ScrollableTableWrapper component
 jest.mock('@/components/elements/ScrollableTableWrapper', () => ({
   __esModule: true,
@@ -205,25 +229,61 @@ describe('TextBlock', () => {
       expect(codeElement.tagName).toBe('SPAN')
     })
 
-    it('should render images using custom component', () => {
+    it('should render regular images using CmsImage when alt is not an icon size', () => {
       const dataWithImage = createTextBlockData({
         content: '![Alt text](/image.png "Title")',
       })
       render(<TextBlock data={dataWithImage} direction={DirectionEnum.LTR} />)
-      // The mock renders img elements using the custom component which uses Label
-      // Label with icon renders the icon as text if it's a string, or uses specific icon logic?
-      // TextBlock img renderer: icon: safeSrc.split('/').pop()
-      // So icon should be 'image.png'
 
-      const label = screen.getByText('Title') // Text is title
+      // alt="Alt text" is not a valid icon size, so CmsImage is rendered
+      const img = screen.getByTestId('mock-cms-image')
+      expect(img).toBeInTheDocument()
+      expect(img).toHaveAttribute('src', '/image.png')
+      expect(img).toHaveAttribute('alt', 'Alt text')
+      expect(img).toHaveAttribute('title', 'Title')
+      expect(img).toHaveClass('rounded-xl')
+    })
+
+    it('should render Cloudinary images as regular images', () => {
+      const cloudinaryUrl =
+        'https://res.cloudinary.com/affilibuster/image/upload/v1770653640/blog_zero_waste_kitchens_841d4873b5.webp'
+      const dataWithCloudinaryImage = createTextBlockData({
+        content: `![blog_zero_waste_kitchens.webp](${cloudinaryUrl})`,
+      })
+      render(<TextBlock data={dataWithCloudinaryImage} direction={DirectionEnum.LTR} />)
+
+      // alt="blog_zero_waste_kitchens.webp" is not a valid icon size, so CmsImage is rendered
+      const img = screen.getByTestId('mock-cms-image')
+      expect(img).toBeInTheDocument()
+      expect(img).toHaveAttribute('src', cloudinaryUrl)
+      expect(img).toHaveAttribute('alt', 'blog_zero_waste_kitchens.webp')
+      expect(img).toHaveClass('rounded-xl')
+    })
+
+    it('should render icon images using Label when alt is a valid icon size', () => {
+      const dataWithIconImage = createTextBlockData({
+        content: '![xl](icons/award.svg "Award Icon")',
+      })
+      render(<TextBlock data={dataWithIconImage} direction={DirectionEnum.LTR} />)
+
+      // alt="xl" is a valid icon size, so Label (icon) is rendered
+      const label = screen.getByTestId('mock-label')
       expect(label).toBeInTheDocument()
-      expect(label.tagName).toBe('SPAN')
+      expect(label).toHaveTextContent('Award Icon')
+      // CmsImage should NOT be rendered for icon images
+      expect(screen.queryByTestId('mock-cms-image')).not.toBeInTheDocument()
+    })
 
-      // We can also check aria-label or title if Label supports it in mock
-      // Mock Label: <span data-testid="mock-label">{data?.text}</span>
-      // It only renders text.
-      // But TextBlock passes text: safeTitle.
-      // So checking for 'Title' is correct.
+    it('should not render image when src is empty', () => {
+      const dataWithNoSrc = createTextBlockData({
+        content: '![description]()',
+      })
+      const { container } = render(<TextBlock data={dataWithNoSrc} direction={DirectionEnum.LTR} />)
+
+      // Empty src should not render CmsImage
+      expect(screen.queryByTestId('mock-cms-image')).not.toBeInTheDocument()
+      // No img element in the container either
+      expect(container.querySelector('img')).not.toBeInTheDocument()
     })
   })
 
