@@ -69,6 +69,17 @@
       "repeatable": false,
       "required": true
     },
+    "exitButton": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "elements.button",
+      "repeatable": false,
+      "required": true
+    },
     "settingsButton": {
       "type": "component",
       "pluginOptions": {

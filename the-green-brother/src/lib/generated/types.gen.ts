@@ -1256,6 +1256,10 @@ export type ApiConsentConsentDocument = {
     /**
      * A component field
      */
+    exitButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
     settingsButton: ElementsButtonEntry;
     /**
      * A component field
@@ -4140,6 +4144,10 @@ export type ApiConsentConsentDocumentWritable = {
      * A component field
      */
     rejectAllButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    exitButton: ElementsButtonEntry;
     /**
      * A component field
      */
@@ -7236,6 +7244,10 @@ export type ConsentGetConsentResponses = {
              * A component field
              */
             rejectAllButton: ElementsButtonEntry;
+            /**
+             * A component field
+             */
+            exitButton: ElementsButtonEntry;
             /**
              * A component field
              */

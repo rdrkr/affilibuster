@@ -35,10 +35,10 @@ jest.mock('@/components/elements', () => ({
   },
 }))
 
-// Mock CookieSettingsButton
+// Mock CookieSettingsAction
 jest.mock('@/components/consent', () => ({
-  CookieSettingsButton: function MockCookieSettingsButton({ label }: { label: string }) {
-    return <button data-testid="cookie-settings-button">{label}</button>
+  CookieSettingsAction: function MockCookieSettingsAction({ data }: { data: { label?: { text?: string } } }) {
+    return <button data-testid="cookie-settings-button">{data.label?.text}</button>
   },
 }))
 
@@ -49,7 +49,7 @@ jest.mock('@/lib/content/api', () => ({
 
 import Footer from '@/components/footer/Footer'
 import { getFooter } from '@/lib/content/api'
-import { LanguageCode, DirectionEnum } from '../../../src/lib/generated'
+import { DirectionEnum, LanguageCode } from '../../../src/lib/generated'
 
 const mockGetFooter = getFooter as jest.MockedFunction<typeof getFooter>
 
@@ -411,7 +411,7 @@ describe('Footer', () => {
   })
 
   describe('cookie settings quick link', () => {
-    it('should render CookieSettingsButton for links with #cookie-settings URL', async () => {
+    it('should render CookieSettingsAction for links with #cookie-settings URL', async () => {
       mockGetFooter.mockResolvedValue({
         columns: [],
         copyrightsLabel: { text: '© {year}' },
@@ -428,12 +428,12 @@ describe('Footer', () => {
       expect(screen.getByText('Privacy')).toBeInTheDocument()
       expect(screen.getByText('Privacy').tagName).toBe('A')
 
-      // Cookie Settings should be rendered as CookieSettingsButton (mocked as button)
+      // Cookie Settings should be rendered as CookieSettingsAction (mocked as button)
       expect(screen.getByTestId('cookie-settings-button')).toBeInTheDocument()
       expect(screen.getByTestId('cookie-settings-button').textContent).toBe('Cookie Settings')
     })
 
-    it('should render CookieSettingsButton with empty label when label text is missing', async () => {
+    it('should render CookieSettingsAction with empty label when label text is missing', async () => {
       mockGetFooter.mockResolvedValue({
         columns: [],
         copyrightsLabel: { text: '© {year}' },

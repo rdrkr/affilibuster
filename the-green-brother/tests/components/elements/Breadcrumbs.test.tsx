@@ -4,9 +4,9 @@ import { render, screen } from '@testing-library/react'
 
 import { Breadcrumbs } from '@/components/elements/Breadcrumbs'
 import {
-  LanguageCode,
   DirectionEnum,
   IconPositionEnum,
+  LanguageCode,
   type ApiNavigationNavigationDocument,
 } from '@/lib/generated/types.gen'
 
@@ -243,5 +243,31 @@ describe('Breadcrumbs', () => {
     // When on home page with empty segments, breadcrumbs component should render
     const nav = container.querySelector('nav')
     expect(nav).toBeInTheDocument()
+  })
+  it('should strip markdown formatting from breadcrumb labels', () => {
+    const markdownNavigation = {
+      ...mockNavigation,
+      blogButton: {
+        ...mockNavigation.blogButton,
+        label: {
+          ...mockNavigation.blogButton.label,
+          text: '**Blog**',
+        },
+      },
+    } as ApiNavigationNavigationDocument
+
+    render(
+      <Breadcrumbs
+        navigation={markdownNavigation}
+        pathname="/en/blog"
+        lang={LanguageCode.EN}
+        direction={DirectionEnum.LTR}
+      />
+    )
+
+    // Blog is the last crumb, rendered as text — should strip ** markers
+    const text = screen.getByTestId('text-component')
+    expect(text).toHaveTextContent('Blog')
+    expect(text.textContent).not.toContain('**')
   })
 })

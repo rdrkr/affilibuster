@@ -22,8 +22,27 @@ jest.mock('@/lib/consent', () => ({
 
 // Mock TextBlock component
 jest.mock('@/components/elements', () => ({
-  TextBlock: function MockTextBlock({ data }: { data: { content?: string } }) {
-    return <div data-testid="mock-textblock">{data.content}</div>
+  TextBlock: function MockTextBlock({
+    data,
+    'data-testid': dataTestId,
+  }: {
+    data: { content?: string }
+    'data-testid'?: string
+  }) {
+    return <div data-testid={dataTestId ?? 'mock-textblock'}>{data.content}</div>
+  },
+  ButtonAction: function MockButtonAction({
+    data,
+    onClick,
+  }: {
+    data: { label?: { text?: string; ariaDescription?: string } }
+    onClick: () => void
+  }) {
+    return (
+      <button type="button" onClick={onClick} aria-label={data.label?.ariaDescription}>
+        {data.label?.text}
+      </button>
+    )
   },
 }))
 
@@ -54,6 +73,16 @@ const mockConsentPageData = {
       url: '#',
       openInNewTab: false,
       label: { text: 'Customize', ariaDescription: 'Customize cookies', iconPosition: 'before_text' as const },
+    },
+    exitButton: {
+      url: '#',
+      openInNewTab: false,
+      label: {
+        text: '',
+        icon: 'close',
+        ariaDescription: 'Close cookie settings',
+        iconPosition: 'before_text' as const,
+      },
     },
     doNotTrackNotice: { content: 'Default Do Not Track notice.' },
     saveButton: {
@@ -110,6 +139,7 @@ const defaultUseConsentReturn: consentLib.UseConsentReturn = {
 }
 
 beforeEach(() => {
+  jest.useFakeTimers()
   jest.clearAllMocks()
   mockUseConsent.mockReturnValue({ ...defaultUseConsentReturn })
   mockGetConsentPage.mockResolvedValue(
@@ -118,6 +148,10 @@ beforeEach(() => {
   mockGetConsentCategories.mockResolvedValue(
     mockCategoriesData as unknown as Awaited<ReturnType<typeof consentLib.getConsentCategories>>
   )
+})
+
+afterEach(() => {
+  jest.useRealTimers()
 })
 
 describe('CookieConsentBanner', () => {
@@ -209,6 +243,11 @@ describe('CookieConsentBanner', () => {
 
       fireEvent.click(screen.getByText('Accept All'))
 
+      // Advance past dismissWithAnimation timeout
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
+
       expect(mockAcceptAll).toHaveBeenCalledWith(['necessary', 'analytics', 'marketing'], '2026-01-01T00:00:00Z')
     })
   })
@@ -241,6 +280,11 @@ describe('CookieConsentBanner', () => {
       })
 
       fireEvent.click(screen.getByText('Reject All'))
+
+      // Advance past dismissWithAnimation timeout
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
 
       expect(mockRejectAll).toHaveBeenCalledWith('necessary', '2026-01-01T00:00:00Z')
     })
@@ -343,6 +387,11 @@ describe('CookieConsentBanner', () => {
       // Save
       fireEvent.click(screen.getByText('Save Preferences'))
 
+      // Advance past dismissWithAnimation timeout
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
+
       expect(mockSaveCustom).toHaveBeenCalledWith(['necessary', 'analytics'], '2026-01-01T00:00:00Z')
     })
 
@@ -413,6 +462,11 @@ describe('CookieConsentBanner', () => {
       })
 
       fireEvent.click(screen.getByLabelText('Close cookie settings'))
+
+      // Advance past dismissWithAnimation timeout
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
 
       expect(mockCloseSettings).toHaveBeenCalled()
     })
@@ -516,7 +570,7 @@ describe('CookieConsentBanner', () => {
 
       const closeButton = screen.getByLabelText('Close cookie settings')
       const closeContainer = closeButton.parentElement
-      expect(closeContainer?.className).toContain('justify-start')
+      expect(closeContainer?.className).toContain('left-0')
     })
 
     it('should position close button to the end for LTR direction', async () => {
@@ -533,7 +587,7 @@ describe('CookieConsentBanner', () => {
 
       const closeButton = screen.getByLabelText('Close cookie settings')
       const closeContainer = closeButton.parentElement
-      expect(closeContainer?.className).toContain('justify-end')
+      expect(closeContainer?.className).toContain('right-0')
     })
   })
 
@@ -714,6 +768,11 @@ describe('CookieConsentBanner', () => {
 
       fireEvent.click(screen.getByText('Accept All'))
 
+      // Advance past dismissWithAnimation timeout
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
+
       expect(mockAcceptAll).toHaveBeenCalledWith(expect.any(Array), '2026-01-01T00:00:00Z')
     })
 
@@ -733,6 +792,11 @@ describe('CookieConsentBanner', () => {
       })
 
       fireEvent.click(screen.getByText('Accept All'))
+
+      // Advance past dismissWithAnimation timeout
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
 
       expect(mockAcceptAll).toHaveBeenCalledWith(expect.any(Array), '1.0')
     })

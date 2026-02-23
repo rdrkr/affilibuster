@@ -2,11 +2,10 @@
 
 'use client'
 
-import React, { type ReactNode } from 'react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { ButtonAction, ButtonLink } from '@/components/elements'
-import type { ButtonSize, ButtonVariant, IconSize } from '@/components/elements/common'
+import { frostedGlassStyle, type ButtonSize, type ButtonVariant, type IconSize } from '@/components/elements/common'
 import { useScrollToClose } from '@/hooks/useScrollToClose'
 import { DirectionEnum, type ElementsButtonEntry } from '@/lib/generated/types.gen'
 
@@ -113,11 +112,10 @@ export function Dropdown({
 
       <div
         className={`
-          w-auto origin-top space-y-1 overflow-hidden rounded-xl
-          border border-y border-neutral-200 bg-white/50 p-2.5
-          shadow-lg backdrop-blur-sm
-          sm:origin-(--dropdown-origin-desktop) dark:border-white/10
-        dark:bg-surface-dark/70
+          w-auto origin-top space-y-1 overflow-hidden
+          border-y p-2.5 sm:origin-(--dropdown-origin-desktop)
+          ${frostedGlassStyle}
+          rounded-xl!
           ${width ? 'sm:w-(--dropdown-width)' : 'sm:min-w-40'}
           ${isRTL ? 'text-right' : 'text-left'}
           ${

@@ -1011,6 +1011,13 @@ export interface ApiConsentConsent extends Struct.SingleTypeSchema {
         }
       }> &
       Schema.Attribute.DefaultTo<'Cookies Consent Page'>
+    exitButton: Schema.Attribute.Component<'elements.button', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::consent.consent'>
     publishedAt: Schema.Attribute.DateTime

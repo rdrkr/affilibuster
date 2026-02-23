@@ -13,9 +13,9 @@
  * Supports RTL layouts and configurable gap sizes.
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-
+import { frostedGlassStyle } from '@/components/elements/common'
 import { DirectionEnum } from '@/lib/generated/types.gen'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 /**
  * Gap size options for carousel items
@@ -318,12 +318,11 @@ function HeroCarousel({
       {/* Dot navigation */}
       {itemCount > 1 && (
         <div
-          className="
-            absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 justify-center gap-2 rounded-full
-            border border-neutral-200 bg-white/50
-            p-2 shadow-lg backdrop-blur-sm
-            dark:border-white/10 dark:bg-neutral-800/30
-          "
+          className={`
+            absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 justify-center gap-2 p-2
+            ${frostedGlassStyle}
+            dark:bg-neutral-800/30!
+          `}
           role="tablist"
           aria-label="Carousel navigation"
         >

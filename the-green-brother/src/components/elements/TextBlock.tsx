@@ -21,7 +21,7 @@ import rehypeRaw from 'rehype-raw'
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import remarkGfm from 'remark-gfm'
 import { ButtonLink } from './ButtonLink'
-import { isIconSize } from './common'
+import { isIconSize, type IconSize } from './common'
 import { Header, type HeaderLevel } from './Header'
 import { Image } from './Image'
 import { Label } from './Label'
@@ -205,6 +205,8 @@ export interface TextBlockProps {
   className?: string
   /** Heading level for the title (default: 3) */
   headerLevel?: HeaderLevel
+  /** Icon size for the header (optional, passed to Header component) */
+  headerIconSize?: IconSize
   /** Additional CSS classes for the header text */
   headerClassName?: string
   /** Additional CSS classes for the subheader container */
@@ -221,6 +223,7 @@ export interface TextBlockProps {
  * @param props.visible - Controls entire block visibility (false = hidden from layout)
  * @param props.className - Additional CSS classes
  * @param props.headerLevel - Heading level
+ * @param props.headerIconSize - Icon size for the header
  * @param props.headerClassName - Header text classes
  * @param props.subheaderClassName - Subheader container classes
  * @param props.subheaderTextClassName - Subheader text classes
@@ -232,6 +235,7 @@ export function TextBlock({
   visible,
   className = '',
   headerLevel = 3,
+  headerIconSize = 'lg',
   headerClassName,
   subheaderClassName = '',
   subheaderTextClassName,
@@ -341,6 +345,7 @@ export function TextBlock({
           data={header}
           level={headerLevel}
           direction={direction}
+          headerIconSize={headerIconSize}
           headerClassName={finalHeaderClassName}
           subheaderClassName={finalSubheaderClassName}
           subheaderTextClassName={safeSubheaderTextClassName}

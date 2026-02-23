@@ -2,10 +2,10 @@
 
 'use client'
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-
 import { ButtonAction } from '@/components/elements/ButtonAction'
+import { frostedGlassStyle } from '@/components/elements/common'
 import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import type { Tab } from './tabbed-view-types'
 
@@ -217,10 +217,10 @@ export function ContainerTabBar<T = unknown>({ tabs, activeKey, onTabChange, dir
         {/* Sliding pill indicator – Navigation frosted glass style */}
         <div
           className={`
-            absolute inset-y-0 my-auto h-[calc(100%-4px)] rounded-full
-            border border-neutral-200 bg-white/50 shadow-lg backdrop-blur-sm
+            absolute inset-y-0 my-auto h-[calc(100%-4px)]
             transition-all duration-300 ease-in-out
-            dark:border-white/10 dark:bg-white/10
+            ${frostedGlassStyle}
+            dark:bg-white/10!
           `}
           style={{
             transform: `translateX(${String(pillPosition.left)}px)`,

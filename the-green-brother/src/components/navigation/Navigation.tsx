@@ -12,6 +12,7 @@
 
 import { useCallback } from 'react'
 
+import { frostedGlassStyle } from '@/components/elements/common'
 import type { ApiNavigationNavigationDocument } from '@/lib/generated/types.gen'
 import { DirectionEnum, type Language } from '@/lib/generated/types.gen'
 import { useNavigationResize } from '@/lib/navigation'
@@ -79,14 +80,7 @@ export function Navigation({
     >
       <nav ref={navRef} className={`relative p-2`} aria-label="Main navigation">
         {/* Background layer with blur effect */}
-        <div
-          className={`
-            absolute inset-0 rounded-full border
-            border-neutral-200 bg-white/50 shadow-lg backdrop-blur-sm
-            dark:border-white/10 dark:bg-surface-dark/70
-          `}
-          aria-hidden="true"
-        />
+        <div className={`absolute inset-0 ${frostedGlassStyle}`} aria-hidden="true" />
 
         <div
           className={`relative z-20 grid h-12 grid-cols-1 items-center transition-opacity duration-200 ${

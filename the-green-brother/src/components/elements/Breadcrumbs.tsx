@@ -6,8 +6,8 @@ import {
   DirectionEnum,
   IconPositionEnum,
   type ApiNavigationNavigationDocument,
-  type LanguageCode,
   type ElementsButtonEntry,
+  type LanguageCode,
 } from '@/lib/generated/types.gen'
 
 import { ButtonLink } from './ButtonLink'
@@ -74,6 +74,22 @@ export function Breadcrumbs({
     }
   }
 
+  /**
+   * Strip markdown formatting from a string.
+   * Removes bold, italic, strikethrough, and inline code markers.
+   * @param text - Text that may contain markdown formatting
+   * @returns Plain text with markdown markers removed
+   */
+  const stripMarkdown = (text: string): string => {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, '$1') // bold **text**
+      .replace(/__(.+?)__/g, '$1') // bold __text__
+      .replace(/\*(.+?)\*/g, '$1') // italic *text*
+      .replace(/_(.+?)_/g, '$1') // italic _text_
+      .replace(/~~(.+?)~~/g, '$1') // strikethrough ~~text~~
+      .replace(/`(.+?)`/g, '$1') // inline code `text`
+  }
+
   // Helper to format segment label for fallback
   const formatLabel = (segment: string) => {
     return segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ')
@@ -131,13 +147,21 @@ export function Breadcrumbs({
           url: crumb.href,
         }
 
-        const labelText = buttonData.label?.text ?? formatLabel(crumb.segment)
+        const labelText = stripMarkdown(buttonData.label?.text ?? formatLabel(crumb.segment))
 
         return (
           <div key={crumb.href} className="flex items-center">
             {crumb.isLast ? (
               <span className="truncate font-medium text-neutral-800 dark:text-white">
-                {isLastAndCustom ? customLastCrumbLabel : <Text text={labelText} />}
+                {isLastAndCustom ? (
+                  typeof customLastCrumbLabel === 'string' ? (
+                    <Text text={stripMarkdown(customLastCrumbLabel)} />
+                  ) : (
+                    customLastCrumbLabel
+                  )
+                ) : (
+                  <Text text={labelText} />
+                )}
               </span>
             ) : (
               <>

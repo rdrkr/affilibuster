@@ -1161,6 +1161,10 @@ class ApiConsentConsentDocument(BaseModel):
     """
     A component field
     """
+    exit_button: ElementsButtonEntry = Field(..., alias="exitButton")
+    """
+    A component field
+    """
     settings_button: ElementsButtonEntry = Field(..., alias="settingsButton")
     """
     A component field
@@ -3869,6 +3873,10 @@ class Data6(BaseModel):
     A component field
     """
     reject_all_button: ElementsButtonEntry = Field(..., alias="rejectAllButton")
+    """
+    A component field
+    """
+    exit_button: ElementsButtonEntry = Field(..., alias="exitButton")
     """
     A component field
     """

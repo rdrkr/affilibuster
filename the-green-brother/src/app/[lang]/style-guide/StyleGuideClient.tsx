@@ -5,7 +5,7 @@
 import React from 'react'
 
 import { BlogCard } from '@/components/blog'
-import CookieSettingsButton from '@/components/consent/CookieSettingsButton'
+
 import { NewsletterSignupCTA } from '@/components/call-to-actions'
 import { ButtonAction, ButtonLink, Header, Icon, Image, Label, Text, TextBlock } from '@/components/elements'
 import { ContributorCard } from '@/components/elements/ContributorCard'
@@ -19,9 +19,9 @@ import {
   type ApiBlogPostBlogPostDocument,
   type ApiContributorContributorDocument,
   type ApiProductProductDocument,
-  LanguageCode,
   type ElementsHeaderEntry,
   IconPositionEnum,
+  LanguageCode,
   VariantEnum,
 } from '@/lib/generated/types.gen'
 
@@ -2309,39 +2309,6 @@ export default function StyleGuideClient(): React.ReactElement {
           </div>
 
           <div className="space-y-8">
-            {/* CookieSettingsButton */}
-            <div>
-              <h3 className="mb-4 text-2xl font-semibold text-white">CookieSettingsButton</h3>
-              <p className="mb-4 text-text-secondary-dark">
-                A button that opens the cookie consent banner in edit mode, allowing users to modify their cookie
-                preferences (GDPR Art. 7(3)). Dispatches a custom DOM event that the CookieConsentBanner listens for.
-              </p>
-              <div className="rounded-xl border border-white/10 bg-background-dark p-6">
-                <CookieSettingsButton label="Cookie Settings" />
-              </div>
-              <pre className="mt-4 overflow-x-auto rounded-lg bg-background-dark p-4 text-sm text-text-secondary-dark">
-                {'<CookieSettingsButton label="Cookie Settings" />'}
-              </pre>
-            </div>
-
-            {/* ConsentGate */}
-            <div>
-              <h3 className="mb-4 text-2xl font-semibold text-white">ConsentGate</h3>
-              <p className="mb-4 text-text-secondary-dark">
-                Conditionally renders children based on whether the user has accepted a specific consent category. Used
-                to gate tracking scripts (analytics, marketing) behind explicit user consent.
-              </p>
-              <div className="rounded-xl border border-white/10 bg-background-dark p-6">
-                <p className="text-text-secondary-dark">
-                  ConsentGate renders its children only when the specified consent category is accepted. In this style
-                  guide context, no consent cookie exists so gated content is hidden.
-                </p>
-              </div>
-              <pre className="mt-4 overflow-x-auto rounded-lg bg-background-dark p-4 text-sm text-text-secondary-dark">
-                {'<ConsentGate category="analytics">\n  <AnalyticsScript />\n</ConsentGate>'}
-              </pre>
-            </div>
-
             {/* CookieConsentBanner note */}
             <div>
               <h3 className="mb-4 text-2xl font-semibold text-white">CookieConsentBanner</h3>

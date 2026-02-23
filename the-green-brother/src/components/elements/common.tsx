@@ -47,6 +47,14 @@ export function isIconSize(value: unknown): value is IconSize {
 }
 
 /**
+ * Frosted glass style for backgrounds
+ */
+export const frostedGlassStyle = `
+  border rounded-full! border-neutral-200 bg-white/50 shadow-lg backdrop-blur-sm
+  dark:border-white/10 dark:bg-surface-dark/70
+`
+
+/**
  * Get CSS classes for button variant
  * @param variant - Button variant
  * @param isActive - Whether the button is currently active
@@ -157,13 +165,11 @@ export function getVariantClasses(
     `,
     'scroll-arrow': `
       cursor-pointer
-      rounded-full! border
-      border-neutral-200 bg-white/50
-      shadow-lg backdrop-blur-sm
       transition-opacity duration-300 ease-in-out
       hover:bg-white/70 active:bg-white/90
-      dark:border-white/10 dark:bg-neutral-800/30
       dark:hover:bg-neutral-800/50 dark:active:bg-neutral-800/70
+      ${frostedGlassStyle}
+      dark:bg-neutral-800/30!
     `,
   }
   return variants[variant]

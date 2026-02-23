@@ -10,7 +10,7 @@
 
 import type { ReactNode } from 'react'
 
-import { CookieSettingsButton } from '@/components/consent'
+import { CookieSettingsAction } from '@/components/consent'
 import { ButtonLink, Label, Text, TextBlock } from '@/components/elements'
 import { DynamicZone } from '@/components/layout/DynamicZone'
 import { getFooter } from '@/lib/content/api'
@@ -123,7 +123,7 @@ export default async function Footer({ lang, direction }: FooterProps) {
         >
           {quickLinks.map((link, index) =>
             link.url === COOKIE_SETTINGS_URL ? (
-              <CookieSettingsButton key={link.id ?? index} label={link.label?.text ?? ''} />
+              <CookieSettingsAction key={link.id ?? index} data={link} direction={direction} />
             ) : (
               <ButtonLink key={link.id ?? index} data={link} variant="link-2" size="xs" direction={direction} />
             )

@@ -16,9 +16,8 @@
  * with previously saved category preferences pre-filled.
  */
 
-import { useCallback, useEffect, useState } from 'react'
-
-import { TextBlock } from '@/components/elements'
+import { ButtonAction, TextBlock } from '@/components/elements'
+import { frostedGlassStyle } from '@/components/elements/common'
 import { getConsentCategories, getConsentPage, useConsent } from '@/lib/consent'
 import type {
   ConsentCategoryGetConsentCategoriesResponses,
@@ -26,6 +25,7 @@ import type {
   ElementsTextBlockEntry,
 } from '@/lib/generated/types.gen'
 import { DirectionEnum } from '@/lib/generated/types.gen'
+import { useCallback, useEffect, useState } from 'react'
 
 /** Props for the CookieConsentBanner component. */
 interface CookieConsentBannerProps {
@@ -81,6 +81,10 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
   const [showSettings, setShowSettings] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
+  const [isClosing, setIsClosing] = useState(false)
+
+  /** Duration of the slide-down exit animation in milliseconds. */
+  const CLOSE_ANIMATION_MS = 300
 
   /** Whether the banner is displayed in edit mode (user re-opening to change preferences). */
   const isEditMode = hasConsented && isSettingsOpen
@@ -137,18 +141,39 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
   const requiredCategory = categories.find(c => c.required)
   const requiredCategoryUid = requiredCategory?.uid
 
+  /**
+   * Plays the slide-down exit animation, then executes the dismiss action.
+   * @param action - The callback to run after the animation completes
+   */
+  const dismissWithAnimation = useCallback(
+    (action: () => void) => {
+      setIsClosing(true)
+      setTimeout(() => {
+        action()
+        setIsClosing(false)
+      }, CLOSE_ANIMATION_MS)
+    },
+    [CLOSE_ANIMATION_MS]
+  )
+
   const handleAcceptAll = useCallback(() => {
-    acceptAll(allCategoryUids, consentVersion)
-  }, [acceptAll, allCategoryUids, consentVersion])
+    dismissWithAnimation(() => {
+      acceptAll(allCategoryUids, consentVersion)
+    })
+  }, [dismissWithAnimation, acceptAll, allCategoryUids, consentVersion])
 
   const handleRejectAll = useCallback(() => {
     if (!requiredCategoryUid) return
-    rejectAll(requiredCategoryUid, consentVersion)
-  }, [rejectAll, requiredCategoryUid, consentVersion])
+    dismissWithAnimation(() => {
+      rejectAll(requiredCategoryUid, consentVersion)
+    })
+  }, [dismissWithAnimation, rejectAll, requiredCategoryUid, consentVersion])
 
   const handleSaveCustom = useCallback(() => {
-    saveCustom(Array.from(selectedCategories), consentVersion)
-  }, [saveCustom, selectedCategories, consentVersion])
+    dismissWithAnimation(() => {
+      saveCustom(Array.from(selectedCategories), consentVersion)
+    })
+  }, [dismissWithAnimation, saveCustom, selectedCategories, consentVersion])
 
   const handleToggleSettings = useCallback(() => {
     setShowSettings(prev => !prev)
@@ -168,9 +193,11 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
   }, [])
 
   const handleClose = useCallback(() => {
-    closeSettings()
-    setShowSettings(false)
-  }, [closeSettings])
+    dismissWithAnimation(() => {
+      closeSettings()
+      setShowSettings(false)
+    })
+  }, [dismissWithAnimation, closeSettings])
 
   // Don't render if no required category found in CMS data (misconfiguration)
   if (!isLoading && categories.length > 0 && !categories.find(c => c.required)) return null
@@ -183,76 +210,94 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
       role="dialog"
       aria-label="Cookie consent"
       dir={isRTL ? 'rtl' : 'ltr'}
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-tertiary-700 bg-surface-dark p-4 shadow-lg sm:p-6"
+      className={`fixed inset-x-4 bottom-4 z-50 mx-auto max-w-7xl p-4 sm:inset-x-6 sm:p-6
+        ${frostedGlassStyle}
+        rounded-xl! bg-white/80! dark:bg-surface-dark/80!
+        ${isClosing ? 'animate-[slideDownOut_0.3s_ease-in_forwards]' : 'animate-[slideUp_0.3s_ease-out_forwards]'}
+      `}
     >
-      <div className="mx-auto max-w-7xl">
-        {/* Close button for edit mode */}
+      <div className="relative">
+        {/* Close button for edit mode — positioned at top corner */}
         {isEditMode && (
-          <div className={`mb-2 flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
-            <button
+          <div className={`absolute top-0 ${isRTL ? 'left-0' : 'right-0'}`}>
+            <ButtonAction
+              data={consentPage.exitButton}
+              direction={direction}
+              variant="ghost-2"
+              iconSize="sm"
+              size="sm"
               onClick={handleClose}
-              aria-label="Close cookie settings"
-              className="rounded-full p-1 text-text-secondary-dark transition-colors hover:text-text-main-dark focus:ring-2 focus:ring-focus-ring focus:outline-none"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="size-5" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
+              showText={false}
+            />
           </div>
         )}
 
         {/* Banner content */}
-        <div className="mb-4">
-          <TextBlock data={asTextBlock(consentPage.consentInformation)} direction={direction} />
-        </div>
+        <TextBlock
+          data={asTextBlock(consentPage.consentInformation)}
+          headerLevel={3}
+          headerIconSize="xl"
+          direction={direction}
+          className="mb-4"
+        />
 
         {/* Do Not Track indicator */}
         {isDoNotTrackEnabled && (
-          <div className="mb-4" data-testid="dnt-notice">
-            <TextBlock data={asTextBlock(consentPage.doNotTrackNotice)} direction={direction} />
-          </div>
+          <TextBlock
+            data={asTextBlock(consentPage.doNotTrackNotice)}
+            headerLevel={4}
+            direction={direction}
+            className="mb-4"
+            data-testid="dnt-notice"
+          />
         )}
 
         {/* Action buttons */}
         <div className={`flex flex-wrap gap-3 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
-          <button
+          <ButtonAction
+            data={consentPage.acceptAllButton}
+            direction={direction}
+            variant="primary"
+            size="sm"
             onClick={handleAcceptAll}
-            className="rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-background-dark transition-colors hover:bg-primary-hover focus:ring-2 focus:ring-focus-ring focus:outline-none"
-          >
-            {consentPage.acceptAllButton.label?.text}
-          </button>
+          />
 
-          <button
+          <ButtonAction
+            data={consentPage.rejectAllButton}
+            direction={direction}
+            variant="outline"
+            size="sm"
             onClick={handleRejectAll}
-            className="rounded-lg border border-tertiary-500 bg-transparent px-6 py-2.5 text-sm font-semibold text-text-main-dark transition-colors hover:border-tertiary-300 hover:bg-subtle-dark focus:ring-2 focus:ring-focus-ring focus:outline-none"
-          >
-            {consentPage.rejectAllButton.label?.text}
-          </button>
+          />
 
           {!isEditMode && (
-            <button
+            <ButtonAction
+              data={consentPage.settingsButton}
+              direction={direction}
+              variant="link-2"
+              size="sm"
               onClick={handleToggleSettings}
-              className="rounded-lg px-6 py-2.5 text-sm font-semibold text-text-secondary-dark underline-offset-2 transition-colors hover:text-text-main-dark hover:underline focus:ring-2 focus:ring-focus-ring focus:outline-none"
-            >
-              {consentPage.settingsButton.label?.text}
-            </button>
+            />
           )}
         </div>
 
         {/* Settings panel */}
         {showSettings && (
-          <div className="mt-4 rounded-lg border border-tertiary-700 bg-background-dark p-4">
+          <div
+            className={`
+              mt-4 rounded-xl border
+              border-neutral-200
+              p-8 shadow-lg
+              dark:border-white/5 dark:shadow-none
+            `}
+          >
             <div className="space-y-3">
               {categories.map(category => (
                 <label
                   key={category.documentId}
                   className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}
                 >
-                  <div className="pt-0.5">
+                  <div className="pt-1">
                     <input
                       type="checkbox"
                       checked={selectedCategories.has(category.uid)}
@@ -260,23 +305,25 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
                       onChange={() => {
                         handleCategoryToggle(category.uid, category.required)
                       }}
-                      className="size-4 cursor-pointer rounded-sm border-tertiary-500 accent-primary disabled:cursor-not-allowed disabled:opacity-60"
+                      className="size-4 cursor-pointer rounded-full border-tertiary-500 accent-primary disabled:cursor-not-allowed disabled:opacity-60"
                     />
                   </div>
+
                   <div className="min-w-0 flex-1">
-                    <TextBlock data={asTextBlock(category.content)} direction={direction} />
+                    <TextBlock data={asTextBlock(category.content)} direction={direction} headerLevel={4} />
                   </div>
                 </label>
               ))}
             </div>
 
             <div className={`mt-4 flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
-              <button
+              <ButtonAction
+                data={consentPage.saveButton}
+                direction={direction}
+                variant="primary"
+                size="sm"
                 onClick={handleSaveCustom}
-                className="rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-background-dark transition-colors hover:bg-primary-hover focus:ring-2 focus:ring-focus-ring focus:outline-none"
-              >
-                {consentPage.saveButton.label?.text}
-              </button>
+              />
             </div>
           </div>
         )}

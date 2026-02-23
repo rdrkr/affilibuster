@@ -2527,6 +2527,9 @@ paths:
                       rejectAllButton:
                         description: A component field
                         $ref: '#/components/schemas/ElementsButtonEntry'
+                      exitButton:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsButtonEntry'
                       settingsButton:
                         description: A component field
                         $ref: '#/components/schemas/ElementsButtonEntry'
@@ -2578,6 +2581,7 @@ paths:
                       - consentInformation
                       - acceptAllButton
                       - rejectAllButton
+                      - exitButton
                       - settingsButton
                       - saveButton
                       - doNotTrackNotice
@@ -14076,6 +14080,9 @@ components:
         rejectAllButton:
           description: A component field
           $ref: '#/components/schemas/ElementsButtonEntry'
+        exitButton:
+          description: A component field
+          $ref: '#/components/schemas/ElementsButtonEntry'
         settingsButton:
           description: A component field
           $ref: '#/components/schemas/ElementsButtonEntry'
@@ -14127,6 +14134,7 @@ components:
         - consentInformation
         - acceptAllButton
         - rejectAllButton
+        - exitButton
         - settingsButton
         - saveButton
         - doNotTrackNotice
