@@ -16,6 +16,10 @@
 
 set -euo pipefail
 
+# Ensure tools installed in user-local bin are available
+# (non-interactive SSH sessions don't source .bashrc/.profile)
+export PATH="${HOME}/.local/bin:${PATH}"
+
 # Configuration
 PROJECT_DIR="/home/deploy/affilibuster"
 ENV_FILE="${PROJECT_DIR}/.env.prod"
