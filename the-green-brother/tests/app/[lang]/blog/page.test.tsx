@@ -4,6 +4,12 @@
  * Unit tests for blog page server component
  */
 
+// Mock draft mode
+const mockDraftMode = jest.fn().mockResolvedValue({ isEnabled: false })
+jest.mock('next/headers', () => ({
+  draftMode: (...args: unknown[]) => mockDraftMode(...args),
+}))
+
 // Mock the client module
 jest.mock('@/lib/content', () => ({
   getBlog: jest.fn(),
@@ -36,7 +42,7 @@ jest.mock('@/app/[lang]/blog/BlogClient', () => ({
 
 import BlogPage from '@/app/[lang]/blog/page'
 import { getBlog, getBlogPosts } from '@/lib/content'
-import { LanguageCode, DirectionEnum } from '@/lib/generated/types.gen'
+import { LanguageCode, DirectionEnum, SchemaEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
 import { render, screen } from '@testing-library/react'
 
@@ -47,6 +53,7 @@ const mockGetLanguages = getLanguages as jest.MockedFunction<typeof getLanguages
 describe('BlogPage', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDraftMode.mockResolvedValue({ isEnabled: false })
     mockGetLanguages.mockResolvedValue([
       { code: LanguageCode.EN, direction: DirectionEnum.LTR },
       { code: LanguageCode.IT, direction: DirectionEnum.LTR },
@@ -63,7 +70,7 @@ describe('BlogPage', () => {
     const Component = await BlogPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
-    expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.EN)
+    expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.EN, {})
     expect(mockGetBlogPosts).toHaveBeenCalledWith({
       pagination: { page: 1, pageSize: 100 },
       locale: LanguageCode.EN,
@@ -80,5 +87,25 @@ describe('BlogPage', () => {
     render(Component)
 
     expect(screen.getByTestId('blog-client').getAttribute('data-post-count')).toBe('0')
+  })
+
+  it('should pass draft status when draft mode is enabled', async () => {
+    mockDraftMode.mockResolvedValue({ isEnabled: true })
+
+    const mockBlogData = { header: { header: { text: 'Blog' } } }
+    const mockPosts = { data: [], meta: {} }
+
+    mockGetBlog.mockResolvedValue(mockBlogData as Awaited<ReturnType<typeof getBlog>>)
+    mockGetBlogPosts.mockResolvedValue(mockPosts as Awaited<ReturnType<typeof getBlogPosts>>)
+
+    const Component = await BlogPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+    render(Component)
+
+    expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
+    expect(mockGetBlogPosts).toHaveBeenCalledWith({
+      pagination: { page: 1, pageSize: 100 },
+      locale: LanguageCode.EN,
+      status: SchemaEnum.DRAFT,
+    })
   })
 })

@@ -4,23 +4,20 @@
  * Unit tests for CookiePolicyPage server component
  */
 
-import { render, screen } from '@testing-library/react'
-
-import CookiePolicyPage from '@/app/[lang]/cookie-policy/page'
-import { getCookiePolicy } from '@/lib/content'
-import type { ApiCookiePolicyCookiePolicyDocument } from '@/lib/generated/types.gen'
-import { LanguageCode } from '@/lib/generated/types.gen'
+// Mock draft mode
+const mockDraftMode = jest.fn().mockResolvedValue({ isEnabled: false })
+jest.mock('next/headers', () => ({
+  draftMode: (...args: unknown[]) => mockDraftMode(...args),
+}))
 
 // Mock the client module
 jest.mock('@/lib/content', () => ({
   getCookiePolicy: jest.fn(),
 }))
 
-const mockGetCookiePolicy = getCookiePolicy as jest.MockedFunction<typeof getCookiePolicy>
-
 // Mock CookiePolicyClient
 jest.mock('@/app/[lang]/cookie-policy/CookiePolicyClient', () => {
-  return function MockCookiePolicyClient({ data }: { data: ApiCookiePolicyCookiePolicyDocument | null }) {
+  return function MockCookiePolicyClient({ data }: { data: unknown }) {
     return (
       <div data-testid="cookie-policy-client" data-has-data={!!data}>
         CookiePolicyClient
@@ -28,6 +25,14 @@ jest.mock('@/app/[lang]/cookie-policy/CookiePolicyClient', () => {
     )
   }
 })
+
+import { render, screen } from '@testing-library/react'
+
+import CookiePolicyPage from '@/app/[lang]/cookie-policy/page'
+import { getCookiePolicy } from '@/lib/content'
+import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
+
+const mockGetCookiePolicy = getCookiePolicy as jest.MockedFunction<typeof getCookiePolicy>
 
 describe('CookiePolicyPage', () => {
   const mockCookiePolicyData = {
@@ -42,6 +47,7 @@ describe('CookiePolicyPage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDraftMode.mockResolvedValue({ isEnabled: false })
     mockGetCookiePolicy.mockResolvedValue(mockCookiePolicyData)
   })
 
@@ -50,7 +56,7 @@ describe('CookiePolicyPage', () => {
     const ui = await CookiePolicyPage({ params })
     render(ui)
 
-    expect(mockGetCookiePolicy).toHaveBeenCalledWith(LanguageCode.EN)
+    expect(mockGetCookiePolicy).toHaveBeenCalledWith(LanguageCode.EN, {})
 
     const client = screen.getByTestId('cookie-policy-client')
     expect(client).toBeInTheDocument()
@@ -64,9 +70,19 @@ describe('CookiePolicyPage', () => {
     const ui = await CookiePolicyPage({ params })
     render(ui)
 
-    expect(mockGetCookiePolicy).toHaveBeenCalledWith(LanguageCode.EN)
+    expect(mockGetCookiePolicy).toHaveBeenCalledWith(LanguageCode.EN, {})
 
     const client = screen.getByTestId('cookie-policy-client')
     expect(client).toHaveAttribute('data-has-data', 'false')
+  })
+
+  it('should pass draft status when draft mode is enabled', async () => {
+    mockDraftMode.mockResolvedValue({ isEnabled: true })
+
+    const params = Promise.resolve({ lang: LanguageCode.EN })
+    const ui = await CookiePolicyPage({ params })
+    render(ui)
+
+    expect(mockGetCookiePolicy).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
   })
 })

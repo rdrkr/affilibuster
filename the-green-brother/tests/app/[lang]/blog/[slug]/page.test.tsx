@@ -4,6 +4,12 @@
  * Unit tests for blog post detail page server component
  */
 
+// Mock draft mode
+const mockDraftMode = jest.fn().mockResolvedValue({ isEnabled: false })
+jest.mock('next/headers', () => ({
+  draftMode: (...args: unknown[]) => mockDraftMode(...args),
+}))
+
 // Mock the client module
 jest.mock('@/lib/content', () => ({
   __esModule: true,
@@ -34,7 +40,7 @@ jest.mock('@/app/[lang]/blog/[slug]/BlogPostClient', () => ({
 
 import BlogPostPage from '@/app/[lang]/blog/[slug]/page'
 import { getBlogPostBySlug, getNavigation } from '@/lib/content'
-import { LanguageCode, DirectionEnum } from '@/lib/generated/types.gen'
+import { LanguageCode, DirectionEnum, SchemaEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages'
 import { render, screen } from '@testing-library/react'
 
@@ -82,6 +88,7 @@ describe('BlogPostPage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDraftMode.mockResolvedValue({ isEnabled: false })
     mockGetLanguages.mockResolvedValue(mockLanguages as any)
     mockGetNavigation.mockResolvedValue(mockNavigation as any)
   })
@@ -142,5 +149,23 @@ describe('BlogPostPage', () => {
     render(Component)
 
     expect(screen.getByTestId('blog-post-client')).toBeInTheDocument()
+  })
+
+  it('should pass draft status when draft mode is enabled', async () => {
+    mockDraftMode.mockResolvedValue({ isEnabled: true })
+
+    const mockPost = { documentId: 'post-1', slug: 'post-slug', content: { header: {} } }
+    mockGetBlogPostBySlug.mockResolvedValue(mockPost as Awaited<ReturnType<typeof getBlogPostBySlug>>)
+    const { getBlog } = require('@/lib/content') as { getBlog: jest.Mock }
+    getBlog.mockResolvedValue({ id: 1 } as any)
+
+    const Component = await BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'post-slug' }) })
+    render(Component)
+
+    expect(mockGetBlogPostBySlug).toHaveBeenCalledWith('post-slug', {
+      locale: LanguageCode.EN,
+      status: SchemaEnum.DRAFT,
+    })
+    expect(getBlog).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
   })
 })

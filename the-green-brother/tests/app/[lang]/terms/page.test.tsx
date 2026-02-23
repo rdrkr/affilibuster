@@ -4,23 +4,20 @@
  * Unit tests for TermsPage server component
  */
 
-import { render, screen } from '@testing-library/react'
-
-import TermsPage from '@/app/[lang]/terms/page'
-import { getTerm } from '@/lib/content'
-import type { ApiTermTermDocument } from '@/lib/generated/types.gen'
-import { LanguageCode } from '@/lib/generated/types.gen'
+// Mock draft mode
+const mockDraftMode = jest.fn().mockResolvedValue({ isEnabled: false })
+jest.mock('next/headers', () => ({
+  draftMode: (...args: unknown[]) => mockDraftMode(...args),
+}))
 
 // Mock the client module
 jest.mock('@/lib/content', () => ({
   getTerm: jest.fn(),
 }))
 
-const mockGetTerm = getTerm as jest.MockedFunction<typeof getTerm>
-
 // Mock TermsOfServiceClient
 jest.mock('@/app/[lang]/terms/TermsOfServiceClient', () => {
-  return function MockTermsOfServiceClient({ data }: { data: ApiTermTermDocument | null }) {
+  return function MockTermsOfServiceClient({ data }: { data: unknown }) {
     return (
       <div data-testid="terms-client" data-has-data={!!data}>
         TermsClient
@@ -28,6 +25,14 @@ jest.mock('@/app/[lang]/terms/TermsOfServiceClient', () => {
     )
   }
 })
+
+import { render, screen } from '@testing-library/react'
+
+import TermsPage from '@/app/[lang]/terms/page'
+import { getTerm } from '@/lib/content'
+import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
+
+const mockGetTerm = getTerm as jest.MockedFunction<typeof getTerm>
 
 describe('TermsPage', () => {
   const mockTermData = {
@@ -42,6 +47,7 @@ describe('TermsPage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDraftMode.mockResolvedValue({ isEnabled: false })
     mockGetTerm.mockResolvedValue(mockTermData)
   })
 
@@ -50,7 +56,7 @@ describe('TermsPage', () => {
     const ui = await TermsPage({ params })
     render(ui)
 
-    expect(mockGetTerm).toHaveBeenCalledWith(LanguageCode.EN)
+    expect(mockGetTerm).toHaveBeenCalledWith(LanguageCode.EN, {})
 
     const client = screen.getByTestId('terms-client')
     expect(client).toBeInTheDocument()
@@ -64,9 +70,19 @@ describe('TermsPage', () => {
     const ui = await TermsPage({ params })
     render(ui)
 
-    expect(mockGetTerm).toHaveBeenCalledWith(LanguageCode.EN)
+    expect(mockGetTerm).toHaveBeenCalledWith(LanguageCode.EN, {})
 
     const client = screen.getByTestId('terms-client')
     expect(client).toHaveAttribute('data-has-data', 'false')
+  })
+
+  it('should pass draft status when draft mode is enabled', async () => {
+    mockDraftMode.mockResolvedValue({ isEnabled: true })
+
+    const params = Promise.resolve({ lang: LanguageCode.EN })
+    const ui = await TermsPage({ params })
+    render(ui)
+
+    expect(mockGetTerm).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
   })
 })

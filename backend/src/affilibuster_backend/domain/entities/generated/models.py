@@ -628,7 +628,7 @@ class ApiAuthPageAuthPageDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -716,7 +716,7 @@ class ApiBlogPostTagBlogPostTagDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -835,7 +835,7 @@ class PluginUploadFileDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -868,7 +868,7 @@ class ApiContributorRoleContributorRoleDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -940,7 +940,7 @@ class ApiContributorContributorDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -998,7 +998,7 @@ class ApiBlogPostBlogPostDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1077,7 +1077,7 @@ class ApiBlogBlogDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1141,7 +1141,7 @@ class ApiConsentConsentDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1209,7 +1209,7 @@ class ApiConsentCategoryConsentCategoryDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1289,7 +1289,7 @@ class ApiContactUsContactUsDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1325,7 +1325,7 @@ class ApiCookiePolicyCookiePolicyDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1404,7 +1404,7 @@ class ApiCurrencyCurrencyDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1440,7 +1440,7 @@ class ApiError404Error404Document(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1480,7 +1480,7 @@ class ApiError410Error410Document(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1540,7 +1540,7 @@ class ApiFaqFaqDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1600,7 +1600,7 @@ class ApiProductCategoryProductCategoryDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1679,7 +1679,7 @@ class ApiThemeThemeDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1753,7 +1753,7 @@ class ApiPrivacyPrivacyDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1816,7 +1816,7 @@ class ApiProductCertificateProductCertificateDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1860,7 +1860,7 @@ class ApiProductTagProductTagDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -1975,7 +1975,7 @@ class ApiProfileProfileDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -2087,7 +2087,7 @@ class ApiTermTermDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -2633,7 +2633,7 @@ class Data1(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -2879,7 +2879,7 @@ class Data2(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -3103,7 +3103,7 @@ class Datum(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -3211,7 +3211,7 @@ class Data3(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -3450,7 +3450,7 @@ class Datum1(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -3605,7 +3605,7 @@ class Data4(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -3760,7 +3760,7 @@ class Data5(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -3856,7 +3856,7 @@ class Data6(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -4083,7 +4083,7 @@ class Datum2(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -4192,7 +4192,7 @@ class Data7(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -4350,7 +4350,7 @@ class Data8(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -4553,7 +4553,7 @@ class Datum3(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -4658,7 +4658,7 @@ class Data9(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -4972,7 +4972,7 @@ class Datum4(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -5190,7 +5190,7 @@ class Data10(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -5408,7 +5408,7 @@ class Data11(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -5498,7 +5498,7 @@ class Data12(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -5799,7 +5799,7 @@ class Datum5(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -5990,7 +5990,7 @@ class Data13(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -6070,7 +6070,7 @@ class Data14(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -6147,7 +6147,7 @@ class Data15(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -6273,7 +6273,7 @@ class Data16(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -6529,7 +6529,7 @@ class Datum6(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -6675,7 +6675,7 @@ class Data17(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -6982,7 +6982,7 @@ class Data18(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -7245,7 +7245,7 @@ class Data21(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -7445,7 +7445,7 @@ class Datum7(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -7600,7 +7600,7 @@ class Data23(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -7712,7 +7712,7 @@ class Data24(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -7916,7 +7916,7 @@ class Datum8(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -8024,7 +8024,7 @@ class Data25(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -8224,7 +8224,7 @@ class Datum9(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -8332,7 +8332,7 @@ class Data26(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -8571,7 +8571,7 @@ class Datum10(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -8768,7 +8768,7 @@ class Data27(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -8965,7 +8965,7 @@ class Data28(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -9089,7 +9089,7 @@ class Data29(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -9245,7 +9245,7 @@ class Data30(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -9445,7 +9445,7 @@ class Datum11(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -9553,7 +9553,7 @@ class Data31(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -9745,7 +9745,7 @@ class ApiFooterFooterDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -9919,7 +9919,7 @@ class ApiNavigationNavigationDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -10023,7 +10023,7 @@ class ApiProductProductDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -10130,7 +10130,7 @@ class ApiProductCategoriesPageProductCategoriesPageDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -10253,7 +10253,7 @@ class Data(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -10343,7 +10343,7 @@ class Data19(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -10403,7 +10403,7 @@ class Data20(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -10495,7 +10495,7 @@ class Data22(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -10605,7 +10605,7 @@ class ApiAboutAboutDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """
@@ -10683,7 +10683,7 @@ class ApiHomepageHomepageDocument(BaseModel):
     """
     Timestamp when this entry was last modified.
     """
-    published_at: str = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
     """

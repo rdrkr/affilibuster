@@ -4,6 +4,12 @@
  * Unit tests for product detail page server component
  */
 
+// Mock draft mode
+const mockDraftMode = jest.fn().mockResolvedValue({ isEnabled: false })
+jest.mock('next/headers', () => ({
+  draftMode: (...args: unknown[]) => mockDraftMode(...args),
+}))
+
 // Mock the client module
 jest.mock('@/lib/content', () => ({
   getProductBySlug: jest.fn(),
@@ -55,7 +61,7 @@ jest.mock('@/app/[lang]/products/[slug]/ProductDetailClient', () => ({
 import ProductDetailPage from '@/app/[lang]/products/[slug]/page'
 import { getProductBySlug, getProductCategoriesPage, getProducts } from '@/lib/content'
 import { userProfileFlag } from '@/lib/feature-flags'
-import { LanguageCode } from '@/lib/generated/types.gen'
+import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 
 const mockGetProductBySlug = getProductBySlug as jest.MockedFunction<typeof getProductBySlug>
@@ -66,6 +72,7 @@ const mockUserProfileFlag = userProfileFlag as jest.MockedFunction<typeof userPr
 describe('ProductDetailPage', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDraftMode.mockResolvedValue({ isEnabled: false })
     // Default mock implementation
     mockGetProducts.mockResolvedValue([])
     mockUserProfileFlag.mockResolvedValue(true)
@@ -97,7 +104,7 @@ describe('ProductDetailPage', () => {
 
     // Assert
     expect(mockGetProductBySlug).toHaveBeenCalledWith('prod-slug', { locale: LanguageCode.EN })
-    expect(mockGetProductCategoriesPage).toHaveBeenCalledWith(LanguageCode.EN)
+    expect(mockGetProductCategoriesPage).toHaveBeenCalledWith(LanguageCode.EN, {})
     expect(mockUserProfileFlag).toHaveBeenCalled()
     expect(mockGetProducts).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -121,13 +128,47 @@ describe('ProductDetailPage', () => {
     mockGetProductBySlug.mockResolvedValue(null)
     mockGetProductCategoriesPage.mockResolvedValue({ certificatesSectionHeader: {} } as any)
 
-    // Expecting notFound() to be called.
-    // Ensure we await the async component if it throws or returns promise (server component)
-    // Server components are async functions.
     await expect(
       ProductDetailPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'non-existent' }) })
     ).rejects.toThrow('NEXT_NOT_FOUND')
 
     expect(mockNotFound).toHaveBeenCalled()
+  })
+
+  it('should pass draft status when draft mode is enabled', async () => {
+    mockDraftMode.mockResolvedValue({ isEnabled: true })
+
+    const mockProduct = {
+      documentId: 'prod-1',
+      slug: 'prod-slug',
+      header: { header: {} },
+      category: { slug: 'electronics' },
+    }
+    const mockCategoriesPage = {
+      certificatesSectionHeader: { header: { text: 'Certificates Header' } },
+      relatedProductsSectionHeader: { header: { text: 'Related Products Header' } },
+      bySellerText: 'by',
+    }
+
+    mockGetProductBySlug.mockResolvedValue(mockProduct as unknown as Awaited<ReturnType<typeof getProductBySlug>>)
+    mockGetProductCategoriesPage.mockResolvedValue(
+      mockCategoriesPage as unknown as Awaited<ReturnType<typeof getProductCategoriesPage>>
+    )
+    mockGetProducts.mockResolvedValue([])
+
+    const jsx = await ProductDetailPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'prod-slug' }) })
+    render(jsx)
+
+    expect(mockGetProductBySlug).toHaveBeenCalledWith('prod-slug', {
+      locale: LanguageCode.EN,
+      status: SchemaEnum.DRAFT,
+    })
+    expect(mockGetProductCategoriesPage).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
+    expect(mockGetProducts).toHaveBeenCalledWith(
+      expect.objectContaining({
+        locale: LanguageCode.EN,
+        status: SchemaEnum.DRAFT,
+      })
+    )
   })
 })

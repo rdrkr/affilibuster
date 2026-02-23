@@ -587,6 +587,62 @@ function removePublishedAtDefaults(obj: unknown): OpenAPISpec {
 }
 
 /**
+ * Make all publishedAt properties nullable across the entire OpenAPI spec.
+ *
+ * Strapi returns `publishedAt: null` for draft documents, but the auto-generated
+ * OpenAPI spec declares `publishedAt` as `{ type: 'string' }`, causing Pydantic
+ * validation errors (502) when the backend receives draft content.
+ *
+ * This function recursively traverses the spec and converts every `publishedAt`
+ * property from `{ type: 'string', ... }` to `{ anyOf: [{ type: 'string', format: 'date-time' }, { type: 'null' }] }`,
+ * preserving existing `description` and `example` fields.
+ * @param obj - The object to process (can be any part of the OpenAPI spec)
+ * @returns The processed object with all publishedAt properties made nullable
+ */
+function makePublishedAtNullable(obj: unknown): OpenAPISpec {
+  if (obj === null || typeof obj !== 'object') {
+    return obj as OpenAPISpec
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => makePublishedAtNullable(item)) as unknown as OpenAPISpec
+  }
+
+  const processed: Record<string, unknown> = {}
+
+  for (const [key, value] of Object.entries(obj)) {
+    if (key === 'publishedAt' && typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      const publishedAtObj = value as Record<string, unknown>
+
+      // Already nullable (has anyOf with null) — skip
+      if (publishedAtObj.anyOf) {
+        processed[key] = makePublishedAtNullable(value)
+        continue
+      }
+
+      // Convert { type: 'string', ... } to { anyOf: [{ type: 'string', format: 'date-time' }, { type: 'null' }] }
+      const stringSchema: Record<string, unknown> = { type: 'string', format: 'date-time' }
+      if (publishedAtObj.description) {
+        stringSchema.description = publishedAtObj.description
+      }
+      if (publishedAtObj.example) {
+        stringSchema.example = publishedAtObj.example
+      }
+
+      processed[key] = {
+        anyOf: [stringSchema, { type: 'null' }],
+      }
+    } else if (typeof value === 'object' && value !== null) {
+      processed[key] = makePublishedAtNullable(value)
+    } else {
+      processed[key] = value
+    }
+  }
+
+  return processed as OpenAPISpec
+}
+
+/**
  * Add id property to component schemas.
  *
  * Strapi includes an `id` field in all component responses, but the auto-generated
@@ -1049,7 +1105,9 @@ function simplifyLocalizationsSchema(spec: OpenAPISpec): OpenAPISpec {
       },
       createdAt: { type: 'string' },
       updatedAt: { type: 'string' },
-      publishedAt: { type: 'string' },
+      publishedAt: {
+        anyOf: [{ type: 'string' }, { type: 'null' }],
+      },
     },
     required: ['id', 'documentId', 'locale'],
     additionalProperties: true, // Allow content type-specific scalar fields
@@ -2043,6 +2101,9 @@ function preprocessStrapiSpec(spec: OpenAPISpec, config: { strapiUrlProd: string
 
   // 13. Remove publishedAt default values
   processed = removePublishedAtDefaults(processed)
+
+  // 13.5. Make publishedAt nullable for draft content support
+  processed = makePublishedAtNullable(processed)
 
   // 14. Fix empty populate enums
   processed = fixEmptyPopulateEnums(processed)

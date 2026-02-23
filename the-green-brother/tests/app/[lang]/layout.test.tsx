@@ -6,6 +6,19 @@
 
 import { render, screen } from '@testing-library/react'
 
+const mockDraftMode = jest.fn().mockResolvedValue({ isEnabled: false })
+jest.mock('next/headers', () => ({
+  draftMode: (...args: unknown[]) => mockDraftMode(...args),
+}))
+
+// Mock DraftModeBanner component
+jest.mock('@/components/elements/DraftModeBanner', () => ({
+  __esModule: true,
+  default: function MockDraftModeBanner() {
+    return <div data-testid="mock-draft-mode-banner">Draft Mode</div>
+  },
+}))
+
 // Mock next-intl
 jest.mock('next-intl', () => ({
   NextIntlClientProvider: function MockProvider({ children }: { children: React.ReactNode }) {
@@ -82,6 +95,7 @@ const mockNotFound = notFound as jest.MockedFunction<typeof notFound>
 describe('LocaleLayout', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDraftMode.mockResolvedValue({ isEnabled: false })
     mockGetNavigation.mockResolvedValue({
       siteTitle: 'Test',
       siteDescription: 'Test',
@@ -214,5 +228,31 @@ describe('LocaleLayout', () => {
 
     // Should still render without errors
     expect(screen.getByTestId('child')).toBeInTheDocument()
+  })
+
+  it('should not render DraftModeBanner when draft mode is disabled', async () => {
+    mockDraftMode.mockResolvedValue({ isEnabled: false })
+
+    const Component = await LocaleLayout({
+      children: <div>Content</div>,
+      params: Promise.resolve({ lang: LanguageCode.EN }),
+    })
+
+    render(Component)
+
+    expect(screen.queryByTestId('mock-draft-mode-banner')).not.toBeInTheDocument()
+  })
+
+  it('should render DraftModeBanner when draft mode is enabled', async () => {
+    mockDraftMode.mockResolvedValue({ isEnabled: true })
+
+    const Component = await LocaleLayout({
+      children: <div>Content</div>,
+      params: Promise.resolve({ lang: LanguageCode.EN }),
+    })
+
+    render(Component)
+
+    expect(screen.getByTestId('mock-draft-mode-banner')).toBeInTheDocument()
   })
 })

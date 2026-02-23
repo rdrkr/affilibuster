@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 import { CookieConsentBanner } from '@/components/consent'
+import DraftModeBanner from '@/components/elements/DraftModeBanner'
 import Footer from '@/components/footer'
 import Navigation from '@/components/navigation'
 import BackToTopButton from '@/components/navigation/BackToTopButton'
@@ -13,6 +14,7 @@ import { LanguageCode } from '@/lib/types'
 import '@/styles/globals.css'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
+import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 
 interface Props {
@@ -38,6 +40,9 @@ async function LocaleLayout({ children, params }: Props) {
   // Enable static rendering
   setRequestLocale(lang)
 
+  // Check draft mode
+  const { isEnabled: isDraft } = await draftMode()
+
   // Fetch CMS data
   const [messages, navigationData, languages, enableProductSearch, enableUserProfile] = await Promise.all([
     getMessages(),
@@ -55,6 +60,7 @@ async function LocaleLayout({ children, params }: Props) {
     <NextIntlClientProvider messages={messages}>
       <LayoutProvider lang={lang} direction={direction} navigation={navigationData ?? null}>
         <div className="flex min-h-screen flex-col">
+          {isDraft && <DraftModeBanner />}
           <div className="mx-auto w-full max-w-7xl">
             {navigationData && (
               <Navigation

@@ -2,7 +2,8 @@
 
 import { getProductCategories, getProductCategoriesPage, getProducts } from '@/lib/client'
 import { userProfileFlag } from '@/lib/feature-flags'
-import { LanguageCode } from '@/lib/generated/types.gen'
+import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
+import { draftMode } from 'next/headers'
 import ProductsClient from './ProductsClient'
 
 /**
@@ -10,6 +11,7 @@ import ProductsClient from './ProductsClient'
  *
  * Fetches products, categories, and page metadata from CMS in parallel
  * and passes them to the client component for rendering.
+ * When draft mode is enabled, fetches draft content for preview.
  * @param params - Route parameters containing language code
  * @param params.params - Promise containing route parameters with lang
  * @returns Server-rendered products page
@@ -17,17 +19,21 @@ import ProductsClient from './ProductsClient'
 export default async function ProductsPage({ params }: { params: Promise<{ lang: LanguageCode }> }) {
   const resolvedParams = await params
   const lang = resolvedParams.lang
+  const { isEnabled: isDraft } = await draftMode()
+  const draftParams = isDraft ? { status: SchemaEnum.DRAFT as const } : {}
 
   // Fetch all products data in parallel
   const [pageData, productsResponse, categoriesResponse, enableUserProfile] = await Promise.all([
-    getProductCategoriesPage(lang),
+    getProductCategoriesPage(lang, { ...draftParams }),
     getProducts({
       pagination: { page: 1, pageSize: 100 }, // Get all products for client-side filtering
       locale: lang,
+      ...draftParams,
     }),
     getProductCategories({
       pagination: { page: 1, pageSize: 100 },
       locale: lang,
+      ...draftParams,
     }),
     userProfileFlag(),
   ])

@@ -4,6 +4,12 @@
  * Unit tests for products page server component
  */
 
+// Mock draft mode
+const mockDraftMode = jest.fn().mockResolvedValue({ isEnabled: false })
+jest.mock('next/headers', () => ({
+  draftMode: (...args: unknown[]) => mockDraftMode(...args),
+}))
+
 // Mock the client module
 jest.mock('@/lib/content', () => ({
   getProductCategoriesPage: jest.fn(),
@@ -37,7 +43,7 @@ jest.mock('@/app/[lang]/products/ProductsClient', () => ({
 
 import ProductsPage from '@/app/[lang]/products/page'
 import { getProductCategories, getProductCategoriesPage, getProducts } from '@/lib/content'
-import { LanguageCode } from '@/lib/generated/types.gen'
+import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 
 const mockGetProductCategoriesPage = getProductCategoriesPage as jest.MockedFunction<typeof getProductCategoriesPage>
@@ -47,6 +53,7 @@ const mockGetProductCategories = getProductCategories as jest.MockedFunction<typ
 describe('ProductsPage', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDraftMode.mockResolvedValue({ isEnabled: false })
   })
 
   it('should fetch data and pass to ProductsClient', async () => {
@@ -103,7 +110,25 @@ describe('ProductsPage', () => {
 
     await ProductsPage({ params: Promise.resolve({ lang: LanguageCode.IT }) })
 
-    expect(mockGetProductCategoriesPage).toHaveBeenCalledWith(LanguageCode.IT)
+    expect(mockGetProductCategoriesPage).toHaveBeenCalledWith(LanguageCode.IT, {})
     expect(mockGetProducts).toHaveBeenCalledWith(expect.objectContaining({ locale: LanguageCode.IT }))
+  })
+
+  it('should pass draft status when draft mode is enabled', async () => {
+    mockDraftMode.mockResolvedValue({ isEnabled: true })
+
+    mockGetProductCategoriesPage.mockResolvedValue(null)
+    mockGetProducts.mockResolvedValue([] as Awaited<ReturnType<typeof getProducts>>)
+    mockGetProductCategories.mockResolvedValue([] as Awaited<ReturnType<typeof getProductCategories>>)
+
+    await ProductsPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(mockGetProductCategoriesPage).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
+    expect(mockGetProducts).toHaveBeenCalledWith(
+      expect.objectContaining({ locale: LanguageCode.EN, status: SchemaEnum.DRAFT })
+    )
+    expect(mockGetProductCategories).toHaveBeenCalledWith(
+      expect.objectContaining({ locale: LanguageCode.EN, status: SchemaEnum.DRAFT })
+    )
   })
 })

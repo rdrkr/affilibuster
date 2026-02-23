@@ -47,7 +47,7 @@ function sortProducts(products: ApiProductProductDocument[], sortBy: SortOption)
       case 'priceHighToLow':
         return priceB - priceA
       case 'newArrivals':
-        return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+        return new Date(b.publishedAt ?? 0).getTime() - new Date(a.publishedAt ?? 0).getTime()
       case 'bestSellers':
       default:
         // Keep original order (assumes backend sorts by popularity)

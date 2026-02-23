@@ -44,7 +44,7 @@ repos:
           - --license-filepath
           - .copyright-header.txt
           - --comment-style
-          - "|#|"
+          - '|#|'
           - --allow-past-years
           - --detect-license-in-X-top-lines=3
         exclude: |
@@ -64,7 +64,7 @@ repos:
           - --license-filepath
           - .copyright-header.txt
           - --comment-style
-          - "|//|"
+          - '|//|'
           - --allow-past-years
           - --detect-license-in-X-top-lines=3
 
@@ -87,6 +87,7 @@ repos:
           )
       - id: check-yaml
         name: Check YAML
+        args: [--unsafe] # required for custom docker compose tags
         exclude: |
           (?x)^(
             contracts/affilibuster.openapi.yaml|

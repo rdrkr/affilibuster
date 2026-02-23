@@ -125,8 +125,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -280,7 +284,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -516,8 +522,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -589,7 +599,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -770,8 +782,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -832,7 +848,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -1109,8 +1127,12 @@ paths:
                           type: string
                           example: '2025-10-30T18:23:15.432Z'
                         publishedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                              description: A datetime field
+                            - type: 'null'
                           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                          type: string
                           example: '2025-10-30T17:41:47.696Z'
                         locale:
                           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -1149,7 +1171,9 @@ paths:
                                 description: Timestamp when this entry was last modified.
                                 example: '2025-10-30T18:23:15.432Z'
                               publishedAt:
-                                type: string
+                                anyOf:
+                                  - type: string
+                                  - type: 'null'
                                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                                 example: '2025-10-30T17:41:47.696Z'
                             required:
@@ -1369,8 +1393,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -1409,7 +1437,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -1706,8 +1736,12 @@ paths:
                           type: string
                           example: '2025-10-30T18:23:15.432Z'
                         publishedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                              description: A datetime field
+                            - type: 'null'
                           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                          type: string
                           example: '2025-10-30T17:41:47.696Z'
                         locale:
                           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -1757,7 +1791,9 @@ paths:
                                 description: Timestamp when this entry was last modified.
                                 example: '2025-10-30T18:23:15.432Z'
                               publishedAt:
-                                type: string
+                                anyOf:
+                                  - type: string
+                                  - type: 'null'
                                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                                 example: '2025-10-30T17:41:47.696Z'
                             required:
@@ -2004,8 +2040,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -2055,7 +2095,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -2303,8 +2345,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -2354,7 +2400,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -2511,8 +2559,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -2566,7 +2618,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -2856,8 +2910,12 @@ paths:
                           type: string
                           example: '2025-10-30T18:23:15.432Z'
                         publishedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                              description: A datetime field
+                            - type: 'null'
                           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                          type: string
                           example: '2025-10-30T17:41:47.696Z'
                         locale:
                           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -2893,7 +2951,9 @@ paths:
                                 description: Timestamp when this entry was last modified.
                                 example: '2025-10-30T18:23:15.432Z'
                               publishedAt:
-                                type: string
+                                anyOf:
+                                  - type: string
+                                  - type: 'null'
                                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                                 example: '2025-10-30T17:41:47.696Z'
                             required:
@@ -3125,8 +3185,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -3162,7 +3226,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -3369,8 +3435,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -3406,7 +3476,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -3687,8 +3759,12 @@ paths:
                           type: string
                           example: '2025-10-30T18:23:15.432Z'
                         publishedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                              description: A datetime field
+                            - type: 'null'
                           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                          type: string
                           example: '2025-10-30T17:41:47.696Z'
                         locale:
                           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -3721,7 +3797,9 @@ paths:
                                 description: Timestamp when this entry was last modified.
                                 example: '2025-10-30T18:23:15.432Z'
                               publishedAt:
-                                type: string
+                                anyOf:
+                                  - type: string
+                                  - type: 'null'
                                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                                 example: '2025-10-30T17:41:47.696Z'
                             required:
@@ -3949,8 +4027,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -3983,7 +4065,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -4340,8 +4424,12 @@ paths:
                           type: string
                           example: '2025-10-30T18:23:15.432Z'
                         publishedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                              description: A datetime field
+                            - type: 'null'
                           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                          type: string
                           example: '2025-10-30T17:41:47.696Z'
                         locale:
                           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -4385,7 +4473,9 @@ paths:
                                 description: Timestamp when this entry was last modified.
                                 example: '2025-10-30T18:23:15.432Z'
                               publishedAt:
-                                type: string
+                                anyOf:
+                                  - type: string
+                                  - type: 'null'
                                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                                 example: '2025-10-30T17:41:47.696Z'
                             required:
@@ -4690,8 +4780,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -4735,7 +4829,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -5041,8 +5137,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -5086,7 +5186,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -5240,8 +5342,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -5280,7 +5386,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -5628,8 +5736,12 @@ paths:
                           type: string
                           example: '2025-10-30T18:23:15.432Z'
                         publishedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                              description: A datetime field
+                            - type: 'null'
                           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                          type: string
                           example: '2025-10-30T17:41:47.696Z'
                         locale:
                           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -5665,7 +5777,9 @@ paths:
                                 description: Timestamp when this entry was last modified.
                                 example: '2025-10-30T18:23:15.432Z'
                               publishedAt:
-                                type: string
+                                anyOf:
+                                  - type: string
+                                  - type: 'null'
                                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                                 example: '2025-10-30T17:41:47.696Z'
                             required:
@@ -5966,8 +6080,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -6003,7 +6121,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -6161,8 +6281,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -6201,7 +6325,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -6352,8 +6478,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -6392,7 +6522,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -6570,8 +6702,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -6607,7 +6743,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -6907,8 +7045,12 @@ paths:
                           type: string
                           example: '2025-10-30T18:23:15.432Z'
                         publishedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                              description: A datetime field
+                            - type: 'null'
                           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                          type: string
                           example: '2025-10-30T17:41:47.696Z'
                       required:
                         - documentId
@@ -7148,8 +7290,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                     required:
                       - documentId
@@ -7715,8 +7861,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -7812,7 +7962,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -7990,8 +8142,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -8145,7 +8301,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -8307,8 +8465,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -8374,7 +8536,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -8536,8 +8700,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -8576,7 +8744,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -8849,8 +9019,12 @@ paths:
                           type: string
                           example: '2025-10-30T18:23:15.432Z'
                         publishedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                              description: A datetime field
+                            - type: 'null'
                           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                          type: string
                           example: '2025-10-30T17:41:47.696Z'
                         locale:
                           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -8892,7 +9066,9 @@ paths:
                                 description: Timestamp when this entry was last modified.
                                 example: '2025-10-30T18:23:15.432Z'
                               publishedAt:
-                                type: string
+                                anyOf:
+                                  - type: string
+                                  - type: 'null'
                                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                                 example: '2025-10-30T17:41:47.696Z'
                             required:
@@ -9050,8 +9226,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -9105,7 +9285,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -9329,8 +9511,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -9372,7 +9558,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -9593,8 +9781,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -9636,7 +9828,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -9911,8 +10105,12 @@ paths:
                           type: string
                           example: '2025-10-30T18:23:15.432Z'
                         publishedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                              description: A datetime field
+                            - type: 'null'
                           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                          type: string
                           example: '2025-10-30T17:41:47.696Z'
                         locale:
                           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -9951,7 +10149,9 @@ paths:
                                 description: Timestamp when this entry was last modified.
                                 example: '2025-10-30T18:23:15.432Z'
                               publishedAt:
-                                type: string
+                                anyOf:
+                                  - type: string
+                                  - type: 'null'
                                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                                 example: '2025-10-30T17:41:47.696Z'
                             required:
@@ -10171,8 +10371,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -10211,7 +10415,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -10485,8 +10691,12 @@ paths:
                           type: string
                           example: '2025-10-30T18:23:15.432Z'
                         publishedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                              description: A datetime field
+                            - type: 'null'
                           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                          type: string
                           example: '2025-10-30T17:41:47.696Z'
                         locale:
                           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -10525,7 +10735,9 @@ paths:
                                 description: Timestamp when this entry was last modified.
                                 example: '2025-10-30T18:23:15.432Z'
                               publishedAt:
-                                type: string
+                                anyOf:
+                                  - type: string
+                                  - type: 'null'
                                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                                 example: '2025-10-30T17:41:47.696Z'
                             required:
@@ -10745,8 +10957,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -10785,7 +11001,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -11063,8 +11281,12 @@ paths:
                           type: string
                           example: '2025-10-30T18:23:15.432Z'
                         publishedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                              description: A datetime field
+                            - type: 'null'
                           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                          type: string
                           example: '2025-10-30T17:41:47.696Z'
                         locale:
                           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -11180,7 +11402,9 @@ paths:
                                 description: Timestamp when this entry was last modified.
                                 example: '2025-10-30T18:23:15.432Z'
                               publishedAt:
-                                type: string
+                                anyOf:
+                                  - type: string
+                                  - type: 'null'
                                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                                 example: '2025-10-30T17:41:47.696Z'
                             required:
@@ -11411,8 +11635,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -11528,7 +11756,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -11760,8 +11990,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -11877,7 +12111,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -12037,8 +12273,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -12131,7 +12371,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -12300,8 +12542,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -12340,7 +12586,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -12613,8 +12861,12 @@ paths:
                           type: string
                           example: '2025-10-30T18:23:15.432Z'
                         publishedAt:
+                          anyOf:
+                            - type: string
+                              format: date-time
+                              description: A datetime field
+                            - type: 'null'
                           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                          type: string
                           example: '2025-10-30T17:41:47.696Z'
                         locale:
                           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -12653,7 +12905,9 @@ paths:
                                 description: Timestamp when this entry was last modified.
                                 example: '2025-10-30T18:23:15.432Z'
                               publishedAt:
-                                type: string
+                                anyOf:
+                                  - type: string
+                                  - type: 'null'
                                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                                 example: '2025-10-30T17:41:47.696Z'
                             required:
@@ -12873,8 +13127,12 @@ paths:
                         type: string
                         example: '2025-10-30T18:23:15.432Z'
                       publishedAt:
+                        anyOf:
+                          - type: string
+                            format: date-time
+                            description: A datetime field
+                          - type: 'null'
                         description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-                        type: string
                         example: '2025-10-30T17:41:47.696Z'
                       locale:
                         description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -12913,7 +13171,9 @@ paths:
                               description: Timestamp when this entry was last modified.
                               example: '2025-10-30T18:23:15.432Z'
                             publishedAt:
-                              type: string
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                               description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                               example: '2025-10-30T17:41:47.696Z'
                           required:
@@ -12989,8 +13249,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -13144,7 +13408,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -13316,8 +13582,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -13389,7 +13659,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -13457,8 +13729,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -13497,7 +13773,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -13596,8 +13874,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         related: {}
       required:
@@ -13639,8 +13921,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -13673,7 +13959,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -13742,8 +14030,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -13787,7 +14079,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -13839,8 +14133,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -13890,7 +14188,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -13961,8 +14261,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -14023,7 +14327,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -14064,8 +14370,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -14119,7 +14429,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -14170,8 +14482,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -14207,7 +14523,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -14278,8 +14596,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -14315,7 +14637,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -14351,8 +14675,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -14391,7 +14719,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -14464,8 +14794,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -14501,7 +14835,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -14545,8 +14881,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -14585,7 +14925,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -14622,8 +14964,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -14662,7 +15008,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -14716,8 +15064,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -14753,7 +15105,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -14792,8 +15146,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -14889,7 +15247,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -14928,8 +15288,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -15083,7 +15447,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -15142,8 +15508,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -15185,7 +15555,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -15277,8 +15649,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -15317,7 +15693,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -15394,8 +15772,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -15461,7 +15843,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -15509,8 +15893,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -15549,7 +15937,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -15607,8 +15997,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -15647,7 +16041,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -15688,8 +16084,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -15728,7 +16128,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -15769,8 +16171,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -15886,7 +16292,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -16019,8 +16427,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -16074,7 +16486,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -16117,8 +16531,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -16211,7 +16629,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:
@@ -16266,8 +16686,12 @@ components:
           type: string
           example: '2025-10-30T18:23:15.432Z'
         publishedAt:
+          anyOf:
+            - type: string
+              format: date-time
+              description: A datetime field
+            - type: 'null'
           description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-          type: string
           example: '2025-10-30T17:41:47.696Z'
         locale:
           description: The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
@@ -16306,7 +16730,9 @@ components:
                 description: Timestamp when this entry was last modified.
                 example: '2025-10-30T18:23:15.432Z'
               publishedAt:
-                type: string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                 example: '2025-10-30T17:41:47.696Z'
             required:

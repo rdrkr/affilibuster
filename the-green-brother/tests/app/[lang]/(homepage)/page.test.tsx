@@ -4,6 +4,12 @@
  * Unit tests for homepage server component
  */
 
+// Mock draft mode
+const mockDraftMode = jest.fn().mockResolvedValue({ isEnabled: false })
+jest.mock('next/headers', () => ({
+  draftMode: (...args: unknown[]) => mockDraftMode(...args),
+}))
+
 // Mock the content module
 jest.mock('@/lib/content', () => ({
   getHomepage: jest.fn(),
@@ -33,7 +39,7 @@ import HomePage from '@/app/[lang]/(homepage)/page'
 import { HomeSections } from '@/components/homepage'
 import { getBlog, getHomepage, getTeamMembers } from '@/lib/content'
 import { userProfileFlag } from '@/lib/feature-flags'
-import { LanguageCode } from '@/lib/generated/types.gen'
+import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 
 const mockGetHomepage = getHomepage as jest.MockedFunction<typeof getHomepage>
@@ -45,6 +51,7 @@ const mockHomeSections = HomeSections as unknown as jest.Mock
 describe('HomePage', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDraftMode.mockResolvedValue({ isEnabled: false })
   })
 
   it('should fetch data and pass to HomeSections', async () => {
@@ -63,9 +70,9 @@ describe('HomePage', () => {
     const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
-    expect(mockGetHomepage).toHaveBeenCalledWith(LanguageCode.EN)
+    expect(mockGetHomepage).toHaveBeenCalledWith(LanguageCode.EN, {})
     expect(mockGetTeamMembers).toHaveBeenCalledWith(LanguageCode.EN)
-    expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.EN)
+    expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.EN, {})
     expect(screen.getByTestId('home-client')).toBeInTheDocument()
     expect(screen.getByTestId('home-sections')).toBeInTheDocument()
     expect(mockHomeSections).toHaveBeenCalledWith(
@@ -140,9 +147,9 @@ describe('HomePage', () => {
     const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.IT }) })
     render(Component)
 
-    expect(mockGetHomepage).toHaveBeenCalledWith(LanguageCode.IT)
+    expect(mockGetHomepage).toHaveBeenCalledWith(LanguageCode.IT, {})
     expect(mockGetTeamMembers).toHaveBeenCalledWith(LanguageCode.IT)
-    expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.IT)
+    expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.IT, {})
   })
 
   it('should fetch team members and pass to HomeSections', async () => {
@@ -169,5 +176,25 @@ describe('HomePage', () => {
       }),
       undefined
     )
+  })
+
+  it('should pass draft status when draft mode is enabled', async () => {
+    mockDraftMode.mockResolvedValue({ isEnabled: true })
+
+    const mockHomepageData = { sections: [] }
+    const mockBlogPage = {
+      readTimeMinutesLabel: { text: 'min' },
+      readArticleLabel: { text: 'Read' },
+    }
+
+    mockGetHomepage.mockResolvedValue(mockHomepageData as unknown as Awaited<ReturnType<typeof getHomepage>>)
+    mockGetTeamMembers.mockResolvedValue([])
+    mockGetBlog.mockResolvedValue(mockBlogPage as unknown as Awaited<ReturnType<typeof getBlog>>)
+
+    const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+    render(Component)
+
+    expect(mockGetHomepage).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
+    expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
   })
 })

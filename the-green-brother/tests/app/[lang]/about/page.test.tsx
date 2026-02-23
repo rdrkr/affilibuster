@@ -4,6 +4,12 @@
  * Unit tests for about page server component
  */
 
+// Mock draft mode
+const mockDraftMode = jest.fn().mockResolvedValue({ isEnabled: false })
+jest.mock('next/headers', () => ({
+  draftMode: (...args: unknown[]) => mockDraftMode(...args),
+}))
+
 // Mock the content module
 jest.mock('@/lib/content', () => ({
   getAbout: jest.fn(),
@@ -43,7 +49,7 @@ jest.mock('@/app/[lang]/about/AboutClient', () => ({
 
 import AboutPage from '@/app/[lang]/about/page'
 import { getAbout, getTeamMembers } from '@/lib/content'
-import { LanguageCode, CurrencyCode, DirectionEnum } from '@/lib/generated/types.gen'
+import { LanguageCode, CurrencyCode, DirectionEnum, SchemaEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
 import { render, screen } from '@testing-library/react'
 
@@ -54,6 +60,7 @@ const mockGetLanguages = getLanguages as jest.MockedFunction<typeof getLanguages
 describe('AboutPage', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDraftMode.mockResolvedValue({ isEnabled: false })
     // Default languages mock with all required Language properties
     mockGetLanguages.mockResolvedValue([
       {
@@ -102,7 +109,7 @@ describe('AboutPage', () => {
     const Component = await AboutPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
-    expect(mockGetAbout).toHaveBeenCalledWith(LanguageCode.EN)
+    expect(mockGetAbout).toHaveBeenCalledWith(LanguageCode.EN, {})
     expect(mockGetTeamMembers).toHaveBeenCalledWith(LanguageCode.EN)
     expect(screen.getByTestId('about-client')).toBeInTheDocument()
     expect(screen.getByTestId('about-client').getAttribute('data-has-data')).toBe('true')
@@ -124,7 +131,7 @@ describe('AboutPage', () => {
 
     await AboutPage({ params: Promise.resolve({ lang: LanguageCode.IT }) })
 
-    expect(mockGetAbout).toHaveBeenCalledWith(LanguageCode.IT)
+    expect(mockGetAbout).toHaveBeenCalledWith(LanguageCode.IT, {})
   })
 
   it('should pass through contributors from API response', async () => {
@@ -152,5 +159,18 @@ describe('AboutPage', () => {
 
     // Verify getTeamMembers was called with just the locale
     expect(mockGetTeamMembers).toHaveBeenCalledWith(LanguageCode.EN)
+  })
+
+  it('should pass draft status when draft mode is enabled', async () => {
+    mockDraftMode.mockResolvedValue({ isEnabled: true })
+
+    const mockAboutData = { seoMetadata: { metaTitle: 'About Us' }, sections: [] }
+    mockGetAbout.mockResolvedValue(mockAboutData as unknown as Awaited<ReturnType<typeof getAbout>>)
+    mockGetTeamMembers.mockResolvedValue([])
+
+    const Component = await AboutPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+    render(Component)
+
+    expect(mockGetAbout).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
   })
 })

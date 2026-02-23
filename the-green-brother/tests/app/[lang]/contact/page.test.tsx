@@ -4,6 +4,12 @@
  * Unit tests for contact page server component
  */
 
+// Mock draft mode
+const mockDraftMode = jest.fn().mockResolvedValue({ isEnabled: false })
+jest.mock('next/headers', () => ({
+  draftMode: (...args: unknown[]) => mockDraftMode(...args),
+}))
+
 // Mock the client module
 jest.mock('@/lib/content', () => ({
   getContactUs: jest.fn(),
@@ -19,7 +25,7 @@ jest.mock('@/app/[lang]/contact/ContactClient', () => ({
 
 import ContactPage from '@/app/[lang]/contact/page'
 import { getContactUs } from '@/lib/content'
-import { LanguageCode } from '@/lib/generated/types.gen'
+import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 
 const mockGetContactUs = getContactUs as jest.MockedFunction<typeof getContactUs>
@@ -27,6 +33,7 @@ const mockGetContactUs = getContactUs as jest.MockedFunction<typeof getContactUs
 describe('ContactPage', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDraftMode.mockResolvedValue({ isEnabled: false })
   })
 
   it('should fetch contact data and pass to ContactClient', async () => {
@@ -36,7 +43,7 @@ describe('ContactPage', () => {
     const Component = await ContactPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
-    expect(mockGetContactUs).toHaveBeenCalledWith(LanguageCode.EN)
+    expect(mockGetContactUs).toHaveBeenCalledWith(LanguageCode.EN, {})
     expect(screen.getByTestId('contact-client')).toBeInTheDocument()
     expect(screen.getByTestId('contact-client').getAttribute('data-has-data')).toBe('true')
   })
@@ -55,6 +62,18 @@ describe('ContactPage', () => {
 
     await ContactPage({ params: Promise.resolve({ lang: LanguageCode.IT }) })
 
-    expect(mockGetContactUs).toHaveBeenCalledWith(LanguageCode.IT)
+    expect(mockGetContactUs).toHaveBeenCalledWith(LanguageCode.IT, {})
+  })
+
+  it('should pass draft status when draft mode is enabled', async () => {
+    mockDraftMode.mockResolvedValue({ isEnabled: true })
+
+    const mockContactData = { title: 'Contact Us' }
+    mockGetContactUs.mockResolvedValue(mockContactData as Awaited<ReturnType<typeof getContactUs>>)
+
+    const Component = await ContactPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+    render(Component)
+
+    expect(mockGetContactUs).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
   })
 })

@@ -4,9 +4,11 @@
  * Unit tests for TopicPage (tag detail page)
  */
 
-import { render, screen } from '@testing-library/react'
-
-import { LanguageCode } from '@/lib/generated/types.gen'
+// Mock draft mode
+const mockDraftMode = jest.fn().mockResolvedValue({ isEnabled: false })
+jest.mock('next/headers', () => ({
+  draftMode: (...args: unknown[]) => mockDraftMode(...args),
+}))
 
 // Mock API functions
 jest.mock('@/lib/content', () => ({
@@ -29,8 +31,11 @@ jest.mock('@/app/[lang]/blog/tag/[tag]/TopicClient', () => {
   }
 })
 
+import { render, screen } from '@testing-library/react'
+
 import TopicPage from '@/app/[lang]/blog/tag/[tag]/page'
 import { getBlog, getBlogPosts } from '@/lib/content'
+import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 
 const mockGetBlogPosts = getBlogPosts as jest.Mock
 const mockGetBlog = getBlog as jest.Mock
@@ -38,6 +43,7 @@ const mockGetBlog = getBlog as jest.Mock
 describe('TopicPage', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDraftMode.mockResolvedValue({ isEnabled: false })
   })
 
   it('should render TopicClient with fetched data', async () => {
@@ -94,5 +100,27 @@ describe('TopicPage', () => {
     const Component = await TopicPage({ params: Promise.resolve({ lang: LanguageCode.EN, tag: 'Test' }) })
 
     expect(Component).toBeNull()
+  })
+
+  it('should pass draft status when draft mode is enabled', async () => {
+    mockDraftMode.mockResolvedValue({ isEnabled: true })
+
+    mockGetBlogPosts.mockResolvedValue({ data: [] })
+    mockGetBlog.mockResolvedValue({
+      pagination: { noItemsFound: { header: { text: 'No items' } } },
+      readTimeMinutesLabel: { text: 'min' },
+      readArticleLabel: { text: 'Read' },
+    })
+
+    const Component = await TopicPage({ params: Promise.resolve({ lang: LanguageCode.EN, tag: 'TestTag' }) })
+    render(Component)
+
+    expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
+    expect(mockGetBlogPosts).toHaveBeenCalledWith(
+      expect.objectContaining({
+        locale: LanguageCode.EN,
+        status: SchemaEnum.DRAFT,
+      })
+    )
   })
 })

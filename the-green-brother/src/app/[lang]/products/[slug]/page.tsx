@@ -2,7 +2,8 @@
 
 import { getProductBySlug, getProductCategoriesPage, getProducts } from '@/lib/client'
 import { userProfileFlag } from '@/lib/feature-flags'
-import { LanguageCode } from '@/lib/generated/types.gen'
+import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
+import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import ProductDetailClient from './ProductDetailClient'
 
@@ -11,6 +12,7 @@ import ProductDetailClient from './ProductDetailClient'
  *
  * Fetches a single product by Slug from CMS and passes it to the client component.
  * Returns 404 if product not found.
+ * When draft mode is enabled, fetches draft content for preview.
  * @param params - Route parameters containing language code and product slug
  * @param params.params - Promise containing route parameters with lang and slug
  * @returns Server-rendered product detail page
@@ -18,11 +20,13 @@ import ProductDetailClient from './ProductDetailClient'
 export default async function ProductDetailPage({ params }: { params: Promise<{ lang: LanguageCode; slug: string }> }) {
   const resolvedParams = await params
   const { lang, slug } = resolvedParams
+  const { isEnabled: isDraft } = await draftMode()
+  const draftParams = isDraft ? { status: SchemaEnum.DRAFT as const } : {}
 
   // Fetch product by Slug
   const [product, productCategoriesPage, userProfileEnabled] = await Promise.all([
-    getProductBySlug(slug, { locale: lang }),
-    getProductCategoriesPage(lang),
+    getProductBySlug(slug, { locale: lang, ...draftParams }),
+    getProductCategoriesPage(lang, { ...draftParams }),
     userProfileFlag(),
   ])
 
@@ -46,6 +50,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         pageSize: 10,
       },
       locale: lang,
+      ...draftParams,
     })) ?? []
 
   const relatedProducts = relatedProductsResponse.filter(p => p.slug !== slug)
