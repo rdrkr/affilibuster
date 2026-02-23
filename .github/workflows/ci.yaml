@@ -4,7 +4,7 @@ name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
   workflow_dispatch:
 
 concurrency:
@@ -12,9 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PYTHON_VERSION: "3.13"
-  NODE_VERSION: "22"
-  UV_VERSION: "0.5.15"
+  PYTHON_VERSION: '3.13'
+  NODE_VERSION: '22'
+  UV_VERSION: '0.5.15'
 
 jobs:
   ci:
@@ -199,3 +199,52 @@ jobs:
           name: merged-coverage
           path: coverage-merged/
           if-no-files-found: ignore
+
+      # ========================================
+      # 9. Telegram Notifications
+      # ========================================
+      - name: Notify Telegram (success)
+        if: success()
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.UPTIME_KUMA_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.UPTIME_KUMA_TELEGRAM_CHAT_ID }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          # Trim whitespace/newlines from secrets to prevent curl URL malformat
+          TELEGRAM_TOKEN="$(echo -n "$TELEGRAM_TOKEN" | tr -d '[:space:]')"
+          TELEGRAM_CHAT_ID="$(echo -n "$TELEGRAM_CHAT_ID" | tr -d '[:space:]')"
+          printf -v MESSAGE '%s\n%s\n%s\n%s\n%s\n%s' \
+            '✅ <b>CI Passed</b>' \
+            '📦 <b>Repo:</b> ${{ github.repository }}' \
+            '🔀 <b>Branch:</b> ${{ github.ref_name }}' \
+            '📝 <b>Commit:</b> <code>${{ github.sha }}</code>' \
+            '👤 <b>By:</b> ${{ github.actor }}' \
+            "🔗 <a href=\"${RUN_URL}\">View Run</a>"
+          curl -sf -X POST \
+            "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "parse_mode=HTML" \
+            --data-urlencode "text=${MESSAGE}"
+
+      - name: Notify Telegram (failure)
+        if: failure()
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.UPTIME_KUMA_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.UPTIME_KUMA_TELEGRAM_CHAT_ID }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          # Trim whitespace/newlines from secrets to prevent curl URL malformat
+          TELEGRAM_TOKEN="$(echo -n "$TELEGRAM_TOKEN" | tr -d '[:space:]')"
+          TELEGRAM_CHAT_ID="$(echo -n "$TELEGRAM_CHAT_ID" | tr -d '[:space:]')"
+          printf -v MESSAGE '%s\n%s\n%s\n%s\n%s\n%s' \
+            '❌ <b>CI Failed</b>' \
+            '📦 <b>Repo:</b> ${{ github.repository }}' \
+            '🔀 <b>Branch:</b> ${{ github.ref_name }}' \
+            '📝 <b>Commit:</b> <code>${{ github.sha }}</code>' \
+            '👤 <b>By:</b> ${{ github.actor }}' \
+            "🔗 <a href=\"${RUN_URL}\">View Run</a>"
+          curl -sf -X POST \
+            "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "parse_mode=HTML" \
+            --data-urlencode "text=${MESSAGE}"
