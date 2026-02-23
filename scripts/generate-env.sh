@@ -289,6 +289,7 @@ main() {
     BACKEND_URL_DEV_VAL="https://thegreenbrother.com/api/v1"
     NEXT_PUBLIC_API_URL_VAL="https://thegreenbrother.com/api/v1"
     NEXT_PUBLIC_CMS_URL_VAL="https://cms.thegreenbrother.com"
+    NEXT_PUBLIC_SITE_URL_VAL="https://thegreenbrother.com"
     NEXT_SERVER_SIDE_API_URL_VAL="http://backend:8000/v1"
 
     # Uptime
@@ -327,6 +328,7 @@ main() {
     BACKEND_URL_DEV_VAL="https://localhost:8000/v1"
     NEXT_PUBLIC_API_URL_VAL="https://localhost:8000/v1"
     NEXT_PUBLIC_CMS_URL_VAL="https://localhost:1337"
+    NEXT_PUBLIC_SITE_URL_VAL="https://localhost:3000"
     NEXT_SERVER_SIDE_API_URL_VAL="http://backend:8000/v1" # Or https://localhost:8000/v1 depending on network
 
     # Uptime
@@ -416,6 +418,7 @@ INTERNAL_THE_GREEN_BROTHER_HOST=the-green-brother
 
 NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL_VAL}
 NEXT_PUBLIC_CMS_URL=${NEXT_PUBLIC_CMS_URL_VAL}
+NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL_VAL}
 NEXT_SERVER_SIDE_API_URL=${NEXT_SERVER_SIDE_API_URL_VAL}
 
 REVALIDATE_SECRET=${REVALIDATE_SECRET}

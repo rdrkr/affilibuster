@@ -102,16 +102,8 @@ function StandardCarousel({
   // Scroll to position whenever startScrollItemIndex changes
   useEffect(() => {
     const clampedIndex = clampIndex(startScrollItemIndex, itemCount)
-    console.log('[Carousel] Mount effect:', {
-      startScrollItemIndex,
-      clampedIndex,
-      itemCount,
-      isRTL,
-      hasTrackRef: !!trackRef.current,
-    })
 
     if (clampedIndex === 0 || !trackRef.current) {
-      console.log('[Carousel] Skipping scroll (index 0 or no ref)')
       return
     }
 
@@ -119,7 +111,6 @@ function StandardCarousel({
     requestAnimationFrame(() => {
       const track = trackRef.current
       if (!track?.parentElement) {
-        console.log('[Carousel] No track or parent in RAF')
         return
       }
 
@@ -136,33 +127,11 @@ function StandardCarousel({
         // In RTL: scroll to offsetLeft directly (RTL handles spacing differently)
         const scrollLeft = isRTL ? targetChild.offsetLeft : targetChild.offsetLeft - padding
 
-        const scrollData = {
-          clampedIndex,
-          targetOffsetLeft: targetChild.offsetLeft,
-          padding,
-          calculatedScrollLeft: scrollLeft,
-          parentScrollLeft: parent.scrollLeft,
-          parentClientWidth: parent.clientWidth,
-          trackScrollWidth: track.scrollWidth,
-          isRTL,
-        }
-        console.log('[Carousel] Before scroll:', scrollData)
-
         // Scroll the parent container (which has overflow-x-auto)
         parent.scrollTo({
           left: scrollLeft,
           behavior: 'instant',
         })
-
-        // Log after scroll (in next tick)
-        setTimeout(() => {
-          console.log('[Carousel] After scroll:', {
-            newScrollLeft: parent.scrollLeft,
-            expectedScrollLeft: targetChild.offsetLeft,
-          })
-        }, 0)
-      } else {
-        console.log('[Carousel] Target child not found at index:', clampedIndex)
       }
     })
   }, [startScrollItemIndex, itemCount, isRTL])

@@ -98,6 +98,14 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  // Serve metadata files under locale prefixes (e.g. /en/robots.txt → /robots.txt)
+  rewrites() {
+    return [
+      { source: '/:lang/manifest.webmanifest', destination: '/manifest.webmanifest' },
+      { source: '/:lang/robots.txt', destination: '/robots.txt' },
+      { source: '/:lang/sitemap.xml', destination: '/sitemap.xml' },
+    ]
+  },
 }
 
 export default withNextIntl(nextConfig)

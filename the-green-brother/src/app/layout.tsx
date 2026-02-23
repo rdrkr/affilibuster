@@ -17,6 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: navigation?.siteTitle ?? 'TheGreenBrother - Sustainable Products',
     description: navigation?.siteDescription ?? 'Your trusted source for curated sustainable products.',
+    manifest: '/manifest.webmanifest',
   }
 }
 
@@ -46,9 +47,8 @@ export default function RootLayout({
   `
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
 

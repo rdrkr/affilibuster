@@ -16,7 +16,6 @@ jest.mock('@/lib/content/api', () => ({
 
 import RootLayout, { generateMetadata } from '@/app/layout'
 import { getNavigation } from '@/lib/content/api'
-import { LanguageCode } from '@/lib/generated/types.gen'
 
 const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 
@@ -47,9 +46,9 @@ describe('RootLayout', () => {
     expect(element.props.suppressHydrationWarning).toBe(true)
   })
 
-  it('should set lang attribute to en', () => {
+  it('should not set a lang attribute on html element', () => {
     const element = RootLayout({ children: <div>Content</div> })
-    expect(element.props.lang).toBe(LanguageCode.EN)
+    expect(element.props.lang).toBeUndefined()
   })
 })
 
@@ -69,6 +68,7 @@ describe('generateMetadata', () => {
     expect(metadata).toEqual({
       title: 'Test Site',
       description: 'Test Description',
+      manifest: '/manifest.webmanifest',
     })
   })
 
@@ -80,6 +80,7 @@ describe('generateMetadata', () => {
     expect(metadata).toEqual({
       title: 'TheGreenBrother - Sustainable Products',
       description: 'Your trusted source for curated sustainable products.',
+      manifest: '/manifest.webmanifest',
     })
   })
 
