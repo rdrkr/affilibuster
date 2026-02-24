@@ -61,6 +61,7 @@ export const frostedGlassStyle = `
  * @param noAnimation - Whether to disable animation for link variant
  * @param direction - Text direction for RTL/LTR layout
  * @param hasIcon - Whether the button has an icon (affects ghost-2 justification)
+ * @param showText - Enable animated text visibility
  * @returns Tailwind CSS classes
  */
 export function getVariantClasses(
@@ -68,7 +69,8 @@ export function getVariantClasses(
   isActive: boolean,
   noAnimation: boolean,
   direction: DirectionEnum,
-  hasIcon: boolean
+  hasIcon: boolean,
+  showText: boolean
 ): string {
   const isRTL = direction === DirectionEnum.RTL
   const variants: Record<ButtonVariant, string> = {
@@ -120,7 +122,7 @@ export function getVariantClasses(
     `,
     'ghost-2': `
       cursor-pointer
-      flex w-full items-center justify-center ${hasIcon ? (isRTL ? 'sm:justify-end' : 'sm:justify-start') : ''}
+      flex w-full items-center justify-center ${hasIcon && showText ? (isRTL ? 'sm:justify-end' : 'sm:justify-start') : ''}
       font-medium whitespace-nowrap rounded-full
       transition-colors text-neutral-700 dark:text-white
       ${isActive ? `bg-neutral-100 dark:bg-white/5` : `bg-transparent`}
@@ -273,7 +275,7 @@ export function getButtonBaseClasses(params: ButtonBaseClassesParams): string {
   return `
     inline-flex items-center justify-center transition-all duration-300 w-fit
     ${!showText ? 'gap-0' : 'gap-2'}
-    ${getVariantClasses(variant, isActive, noAnimation, direction, hasIcon)}
+    ${getVariantClasses(variant, isActive, noAnimation, direction, hasIcon, showText)}
     ${getSizeText(size)}
     ${variant === 'link-1' || variant === 'link-2' ? 'p-0' : getSizeDimensions(size)}
     ${!showText ? '!px-0' : ''}

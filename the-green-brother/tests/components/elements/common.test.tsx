@@ -19,19 +19,19 @@ import { DirectionEnum } from '@/lib/generated/types.gen'
 describe('common utilities', () => {
   describe('getVariantClasses', () => {
     it('should return classes for primary variant', () => {
-      const classes = getVariantClasses('primary', false, false, DirectionEnum.LTR, false)
+      const classes = getVariantClasses('primary', false, false, DirectionEnum.LTR, false, true)
       expect(classes).toContain('bg-primary')
       expect(classes).toContain('text-background-dark')
     })
 
     it('should handle active state', () => {
-      const classes = getVariantClasses('ghost-1', true, false, DirectionEnum.LTR, false)
+      const classes = getVariantClasses('ghost-1', true, false, DirectionEnum.LTR, false, true)
       expect(classes).toContain('text-primary text-shadow-sm dark:text-primary dark:text-shadow-none')
     })
 
     it('should handle noAnimation for link-1 variant', () => {
-      const classesWithAnimation = getVariantClasses('link-1', false, false, DirectionEnum.LTR, false)
-      const classesWithoutAnimation = getVariantClasses('link-1', false, true, DirectionEnum.LTR, false)
+      const classesWithAnimation = getVariantClasses('link-1', false, false, DirectionEnum.LTR, false, true)
+      const classesWithoutAnimation = getVariantClasses('link-1', false, true, DirectionEnum.LTR, false, true)
       expect(classesWithAnimation).toContain('hover:scale-105')
       expect(classesWithoutAnimation).not.toContain('hover:scale-105')
     })

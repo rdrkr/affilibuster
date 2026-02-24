@@ -6,7 +6,15 @@
 
 # Main site: thegreenbrother.com
 thegreenbrother.com, www.thegreenbrother.com {
-	# API requests: strip /api prefix and proxy to backend
+	# Next.js API routes: proxy to frontend (must be before backend catch-all)
+	handle /api/preview* {
+		reverse_proxy the-green-brother:{$THE_GREEN_BROTHER_PORT}
+	}
+	handle /api/health* {
+		reverse_proxy the-green-brother:{$THE_GREEN_BROTHER_PORT}
+	}
+
+	# Backend API requests: strip /api prefix and proxy to backend
 	handle_path /api/* {
 		reverse_proxy backend:{$BACKEND_PORT}
 	}
@@ -18,7 +26,6 @@ thegreenbrother.com, www.thegreenbrother.com {
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 		X-Content-Type-Options "nosniff"
-		X-Frame-Options "SAMEORIGIN"
 		Referrer-Policy "strict-origin-when-cross-origin"
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
 		# Remove server identification

@@ -210,7 +210,7 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
       role="dialog"
       aria-label="Cookie consent"
       dir={isRTL ? 'rtl' : 'ltr'}
-      className={`fixed inset-x-4 bottom-4 z-50 mx-auto max-w-7xl p-4 sm:inset-x-6 sm:p-6
+      className={`fixed inset-x-4 bottom-8 z-50 mx-auto max-w-6xl p-8 sm:inset-x-6 sm:p-6
         ${frostedGlassStyle}
         rounded-xl! bg-white/80! dark:bg-surface-dark/80!
         ${isClosing ? 'animate-[slideDownOut_0.3s_ease-in_forwards]' : 'animate-[slideUp_0.3s_ease-out_forwards]'}
@@ -238,16 +238,20 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
           headerLevel={3}
           headerIconSize="xl"
           direction={direction}
-          className="mb-4"
+          className="mb-4 prose-headings:mb-2!"
         />
 
         {/* Do Not Track indicator */}
         {isDoNotTrackEnabled && (
           <TextBlock
             data={asTextBlock(consentPage.doNotTrackNotice)}
-            headerLevel={4}
+            headerLevel={5}
             direction={direction}
-            className="mb-4"
+            className={`
+              -mt-2 mb-4 rounded-xl border border-neutral-200 p-4
+              shadow-lg dark:border-white/5
+              dark:shadow-none prose-headings:mb-0!
+            `}
             data-testid="dnt-notice"
           />
         )}
@@ -305,18 +309,27 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
                       onChange={() => {
                         handleCategoryToggle(category.uid, category.required)
                       }}
-                      className="size-4 cursor-pointer rounded-full border-tertiary-500 accent-primary disabled:cursor-not-allowed disabled:opacity-60"
+                      className={`
+                        size-4 cursor-pointer rounded-full
+                        border-tertiary-500 accent-primary
+                        disabled:cursor-not-allowed disabled:opacity-60
+                      `}
                     />
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <TextBlock data={asTextBlock(category.content)} direction={direction} headerLevel={4} />
+                    <TextBlock
+                      data={asTextBlock(category.content)}
+                      direction={direction}
+                      headerLevel={5}
+                      className="prose-headings:mb-0!"
+                    />
                   </div>
                 </label>
               ))}
             </div>
 
-            <div className={`mt-4 flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
+            <div className={`mt-2 flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
               <ButtonAction
                 data={consentPage.saveButton}
                 direction={direction}
