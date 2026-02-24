@@ -71,6 +71,7 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
     acceptedCategories,
     isSettingsOpen,
     isDoNotTrackEnabled,
+    cookieDntState,
     acceptAll,
     rejectAll,
     saveCustom,
@@ -90,8 +91,10 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
   /** Whether the banner is displayed in edit mode (user re-opening to change preferences). */
   const isEditMode = hasConsented && isSettingsOpen
 
-  /** Whether the banner should be visible at all. */
-  const shouldShow = !hasConsented || isSettingsOpen
+  const dntJustEnabled = isDoNotTrackEnabled && (cookieDntState === false || cookieDntState === undefined)
+
+  /** Whether the banner should be visible at all, or needs to fetch data for silent revocation. */
+  const shouldShow = !hasConsented || isSettingsOpen || (dntJustEnabled && acceptedCategories.length > 0)
 
   const isRTL = direction === DirectionEnum.RTL
 
@@ -133,16 +136,39 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
     setPrevIsSettingsOpen(false)
   }
 
-  // Auto-reject when Do Not Track is enabled and user has not yet consented
+  // Auto-reject or revoke when Do Not Track is enabled
   useEffect(() => {
-    if (!isDoNotTrackEnabled || hasConsented || isLoading || categories.length === 0) return
+    if (!isDoNotTrackEnabled || isLoading || categories.length === 0) return
 
     const requiredUid = categories.find(c => c.required)?.uid
     if (!requiredUid) return
 
     const version = consentPage?.publishedAt ?? '1.0'
-    rejectAll(requiredUid, version)
-  }, [isDoNotTrackEnabled, hasConsented, isLoading, categories, consentPage, rejectAll])
+
+    // If not consented yet, auto-reject
+    if (!hasConsented) {
+      rejectAll(requiredUid, version)
+      return
+    }
+
+    // If already consented, but DNT was previously OFF (or unset) and is now ON, revoke to mandatory only
+    const wasDntOff = cookieDntState === false || cookieDntState === undefined
+    if (wasDntOff) {
+      const hasNonRequiredCategories = acceptedCategories.some(uid => uid !== requiredUid)
+      if (hasNonRequiredCategories) {
+        rejectAll(requiredUid, version)
+      }
+    }
+  }, [
+    isDoNotTrackEnabled,
+    hasConsented,
+    isLoading,
+    categories,
+    consentPage,
+    rejectAll,
+    acceptedCategories,
+    cookieDntState,
+  ])
 
   const consentVersion = consentPage?.publishedAt ?? '1.0'
 
@@ -219,7 +245,9 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
       role="dialog"
       aria-label="Cookie consent"
       dir={isRTL ? 'rtl' : 'ltr'}
-      className={`fixed inset-x-4 bottom-8 z-50 mx-auto max-w-6xl p-8 sm:inset-x-6 sm:p-6
+      className={`
+        fixed inset-x-4 bottom-8 z-50 mx-auto max-h-[82dvh] max-w-6xl overflow-y-auto p-4
+        md:inset-x-6 md:max-h-[86dvh] md:p-6
         ${frostedGlassStyle}
         rounded-xl! bg-white/80! dark:bg-surface-dark/80!
         ${isClosing ? 'animate-[slideDownOut_0.3s_ease-in_forwards]' : 'animate-[slideUp_0.3s_ease-out_forwards]'}
@@ -288,7 +316,7 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
             <ButtonAction
               data={consentPage.settingsButton}
               direction={direction}
-              variant="link-2"
+              variant="ghost-3"
               size="sm"
               onClick={handleToggleSettings}
             />
@@ -296,57 +324,66 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
         </div>
 
         {/* Settings panel */}
-        {showSettings && (
-          <div
-            className={`
-              mt-4 rounded-xl border
-              border-neutral-200
-              p-8 shadow-lg
-              dark:border-white/5 dark:shadow-none
-            `}
-          >
-            <div className="space-y-3">
-              {categories.map(category => (
-                <label key={category.documentId} className={`flex flex-row items-start gap-3`}>
-                  <div className="pt-1">
-                    <input
-                      type="checkbox"
-                      checked={selectedCategories.has(category.uid)}
-                      disabled={category.required === true}
-                      onChange={() => {
-                        handleCategoryToggle(category.uid, category.required)
-                      }}
-                      className={`
-                        size-4 cursor-pointer rounded-full
-                        border-tertiary-500 accent-primary
-                        disabled:cursor-not-allowed disabled:opacity-60
-                      `}
-                    />
-                  </div>
+        <div
+          className={`
+            grid transition-[grid-template-rows,opacity,margin] duration-300 ease-in-out
+            ${showSettings ? 'mt-4 grid-rows-[1fr] opacity-100' : 'mt-0 grid-rows-[0fr] opacity-0'}
+          `}
+          aria-hidden={!showSettings}
+          inert={!showSettings ? true : undefined}
+          data-testid="settings-panel"
+        >
+          <div className="overflow-hidden">
+            <div
+              className={`
+                rounded-xl border border-neutral-200
+                p-4 shadow-lg md:p-6
+                dark:border-white/5 dark:shadow-none
+              `}
+            >
+              <div className="space-y-3">
+                {categories.map(category => (
+                  <label key={category.documentId} className={`flex flex-row items-start gap-3`}>
+                    <div className="pt-1">
+                      <input
+                        type="checkbox"
+                        checked={selectedCategories.has(category.uid)}
+                        disabled={category.required === true}
+                        onChange={() => {
+                          handleCategoryToggle(category.uid, category.required)
+                        }}
+                        className={`
+                          size-4 cursor-pointer rounded-full
+                          border-tertiary-500 accent-primary
+                          disabled:cursor-not-allowed disabled:opacity-60
+                        `}
+                      />
+                    </div>
 
-                  <div className="min-w-0 flex-1">
-                    <TextBlock
-                      data={asTextBlock(category.content)}
-                      direction={direction}
-                      headerLevel={5}
-                      className="prose-headings:mb-0!"
-                    />
-                  </div>
-                </label>
-              ))}
-            </div>
+                    <div className="min-w-0 flex-1">
+                      <TextBlock
+                        data={asTextBlock(category.content)}
+                        direction={direction}
+                        headerLevel={5}
+                        className="prose-headings:mb-0!"
+                      />
+                    </div>
+                  </label>
+                ))}
+              </div>
 
-            <div className={`mt-2 flex justify-end`}>
-              <ButtonAction
-                data={consentPage.saveButton}
-                direction={direction}
-                variant="primary"
-                size="sm"
-                onClick={handleSaveCustom}
-              />
+              <div className={`mt-2 flex justify-end`}>
+                <ButtonAction
+                  data={consentPage.saveButton}
+                  direction={direction}
+                  variant="primary"
+                  size="sm"
+                  onClick={handleSaveCustom}
+                />
+              </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   )

@@ -58,6 +58,8 @@ export interface UseConsentReturn {
   closeSettings: () => void
   /** Whether the browser's Do Not Track setting is enabled. */
   isDoNotTrackEnabled: boolean
+  /** The state of Do Not Track when consent was saved. */
+  cookieDntState?: boolean | undefined
 }
 
 /**
@@ -111,6 +113,8 @@ export function useConsent(): UseConsentReturn {
   const acceptedCategories = useMemo(() => cookieValue?.categories ?? [], [cookieValue])
   const isDoNotTrackEnabled = typeof navigator !== 'undefined' && navigator.doNotTrack === '1'
 
+  const cookieDntState = cookieValue?.dntStateAtConsent
+
   // Listen for the custom DOM event to open settings from external components
   useEffect(() => {
     const handler = (): void => {
@@ -132,10 +136,12 @@ export function useConsent(): UseConsentReturn {
   }, [])
 
   const persistConsent = useCallback((categories: string[], consentVersion: string, action: ConsentAction) => {
+    const currentDntState = typeof navigator !== 'undefined' && navigator.doNotTrack === '1'
     const value: ConsentCookieValue = {
       categories,
       timestamp: new Date().toISOString(),
       version: consentVersion,
+      dntStateAtConsent: currentDntState,
     }
 
     writeConsentCookie(value)
@@ -187,5 +193,6 @@ export function useConsent(): UseConsentReturn {
     openSettings,
     closeSettings,
     isDoNotTrackEnabled,
+    cookieDntState,
   }
 }

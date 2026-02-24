@@ -49,4 +49,6 @@ export interface ConsentCookieValue {
   timestamp: string
   /** Consent version from CMS. */
   version: string
+  /** Whether Do Not Track was enabled at the time of providing consent. */
+  dntStateAtConsent?: boolean
 }

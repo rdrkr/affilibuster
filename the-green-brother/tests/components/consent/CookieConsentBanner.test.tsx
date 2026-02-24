@@ -296,10 +296,11 @@ describe('CookieConsentBanner', () => {
         render(<CookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
       })
 
-      expect(screen.queryByText('**Necessary** - Required cookies')).not.toBeInTheDocument()
+      expect(screen.getByTestId('settings-panel')).toHaveAttribute('aria-hidden', 'true')
 
       fireEvent.click(screen.getByText('Customize'))
 
+      expect(screen.getByTestId('settings-panel')).toHaveAttribute('aria-hidden', 'false')
       expect(screen.getByText('**Necessary** - Required cookies')).toBeInTheDocument()
       expect(screen.getByText('**Analytics** - Performance tracking')).toBeInTheDocument()
       expect(screen.getByText('**Marketing** - Advertising cookies')).toBeInTheDocument()
@@ -312,10 +313,10 @@ describe('CookieConsentBanner', () => {
 
       const customizeButton = screen.getByText('Customize')
       fireEvent.click(customizeButton)
-      expect(screen.getByText('**Necessary** - Required cookies')).toBeInTheDocument()
+      expect(screen.getByTestId('settings-panel')).toHaveAttribute('aria-hidden', 'false')
 
       fireEvent.click(customizeButton)
-      expect(screen.queryByText('**Necessary** - Required cookies')).not.toBeInTheDocument()
+      expect(screen.getByTestId('settings-panel')).toHaveAttribute('aria-hidden', 'true')
     })
 
     it('should pre-check required categories', async () => {
@@ -400,7 +401,7 @@ describe('CookieConsentBanner', () => {
         render(<CookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
       })
 
-      expect(screen.queryByText('Save Preferences')).not.toBeInTheDocument()
+      expect(screen.getByTestId('settings-panel')).toHaveAttribute('aria-hidden', 'true')
 
       fireEvent.click(screen.getByText('Customize'))
 
@@ -724,6 +725,42 @@ describe('CookieConsentBanner', () => {
       })
 
       expect(screen.queryByTestId('dnt-notice')).not.toBeInTheDocument()
+    })
+
+    it('should revoke consent to mandatory only when DNT is newly enabled', async () => {
+      const mockRejectAll = jest.fn()
+      mockUseConsent.mockReturnValue({
+        ...defaultUseConsentReturn,
+        hasConsented: true,
+        acceptedCategories: ['necessary', 'analytics'],
+        isDoNotTrackEnabled: true,
+        cookieDntState: false,
+        rejectAll: mockRejectAll,
+      })
+
+      await act(async () => {
+        render(<CookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
+      })
+
+      expect(mockRejectAll).toHaveBeenCalledWith('necessary', '2026-01-01T00:00:00Z')
+    })
+
+    it('should not revoke consent when DNT is newly enabled but only mandatory is accepted', async () => {
+      const mockRejectAll = jest.fn()
+      mockUseConsent.mockReturnValue({
+        ...defaultUseConsentReturn,
+        hasConsented: true,
+        acceptedCategories: ['necessary'],
+        isDoNotTrackEnabled: true,
+        cookieDntState: undefined,
+        rejectAll: mockRejectAll,
+      })
+
+      await act(async () => {
+        render(<CookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
+      })
+
+      expect(mockRejectAll).not.toHaveBeenCalled()
     })
   })
 

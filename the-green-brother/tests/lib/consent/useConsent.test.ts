@@ -10,9 +10,9 @@
 
 import { act, renderHook } from '@testing-library/react'
 
-import { useConsent, openCookieSettings, OPEN_COOKIE_SETTINGS_EVENT } from '@/lib/consent/useConsent'
 import * as consentApi from '@/lib/consent/api'
 import { CONSENT_COOKIE_NAME } from '@/lib/consent/types'
+import { OPEN_COOKIE_SETTINGS_EVENT, openCookieSettings, useConsent } from '@/lib/consent/useConsent'
 import { ConsentAction, ConsentType } from '@/lib/generated/types.gen'
 
 jest.mock('@/lib/consent/api', () => ({
@@ -381,6 +381,29 @@ describe('useConsent', () => {
       const { result } = renderHook(() => useConsent())
 
       expect(result.current.isDoNotTrackEnabled).toBe(false)
+    })
+
+    it('should handle undefined navigator gracefully', () => {
+      const originalNavigator = globalThis.navigator
+      Object.defineProperty(globalThis, 'navigator', { value: undefined, configurable: true })
+
+      const { result } = renderHook(() => useConsent())
+      expect(result.current.isDoNotTrackEnabled).toBe(false)
+
+      Object.defineProperty(globalThis, 'navigator', { value: originalNavigator, configurable: true })
+    })
+
+    it('should handle undefined navigator in persistConsent', () => {
+      const originalNavigator = globalThis.navigator
+      Object.defineProperty(globalThis, 'navigator', { value: undefined, configurable: true })
+
+      const { result } = renderHook(() => useConsent())
+      act(() => {
+        result.current.acceptAll(['necessary'], '1.0')
+      })
+
+      expect(result.current.cookieDntState).toBe(false)
+      Object.defineProperty(globalThis, 'navigator', { value: originalNavigator, configurable: true })
     })
   })
 
