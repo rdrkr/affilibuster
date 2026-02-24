@@ -64,6 +64,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           envs: GITHUB_TOKEN,DEPLOY_BRANCH,STRAPI_IMPORT
+          command_timeout: 30m
           script: |
             set -e
             echo "Starting deployment..."

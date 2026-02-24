@@ -7,6 +7,7 @@ Uptime Kuma Provisioning Script.
 Syncs monitors from uptime-kuma-monitors.yaml to a running Uptime Kuma instance.
 """
 
+import contextlib
 import logging
 import os
 import sys
@@ -259,6 +260,10 @@ def main() -> None:
 
         except Exception as e:  # pylint: disable=broad-except
             logger.warning("Attempt %d/%d failed: %s", attempt, max_retries, e)
+            if "api" in locals():
+                with contextlib.suppress(Exception):
+                    api.disconnect()
+
             if attempt < max_retries:
                 logger.info("Retrying in %d seconds...", retry_delay)
                 time.sleep(retry_delay)
