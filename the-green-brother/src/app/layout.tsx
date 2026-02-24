@@ -17,6 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: navigation?.siteTitle ?? 'TheGreenBrother - Sustainable Products',
     description: navigation?.siteDescription ?? 'Your trusted source for curated sustainable products.',
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
     manifest: '/manifest.webmanifest',
   }
 }

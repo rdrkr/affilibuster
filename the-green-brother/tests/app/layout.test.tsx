@@ -65,11 +65,17 @@ describe('generateMetadata', () => {
 
     const metadata = await generateMetadata()
 
-    expect(metadata).toEqual({
-      title: 'Test Site',
-      description: 'Test Description',
-      manifest: '/manifest.webmanifest',
-    })
+    expect(metadata.metadataBase).toBeInstanceOf(URL)
+    expect(metadata.metadataBase?.toString()).toBe(
+      new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').toString()
+    )
+    expect(metadata).toEqual(
+      expect.objectContaining({
+        title: 'Test Site',
+        description: 'Test Description',
+        manifest: '/manifest.webmanifest',
+      })
+    )
   })
 
   it('should return default metadata when navigation is null', async () => {
@@ -77,11 +83,17 @@ describe('generateMetadata', () => {
 
     const metadata = await generateMetadata()
 
-    expect(metadata).toEqual({
-      title: 'TheGreenBrother - Sustainable Products',
-      description: 'Your trusted source for curated sustainable products.',
-      manifest: '/manifest.webmanifest',
-    })
+    expect(metadata.metadataBase).toBeInstanceOf(URL)
+    expect(metadata.metadataBase?.toString()).toBe(
+      new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').toString()
+    )
+    expect(metadata).toEqual(
+      expect.objectContaining({
+        title: 'TheGreenBrother - Sustainable Products',
+        description: 'Your trusted source for curated sustainable products.',
+        manifest: '/manifest.webmanifest',
+      })
+    )
   })
 
   it('should return default title when navigation has no siteTitle', async () => {

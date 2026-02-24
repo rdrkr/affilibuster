@@ -45,7 +45,14 @@ export async function GET(request: NextRequest): Promise<Response> {
     draft.enable()
   }
 
-  const url = new URL(slug, request.url)
+  // Build the redirect URL using the forwarded host (from reverse proxy) or
+  // the request host, so the redirect goes to the public URL, not the internal
+  // Docker container address (e.g., 0.0.0.0:3000).
+  const forwardedHost = request.headers.get('x-forwarded-host')
+  const forwardedProto = request.headers.get('x-forwarded-proto') ?? 'https'
+  const host = forwardedHost ?? request.headers.get('host') ?? 'localhost:3000'
+  const origin = `${forwardedProto}://${host}`
+  const url = new URL(slug, origin)
   const response = NextResponse.redirect(url)
 
   // Copy draft mode cookie from Next.js internal response and override SameSite

@@ -85,12 +85,16 @@ jest.mock('next/server', () => ({
     /** The request URL. */
     url: string
 
+    /** The request headers. */
+    headers: Map<string, string>
+
     /**
      * Create a mock NextRequest.
      * @param input - URL string or URL object
      */
     constructor(input: string | URL) {
       this.url = typeof input === 'string' ? input : input.toString()
+      this.headers = new Map([['host', 'localhost:3000']])
     }
   },
   NextResponse: {
@@ -174,12 +178,7 @@ describe('/api/preview route', () => {
       expect(mockDraftMode).toHaveBeenCalled()
       expect(mockEnable).toHaveBeenCalledTimes(1)
       expect(mockDisable).not.toHaveBeenCalled()
-      expect(NextResponse.redirect).toHaveBeenCalledWith(
-        new URL(
-          '/en/blog/test-post',
-          'http://localhost:3000/api/preview?secret=test-preview-secret&slug=%2Fen%2Fblog%2Ftest-post&status=draft'
-        )
-      )
+      expect(NextResponse.redirect).toHaveBeenCalledWith(new URL('/en/blog/test-post', 'https://localhost:3000'))
       expect(response).toBe(mockRedirectResponse)
     })
 
@@ -242,6 +241,21 @@ describe('/api/preview route', () => {
       await GET(request)
 
       expect(mockRedirectResponse.cookies.set).not.toHaveBeenCalled()
+    })
+
+    it('should use x-forwarded-host for redirect URL when behind reverse proxy', async () => {
+      const request = createRequest({
+        secret: VALID_SECRET,
+        slug: '/en/blog/test-post',
+        status: 'published',
+      })
+      // Simulate reverse proxy headers
+      ;(request as unknown as { headers: Map<string, string> }).headers.set('x-forwarded-host', 'thegreenbrother.com')
+      ;(request as unknown as { headers: Map<string, string> }).headers.set('x-forwarded-proto', 'https')
+
+      await GET(request)
+
+      expect(NextResponse.redirect).toHaveBeenCalledWith(new URL('/en/blog/test-post', 'https://thegreenbrother.com'))
     })
 
     it('should not set SameSite cookie for published status', async () => {

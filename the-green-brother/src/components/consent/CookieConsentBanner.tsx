@@ -266,8 +266,9 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
         )}
 
         {/* Action buttons */}
-        <div className={`flex flex-wrap gap-3 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+        <div className={`flex flex-row flex-wrap justify-start gap-3`} dir={isRTL ? 'rtl' : 'ltr'}>
           <ButtonAction
+            flex-w
             data={consentPage.acceptAllButton}
             direction={direction}
             variant="primary"
@@ -306,10 +307,7 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
           >
             <div className="space-y-3">
               {categories.map(category => (
-                <label
-                  key={category.documentId}
-                  className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}
-                >
+                <label key={category.documentId} className={`flex flex-row items-start gap-3`}>
                   <div className="pt-1">
                     <input
                       type="checkbox"
@@ -338,7 +336,7 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
               ))}
             </div>
 
-            <div className={`mt-2 flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
+            <div className={`mt-2 flex justify-end`}>
               <ButtonAction
                 data={consentPage.saveButton}
                 direction={direction}

@@ -222,13 +222,13 @@ describe('CookieConsentBanner', () => {
       expect(dialog).toHaveAttribute('dir', 'ltr')
     })
 
-    it('should reverse button order for RTL', async () => {
+    it('should set dir="rtl" on button container for RTL support', async () => {
       await act(async () => {
         render(<CookieConsentBanner lang="he" direction={DirectionEnum.RTL} />)
       })
 
       const buttonsContainer = screen.getByText('Accept All').parentElement
-      expect(buttonsContainer?.className).toContain('flex-row-reverse')
+      expect(buttonsContainer).toHaveAttribute('dir', 'rtl')
     })
   })
 
