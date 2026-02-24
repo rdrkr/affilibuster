@@ -16,6 +16,23 @@ export type {
   RecordConsentResponse,
 } from '@/lib/generated/types.gen'
 
+import type { RecordConsentRequest } from '@/lib/generated/types.gen'
+
+/**
+ * API request data type for the POST /consent endpoint.
+ *
+ * Manually defined because the code generator does not produce a Data type
+ * for this endpoint. Follows the same pattern as other generated Data types
+ * (e.g., DetectLanguageData, LoginUserData).
+ */
+export interface RecordConsentData {
+  /** The consent record request body. */
+  body: RecordConsentRequest
+  path?: never
+  query?: never
+  url: '/consent'
+}
+
 /** Cookie name used to store consent preferences. */
 export const CONSENT_COOKIE_NAME = 'cc_consent'
 

@@ -36,7 +36,7 @@ def upgrade() -> None:
             sa.Column("action", sa.String(length=20), nullable=False),
             sa.Column("ip_address", sa.String(length=45), nullable=True),
             sa.Column("user_agent", sa.Text(), nullable=True),
-            sa.Column("consent_version", sa.String(length=20), nullable=True),
+            sa.Column("consent_version", sa.String(length=50), nullable=True),
             sa.Column(
                 "created_at",
                 sa.DateTime(),

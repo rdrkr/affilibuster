@@ -7,7 +7,7 @@
  * from the CMS, and recording consent decisions for GDPR compliance.
  */
 
-import { apiRequest, createApiRequest, getBaseUrl, getSessionId } from '@/lib/core/client'
+import { apiRequest, createApiRequest } from '@/lib/core/client'
 import type {
   ConsentCategoryGetConsentCategoriesData,
   ConsentCategoryGetConsentCategoriesResponses,
@@ -16,6 +16,7 @@ import type {
   RecordConsentRequest,
   RecordConsentResponse,
 } from '@/lib/generated/types.gen'
+import type { RecordConsentData } from './types'
 
 /**
  * Fetch consent page content from the CMS.
@@ -69,34 +70,19 @@ export async function getConsentCategories(
  * Record a consent decision for GDPR audit trail.
  *
  * Posts the user's consent choices (accept all, reject all, custom) to the backend
- * for immutable storage. Includes session ID for correlation.
+ * for immutable storage. Uses the shared apiRequest helper for consistent
+ * URL construction, session ID injection, CORS handling, and error management.
  * @param body - The consent record request containing action, categories, and type
  * @returns The recorded consent response or null if the request fails
  */
 export async function recordConsent(body: RecordConsentRequest): Promise<RecordConsentResponse | null> {
   try {
-    const baseUrl = getBaseUrl()
-    const sessionId = getSessionId()
-
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    }
-
-    if (sessionId) {
-      headers['X-Session-Id'] = sessionId
-    }
-
-    const response = await fetch(`${baseUrl}/consent`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body),
+    const request = createApiRequest<RecordConsentData>('/consent', {
+      body,
     })
-
-    if (!response.ok) {
-      throw new Error(`Failed to record consent: ${response.statusText}`)
-    }
-
-    return (await response.json()) as RecordConsentResponse
+    return await apiRequest<RecordConsentResponse>(request, {
+      method: 'POST',
+    })
   } catch (error) {
     console.error('Failed to record consent:', error)
     return null

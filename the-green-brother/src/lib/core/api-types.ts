@@ -131,6 +131,9 @@ import type {
     VerifyEmailResponses
 } from '@/lib/generated/types.gen'
 
+import type { RecordConsentData } from '@/lib/consent/types'
+import type { RecordConsentResponse } from '@/lib/generated/types.gen'
+
 /**
  * Union type of all API request data types.
  *
@@ -205,6 +208,8 @@ export type ApiRequest =
   | HealthCheckData
   // Redirect operations
   | CheckRedirectData
+  // Consent operations
+  | RecordConsentData
 
 /**
  * Union type of all API response types.
@@ -279,6 +284,8 @@ export type ApiResponse =
   | HealthCheckResponses[200]
   // Redirect operations
   | CheckRedirectResponses[200]
+  // Consent operations
+  | RecordConsentResponse
 
 /**
  * Custom error class for API request failures.

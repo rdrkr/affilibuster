@@ -46,7 +46,7 @@ class ConsentRecordModel(Base):
     user_agent: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Version tracking for consent policy changes
-    consent_version: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    consent_version: Mapped[str | None] = mapped_column(String(50), nullable=True)
 
     # Timestamp (immutable - consent records are append-only)
     created_at: Mapped[datetime] = mapped_column(

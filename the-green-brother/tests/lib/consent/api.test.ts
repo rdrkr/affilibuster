@@ -14,16 +14,10 @@ import { ConsentAction, ConsentType } from '@/lib/generated/types.gen'
 jest.mock('@/lib/core/client', () => ({
   apiRequest: jest.fn(),
   createApiRequest: jest.fn((url: string, options?: Record<string, unknown>) => ({ url, ...options })),
-  getBaseUrl: jest.fn(() => 'https://localhost:8000/v1'),
-  getSessionId: jest.fn(() => 'test-session-123'),
 }))
 
 const mockApiRequest = apiClient.apiRequest as jest.MockedFunction<typeof apiClient.apiRequest>
 const mockCreateApiRequest = apiClient.createApiRequest as jest.MockedFunction<typeof apiClient.createApiRequest>
-const mockGetBaseUrl = apiClient.getBaseUrl as jest.MockedFunction<typeof apiClient.getBaseUrl>
-const mockGetSessionId = apiClient.getSessionId as jest.MockedFunction<typeof apiClient.getSessionId>
-
-const mockFetch = global.fetch as jest.MockedFunction<typeof global.fetch>
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -113,12 +107,9 @@ describe('getConsentCategories', () => {
 })
 
 describe('recordConsent', () => {
-  it('should post consent record to backend', async () => {
+  it('should post consent record via apiRequest', async () => {
     const responseBody = { success: true, consentId: 'uuid-123', message: 'Recorded' }
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(responseBody),
-    } as Response)
+    mockApiRequest.mockResolvedValueOnce(responseBody as unknown as Awaited<ReturnType<typeof apiClient.apiRequest>>)
 
     const body = {
       consentType: ConsentType.COOKIE,
@@ -129,24 +120,14 @@ describe('recordConsent', () => {
 
     const result = await recordConsent(body)
 
-    expect(mockFetch).toHaveBeenCalledWith('https://localhost:8000/v1/consent', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Session-Id': 'test-session-123',
-      },
-      body: JSON.stringify(body),
-    })
+    expect(mockCreateApiRequest).toHaveBeenCalledWith('/consent', { body })
+    expect(mockApiRequest).toHaveBeenCalledWith(expect.objectContaining({ url: '/consent', body }), { method: 'POST' })
     expect(result).toEqual(responseBody)
   })
 
-  it('should omit session header when no session ID', async () => {
-    mockGetSessionId.mockReturnValueOnce('')
+  it('should post consent record with reject all action', async () => {
     const responseBody = { success: true, consentId: 'uuid-456', message: 'Recorded' }
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(responseBody),
-    } as Response)
+    mockApiRequest.mockResolvedValueOnce(responseBody as unknown as Awaited<ReturnType<typeof apiClient.apiRequest>>)
 
     const body = {
       consentType: ConsentType.COOKIE,
@@ -154,21 +135,16 @@ describe('recordConsent', () => {
       categories: { necessary: true },
     }
 
-    await recordConsent(body)
+    const result = await recordConsent(body)
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        headers: { 'Content-Type': 'application/json' },
-      })
-    )
+    expect(mockCreateApiRequest).toHaveBeenCalledWith('/consent', { body })
+    expect(mockApiRequest).toHaveBeenCalledWith(expect.objectContaining({ url: '/consent', body }), { method: 'POST' })
+    expect(result).toEqual(responseBody)
   })
 
-  it('should return null and log error on non-ok response', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      statusText: 'Bad Request',
-    } as Response)
+  it('should return null and log error on API failure', async () => {
+    const error = new Error('API request failed: Bad Request')
+    mockApiRequest.mockRejectedValueOnce(error)
 
     const body = {
       consentType: ConsentType.COOKIE,
@@ -179,11 +155,12 @@ describe('recordConsent', () => {
     const result = await recordConsent(body)
 
     expect(result).toBeNull()
-    expect(console.error).toHaveBeenCalledWith('Failed to record consent:', expect.any(Error))
+    expect(console.error).toHaveBeenCalledWith('Failed to record consent:', error)
   })
 
   it('should return null and log error on network failure', async () => {
-    mockFetch.mockRejectedValueOnce(new Error('Network failure'))
+    const error = new Error('Network failure')
+    mockApiRequest.mockRejectedValueOnce(error)
 
     const body = {
       consentType: ConsentType.COOKIE,
@@ -194,22 +171,6 @@ describe('recordConsent', () => {
     const result = await recordConsent(body)
 
     expect(result).toBeNull()
-    expect(console.error).toHaveBeenCalledWith('Failed to record consent:', expect.any(Error))
-  })
-
-  it('should use correct base URL', async () => {
-    mockGetBaseUrl.mockReturnValueOnce('https://api.example.com/v1')
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ success: true, consentId: 'id', message: 'ok' }),
-    } as Response)
-
-    await recordConsent({
-      consentType: ConsentType.COOKIE,
-      action: ConsentAction.ACCEPT_ALL,
-      categories: { necessary: true },
-    })
-
-    expect(mockFetch).toHaveBeenCalledWith('https://api.example.com/v1/consent', expect.any(Object))
+    expect(console.error).toHaveBeenCalledWith('Failed to record consent:', error)
   })
 })
