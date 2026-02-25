@@ -11,7 +11,6 @@
 #
 # Requirements:
 #   - Docker running with all production services
-#   - .env.prod with UPTIME_KUMA_TELEGRAM_BOT_TOKEN and UPTIME_KUMA_TELEGRAM_CHAT_ID (optional, for notifications)
 #   - /mnt/backups/postgres directory (or it will be created)
 
 set -euo pipefail
@@ -36,29 +35,11 @@ if [[ -f "${ENV_FILE}" ]]; then
   set -u
 fi
 
-# Default optional vars (Telegram notifications)
-UPTIME_KUMA_TELEGRAM_BOT_TOKEN="${UPTIME_KUMA_TELEGRAM_BOT_TOKEN:-}"
-UPTIME_KUMA_TELEGRAM_CHAT_ID="${UPTIME_KUMA_TELEGRAM_CHAT_ID:-}"
+# Default optional vars
 
-# Telegram notification helper
-send_telegram() {
-  message="$1"
-  if [[ -n "${UPTIME_KUMA_TELEGRAM_BOT_TOKEN}" ]] && [[ -n "${UPTIME_KUMA_TELEGRAM_CHAT_ID}" ]]; then
-    curl -sf -X POST \
-      "https://api.telegram.org/bot${UPTIME_KUMA_TELEGRAM_BOT_TOKEN}/sendMessage" \
-      -d "chat_id=${UPTIME_KUMA_TELEGRAM_CHAT_ID}" \
-      -d "text=${message}" \
-      -d "parse_mode=HTML" \
-      >/dev/null 2>&1 || echo "[${TIMESTAMP}] WARNING: Failed to send Telegram notification"
-  fi
-}
-
-# Error handler — notify on failure
+# Error handler
 on_error() {
   echo "[${TIMESTAMP}] ERROR: Backup failed!"
-  send_telegram "❌ <b>Affilibuster Backup Failed</b>
-🕐 ${TIMESTAMP}
-⚠️ Check /var/log/affilibuster-backup.log for details"
   exit 1
 }
 trap on_error ERR
@@ -115,23 +96,19 @@ if git diff --cached --quiet; then
   GIT_STATUS="No changes"
 else
   git commit -m "backup :: daily Strapi data export (${TIMESTAMP})"
+
+  # Fetch and integrate remote changes before pushing to avoid rejection
+  git pull --rebase origin "${BACKUP_BRANCH}"
+
   git push origin "HEAD:${BACKUP_BRANCH}"
   echo "[${TIMESTAMP}] Strapi data pushed to ${BACKUP_BRANCH}"
   GIT_STATUS="Pushed to ${BACKUP_BRANCH}"
 fi
 
 # ---------------------------------------------------
-# Step 4: Send success notification
+# Step 4: Summary Output
 # ---------------------------------------------------
 PG_DUMP_COUNT=$(find "${PG_BACKUP_DIR}" -name "*.dump" -type f 2>/dev/null | wc -l | tr -d ' ')
-
-send_telegram "✅ <b>Affilibuster Backup Complete</b>
-🕐 ${TIMESTAMP}
-
-📦 <b>Strapi CMS:</b> ${STRAPI_SIZE}
-🗄 <b>PostgreSQL:</b> ${PG_SIZE}
-📁 <b>PG dumps on disk:</b> ${PG_DUMP_COUNT}
-🔀 <b>Git:</b> ${GIT_STATUS}"
 
 echo "============================================"
 echo "[${TIMESTAMP}] Daily backup complete!"
@@ -140,3 +117,11 @@ echo "  PG dump: ${PG_SIZE}"
 echo "  PG dumps on disk: ${PG_DUMP_COUNT}"
 echo "  Git: ${GIT_STATUS}"
 echo "============================================"
+
+# Write stats for GitHub Actions to read
+cat >"${PROJECT_DIR}/.backup_stats" <<EOF
+STRAPI_SIZE="${STRAPI_SIZE}"
+PG_SIZE="${PG_SIZE}"
+PG_DUMP_COUNT="${PG_DUMP_COUNT}"
+GIT_STATUS="${GIT_STATUS}"
+EOF

@@ -367,7 +367,6 @@ print_summary() {
   echo "  - fail2ban: SSH brute-force protection (24h ban)"
   echo "  - Auto-updates: Security patches applied automatically"
   echo "  - Swap: ${SWAP_SIZE_GB}GB as memory safety net"
-  echo "  - Backup: Daily at 3 AM UTC (Strapi + PostgreSQL + git push)"
   echo ""
   echo -e "${YELLOW}⚠️  IMPORTANT: Test SSH as '${DEPLOY_USER}' before closing this session!${NC}"
   echo ""
@@ -455,49 +454,15 @@ EOF
   echo ""
 }
 
-# Setup daily backup cron job + logrotate
-setup_backup_cron() {
-  log_info "Setting up daily backup cron job..."
-
-  local backup_script="/home/${DEPLOY_USER}/affilibuster/scripts/backup.sh"
-  local backup_log="/var/log/affilibuster-backup.log"
-  local cron_entry="0 3 * * * ${backup_script} >> ${backup_log} 2>&1"
-
-  # Create log file with correct ownership
-  touch "${backup_log}"
-  chown "${DEPLOY_USER}:${DEPLOY_USER}" "${backup_log}"
+# Setup backup dependencies
+setup_backup_deps() {
+  log_info "Setting up backup dependencies..."
 
   # Create backup directory
   mkdir -p /mnt/backups/postgres
   chown "${DEPLOY_USER}:${DEPLOY_USER}" /mnt/backups/postgres
 
-  # Install cron job for deploy user (idempotent)
-  local existing_cron
-  existing_cron=$(crontab -u "${DEPLOY_USER}" -l 2>/dev/null || true)
-  if echo "${existing_cron}" | grep -qF "backup.sh"; then
-    log_warn "Backup cron job already exists, skipping"
-  else
-    (
-      echo "${existing_cron}"
-      echo "${cron_entry}"
-    ) | crontab -u "${DEPLOY_USER}" -
-    log_success "Backup cron job installed (daily at 3 AM UTC)"
-  fi
-
-  # Setup logrotate
-  cat >/etc/logrotate.d/affilibuster-backup <<EOF
-${backup_log} {
-    weekly
-    rotate 4
-    compress
-    delaycompress
-    missingok
-    notifempty
-    create 644 ${DEPLOY_USER} ${DEPLOY_USER}
-}
-EOF
-
-  log_success "Logrotate configured for backup logs"
+  log_success "Backup directories configured"
 }
 
 # Main execution
@@ -520,7 +485,7 @@ main() {
   install_utilities
   run_dev_setup
   setup_deploy_key
-  setup_backup_cron
+  setup_backup_deps
   cleanup
   print_summary
 }

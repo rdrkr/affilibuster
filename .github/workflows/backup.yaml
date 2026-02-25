@@ -4,6 +4,8 @@ name: Backup
 run-name: Production Backup
 
 on:
+  schedule:
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 concurrency:
@@ -33,3 +35,78 @@ jobs:
             set -e
             cd ~/affilibuster
             make backup-prod
+
+      - name: Fetch Backup Stats
+        id: stats
+        if: success()
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
+
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "cat ~/affilibuster/.backup_stats" > backup_stats.env
+
+          source backup_stats.env
+          echo "strapi_size=$STRAPI_SIZE" >> $GITHUB_OUTPUT
+          echo "pg_size=$PG_SIZE" >> $GITHUB_OUTPUT
+          echo "pg_dump_count=$PG_DUMP_COUNT" >> $GITHUB_OUTPUT
+          echo "git_status=$GIT_STATUS" >> $GITHUB_OUTPUT
+
+      - name: Notify Telegram (success)
+        if: success()
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.UPTIME_KUMA_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.UPTIME_KUMA_TELEGRAM_CHAT_ID }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          STRAPI_SIZE: ${{ steps.stats.outputs.strapi_size }}
+          PG_SIZE: ${{ steps.stats.outputs.pg_size }}
+          PG_DUMP_COUNT: ${{ steps.stats.outputs.pg_dump_count }}
+          GIT_STATUS: ${{ steps.stats.outputs.git_status }}
+        run: |
+          # Trim whitespace/newlines from secrets to prevent curl URL malformat
+          TELEGRAM_TOKEN="$(echo -n "$TELEGRAM_TOKEN" | tr -d '[:space:]')"
+          TELEGRAM_CHAT_ID="$(echo -n "$TELEGRAM_CHAT_ID" | tr -d '[:space:]')"
+
+          printf -v MESSAGE '%s\n%s\n\n%s\n%s\n%s\n%s\n\n%s\n%s\n%s\n%s' \
+            '✅ <b>Affilibuster Backup Complete</b>' \
+            "🕐 $(date -u +'%Y-%m-%d %H:%M:%S UTC')" \
+            "📦 <b>Strapi CMS:</b> ${STRAPI_SIZE}" \
+            "🗄 <b>PostgreSQL:</b> ${PG_SIZE}" \
+            "📁 <b>PG dumps on disk:</b> ${PG_DUMP_COUNT}" \
+            "🔀 <b>Git:</b> ${GIT_STATUS}" \
+            '📦 <b>Repo:</b> ${{ github.repository }}' \
+            '🔀 <b>Branch:</b> ${{ github.ref_name }}' \
+            '👤 <b>By:</b> ${{ github.actor }}' \
+            "🔗 <a href=\"${RUN_URL}\">View Run</a>"
+
+          curl -sf -X POST \
+            "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "parse_mode=HTML" \
+            --data-urlencode "text=${MESSAGE}"
+
+      - name: Notify Telegram (failure)
+        if: failure()
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.UPTIME_KUMA_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.UPTIME_KUMA_TELEGRAM_CHAT_ID }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          # Trim whitespace/newlines from secrets to prevent curl URL malformat
+          TELEGRAM_TOKEN="$(echo -n "$TELEGRAM_TOKEN" | tr -d '[:space:]')"
+          TELEGRAM_CHAT_ID="$(echo -n "$TELEGRAM_CHAT_ID" | tr -d '[:space:]')"
+
+          printf -v MESSAGE '%s\n%s\n\n%s\n%s\n%s\n%s' \
+            '❌ <b>Affilibuster Backup Failed</b>' \
+            "🕐 $(date -u +'%Y-%m-%d %H:%M:%S UTC')" \
+            '📦 <b>Repo:</b> ${{ github.repository }}' \
+            '🔀 <b>Branch:</b> ${{ github.ref_name }}' \
+            '👤 <b>By:</b> ${{ github.actor }}' \
+            "🔗 <a href=\"${RUN_URL}\">View Run</a>"
+
+          curl -sf -X POST \
+            "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "parse_mode=HTML" \
+            --data-urlencode "text=${MESSAGE}"

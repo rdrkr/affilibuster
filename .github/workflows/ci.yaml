@@ -1,6 +1,6 @@
 # Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-name: CI
+name: Preflight
 
 on:
   push:
