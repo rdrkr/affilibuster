@@ -5,22 +5,15 @@
 import { useEffect, useState } from 'react'
 
 import { Icon } from '@/components/elements'
-import { DirectionEnum } from '@/lib/generated/types.gen'
-
-interface BackToTopButtonProps {
-  direction?: DirectionEnum
-}
 
 /**
  * Back to top button component.
  * Appears when user scrolls down and smoothly scrolls to top on click.
- * @param props - Component props
- * @param props.direction - Language direction (ltr/rtl)
+ * Position adapts to text direction via CSS logical property (end-6).
  * @returns BackToTopButton component
  */
-const BackToTopButton = ({ direction = DirectionEnum.LTR }: BackToTopButtonProps) => {
+const BackToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false)
-  const isRTL = direction === DirectionEnum.RTL
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -49,7 +42,7 @@ const BackToTopButton = ({ direction = DirectionEnum.LTR }: BackToTopButtonProps
       onClick={scrollToTop}
       aria-label="Scroll to top"
       className={`
-        fixed ${isRTL ? 'left-6' : 'right-6'} bottom-6 z-40 flex size-12 transform items-center
+        fixed inset-e-6 bottom-6 z-40 flex size-12 transform items-center
         justify-center rounded-full bg-primary text-background-dark shadow-lg
         transition-all duration-500
         hover:bg-primary-hover active:bg-primary-800

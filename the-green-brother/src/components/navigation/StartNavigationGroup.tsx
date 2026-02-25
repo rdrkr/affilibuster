@@ -14,8 +14,7 @@ import { useCallback, useEffect } from 'react'
 
 import { usePathname } from 'next/navigation'
 
-import type { ApiNavigationNavigationDocument } from '@/lib/generated/types.gen'
-import { DirectionEnum } from '@/lib/generated/types.gen'
+import type { ApiNavigationNavigationDocument, DirectionEnum } from '@/lib/generated/types.gen'
 import { SEARCH_EXPANDED_WIDTH, THRESHOLDS } from '@/lib/navigation'
 
 import { ProductCategoriesMenu } from '@/components/menus'
@@ -132,7 +131,7 @@ export function StartNavigationGroup({
   )
 
   return (
-    <NavigationGroup displayMode={displayMode} direction={direction} position="start">
+    <NavigationGroup displayMode={displayMode} position="start">
       {({ showText }) => (
         <>
           {/* Brand */}
@@ -150,7 +149,7 @@ export function StartNavigationGroup({
             className={`
               text-black! hover:text-black active:scale-95
               dark:text-white! dark:hover:text-white
-              ${isBrandTextVisible ? (direction === DirectionEnum.RTL ? 'ml-3' : 'mr-3') : ''}
+              ${isBrandTextVisible ? 'me-3' : ''}
               [&]:inline-flex [&]:overflow-hidden [&]:whitespace-nowrap
               [&]:transition-all [&]:duration-300 [&]:ease-out
               [&>span]:inline-flex [&>span]:overflow-hidden [&>span]:whitespace-nowrap

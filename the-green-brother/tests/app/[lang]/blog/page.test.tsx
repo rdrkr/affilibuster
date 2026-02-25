@@ -14,6 +14,7 @@ jest.mock('next/headers', () => ({
 jest.mock('@/lib/content', () => ({
   getBlog: jest.fn(),
   getBlogPosts: jest.fn(),
+  getNavigation: jest.fn(),
 }))
 
 jest.mock('@/lib/languages/api', () => ({
@@ -40,14 +41,15 @@ jest.mock('@/app/[lang]/blog/BlogClient', () => ({
   },
 }))
 
-import BlogPage from '@/app/[lang]/blog/page'
-import { getBlog, getBlogPosts } from '@/lib/content'
+import BlogPage, { generateMetadata } from '@/app/[lang]/blog/page'
+import { getBlog, getBlogPosts, getNavigation } from '@/lib/content'
 import { LanguageCode, DirectionEnum, SchemaEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
 import { render, screen } from '@testing-library/react'
 
 const mockGetBlog = getBlog as jest.MockedFunction<typeof getBlog>
 const mockGetBlogPosts = getBlogPosts as jest.MockedFunction<typeof getBlogPosts>
+const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 const mockGetLanguages = getLanguages as jest.MockedFunction<typeof getLanguages>
 
 describe('BlogPage', () => {
@@ -107,5 +109,34 @@ describe('BlogPage', () => {
       locale: LanguageCode.EN,
       status: SchemaEnum.DRAFT,
     })
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return metadata from CMS data', async () => {
+    mockGetBlog.mockResolvedValue({
+      seoMetadata: { metaTitle: 'Blog', metaDescription: 'Read our blog' },
+    } as any)
+    mockGetNavigation.mockResolvedValue({ siteTitle: 'TestSite' } as any)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBe('Blog')
+    expect(metadata.description).toBe('Read our blog')
+    expect(metadata.alternates?.canonical).toContain('/en/blog')
+  })
+
+  it('should handle null CMS data gracefully', async () => {
+    mockGetBlog.mockResolvedValue(null)
+    mockGetNavigation.mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.alternates?.canonical).toContain('/en/blog')
   })
 })

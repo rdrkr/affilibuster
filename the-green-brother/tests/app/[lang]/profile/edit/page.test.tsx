@@ -22,29 +22,29 @@ jest.mock('next/link', () => ({
   },
 }))
 
-import EditProfile from '@/app/[lang]/profile/edit/page'
+import EditProfilePage, { generateMetadata } from '@/app/[lang]/profile/edit/page'
 
-describe('EditProfile', () => {
+describe('EditProfilePage', () => {
   it('should render edit profile page', () => {
-    render(<EditProfile />)
+    render(<EditProfilePage />)
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Edit Profile')
   })
 
   it('should render back button linking to profile', () => {
-    render(<EditProfile />)
+    render(<EditProfilePage />)
 
     expect(screen.getByRole('link', { name: /arrow_back/i })).toHaveAttribute('href', '/profile')
   })
 
   it('should render profile image', () => {
-    render(<EditProfile />)
+    render(<EditProfilePage />)
 
     expect(screen.getByRole('img', { name: 'Profile' })).toBeInTheDocument()
   })
 
   it('should render form fields', () => {
-    render(<EditProfile />)
+    render(<EditProfilePage />)
 
     expect(screen.getByText('First Name')).toBeInTheDocument()
     expect(screen.getByText('Last Name')).toBeInTheDocument()
@@ -53,7 +53,7 @@ describe('EditProfile', () => {
   })
 
   it('should have default values in inputs', () => {
-    render(<EditProfile />)
+    render(<EditProfilePage />)
 
     expect(screen.getByDisplayValue('Alex')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Green')).toBeInTheDocument()
@@ -61,14 +61,23 @@ describe('EditProfile', () => {
   })
 
   it('should render cancel link', () => {
-    render(<EditProfile />)
+    render(<EditProfilePage />)
 
     expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', '/profile')
   })
 
   it('should render save button', () => {
-    render(<EditProfile />)
+    render(<EditProfilePage />)
 
     expect(screen.getByRole('button', { name: 'Save Changes' })).toBeInTheDocument()
+  })
+})
+
+describe('generateMetadata', () => {
+  it('should return noindex metadata', () => {
+    const metadata = generateMetadata()
+
+    expect(metadata.title).toBe('Edit Profile')
+    expect(metadata.robots).toEqual({ index: false, follow: false })
   })
 })

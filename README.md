@@ -239,9 +239,6 @@ affilibuster/                        # Monorepo root
 ├── docs/                            # Project documentation
 │ ├── eco-friendly-affiliate-website-prd.md
 │ └── specs/
-│   └── 008-hetzner-vps-migration/   # VPS migration plan & status
-│     ├── plan.md                    # Full migration plan
-│     └── implementation-status.md   # Phase-by-phase progress
 │
 ├── Caddyfile                        # Production reverse proxy (auto SSL, routing, security headers)
 ├── Caddyfile.remote                 # Local proxy for remote-backend development
@@ -363,7 +360,7 @@ This ensures:
 ## 🚢 Production Deployment (Hetzner VPS)
 
 Affilibuster runs on a self-hosted Hetzner VPS with Docker, Caddy for automatic SSL, and GitHub Actions for continuous
-deployment. Full migration plan: [`docs/specs/008-hetzner-vps-migration/plan.md`](docs/specs/008-hetzner-vps-migration/plan.md).
+deployment.
 
 ### Production Architecture
 
@@ -535,10 +532,10 @@ make build-remote
 **How it works**: A local Caddy reverse proxy listens on `localhost:3000` and routes `/api/*` requests to
 `thegreenbrother.com` (production), while all other requests go to the local Next.js dev server with hot reload.
 
-| File                       | Purpose                                        |
-| -------------------------- | ---------------------------------------------- |
-| `docker-compose.remote.yaml` | Frontend + local Caddy proxy                |
-| `Caddyfile.remote`         | Routes `/api/*` to prod, rest to local frontend |
+| File                         | Purpose                                         |
+| ---------------------------- | ----------------------------------------------- |
+| `docker-compose.remote.yaml` | Frontend + local Caddy proxy                    |
+| `Caddyfile.remote`           | Routes `/api/*` to prod, rest to local frontend |
 
 ### Development Workflow
 

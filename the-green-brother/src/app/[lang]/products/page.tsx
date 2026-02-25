@@ -1,10 +1,29 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-import { getProductCategories, getProductCategoriesPage, getProducts } from '@/lib/client'
+import { getNavigation, getProductCategories, getProductCategoriesPage, getProducts } from '@/lib/client'
 import { userProfileFlag } from '@/lib/feature-flags'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
+import { buildPageMetadata } from '@/lib/seo'
+import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import ProductsClient from './ProductsClient'
+
+/**
+ * Generate SEO metadata for the products page from CMS data.
+ * @param root0 - Metadata generation props
+ * @param root0.params - Promise containing route parameters with lang
+ * @returns Metadata object with title, description, OG, Twitter, and alternates
+ */
+export async function generateMetadata({ params }: { params: Promise<{ lang: LanguageCode }> }): Promise<Metadata> {
+  const { lang } = await params
+  const [pageData, navigation] = await Promise.all([getProductCategoriesPage(lang), getNavigation(lang)])
+  return buildPageMetadata({
+    seoMetadata: pageData?.seoMetadata,
+    lang,
+    path: '/products',
+    siteName: navigation?.siteTitle,
+  })
+}
 
 /**
  * Products listing page server component.

@@ -289,7 +289,7 @@ export function EndNavigationGroup({
   const groupVisible = displayMode !== 'none'
 
   return (
-    <NavigationGroup displayMode={displayMode} direction={direction} position="end">
+    <NavigationGroup displayMode={displayMode} position="end">
       {({ showText }) => (
         <>
           {/* Search */}

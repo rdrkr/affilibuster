@@ -14,7 +14,7 @@ import { useCallback } from 'react'
 
 import { frostedGlassStyle } from '@/components/elements/common'
 import type { ApiNavigationNavigationDocument } from '@/lib/generated/types.gen'
-import { DirectionEnum, type Language } from '@/lib/generated/types.gen'
+import type { DirectionEnum, Language } from '@/lib/generated/types.gen'
 import { useNavigationResize } from '@/lib/navigation'
 
 import { useThemeContext } from '@/components/providers'
@@ -73,19 +73,20 @@ export function Navigation({
   return (
     <div
       className={`
-      sticky top-4 z-50 p-4
-      sm:px-6
-      lg:px-8
-    `}
+        sticky top-4 z-50 p-4
+        sm:px-6
+        lg:px-8
+      `}
     >
       <nav ref={navRef} className={`relative p-2`} aria-label="Main navigation">
         {/* Background layer with blur effect */}
         <div className={`absolute inset-0 ${frostedGlassStyle}`} aria-hidden="true" />
 
         <div
-          className={`relative z-20 grid h-12 grid-cols-1 items-center transition-opacity duration-200 ${
-            isReady ? 'opacity-100' : 'opacity-0'
-          }`}
+          className={`
+            relative z-20 grid h-12 grid-cols-1 items-center transition-opacity duration-200
+            ${isReady ? 'opacity-100' : 'opacity-0'}
+          `}
         >
           {isReady && (
             <>

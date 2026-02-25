@@ -15,6 +15,7 @@ jest.mock('@/lib/content', () => ({
   getProductBySlug: jest.fn(),
   getProductCategoriesPage: jest.fn(),
   getProducts: jest.fn(),
+  getNavigation: jest.fn(),
 }))
 
 // Mock feature flags
@@ -58,8 +59,8 @@ jest.mock('@/app/[lang]/products/[slug]/ProductDetailClient', () => ({
   },
 }))
 
-import ProductDetailPage from '@/app/[lang]/products/[slug]/page'
-import { getProductBySlug, getProductCategoriesPage, getProducts } from '@/lib/content'
+import ProductDetailPage, { generateMetadata, generateStaticParams } from '@/app/[lang]/products/[slug]/page'
+import { getNavigation, getProductBySlug, getProductCategoriesPage, getProducts } from '@/lib/content'
 import { userProfileFlag } from '@/lib/feature-flags'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
@@ -67,6 +68,7 @@ import { render, screen } from '@testing-library/react'
 const mockGetProductBySlug = getProductBySlug as jest.MockedFunction<typeof getProductBySlug>
 const mockGetProductCategoriesPage = getProductCategoriesPage as jest.MockedFunction<typeof getProductCategoriesPage>
 const mockGetProducts = getProducts as jest.MockedFunction<typeof getProducts>
+const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 const mockUserProfileFlag = userProfileFlag as jest.MockedFunction<typeof userProfileFlag>
 
 describe('ProductDetailPage', () => {
@@ -170,5 +172,75 @@ describe('ProductDetailPage', () => {
         status: SchemaEnum.DRAFT,
       })
     )
+  })
+})
+
+describe('generateStaticParams', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return params for all products across all languages', async () => {
+    mockGetProducts.mockResolvedValue([{ slug: 'eco-bottle' }, { slug: 'bamboo-brush' }] as Awaited<
+      ReturnType<typeof getProducts>
+    >)
+
+    const params = await generateStaticParams()
+
+    expect(params).toEqual(
+      expect.arrayContaining([
+        { lang: 'en', slug: 'eco-bottle' },
+        { lang: 'it', slug: 'eco-bottle' },
+        { lang: 'he', slug: 'eco-bottle' },
+        { lang: 'en', slug: 'bamboo-brush' },
+        { lang: 'it', slug: 'bamboo-brush' },
+        { lang: 'he', slug: 'bamboo-brush' },
+      ])
+    )
+    expect(params.length).toBe(6)
+  })
+
+  it('should return empty array when products is null', async () => {
+    mockGetProducts.mockResolvedValue(null as unknown as Awaited<ReturnType<typeof getProducts>>)
+
+    const params = await generateStaticParams()
+
+    expect(params).toEqual([])
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return metadata from CMS product data', async () => {
+    mockGetProductBySlug.mockResolvedValue({
+      seoMetadata: { metaTitle: 'Eco Bottle', metaDescription: 'Best eco bottle' },
+      images: [{ url: 'https://example.com/bottle.jpg' }],
+    } as unknown as Awaited<ReturnType<typeof getProductBySlug>>)
+    mockGetNavigation.mockResolvedValue({
+      siteTitle: 'TheGreenBrother',
+    } as Awaited<ReturnType<typeof getNavigation>>)
+
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ lang: LanguageCode.EN, slug: 'eco-bottle' }),
+    })
+
+    expect(metadata.title).toBe('Eco Bottle')
+    expect(metadata.description).toBe('Best eco bottle')
+    expect(metadata.openGraph?.images).toEqual([{ url: 'https://example.com/bottle.jpg' }])
+  })
+
+  it('should handle null product gracefully', async () => {
+    mockGetProductBySlug.mockResolvedValue(null)
+    mockGetNavigation.mockResolvedValue(null)
+
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ lang: LanguageCode.EN, slug: 'non-existent' }),
+    })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.description).toBeUndefined()
   })
 })

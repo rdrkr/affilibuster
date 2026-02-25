@@ -2,15 +2,14 @@
 
 # Affilibuster Product Roadmap
 
-**Last Updated**: 2025-12-15
-**Version**: 1.5.0
+**Last Updated**: 2026-02-26
+**Version**: 1.6.0
 
 This document outlines missing features and capabilities identified through comprehensive code analysis against
 requirements documented in:
 
-- Constitution (`.specify/memory/constitution.md`)
-- Product Requirements Document (`docs/eco-friendly-affiliate-website-prd.md`)
-- Feature Specifications (`specs/` folder)
+- Product Requirements Document (`docs/prd/eco-friendly-affiliate-website-prd.md`)
+- Feature Specifications (`docs/specs/` folder)
 
 ## Status Legend
 
@@ -23,14 +22,15 @@ requirements documented in:
 
 ## Feature Specifications Summary
 
-| Spec                                               | Feature                              | Status         | Progress | Tasks        | Notes                                            |
-| -------------------------------------------------- | ------------------------------------ | -------------- | -------- | ------------ | ------------------------------------------------ |
-| [001](./specs/001-core-platform-setup/)            | Core Platform Setup & Multi-Language | ✅ Complete    | 100%     | 184/184      | All tasks complete including URL redirects       |
-| [002](./specs/002-https-migration/)                | HTTPS Migration for All Components   | ✅ Complete    | 100%     | 34/34        | Automated mkcert setup, OpenAPI models migration |
-| [003](./specs/003-comprehensive-testing-strategy/) | Comprehensive Testing Strategy       | ✅ Complete    | 100%     | 63/63        | Exceeded 80% target with 100% coverage           |
-| [004](./specs/004-user-authentication/)            | User Authentication & Login          | ✅ Complete    | 100%     | Phase 1 done | Backend + TheGreenBrother + 100% test coverage   |
-| [005](./specs/005-e2e-test-coverage/)              | E2E Test Coverage Completion         | 🟡 In Progress | 77%      | 83/108 tests | 25 tests skipped for unimplemented features      |
-| [007](./specs/007-production-security/)            | Production Security Hardening        | 🔴 Not Started | 0%       | 0/17 tasks   | Rate limiting, 2FA, CORS, security headers       |
+| Spec | Feature                              | Status         | Progress | Tasks        | Notes                                            |
+| ---- | ------------------------------------ | -------------- | -------- | ------------ | ------------------------------------------------ |
+| 001  | Core Platform Setup & Multi-Language | ✅ Complete    | 100%     | 184/184      | All tasks complete including URL redirects       |
+| 002  | HTTPS Migration for All Components   | ✅ Complete    | 100%     | 34/34        | Automated mkcert setup, OpenAPI models migration |
+| 003  | Comprehensive Testing Strategy       | ✅ Complete    | 100%     | 63/63        | Exceeded 80% target with 100% coverage           |
+| 004  | User Authentication & Login          | 🟡 In Progress | 77%      | Phase 1 done | Backend + TheGreenBrother + 100% test coverage   |
+| 005  | E2E Test Coverage Completion         | 🟡 In Progress | 77%      | 83/108 tests | 25 tests skipped for unimplemented features      |
+| 007  | Production Security Hardening        | 🔴 Not Started | 0%       | 0/17 tasks   | Rate limiting, 2FA, CORS, security headers       |
+| 008  | Hetzner VPS Migration                | ✅ Complete    | 100%     | All phases   | Self-hosted, automated deployments, monitoring   |
 
 ---
 
@@ -43,8 +43,8 @@ currency, featured flag.
 
 **Missing**:
 
-- [ ] Product images/gallery fields
-- [ ] Eco-certifications field (array/relation)
+- [x] Product images/gallery fields
+- [x] Eco-certifications field (array/relation)
 - [ ] Material field (e.g., organic cotton, bamboo, recycled plastic)
 - [ ] Sustainability features field (e.g., carbon neutral, fair trade, biodegradable)
 - [ ] Brand field (string or relation to Brand content type)
@@ -52,7 +52,7 @@ currency, featured flag.
 - [ ] Weight field (for shipping calculations)
 - [ ] Stock status field
 - [ ] SKU field
-- [ ] Product tags/labels (e.g., "Best Seller", "New Arrival")
+- [x] Product tags/labels (e.g., "Best Seller", "New Arrival")
 
 **Priority**: High
 **Impact**: Essential for eco-friendly affiliate website value proposition
@@ -84,15 +84,15 @@ currency, featured flag.
 
 **Missing**:
 
-- [ ] Category content type (name, slug, description, image, parent category for hierarchy)
-- [ ] Category relation in Product (many-to-many)
-- [ ] Category listing pages (`/[lang]/categories`)
-- [ ] Category detail pages (`/[lang]/category/[slug]`)
-- [ ] Product filtering by category
-- [ ] Category hierarchy/tree navigation
-- [ ] Breadcrumb navigation showing category path
-- [ ] Category-specific SEO metadata
-- [ ] Category schema markup
+- [x] Category content type (name, slug, description, image, parent category for hierarchy)
+- [x] Category relation in Product (many-to-many)
+- [x] Category listing pages (`/[lang]/categories`)
+- [x] Category detail pages (`/[lang]/category/[slug]`)
+- [x] Product filtering by category
+- [x] Category hierarchy/tree navigation
+- [x] Breadcrumb navigation showing category path
+- [x] Category-specific SEO metadata
+- [x] Category schema markup
 
 **Priority**: High
 **Impact**: Required for product organization and navigation
@@ -104,20 +104,38 @@ currency, featured flag.
 
 **Missing**:
 
-- [ ] Article/Blog Post content type (title, slug, content, excerpt, author, publish date, tags)
-- [ ] Blog listing page (`/[lang]/blog`)
-- [ ] Article detail pages (`/[lang]/blog/[slug]`)
-- [ ] Article categories/tags
-- [ ] Author profiles
-- [ ] Related articles
-- [ ] Article schema markup
+- [x] Article/Blog Post content type (title, slug, content, excerpt, author, publish date, tags)
+- [x] Blog listing page (`/[lang]/blog`)
+- [x] Article detail pages (`/[lang]/blog/[slug]`)
+- [x] Article categories/tags
+- [x] Author profiles
+- [x] Related articles
+- [x] Article schema markup
 - [ ] RSS feed for articles
 - [ ] Article search
-- [ ] Reading time estimate
+- [x] Reading time estimate
 
 **Priority**: Medium-High
 **Impact**: Essential for SEO traffic generation and establishing expertise
 **Reference**: PRD Section 1 (Blog / Content Pages), PRD Section 4 (SEO Blog Content)
+
+### 1.5 Contact & Support System - 🟡 Partial
+
+**Current State**: Basic Contact & Support page exists in CMS and frontend, but lacks functional forms or FAQ sections.
+
+**Missing**:
+
+- [ ] Functional contact form submission API (backend)
+- [ ] Email notification integration for contact forms
+- [ ] Spam protection (CAPTCHA/Turnstile) for contact forms
+- [ ] FAQ content type in CMS
+- [ ] FAQ accordion component in frontend
+- [ ] FAQ schema markup for SEO
+- [ ] Support ticketing system/integration (Future)
+
+**Priority**: Medium
+**Impact**: Essential for user trust and support inquiries
+**Reference**: PRD Section 1 (Contact & Support Page)
 
 ---
 
@@ -379,18 +397,18 @@ integration.
 **Priority**: Complete (core functionality)
 **Reference**: Spec 001 FR-018, T145
 
-### 5.3 Breadcrumb Navigation - 🔴 Not Started
+### 5.3 Breadcrumb Navigation - 🟢 Complete
 
 **Current State**: No breadcrumb navigation exists.
 
 **Missing**:
 
-- [ ] Breadcrumb component (frontend)
-- [ ] Breadcrumb data structure in CMS content types
-- [ ] Dynamic breadcrumb generation based on page hierarchy
-- [ ] Breadcrumb schema markup (`BreadcrumbList`)
-- [ ] Breadcrumb styling (mobile, desktop, RTL)
-- [ ] Breadcrumb customization per page
+- [x] Breadcrumb component (frontend)
+- [x] Breadcrumb data structure in CMS content types
+- [x] Dynamic breadcrumb generation based on page hierarchy
+- [x] Breadcrumb schema markup (`BreadcrumbList`)
+- [x] Breadcrumb styling (mobile, desktop, RTL)
+- [x] Breadcrumb customization per page
 
 **Priority**: Medium
 **Impact**: Improves navigation and SEO
@@ -402,14 +420,14 @@ integration.
 
 **Missing**:
 
-- [ ] Consistent use of Next.js Image component everywhere
-- [ ] WebP format enforcement in CMS (convert uploads to WebP)
-- [ ] Responsive image srcsets
-- [ ] Image lazy loading (beyond default Next.js behavior)
-- [ ] Eager loading for above-the-fold images
-- [ ] Image compression pipeline
-- [ ] Alt text enforcement in CMS
-- [ ] Image CDN configuration
+- [x] Consistent use of Next.js Image component everywhere
+- [x] WebP format enforcement in CMS (convert uploads to WebP)
+- [x] Responsive image srcsets
+- [x] Image lazy loading (beyond default Next.js behavior)
+- [x] Eager loading for above-the-fold images
+- [x] Image compression pipeline
+- [x] Alt text enforcement in CMS
+- [x] Image CDN configuration
 
 **Priority**: High
 **Impact**: Critical for performance and SEO
@@ -677,6 +695,22 @@ integration.
 **Impact**: Depends on specific business requirements
 **Reference**: PRD Section 5
 
+### 10.4 Affiliate Program Automation - 🔴 Not Started
+
+**Current State**: No automated discovery or commission updates. Affiliate links must be manually maintained.
+
+**Missing**:
+
+- [ ] Auto-discovery of new affiliate deals/promotions
+- [ ] Automated commission structure updates
+- [ ] Dead link detection and automated pausing
+- [ ] Affiliate network API integrations (Amazon API, Impact, CJ, etc.) for automated syncing
+- [ ] Price and availability syncing from merchants
+
+**Priority**: Low (Future Enhancement)
+**Impact**: Reduces manual maintenance of affiliate links
+**Reference**: PRD Section 5 (Affiliate Program Automation)
+
 ---
 
 ## 11. Security & Compliance
@@ -735,7 +769,7 @@ protocol.
 
 **Missing**:
 
-- [ ] Cookie consent banner
+- [x] Cookie consent banner
 - [ ] Cookie policy page
 - [ ] Data processing agreement
 - [ ] User data export functionality

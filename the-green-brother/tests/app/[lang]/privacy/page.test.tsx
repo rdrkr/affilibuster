@@ -13,6 +13,7 @@ jest.mock('next/headers', () => ({
 // Mock the client module
 jest.mock('@/lib/content', () => ({
   getPrivacy: jest.fn(),
+  getNavigation: jest.fn(),
 }))
 
 // Mock PrivacyPolicyClient
@@ -28,11 +29,12 @@ jest.mock('@/app/[lang]/privacy/PrivacyPolicyClient', () => {
 
 import { render, screen } from '@testing-library/react'
 
-import PrivacyPage from '@/app/[lang]/privacy/page'
-import { getPrivacy } from '@/lib/content'
+import PrivacyPage, { generateMetadata } from '@/app/[lang]/privacy/page'
+import { getNavigation, getPrivacy } from '@/lib/content'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 
 const mockGetPrivacy = getPrivacy as jest.MockedFunction<typeof getPrivacy>
+const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 
 describe('PrivacyPage', () => {
   const mockPrivacyData = {
@@ -84,5 +86,34 @@ describe('PrivacyPage', () => {
     render(ui)
 
     expect(mockGetPrivacy).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return metadata from CMS data', async () => {
+    mockGetPrivacy.mockResolvedValue({
+      seoMetadata: { metaTitle: 'Privacy Policy', metaDescription: 'Our privacy policy' },
+    } as any)
+    mockGetNavigation.mockResolvedValue({ siteTitle: 'TestSite' } as any)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBe('Privacy Policy')
+    expect(metadata.description).toBe('Our privacy policy')
+    expect(metadata.alternates?.canonical).toContain('/en/privacy')
+  })
+
+  it('should handle null CMS data gracefully', async () => {
+    mockGetPrivacy.mockResolvedValue(null)
+    mockGetNavigation.mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.alternates?.canonical).toContain('/en/privacy')
   })
 })

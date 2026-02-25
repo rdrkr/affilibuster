@@ -14,6 +14,7 @@ jest.mock('next/headers', () => ({
 jest.mock('@/lib/content', () => ({
   __esModule: true,
   getBlogPostBySlug: jest.fn(),
+  getBlogPosts: jest.fn(),
   getNavigation: jest.fn(),
   getBlog: jest.fn(),
 }))
@@ -38,13 +39,14 @@ jest.mock('@/app/[lang]/blog/[slug]/BlogPostClient', () => ({
   },
 }))
 
-import BlogPostPage from '@/app/[lang]/blog/[slug]/page'
-import { getBlogPostBySlug, getNavigation } from '@/lib/content'
+import BlogPostPage, { generateMetadata, generateStaticParams } from '@/app/[lang]/blog/[slug]/page'
+import { getBlogPostBySlug, getBlogPosts, getNavigation } from '@/lib/content'
 import { LanguageCode, DirectionEnum, SchemaEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages'
 import { render, screen } from '@testing-library/react'
 
 const mockGetBlogPostBySlug = getBlogPostBySlug as jest.MockedFunction<typeof getBlogPostBySlug>
+const mockGetBlogPosts = getBlogPosts as jest.MockedFunction<typeof getBlogPosts>
 const mockGetLanguages = getLanguages as jest.MockedFunction<typeof getLanguages>
 const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 
@@ -167,5 +169,76 @@ describe('BlogPostPage', () => {
       status: SchemaEnum.DRAFT,
     })
     expect(getBlog).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
+  })
+})
+
+describe('generateStaticParams', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return params for all blog posts across all languages', async () => {
+    mockGetBlogPosts.mockResolvedValue({
+      data: [{ slug: 'my-post' }, { slug: 'another-post' }],
+    } as Awaited<ReturnType<typeof getBlogPosts>>)
+
+    const params = await generateStaticParams()
+
+    expect(params).toEqual(
+      expect.arrayContaining([
+        { lang: 'en', slug: 'my-post' },
+        { lang: 'it', slug: 'my-post' },
+        { lang: 'he', slug: 'my-post' },
+        { lang: 'en', slug: 'another-post' },
+        { lang: 'it', slug: 'another-post' },
+        { lang: 'he', slug: 'another-post' },
+      ])
+    )
+    expect(params.length).toBe(6)
+  })
+
+  it('should return empty array when response is null', async () => {
+    mockGetBlogPosts.mockResolvedValue(null as unknown as Awaited<ReturnType<typeof getBlogPosts>>)
+
+    const params = await generateStaticParams()
+
+    expect(params).toEqual([])
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return metadata from CMS blog post data', async () => {
+    mockGetBlogPostBySlug.mockResolvedValue({
+      seoMetadata: { metaTitle: 'My Blog Post', metaDescription: 'A great post' },
+      featuredImage: { url: 'https://example.com/featured.jpg' },
+    } as unknown as Awaited<ReturnType<typeof getBlogPostBySlug>>)
+    mockGetNavigation.mockResolvedValue({
+      siteTitle: 'TheGreenBrother',
+    } as Awaited<ReturnType<typeof getNavigation>>)
+
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ lang: LanguageCode.EN, slug: 'my-post' }),
+    })
+
+    expect(metadata.title).toBe('My Blog Post')
+    expect(metadata.description).toBe('A great post')
+    expect(metadata.openGraph).toEqual(expect.objectContaining({ type: 'article' }))
+    expect(metadata.openGraph?.images).toEqual([{ url: 'https://example.com/featured.jpg' }])
+  })
+
+  it('should handle null post gracefully', async () => {
+    mockGetBlogPostBySlug.mockResolvedValue(null)
+    mockGetNavigation.mockResolvedValue(null)
+
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ lang: LanguageCode.EN, slug: 'non-existent' }),
+    })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.description).toBeUndefined()
   })
 })

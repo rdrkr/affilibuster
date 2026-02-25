@@ -1,5 +1,0 @@
-# Backend testing dependencies contract
-# Target: backend/requirements.txt (append to existing file)
-
-# NEW: Parallel test execution
-pytest-xdist>=3.6.1

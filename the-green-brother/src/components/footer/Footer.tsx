@@ -14,8 +14,7 @@ import { CookieSettingsAction } from '@/components/consent'
 import { ButtonLink, Label, Text, TextBlock } from '@/components/elements'
 import { DynamicZone } from '@/components/layout/DynamicZone'
 import { getFooter } from '@/lib/content/api'
-import type { ApiFooterFooterDocument } from '@/lib/generated/types.gen'
-import { DirectionEnum } from '@/lib/generated/types.gen'
+import type { ApiFooterFooterDocument, DirectionEnum } from '@/lib/generated/types.gen'
 
 /**
  * Special URL convention for cookie settings quick link.
@@ -51,8 +50,6 @@ export default async function Footer({ lang, direction }: FooterProps) {
   }
 
   const { columns, copyrightsLabel, quickLinks } = footerData
-
-  const isRTL = direction === DirectionEnum.RTL
 
   /**
    * Render a single column based on its component type.
@@ -106,7 +103,6 @@ export default async function Footer({ lang, direction }: FooterProps) {
         className={`
             flex flex-col items-center justify-between
             md:flex-row dark:border-subtle-dark
-            ${isRTL ? 'md:flex-row-reverse' : ''}
           `}
       >
         <Label

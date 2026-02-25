@@ -15,6 +15,7 @@ jest.mock('@/lib/content', () => ({
   getHomepage: jest.fn(),
   getTeamMembers: jest.fn(),
   getBlog: jest.fn(),
+  getNavigation: jest.fn(),
 }))
 
 // Mock feature flags to avoid jose ESM import issues
@@ -35,9 +36,9 @@ jest.mock('@/components/homepage', () => ({
   HomeSections: jest.fn(() => <div data-testid="home-sections" />),
 }))
 
-import HomePage from '@/app/[lang]/(homepage)/page'
+import HomePage, { generateMetadata } from '@/app/[lang]/(homepage)/page'
 import { HomeSections } from '@/components/homepage'
-import { getBlog, getHomepage, getTeamMembers } from '@/lib/content'
+import { getBlog, getHomepage, getNavigation, getTeamMembers } from '@/lib/content'
 import { userProfileFlag } from '@/lib/feature-flags'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
@@ -45,6 +46,7 @@ import { render, screen } from '@testing-library/react'
 const mockGetHomepage = getHomepage as jest.MockedFunction<typeof getHomepage>
 const mockGetTeamMembers = getTeamMembers as jest.MockedFunction<typeof getTeamMembers>
 const mockGetBlog = getBlog as jest.MockedFunction<typeof getBlog>
+const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 const mockUserProfileFlag = userProfileFlag as jest.MockedFunction<typeof userProfileFlag>
 const mockHomeSections = HomeSections as unknown as jest.Mock
 
@@ -196,5 +198,34 @@ describe('HomePage', () => {
 
     expect(mockGetHomepage).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
     expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return metadata from CMS data', async () => {
+    mockGetHomepage.mockResolvedValue({
+      seoMetadata: { metaTitle: 'Home', metaDescription: 'Welcome home' },
+    } as any)
+    mockGetNavigation.mockResolvedValue({ siteTitle: 'TestSite' } as any)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBe('Home')
+    expect(metadata.description).toBe('Welcome home')
+    expect(metadata.alternates?.canonical).toContain('/en')
+  })
+
+  it('should handle null CMS data gracefully', async () => {
+    mockGetHomepage.mockResolvedValue(null)
+    mockGetNavigation.mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.alternates?.canonical).toContain('/en')
   })
 })

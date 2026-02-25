@@ -13,13 +13,12 @@
 import { render, screen } from '@testing-library/react'
 
 import { NavigationGroup } from '@/components/navigation/NavigationGroup'
-import { DirectionEnum } from '@/lib/generated/types.gen'
 
 describe('NavigationGroup', () => {
   describe('Render Props Context', () => {
     it('should pass showText=true when displayMode is full', () => {
       render(
-        <NavigationGroup displayMode="full" direction={DirectionEnum.LTR} position="start">
+        <NavigationGroup displayMode="full" position="start">
           {({ showText }) => <span data-testid="child">{showText ? 'text-visible' : 'text-hidden'}</span>}
         </NavigationGroup>
       )
@@ -29,7 +28,7 @@ describe('NavigationGroup', () => {
 
     it('should pass showText=false when displayMode is partial', () => {
       render(
-        <NavigationGroup displayMode="partial" direction={DirectionEnum.LTR} position="start">
+        <NavigationGroup displayMode="partial" position="start">
           {({ showText }) => <span data-testid="child">{showText ? 'text-visible' : 'text-hidden'}</span>}
         </NavigationGroup>
       )
@@ -39,7 +38,7 @@ describe('NavigationGroup', () => {
 
     it('should pass showText=false when displayMode is minimal', () => {
       render(
-        <NavigationGroup displayMode="minimal" direction={DirectionEnum.LTR} position="start">
+        <NavigationGroup displayMode="minimal" position="start">
           {({ showText }) => <span data-testid="child">{showText ? 'text-visible' : 'text-hidden'}</span>}
         </NavigationGroup>
       )
@@ -49,7 +48,7 @@ describe('NavigationGroup', () => {
 
     it('should pass displayMode in context', () => {
       render(
-        <NavigationGroup displayMode="partial" direction={DirectionEnum.LTR} position="start">
+        <NavigationGroup displayMode="partial" position="start">
           {({ displayMode }) => <span data-testid="child">{displayMode}</span>}
         </NavigationGroup>
       )
@@ -61,7 +60,7 @@ describe('NavigationGroup', () => {
   describe('Display Mode Visibility', () => {
     it('should render children when displayMode is full', () => {
       render(
-        <NavigationGroup displayMode="full" direction={DirectionEnum.LTR} position="start">
+        <NavigationGroup displayMode="full" position="start">
           {() => <span data-testid="child">content</span>}
         </NavigationGroup>
       )
@@ -71,7 +70,7 @@ describe('NavigationGroup', () => {
 
     it('should render children when displayMode is partial', () => {
       render(
-        <NavigationGroup displayMode="partial" direction={DirectionEnum.LTR} position="start">
+        <NavigationGroup displayMode="partial" position="start">
           {() => <span data-testid="child">content</span>}
         </NavigationGroup>
       )
@@ -81,7 +80,7 @@ describe('NavigationGroup', () => {
 
     it('should render children when displayMode is minimal', () => {
       render(
-        <NavigationGroup displayMode="minimal" direction={DirectionEnum.LTR} position="start">
+        <NavigationGroup displayMode="minimal" position="start">
           {() => <span data-testid="child">content</span>}
         </NavigationGroup>
       )
@@ -91,7 +90,7 @@ describe('NavigationGroup', () => {
 
     it('should pass displayMode=none in context', () => {
       render(
-        <NavigationGroup displayMode="none" direction={DirectionEnum.LTR} position="start">
+        <NavigationGroup displayMode="none" position="start">
           {({ displayMode }) => <span data-testid="child">{displayMode}</span>}
         </NavigationGroup>
       )
@@ -103,7 +102,7 @@ describe('NavigationGroup', () => {
   describe('Position-based styling', () => {
     it('should apply consistent styling for start position', () => {
       render(
-        <NavigationGroup displayMode="full" direction={DirectionEnum.LTR} position="start">
+        <NavigationGroup displayMode="full" position="start">
           {() => <span>content</span>}
         </NavigationGroup>
       )
@@ -114,7 +113,7 @@ describe('NavigationGroup', () => {
 
     it('should apply consistent styling for end position', () => {
       render(
-        <NavigationGroup displayMode="full" direction={DirectionEnum.LTR} position="end">
+        <NavigationGroup displayMode="full" position="end">
           {() => <span>content</span>}
         </NavigationGroup>
       )
@@ -128,7 +127,7 @@ describe('NavigationGroup', () => {
     describe('LTR', () => {
       it('should apply justify-self-start for start position', () => {
         render(
-          <NavigationGroup displayMode="full" direction={DirectionEnum.LTR} position="start">
+          <NavigationGroup displayMode="full" position="start">
             {() => <span>content</span>}
           </NavigationGroup>
         )
@@ -140,7 +139,7 @@ describe('NavigationGroup', () => {
 
       it('should apply justify-self-end for end position', () => {
         render(
-          <NavigationGroup displayMode="full" direction={DirectionEnum.LTR} position="end">
+          <NavigationGroup displayMode="full" position="end">
             {() => <span>content</span>}
           </NavigationGroup>
         )
@@ -151,29 +150,29 @@ describe('NavigationGroup', () => {
       })
     })
 
-    describe('RTL', () => {
-      it('should apply justify-self-end for start position', () => {
+    describe('direction-agnostic (html dir handles RTL)', () => {
+      it('should use justify-self-start for start position regardless of direction', () => {
         render(
-          <NavigationGroup displayMode="full" direction={DirectionEnum.RTL} position="start">
+          <NavigationGroup displayMode="full" position="start">
             {() => <span>content</span>}
           </NavigationGroup>
         )
 
         const group = screen.getByTestId('navigation-group-start')
-        expect(group.className).toContain('justify-self-end')
-        expect(group.className).not.toContain('justify-self-start')
+        expect(group.className).toContain('justify-self-start')
+        expect(group.className).not.toContain('justify-self-end')
       })
 
-      it('should apply justify-self-start for end position', () => {
+      it('should use justify-self-end for end position regardless of direction', () => {
         render(
-          <NavigationGroup displayMode="full" direction={DirectionEnum.RTL} position="end">
+          <NavigationGroup displayMode="full" position="end">
             {() => <span>content</span>}
           </NavigationGroup>
         )
 
         const group = screen.getByTestId('navigation-group-end')
-        expect(group.className).toContain('justify-self-start')
-        expect(group.className).not.toContain('justify-self-end')
+        expect(group.className).toContain('justify-self-end')
+        expect(group.className).not.toContain('justify-self-start')
       })
     })
   })
@@ -181,7 +180,7 @@ describe('NavigationGroup', () => {
   describe('Data attributes', () => {
     it('should set data-testid based on position', () => {
       render(
-        <NavigationGroup displayMode="full" direction={DirectionEnum.LTR} position="start">
+        <NavigationGroup displayMode="full" position="start">
           {() => <span>content</span>}
         </NavigationGroup>
       )
@@ -191,7 +190,7 @@ describe('NavigationGroup', () => {
 
     it('should set data-display-mode attribute', () => {
       render(
-        <NavigationGroup displayMode="partial" direction={DirectionEnum.LTR} position="end">
+        <NavigationGroup displayMode="partial" position="end">
           {() => <span>content</span>}
         </NavigationGroup>
       )
@@ -203,7 +202,7 @@ describe('NavigationGroup', () => {
   describe('Custom className', () => {
     it('should apply custom className', () => {
       render(
-        <NavigationGroup displayMode="full" direction={DirectionEnum.LTR} position="start" className="hidden md:flex">
+        <NavigationGroup displayMode="full" position="start" className="hidden md:flex">
           {() => <span>content</span>}
         </NavigationGroup>
       )
@@ -217,7 +216,7 @@ describe('NavigationGroup', () => {
   describe('Transition classes', () => {
     it('should include transition classes for animations', () => {
       render(
-        <NavigationGroup displayMode="full" direction={DirectionEnum.LTR} position="start">
+        <NavigationGroup displayMode="full" position="start">
           {() => <span>content</span>}
         </NavigationGroup>
       )

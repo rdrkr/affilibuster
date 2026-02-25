@@ -30,7 +30,7 @@ describe('Carousel', () => {
     it('should apply sm gap class to inner wrapper', () => {
       render(<Carousel {...defaultProps} gap="sm" />)
       const inner = screen.getByTestId('carousel-track')
-      expect(inner).toHaveClass('gap-4')
+      expect(inner).toHaveClass('gap-2', 'md:gap-4')
     })
 
     it('should apply md gap class by default to inner wrapper', () => {

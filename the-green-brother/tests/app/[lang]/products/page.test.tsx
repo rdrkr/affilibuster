@@ -15,6 +15,7 @@ jest.mock('@/lib/content', () => ({
   getProductCategoriesPage: jest.fn(),
   getProducts: jest.fn(),
   getProductCategories: jest.fn(),
+  getNavigation: jest.fn(),
 }))
 
 // Mock the feature flags module
@@ -41,14 +42,15 @@ jest.mock('@/app/[lang]/products/ProductsClient', () => ({
   },
 }))
 
-import ProductsPage from '@/app/[lang]/products/page'
-import { getProductCategories, getProductCategoriesPage, getProducts } from '@/lib/content'
+import ProductsPage, { generateMetadata } from '@/app/[lang]/products/page'
+import { getNavigation, getProductCategories, getProductCategoriesPage, getProducts } from '@/lib/content'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 
 const mockGetProductCategoriesPage = getProductCategoriesPage as jest.MockedFunction<typeof getProductCategoriesPage>
 const mockGetProducts = getProducts as jest.MockedFunction<typeof getProducts>
 const mockGetProductCategories = getProductCategories as jest.MockedFunction<typeof getProductCategories>
+const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 
 describe('ProductsPage', () => {
   beforeEach(() => {
@@ -130,5 +132,34 @@ describe('ProductsPage', () => {
     expect(mockGetProductCategories).toHaveBeenCalledWith(
       expect.objectContaining({ locale: LanguageCode.EN, status: SchemaEnum.DRAFT })
     )
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return metadata from CMS data', async () => {
+    mockGetProductCategoriesPage.mockResolvedValue({
+      seoMetadata: { metaTitle: 'Products', metaDescription: 'Browse our products' },
+    } as any)
+    mockGetNavigation.mockResolvedValue({ siteTitle: 'TestSite' } as any)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBe('Products')
+    expect(metadata.description).toBe('Browse our products')
+    expect(metadata.alternates?.canonical).toContain('/en/products')
+  })
+
+  it('should handle null CMS data gracefully', async () => {
+    mockGetProductCategoriesPage.mockResolvedValue(null)
+    mockGetNavigation.mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.alternates?.canonical).toContain('/en/products')
   })
 })

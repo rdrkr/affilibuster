@@ -1,11 +1,46 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-import { getProductBySlug, getProductCategoriesPage, getProducts } from '@/lib/client'
+import { getNavigation, getProductBySlug, getProductCategoriesPage, getProducts } from '@/lib/client'
 import { userProfileFlag } from '@/lib/feature-flags'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
+import { buildPageMetadata } from '@/lib/seo'
+import { SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
+import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import ProductDetailClient from './ProductDetailClient'
+
+/**
+ * Generate static params for all product slugs across all languages.
+ * @returns Array of { lang, slug } param objects for static generation
+ */
+export async function generateStaticParams(): Promise<{ lang: string; slug: string }[]> {
+  const products = await getProducts({ pagination: { page: 1, pageSize: 100 } })
+  if (!products) return []
+  return SUPPORTED_LANGUAGE_CODES.flatMap(lang => products.map(product => ({ lang, slug: product.slug })))
+}
+
+/**
+ * Generate SEO metadata for a product detail page from CMS data.
+ * @param root0 - Metadata generation props
+ * @param root0.params - Promise containing route parameters with lang and slug
+ * @returns Metadata object with title, description, OG, Twitter, and alternates
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: LanguageCode; slug: string }>
+}): Promise<Metadata> {
+  const { lang, slug } = await params
+  const [product, navigation] = await Promise.all([getProductBySlug(slug, { locale: lang }), getNavigation(lang)])
+  return buildPageMetadata({
+    seoMetadata: product?.seoMetadata,
+    lang,
+    path: `/products/${slug}`,
+    siteName: navigation?.siteTitle,
+    ogImageUrl: product?.images[0]?.url,
+  })
+}
 
 /**
  * Product detail page server component.

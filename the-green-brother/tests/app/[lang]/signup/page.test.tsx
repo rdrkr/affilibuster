@@ -27,7 +27,7 @@ jest.mock('@/lib/content/api', () => ({
   getAuthPage: jest.fn(),
 }))
 
-import Signup from '@/app/[lang]/signup/page'
+import Signup, { generateMetadata } from '@/app/[lang]/signup/page'
 import { getAuthPage } from '@/lib/content/api'
 
 const mockAuthPage = {
@@ -199,5 +199,32 @@ describe('Signup', () => {
     expect(screen.getByRole('button', { name: 'Sign Up' })).toBeInTheDocument() // Default
     expect(screen.getByText('Terms')).toBeInTheDocument() // Default
     expect(screen.getByText('Privacy Policy')).toBeInTheDocument() // Default
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return noindex metadata from CMS data', async () => {
+    ;(getAuthPage as jest.Mock).mockResolvedValue({
+      seoMetadata: { metaTitle: 'Sign Up', metaDescription: 'Create your account' },
+    })
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: 'en' }) })
+
+    expect(metadata.title).toBe('Sign Up')
+    expect(metadata.description).toBe('Create your account')
+    expect(metadata.robots).toEqual({ index: false, follow: false })
+  })
+
+  it('should handle null auth page gracefully', async () => {
+    ;(getAuthPage as jest.Mock).mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: 'en' }) })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.robots).toEqual({ index: false, follow: false })
   })
 })

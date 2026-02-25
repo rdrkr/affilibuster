@@ -342,7 +342,7 @@ describe('Footer', () => {
     expect(screen.getByText('Content without explicit id')).toBeInTheDocument()
   })
 
-  it('should apply md:flex-row-reverse to bottom footer section for RTL direction', async () => {
+  it('should not apply flex-row-reverse since html dir handles RTL layout', async () => {
     mockGetFooter.mockResolvedValue({
       columns: [],
       copyrightsLabel: { text: '© {year}' },
@@ -352,25 +352,7 @@ describe('Footer', () => {
     const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.RTL })
     render(Component!)
 
-    // Find the container for copyright and quick links (it has flex-col by default)
-    // The copyright text is a good anchor
-    const copyrightElement = screen.getByText(content => content.includes('© {year}'))
-    const bottomSection = copyrightElement.closest('.flex.flex-col.items-center.justify-between')
-
-    expect(bottomSection).toHaveClass('md:flex-row-reverse')
-  })
-
-  it('should not apply md:flex-row-reverse for LTR direction', async () => {
-    mockGetFooter.mockResolvedValue({
-      columns: [],
-      copyrightsLabel: { text: '© {year}' },
-      quickLinks: [],
-    } as unknown as Awaited<ReturnType<typeof getFooter>>)
-
-    const Component = await Footer({ lang: LanguageCode.EN, direction: DirectionEnum.LTR })
-    render(Component!)
-
-    // Verify literal string is passed (logic moved/removed)
+    // RTL layout is handled by html dir attribute, not CSS flex-row-reverse
     const copyrightElement = screen.getByText(content => content.includes('© {year}'))
     const bottomSection = copyrightElement.closest('.flex.flex-col.items-center.justify-between')
 

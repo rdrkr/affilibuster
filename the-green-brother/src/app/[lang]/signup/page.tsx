@@ -3,10 +3,27 @@
 import SignupClient from '@/components/auth/SignupClient'
 import { getAuthPage } from '@/lib/content/api'
 import { DirectionEnum, LanguageCode } from '@/lib/generated/types.gen'
+import { buildNoIndexMetadata } from '@/lib/seo'
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 interface SignupPageProps {
   params: Promise<{ lang: string }>
+}
+
+/**
+ * Generate noindex metadata for the signup page.
+ * @param root0 - Metadata generation props
+ * @param root0.params - Promise containing route parameters with lang
+ * @returns Metadata object with noindex robots directive
+ */
+export async function generateMetadata({ params }: SignupPageProps): Promise<Metadata> {
+  const { lang } = await params
+  const authPage = await getAuthPage(lang)
+  return buildNoIndexMetadata({
+    title: authPage?.seoMetadata.metaTitle,
+    description: authPage?.seoMetadata.metaDescription,
+  })
 }
 
 /**

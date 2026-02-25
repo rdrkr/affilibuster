@@ -13,6 +13,7 @@ jest.mock('next/headers', () => ({
 // Mock the client module
 jest.mock('@/lib/content', () => ({
   getTerm: jest.fn(),
+  getNavigation: jest.fn(),
 }))
 
 // Mock TermsOfServiceClient
@@ -28,11 +29,12 @@ jest.mock('@/app/[lang]/terms/TermsOfServiceClient', () => {
 
 import { render, screen } from '@testing-library/react'
 
-import TermsPage from '@/app/[lang]/terms/page'
-import { getTerm } from '@/lib/content'
+import TermsPage, { generateMetadata } from '@/app/[lang]/terms/page'
+import { getNavigation, getTerm } from '@/lib/content'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 
 const mockGetTerm = getTerm as jest.MockedFunction<typeof getTerm>
+const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 
 describe('TermsPage', () => {
   const mockTermData = {
@@ -84,5 +86,34 @@ describe('TermsPage', () => {
     render(ui)
 
     expect(mockGetTerm).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return metadata from CMS data', async () => {
+    mockGetTerm.mockResolvedValue({
+      seoMetadata: { metaTitle: 'Terms of Service', metaDescription: 'Our terms' },
+    } as any)
+    mockGetNavigation.mockResolvedValue({ siteTitle: 'TestSite' } as any)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBe('Terms of Service')
+    expect(metadata.description).toBe('Our terms')
+    expect(metadata.alternates?.canonical).toContain('/en/terms')
+  })
+
+  it('should handle null CMS data gracefully', async () => {
+    mockGetTerm.mockResolvedValue(null)
+    mockGetNavigation.mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.alternates?.canonical).toContain('/en/terms')
   })
 })

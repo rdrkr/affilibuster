@@ -4,7 +4,7 @@
  * Unit tests for wishlist page
  */
 
-import Wishlist from '@/app/[lang]/profile/wishlist/page'
+import Wishlist, { generateMetadata } from '@/app/[lang]/profile/wishlist/page'
 import { getProfile } from '@/lib/content/api'
 import { render, screen } from '@testing-library/react'
 
@@ -123,5 +123,32 @@ describe('Wishlist', () => {
     const ui = await Wishlist({ params: Promise.resolve({ lang: 'he' }) })
     render(ui)
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return noindex metadata from CMS data', async () => {
+    ;(getProfile as jest.Mock).mockResolvedValue({
+      seoMetadata: { metaTitle: 'Wishlist', metaDescription: 'Your saved items' },
+    })
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: 'en' }) })
+
+    expect(metadata.title).toBe('Wishlist')
+    expect(metadata.description).toBe('Your saved items')
+    expect(metadata.robots).toEqual({ index: false, follow: false })
+  })
+
+  it('should handle null profile data gracefully', async () => {
+    ;(getProfile as jest.Mock).mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: 'en' }) })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.robots).toEqual({ index: false, follow: false })
   })
 })

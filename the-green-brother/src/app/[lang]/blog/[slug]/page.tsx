@@ -1,10 +1,46 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-import { getBlog, getBlogPostBySlug, getLanguages, getNavigation } from '@/lib/client'
+import { getBlog, getBlogPostBySlug, getBlogPosts, getLanguages, getNavigation } from '@/lib/client'
 import { DirectionEnum, LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
+import { buildPageMetadata } from '@/lib/seo'
+import { SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
+import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import BlogPostClient from './BlogPostClient'
+
+/**
+ * Generate static params for all blog post slugs across all languages.
+ * @returns Array of { lang, slug } param objects for static generation
+ */
+export async function generateStaticParams(): Promise<{ lang: string; slug: string }[]> {
+  const response = await getBlogPosts({ pagination: { page: 1, pageSize: 100 } })
+  if (!response?.data) return []
+  return SUPPORTED_LANGUAGE_CODES.flatMap(lang => response.data.map(post => ({ lang, slug: post.slug })))
+}
+
+/**
+ * Generate SEO metadata for a blog post detail page from CMS data.
+ * @param root0 - Metadata generation props
+ * @param root0.params - Promise containing route parameters with lang and slug
+ * @returns Metadata object with title, description, OG (article type), Twitter, and alternates
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: LanguageCode; slug: string }>
+}): Promise<Metadata> {
+  const { lang, slug } = await params
+  const [post, navigation] = await Promise.all([getBlogPostBySlug(slug, { locale: lang }), getNavigation(lang)])
+  return buildPageMetadata({
+    seoMetadata: post?.seoMetadata,
+    lang,
+    path: `/blog/${slug}`,
+    siteName: navigation?.siteTitle,
+    ogType: 'article',
+    ogImageUrl: post?.featuredImage.url,
+  })
+}
 
 /**
  * Blog post detail page server component.

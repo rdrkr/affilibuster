@@ -14,6 +14,7 @@ jest.mock('next/headers', () => ({
 jest.mock('@/lib/content', () => ({
   getAbout: jest.fn(),
   getTeamMembers: jest.fn(),
+  getNavigation: jest.fn(),
 }))
 
 // Mock the languages API
@@ -47,14 +48,15 @@ jest.mock('@/app/[lang]/about/AboutClient', () => ({
   },
 }))
 
-import AboutPage from '@/app/[lang]/about/page'
-import { getAbout, getTeamMembers } from '@/lib/content'
+import AboutPage, { generateMetadata } from '@/app/[lang]/about/page'
+import { getAbout, getNavigation, getTeamMembers } from '@/lib/content'
 import { LanguageCode, CurrencyCode, DirectionEnum, SchemaEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
 import { render, screen } from '@testing-library/react'
 
 const mockGetAbout = getAbout as jest.MockedFunction<typeof getAbout>
 const mockGetTeamMembers = getTeamMembers as jest.MockedFunction<typeof getTeamMembers>
+const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 const mockGetLanguages = getLanguages as jest.MockedFunction<typeof getLanguages>
 
 describe('AboutPage', () => {
@@ -172,5 +174,34 @@ describe('AboutPage', () => {
     render(Component)
 
     expect(mockGetAbout).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return metadata from CMS data', async () => {
+    mockGetAbout.mockResolvedValue({
+      seoMetadata: { metaTitle: 'About Us', metaDescription: 'Learn about us' },
+    } as any)
+    mockGetNavigation.mockResolvedValue({ siteTitle: 'TestSite' } as any)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBe('About Us')
+    expect(metadata.description).toBe('Learn about us')
+    expect(metadata.alternates?.canonical).toContain('/en/about')
+  })
+
+  it('should handle null CMS data gracefully', async () => {
+    mockGetAbout.mockResolvedValue(null)
+    mockGetNavigation.mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.alternates?.canonical).toContain('/en/about')
   })
 })

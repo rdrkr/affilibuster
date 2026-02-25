@@ -33,7 +33,7 @@ jest.mock('@/lib/auth/api', () => ({
   deleteAccount: (...args: unknown[]) => mockDeleteAccount(...args),
 }))
 
-import DeleteAccount from '@/app/[lang]/profile/delete/page'
+import DeleteAccount, { generateMetadata } from '@/app/[lang]/profile/delete/page'
 import { getProfile } from '@/lib/content/api'
 
 const mockProfileData = {
@@ -188,5 +188,32 @@ describe('DeleteAccount', () => {
 
     expect(screen.getByText('Confirm Delete')).toBeInTheDocument() // Default
     expect(screen.getByText('Cancel')).toBeInTheDocument() // Default
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return noindex metadata from CMS data', async () => {
+    ;(getProfile as jest.Mock).mockResolvedValue({
+      seoMetadata: { metaTitle: 'Delete Account', metaDescription: 'Delete your account' },
+    })
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: 'en' }) })
+
+    expect(metadata.title).toBe('Delete Account')
+    expect(metadata.description).toBe('Delete your account')
+    expect(metadata.robots).toEqual({ index: false, follow: false })
+  })
+
+  it('should handle null profile data gracefully', async () => {
+    ;(getProfile as jest.Mock).mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: 'en' }) })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.robots).toEqual({ index: false, follow: false })
   })
 })

@@ -1,10 +1,17 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 /**
- * Unit tests for locale-aware layout component
+ * Unit tests for locale-aware layout component.
+ * Tests HTML shell (lang, dir), generateMetadata, and child component composition.
  */
 
 import { render, screen } from '@testing-library/react'
+import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
+
+// Mock next/font/google
+jest.mock('next/font/google', () => ({
+  Inter: () => ({ className: 'inter-font' }),
+}))
 
 const mockDraftMode = jest.fn().mockResolvedValue({ isEnabled: false })
 jest.mock('next/headers', () => ({
@@ -67,6 +74,16 @@ jest.mock('@/components/consent', () => ({
   },
 }))
 
+// Mock LayoutProvider and ThemeProvider
+jest.mock('@/components/providers', () => ({
+  LayoutProvider: function MockLayoutProvider({ children }: { children: React.ReactNode }) {
+    return <div data-testid="layout-provider">{children}</div>
+  },
+  ThemeProvider: function MockThemeProvider({ children }: { children: React.ReactNode }) {
+    return <div data-testid="theme-provider">{children}</div>
+  },
+}))
+
 // Mock the content and languages APIs
 jest.mock('@/lib/content/api', () => ({
   getNavigation: jest.fn(),
@@ -82,15 +99,123 @@ jest.mock('@/lib/feature-flags', () => ({
   userProfileFlag: jest.fn().mockResolvedValue(false),
 }))
 
-import LocaleLayout from '@/app/[lang]/layout'
+import LocaleLayout, { generateMetadata } from '@/app/[lang]/layout'
 import { getNavigation } from '@/lib/content/api'
-import { LanguageCode } from '@/lib/generated/types.gen'
+import { DirectionEnum, LanguageCode } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
 import { notFound } from 'next/navigation'
 
 const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 const mockGetLanguages = getLanguages as jest.MockedFunction<typeof getLanguages>
 const mockNotFound = notFound as jest.MockedFunction<typeof notFound>
+
+/** Props shape for the html element returned by LocaleLayout. */
+interface HtmlElementProps {
+  lang: string
+  dir: string
+  suppressHydrationWarning: boolean
+  children: React.ReactNode
+}
+
+/**
+ * Get typed props from the html ReactElement returned by LocaleLayout.
+ * @param element - The ReactElement returned by LocaleLayout
+ * @returns Typed HTML element props
+ */
+function getHtmlProps(element: ReactElement): HtmlElementProps {
+  return element.props as HtmlElementProps
+}
+
+/**
+ * Extract the body content from the HTML element returned by LocaleLayout.
+ * LocaleLayout returns an <html> element which cannot be rendered inside
+ * React Testing Library's <div> container. This helper extracts the <body>
+ * children for content rendering tests.
+ * @param element - The ReactElement returned by LocaleLayout
+ * @returns A fragment containing the body's children
+ */
+function getBodyContent(element: ReactElement): ReactElement {
+  const htmlChildren = Children.toArray((element.props as { children: ReactNode }).children)
+  const body = htmlChildren.find((child): child is ReactElement => isValidElement(child) && child.type === 'body')
+  if (!body) {
+    throw new Error('Expected <body> element inside <html>')
+  }
+  return <>{(body.props as { children: ReactNode }).children}</>
+}
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return title template and description from navigation', async () => {
+    mockGetNavigation.mockResolvedValue({
+      siteTitle: 'TestSite',
+      siteDescription: 'Test site description',
+    } as Awaited<ReturnType<typeof getNavigation>>)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toEqual({
+      template: '%s | TestSite',
+      default: 'TestSite',
+    })
+    expect(metadata.description).toBe('Test site description')
+  })
+
+  it('should fallback to TheGreenBrother when navigation is null', async () => {
+    mockGetNavigation.mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toEqual({
+      template: '%s | TheGreenBrother',
+      default: 'TheGreenBrother',
+    })
+    expect(metadata.description).toBeUndefined()
+  })
+
+  it('should include base openGraph and twitter defaults', async () => {
+    mockGetNavigation.mockResolvedValue({
+      siteTitle: 'TestSite',
+    } as Awaited<ReturnType<typeof getNavigation>>)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.openGraph).toEqual(
+      expect.objectContaining({
+        siteName: 'TestSite',
+        type: 'website',
+      })
+    )
+    expect(metadata.twitter).toEqual(
+      expect.objectContaining({
+        card: 'summary_large_image',
+      })
+    )
+  })
+
+  it('should fetch navigation with the correct language', async () => {
+    mockGetNavigation.mockResolvedValue(null)
+
+    await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.IT }) })
+
+    expect(mockGetNavigation).toHaveBeenCalledWith(LanguageCode.IT)
+  })
+
+  it('should fallback title when siteTitle is missing', async () => {
+    mockGetNavigation.mockResolvedValue({
+      siteDescription: 'Description only',
+    } as Awaited<ReturnType<typeof getNavigation>>)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toEqual({
+      template: '%s | TheGreenBrother',
+      default: 'TheGreenBrother',
+    })
+  })
+})
 
 describe('LocaleLayout', () => {
   beforeEach(() => {
@@ -105,154 +230,213 @@ describe('LocaleLayout', () => {
     >)
   })
 
-  it('should render children within the layout', async () => {
-    const Component = await LocaleLayout({
-      children: <div data-testid="child">Test Child</div>,
-      params: Promise.resolve({ lang: LanguageCode.EN }),
+  describe('HTML shell', () => {
+    it('should return an html element', async () => {
+      const element = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
+
+      expect(element.type).toBe('html')
     })
 
-    render(Component)
+    it('should set lang attribute from route params', async () => {
+      const element = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
 
-    expect(screen.getByTestId('child')).toBeInTheDocument()
-    expect(screen.getByText('Test Child')).toBeInTheDocument()
+      expect(getHtmlProps(element).lang).toBe('en')
+    })
+
+    it('should set lang to Hebrew for he locale', async () => {
+      const element = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.HE }),
+      })
+
+      expect(getHtmlProps(element).lang).toBe('he')
+    })
+
+    it('should set lang to Italian for it locale', async () => {
+      const element = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.IT }),
+      })
+
+      expect(getHtmlProps(element).lang).toBe('it')
+    })
+
+    it('should set dir to ltr by default', async () => {
+      const element = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
+
+      expect(getHtmlProps(element).dir).toBe(DirectionEnum.LTR)
+    })
+
+    it('should set dir to rtl for Hebrew', async () => {
+      mockGetLanguages.mockResolvedValue([
+        { code: LanguageCode.HE, name: 'Hebrew', direction: DirectionEnum.RTL },
+      ] as unknown as Awaited<ReturnType<typeof getLanguages>>)
+
+      const element = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.HE }),
+      })
+
+      expect(getHtmlProps(element).dir).toBe(DirectionEnum.RTL)
+    })
+
+    it('should include suppressHydrationWarning', async () => {
+      const element = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
+
+      expect(getHtmlProps(element).suppressHydrationWarning).toBe(true)
+    })
   })
 
-  it('should render navigation when data is available', async () => {
-    const Component = await LocaleLayout({
-      children: <div>Content</div>,
-      params: Promise.resolve({ lang: LanguageCode.EN }),
+  describe('content rendering', () => {
+    it('should render children within the layout', async () => {
+      const Component = await LocaleLayout({
+        children: <div data-testid="child">Test Child</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
+
+      render(getBodyContent(Component))
+
+      expect(screen.getByTestId('child')).toBeInTheDocument()
+      expect(screen.getByText('Test Child')).toBeInTheDocument()
     })
 
-    render(Component)
+    it('should render navigation when data is available', async () => {
+      const Component = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
 
-    expect(screen.getByTestId('mock-navigation')).toBeInTheDocument()
-  })
+      render(getBodyContent(Component))
 
-  it('should render footer', async () => {
-    const Component = await LocaleLayout({
-      children: <div>Content</div>,
-      params: Promise.resolve({ lang: LanguageCode.EN }),
+      expect(screen.getByTestId('mock-navigation')).toBeInTheDocument()
     })
 
-    render(Component)
+    it('should render footer', async () => {
+      const Component = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
 
-    expect(screen.getByTestId('mock-footer')).toBeInTheDocument()
-  })
+      render(getBodyContent(Component))
 
-  it('should render back to top button', async () => {
-    const Component = await LocaleLayout({
-      children: <div>Content</div>,
-      params: Promise.resolve({ lang: LanguageCode.EN }),
+      expect(screen.getByTestId('mock-footer')).toBeInTheDocument()
     })
 
-    render(Component)
+    it('should render back to top button', async () => {
+      const Component = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
 
-    expect(screen.getByTestId('mock-back-to-top')).toBeInTheDocument()
-  })
+      render(getBodyContent(Component))
 
-  it('should render cookie consent banner', async () => {
-    const Component = await LocaleLayout({
-      children: <div>Content</div>,
-      params: Promise.resolve({ lang: LanguageCode.EN }),
+      expect(screen.getByTestId('mock-back-to-top')).toBeInTheDocument()
     })
 
-    render(Component)
+    it('should render cookie consent banner', async () => {
+      const Component = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
 
-    expect(screen.getByTestId('mock-cookie-consent-banner')).toBeInTheDocument()
-  })
+      render(getBodyContent(Component))
 
-  it('should call notFound for invalid language', async () => {
-    await LocaleLayout({
-      children: <div>Content</div>,
-      params: Promise.resolve({ lang: 'invalid' as LanguageCode }),
+      expect(screen.getByTestId('mock-cookie-consent-banner')).toBeInTheDocument()
     })
 
-    expect(mockNotFound).toHaveBeenCalled()
-  })
+    it('should call notFound for invalid language', async () => {
+      await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: 'invalid' as LanguageCode }),
+      })
 
-  it('should not render navigation when data is null', async () => {
-    mockGetNavigation.mockResolvedValue(null)
-
-    const Component = await LocaleLayout({
-      children: <div>Content</div>,
-      params: Promise.resolve({ lang: LanguageCode.EN }),
+      expect(mockNotFound).toHaveBeenCalled()
     })
 
-    render(Component)
+    it('should not render navigation when data is null', async () => {
+      mockGetNavigation.mockResolvedValue(null)
 
-    expect(screen.queryByTestId('mock-navigation')).not.toBeInTheDocument()
-  })
+      const Component = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
 
-  it('should wrap content with NextIntlClientProvider', async () => {
-    const Component = await LocaleLayout({
-      children: <div>Content</div>,
-      params: Promise.resolve({ lang: LanguageCode.EN }),
+      render(getBodyContent(Component))
+
+      expect(screen.queryByTestId('mock-navigation')).not.toBeInTheDocument()
     })
 
-    render(Component)
+    it('should wrap content with NextIntlClientProvider', async () => {
+      const Component = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
 
-    expect(screen.getByTestId('intl-provider')).toBeInTheDocument()
-  })
+      render(getBodyContent(Component))
 
-  it('should support Italian locale', async () => {
-    const Component = await LocaleLayout({
-      children: <div data-testid="italian-child">Italian Content</div>,
-      params: Promise.resolve({ lang: LanguageCode.IT }),
+      expect(screen.getByTestId('intl-provider')).toBeInTheDocument()
     })
 
-    render(Component)
+    it('should wrap content with ThemeProvider', async () => {
+      const Component = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
 
-    expect(screen.getByTestId('italian-child')).toBeInTheDocument()
-  })
+      render(getBodyContent(Component))
 
-  it('should support Hebrew locale', async () => {
-    const Component = await LocaleLayout({
-      children: <div data-testid="hebrew-child">Hebrew Content</div>,
-      params: Promise.resolve({ lang: LanguageCode.HE }),
+      expect(screen.getByTestId('theme-provider')).toBeInTheDocument()
     })
 
-    render(Component)
+    it('should handle null languages response gracefully', async () => {
+      mockGetLanguages.mockResolvedValue(null)
 
-    expect(screen.getByTestId('hebrew-child')).toBeInTheDocument()
-  })
+      const Component = await LocaleLayout({
+        children: <div data-testid="child">Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
 
-  it('should handle null languages response gracefully', async () => {
-    mockGetLanguages.mockResolvedValue(null)
+      render(getBodyContent(Component))
 
-    const Component = await LocaleLayout({
-      children: <div data-testid="child">Content</div>,
-      params: Promise.resolve({ lang: LanguageCode.EN }),
+      expect(screen.getByTestId('child')).toBeInTheDocument()
     })
 
-    render(Component)
+    it('should not render DraftModeBanner when draft mode is disabled', async () => {
+      mockDraftMode.mockResolvedValue({ isEnabled: false })
 
-    // Should still render without errors
-    expect(screen.getByTestId('child')).toBeInTheDocument()
-  })
+      const Component = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
 
-  it('should not render DraftModeBanner when draft mode is disabled', async () => {
-    mockDraftMode.mockResolvedValue({ isEnabled: false })
+      render(getBodyContent(Component))
 
-    const Component = await LocaleLayout({
-      children: <div>Content</div>,
-      params: Promise.resolve({ lang: LanguageCode.EN }),
+      expect(screen.queryByTestId('mock-draft-mode-banner')).not.toBeInTheDocument()
     })
 
-    render(Component)
+    it('should render DraftModeBanner when draft mode is enabled', async () => {
+      mockDraftMode.mockResolvedValue({ isEnabled: true })
 
-    expect(screen.queryByTestId('mock-draft-mode-banner')).not.toBeInTheDocument()
-  })
+      const Component = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
 
-  it('should render DraftModeBanner when draft mode is enabled', async () => {
-    mockDraftMode.mockResolvedValue({ isEnabled: true })
+      render(getBodyContent(Component))
 
-    const Component = await LocaleLayout({
-      children: <div>Content</div>,
-      params: Promise.resolve({ lang: LanguageCode.EN }),
+      expect(screen.getByTestId('mock-draft-mode-banner')).toBeInTheDocument()
     })
-
-    render(Component)
-
-    expect(screen.getByTestId('mock-draft-mode-banner')).toBeInTheDocument()
   })
 })

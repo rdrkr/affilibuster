@@ -47,7 +47,7 @@ jest.mock('@/lib/consent', () => ({
   openCookieSettings: (...args: unknown[]) => mockOpenCookieSettings(...args),
 }))
 
-import Profile from '@/app/[lang]/profile/page'
+import Profile, { generateMetadata } from '@/app/[lang]/profile/page'
 import { getProfile } from '@/lib/content/api'
 
 const mockProfileData = {
@@ -276,5 +276,32 @@ describe('Profile', () => {
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
 
     // We can just verify it renders successfullly, coverage for isRtl branch will be hit
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return noindex metadata from CMS data', async () => {
+    ;(getProfile as jest.Mock).mockResolvedValue({
+      seoMetadata: { metaTitle: 'Profile', metaDescription: 'Your profile page' },
+    })
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: 'en' }) })
+
+    expect(metadata.title).toBe('Profile')
+    expect(metadata.description).toBe('Your profile page')
+    expect(metadata.robots).toEqual({ index: false, follow: false })
+  })
+
+  it('should handle null profile data gracefully', async () => {
+    ;(getProfile as jest.Mock).mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: 'en' }) })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.robots).toEqual({ index: false, follow: false })
   })
 })

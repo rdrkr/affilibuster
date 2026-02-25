@@ -4,7 +4,7 @@
  * Unit tests for currency settings page
  */
 
-import Currency from '@/app/[lang]/profile/currency/page'
+import Currency, { generateMetadata } from '@/app/[lang]/profile/currency/page'
 import { getCurrencies, getProfile } from '@/lib/content/api'
 import { fireEvent, render, screen } from '@testing-library/react'
 
@@ -169,5 +169,32 @@ describe('Currency', () => {
     const ui = await Currency({ params: Promise.resolve({ lang: 'he' }) })
     render(ui)
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return noindex metadata from CMS data', async () => {
+    ;(getProfile as jest.Mock).mockResolvedValue({
+      seoMetadata: { metaTitle: 'Currency Settings', metaDescription: 'Choose your currency' },
+    })
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: 'en' }) })
+
+    expect(metadata.title).toBe('Currency Settings')
+    expect(metadata.description).toBe('Choose your currency')
+    expect(metadata.robots).toEqual({ index: false, follow: false })
+  })
+
+  it('should handle null profile data gracefully', async () => {
+    ;(getProfile as jest.Mock).mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: 'en' }) })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.robots).toEqual({ index: false, follow: false })
   })
 })

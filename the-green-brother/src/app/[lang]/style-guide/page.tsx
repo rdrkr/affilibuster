@@ -6,6 +6,7 @@
  * Available in all languages
  */
 
+import { buildNoIndexMetadata } from '@/lib/seo'
 import { LanguageCode, SUPPORTED_LANGUAGE_CODES, isLanguageCode } from '@/lib/types'
 import type { Metadata } from 'next'
 import { setRequestLocale } from 'next-intl/server'
@@ -24,18 +25,14 @@ export function generateStaticParams() {
 }
 
 /**
- * Generate metadata for the style guide page
- * @returns Metadata object
+ * Generate noindex metadata for the style guide page.
+ * @returns Metadata object with noindex robots directive
  */
 export function generateMetadata(): Metadata {
-  return {
-    title: 'Style Guide - TheGreenBrother',
+  return buildNoIndexMetadata({
+    title: 'Style Guide',
     description: 'Design system reference for TheGreenBrother',
-    robots: {
-      index: false, // Don't index style guide in production
-      follow: false,
-    },
-  }
+  })
 }
 
 /**

@@ -218,14 +218,13 @@ describe('StartNavigationGroup', () => {
   })
 
   describe('RTL Support', () => {
-    it('should apply ml-3 class to brand button when direction is RTL and brand text is visible', () => {
+    it('should apply me-3 logical margin to brand button when brand text is visible', () => {
       mockUsePathname.mockReturnValue('/')
       render(<StartNavigationGroup data={mockData} displayMode="full" direction={DirectionEnum.RTL} navWidth={1200} />)
 
       const brandLink = screen.getByText('Brand')
-      // In RTL mode with brand text visible, className should include 'ml-3' instead of 'mr-3'
-      expect(brandLink.className).toContain('ml-3')
-      expect(brandLink.className).not.toContain('mr-3')
+      // Logical property me-3 adapts to text direction via html dir attribute
+      expect(brandLink.className).toContain('me-3')
     })
   })
 

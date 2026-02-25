@@ -1,11 +1,30 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 import { HomeSections } from '@/components/homepage'
-import { getBlog, getHomepage, getTeamMembers } from '@/lib/content'
+import { getBlog, getHomepage, getNavigation, getTeamMembers } from '@/lib/content'
 import { userProfileFlag } from '@/lib/feature-flags'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
+import { buildPageMetadata } from '@/lib/seo'
+import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import HomeClient from './HomeClient'
+
+/**
+ * Generate SEO metadata for the homepage from CMS data.
+ * @param root0 - Metadata generation props
+ * @param root0.params - Promise containing route parameters with lang
+ * @returns Metadata object with title, description, OG, Twitter, and alternates
+ */
+export async function generateMetadata({ params }: { params: Promise<{ lang: LanguageCode }> }): Promise<Metadata> {
+  const { lang } = await params
+  const [pageData, navigation] = await Promise.all([getHomepage(lang), getNavigation(lang)])
+  return buildPageMetadata({
+    seoMetadata: pageData?.seoMetadata,
+    lang,
+    path: '',
+    siteName: navigation?.siteTitle,
+  })
+}
 
 /**
  * Homepage Server Component

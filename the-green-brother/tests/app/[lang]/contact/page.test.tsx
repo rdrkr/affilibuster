@@ -13,6 +13,7 @@ jest.mock('next/headers', () => ({
 // Mock the client module
 jest.mock('@/lib/content', () => ({
   getContactUs: jest.fn(),
+  getNavigation: jest.fn(),
 }))
 
 // Mock the ContactClient component
@@ -23,12 +24,13 @@ jest.mock('@/app/[lang]/contact/ContactClient', () => ({
   },
 }))
 
-import ContactPage from '@/app/[lang]/contact/page'
-import { getContactUs } from '@/lib/content'
+import ContactPage, { generateMetadata } from '@/app/[lang]/contact/page'
+import { getContactUs, getNavigation } from '@/lib/content'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
 
 const mockGetContactUs = getContactUs as jest.MockedFunction<typeof getContactUs>
+const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 
 describe('ContactPage', () => {
   beforeEach(() => {
@@ -75,5 +77,34 @@ describe('ContactPage', () => {
     render(Component)
 
     expect(mockGetContactUs).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return metadata from CMS data', async () => {
+    mockGetContactUs.mockResolvedValue({
+      seoMetadata: { metaTitle: 'Contact', metaDescription: 'Get in touch' },
+    } as any)
+    mockGetNavigation.mockResolvedValue({ siteTitle: 'TestSite' } as any)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBe('Contact')
+    expect(metadata.description).toBe('Get in touch')
+    expect(metadata.alternates?.canonical).toContain('/en/contact')
+  })
+
+  it('should handle null CMS data gracefully', async () => {
+    mockGetContactUs.mockResolvedValue(null)
+    mockGetNavigation.mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.alternates?.canonical).toContain('/en/contact')
   })
 })

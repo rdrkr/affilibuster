@@ -7,7 +7,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 
 import BackToTopButton from '@/components/navigation/BackToTopButton'
-import { DirectionEnum } from '@/lib/generated/types.gen'
 
 // Mock Icon
 jest.mock('@/components/elements', () => ({
@@ -117,23 +116,12 @@ describe('BackToTopButton', () => {
     // But it's hidden: opacity-0 translate-y-10 scale-90 pointer-events-none
     expect(button).toHaveClass('opacity-0')
     expect(button).toHaveClass('pointer-events-none')
-
-    // Default (LTR) position
-    expect(button).toHaveClass('right-6')
   })
 
-  it('should position on left for RTL direction', () => {
-    render(<BackToTopButton direction={DirectionEnum.RTL} />)
+  it('should use logical end-6 positioning for direction-aware placement', () => {
+    render(<BackToTopButton />)
     const button = screen.getByRole('button', { name: /scroll to top/i })
-    expect(button).toHaveClass('left-6')
-    expect(button).not.toHaveClass('right-6')
-  })
-
-  it('should position on right for LTR direction', () => {
-    render(<BackToTopButton direction={DirectionEnum.LTR} />)
-    const button = screen.getByRole('button', { name: /scroll to top/i })
-    expect(button).toHaveClass('right-6')
-    expect(button).not.toHaveClass('left-6')
+    expect(button).toHaveClass('inset-e-6')
   })
 
   it('should not have pointer-events-none when visible', () => {

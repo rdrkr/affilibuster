@@ -13,6 +13,7 @@ jest.mock('next/headers', () => ({
 // Mock the client module
 jest.mock('@/lib/content', () => ({
   getCookiePolicy: jest.fn(),
+  getNavigation: jest.fn(),
 }))
 
 // Mock CookiePolicyClient
@@ -28,11 +29,12 @@ jest.mock('@/app/[lang]/cookie-policy/CookiePolicyClient', () => {
 
 import { render, screen } from '@testing-library/react'
 
-import CookiePolicyPage from '@/app/[lang]/cookie-policy/page'
-import { getCookiePolicy } from '@/lib/content'
+import CookiePolicyPage, { generateMetadata } from '@/app/[lang]/cookie-policy/page'
+import { getCookiePolicy, getNavigation } from '@/lib/content'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 
 const mockGetCookiePolicy = getCookiePolicy as jest.MockedFunction<typeof getCookiePolicy>
+const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 
 describe('CookiePolicyPage', () => {
   const mockCookiePolicyData = {
@@ -84,5 +86,34 @@ describe('CookiePolicyPage', () => {
     render(ui)
 
     expect(mockGetCookiePolicy).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return metadata from CMS data', async () => {
+    mockGetCookiePolicy.mockResolvedValue({
+      seoMetadata: { metaTitle: 'Cookie Policy', metaDescription: 'Our cookie policy' },
+    } as any)
+    mockGetNavigation.mockResolvedValue({ siteTitle: 'TestSite' } as any)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBe('Cookie Policy')
+    expect(metadata.description).toBe('Our cookie policy')
+    expect(metadata.alternates?.canonical).toContain('/en/cookie-policy')
+  })
+
+  it('should handle null CMS data gracefully', async () => {
+    mockGetCookiePolicy.mockResolvedValue(null)
+    mockGetNavigation.mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.alternates?.canonical).toContain('/en/cookie-policy')
   })
 })

@@ -46,7 +46,7 @@ describe('StyleGuidePage', () => {
     it('should return metadata with correct title', () => {
       const metadata = generateMetadata()
 
-      expect(metadata.title).toBe('Style Guide - TheGreenBrother')
+      expect(metadata.title).toBe('Style Guide')
     })
 
     it('should return metadata with correct description', () => {

@@ -1,9 +1,28 @@
 // Copyright (c) 2026 Affilibuster by Ronen Druker.
 
-import { getBlog, getBlogPosts } from '@/lib/client'
+import { getBlog, getBlogPosts, getNavigation } from '@/lib/client'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
+import { buildPageMetadata } from '@/lib/seo'
+import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import BlogClient from './BlogClient'
+
+/**
+ * Generate SEO metadata for the blog listing page from CMS data.
+ * @param root0 - Metadata generation props
+ * @param root0.params - Promise containing route parameters with lang
+ * @returns Metadata object with title, description, OG, Twitter, and alternates
+ */
+export async function generateMetadata({ params }: { params: Promise<{ lang: LanguageCode }> }): Promise<Metadata> {
+  const { lang } = await params
+  const [pageData, navigation] = await Promise.all([getBlog(lang), getNavigation(lang)])
+  return buildPageMetadata({
+    seoMetadata: pageData?.seoMetadata,
+    lang,
+    path: '/blog',
+    siteName: navigation?.siteTitle,
+  })
+}
 
 /**
  * Blog listing page server component.

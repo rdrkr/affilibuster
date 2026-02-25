@@ -53,7 +53,7 @@ const mockAuthPage = {
   signupLinkText: 'Sign Up',
 }
 
-import Login from '@/app/[lang]/login/page'
+import Login, { generateMetadata } from '@/app/[lang]/login/page'
 import { getAuthPage } from '@/lib/content/api'
 
 describe('Login', () => {
@@ -177,5 +177,33 @@ describe('Login', () => {
     render(ui)
 
     expect(screen.getByRole('button', { name: 'Log In' })).toBeInTheDocument() // Default
+  })
+})
+
+describe('generateMetadata', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    ;(getAuthPage as jest.Mock).mockResolvedValue(mockAuthPage)
+  })
+
+  it('should return noindex metadata from CMS data', async () => {
+    ;(getAuthPage as jest.Mock).mockResolvedValue({
+      seoMetadata: { metaTitle: 'Login', metaDescription: 'Login page' },
+    })
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: 'en' }) })
+
+    expect(metadata.title).toBe('Login')
+    expect(metadata.description).toBe('Login page')
+    expect(metadata.robots).toEqual({ index: false, follow: false })
+  })
+
+  it('should handle null auth page gracefully', async () => {
+    ;(getAuthPage as jest.Mock).mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ lang: 'en' }) })
+
+    expect(metadata.title).toBeUndefined()
+    expect(metadata.robots).toEqual({ index: false, follow: false })
   })
 })

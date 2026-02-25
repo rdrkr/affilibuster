@@ -56,7 +56,7 @@ export interface CarouselProps {
  */
 function getGapClass(gap: CarouselGap): string {
   const gapClasses: Record<CarouselGap, string> = {
-    sm: 'gap-4',
+    sm: 'gap-2 md:gap-4',
     md: 'gap-6',
     lg: 'gap-8',
   }
