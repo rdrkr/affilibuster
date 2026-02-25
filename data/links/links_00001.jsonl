@@ -1711,6 +1711,8 @@
 {"kind":"relation.circular","relation":"oneToMany","left":{"type":"api::theme.theme","ref":71,"field":"localizations"},"right":{"type":"api::theme.theme","ref":"nroilitc0r2798xmsk1s8cvv"}}
 {"kind":"relation.circular","relation":"oneToMany","left":{"type":"api::theme.theme","ref":72,"field":"localizations"},"right":{"type":"api::theme.theme","ref":"nroilitc0r2798xmsk1s8cvv"}}
 {"kind":"relation.circular","relation":"oneToMany","left":{"type":"admin::session","ref":71,"field":"localizations"},"right":{"type":"admin::session","ref":"yeqnwroy44ngqpqr4q570sl8"}}
+{"kind":"relation.circular","relation":"oneToMany","left":{"type":"admin::session","ref":73,"field":"localizations"},"right":{"type":"admin::session","ref":"z10g6tlj4gn79s34pop6k3um"}}
+{"kind":"relation.circular","relation":"oneToMany","left":{"type":"admin::session","ref":72,"field":"localizations"},"right":{"type":"admin::session","ref":"r9ontupue7wh8excnqmovi21"}}
 {"kind":"relation.circular","relation":"oneToMany","left":{"type":"admin::session","ref":70,"field":"localizations"},"right":{"type":"admin::session","ref":"uimtry7izkf1j7y95dbmm1qs"}}
 {"kind":"relation.circular","relation":"oneToMany","left":{"type":"admin::session","ref":54,"field":"localizations"},"right":{"type":"admin::session","ref":"oprl7orykqf1p6mg25l1fte9"}}
 {"kind":"relation.circular","relation":"oneToMany","left":{"type":"admin::session","ref":59,"field":"localizations"},"right":{"type":"admin::session","ref":"qy12r2iktcj75qqscnfju802"}}
