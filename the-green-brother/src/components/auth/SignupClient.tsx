@@ -63,7 +63,7 @@ export default function SignupClient({ data, lang, direction }: SignupClientProp
     termsText,
   } = data
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = (e: React.SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
     e.preventDefault()
     if (!termsAccepted) {
       alert('Please accept terms') // proper error handling later

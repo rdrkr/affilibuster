@@ -47,7 +47,7 @@ export default function DeleteAccountClient({ data, lang, direction }: DeleteAcc
    * Calls the deleteAccount API with password verification.
    * @param e - The form submit event.
    */
-  const handleDelete = async (e: React.FormEvent): Promise<void> => {
+  const handleDelete = async (e: React.SyntheticEvent<HTMLFormElement, SubmitEvent>): Promise<void> => {
     e.preventDefault()
     setError(null)
     setIsLoading(true)

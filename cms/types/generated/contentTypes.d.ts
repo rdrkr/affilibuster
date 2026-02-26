@@ -826,9 +826,21 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
           localized: true
         }
       }>
+    squareImage: Schema.Attribute.Media<'images'> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
     tags: Schema.Attribute.Relation<'oneToMany', 'api::blog-post-tag.blog-post-tag'> & Schema.Attribute.Required
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    wideImage: Schema.Attribute.Media<'images'> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
   }
 }
 

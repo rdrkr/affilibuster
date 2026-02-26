@@ -1073,6 +1073,14 @@ export type ApiBlogPostBlogPostDocument = {
      */
     featuredImage: PluginUploadFileDocument;
     /**
+     * A media field
+     */
+    wideImage?: PluginUploadFileDocument;
+    /**
+     * A media field
+     */
+    squareImage?: PluginUploadFileDocument;
+    /**
      * A relational field
      */
     author: ApiContributorContributorDocument;
@@ -4041,6 +4049,14 @@ export type ApiBlogPostBlogPostDocumentWritable = {
      */
     featuredImage: PluginUploadFileDocument;
     /**
+     * A media field
+     */
+    wideImage?: PluginUploadFileDocument;
+    /**
+     * A media field
+     */
+    squareImage?: PluginUploadFileDocument;
+    /**
      * A relational field
      */
     author: ApiContributorContributorDocumentWritable;
@@ -6750,6 +6766,14 @@ export type BlogPostGetBlogPostsResponses = {
              */
             featuredImage: PluginUploadFileDocument;
             /**
+             * A media field
+             */
+            wideImage?: PluginUploadFileDocument;
+            /**
+             * A media field
+             */
+            squareImage?: PluginUploadFileDocument;
+            /**
              * A relational field
              */
             author: ApiContributorContributorDocument;
@@ -6922,6 +6946,14 @@ export type BlogPostGetBlogPostsBySlugResponses = {
              */
             featuredImage: PluginUploadFileDocument;
             /**
+             * A media field
+             */
+            wideImage?: PluginUploadFileDocument;
+            /**
+             * A media field
+             */
+            squareImage?: PluginUploadFileDocument;
+            /**
              * A relational field
              */
             author: ApiContributorContributorDocument;
@@ -7093,6 +7125,14 @@ export type BlogPostGetBlogPostsByIdResponses = {
              * A media field
              */
             featuredImage: PluginUploadFileDocument;
+            /**
+             * A media field
+             */
+            wideImage?: PluginUploadFileDocument;
+            /**
+             * A media field
+             */
+            squareImage?: PluginUploadFileDocument;
             /**
              * A relational field
              */

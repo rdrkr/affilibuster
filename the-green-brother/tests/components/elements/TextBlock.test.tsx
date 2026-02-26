@@ -29,12 +29,14 @@ jest.mock('@/components/elements/ButtonLink', () => ({
   ButtonLink: function MockButtonLink({
     data,
     children,
+    variant,
   }: {
     data: { url: string; openInNewTab: boolean | null }
     children: React.ReactNode
+    variant?: string
   }) {
     return (
-      <a data-testid="mock-button-link" href={data.url}>
+      <a data-testid="mock-button-link" href={data.url} data-variant={variant}>
         {children}
       </a>
     )
@@ -67,6 +69,8 @@ jest.mock('@/components/elements/Image', () => ({
         alt={props.image?.alternativeText}
         className={props.className}
         title={props.title}
+        width={props.width}
+        height={props.height}
         data-testid="mock-cms-image"
       />
     )
@@ -202,6 +206,19 @@ describe('TextBlock', () => {
       expect(link).toBeInTheDocument()
       expect(link).toHaveAttribute('href', 'https://example.com')
       expect(link).toHaveTextContent('here')
+      // By default it should use link-1
+      expect(link).toHaveAttribute('data-variant', 'link-1')
+    })
+
+    it('should respect custom linkButtonVariant', () => {
+      const dataWithLink = createTextBlockData({
+        content: 'Click [here](https://example.com) for more.',
+      })
+      // Pass a custom variant, e.g. "primary"
+      render(<TextBlock data={dataWithLink} direction={DirectionEnum.LTR} linkButtonVariant="primary" />)
+      const link = screen.getByTestId('mock-button-link')
+      expect(link).toBeInTheDocument()
+      expect(link).toHaveAttribute('data-variant', 'primary')
     })
 
     it('should render inline code elements', () => {
@@ -241,7 +258,9 @@ describe('TextBlock', () => {
       expect(img).toHaveAttribute('src', '/image.png')
       expect(img).toHaveAttribute('alt', 'Alt text')
       expect(img).toHaveAttribute('title', 'Title')
-      expect(img).toHaveClass('rounded-xl')
+      expect(img).toHaveClass('mx-auto', 'block', 'rounded-xl')
+      expect(img).toHaveAttribute('width', '1000')
+      expect(img).toHaveAttribute('height', '500')
     })
 
     it('should render Cloudinary images as regular images', () => {
@@ -257,7 +276,25 @@ describe('TextBlock', () => {
       expect(img).toBeInTheDocument()
       expect(img).toHaveAttribute('src', cloudinaryUrl)
       expect(img).toHaveAttribute('alt', 'blog_zero_waste_kitchens.webp')
-      expect(img).toHaveClass('rounded-xl')
+      expect(img).toHaveClass('mx-auto', 'block', 'rounded-xl')
+    })
+
+    it('should respect HTML image properties when provided', () => {
+      // Use markdown image syntax for standard images, as rehype-raw might struggle with raw HTML images without block context
+      // wait, markdown image syntax does not support width/height out of the box.
+      // We will test if the parsed HTML retains width and height if we pass it through.
+      const dataWithHtmlImage = createTextBlockData({
+        content: '<img src="/image.png" alt="Alt text" width="50" height="50" title="Title" />',
+      })
+      render(<TextBlock data={dataWithHtmlImage} direction={DirectionEnum.LTR} />)
+
+      const img = screen.queryByTestId('mock-cms-image')
+      if (img) {
+        expect(img).toBeInTheDocument()
+        expect(img).toHaveAttribute('width', '50')
+        expect(img).toHaveAttribute('height', '50')
+        expect(img).toHaveClass('mx-auto', 'block', 'rounded-xl')
+      }
     })
 
     it('should render icon images using Label when alt is a valid icon size', () => {

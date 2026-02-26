@@ -47,6 +47,28 @@
       "required": true,
       "allowedTypes": ["images"]
     },
+    "wideImage": {
+      "type": "media",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "squareImage": {
+      "type": "media",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
     "author": {
       "type": "relation",
       "relation": "oneToOne",

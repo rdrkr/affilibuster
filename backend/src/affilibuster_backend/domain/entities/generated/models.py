@@ -1014,6 +1014,14 @@ class ApiBlogPostBlogPostDocument(BaseModel):
     """
     A media field
     """
+    wide_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="wideImage")
+    """
+    A media field
+    """
+    square_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="squareImage")
+    """
+    A media field
+    """
     author: ApiContributorContributorDocument
     """
     A relational field
@@ -3466,6 +3474,14 @@ class Datum1(BaseModel):
     """
     A media field
     """
+    wide_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="wideImage")
+    """
+    A media field
+    """
+    square_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="squareImage")
+    """
+    A media field
+    """
     author: ApiContributorContributorDocument
     """
     A relational field
@@ -3621,6 +3637,14 @@ class Data4(BaseModel):
     """
     A media field
     """
+    wide_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="wideImage")
+    """
+    A media field
+    """
+    square_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="squareImage")
+    """
+    A media field
+    """
     author: ApiContributorContributorDocument
     """
     A relational field
@@ -3773,6 +3797,14 @@ class Data5(BaseModel):
     A component field
     """
     featured_image: PluginUploadFileDocument = Field(..., alias="featuredImage")
+    """
+    A media field
+    """
+    wide_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="wideImage")
+    """
+    A media field
+    """
+    square_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="squareImage")
     """
     A media field
     """

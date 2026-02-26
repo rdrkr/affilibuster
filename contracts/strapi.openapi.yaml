@@ -1753,6 +1753,12 @@ paths:
                         featuredImage:
                           description: A media field
                           $ref: '#/components/schemas/PluginUploadFileDocument'
+                        wideImage:
+                          description: A media field
+                          $ref: '#/components/schemas/PluginUploadFileDocument'
+                        squareImage:
+                          description: A media field
+                          $ref: '#/components/schemas/PluginUploadFileDocument'
                         author:
                           description: A relational field
                           $ref: '#/components/schemas/ApiContributorContributorDocument'
@@ -2055,6 +2061,12 @@ paths:
                         description: A component field
                         $ref: '#/components/schemas/ElementsTextBlockEntry'
                       featuredImage:
+                        description: A media field
+                        $ref: '#/components/schemas/PluginUploadFileDocument'
+                      wideImage:
+                        description: A media field
+                        $ref: '#/components/schemas/PluginUploadFileDocument'
+                      squareImage:
                         description: A media field
                         $ref: '#/components/schemas/PluginUploadFileDocument'
                       author:
@@ -2360,6 +2372,12 @@ paths:
                         description: A component field
                         $ref: '#/components/schemas/ElementsTextBlockEntry'
                       featuredImage:
+                        description: A media field
+                        $ref: '#/components/schemas/PluginUploadFileDocument'
+                      wideImage:
+                        description: A media field
+                        $ref: '#/components/schemas/PluginUploadFileDocument'
+                      squareImage:
                         description: A media field
                         $ref: '#/components/schemas/PluginUploadFileDocument'
                       author:
@@ -14148,6 +14166,12 @@ components:
           description: A component field
           $ref: '#/components/schemas/ElementsTextBlockEntry'
         featuredImage:
+          description: A media field
+          $ref: '#/components/schemas/PluginUploadFileDocument'
+        wideImage:
+          description: A media field
+          $ref: '#/components/schemas/PluginUploadFileDocument'
+        squareImage:
           description: A media field
           $ref: '#/components/schemas/PluginUploadFileDocument'
         author:

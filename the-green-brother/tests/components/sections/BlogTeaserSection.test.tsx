@@ -229,6 +229,20 @@ describe('BlogTeaserSection', () => {
         provider: 'local',
         publishedAt: '2025-01-15',
       },
+      wideImage: {
+        documentId: 'img-wide-1',
+        id: 1,
+        url: '/uploads/plastic-waste-wide.webp',
+        name: 'plastic-waste-wide.webp',
+        alternativeText: 'Plastic waste wide',
+      } as any,
+      squareImage: {
+        documentId: 'img-square-1',
+        id: 1,
+        url: '/uploads/plastic-waste-square.webp',
+        name: 'plastic-waste-square.webp',
+        alternativeText: 'Plastic waste square',
+      } as any,
       tags: [
         {
           documentId: 'tag-1',
@@ -317,6 +331,20 @@ describe('BlogTeaserSection', () => {
         provider: 'local',
         publishedAt: '2025-01-10',
       },
+      wideImage: {
+        documentId: 'img-wide-2',
+        id: 2,
+        url: '/uploads/fashion-wide.webp',
+        name: 'fashion-wide.webp',
+        alternativeText: 'Fashion wide',
+      } as any,
+      squareImage: {
+        documentId: 'img-square-2',
+        id: 2,
+        url: '/uploads/fashion-square.webp',
+        name: 'fashion-square.webp',
+        alternativeText: 'Fashion square',
+      } as any,
       tags: [
         {
           documentId: 'tag-2',

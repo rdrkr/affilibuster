@@ -59,7 +59,7 @@ export default function LoginClient({ data, lang, direction }: LoginClientProps)
     // hidePasswordLabel,
   } = data
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = (e: React.SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
     e.preventDefault()
     setIsLoading(true)
 

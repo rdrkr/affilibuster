@@ -21,7 +21,7 @@ import rehypeRaw from 'rehype-raw'
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import remarkGfm from 'remark-gfm'
 import { ButtonLink } from './ButtonLink'
-import { isIconSize, type IconSize } from './common'
+import { isIconSize, type ButtonVariant, type IconSize } from './common'
 import { Header, type HeaderLevel } from './Header'
 import { Image } from './Image'
 import { Label } from './Label'
@@ -33,9 +33,10 @@ import { ScrollableTableWrapper } from './ScrollableTableWrapper'
  */
 const sanitizeSchema = {
   ...defaultSchema,
-  tagNames: [...(defaultSchema.tagNames ?? []), 'center'],
+  tagNames: [...(defaultSchema.tagNames ?? []), 'center', 'img'],
   attributes: {
     ...defaultSchema.attributes,
+    img: [...(defaultSchema.attributes?.img ?? []), 'width', 'height'],
   },
 }
 
@@ -47,6 +48,8 @@ interface MarkdownProps {
   content: string
   /** Language direction for RTL support */
   direction: DirectionEnum
+  /** Button variant for links */
+  linkButtonVariant: ButtonVariant
 }
 
 /**
@@ -56,9 +59,10 @@ interface MarkdownProps {
  * @param props - Component props
  * @param props.content - Markdown content to render
  * @param props.direction - Language direction for RTL support
+ * @param props.linkButtonVariant - Button variant for links
  * @returns Rendered markdown as React elements
  */
-function Markdown({ content, direction }: MarkdownProps) {
+function Markdown({ content, direction, linkButtonVariant }: MarkdownProps) {
   const isRTL = direction === DirectionEnum.RTL
 
   /**
@@ -76,12 +80,21 @@ function Markdown({ content, direction }: MarkdownProps) {
 
       return (
         <div style={{ textAlign: 'center' }}>
-          {shouldParseAsMarkdown ? <Markdown content={children} direction={direction} /> : children}
+          {shouldParseAsMarkdown ? (
+            <Markdown content={children} direction={direction} linkButtonVariant={linkButtonVariant} />
+          ) : (
+            children
+          )}
         </div>
       )
     },
     a: ({ href, children }: ComponentPropsWithoutRef<'a'>) => (
-      <ButtonLink data={{ url: href ?? '', openInNewTab: null }} variant="link-2" size="sm" direction={direction}>
+      <ButtonLink
+        data={{ url: href ?? '', openInNewTab: null }}
+        variant={linkButtonVariant}
+        size="sm"
+        direction={direction}
+      >
         {children}
       </ButtonLink>
     ),
@@ -115,7 +128,7 @@ function Markdown({ content, direction }: MarkdownProps) {
       )
     },
     img: (props: ComponentPropsWithoutRef<'img'>) => {
-      const { src, alt, title } = props
+      const { src, alt, title, width, height, ...rest } = props
       // src can be string or Blob, only use if string
       const safeSrc = typeof src === 'string' ? src : ''
       const safeTitle = title ?? ''
@@ -157,15 +170,20 @@ function Markdown({ content, direction }: MarkdownProps) {
         ...(alt ? { alternativeText: alt } : {}),
       }
 
+      const imgWidth = width ? Number(width) : 1000
+      const imgHeight = height ? Number(height) : 500
+      const defaultStyle = width || height ? {} : { width: '100%', height: 'auto' }
+
       return (
         <Image
           image={imageDoc}
           title={safeTitle || undefined}
-          width={1000}
-          height={500}
-          sizes="100vw"
-          style={{ width: '100%', height: 'auto' }}
-          className="rounded-xl"
+          width={imgWidth}
+          height={imgHeight}
+          sizes={width ? undefined : '100vw'}
+          style={defaultStyle}
+          className="mx-auto block rounded-xl"
+          {...rest}
         />
       )
     },
@@ -213,6 +231,8 @@ export interface TextBlockProps {
   subheaderClassName?: string
   /** Additional CSS classes for the subheader text element */
   subheaderTextClassName?: string
+  /** Button variant to use for markdown links (default: link-1) */
+  linkButtonVariant?: ButtonVariant
 }
 
 /**
@@ -222,6 +242,7 @@ export interface TextBlockProps {
  * @param props.direction - Language direction for RTL support
  * @param props.visible - Controls entire block visibility (false = hidden from layout)
  * @param props.className - Additional CSS classes
+ * @param props.linkButtonVariant - Button variant for links
  * @param props.headerLevel - Heading level
  * @param props.headerIconSize - Icon size for the header
  * @param props.headerClassName - Header text classes
@@ -239,6 +260,7 @@ export function TextBlock({
   headerClassName,
   subheaderClassName = '',
   subheaderTextClassName,
+  linkButtonVariant = 'link-1',
 }: TextBlockProps) {
   if (visible === false) {
     return null
@@ -352,7 +374,7 @@ export function TextBlock({
         />
       )}
 
-      {content && <Markdown content={content} direction={direction} />}
+      {content && <Markdown content={content} direction={direction} linkButtonVariant={linkButtonVariant} />}
     </div>
   )
 }
