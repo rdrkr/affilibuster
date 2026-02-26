@@ -23,6 +23,15 @@ jest.mock('@/lib/feature-flags', () => ({
   userProfileFlag: jest.fn().mockResolvedValue(false),
 }))
 
+// Mock JsonLdScript component
+jest.mock('@/components/seo', () => ({
+  JsonLdScript: jest.fn(({ data }: { data: Record<string, unknown> }) => (
+    <script type="application/ld+json" data-testid="json-ld">
+      {JSON.stringify(data)}
+    </script>
+  )),
+}))
+
 // Mock the ProductsClient component
 jest.mock('@/app/[lang]/products/ProductsClient', () => ({
   __esModule: true,
@@ -43,6 +52,7 @@ jest.mock('@/app/[lang]/products/ProductsClient', () => ({
 }))
 
 import ProductsPage, { generateMetadata } from '@/app/[lang]/products/page'
+import { JsonLdScript } from '@/components/seo'
 import { getNavigation, getProductCategories, getProductCategoriesPage, getProducts } from '@/lib/content'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 import { render, screen } from '@testing-library/react'
@@ -51,6 +61,7 @@ const mockGetProductCategoriesPage = getProductCategoriesPage as jest.MockedFunc
 const mockGetProducts = getProducts as jest.MockedFunction<typeof getProducts>
 const mockGetProductCategories = getProductCategories as jest.MockedFunction<typeof getProductCategories>
 const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
+const mockJsonLdScript = JsonLdScript as unknown as jest.Mock
 
 describe('ProductsPage', () => {
   beforeEach(() => {
@@ -90,6 +101,24 @@ describe('ProductsPage', () => {
     expect(screen.getByTestId('products-client').getAttribute('data-product-count')).toBe('2')
     expect(screen.getByTestId('products-client').getAttribute('data-category-count')).toBe('1')
     expect(screen.getByTestId('products-client').getAttribute('data-enable-user-profile')).toBe('false')
+  })
+
+  it('should render BreadcrumbList JSON-LD', async () => {
+    mockGetProductCategoriesPage.mockResolvedValue({
+      header: { header: { text: 'Our Products' } },
+    } as unknown as Awaited<ReturnType<typeof getProductCategoriesPage>>)
+    mockGetProducts.mockResolvedValue([] as Awaited<ReturnType<typeof getProducts>>)
+    mockGetProductCategories.mockResolvedValue([] as Awaited<ReturnType<typeof getProductCategories>>)
+
+    const Component = await ProductsPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+    render(Component)
+
+    expect(mockJsonLdScript).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ '@type': 'BreadcrumbList' }),
+      }),
+      undefined
+    )
   })
 
   it('should pass empty arrays when responses are null', async () => {

@@ -1,8 +1,10 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
+import bundleAnalyzer from '@next/bundle-analyzer'
 import type { NextConfig } from 'next'
 import next_intl from 'next-intl/plugin'
 
+const withBundleAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === 'true' })
 const withNextIntl = next_intl('./src/i18n.ts')
 
 const getProtocol = (protocol?: string): 'http' | 'https' => {
@@ -38,6 +40,7 @@ const nextConfig: NextConfig = {
   // Performance optimizations
   compress: true, // Enable gzip compression (SWC minification & font optimization are enabled by default)
   images: {
+    unoptimized: true, // Images are pre-optimized by Strapi/Cloudinary; Next.js optimization blocks private IPs in Docker
     remotePatterns: [
       {
         // Backend access
@@ -61,7 +64,6 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
-    unoptimized: true, // dynamic .webp file names do not unoptimized implcitly
     formats: ['image/avif', 'image/webp'], // Use modern image formats
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
@@ -98,6 +100,20 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  // Cache-Control headers for static assets (immutable, long-lived cache)
+  headers() {
+    return [
+      {
+        source: '/(images|icons)/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ]
+  },
   // Serve metadata files under locale prefixes (e.g. /en/robots.txt → /robots.txt)
   rewrites() {
     return [
@@ -108,4 +124,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withNextIntl(nextConfig)
+export default withBundleAnalyzer(withNextIntl(nextConfig))

@@ -16,17 +16,26 @@ const intlMiddleware = createMiddleware({
 /**
  * Proxy middleware that wraps next-intl middleware with additional security headers.
  *
- * Adds Content-Security-Policy `frame-ancestors` and X-Frame-Options headers
- * to allow Strapi admin to embed the Next.js preview in an iframe.
+ * Adds Content-Security-Policy `frame-ancestors`, X-Frame-Options, and additional
+ * security headers (HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)
+ * to harden the application against common web vulnerabilities.
  * @param request - The incoming Next.js request
- * @returns NextResponse with i18n routing and CSP headers
+ * @returns NextResponse with i18n routing and security headers
  */
 export default function middleware(request: NextRequest): NextResponse {
   const response = intlMiddleware(request)
   const cmsUrl = process.env.NEXT_PUBLIC_CMS_URL ?? 'https://localhost:1337'
+  const isHttps = request.nextUrl.protocol === 'https:'
 
   response.headers.set('Content-Security-Policy', `frame-ancestors 'self' ${cmsUrl}`)
   response.headers.set('X-Frame-Options', `ALLOW-FROM ${cmsUrl}`)
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+
+  if (isHttps) {
+    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+  }
 
   return response
 }

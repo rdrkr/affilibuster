@@ -40,7 +40,8 @@ jest.mock('@/components/blog', () => ({
       slug: string
       content?: { header?: { header?: { text?: string } } }
       tags?: { tag?: { text?: string } }[]
-      featuredImage?: { url?: string; alternativeText?: string }
+      wideImage?: { url?: string; alternativeText?: string }
+      squareImage?: { url?: string; alternativeText?: string }
     }
     direction?: string
     basePath?: string

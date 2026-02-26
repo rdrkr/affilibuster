@@ -1,9 +1,11 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
+import { JsonLdScript } from '@/components/seo'
 import { getNavigation, getProductBySlug, getProductCategoriesPage, getProducts } from '@/lib/client'
 import { userProfileFlag } from '@/lib/feature-flags'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
-import { buildPageMetadata } from '@/lib/seo'
+import { buildBreadcrumbJsonLd, buildPageMetadata, buildProductJsonLd } from '@/lib/seo'
+import type { BreadcrumbEntry } from '@/lib/seo'
 import { SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
@@ -90,14 +92,38 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
   const relatedProducts = relatedProductsResponse.filter(p => p.slug !== slug)
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  const productUrl = `${siteUrl}/${lang}/products/${slug}`
+  const productName = product.header.header?.text ?? product.slug
+  const sellerName = `${product.seller.firstName}${product.seller.lastName ? ` ${product.seller.lastName}` : ''}`
+
+  const productJsonLd = buildProductJsonLd({
+    name: productName,
+    ...(product.seoMetadata.metaDescription !== undefined ? { description: product.seoMetadata.metaDescription } : {}),
+    imageUrls: product.images.map(img => img.url),
+    sellerName,
+    prices: product.prices.map(p => ({ amount: p.amount, currencyCode: p.currency.code })),
+    url: productUrl,
+  })
+
+  const breadcrumbs: BreadcrumbEntry[] = [
+    { name: 'Home', path: '' },
+    { name: product.category.content.text, path: '/products' },
+    { name: productName },
+  ]
+
   return (
-    <ProductDetailClient
-      product={product}
-      certificatesHeader={productCategoriesPage.certificatesSectionHeader}
-      relatedProducts={relatedProducts}
-      relatedProductsHeader={productCategoriesPage.relatedProductsSectionHeader}
-      enableUserProfile={userProfileEnabled}
-      bySellerText={productCategoriesPage.bySellerText}
-    />
+    <>
+      <JsonLdScript data={productJsonLd} />
+      <JsonLdScript data={buildBreadcrumbJsonLd(breadcrumbs, lang)} />
+      <ProductDetailClient
+        product={product}
+        certificatesHeader={productCategoriesPage.certificatesSectionHeader}
+        relatedProducts={relatedProducts}
+        relatedProductsHeader={productCategoriesPage.relatedProductsSectionHeader}
+        enableUserProfile={userProfileEnabled}
+        bySellerText={productCategoriesPage.bySellerText}
+      />
+    </>
   )
 }

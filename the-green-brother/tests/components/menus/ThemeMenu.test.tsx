@@ -370,9 +370,26 @@ describe('ThemeMenu', () => {
         direction={DirectionEnum.RTL}
       />
     )
-    // Open menu
-    fireEvent.click(screen.getByRole('button', { name: 'Select theme' }))
+    const container = screen.getByTestId('theme-menu-container')
+    // Open menu via hover (so dropdown becomes visible)
+    fireEvent.mouseEnter(container)
     // Component should render without error in RTL mode
+    expect(screen.getByText('Light')).toBeInTheDocument()
+  })
+
+  it('should render theme items in LTR direction when direction is LTR', () => {
+    render(
+      <ThemeMenu
+        data={mockData}
+        selectedTheme="light"
+        onThemeChange={mockOnThemeChange}
+        direction={DirectionEnum.LTR}
+      />
+    )
+    const container = screen.getByTestId('theme-menu-container')
+    // Open menu via hover (so dropdown becomes visible)
+    fireEvent.mouseEnter(container)
+    // Theme items should be visible
     expect(screen.getByText('Light')).toBeInTheDocument()
   })
 

@@ -95,6 +95,12 @@
   --color-warning-900: #713f12;
 
   /* ============================================
+   * SKELETON / LOADING PLACEHOLDER COLORS
+   * ============================================ */
+  --color-skeleton: var(--color-primary-50);
+  --color-skeleton-dark: var(--color-secondary-900);
+
+  /* ============================================
    * INTERACTIVE STATE COLORS
    * ============================================ */
   --color-primary-hover: var(--color-primary-500);

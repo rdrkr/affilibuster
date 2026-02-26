@@ -1,9 +1,10 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
+import { JsonLdScript } from '@/components/seo'
 import { getNavigation, getProductCategories, getProductCategoriesPage, getProducts } from '@/lib/client'
 import { userProfileFlag } from '@/lib/feature-flags'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
-import { buildPageMetadata } from '@/lib/seo'
+import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo'
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import ProductsClient from './ProductsClient'
@@ -57,12 +58,17 @@ export default async function ProductsPage({ params }: { params: Promise<{ lang:
     userProfileFlag(),
   ])
 
+  const breadcrumbs = [{ name: 'Home', path: '' }, { name: pageData?.header.header?.text ?? 'Products' }]
+
   return (
-    <ProductsClient
-      pageData={pageData}
-      products={productsResponse ?? []}
-      categories={categoriesResponse ?? []}
-      enableUserProfile={enableUserProfile}
-    />
+    <>
+      <JsonLdScript data={buildBreadcrumbJsonLd(breadcrumbs, lang)} />
+      <ProductsClient
+        pageData={pageData}
+        products={productsResponse ?? []}
+        categories={categoriesResponse ?? []}
+        enableUserProfile={enableUserProfile}
+      />
+    </>
   )
 }

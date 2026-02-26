@@ -36,6 +36,10 @@ export interface DropdownProps {
   className?: string
   /** Position dropdown relative to trigger instead of nav on mobile (default: false) */
   inlineOnMobile?: boolean
+  /** Gap in pixels between trigger button and dropdown panel (default: 8). Negative values pull the dropdown closer to the trigger. */
+  triggerGap?: number
+  /** Additional CSS classes for the gap element, overrides triggerGap if provided */
+  triggerGapClassName?: string
 }
 
 /**
@@ -55,6 +59,8 @@ export interface DropdownProps {
  * @param props.style - Custom inline styles
  * @param props.className - Additional CSS classes
  * @param props.inlineOnMobile - Position relative to trigger on mobile (default: false)
+ * @param props.triggerGap - Gap in pixels between trigger and dropdown (default: 8)
+ * @param props.triggerGapClassName - Custom CSS class for the gap
  * @returns Dropdown panel component
  */
 export function Dropdown({
@@ -66,6 +72,8 @@ export function Dropdown({
   style,
   className = '',
   inlineOnMobile = false,
+  triggerGap = 8,
+  triggerGapClassName,
 }: DropdownProps) {
   const isRTL = direction === DirectionEnum.RTL
 
@@ -107,17 +115,28 @@ export function Dropdown({
       ${isVisible ? 'visible' : 'pointer-events-none'}
     `}
     >
-      {/* Hover bridge - covers the gap between button and dropdown */}
-      <div className={`h-2`} aria-hidden="true" />
+      {/* Hover bridge - covers the gap between button and dropdown. Negative values use margin to pull dropdown closer. */}
+      <div
+        className={triggerGapClassName}
+        style={
+          triggerGapClassName
+            ? undefined
+            : {
+                height: triggerGap >= 0 ? `${String(triggerGap)}px` : 0,
+                marginTop: triggerGap < 0 ? `${String(triggerGap)}px` : 0,
+              }
+        }
+        aria-hidden="true"
+      />
 
       <div
         className={`
-          w-auto origin-top space-y-1 overflow-hidden
+          flex w-auto origin-top flex-col space-y-1 overflow-hidden
           border-y p-2.5 sm:origin-(--dropdown-origin-desktop)
           ${frostedGlassStyle}
           rounded-xl!
           ${width ? 'sm:w-(--dropdown-width)' : 'sm:min-w-40'}
-          ${isRTL ? 'text-right' : 'text-left'}
+          ${isRTL ? 'items-end text-right' : 'items-start text-left'}
           ${
             isVisible
               ? 'visible animate-[dropdownBounce_0.3s_cubic-bezier(0.34,1.56,0.64,1)_forwards]'
@@ -184,6 +203,10 @@ export interface DropdownMenuProps {
   onOpenChange?: (isOpen: boolean) => void
   /** Position dropdown relative to trigger instead of nav on mobile (default: false) */
   inlineOnMobile?: boolean
+  /** Gap in pixels between trigger button and dropdown panel (default: 8). Negative values pull the dropdown closer to the trigger. */
+  triggerGap?: number
+  /** Additional CSS classes for the gap element, overrides triggerGap if provided */
+  triggerGapClassName?: string
 }
 
 /**
@@ -217,6 +240,8 @@ export interface DropdownMenuProps {
  * @param props.isOpen - Controlled open state
  * @param props.onOpenChange - Controlled open change callback
  * @param props.inlineOnMobile - Position dropdown relative to trigger on mobile
+ * @param props.triggerGap - Gap in pixels between trigger and dropdown (default: 8)
+ * @param props.triggerGapClassName - Custom CSS class for the gap
  * @returns Dropdown menu component
  */
 export function DropdownMenu({
@@ -241,6 +266,8 @@ export function DropdownMenu({
   isOpen: controlledIsOpen,
   onOpenChange,
   inlineOnMobile = false,
+  triggerGap,
+  triggerGapClassName,
 }: DropdownMenuProps) {
   // Support both controlled and uncontrolled modes
   const [internalIsOpen, setInternalIsOpen] = useState(false)
@@ -374,6 +401,8 @@ export function DropdownMenu({
         inlineOnMobile={inlineOnMobile}
         {...(width ? { width } : {})}
         {...(dropdownClassName ? { className: dropdownClassName } : {})}
+        {...(triggerGap !== undefined ? { triggerGap } : {})}
+        {...(triggerGapClassName ? { triggerGapClassName } : {})}
       >
         {wrappedChildren}
       </Dropdown>

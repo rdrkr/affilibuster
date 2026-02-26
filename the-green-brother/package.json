@@ -16,6 +16,7 @@
     "develop": "npm run dev",
     "prebuild": "npm run preflight",
     "build": "next build",
+    "analyze": "ANALYZE=true next build",
     "clean": "rm -rf coverage node_modules .next test-results core tsconfig.tsbuildinfo next-env.d.ts .swc playwright-report ../.coverage ../test-results",
     "start": "next start",
     "test": "jest --coverage --coverageReporters=lcov --coverageReporters=html --passWithNoTests",
@@ -51,7 +52,6 @@
     "lint-staged": "^16.2.7",
     "next": "^16.1.6",
     "next-intl": "^4.8.3",
-    "next-seo": "^7.2.0",
     "postcss": "^8.5.6",
     "prettier": "^3.8.1",
     "react": "^19.2.4",
@@ -76,5 +76,8 @@
     "*.{json,css,scss,md,yaml,yml}": [
       "prettier --write"
     ]
+  },
+  "devDependencies": {
+    "@next/bundle-analyzer": "^16.1.6"
   }
 }

@@ -103,6 +103,7 @@ export default defineConfig([
             'drop-shadow-icon-sm', // Custom drop shadow for icons/images
             'prose', // Typography plugin
             'prose-invert', // Typography plugin
+            'skeleton', // Custom skeleton loading element
           ],
         },
       ],

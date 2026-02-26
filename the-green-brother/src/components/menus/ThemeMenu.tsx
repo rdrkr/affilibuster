@@ -88,27 +88,28 @@ export function ThemeMenu({
       isOpen={isOpen}
       onOpenChange={setIsOpen}
     >
-      {themes.map((theme: ApiThemeThemeDocument) => {
-        const themeMode = cmsTextToThemeMode(theme.themeId)
+      {/* Theme items have their own direction, independent of the menu direction */}
+      <div dir="ltr">
+        {themes.map((theme: ApiThemeThemeDocument) => {
+          const themeMode = cmsTextToThemeMode(theme.themeId)
 
-        return (
-          <ButtonAction
-            key={theme.content.text}
-            data={{ label: theme.content, url: '', openInNewTab: false }}
-            showText={true}
-            direction={direction}
-            onClick={() => {
-              handleThemeSelect(themeMode)
-            }}
-            variant="ghost-2"
-            iconSize="sm"
-            size="sm"
-            isActive={selectedTheme === themeMode}
-          />
-        )
-      })}
+          return (
+            <ButtonAction
+              key={theme.content.text}
+              data={{ label: theme.content, url: '', openInNewTab: false }}
+              showText={true}
+              direction={direction}
+              onClick={() => {
+                handleThemeSelect(themeMode)
+              }}
+              variant="ghost-2"
+              iconSize="sm"
+              size="sm"
+              isActive={selectedTheme === themeMode}
+            />
+          )
+        })}
+      </div>
     </DropdownMenu>
   )
 }
-
-export default ThemeMenu

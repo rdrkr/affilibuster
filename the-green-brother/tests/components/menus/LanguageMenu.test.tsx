@@ -283,6 +283,24 @@ describe('LanguageMenu', () => {
     expect(screen.getByText(/English/)).toBeInTheDocument()
   })
 
+  it('should always render language items in LTR direction', () => {
+    const { container } = render(
+      <LanguageMenu
+        data={mockData}
+        languages={mockLanguages}
+        selectedLang={LanguageCode.EN}
+        onLanguageChange={mockOnLanguageChange}
+        direction={DirectionEnum.RTL}
+        showText={true}
+      />
+    )
+    // Open menu
+    fireEvent.click(screen.getByRole('button', { name: 'Select language' }))
+    // Language items wrapper should always be LTR
+    const ltrWrapper = container.querySelector('[dir="ltr"]')
+    expect(ltrWrapper).toBeInTheDocument()
+  })
+
   it('should render with iconPosition AFTER_TEXT', () => {
     const mockDataIconAfter = {
       ...mockData,

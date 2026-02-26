@@ -28,7 +28,17 @@ const mockNotFound = jest.fn()
 jest.mock('next/navigation', () => ({
   notFound: (): void => {
     mockNotFound()
+    throw new Error('NEXT_NOT_FOUND')
   },
+}))
+
+// Mock JsonLdScript component
+jest.mock('@/components/seo', () => ({
+  JsonLdScript: jest.fn(({ data }: { data: Record<string, unknown> }) => (
+    <script type="application/ld+json" data-testid="json-ld">
+      {JSON.stringify(data)}
+    </script>
+  )),
 }))
 
 // Mock the BlogPostClient component
@@ -40,6 +50,7 @@ jest.mock('@/app/[lang]/blog/[slug]/BlogPostClient', () => ({
 }))
 
 import BlogPostPage, { generateMetadata, generateStaticParams } from '@/app/[lang]/blog/[slug]/page'
+import { JsonLdScript } from '@/components/seo'
 import { getBlogPostBySlug, getBlogPosts, getNavigation } from '@/lib/content'
 import { DirectionEnum, LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages'
@@ -49,6 +60,7 @@ const mockGetBlogPostBySlug = getBlogPostBySlug as jest.MockedFunction<typeof ge
 const mockGetBlogPosts = getBlogPosts as jest.MockedFunction<typeof getBlogPosts>
 const mockGetLanguages = getLanguages as jest.MockedFunction<typeof getLanguages>
 const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
+const mockJsonLdScript = JsonLdScript as unknown as jest.Mock
 
 describe('BlogPostPage', () => {
   const mockLanguages = [
@@ -93,10 +105,23 @@ describe('BlogPostPage', () => {
     mockDraftMode.mockResolvedValue({ isEnabled: false })
     mockGetLanguages.mockResolvedValue(mockLanguages as any)
     mockGetNavigation.mockResolvedValue(mockNavigation as any)
+    // Default getBlog mock - individual tests override as needed
+    const { getBlog } = require('@/lib/content') as { getBlog: jest.Mock }
+    getBlog.mockResolvedValue({ id: 1 } as any)
   })
 
   it('should fetch blog post and pass to BlogPostClient', async () => {
-    const mockPost = { documentId: 'post-1', slug: 'post-slug', content: { header: {} } }
+    const mockPost = {
+      documentId: 'post-1',
+      slug: 'post-slug',
+      content: { header: {} },
+      author: { firstName: 'Jane', lastName: 'Doe' },
+      wideImage: { url: 'https://example.com/featured.jpg' },
+      squareImage: { url: 'https://example.com/featured-square.jpg' },
+      publishedDate: '2026-01-15T10:00:00Z',
+      updatedAt: '2026-02-20T14:30:00Z',
+      seoMetadata: { metaTitle: 'Post Title', metaDescription: 'A post' },
+    }
     mockGetBlogPostBySlug.mockResolvedValue(mockPost as Awaited<ReturnType<typeof getBlogPostBySlug>>)
 
     const Component = await BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'post-slug' }) })
@@ -108,26 +133,83 @@ describe('BlogPostPage', () => {
     expect(screen.getByTestId('blog-post-client')).toBeInTheDocument()
   })
 
+  it('should render JSON-LD structured data for Article and Breadcrumb', async () => {
+    const mockPost = {
+      documentId: 'post-1',
+      slug: 'post-slug',
+      content: { header: {} },
+      author: { firstName: 'Jane', lastName: 'Doe' },
+      wideImage: { url: 'https://example.com/featured.jpg' },
+      squareImage: { url: 'https://example.com/featured-square.jpg' },
+      publishedDate: '2026-01-15T10:00:00Z',
+      updatedAt: '2026-02-20T14:30:00Z',
+      seoMetadata: { metaTitle: 'My Article', metaDescription: 'About eco products' },
+    }
+    mockGetBlogPostBySlug.mockResolvedValue(mockPost as Awaited<ReturnType<typeof getBlogPostBySlug>>)
+    const { getBlog } = require('@/lib/content') as { getBlog: jest.Mock }
+    getBlog.mockResolvedValue({ id: 1 } as any)
+
+    const Component = await BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'post-slug' }) })
+    render(Component)
+
+    // Should render two JsonLdScript components (Article + Breadcrumb)
+    expect(mockJsonLdScript).toHaveBeenCalledTimes(2)
+    expect(mockJsonLdScript).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ '@type': 'Article', headline: 'My Article' }),
+      }),
+      undefined
+    )
+    expect(mockJsonLdScript).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ '@type': 'BreadcrumbList' }),
+      }),
+      undefined
+    )
+  })
+
   it('should call notFound when post is null', async () => {
     mockGetBlogPostBySlug.mockResolvedValue(null)
 
-    await BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'non-existent' }) })
+    await expect(
+      BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'non-existent' }) })
+    ).rejects.toThrow('NEXT_NOT_FOUND')
 
     expect(mockNotFound).toHaveBeenCalled()
   })
 
   it('should call notFound when navigation is null', async () => {
-    const mockPost = { documentId: 'post-1', slug: 'post-slug', content: { header: {} } }
+    const mockPost = {
+      documentId: 'post-1',
+      slug: 'post-slug',
+      content: { header: {} },
+      author: { firstName: 'Jane' },
+      wideImage: { url: 'https://example.com/img.jpg' },
+      squareImage: { url: 'https://example.com/img-square.jpg' },
+      publishedDate: '2026-01-15',
+      seoMetadata: { metaTitle: 'Post' },
+    }
     mockGetBlogPostBySlug.mockResolvedValue(mockPost as Awaited<ReturnType<typeof getBlogPostBySlug>>)
     mockGetNavigation.mockResolvedValue(null)
 
-    await BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'post-slug' }) })
+    await expect(
+      BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'post-slug' }) })
+    ).rejects.toThrow('NEXT_NOT_FOUND')
 
     expect(mockNotFound).toHaveBeenCalled()
   })
 
   it('should call notFound when blogData is null', async () => {
-    const mockPost = { documentId: 'post-1', slug: 'post-slug', content: { header: {} } }
+    const mockPost = {
+      documentId: 'post-1',
+      slug: 'post-slug',
+      content: { header: {} },
+      author: { firstName: 'Jane' },
+      wideImage: { url: 'https://example.com/img.jpg' },
+      squareImage: { url: 'https://example.com/img-square.jpg' },
+      publishedDate: '2026-01-15',
+      seoMetadata: { metaTitle: 'Post' },
+    }
     mockGetBlogPostBySlug.mockResolvedValue(mockPost as Awaited<ReturnType<typeof getBlogPostBySlug>>)
     mockGetNavigation.mockResolvedValue(mockNavigation as any)
 
@@ -135,13 +217,24 @@ describe('BlogPostPage', () => {
     const { getBlog } = require('@/lib/content') as { getBlog: jest.Mock }
     getBlog.mockResolvedValue(null)
 
-    await BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'post-slug' }) })
+    await expect(
+      BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'post-slug' }) })
+    ).rejects.toThrow('NEXT_NOT_FOUND')
 
     expect(mockNotFound).toHaveBeenCalled()
   })
 
   it('should use default LTR direction when language is not found', async () => {
-    const mockPost = { documentId: 'post-1', slug: 'post-slug', content: { header: {} } }
+    const mockPost = {
+      documentId: 'post-1',
+      slug: 'post-slug',
+      content: { header: {} },
+      author: { firstName: 'Jane' },
+      wideImage: { url: 'https://example.com/img.jpg' },
+      squareImage: { url: 'https://example.com/img-square.jpg' },
+      publishedDate: '2026-01-15',
+      seoMetadata: { metaTitle: 'Post' },
+    }
     mockGetBlogPostBySlug.mockResolvedValue(mockPost as Awaited<ReturnType<typeof getBlogPostBySlug>>)
     mockGetLanguages.mockResolvedValue([] as any) // No languages found
     const { getBlog } = require('@/lib/content') as { getBlog: jest.Mock }
@@ -156,7 +249,16 @@ describe('BlogPostPage', () => {
   it('should pass draft status when draft mode is enabled', async () => {
     mockDraftMode.mockResolvedValue({ isEnabled: true })
 
-    const mockPost = { documentId: 'post-1', slug: 'post-slug', content: { header: {} } }
+    const mockPost = {
+      documentId: 'post-1',
+      slug: 'post-slug',
+      content: { header: {} },
+      author: { firstName: 'Jane' },
+      wideImage: { url: 'https://example.com/img.jpg' },
+      squareImage: { url: 'https://example.com/img-square.jpg' },
+      publishedDate: '2026-01-15',
+      seoMetadata: { metaTitle: 'Post' },
+    }
     mockGetBlogPostBySlug.mockResolvedValue(mockPost as Awaited<ReturnType<typeof getBlogPostBySlug>>)
     const { getBlog } = require('@/lib/content') as { getBlog: jest.Mock }
     getBlog.mockResolvedValue({ id: 1 } as any)

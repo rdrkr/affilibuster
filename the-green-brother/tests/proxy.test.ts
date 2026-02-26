@@ -74,7 +74,7 @@ describe('proxy middleware configuration', () => {
 
     const proxyModule = await import('@/proxy')
     const middleware = proxyModule.default
-    const request = { url: 'http://localhost:3000/en' } as never
+    const request = { url: 'http://localhost:3000/en', nextUrl: { protocol: 'http:' } } as never
 
     middleware(request)
 
@@ -98,11 +98,76 @@ describe('proxy middleware configuration', () => {
 
     const proxyModule = await import('@/proxy')
     const middleware = proxyModule.default
-    const request = { url: 'http://localhost:3000/en' } as never
+    const request = { url: 'http://localhost:3000/en', nextUrl: { protocol: 'http:' } } as never
 
     middleware(request)
 
     expect(mockResponse.headers.set).toHaveBeenCalledWith('X-Frame-Options', 'ALLOW-FROM https://localhost:1337')
+  })
+
+  it('should set security headers (X-Content-Type-Options, Referrer-Policy, Permissions-Policy)', async () => {
+    jest.resetModules()
+    jest.mock('next-intl/middleware', () => ({
+      __esModule: true,
+      default: jest.fn(() => jest.fn(() => mockResponse)),
+    }))
+    jest.mock('next/server', () => ({
+      NextResponse: {},
+    }))
+
+    const proxyModule = await import('@/proxy')
+    const middleware = proxyModule.default
+    const request = { url: 'http://localhost:3000/en', nextUrl: { protocol: 'http:' } } as never
+
+    middleware(request)
+
+    expect(mockResponse.headers.set).toHaveBeenCalledWith('X-Content-Type-Options', 'nosniff')
+    expect(mockResponse.headers.set).toHaveBeenCalledWith('Referrer-Policy', 'strict-origin-when-cross-origin')
+    expect(mockResponse.headers.set).toHaveBeenCalledWith(
+      'Permissions-Policy',
+      'camera=(), microphone=(), geolocation=()'
+    )
+  })
+
+  it('should set HSTS header when protocol is HTTPS', async () => {
+    jest.resetModules()
+    jest.mock('next-intl/middleware', () => ({
+      __esModule: true,
+      default: jest.fn(() => jest.fn(() => mockResponse)),
+    }))
+    jest.mock('next/server', () => ({
+      NextResponse: {},
+    }))
+
+    const proxyModule = await import('@/proxy')
+    const middleware = proxyModule.default
+    const request = { url: 'https://localhost:3000/en', nextUrl: { protocol: 'https:' } } as never
+
+    middleware(request)
+
+    expect(mockResponse.headers.set).toHaveBeenCalledWith(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains'
+    )
+  })
+
+  it('should not set HSTS header when protocol is HTTP', async () => {
+    jest.resetModules()
+    jest.mock('next-intl/middleware', () => ({
+      __esModule: true,
+      default: jest.fn(() => jest.fn(() => mockResponse)),
+    }))
+    jest.mock('next/server', () => ({
+      NextResponse: {},
+    }))
+
+    const proxyModule = await import('@/proxy')
+    const middleware = proxyModule.default
+    const request = { url: 'http://localhost:3000/en', nextUrl: { protocol: 'http:' } } as never
+
+    middleware(request)
+
+    expect(mockResponse.headers.set).not.toHaveBeenCalledWith('Strict-Transport-Security', expect.anything())
   })
 
   it('should use NEXT_PUBLIC_CMS_URL env var when set', async () => {
@@ -119,7 +184,7 @@ describe('proxy middleware configuration', () => {
 
     const proxyModule = await import('@/proxy')
     const middleware = proxyModule.default
-    const request = { url: 'http://localhost:3000/en' } as never
+    const request = { url: 'http://localhost:3000/en', nextUrl: { protocol: 'http:' } } as never
 
     middleware(request)
 
@@ -142,7 +207,7 @@ describe('proxy middleware configuration', () => {
 
     const proxyModule = await import('@/proxy')
     const middleware = proxyModule.default
-    const request = { url: 'http://localhost:3000/en' } as never
+    const request = { url: 'http://localhost:3000/en', nextUrl: { protocol: 'http:' } } as never
 
     const result = middleware(request)
 

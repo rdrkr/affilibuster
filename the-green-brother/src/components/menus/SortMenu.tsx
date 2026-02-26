@@ -115,6 +115,7 @@ export function SortMenu({
       onOpenChange={setIsOpen}
       align={isRTL ? 'end' : 'start'}
       inlineOnMobile
+      triggerGapClassName="-m-6 md:m-0"
       testId="sort-menu-container"
       visible={visible}
     >

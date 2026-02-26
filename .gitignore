@@ -360,3 +360,4 @@ openapi-ts-error-*.log
 frontend/
 /cms/core
 /the-green-brother/core
+/.claude/worktrees

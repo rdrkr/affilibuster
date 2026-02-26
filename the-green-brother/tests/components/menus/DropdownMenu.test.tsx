@@ -39,7 +39,7 @@ describe('Dropdown', () => {
     expect(screen.queryByText('Test Content')).not.toBeInTheDocument()
   })
 
-  it('should apply RTL positioning classes', () => {
+  it('should apply RTL positioning classes and item alignment', () => {
     render(
       <Dropdown isVisible={true} direction={DirectionEnum.RTL} align="start">
         <div>Test Content</div>
@@ -47,9 +47,12 @@ describe('Dropdown', () => {
     )
     const container = screen.getByText('Test Content').closest('.fixed')
     expect(container).toHaveClass('sm:left-auto')
+    // Inner panel should align items to end for RTL
+    const panel = screen.getByText('Test Content').parentElement
+    expect(panel).toHaveClass('items-end')
   })
 
-  it('should apply LTR start positioning (right-auto)', () => {
+  it('should apply LTR start positioning (right-auto) and item alignment', () => {
     render(
       <Dropdown isVisible={true} direction={DirectionEnum.LTR} align="start">
         <div>Test Content</div>
@@ -57,6 +60,9 @@ describe('Dropdown', () => {
     )
     const container = screen.getByText('Test Content').closest('.fixed')
     expect(container).toHaveClass('sm:right-auto')
+    // Inner panel should align items to start for LTR
+    const panel = screen.getByText('Test Content').parentElement
+    expect(panel).toHaveClass('items-start')
   })
 
   it('should apply LTR end positioning (left-auto)', () => {
@@ -77,6 +83,36 @@ describe('Dropdown', () => {
     )
     const container = screen.getByText('Test Content').closest('.fixed')
     expect(container).toHaveClass('sm:right-auto')
+  })
+
+  it('should use default triggerGap of 8px for hover bridge', () => {
+    const { container } = render(
+      <Dropdown isVisible={true}>
+        <div>Test Content</div>
+      </Dropdown>
+    )
+    const hoverBridge = container.querySelector('[aria-hidden="true"]')
+    expect(hoverBridge).toHaveStyle({ height: '8px', marginTop: '0' })
+  })
+
+  it('should apply custom positive triggerGap to hover bridge', () => {
+    const { container } = render(
+      <Dropdown isVisible={true} triggerGap={4}>
+        <div>Test Content</div>
+      </Dropdown>
+    )
+    const hoverBridge = container.querySelector('[aria-hidden="true"]')
+    expect(hoverBridge).toHaveStyle({ height: '4px', marginTop: '0' })
+  })
+
+  it('should apply negative triggerGap as margin to pull dropdown closer', () => {
+    const { container } = render(
+      <Dropdown isVisible={true} triggerGap={-10}>
+        <div>Test Content</div>
+      </Dropdown>
+    )
+    const hoverBridge = container.querySelector('[aria-hidden="true"]')
+    expect(hoverBridge).toHaveStyle({ height: '0', marginTop: '-10px' })
   })
 
   it('should use inline positioning when inlineOnMobile is true', () => {
@@ -341,6 +377,16 @@ describe('DropdownMenu', () => {
     // Click should not toggle either
     fireEvent.click(button)
     expect(button).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('should pass triggerGap to Dropdown hover bridge', () => {
+    const { container } = render(
+      <DropdownMenu triggerData={mockTriggerData} direction={DirectionEnum.LTR} testId="test-menu" triggerGap={1}>
+        <div>Dropdown Content</div>
+      </DropdownMenu>
+    )
+    const hoverBridge = container.querySelector('[aria-hidden="true"]')
+    expect(hoverBridge).toHaveStyle({ height: '1px', marginTop: '0' })
   })
 
   it('should render trigger as ButtonLink when triggerType is "link"', () => {

@@ -73,6 +73,7 @@ export function LanguageMenu({
 }: LanguageMenuProps) {
   const isIconAfterText = data.menuButton.label?.iconPosition === IconPositionEnum.AFTER_TEXT
   const label = data.menuButton.label
+  const isRTL = direction === DirectionEnum.RTL
   const [isOpen, setIsOpen] = useState(false)
 
   const handleLanguageSelect = useCallback(
@@ -109,7 +110,7 @@ export function LanguageMenu({
   }
 
   // Determine children position based on icon position from CMS
-  const childrenPosition = isIconAfterText ? 'end' : 'start'
+  const childrenPosition = isRTL ? (isIconAfterText ? 'start' : 'end') : isIconAfterText ? 'end' : 'start'
 
   return (
     <DropdownMenu
@@ -123,32 +124,35 @@ export function LanguageMenu({
       isOpen={isOpen}
       onOpenChange={setIsOpen}
     >
-      {languages.map(lang => (
-        <ButtonAction
-          key={lang.name}
-          data={{
-            label: {
-              iconPosition: IconPositionEnum.BEFORE_TEXT,
-              text: `${lang.flag}\u00A0\u00A0${lang.name}`,
-              ariaDescription: lang.name,
-            },
-            url: '',
-            openInNewTab: false,
-          }}
-          showText={true}
-          direction={DirectionEnum.LTR}
-          onClick={() => {
-            handleLanguageSelect(lang.code)
-          }}
-          variant="ghost-2"
-          iconSize="sm"
-          size="sm"
-          isActive={selectedLang === lang.code}
-        >
-          {/* force justify as if button has icon */}
-          {'\u00A0'}
-        </ButtonAction>
-      ))}
+      {/* Always LTR regardless of page direction */}
+      <div dir="ltr">
+        {languages.map(lang => (
+          <ButtonAction
+            key={lang.name}
+            data={{
+              label: {
+                iconPosition: IconPositionEnum.BEFORE_TEXT,
+                text: `${lang.flag}\u00A0\u00A0${lang.name}`,
+                ariaDescription: lang.name,
+              },
+              url: '',
+              openInNewTab: false,
+            }}
+            showText={true}
+            direction={DirectionEnum.LTR} // Always LTR regardless of page direction
+            onClick={() => {
+              handleLanguageSelect(lang.code)
+            }}
+            variant="ghost-2"
+            iconSize="sm"
+            size="sm"
+            isActive={selectedLang === lang.code}
+          >
+            {/* force justify as if button has icon */}
+            {'\u00A0'}
+          </ButtonAction>
+        ))}
+      </div>
     </DropdownMenu>
   )
 }

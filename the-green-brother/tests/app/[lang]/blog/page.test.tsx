@@ -21,6 +21,15 @@ jest.mock('@/lib/languages/api', () => ({
   getLanguages: jest.fn(),
 }))
 
+// Mock JsonLdScript component
+jest.mock('@/components/seo', () => ({
+  JsonLdScript: jest.fn(({ data }: { data: Record<string, unknown> }) => (
+    <script type="application/ld+json" data-testid="json-ld">
+      {JSON.stringify(data)}
+    </script>
+  )),
+}))
+
 // Mock the BlogClient component
 jest.mock('@/app/[lang]/blog/BlogClient', () => ({
   __esModule: true,
@@ -42,6 +51,7 @@ jest.mock('@/app/[lang]/blog/BlogClient', () => ({
 }))
 
 import BlogPage, { generateMetadata } from '@/app/[lang]/blog/page'
+import { JsonLdScript } from '@/components/seo'
 import { getBlog, getBlogPosts, getNavigation } from '@/lib/content'
 import { LanguageCode, DirectionEnum, SchemaEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
@@ -51,6 +61,7 @@ const mockGetBlog = getBlog as jest.MockedFunction<typeof getBlog>
 const mockGetBlogPosts = getBlogPosts as jest.MockedFunction<typeof getBlogPosts>
 const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 const mockGetLanguages = getLanguages as jest.MockedFunction<typeof getLanguages>
+const mockJsonLdScript = JsonLdScript as unknown as jest.Mock
 
 describe('BlogPage', () => {
   beforeEach(() => {
@@ -79,6 +90,24 @@ describe('BlogPage', () => {
     })
     expect(screen.getByTestId('blog-client')).toBeInTheDocument()
     expect(screen.getByTestId('blog-client').getAttribute('data-post-count')).toBe('2')
+  })
+
+  it('should render BreadcrumbList JSON-LD', async () => {
+    const mockBlogData = { header: { header: { text: 'Our Blog' } } }
+    const mockPosts = { data: [], meta: {} }
+
+    mockGetBlog.mockResolvedValue(mockBlogData as Awaited<ReturnType<typeof getBlog>>)
+    mockGetBlogPosts.mockResolvedValue(mockPosts as Awaited<ReturnType<typeof getBlogPosts>>)
+
+    const Component = await BlogPage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+    render(Component)
+
+    expect(mockJsonLdScript).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ '@type': 'BreadcrumbList' }),
+      }),
+      undefined
+    )
   })
 
   it('should pass empty array when posts response is null', async () => {

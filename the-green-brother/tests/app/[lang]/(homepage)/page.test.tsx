@@ -36,8 +36,18 @@ jest.mock('@/components/homepage', () => ({
   HomeSections: jest.fn(() => <div data-testid="home-sections" />),
 }))
 
+// Mock JsonLdScript component
+jest.mock('@/components/seo', () => ({
+  JsonLdScript: jest.fn(({ data }: { data: Record<string, unknown> }) => (
+    <script type="application/ld+json" data-testid="json-ld">
+      {JSON.stringify(data)}
+    </script>
+  )),
+}))
+
 import HomePage, { generateMetadata } from '@/app/[lang]/(homepage)/page'
 import { HomeSections } from '@/components/homepage'
+import { JsonLdScript } from '@/components/seo'
 import { getBlog, getHomepage, getNavigation, getTeamMembers } from '@/lib/content'
 import { userProfileFlag } from '@/lib/feature-flags'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
@@ -49,11 +59,18 @@ const mockGetBlog = getBlog as jest.MockedFunction<typeof getBlog>
 const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 const mockUserProfileFlag = userProfileFlag as jest.MockedFunction<typeof userProfileFlag>
 const mockHomeSections = HomeSections as unknown as jest.Mock
+const mockJsonLdScript = JsonLdScript as unknown as jest.Mock
 
 describe('HomePage', () => {
+  const mockNavigationData = {
+    siteTitle: 'TheGreenBrother',
+    brandButton: { label: { icon: 'https://example.com/logo.png', text: 'Logo', ariaDescription: 'Logo' } },
+  }
+
   beforeEach(() => {
     jest.clearAllMocks()
     mockDraftMode.mockResolvedValue({ isEnabled: false })
+    mockGetNavigation.mockResolvedValue(mockNavigationData as unknown as Awaited<ReturnType<typeof getNavigation>>)
   })
 
   it('should fetch data and pass to HomeSections', async () => {
@@ -75,6 +92,7 @@ describe('HomePage', () => {
     expect(mockGetHomepage).toHaveBeenCalledWith(LanguageCode.EN, {})
     expect(mockGetTeamMembers).toHaveBeenCalledWith(LanguageCode.EN)
     expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.EN, {})
+    expect(mockGetNavigation).toHaveBeenCalledWith(LanguageCode.EN)
     expect(screen.getByTestId('home-client')).toBeInTheDocument()
     expect(screen.getByTestId('home-sections')).toBeInTheDocument()
     expect(mockHomeSections).toHaveBeenCalledWith(
@@ -84,6 +102,57 @@ describe('HomePage', () => {
         enableUserProfile: false,
         readTimeMinutesLabel: mockBlogPage.readTimeMinutesLabel,
         readArticleLabel: mockBlogPage.readArticleLabel,
+      }),
+      undefined
+    )
+  })
+
+  it('should render JSON-LD structured data for Organization and WebSite', async () => {
+    const mockBlogPage = {
+      readTimeMinutesLabel: { text: 'min' },
+      readArticleLabel: { text: 'Read' },
+    }
+
+    mockGetHomepage.mockResolvedValue({ sections: [] } as unknown as Awaited<ReturnType<typeof getHomepage>>)
+    mockGetTeamMembers.mockResolvedValue([])
+    mockGetBlog.mockResolvedValue(mockBlogPage as unknown as Awaited<ReturnType<typeof getBlog>>)
+
+    const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+    render(Component)
+
+    // Should render two JsonLdScript components (Organization + WebSite)
+    expect(mockJsonLdScript).toHaveBeenCalledTimes(2)
+    expect(mockJsonLdScript).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ '@type': 'Organization', name: 'TheGreenBrother' }),
+      }),
+      undefined
+    )
+    expect(mockJsonLdScript).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ '@type': 'WebSite', name: 'TheGreenBrother' }),
+      }),
+      undefined
+    )
+  })
+
+  it('should use fallback site name when navigation is null', async () => {
+    mockGetNavigation.mockResolvedValue(null)
+    const mockBlogPage = {
+      readTimeMinutesLabel: { text: 'min' },
+      readArticleLabel: { text: 'Read' },
+    }
+
+    mockGetHomepage.mockResolvedValue({ sections: [] } as unknown as Awaited<ReturnType<typeof getHomepage>>)
+    mockGetTeamMembers.mockResolvedValue([])
+    mockGetBlog.mockResolvedValue(mockBlogPage as unknown as Awaited<ReturnType<typeof getBlog>>)
+
+    const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+    render(Component)
+
+    expect(mockJsonLdScript).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ '@type': 'Organization', name: 'TheGreenBrother' }),
       }),
       undefined
     )
@@ -152,6 +221,7 @@ describe('HomePage', () => {
     expect(mockGetHomepage).toHaveBeenCalledWith(LanguageCode.IT, {})
     expect(mockGetTeamMembers).toHaveBeenCalledWith(LanguageCode.IT)
     expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.IT, {})
+    expect(mockGetNavigation).toHaveBeenCalledWith(LanguageCode.IT)
   })
 
   it('should fetch team members and pass to HomeSections', async () => {

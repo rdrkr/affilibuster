@@ -32,6 +32,15 @@ jest.mock('next/navigation', () => ({
   },
 }))
 
+// Mock JsonLdScript component
+jest.mock('@/components/seo', () => ({
+  JsonLdScript: jest.fn(({ data }: { data: Record<string, unknown> }) => (
+    <script type="application/ld+json" data-testid="json-ld">
+      {JSON.stringify(data)}
+    </script>
+  )),
+}))
+
 // Mock the ProductDetailClient component
 jest.mock('@/app/[lang]/products/[slug]/ProductDetailClient', () => ({
   __esModule: true,
@@ -60,6 +69,7 @@ jest.mock('@/app/[lang]/products/[slug]/ProductDetailClient', () => ({
 }))
 
 import ProductDetailPage, { generateMetadata, generateStaticParams } from '@/app/[lang]/products/[slug]/page'
+import { JsonLdScript } from '@/components/seo'
 import { getNavigation, getProductBySlug, getProductCategoriesPage, getProducts } from '@/lib/content'
 import { userProfileFlag } from '@/lib/feature-flags'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
@@ -70,6 +80,7 @@ const mockGetProductCategoriesPage = getProductCategoriesPage as jest.MockedFunc
 const mockGetProducts = getProducts as jest.MockedFunction<typeof getProducts>
 const mockGetNavigation = getNavigation as jest.MockedFunction<typeof getNavigation>
 const mockUserProfileFlag = userProfileFlag as jest.MockedFunction<typeof userProfileFlag>
+const mockJsonLdScript = JsonLdScript as unknown as jest.Mock
 
 describe('ProductDetailPage', () => {
   beforeEach(() => {
@@ -84,8 +95,12 @@ describe('ProductDetailPage', () => {
     const mockProduct = {
       documentId: 'prod-1',
       slug: 'prod-slug',
-      header: { header: {} },
-      category: { slug: 'electronics' },
+      header: { header: { text: 'Product Name' } },
+      category: { slug: 'electronics', content: { text: 'Electronics' } },
+      seller: { firstName: 'John', lastName: 'Doe' },
+      images: [{ url: 'https://example.com/img.jpg' }],
+      prices: [{ amount: 29.99, currency: { code: 'USD' } }],
+      seoMetadata: { metaTitle: 'Product Name', metaDescription: 'A product' },
     }
     const mockCategoriesPage = {
       certificatesSectionHeader: { header: { text: 'Certificates Header' } },
@@ -126,6 +141,48 @@ describe('ProductDetailPage', () => {
     expect(client).toHaveAttribute('data-enable-user-profile', 'true')
   })
 
+  it('should render JSON-LD structured data for Product and Breadcrumb', async () => {
+    const mockProduct = {
+      documentId: 'prod-1',
+      slug: 'prod-slug',
+      header: { header: { text: 'Eco Bottle' } },
+      category: { slug: 'eco', content: { text: 'Eco Products' } },
+      seller: { firstName: 'Jane' },
+      images: [{ url: 'https://example.com/img1.jpg' }],
+      prices: [{ amount: 19.99, currency: { code: 'EUR' } }],
+      seoMetadata: { metaDescription: 'A great product' },
+    }
+    const mockCategoriesPage = {
+      certificatesSectionHeader: { header: { text: 'Certs' } },
+      relatedProductsSectionHeader: { header: { text: 'Related' } },
+      bySellerText: 'by',
+    }
+
+    mockGetProductBySlug.mockResolvedValue(mockProduct as unknown as Awaited<ReturnType<typeof getProductBySlug>>)
+    mockGetProductCategoriesPage.mockResolvedValue(
+      mockCategoriesPage as unknown as Awaited<ReturnType<typeof getProductCategoriesPage>>
+    )
+    mockGetProducts.mockResolvedValue([])
+
+    const jsx = await ProductDetailPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'prod-slug' }) })
+    render(jsx)
+
+    // Should render two JsonLdScript components (Product + Breadcrumb)
+    expect(mockJsonLdScript).toHaveBeenCalledTimes(2)
+    expect(mockJsonLdScript).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ '@type': 'Product', name: 'Eco Bottle' }),
+      }),
+      undefined
+    )
+    expect(mockJsonLdScript).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ '@type': 'BreadcrumbList' }),
+      }),
+      undefined
+    )
+  })
+
   it('should call notFound when product is null', async () => {
     mockGetProductBySlug.mockResolvedValue(null)
     mockGetProductCategoriesPage.mockResolvedValue({ certificatesSectionHeader: {} } as any)
@@ -143,8 +200,12 @@ describe('ProductDetailPage', () => {
     const mockProduct = {
       documentId: 'prod-1',
       slug: 'prod-slug',
-      header: { header: {} },
-      category: { slug: 'electronics' },
+      header: { header: { text: 'Product' } },
+      category: { slug: 'electronics', content: { text: 'Electronics' } },
+      seller: { firstName: 'John', lastName: 'Doe' },
+      images: [{ url: 'https://example.com/img.jpg' }],
+      prices: [{ amount: 29.99, currency: { code: 'USD' } }],
+      seoMetadata: {},
     }
     const mockCategoriesPage = {
       certificatesSectionHeader: { header: { text: 'Certificates Header' } },

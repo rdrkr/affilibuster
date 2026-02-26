@@ -11,6 +11,7 @@ import { Children, isValidElement, type ReactElement, type ReactNode } from 'rea
 // Mock next/font/google
 jest.mock('next/font/google', () => ({
   Inter: () => ({ className: 'inter-font' }),
+  Heebo: () => ({ className: 'heebo-font' }),
 }))
 
 const mockDraftMode = jest.fn().mockResolvedValue({ isEnabled: false })
@@ -127,6 +128,20 @@ function getHtmlProps(element: ReactElement): HtmlElementProps {
 }
 
 /**
+ * Extract the body element from the HTML element returned by LocaleLayout.
+ * @param element - The ReactElement returned by LocaleLayout
+ * @returns The body ReactElement
+ */
+function getBodyElement(element: ReactElement): ReactElement {
+  const htmlChildren = Children.toArray((element.props as { children: ReactNode }).children)
+  const body = htmlChildren.find((child): child is ReactElement => isValidElement(child) && child.type === 'body')
+  if (!body) {
+    throw new Error('Expected <body> element inside <html>')
+  }
+  return body
+}
+
+/**
  * Extract the body content from the HTML element returned by LocaleLayout.
  * LocaleLayout returns an <html> element which cannot be rendered inside
  * React Testing Library's <div> container. This helper extracts the <body>
@@ -135,11 +150,7 @@ function getHtmlProps(element: ReactElement): HtmlElementProps {
  * @returns A fragment containing the body's children
  */
 function getBodyContent(element: ReactElement): ReactElement {
-  const htmlChildren = Children.toArray((element.props as { children: ReactNode }).children)
-  const body = htmlChildren.find((child): child is ReactElement => isValidElement(child) && child.type === 'body')
-  if (!body) {
-    throw new Error('Expected <body> element inside <html>')
-  }
+  const body = getBodyElement(element)
   return <>{(body.props as { children: ReactNode }).children}</>
 }
 
@@ -296,6 +307,34 @@ describe('LocaleLayout', () => {
       })
 
       expect(getHtmlProps(element).suppressHydrationWarning).toBe(true)
+    })
+
+    it('should use Inter font for non-Hebrew locales', async () => {
+      const element = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.EN }),
+      })
+
+      const body = getBodyElement(element)
+      const bodyClassName = (body.props as { className: string }).className
+      expect(bodyClassName).toContain('inter-font')
+      expect(bodyClassName).not.toContain('heebo-font')
+    })
+
+    it('should use Heebo font for Hebrew locale', async () => {
+      mockGetLanguages.mockResolvedValue([
+        { code: LanguageCode.HE, name: 'Hebrew', direction: DirectionEnum.RTL },
+      ] as unknown as Awaited<ReturnType<typeof getLanguages>>)
+
+      const element = await LocaleLayout({
+        children: <div>Content</div>,
+        params: Promise.resolve({ lang: LanguageCode.HE }),
+      })
+
+      const body = getBodyElement(element)
+      const bodyClassName = (body.props as { className: string }).className
+      expect(bodyClassName).toContain('heebo-font')
+      expect(bodyClassName).not.toContain('inter-font')
     })
   })
 

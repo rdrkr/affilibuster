@@ -1,8 +1,9 @@
 // Copyright (c) 2026 Affilibuster by Ronen Druker.
 
+import { JsonLdScript } from '@/components/seo'
 import { getBlog, getBlogPosts, getNavigation } from '@/lib/client'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
-import { buildPageMetadata } from '@/lib/seo'
+import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo'
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import BlogClient from './BlogClient'
@@ -49,5 +50,12 @@ export default async function BlogPage({ params }: { params: Promise<{ lang: Lan
     }),
   ])
 
-  return <BlogClient blogPageData={blogPageData} posts={postsResponse?.data ?? []} />
+  const breadcrumbs = [{ name: 'Home', path: '' }, { name: blogPageData?.header.header?.text ?? 'Blog' }]
+
+  return (
+    <>
+      <JsonLdScript data={buildBreadcrumbJsonLd(breadcrumbs, lang)} />
+      <BlogClient blogPageData={blogPageData} posts={postsResponse?.data ?? []} />
+    </>
+  )
 }

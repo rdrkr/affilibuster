@@ -1,8 +1,10 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
+import { JsonLdScript } from '@/components/seo'
 import { getBlog, getBlogPostBySlug, getBlogPosts, getLanguages, getNavigation } from '@/lib/client'
 import { DirectionEnum, LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
-import { buildPageMetadata } from '@/lib/seo'
+import type { BreadcrumbEntry } from '@/lib/seo'
+import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo'
 import { SUPPORTED_LANGUAGE_CODES } from '@/lib/types'
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
@@ -75,5 +77,28 @@ export default async function BlogPostPage({ params }: { params: Promise<{ lang:
     notFound()
   }
 
-  return <BlogPostClient post={post} direction={direction} blogData={blogData} language={lang} />
+  const authorName = `${post.author.firstName}${post.author.lastName ? ` ${post.author.lastName}` : ''}`
+  const articleJsonLd = buildArticleJsonLd({
+    headline: post.seoMetadata.metaTitle ?? post.slug,
+    ...(post.seoMetadata.metaDescription !== undefined ? { description: post.seoMetadata.metaDescription } : {}),
+    imageUrl: post.wideImage.url,
+    authorName,
+    datePublished: post.publishedDate,
+    ...(post.updatedAt !== undefined ? { dateModified: post.updatedAt } : {}),
+    publisherName: navigation.siteTitle,
+  })
+
+  const breadcrumbs: BreadcrumbEntry[] = [
+    { name: 'Home', path: '' },
+    { name: 'Blog', path: '/blog' },
+    { name: post.seoMetadata.metaTitle ?? post.slug },
+  ]
+
+  return (
+    <>
+      <JsonLdScript data={articleJsonLd} />
+      <JsonLdScript data={buildBreadcrumbJsonLd(breadcrumbs, lang)} />
+      <BlogPostClient post={post} direction={direction} blogData={blogData} language={lang} />
+    </>
+  )
 }

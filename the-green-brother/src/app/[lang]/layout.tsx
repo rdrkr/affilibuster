@@ -15,11 +15,12 @@ import type { Metadata } from 'next'
 import '@/styles/globals.css'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
-import { Inter } from 'next/font/google'
+import { Heebo, Inter } from 'next/font/google'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
+const heebo = Heebo({ subsets: ['hebrew', 'latin'], display: 'swap' })
 
 interface Props {
   children: React.ReactNode
@@ -113,7 +114,7 @@ async function LocaleLayout({ children, params }: Props) {
 
       <body
         className={`
-          ${inter.className}
+          ${lang === LanguageCode.HE ? heebo.className : inter.className}
           font-sans transition-colors duration-300
           selection:bg-primary selection:text-black
         `}

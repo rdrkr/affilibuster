@@ -1,10 +1,11 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 import { HomeSections } from '@/components/homepage'
+import { JsonLdScript } from '@/components/seo'
 import { getBlog, getHomepage, getNavigation, getTeamMembers } from '@/lib/content'
 import { userProfileFlag } from '@/lib/feature-flags'
 import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
-import { buildPageMetadata } from '@/lib/seo'
+import { buildOrganizationJsonLd, buildPageMetadata, buildWebSiteJsonLd } from '@/lib/seo'
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import HomeClient from './HomeClient'
@@ -42,29 +43,39 @@ async function HomePage({ params }: { params: Promise<{ lang: LanguageCode }> })
   const { isEnabled: isDraft } = await draftMode()
   const draftParams = isDraft ? { status: SchemaEnum.DRAFT as const } : {}
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+
   // Fetch all homepage data in parallel
-  const [homepageData, teamMembers, enableUserProfile, blogPageResponse] = await Promise.all([
+  const [homepageData, teamMembers, enableUserProfile, blogPageResponse, navigation] = await Promise.all([
     getHomepage(lang, { ...draftParams }),
     getTeamMembers(lang),
     userProfileFlag(),
     getBlog(lang, { ...draftParams }),
+    getNavigation(lang),
   ])
 
   if (!homepageData || !blogPageResponse) {
     return null
   }
 
+  const siteName = navigation?.siteTitle ?? 'TheGreenBrother'
+  const logoUrl = navigation?.brandButton.label?.icon
+
   // Pass data to client component
   return (
-    <HomeClient>
-      <HomeSections
-        sections={homepageData.sections}
-        teamMembers={teamMembers}
-        enableUserProfile={enableUserProfile}
-        readTimeMinutesLabel={blogPageResponse.readTimeMinutesLabel}
-        readArticleLabel={blogPageResponse.readArticleLabel}
-      />
-    </HomeClient>
+    <>
+      <JsonLdScript data={buildOrganizationJsonLd(siteName, siteUrl, logoUrl)} />
+      <JsonLdScript data={buildWebSiteJsonLd(siteName, siteUrl)} />
+      <HomeClient>
+        <HomeSections
+          sections={homepageData.sections}
+          teamMembers={teamMembers}
+          enableUserProfile={enableUserProfile}
+          readTimeMinutesLabel={blogPageResponse.readTimeMinutesLabel}
+          readArticleLabel={blogPageResponse.readArticleLabel}
+        />
+      </HomeClient>
+    </>
   )
 }
 
