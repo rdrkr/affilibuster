@@ -202,12 +202,11 @@ export function Card({
     `
 
   const cardClasses = `
-    flex group relative isolate flex shrink-0 snap-start overflow-hidden
+    group relative isolate flex shrink-0 snap-start overflow-hidden flex-col min-h-0 min-w-0
     ${showBackground ? 'rounded-xl border border-neutral-200 bg-white shadow-md dark:border-white/5 dark:bg-surface-dark dark:shadow-none' : ''}
     ${animationClasses}
     ${width === 'full' ? 'w-full' : width === 'fit' ? 'w-fit' : ''}
     ${height === 'full' ? 'h-full' : height === 'fit' ? 'h-fit' : ''}
-    flex-col
     ${className}
   `
 
@@ -252,7 +251,7 @@ export function Card({
     ${imageMarginClass}
   `
 
-  const contentContainerClasses = `flex flex-col flex-1 justify-center ${sizeClasses.paddingClasses}`
+  const contentContainerClasses = `flex flex-col flex-1 justify-center min-h-0 min-w-0 ${sizeClasses.paddingClasses}`
 
   // Footer classes - mt-auto pushes to bottom, pt-4 for spacing, pb-2 to match circle image mt-6 with existing content padding
   const footerClasses = `mt-auto pt-4 ${imageShape === 'circle' ? 'pb-2' : ''}`
@@ -293,7 +292,7 @@ export function Card({
               {size !== 'xs' && header}
 
               {/* Content */}
-              <div className={size === 'xs' ? undefined : 'flex-1'}>{content}</div>
+              <div className={size === 'xs' ? undefined : 'flex min-h-0 min-w-0 flex-1 flex-col'}>{content}</div>
 
               {/* Footer (inline for lg/xl, otherwise below) */}
               {size !== 'xs' && size !== 'sm' && size !== 'md' && footer && (
@@ -336,10 +335,8 @@ export function Card({
           <div className={contentContainerClasses}>
             {/* Header */}
             {size !== 'xs' && header}
-
             {/* Content */}
-            <div className="flex-1">{content}</div>
-
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col">{content}</div>
             {/* Footer */}
             {footer && <div className={footerClasses}>{footer}</div>}
           </div>

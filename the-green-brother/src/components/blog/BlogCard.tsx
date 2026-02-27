@@ -116,9 +116,9 @@ export function BlogCard({
     ) : null
 
   // Content slot: Header with title and excerpt (hide subheader for 'sm' size)
-  // Wrapped in overflow-hidden with min-w-0 to ensure text truncation works properly in flex containers
+  // Wrapped in flex and overflow-hidden to ensure text truncation works properly in flex containers
   const contentSlot = content.header ? (
-    <div className="min-w-0 overflow-hidden">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <Header
         data={
           size === 'sm'
@@ -127,13 +127,16 @@ export function BlogCard({
         }
         level={headingLevel}
         direction={direction}
+        className="flex min-h-0 min-w-0 flex-1 flex-col"
         headerClassName={`
-          line-clamp-2 leading-snug
+          leading-snug shrink-0
           text-neutral-800 transition-colors group-hover:text-primary group-hover:text-shadow-sm
           active:text-primary-700
           dark:text-white dark:group-hover:text-shadow-none dark:active:text-primary-400
         `}
-        subheaderTextClassName="line-clamp-3"
+        headerTextClassName="line-clamp-2 min-w-0"
+        subheaderClassName="flex-1 min-h-0 overflow-hidden flex flex-col"
+        subheaderTextClassName="line-clamp-3 min-w-0"
       />
     </div>
   ) : null

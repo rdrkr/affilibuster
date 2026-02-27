@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "openapi:generate": "openapi-ts",
-    "type-check": "tsc --noEmit -p tsconfig.lint.json",
-    "lint": "eslint --max-warnings 0 . && npm run type-check",
-    "lint:fix": "eslint --fix --max-warnings 0 . && npm run type-check",
+    "type-check": "tsc -p tsconfig.lint.json",
+    "lint": "eslint --concurrency=auto --max-warnings 0 . && npm run type-check",
+    "lint:fix": "eslint --concurrency=auto --fix --max-warnings 0 . && npm run type-check",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "preflight": "npm run openapi:generate && npm run format:fix && npm run lint:fix",

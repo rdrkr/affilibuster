@@ -30,8 +30,10 @@ export interface HeaderProps {
   subheaderIconSize?: IconSize
   /** Additional CSS classes for the container */
   className?: string
-  /** Additional CSS classes for the header text */
+  /** Additional CSS classes for the header container */
   headerClassName?: string
+  /** Additional CSS classes for the header text element (inside Label) */
+  headerTextClassName?: string
   /** Additional CSS classes for the subheader container (Label wrapper) */
   subheaderClassName?: string
   /** Additional CSS classes for the subheader text element (inside Label) */
@@ -67,6 +69,7 @@ function getAlignmentClass(alignment: AlignmentEnum, direction: DirectionEnum): 
  * @param props.subheaderIconSize - Icon size for subheader
  * @param props.className - Container CSS classes
  * @param props.headerClassName - Header text CSS classes
+ * @param props.headerTextClassName - Header text element CSS classes (for text truncation, etc.)
  * @param props.subheaderClassName - Subheader container CSS classes
  * @param props.subheaderTextClassName - Subheader text element CSS classes (for text truncation, etc.)
  * @param props.direction - Language direction for alignment
@@ -80,6 +83,7 @@ export function Header({
   subheaderIconSize = 'md',
   className = '',
   headerClassName = '',
+  headerTextClassName = '',
   subheaderClassName = '',
   subheaderTextClassName = '',
   direction,
@@ -151,6 +155,7 @@ export function Header({
                 ${defaultSizeClass}
                 ${headerClassName}
               `}
+              textClassName={headerTextClassName}
               direction={direction}
             />
             {subheader && (
@@ -183,6 +188,7 @@ export function Header({
           iconSize={headerIconSize}
           promoteIcon={isPromoted}
           className={`font-bold ${alignmentClass} ${defaultSizeClass} ${headerClassName}`}
+          textClassName={headerTextClassName}
           iconClassName="text-primary text-shadow-sm dark:text-shadow-none"
           direction={direction}
         />
