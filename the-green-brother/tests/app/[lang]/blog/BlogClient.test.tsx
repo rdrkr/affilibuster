@@ -96,7 +96,8 @@ describe('BlogClient', () => {
       content: { header: { header: { text: 'First Post' }, subheader: { text: 'Introduction' } } },
 
       tags: [{ tag: { text: 'Sustainability' } }],
-      featuredImage: { url: '/images/post1.jpg', alternativeText: 'Post 1' },
+      wideImage: { url: '/images/post1-wide.jpg', alternativeText: 'Post 1 Wide' } as any,
+      squareImage: { url: '/images/post1-square.jpg', alternativeText: 'Post 1 Square' } as any,
     } as ApiBlogPostBlogPostDocument,
     {
       documentId: 'post-2',

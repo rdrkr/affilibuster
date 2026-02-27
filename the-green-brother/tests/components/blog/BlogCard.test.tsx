@@ -181,10 +181,22 @@ describe('BlogCard', () => {
           },
         },
       },
-      featuredImage: {
-        documentId: 'img-1',
+      wideImage: {
+        documentId: 'img-wide-1',
         id: 1,
-        name: 'test-image.webp',
+        name: 'test-image-wide.webp',
+        alternativeText: 'Test image alt',
+        url: '/uploads/test-image.webp',
+        hash: 'test_abc',
+        mime: 'image/webp',
+        size: 80,
+        provider: 'local',
+        publishedAt: '2025-01-15',
+      },
+      squareImage: {
+        documentId: 'img-sq-1',
+        id: 2,
+        name: 'test-image-sq.webp',
         alternativeText: 'Test image alt',
         url: '/uploads/test-image.webp',
         hash: 'test_abc',
@@ -351,7 +363,7 @@ describe('BlogCard', () => {
   })
 
   it('should handle missing featured image (null-like)', () => {
-    const { featuredImage: _image, ...basePost } = createMockPost()
+    const { wideImage: _wide, squareImage: _sq, ...basePost } = createMockPost()
     const postWithoutImage = basePost as ApiBlogPostBlogPostDocument
     render(<BlogCard {...defaultProps} post={postWithoutImage} />)
 

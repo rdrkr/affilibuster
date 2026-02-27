@@ -8,9 +8,9 @@ import { HeroSection } from '@/components/sections/HeroSection'
 
 import {
   AlignmentEnum,
-  LanguageCode,
   DirectionEnum,
   IconPositionEnum,
+  LanguageCode,
   SectionsHeroEntry,
   VariantEnum,
   type ApiBlogBlogDocument,
@@ -67,7 +67,7 @@ export default function BlogPostClient({ post, direction, blogData, language }: 
         ariaDescription: postHeader?.ariaDescription ?? '',
       },
     },
-    image: post.featuredImage,
+    image: post.wideImage,
     variant: VariantEnum.TEXT_ABOVE_BACKGROUND,
   }
 

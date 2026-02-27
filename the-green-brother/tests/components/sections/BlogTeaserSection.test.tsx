@@ -217,18 +217,7 @@ describe('BlogTeaserSection', () => {
           },
         },
       },
-      featuredImage: {
-        documentId: 'img-1',
-        id: 1,
-        name: 'plastic-waste.webp',
-        alternativeText: 'Plastic waste reduction tips',
-        url: '/uploads/plastic-waste.webp',
-        hash: 'plastic_abc',
-        mime: 'image/webp',
-        size: 80,
-        provider: 'local',
-        publishedAt: '2025-01-15',
-      },
+
       wideImage: {
         documentId: 'img-wide-1',
         id: 1,
@@ -319,18 +308,7 @@ describe('BlogTeaserSection', () => {
           },
         },
       },
-      featuredImage: {
-        documentId: 'img-2',
-        id: 2,
-        name: 'fashion.webp',
-        alternativeText: 'Sustainable fashion tips',
-        url: '/uploads/fashion.webp',
-        hash: 'fashion_abc',
-        mime: 'image/webp',
-        size: 70,
-        provider: 'local',
-        publishedAt: '2025-01-10',
-      },
+
       wideImage: {
         documentId: 'img-wide-2',
         id: 2,
@@ -514,8 +492,8 @@ describe('BlogTeaserSection', () => {
     const postsWithoutImage: ApiBlogPostBlogPostDocument[] = [
       {
         ...mockBlogPosts[0]!,
-        featuredImage: {
-          ...mockBlogPosts[0]!.featuredImage!,
+        wideImage: {
+          ...mockBlogPosts[0]!.wideImage!,
           url: '',
         },
       },
@@ -537,8 +515,8 @@ describe('BlogTeaserSection', () => {
     const postsWithAbsoluteUrl: ApiBlogPostBlogPostDocument[] = [
       {
         ...mockBlogPosts[0]!,
-        featuredImage: {
-          ...mockBlogPosts[0]!.featuredImage!,
+        wideImage: {
+          ...mockBlogPosts[0]!.wideImage!,
           url: 'https://cdn.example.com/plastic-waste.webp',
         },
       },
@@ -572,11 +550,11 @@ describe('BlogTeaserSection', () => {
   })
 
   it('should pass post data to BlogCard (alt text handling tested in BlogCard)', () => {
-    const { alternativeText: _alternativeText, ...imageWithoutAlt } = mockBlogPosts[0]!.featuredImage!
+    const { alternativeText: _alternativeText, ...imageWithoutAlt } = mockBlogPosts[0]!.wideImage!
     const postsWithoutAlt: ApiBlogPostBlogPostDocument[] = [
       {
         ...mockBlogPosts[0]!,
-        featuredImage: imageWithoutAlt,
+        wideImage: imageWithoutAlt as any,
       },
     ]
 

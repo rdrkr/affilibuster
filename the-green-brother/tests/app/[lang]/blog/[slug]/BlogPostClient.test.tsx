@@ -94,9 +94,9 @@ jest.mock('next/navigation', () => ({
 
 import BlogPostClient from '@/app/[lang]/blog/[slug]/BlogPostClient'
 import {
-  LanguageCode,
   DirectionEnum,
   IconPositionEnum,
+  LanguageCode,
   type ApiBlogBlogDocument,
   type ApiBlogPostBlogPostDocument,
 } from '@/lib/generated/types.gen'
@@ -170,7 +170,8 @@ describe('BlogPostClient', () => {
       publishedAt: '2024-01-01',
     },
     tags: [{ tag: { text: 'Technology' } }],
-    featuredImage: { url: '/images/featured.jpg' },
+    wideImage: { url: '/images/wide.jpg' } as any,
+    squareImage: { url: '/images/square.jpg' } as any,
   } as ApiBlogPostBlogPostDocument
 
   it('should render post title', () => {
@@ -368,10 +369,11 @@ describe('BlogPostClient', () => {
     expect(screen.queryByText('Technology')).not.toBeInTheDocument()
   })
 
-  it('should render without featured image when not available', () => {
+  it('should render without wide image when not available', () => {
     const postWithoutImage = {
       ...mockPost,
-      featuredImage: undefined,
+      wideImage: undefined,
+      squareImage: undefined,
     } as unknown as ApiBlogPostBlogPostDocument
 
     renderWithLayout(
@@ -559,7 +561,7 @@ describe('BlogPostClient', () => {
 
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
   })
-  it('should render featured image from post', () => {
+  it('should render wide image from post', () => {
     renderWithLayout(
       <BlogPostClient
         post={mockPost}
@@ -573,7 +575,7 @@ describe('BlogPostClient', () => {
     )
 
     const hero = screen.getByTestId('hero-section')
-    expect(hero).toHaveAttribute('data-image-src', '/images/featured.jpg')
+    expect(hero).toHaveAttribute('data-image-src', '/images/wide.jpg')
   })
 
   it('should have responsive layout classes for metadata', () => {

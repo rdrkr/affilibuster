@@ -793,13 +793,6 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
       }>
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    featuredImage: Schema.Attribute.Media<'images'> &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
     locale: Schema.Attribute.String
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'>
     publishedAt: Schema.Attribute.DateTime
@@ -827,6 +820,7 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
         }
       }>
     squareImage: Schema.Attribute.Media<'images'> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false
@@ -836,6 +830,7 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     wideImage: Schema.Attribute.Media<'images'> &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false

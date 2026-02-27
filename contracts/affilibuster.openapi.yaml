@@ -2370,9 +2370,6 @@ paths:
                         content:
                           description: A component field
                           $ref: '#/components/schemas/ElementsTextBlockEntry'
-                        featuredImage:
-                          description: A media field
-                          $ref: '#/components/schemas/PluginUploadFileDocument'
                         wideImage:
                           description: A media field
                           $ref: '#/components/schemas/PluginUploadFileDocument'
@@ -2435,7 +2432,8 @@ paths:
                         - publishedDate
                         - publishedAt
                         - content
-                        - featuredImage
+                        - wideImage
+                        - squareImage
                         - author
                         - tags
                         - seoMetadata
@@ -2680,9 +2678,6 @@ paths:
                       content:
                         description: A component field
                         $ref: '#/components/schemas/ElementsTextBlockEntry'
-                      featuredImage:
-                        description: A media field
-                        $ref: '#/components/schemas/PluginUploadFileDocument'
                       wideImage:
                         description: A media field
                         $ref: '#/components/schemas/PluginUploadFileDocument'
@@ -2745,7 +2740,8 @@ paths:
                       - publishedDate
                       - publishedAt
                       - content
-                      - featuredImage
+                      - wideImage
+                      - squareImage
                       - author
                       - tags
                       - seoMetadata
@@ -2991,9 +2987,6 @@ paths:
                       content:
                         description: A component field
                         $ref: '#/components/schemas/ElementsTextBlockEntry'
-                      featuredImage:
-                        description: A media field
-                        $ref: '#/components/schemas/PluginUploadFileDocument'
                       wideImage:
                         description: A media field
                         $ref: '#/components/schemas/PluginUploadFileDocument'
@@ -3056,7 +3049,8 @@ paths:
                       - publishedDate
                       - publishedAt
                       - content
-                      - featuredImage
+                      - wideImage
+                      - squareImage
                       - author
                       - tags
                       - seoMetadata
@@ -15484,9 +15478,6 @@ components:
         content:
           description: A component field
           $ref: '#/components/schemas/ElementsTextBlockEntry'
-        featuredImage:
-          description: A media field
-          $ref: '#/components/schemas/PluginUploadFileDocument'
         wideImage:
           description: A media field
           $ref: '#/components/schemas/PluginUploadFileDocument'
@@ -15549,7 +15540,8 @@ components:
         - publishedDate
         - publishedAt
         - content
-        - featuredImage
+        - wideImage
+        - squareImage
         - author
         - tags
         - seoMetadata

@@ -67,6 +67,7 @@ export default async function Footer({ lang, direction }: FooterProps) {
             direction={direction}
             className="max-w-54! min-w-54! text-sm md:mx-auto! prose-headings:mt-1! prose-headings:mb-2! prose-p:my-1!"
             linkButtonVariant="link-2"
+            linkButtonAnimation={true}
           />
         )
       }

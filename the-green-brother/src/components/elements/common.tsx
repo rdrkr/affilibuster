@@ -149,7 +149,7 @@ export function getVariantClasses(
       disabled:text-tertiary-500 disabled:cursor-not-allowed
       ${
         noAnimation
-          ? ''
+          ? 'hover:underline'
           : 'transition-all duration-300 hover:scale-105 hover:text-shadow-shimmer disabled:hover:scale-100 active:scale-95'
       }
     `,

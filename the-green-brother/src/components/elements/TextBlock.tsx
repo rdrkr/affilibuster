@@ -50,6 +50,8 @@ interface MarkdownProps {
   direction: DirectionEnum
   /** Button variant for links */
   linkButtonVariant: ButtonVariant
+  /** Control button link animation (default: false) */
+  linkButtonAnimation?: boolean
 }
 
 /**
@@ -60,9 +62,10 @@ interface MarkdownProps {
  * @param props.content - Markdown content to render
  * @param props.direction - Language direction for RTL support
  * @param props.linkButtonVariant - Button variant for links
+ * @param props.linkButtonAnimation - Control button link animation
  * @returns Rendered markdown as React elements
  */
-function Markdown({ content, direction, linkButtonVariant }: MarkdownProps) {
+function Markdown({ content, direction, linkButtonVariant, linkButtonAnimation = false }: MarkdownProps) {
   const isRTL = direction === DirectionEnum.RTL
 
   /**
@@ -81,7 +84,12 @@ function Markdown({ content, direction, linkButtonVariant }: MarkdownProps) {
       return (
         <div style={{ textAlign: 'center' }}>
           {shouldParseAsMarkdown ? (
-            <Markdown content={children} direction={direction} linkButtonVariant={linkButtonVariant} />
+            <Markdown
+              content={children}
+              direction={direction}
+              linkButtonVariant={linkButtonVariant}
+              linkButtonAnimation={linkButtonAnimation}
+            />
           ) : (
             children
           )}
@@ -94,6 +102,7 @@ function Markdown({ content, direction, linkButtonVariant }: MarkdownProps) {
         variant={linkButtonVariant}
         size="sm"
         direction={direction}
+        noAnimation={!linkButtonAnimation}
       >
         {children}
       </ButtonLink>
@@ -233,6 +242,8 @@ export interface TextBlockProps {
   subheaderTextClassName?: string
   /** Button variant to use for markdown links (default: link-1) */
   linkButtonVariant?: ButtonVariant
+  /** Control button link animation (default: false) */
+  linkButtonAnimation?: boolean
 }
 
 /**
@@ -243,6 +254,7 @@ export interface TextBlockProps {
  * @param props.visible - Controls entire block visibility (false = hidden from layout)
  * @param props.className - Additional CSS classes
  * @param props.linkButtonVariant - Button variant for links
+ * @param props.linkButtonAnimation - Control button link animation
  * @param props.headerLevel - Heading level
  * @param props.headerIconSize - Icon size for the header
  * @param props.headerClassName - Header text classes
@@ -261,6 +273,7 @@ export function TextBlock({
   subheaderClassName = '',
   subheaderTextClassName,
   linkButtonVariant = 'link-1',
+  linkButtonAnimation = false,
 }: TextBlockProps) {
   if (visible === false) {
     return null
@@ -374,7 +387,14 @@ export function TextBlock({
         />
       )}
 
-      {content && <Markdown content={content} direction={direction} linkButtonVariant={linkButtonVariant} />}
+      {content && (
+        <Markdown
+          content={content}
+          direction={direction}
+          linkButtonVariant={linkButtonVariant}
+          linkButtonAnimation={linkButtonAnimation}
+        />
+      )}
     </div>
   )
 }

@@ -38,7 +38,7 @@ export async function generateMetadata({
     path: `/blog/${slug}`,
     siteName: navigation?.siteTitle,
     ogType: 'article',
-    ogImageUrl: post?.featuredImage.url,
+    ogImageUrl: post?.wideImage.url ?? post?.squareImage.url,
   })
 }
 

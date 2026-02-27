@@ -86,7 +86,7 @@ export function BlogCard({
   readArticleLabel,
   preload = false,
 }: BlogCardProps) {
-  const { featuredImage, tags, content, readTimeInMinutes, slug } = post
+  const { wideImage, squareImage, tags, content, readTimeInMinutes, slug } = post
 
   const author = post.author
   const firstTag = tags[0]?.tag.text ?? ''
@@ -94,6 +94,9 @@ export function BlogCard({
   const authorName = author.lastName ? `${author.firstName} ${author.lastName}` : author.firstName
   const authorAndReadTime = authorName ? `${authorName} • ${readTimeString}` : readTimeString
   const postUrl = `${basePath}/${slug}`
+
+  const isWide = size === 'lg' || size === 'xl'
+  const imageToUse = isWide ? wideImage : squareImage
 
   // Determine layout based on size if not explicitly provided
   // 'sm' size traditionally used side-by-side (ltr)
@@ -184,7 +187,7 @@ export function BlogCard({
     <Card
       asLink={asLink}
       href={postUrl}
-      image={featuredImage}
+      image={imageToUse}
       header={headerSlot}
       content={contentSlot}
       footer={footerSlot}

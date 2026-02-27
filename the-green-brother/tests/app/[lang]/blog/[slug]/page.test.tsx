@@ -41,7 +41,7 @@ jest.mock('@/app/[lang]/blog/[slug]/BlogPostClient', () => ({
 
 import BlogPostPage, { generateMetadata, generateStaticParams } from '@/app/[lang]/blog/[slug]/page'
 import { getBlogPostBySlug, getBlogPosts, getNavigation } from '@/lib/content'
-import { LanguageCode, DirectionEnum, SchemaEnum } from '@/lib/generated/types.gen'
+import { DirectionEnum, LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages'
 import { render, screen } from '@testing-library/react'
 
@@ -214,7 +214,7 @@ describe('generateMetadata', () => {
   it('should return metadata from CMS blog post data', async () => {
     mockGetBlogPostBySlug.mockResolvedValue({
       seoMetadata: { metaTitle: 'My Blog Post', metaDescription: 'A great post' },
-      featuredImage: { url: 'https://example.com/featured.jpg' },
+      wideImage: { url: 'https://example.com/featured.jpg' },
     } as unknown as Awaited<ReturnType<typeof getBlogPostBySlug>>)
     mockGetNavigation.mockResolvedValue({
       siteTitle: 'TheGreenBrother',

@@ -1010,15 +1010,11 @@ class ApiBlogPostBlogPostDocument(BaseModel):
     """
     A component field
     """
-    featured_image: PluginUploadFileDocument = Field(..., alias="featuredImage")
+    wide_image: PluginUploadFileDocument = Field(..., alias="wideImage")
     """
     A media field
     """
-    wide_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="wideImage")
-    """
-    A media field
-    """
-    square_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="squareImage")
+    square_image: PluginUploadFileDocument = Field(..., alias="squareImage")
     """
     A media field
     """
@@ -3470,15 +3466,11 @@ class Datum1(BaseModel):
     """
     A component field
     """
-    featured_image: PluginUploadFileDocument = Field(..., alias="featuredImage")
+    wide_image: PluginUploadFileDocument = Field(..., alias="wideImage")
     """
     A media field
     """
-    wide_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="wideImage")
-    """
-    A media field
-    """
-    square_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="squareImage")
+    square_image: PluginUploadFileDocument = Field(..., alias="squareImage")
     """
     A media field
     """
@@ -3633,15 +3625,11 @@ class Data4(BaseModel):
     """
     A component field
     """
-    featured_image: PluginUploadFileDocument = Field(..., alias="featuredImage")
+    wide_image: PluginUploadFileDocument = Field(..., alias="wideImage")
     """
     A media field
     """
-    wide_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="wideImage")
-    """
-    A media field
-    """
-    square_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="squareImage")
+    square_image: PluginUploadFileDocument = Field(..., alias="squareImage")
     """
     A media field
     """
@@ -3796,15 +3784,11 @@ class Data5(BaseModel):
     """
     A component field
     """
-    featured_image: PluginUploadFileDocument = Field(..., alias="featuredImage")
+    wide_image: PluginUploadFileDocument = Field(..., alias="wideImage")
     """
     A media field
     """
-    wide_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="wideImage")
-    """
-    A media field
-    """
-    square_image: PluginUploadFileDocument | None = Field(default_factory=PluginUploadFileDocument, alias="squareImage")
+    square_image: PluginUploadFileDocument = Field(..., alias="squareImage")
     """
     A media field
     """

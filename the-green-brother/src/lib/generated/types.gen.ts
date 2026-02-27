@@ -1071,15 +1071,11 @@ export type ApiBlogPostBlogPostDocument = {
     /**
      * A media field
      */
-    featuredImage: PluginUploadFileDocument;
+    wideImage: PluginUploadFileDocument;
     /**
      * A media field
      */
-    wideImage?: PluginUploadFileDocument;
-    /**
-     * A media field
-     */
-    squareImage?: PluginUploadFileDocument;
+    squareImage: PluginUploadFileDocument;
     /**
      * A relational field
      */
@@ -4047,15 +4043,11 @@ export type ApiBlogPostBlogPostDocumentWritable = {
     /**
      * A media field
      */
-    featuredImage: PluginUploadFileDocument;
+    wideImage: PluginUploadFileDocument;
     /**
      * A media field
      */
-    wideImage?: PluginUploadFileDocument;
-    /**
-     * A media field
-     */
-    squareImage?: PluginUploadFileDocument;
+    squareImage: PluginUploadFileDocument;
     /**
      * A relational field
      */
@@ -6764,15 +6756,11 @@ export type BlogPostGetBlogPostsResponses = {
             /**
              * A media field
              */
-            featuredImage: PluginUploadFileDocument;
+            wideImage: PluginUploadFileDocument;
             /**
              * A media field
              */
-            wideImage?: PluginUploadFileDocument;
-            /**
-             * A media field
-             */
-            squareImage?: PluginUploadFileDocument;
+            squareImage: PluginUploadFileDocument;
             /**
              * A relational field
              */
@@ -6944,15 +6932,11 @@ export type BlogPostGetBlogPostsBySlugResponses = {
             /**
              * A media field
              */
-            featuredImage: PluginUploadFileDocument;
+            wideImage: PluginUploadFileDocument;
             /**
              * A media field
              */
-            wideImage?: PluginUploadFileDocument;
-            /**
-             * A media field
-             */
-            squareImage?: PluginUploadFileDocument;
+            squareImage: PluginUploadFileDocument;
             /**
              * A relational field
              */
@@ -7124,15 +7108,11 @@ export type BlogPostGetBlogPostsByIdResponses = {
             /**
              * A media field
              */
-            featuredImage: PluginUploadFileDocument;
+            wideImage: PluginUploadFileDocument;
             /**
              * A media field
              */
-            wideImage?: PluginUploadFileDocument;
-            /**
-             * A media field
-             */
-            squareImage?: PluginUploadFileDocument;
+            squareImage: PluginUploadFileDocument;
             /**
              * A relational field
              */
