@@ -2,8 +2,8 @@
 
 # Affilibuster Product Roadmap
 
-**Last Updated**: 2026-02-26
-**Version**: 1.6.0
+**Last Updated**: 2026-02-27
+**Version**: 1.7.0
 
 This document outlines missing features and capabilities identified through comprehensive code analysis against
 requirements documented in:
@@ -763,24 +763,45 @@ protocol.
 **Reference**: Spec 002, Constitution Security Principles
 **Total Tasks**: 34 tasks across 8 phases (100% complete)
 
-### 11.1 GDPR Compliance - 🟡 Partial
+### 11.1 GDPR Compliance - 🟡 In Progress
 
-**Current State**: Privacy policy page exists, basic structure in place.
+**Current State**: Strong GDPR foundations (~90% compliant). Comprehensive cookie consent system, consent audit trail,
+right to erasure, DSAR export, privacy/terms/cookie-policy pages, data retention, secure sessions, and zero third-party
+tracking all implemented. Remaining items are newsletter consent and E2E test coverage.
 
-**Missing**:
+**Specification**: [gdpr-compliance-spec](./specs/gdpr-compliance-spec.md)
 
-- [x] Cookie consent banner
-- [ ] Cookie policy page
-- [ ] Data processing agreement
-- [ ] User data export functionality
-- [ ] User data deletion functionality (right to be forgotten)
-- [ ] Privacy-focused analytics configuration
-- [ ] Third-party cookie audit
-- [ ] Consent management for analytics/marketing tools
+**Completed** ✅:
+
+- [x] Cookie consent banner with granular categories (necessary, analytics, marketing)
+- [x] Cookie policy page (CMS-driven)
+- [x] Privacy policy page (CMS-driven)
+- [x] Terms of service page (CMS-driven)
+- [x] Consent audit trail (immutable database records per event)
+- [x] User data export functionality (DSAR - GET `/profile/export`)
+- [x] User data deletion functionality (right to erasure - DELETE `/profile`)
+- [x] Privacy-focused analytics configuration (zero third-party tracking)
+- [x] Third-party cookie audit (none used)
+- [x] Consent cookie `Secure` flag (conditional on HTTPS)
+- [x] IP anonymization in request logging (last octet zeroed)
+- [x] Consent record IP hashing (salted SHA-256, no raw PII stored)
+- [x] Alembic migration to clear legacy raw IP data
+- [x] User-agent excluded from logs and consent records (data minimization)
+- [x] Data retention cleanup scheduling (daily GitHub Actions)
+- [x] Log retention configuration (Docker json-file driver, 10m/5 files)
+- [x] DNT (Do Not Track) detection in consent hook
+
+**In Progress**:
+
+- [x] Rate limiting on sensitive endpoints (login, register, consent, DSAR)
+- [x] Newsletter consent checkbox (CMS-driven label, disabled submit until consent)
+- [x] E2E cookie consent tests (replace placeholder assertions)
+- [x] GDPR documentation (breach notification, LIA, data processing inventory)
+- [ ] Newsletter backend (subscription database, double opt-in, email service)
 
 **Priority**: High
 **Impact**: Legal requirement for EU visitors
-**Reference**: Constitution Security & Compliance, PRD
+**Reference**: Constitution Security & Compliance, PRD, GDPR Articles 5-7, 12-20, 25, 32-34
 
 ### 11.2 Accessibility (WCAG 2.1 AA) - 🟡 Partial
 
@@ -919,6 +940,7 @@ protocol.
 
 | Version | Date       | Changes                                                                                                                  |
 | ------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| 1.7.0   | 2026-02-27 | GDPR compliance: IP anonymization, consent IP hashing, Secure cookies, data cleanup scheduling, log retention            |
 | 1.5.0   | 2025-12-15 | Added spec 007 (Production Security Hardening), added Section 11.0, updated critical priorities                          |
 | 1.4.0   | 2025-11-24 | Completed spec 002 (HTTPS Migration), automated mkcert setup, migrated to OpenAPI models, updated all docs               |
 | 1.3.0   | 2025-11-24 | Added spec 002 (HTTPS Migration), updated Security & Compliance section 11.0, added to critical priorities               |

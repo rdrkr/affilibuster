@@ -25,6 +25,12 @@
       "component": "elements.button",
       "repeatable": false,
       "required": true
+    },
+    "consentLabel": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": false
     }
   },
   "config": {}

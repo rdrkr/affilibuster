@@ -3161,6 +3161,10 @@ export type CallToActionsNewsletterSignupCtaEntry = {
      * A component field
      */
     submitButton: ElementsButtonEntry;
+    /**
+     * A component field
+     */
+    consentLabel?: ElementsLabelEntry;
 };
 
 /**

@@ -33,6 +33,16 @@ describe('NewsletterSignupCTA', () => {
     },
   }
 
+  const mockSectionDataWithConsent: NewsletterSignupCTAProps['data'] = {
+    ...mockSectionData,
+    consentLabel: {
+      text: 'I agree to receive newsletters and accept the privacy policy.',
+      ariaDescription: 'Newsletter consent checkbox',
+      icon: '',
+      iconPosition: IconPositionEnum.BEFORE_TEXT,
+    },
+  }
+
   it('should render newsletter title', () => {
     render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
@@ -113,10 +123,10 @@ describe('NewsletterSignupCTA', () => {
     expect(emailInput).toHaveAttribute('dir', 'ltr')
   })
 
-  it('should have flex gap-2 on form for RTL direction (dir attribute handles layout)', () => {
+  it('should have flex gap-2 on input row for RTL direction (dir attribute handles layout)', () => {
     const { container } = render(<NewsletterSignupCTA direction={DirectionEnum.RTL} data={mockSectionData} />)
-    const form = container.querySelector('form')
-    expect(form).toHaveClass('flex', 'gap-2')
+    const inputRow = container.querySelector('.flex.gap-2')
+    expect(inputRow).toBeInTheDocument()
   })
 
   it('should render submit button and handle click without errors', () => {
@@ -139,5 +149,95 @@ describe('NewsletterSignupCTA', () => {
     expect(emailInput).toHaveAttribute('id', 'newsletter-email')
     expect(emailInput).toHaveAttribute('name', 'email')
     expect(emailInput).toHaveAttribute('autocomplete', 'email')
+  })
+
+  describe('consent checkbox', () => {
+    it('should not render consent checkbox when consentLabel is not provided', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+    })
+
+    it('should render consent checkbox when consentLabel is provided', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+
+      const checkbox = screen.getByRole('checkbox')
+      expect(checkbox).toBeInTheDocument()
+      expect(checkbox).toHaveAttribute('aria-label', 'Newsletter consent checkbox')
+      expect(checkbox).not.toBeChecked()
+    })
+
+    it('should render consent label text from CMS', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+
+      expect(screen.getByText('I agree to receive newsletters and accept the privacy policy.')).toBeInTheDocument()
+    })
+
+    it('should disable submit button when consent is required but not checked', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+
+      const submitButton = screen.getByRole('button', { name: /Submit newsletter signup/i })
+      expect(submitButton).toBeDisabled()
+    })
+
+    it('should enable submit button when consent is checked', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+
+      const checkbox = screen.getByRole('checkbox')
+      fireEvent.click(checkbox)
+
+      const submitButton = screen.getByRole('button', { name: /Submit newsletter signup/i })
+      expect(submitButton).not.toBeDisabled()
+    })
+
+    it('should not disable submit button when no consent is required', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const submitButton = screen.getByRole('button', { name: /Submit newsletter signup/i })
+      expect(submitButton).not.toBeDisabled()
+    })
+
+    it('should toggle consent checkbox state', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+
+      const checkbox = screen.getByRole('checkbox')
+      expect(checkbox).not.toBeChecked()
+
+      fireEvent.click(checkbox)
+      expect(checkbox).toBeChecked()
+
+      fireEvent.click(checkbox)
+      expect(checkbox).not.toBeChecked()
+    })
+
+    it('should have proper consent checkbox attributes', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+
+      const checkbox = screen.getByRole('checkbox')
+      expect(checkbox).toHaveAttribute('id', 'newsletter-consent')
+      expect(checkbox).toHaveAttribute('name', 'consent')
+    })
+
+    it('should associate label with checkbox via htmlFor', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+
+      const label = screen.getByText('I agree to receive newsletters and accept the privacy policy.').closest('label')
+      expect(label).toHaveAttribute('for', 'newsletter-consent')
+    })
+
+    it('should apply RTL styling to consent label', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.RTL} data={mockSectionDataWithConsent} />)
+
+      const label = screen.getByText('I agree to receive newsletters and accept the privacy policy.').closest('label')
+      expect(label).toHaveClass('flex-row-reverse', 'text-right')
+    })
+
+    it('should apply LTR styling to consent label', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+
+      const label = screen.getByText('I agree to receive newsletters and accept the privacy policy.').closest('label')
+      expect(label).toHaveClass('text-left')
+      expect(label).not.toHaveClass('flex-row-reverse')
+    })
   })
 })

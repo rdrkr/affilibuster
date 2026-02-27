@@ -7,7 +7,7 @@ Tests request/response logging and error logging.
 """
 
 import contextlib
-from typing import Never
+from typing import Any, Never
 
 import pytest
 from fastapi import FastAPI
@@ -326,3 +326,132 @@ class TestRequestLoggingMiddlewareHeaderSanitization:
         assert "x-session-id" in SENSITIVE_HEADERS
         assert "x-api-key" in SENSITIVE_HEADERS
         assert "x-csrf-token" in SENSITIVE_HEADERS
+
+
+@pytest.mark.unit
+class TestRequestLoggingMiddlewareIPAnonymization:
+    """Test IP anonymization in request logging (GDPR Art. 5(1)(c))."""
+
+    @pytest.mark.asyncio
+    async def test_ip_address_is_anonymized_in_logs(self, caplog, monkeypatch):
+        """Test that client IPs are anonymized when setting is enabled."""
+        import logging
+
+        from affilibuster_backend.infrastructure.middleware import request_logging
+
+        monkeypatch.setattr(request_logging.settings, "anonymize_request_ips", True)
+
+        middleware = RequestLoggingMiddleware(app=noop_app)
+        request = create_mock_request("GET", "/test-anon")
+
+        async def success_call_next(_: Request) -> Response:
+            return Response(status_code=200)
+
+        with caplog.at_level(logging.INFO):
+            await middleware.dispatch(request, success_call_next)
+
+        # Client host is 127.0.0.1 in mock request, should be anonymized to 127.0.0.0
+        info_records = [r for r in caplog.records if r.levelname == "INFO" and hasattr(r, "client_host")]
+        assert len(info_records) > 0
+        assert info_records[0].client_host == "127.0.0.0"
+
+    @pytest.mark.asyncio
+    async def test_ip_not_anonymized_when_setting_disabled(self, caplog, monkeypatch):
+        """Test that client IPs are NOT anonymized when setting is disabled."""
+        import logging
+
+        from affilibuster_backend.infrastructure.middleware import request_logging
+
+        monkeypatch.setattr(request_logging.settings, "anonymize_request_ips", False)
+
+        middleware = RequestLoggingMiddleware(app=noop_app)
+        request = create_mock_request("GET", "/test-raw")
+
+        async def success_call_next(_: Request) -> Response:
+            return Response(status_code=200)
+
+        with caplog.at_level(logging.INFO):
+            await middleware.dispatch(request, success_call_next)
+
+        info_records = [r for r in caplog.records if r.levelname == "INFO" and hasattr(r, "client_host")]
+        assert len(info_records) > 0
+        assert info_records[0].client_host == "127.0.0.1"
+
+    @pytest.mark.asyncio
+    async def test_user_agent_not_in_info_logs(self, caplog, monkeypatch):
+        """Test that user-agent is excluded from INFO-level access logs for GDPR."""
+        import logging
+
+        from affilibuster_backend.infrastructure.middleware import request_logging
+
+        monkeypatch.setattr(request_logging.settings, "anonymize_request_ips", False)
+
+        middleware = RequestLoggingMiddleware(app=noop_app)
+        request = create_mock_request("GET", "/test-ua", headers=[(b"user-agent", b"TestBot/1.0")])
+
+        async def success_call_next(_: Request) -> Response:
+            return Response(status_code=200)
+
+        with caplog.at_level(logging.INFO):
+            await middleware.dispatch(request, success_call_next)
+
+        info_records = [r for r in caplog.records if r.levelname == "INFO" and hasattr(r, "method")]
+        assert len(info_records) > 0
+        # INFO-level access logs should NOT contain user_agent
+        assert not hasattr(info_records[0], "user_agent")
+
+    @pytest.mark.asyncio
+    async def test_unknown_client_host_skips_anonymization(self, caplog, monkeypatch):
+        """Test that 'unknown' client host is not anonymized."""
+        import logging
+
+        from affilibuster_backend.infrastructure.middleware import request_logging
+
+        monkeypatch.setattr(request_logging.settings, "anonymize_request_ips", True)
+
+        middleware = RequestLoggingMiddleware(app=noop_app)
+        # Create request with no client
+        scope: dict[str, Any] = {
+            "type": "http",
+            "method": "GET",
+            "path": "/test-no-client",
+            "query_string": b"",
+            "headers": [],
+            "server": ("testserver", 80),
+            "client": None,
+            "scheme": "http",
+        }
+        request = Request(scope)
+
+        async def success_call_next(_: Request) -> Response:
+            return Response(status_code=200)
+
+        with caplog.at_level(logging.INFO):
+            await middleware.dispatch(request, success_call_next)
+
+        info_records = [r for r in caplog.records if r.levelname == "INFO" and hasattr(r, "client_host")]
+        assert len(info_records) > 0
+        assert info_records[0].client_host == "unknown"
+
+    @pytest.mark.asyncio
+    async def test_error_response_excludes_user_agent(self, caplog, monkeypatch):
+        """Test that error logs also exclude user-agent from extra fields."""
+        import logging
+
+        from affilibuster_backend.infrastructure.middleware import request_logging
+
+        monkeypatch.setattr(request_logging.settings, "anonymize_request_ips", False)
+
+        middleware = RequestLoggingMiddleware(app=noop_app)
+        request = create_mock_request("GET", "/test-error-ua")
+
+        async def failing_call_next(_: Request):
+            raise RuntimeError("Error test")
+
+        with caplog.at_level(logging.ERROR), pytest.raises(RuntimeError):
+            await middleware.dispatch(request, failing_call_next)
+
+        error_records = [r for r in caplog.records if r.levelname == "ERROR"]
+        assert len(error_records) > 0
+        # Error logs should NOT contain user_agent
+        assert not hasattr(error_records[0], "user_agent")

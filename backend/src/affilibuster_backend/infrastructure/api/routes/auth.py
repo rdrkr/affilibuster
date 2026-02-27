@@ -111,6 +111,7 @@ PasswordResetTokenRepoDep = Annotated[IPasswordResetTokenRepository, Depends(get
         201: {"description": "User registered successfully"},
         409: {"description": "Email already exists"},
         422: {"description": "Validation error"},
+        429: {"description": "Rate limit exceeded"},
     },
 )
 async def register_user(  # noqa: PLR0913 - All dependencies required for FastAPI dependency injection
@@ -236,6 +237,7 @@ async def register_user(  # noqa: PLR0913 - All dependencies required for FastAP
         200: {"description": "Login successful"},
         401: {"description": "Invalid credentials"},
         422: {"description": "Validation error"},
+        429: {"description": "Rate limit exceeded"},
     },
 )
 async def login_user(  # noqa: PLR0913 - All dependencies required for FastAPI dependency injection
@@ -606,6 +608,7 @@ async def resend_verification_email(
     responses={
         200: {"description": "Password reset email sent (if account exists)"},
         422: {"description": "Validation error"},
+        429: {"description": "Rate limit exceeded"},
     },
 )
 async def forgot_password(

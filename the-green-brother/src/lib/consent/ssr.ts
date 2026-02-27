@@ -24,3 +24,13 @@ export function isWindowDefined(): boolean {
 export function isDocumentDefined(): boolean {
   return typeof document !== 'undefined'
 }
+
+/**
+ * Check whether the current page is served over HTTPS.
+ *
+ * Used to conditionally set the `Secure` flag on cookies for GDPR compliance.
+ * @returns true if protocol is `https:`, false otherwise (including SSR)
+ */
+export function isSecureContext(): boolean {
+  return isWindowDefined() && window.location.protocol === 'https:'
+}

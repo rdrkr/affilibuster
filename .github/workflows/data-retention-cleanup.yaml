@@ -1,0 +1,55 @@
+# Copyright (c) 2026 Affilibuster by Ronen Druker.
+
+name: Data Retention Cleanup
+run-name: GDPR Data Retention Cleanup
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: data-retention-cleanup
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    name: Run Data Retention Cleanup
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Execute Cleanup via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            cd ~/affilibuster
+            docker compose exec -T backend uv run task cleanup
+
+      - name: Notify Telegram (failure)
+        if: failure()
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.UPTIME_KUMA_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.UPTIME_KUMA_TELEGRAM_CHAT_ID }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          TELEGRAM_TOKEN="$(echo -n "$TELEGRAM_TOKEN" | tr -d '[:space:]')"
+          TELEGRAM_CHAT_ID="$(echo -n "$TELEGRAM_CHAT_ID" | tr -d '[:space:]')"
+
+          printf -v MESSAGE '%s\n%s\n\n%s' \
+            '❌ <b>Data Retention Cleanup Failed</b>' \
+            "🕐 $(date -u +'%Y-%m-%d %H:%M:%S UTC')" \
+            "🔗 <a href=\"${RUN_URL}\">View Run</a>"
+
+          curl -sf -X POST \
+            "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "parse_mode=HTML" \
+            --data-urlencode "text=${MESSAGE}"

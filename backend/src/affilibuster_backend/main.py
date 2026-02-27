@@ -57,6 +57,7 @@ from affilibuster_backend.infrastructure.middleware import (
     QueryParamsParserMiddleware,
     RequestLoggingMiddleware,
 )
+from affilibuster_backend.infrastructure.middleware.rate_limiter import RateLimitMiddleware
 
 # Configure logging
 logging.basicConfig(level=getattr(logging, settings.log_level), format="%(message)s")
@@ -246,6 +247,9 @@ app.add_middleware(APIVersionMiddleware)
 # Add query params parser middleware (bracket notation support)
 # Must be added before request logging so parsed params are available to routes
 app.add_middleware(QueryParamsParserMiddleware)
+
+# Add rate limiting middleware (GDPR Art. 32 - security of processing)
+app.add_middleware(RateLimitMiddleware)
 
 # Add request logging middleware (T141)
 app.add_middleware(RequestLoggingMiddleware)

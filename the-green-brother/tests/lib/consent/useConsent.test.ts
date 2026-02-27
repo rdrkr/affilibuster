@@ -12,11 +12,28 @@ import { act, renderHook } from '@testing-library/react'
 
 import * as consentApi from '@/lib/consent/api'
 import { CONSENT_COOKIE_NAME } from '@/lib/consent/types'
-import { OPEN_COOKIE_SETTINGS_EVENT, openCookieSettings, useConsent } from '@/lib/consent/useConsent'
+import {
+  OPEN_COOKIE_SETTINGS_EVENT,
+  openCookieSettings,
+  useConsent,
+  writeConsentCookie,
+} from '@/lib/consent/useConsent'
 import { ConsentAction, ConsentType } from '@/lib/generated/types.gen'
 
 jest.mock('@/lib/consent/api', () => ({
   recordConsent: jest.fn().mockResolvedValue({ success: true, consentId: 'id-1', message: 'ok' }),
+}))
+
+const mockSsr = jest.requireMock('@/lib/consent/ssr') as {
+  isWindowDefined: jest.Mock
+  isDocumentDefined: jest.Mock
+  isSecureContext: jest.Mock
+}
+
+jest.mock('@/lib/consent/ssr', () => ({
+  isWindowDefined: jest.fn(() => true),
+  isDocumentDefined: jest.fn(() => true),
+  isSecureContext: jest.fn(() => false),
 }))
 
 const mockRecordConsent = consentApi.recordConsent as jest.MockedFunction<typeof consentApi.recordConsent>
@@ -445,6 +462,60 @@ describe('useConsent', () => {
     it('should be a string constant', () => {
       expect(typeof OPEN_COOKIE_SETTINGS_EVENT).toBe('string')
       expect(OPEN_COOKIE_SETTINGS_EVENT).toBe('affilibuster:open-cookie-settings')
+    })
+  })
+
+  describe('Secure cookie flag', () => {
+    let cookieSetterSpy: jest.Mock
+
+    beforeEach(() => {
+      const originalDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie')!
+      cookieSetterSpy = jest.fn()
+      const descriptor: PropertyDescriptor = {
+        set: (value: string) => {
+          cookieSetterSpy(value)
+          originalDescriptor.set!.call(document, value)
+        },
+        configurable: true,
+      }
+      if (originalDescriptor.get) {
+        descriptor.get = originalDescriptor.get
+      }
+      Object.defineProperty(document, 'cookie', descriptor)
+    })
+
+    afterEach(() => {
+      const originalDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie')!
+      Object.defineProperty(document, 'cookie', originalDescriptor)
+      mockSsr.isSecureContext.mockReturnValue(false)
+    })
+
+    it('should include Secure flag when isSecureContext returns true', () => {
+      mockSsr.isSecureContext.mockReturnValue(true)
+
+      writeConsentCookie({
+        categories: ['necessary'],
+        timestamp: new Date().toISOString(),
+        version: '1.0',
+        dntStateAtConsent: false,
+      })
+
+      const cookieString = cookieSetterSpy.mock.calls[0]![0] as string
+      expect(cookieString).toContain('; Secure')
+    })
+
+    it('should not include Secure flag when isSecureContext returns false', () => {
+      mockSsr.isSecureContext.mockReturnValue(false)
+
+      writeConsentCookie({
+        categories: ['necessary'],
+        timestamp: new Date().toISOString(),
+        version: '1.0',
+        dntStateAtConsent: false,
+      })
+
+      const cookieString = cookieSetterSpy.mock.calls[0]![0] as string
+      expect(cookieString).not.toContain('; Secure')
     })
   })
 })

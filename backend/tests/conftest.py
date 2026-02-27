@@ -111,7 +111,7 @@ async def wait_for_strapi(strapi_url: str, strapi_token: str):
     raise RuntimeError(f"Strapi did not become healthy at {strapi_url} after {max_retries} attempts")
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def real_cms_repository(strapi_url, strapi_token):
     """Fixture providing a real Strapi repository client."""
     return StrapiRepositoryImpl(api_token=strapi_token, base_url=strapi_url)
@@ -145,8 +145,8 @@ async def integration_client(integration_app):
         yield client
 
 
-@pytest.fixture
-def strapi_test_data(wait_for_strapi):
+@pytest_asyncio.fixture
+async def strapi_test_data(wait_for_strapi):
     """
     Fixture ensuring Strapi is ready with seeded data.
 

@@ -4,6 +4,7 @@
 
 from .error_handler import ErrorHandlingMiddleware
 from .query_params_parser import QueryParamsParserMiddleware
+from .rate_limiter import RateLimitMiddleware
 from .request_logging import RequestLoggingMiddleware
 
-__all__ = ["ErrorHandlingMiddleware", "QueryParamsParserMiddleware", "RequestLoggingMiddleware"]
+__all__ = ["ErrorHandlingMiddleware", "QueryParamsParserMiddleware", "RateLimitMiddleware", "RequestLoggingMiddleware"]

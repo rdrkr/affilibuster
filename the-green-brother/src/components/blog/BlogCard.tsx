@@ -95,12 +95,15 @@ export function BlogCard({
   const authorAndReadTime = authorName ? `${authorName} • ${readTimeString}` : readTimeString
   const postUrl = `${basePath}/${slug}`
 
-  const isWide = size === 'lg' || size === 'xl'
-  const imageToUse = isWide ? wideImage : squareImage
-
   // Determine layout based on size if not explicitly provided
   // 'sm' size traditionally used side-by-side (ltr)
   const resolvedLayout = layout ?? (size === 'sm' ? 'ltr' : 'ttb')
+
+  // Choose image based on resolved layout dimensions:
+  // - Vertical layouts (ttb/btt): image spans full width with constrained height → wider than tall → wideImage
+  // - Horizontal layouts (ltr/rtl): image in a column with full height → taller than wide → squareImage
+  const isVerticalLayout = resolvedLayout === 'ttb' || resolvedLayout === 'btt'
+  const imageToUse = isVerticalLayout ? wideImage : squareImage
 
   // Header slot: Tag
   const headerSlot =

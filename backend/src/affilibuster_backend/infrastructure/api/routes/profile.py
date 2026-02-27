@@ -207,6 +207,7 @@ async def delete_account(  # noqa: PLR0913 - All dependencies required for FastA
     status_code=status.HTTP_200_OK,
     summary="Export user data (DSAR)",
     description="Exports all user data for GDPR Data Subject Access Request (Articles 15/20).",
+    responses={429: {"description": "Rate limit exceeded"}},
 )
 async def export_user_data(
     current_user: Annotated[UserEntity, Depends(get_current_user)],

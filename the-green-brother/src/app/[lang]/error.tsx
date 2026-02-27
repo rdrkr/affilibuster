@@ -31,8 +31,8 @@ interface ErrorPageProps {
 export default function ErrorPage({ error, reset }: ErrorPageProps): React.ReactElement {
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center px-4 text-center">
-      <div className="text-6xl">&#9888;</div>
-      <p className="mt-4 text-sm text-neutral-500">{error.digest}</p>
+      <div className="mb-4 text-6xl text-neutral-300 dark:text-neutral-600">&#9888;</div>
+      <p className="text-sm text-neutral-500">{error.digest}</p>
       <button
         onClick={reset}
         className="mt-8 inline-block rounded-lg bg-primary-600 px-6 py-3 text-white transition-colors hover:bg-primary-700"

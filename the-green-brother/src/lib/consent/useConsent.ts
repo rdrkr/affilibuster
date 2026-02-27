@@ -18,7 +18,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ConsentAction, ConsentType } from '@/lib/generated/types.gen'
 
 import { recordConsent } from './api'
-import { isDocumentDefined, isWindowDefined } from './ssr'
+import { isDocumentDefined, isSecureContext, isWindowDefined } from './ssr'
 import { CONSENT_COOKIE_EXPIRY_DAYS, CONSENT_COOKIE_NAME, type ConsentCookieValue } from './types'
 
 /** Custom DOM event name used to trigger the cookie settings banner. */
@@ -93,7 +93,8 @@ export function writeConsentCookie(value: ConsentCookieValue): void {
   const expires = new Date()
   expires.setDate(expires.getDate() + CONSENT_COOKIE_EXPIRY_DAYS)
 
-  document.cookie = `${CONSENT_COOKIE_NAME}=${encoded}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`
+  const securePart = isSecureContext() ? '; Secure' : ''
+  document.cookie = `${CONSENT_COOKIE_NAME}=${encoded}; path=/; expires=${expires.toUTCString()}; SameSite=Lax${securePart}`
 }
 
 /**

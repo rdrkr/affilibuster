@@ -16953,6 +16953,9 @@ components:
         submitButton:
           description: A component field
           $ref: '#/components/schemas/ElementsButtonEntry'
+        consentLabel:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
       required:
         - id
         - title

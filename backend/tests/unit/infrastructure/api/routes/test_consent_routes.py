@@ -3,8 +3,8 @@
 """
 Unit tests for consent API routes.
 
-Tests the consent recording endpoint. Consent banner configuration
-is now served by auto-generated CMS proxy routes.
+Tests the consent recording endpoint with IP hashing (GDPR Art. 5(1)(c)).
+Consent banner configuration is served by auto-generated CMS proxy routes.
 """
 
 from unittest.mock import AsyncMock, MagicMock
@@ -20,8 +20,12 @@ from affilibuster_backend.domain.entities.generated.models import (
     RecordConsentRequest,
     RecordConsentResponse,
 )
+from affilibuster_backend.domain.services.ip_anonymizer import IPAnonymizer
 from affilibuster_backend.domain.use_cases.consent.record_consent_use_case import RecordConsentUseCase
 from affilibuster_backend.infrastructure.api.routes.consent import record_consent
+
+# Shared anonymizer for computing expected hashes in tests
+_ip_anonymizer = IPAnonymizer()
 
 
 @pytest.mark.unit
@@ -29,8 +33,8 @@ from affilibuster_backend.infrastructure.api.routes.consent import record_consen
 class TestRecordConsentEndpoint:
     """Unit tests for the record_consent endpoint."""
 
-    async def test_record_consent_success(self) -> None:
-        """Test successful consent recording."""
+    async def test_record_consent_success_with_hashed_ip(self) -> None:
+        """Test successful consent recording with IP hashed (not raw)."""
         # Arrange
         consent_id = uuid4()
         mock_use_case = AsyncMock(spec=RecordConsentUseCase)
@@ -62,12 +66,14 @@ class TestRecordConsentEndpoint:
         # Assert
         assert result.success is True
         assert result.consent_id == consent_id
-        mock_use_case.execute.assert_called_once_with(
-            consent_request=body,
-            session_id="sess-abc123",
-            ip_address="192.168.1.1",
-            user_agent="TestAgent/1.0",
-        )
+
+        # IP should be hashed, not raw
+        call_kwargs = mock_use_case.execute.call_args.kwargs
+        assert call_kwargs["session_id"] == "sess-abc123"
+        assert call_kwargs["ip_address"] != "192.168.1.1"
+        assert len(call_kwargs["ip_address"]) == 64  # SHA-256 hex digest
+        # User-agent should NOT be stored (GDPR data minimization)
+        assert call_kwargs["user_agent"] is None
 
     async def test_record_consent_accept_all_with_necessary_false_raises_400(self) -> None:
         """Test that accept_all action with necessary=False raises validation error."""
@@ -126,7 +132,7 @@ class TestRecordConsentEndpoint:
         assert result.success is True
 
     async def test_record_consent_without_client(self) -> None:
-        """Test consent recording when request has no client info."""
+        """Test consent recording when request has no client info (no IP to hash)."""
         # Arrange
         consent_id = uuid4()
         mock_use_case = AsyncMock(spec=RecordConsentUseCase)
@@ -161,7 +167,7 @@ class TestRecordConsentEndpoint:
         )
 
     async def test_record_consent_without_session_id(self) -> None:
-        """Test consent recording without session ID header."""
+        """Test consent recording without session ID header (IP still hashed)."""
         # Arrange
         consent_id = uuid4()
         mock_use_case = AsyncMock(spec=RecordConsentUseCase)
@@ -189,9 +195,42 @@ class TestRecordConsentEndpoint:
 
         # Assert
         assert result.success is True
-        mock_use_case.execute.assert_called_once_with(
-            consent_request=body,
-            session_id=None,
-            ip_address="127.0.0.1",
-            user_agent="Agent/1.0",
+        call_kwargs = mock_use_case.execute.call_args.kwargs
+        assert call_kwargs["session_id"] is None
+        # IP should be hashed
+        assert call_kwargs["ip_address"] != "127.0.0.1"
+        assert len(call_kwargs["ip_address"]) == 64
+        # User-agent should NOT be stored
+        assert call_kwargs["user_agent"] is None
+
+    async def test_record_consent_same_ip_produces_consistent_hash(self) -> None:
+        """Test that the same IP always produces the same hash (deterministic)."""
+        # Arrange
+        mock_use_case = AsyncMock(spec=RecordConsentUseCase)
+        mock_use_case.execute.return_value = RecordConsentResponse(
+            success=True,
+            consent_id=uuid4(),
+            message="Consent recorded successfully",
         )
+        body = RecordConsentRequest(
+            consent_type=ConsentType.COOKIE,
+            categories=ConsentCategories(necessary=True),
+            action=ConsentAction.ACCEPT_ALL,
+        )
+
+        mock_request_1 = MagicMock()
+        mock_request_1.client.host = "10.20.30.40"
+        mock_request_1.headers.get.return_value = None
+
+        mock_request_2 = MagicMock()
+        mock_request_2.client.host = "10.20.30.40"
+        mock_request_2.headers.get.return_value = None
+
+        # Act
+        await record_consent(body=body, use_case=mock_use_case, request=mock_request_1)
+        await record_consent(body=body, use_case=mock_use_case, request=mock_request_2)
+
+        # Assert
+        hash_1 = mock_use_case.execute.call_args_list[0].kwargs["ip_address"]
+        hash_2 = mock_use_case.execute.call_args_list[1].kwargs["ip_address"]
+        assert hash_1 == hash_2

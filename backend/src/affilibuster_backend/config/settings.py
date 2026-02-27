@@ -83,6 +83,19 @@ class Settings(BaseSettings):
     user_retention_days: int = 30
     session_retention_days: int = 0
 
+    # GDPR Privacy (Art. 5(1)(c) data minimization, Art. 25 by design)
+    anonymize_request_ips: bool = True
+    ip_hash_salt: str = "affilibuster-consent-ip-salt"
+
+    # Rate Limiting (GDPR Art. 32 - security of processing)
+    rate_limit_enabled: bool = True
+    rate_limit_default: str = "60/minute"
+    rate_limit_login: str = "5/minute"
+    rate_limit_register: str = "3/minute"
+    rate_limit_pw_reset: str = "3/minute"
+    rate_limit_consent: str = "10/minute"
+    rate_limit_dsar_export: str = "3/hour"
+
     # Email / SMTP
     smtp_host: str = "localhost"
     smtp_port: int = 587

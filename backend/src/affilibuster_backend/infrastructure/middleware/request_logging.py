@@ -5,6 +5,7 @@ Request logging middleware.
 
 Reference: T141 (Implement request logging middleware)
 Logs all API requests with method, path, status, and duration.
+IP addresses are anonymized by default for GDPR compliance (Art. 5(1)(c)).
 """
 
 import logging
@@ -15,17 +16,27 @@ from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
+from affilibuster_backend.config import settings
+from affilibuster_backend.domain.services.ip_anonymizer import IPAnonymizer
+
+__all__ = ["SENSITIVE_HEADERS", "RequestLoggingMiddleware", "settings"]
+
 logger = logging.getLogger(__name__)
 
 # Headers that contain sensitive data and must not be logged
 SENSITIVE_HEADERS = frozenset({"authorization", "cookie", "x-session-id", "x-api-key", "x-csrf-token"})
+
+# Shared IP anonymizer instance
+_ip_anonymizer = IPAnonymizer()
 
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """
     Middleware to log all HTTP requests with structured logging.
 
-    Logs: method, path, status code, duration, user agent.
+    Logs: method, path, status code, duration.
+    IP addresses are anonymized by default (GDPR Art. 5(1)(c) data minimization).
+    User-agent is only logged at DEBUG level to minimize PII in access logs.
     """
 
     async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
@@ -33,6 +44,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         Dispatch the request through the middleware chain.
 
         Logs request/response details including timing and error information.
+        IP addresses are anonymized when anonymize_request_ips is enabled.
         """
         # Record start time
         start_time = time.time()
@@ -40,10 +52,19 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         # Get request details
         method = request.method
         path = request.url.path
-        client_host = request.client.host if request.client else "unknown"
+        raw_client_host = request.client.host if request.client else "unknown"
         user_agent = request.headers.get("user-agent", "unknown")
 
-        # Log request details
+        # Anonymize IP for logging (GDPR Art. 5(1)(c))
+        if settings.anonymize_request_ips and raw_client_host != "unknown":
+            try:
+                client_host = _ip_anonymizer.anonymize(raw_client_host)
+            except ValueError:
+                client_host = "invalid"
+        else:
+            client_host = raw_client_host
+
+        # Log request details (DEBUG only - includes user-agent)
         logger.debug(
             "Request: %s %s - Client: %s - User-Agent: %s",
             method,
@@ -66,7 +87,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             # Calculate duration even for errors
             duration_ms = int((time.time() - start_time) * 1000)
 
-            # Log error
+            # Log error (no user-agent in error logs)
             logger.exception(
                 "%s %s - ERROR - %dms",
                 method,
@@ -78,7 +99,6 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
                     "status_code": 500,
                     "duration_ms": duration_ms,
                     "client_host": client_host,
-                    "user_agent": user_agent,
                     "error": str(exc),
                 },
             )
@@ -91,7 +111,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             # Calculate duration
             duration_ms = int((time.time() - start_time) * 1000)
 
-            # Log successful request as debug
+            # Log successful request as debug (includes user-agent)
             logger.debug(
                 "Response: %s %s - Status: %d - Duration: %dms",
                 method,
@@ -108,7 +128,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
                 },
             )
 
-            # Log successful request as info (access log)
+            # Log successful request as info (access log - no user-agent for GDPR)
             logger.info(
                 "%s %s - %d - %dms",
                 method,
@@ -121,7 +141,6 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
                     "status_code": status_code,
                     "duration_ms": duration_ms,
                     "client_host": client_host,
-                    "user_agent": user_agent,
                 },
             )
 

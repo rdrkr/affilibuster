@@ -2,52 +2,86 @@
 
 /**
  * E2E tests for cookie consent banner and GDPR compliance.
- * Reference: Mentioned in affiliate-tracking.spec.ts
- * Reference: GDPR/privacy requirements
+ * Reference: GDPR Articles 5-7, 25 (consent, data protection by design)
  *
  * Tests cover:
  * - Cookie consent banner display
- * - Cookie preferences
+ * - Cookie preferences (customize)
  * - Consent acceptance/rejection
- * - Cookie policy
- * - Tracking opt-out
+ * - Consent persistence across sessions
+ * - Consent withdrawal (GDPR Art. 7(3))
+ * - Do Not Track respect
+ * - Cookie policy page
  */
 
 import { expect, test } from '../fixtures'
+import { navigateAndWait, waitForHidden } from '../helpers/waits'
+import { handlePageModals } from '../helpers/modals'
+
+/** Cookie name used by the consent system. */
+const CONSENT_COOKIE_NAME = 'cc_consent'
 
 test.describe('Cookie Consent', () => {
   // ========================================
   // CONSENT BANNER DISPLAY
   // ========================================
   test.describe('Consent Banner', () => {
-    test('should display cookie consent banner on first visit', async ({ page: _page }) => {
-      // GDPR compliance - consent banner
-      expect(true).toBe(true)
+    test('should display cookie consent banner on first visit', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      await expect(banner).toBeVisible()
     })
 
-    test('should show banner at bottom of page', async ({ page: _page }) => {
-      // Banner positioning
-      expect(true).toBe(true)
+    test('should show banner at bottom of page', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      await expect(banner).toBeVisible()
+      // Banner should be at the bottom (fixed positioning)
+      const box = await banner.boundingBox()
+      const viewport = page.viewportSize()
+      expect(box).toBeTruthy()
+      expect(viewport).toBeTruthy()
+      // Banner bottom edge should be near the viewport bottom
+      if (box && viewport) {
+        expect(box.y + box.height).toBeGreaterThan(viewport.height * 0.5)
+      }
     })
 
-    test('should not block page content', async ({ page: _page }) => {
-      // Non-intrusive display
-      expect(true).toBe(true)
+    test('should not block page content', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      await expect(banner).toBeVisible()
+      // Main page content should still be visible/accessible
+      const main = page.locator('main').first()
+      await expect(main).toBeVisible()
     })
 
-    test('should show consent message in user language', async ({ page: _page }) => {
-      // Localized consent
-      expect(true).toBe(true)
+    test('should show consent message in user language', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      await expect(banner).toBeVisible()
+      // Banner should contain CMS-driven text (not empty)
+      const bannerText = await banner.textContent()
+      expect(bannerText).toBeTruthy()
+      expect(bannerText!.length).toBeGreaterThan(10)
     })
 
-    test('should include link to cookie policy', async ({ page: _page }) => {
-      // Policy link
-      expect(true).toBe(true)
+    test('should include link to cookie policy', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      await expect(banner).toBeVisible()
+      // Look for a link containing "cookie" in the banner
+      const cookiePolicyLink = banner.getByRole('link', { name: /cookie/i })
+      await expect(cookiePolicyLink).toBeVisible()
     })
 
-    test('should include link to privacy policy', async ({ page: _page }) => {
-      // Privacy link
-      expect(true).toBe(true)
+    test('should include link to privacy policy', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      await expect(banner).toBeVisible()
+      // Look for a link containing "privacy" in the banner
+      const privacyLink = banner.getByRole('link', { name: /privacy/i })
+      await expect(privacyLink).toBeVisible()
     })
   })
 
@@ -55,34 +89,76 @@ test.describe('Cookie Consent', () => {
   // CONSENT ACTIONS
   // ========================================
   test.describe('Consent Actions', () => {
-    test('should have "Accept All" button', async ({ page: _page }) => {
-      // Accept all cookies
-      expect(true).toBe(true)
+    test('should have "Accept All" button', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const acceptBtn = banner.getByRole('button', { name: /accept all/i })
+      await expect(acceptBtn).toBeVisible()
     })
 
-    test('should have "Reject All" button', async ({ page: _page }) => {
-      // Reject non-essential
-      expect(true).toBe(true)
+    test('should have "Reject All" button', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const rejectBtn = banner.getByRole('button', { name: /reject all/i })
+      await expect(rejectBtn).toBeVisible()
     })
 
-    test('should have "Customize" button', async ({ page: _page }) => {
-      // Open preferences
-      expect(true).toBe(true)
+    test('should have "Customize" button', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const customizeBtn = banner.getByRole('button', { name: /customize/i })
+      await expect(customizeBtn).toBeVisible()
     })
 
-    test('should save consent on "Accept All"', async ({ page: _page }) => {
-      // Save acceptance
-      expect(true).toBe(true)
+    test('should save consent on "Accept All"', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const acceptBtn = banner.getByRole('button', { name: /accept all/i })
+      await acceptBtn.click()
+
+      // Banner should dismiss
+      await waitForHidden(banner)
+
+      // Consent cookie should be set
+      const cookies = await page.context().cookies()
+      const consentCookie = cookies.find(c => c.name === CONSENT_COOKIE_NAME)
+      expect(consentCookie).toBeTruthy()
+
+      // Cookie value should contain accepted categories
+      const value = JSON.parse(decodeURIComponent(consentCookie!.value))
+      expect(value.categories).toBeTruthy()
+      expect(value.categories.length).toBeGreaterThan(1) // More than just "necessary"
+      expect(value.timestamp).toBeTruthy()
     })
 
-    test('should save rejection on "Reject All"', async ({ page: _page }) => {
-      // Save rejection
-      expect(true).toBe(true)
+    test('should save rejection on "Reject All"', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const rejectBtn = banner.getByRole('button', { name: /reject all/i })
+      await rejectBtn.click()
+
+      // Banner should dismiss
+      await waitForHidden(banner)
+
+      // Consent cookie should be set with only necessary category
+      const cookies = await page.context().cookies()
+      const consentCookie = cookies.find(c => c.name === CONSENT_COOKIE_NAME)
+      expect(consentCookie).toBeTruthy()
+
+      const value = JSON.parse(decodeURIComponent(consentCookie!.value))
+      // After rejection, only the mandatory/necessary category should remain
+      expect(value.categories.length).toBe(1)
     })
 
-    test('should hide banner after consent', async ({ page: _page }) => {
-      // Banner dismissal
-      expect(true).toBe(true)
+    test('should hide banner after consent', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      await expect(banner).toBeVisible()
+
+      const acceptBtn = banner.getByRole('button', { name: /accept all/i })
+      await acceptBtn.click()
+
+      await waitForHidden(banner)
     })
   })
 
@@ -90,39 +166,102 @@ test.describe('Cookie Consent', () => {
   // COOKIE PREFERENCES
   // ========================================
   test.describe('Cookie Preferences', () => {
-    test('should show cookie categories', async ({ page: _page }) => {
-      // Category list
-      expect(true).toBe(true)
+    test('should show cookie categories when customizing', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const customizeBtn = banner.getByRole('button', { name: /customize/i })
+      await customizeBtn.click()
+
+      // Settings panel should appear
+      const settingsPanel = page.getByTestId('settings-panel')
+      await expect(settingsPanel).toBeVisible()
+
+      // Should have checkboxes for cookie categories
+      const checkboxes = settingsPanel.getByRole('checkbox')
+      const count = await checkboxes.count()
+      expect(count).toBeGreaterThanOrEqual(1)
     })
 
-    test('should show "Necessary" cookies (always enabled)', async ({ page: _page }) => {
-      // Essential cookies
-      expect(true).toBe(true)
+    test('should show "Necessary" cookies always enabled', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const customizeBtn = banner.getByRole('button', { name: /customize/i })
+      await customizeBtn.click()
+
+      const settingsPanel = page.getByTestId('settings-panel')
+      await expect(settingsPanel).toBeVisible()
+
+      // Required category checkbox should be checked and disabled
+      const checkboxes = settingsPanel.getByRole('checkbox')
+      const firstCheckbox = checkboxes.first()
+      await expect(firstCheckbox).toBeChecked()
+      await expect(firstCheckbox).toBeDisabled()
     })
 
-    test('should allow toggling "Analytics" cookies', async ({ page: _page }) => {
-      // Analytics opt-in/out
-      expect(true).toBe(true)
+    test('should allow toggling optional categories', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const customizeBtn = banner.getByRole('button', { name: /customize/i })
+      await customizeBtn.click()
+
+      const settingsPanel = page.getByTestId('settings-panel')
+      await expect(settingsPanel).toBeVisible()
+
+      // Find an optional (enabled) checkbox and toggle it
+      const checkboxes = settingsPanel.getByRole('checkbox')
+      const count = await checkboxes.count()
+
+      // At least one optional category should exist
+      let foundOptional = false
+      for (let i = 0; i < count; i++) {
+        const cb = checkboxes.nth(i)
+        const isDisabled = await cb.isDisabled()
+        if (!isDisabled) {
+          foundOptional = true
+          // Toggle it
+          const wasBefore = await cb.isChecked()
+          await cb.click()
+          const isAfter = await cb.isChecked()
+          expect(isAfter).not.toBe(wasBefore)
+          break
+        }
+      }
+      expect(foundOptional).toBe(true)
     })
 
-    test('should allow toggling "Marketing" cookies', async ({ page: _page }) => {
-      // Marketing opt-in/out
-      expect(true).toBe(true)
+    test('should show description for each cookie category', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const customizeBtn = banner.getByRole('button', { name: /customize/i })
+      await customizeBtn.click()
+
+      const settingsPanel = page.getByTestId('settings-panel')
+      await expect(settingsPanel).toBeVisible()
+
+      // Settings panel should have descriptive text beyond just checkbox labels
+      const panelText = await settingsPanel.textContent()
+      expect(panelText).toBeTruthy()
+      expect(panelText!.length).toBeGreaterThan(50)
     })
 
-    test('should allow toggling "Functional" cookies', async ({ page: _page }) => {
-      // Functional opt-in/out
-      expect(true).toBe(true)
-    })
+    test('should save custom preferences', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const customizeBtn = banner.getByRole('button', { name: /customize/i })
+      await customizeBtn.click()
 
-    test('should show description for each cookie category', async ({ page: _page }) => {
-      // Category descriptions
-      expect(true).toBe(true)
-    })
+      // Click Save Preferences
+      const saveBtn = banner.getByRole('button', { name: /save preferences/i })
+      await expect(saveBtn).toBeVisible()
+      await saveBtn.click()
 
-    test('should save custom preferences', async ({ page: _page }) => {
-      // Save custom selection
-      expect(true).toBe(true)
+      // Banner should dismiss
+      await waitForHidden(banner)
+
+      // Consent cookie should be set
+      const cookies = await page.context().cookies()
+      const consentCookie = cookies.find(c => c.name === CONSENT_COOKIE_NAME)
+      expect(consentCookie).toBeTruthy()
     })
   })
 
@@ -130,29 +269,53 @@ test.describe('Cookie Consent', () => {
   // CONSENT PERSISTENCE
   // ========================================
   test.describe('Consent Persistence', () => {
-    test('should store consent in localStorage', async ({ page: _page }) => {
-      // Local storage
-      expect(true).toBe(true)
+    test('should store consent in cookies', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const acceptBtn = banner.getByRole('button', { name: /accept all/i })
+      await acceptBtn.click()
+      await waitForHidden(banner)
+
+      const cookies = await page.context().cookies()
+      const consentCookie = cookies.find(c => c.name === CONSENT_COOKIE_NAME)
+      expect(consentCookie).toBeTruthy()
+      expect(consentCookie!.path).toBe('/')
     })
 
-    test('should store consent in cookies', async ({ page: _page }) => {
-      // Cookie storage
-      expect(true).toBe(true)
+    test('should not show banner again after consent', async ({ page }) => {
+      // First visit: accept consent
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const acceptBtn = banner.getByRole('button', { name: /accept all/i })
+      await acceptBtn.click()
+      await waitForHidden(banner)
+
+      // Navigate to another page
+      await navigateAndWait(page, '/en')
+      await handlePageModals(page)
+
+      // Banner should NOT reappear
+      const bannerAgain = page.getByRole('dialog', { name: /cookie consent/i })
+      await expect(bannerAgain).not.toBeVisible()
     })
 
-    test('should remember consent across sessions', async ({ page: _page }) => {
-      // Persistent consent
-      expect(true).toBe(true)
-    })
+    test('should persist consent cookie structure', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const acceptBtn = banner.getByRole('button', { name: /accept all/i })
+      await acceptBtn.click()
+      await waitForHidden(banner)
 
-    test('should not show banner again after consent', async ({ page: _page }) => {
-      // No repeated prompts
-      expect(true).toBe(true)
-    })
+      const cookies = await page.context().cookies()
+      const consentCookie = cookies.find(c => c.name === CONSENT_COOKIE_NAME)
+      expect(consentCookie).toBeTruthy()
 
-    test('should allow changing consent later', async ({ page: _page }) => {
-      // Consent modification
-      expect(true).toBe(true)
+      // Validate cookie structure
+      const value = JSON.parse(decodeURIComponent(consentCookie!.value))
+      expect(value).toHaveProperty('categories')
+      expect(value).toHaveProperty('timestamp')
+      expect(value).toHaveProperty('version')
+      expect(Array.isArray(value.categories)).toBe(true)
     })
   })
 
@@ -160,59 +323,125 @@ test.describe('Cookie Consent', () => {
   // TRACKING BASED ON CONSENT
   // ========================================
   test.describe('Tracking Enforcement', () => {
-    test('should not load analytics before consent', async ({ page: _page }) => {
-      // Block tracking
-      expect(true).toBe(true)
+    // Affilibuster currently uses zero third-party tracking (no GA, no marketing pixels).
+    // These tests verify that no tracking scripts load regardless of consent state.
+
+    test('should not load any third-party tracking scripts', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+
+      // Accept all cookies
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const acceptBtn = banner.getByRole('button', { name: /accept all/i })
+      await acceptBtn.click()
+      await waitForHidden(banner)
+
+      // Verify no GA or marketing scripts are loaded
+      const gaScript = await page.evaluate(() => {
+        const scripts = Array.from(document.querySelectorAll('script'))
+        return scripts.some(
+          s =>
+            s.src.includes('googletagmanager') ||
+            s.src.includes('google-analytics') ||
+            s.src.includes('facebook') ||
+            s.src.includes('doubleclick')
+        )
+      })
+      expect(gaScript).toBe(false)
     })
 
-    test('should not load marketing pixels before consent', async ({ page: _page }) => {
-      // Block marketing
-      expect(true).toBe(true)
-    })
+    test('should not set any third-party cookies', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const acceptBtn = banner.getByRole('button', { name: /accept all/i })
+      await acceptBtn.click()
+      await waitForHidden(banner)
 
-    test('should load analytics after acceptance', async ({ page: _page }) => {
-      // Enable analytics
-      expect(true).toBe(true)
-    })
+      // Reload and check cookies
+      await navigateAndWait(page, '/en')
+      const cookies = await page.context().cookies()
 
-    test('should load marketing pixels after acceptance', async ({ page: _page }) => {
-      // Enable marketing
-      expect(true).toBe(true)
-    })
-
-    test('should respect partial consent', async ({ page: _page }) => {
-      // Granular consent
-      expect(true).toBe(true)
+      // All cookies should be first-party (same domain)
+      const thirdPartyCookies = cookies.filter(
+        c => !c.domain.includes('localhost') && !c.domain.includes('127.0.0.1') && c.domain !== ''
+      )
+      expect(thirdPartyCookies).toHaveLength(0)
     })
   })
 
   // ========================================
-  // CONSENT WITHDRAWAL
+  // CONSENT WITHDRAWAL (GDPR Art. 7(3))
   // ========================================
   test.describe('Consent Withdrawal', () => {
-    test('should allow withdrawing consent', async ({ page: _page }) => {
-      // Withdraw consent
-      expect(true).toBe(true)
+    test('should show consent settings in footer', async ({ page }) => {
+      // First, accept consent to dismiss banner
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const acceptBtn = banner.getByRole('button', { name: /accept all/i })
+      await acceptBtn.click()
+      await waitForHidden(banner)
+
+      // Footer should have a cookie settings link/button
+      const footer = page.locator('footer')
+      await expect(footer).toBeVisible()
+      const settingsLink = footer
+        .getByRole('button', { name: /cookie/i })
+        .or(footer.getByRole('link', { name: /cookie/i }))
+      await expect(settingsLink).toBeVisible()
     })
 
-    test('should show consent settings in footer', async ({ page: _page }) => {
-      // Settings link
-      expect(true).toBe(true)
+    test('should allow reopening consent settings from footer', async ({ page }) => {
+      // Accept consent first
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const acceptBtn = banner.getByRole('button', { name: /accept all/i })
+      await acceptBtn.click()
+      await waitForHidden(banner)
+
+      // Click footer cookie settings link
+      const footer = page.locator('footer')
+      const settingsLink = footer
+        .getByRole('button', { name: /cookie/i })
+        .or(footer.getByRole('link', { name: /cookie/i }))
+      await settingsLink.click()
+
+      // Banner should reappear in edit mode with settings panel open
+      const reopenedBanner = page.getByRole('dialog', { name: /cookie consent/i })
+      await expect(reopenedBanner).toBeVisible()
+
+      // Settings panel should be auto-opened for withdrawal
+      const settingsPanel = page.getByTestId('settings-panel')
+      await expect(settingsPanel).toBeVisible()
     })
 
-    test('should show consent settings in profile', async ({ page: _page }) => {
-      // Profile settings
-      expect(true).toBe(true)
-    })
+    test('should allow modifying consent after initial acceptance', async ({ page }) => {
+      // Accept all first
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      const acceptBtn = banner.getByRole('button', { name: /accept all/i })
+      await acceptBtn.click()
+      await waitForHidden(banner)
 
-    test('should clear tracking data on withdrawal', async ({ page: _page }) => {
-      // Data deletion
-      expect(true).toBe(true)
-    })
+      // Reopen settings from footer
+      const footer = page.locator('footer')
+      const settingsLink = footer
+        .getByRole('button', { name: /cookie/i })
+        .or(footer.getByRole('link', { name: /cookie/i }))
+      await settingsLink.click()
 
-    test('should stop tracking after withdrawal', async ({ page: _page }) => {
-      // Disable tracking
-      expect(true).toBe(true)
+      const reopenedBanner = page.getByRole('dialog', { name: /cookie consent/i })
+      await expect(reopenedBanner).toBeVisible()
+
+      // Click "Reject All" to withdraw consent
+      const rejectBtn = reopenedBanner.getByRole('button', { name: /reject all/i })
+      await rejectBtn.click()
+      await waitForHidden(reopenedBanner)
+
+      // Verify consent was updated to only necessary
+      const cookies = await page.context().cookies()
+      const consentCookie = cookies.find(c => c.name === CONSENT_COOKIE_NAME)
+      expect(consentCookie).toBeTruthy()
+      const value = JSON.parse(decodeURIComponent(consentCookie!.value))
+      expect(value.categories.length).toBe(1) // Only necessary
     })
   })
 
@@ -220,19 +449,25 @@ test.describe('Cookie Consent', () => {
   // DO NOT TRACK
   // ========================================
   test.describe('Do Not Track', () => {
-    test('should respect DNT header', async ({ page: _page }) => {
-      // DNT compliance
-      expect(true).toBe(true)
-    })
+    test('should show DNT notice when DNT is enabled', async ({ browser }) => {
+      // Create a context with DNT header
+      const context = await browser.newContext({
+        extraHTTPHeaders: { DNT: '1' },
+      })
+      const page = await context.newPage()
 
-    test('should auto-reject tracking with DNT enabled', async ({ page: _page }) => {
-      // Auto-reject
-      expect(true).toBe(true)
-    })
+      // Set DNT via JS (since the hook reads navigator.doNotTrack)
+      await page.addInitScript(() => {
+        Object.defineProperty(navigator, 'doNotTrack', { get: () => '1' })
+      })
 
-    test('should show DNT status in preferences', async ({ page: _page }) => {
-      // DNT indicator
-      expect(true).toBe(true)
+      await navigateAndWait(page, '/en')
+
+      // Banner should show DNT notice
+      const dntNotice = page.getByTestId('dnt-notice')
+      await expect(dntNotice).toBeVisible()
+
+      await context.close()
     })
   })
 
@@ -240,34 +475,22 @@ test.describe('Cookie Consent', () => {
   // COOKIE POLICY PAGE
   // ========================================
   test.describe('Cookie Policy', () => {
-    test('should have dedicated cookie policy page', async ({ page: _page }) => {
-      // Policy page
-      expect(true).toBe(true)
+    test('should have dedicated cookie policy page', async ({ page }) => {
+      await navigateAndWait(page, '/en/cookie-policy')
+      // Page should load without 404
+      await expect(page.locator('main')).toBeVisible()
+      const heading = page.getByRole('heading').first()
+      await expect(heading).toBeVisible()
     })
 
-    test('should list all cookies used', async ({ page: _page }) => {
-      // Cookie list
-      expect(true).toBe(true)
-    })
-
-    test('should explain purpose of each cookie', async ({ page: _page }) => {
-      // Cookie descriptions
-      expect(true).toBe(true)
-    })
-
-    test('should show cookie duration', async ({ page: _page }) => {
-      // Expiry information
-      expect(true).toBe(true)
-    })
-
-    test('should explain third-party cookies', async ({ page: _page }) => {
-      // Third-party disclosure
-      expect(true).toBe(true)
-    })
-
-    test('should provide opt-out instructions', async ({ page: _page }) => {
-      // Opt-out guide
-      expect(true).toBe(true)
+    test('should have content on cookie policy page', async ({ page }) => {
+      await navigateAndWait(page, '/en/cookie-policy')
+      const main = page.locator('main')
+      await expect(main).toBeVisible()
+      // Page should have substantial content about cookies
+      const text = await main.textContent()
+      expect(text).toBeTruthy()
+      expect(text!.length).toBeGreaterThan(100)
     })
   })
 
@@ -275,24 +498,24 @@ test.describe('Cookie Consent', () => {
   // REGIONAL COMPLIANCE
   // ========================================
   test.describe('Regional Compliance', () => {
-    test('should show GDPR-compliant banner for EU visitors', async ({ page: _page }) => {
-      // GDPR compliance
-      expect(true).toBe(true)
+    // Note: Affilibuster does not currently implement geo-based consent variations.
+    // The consent banner shows for ALL visitors (strictest compliance - GDPR for everyone).
+    // These tests verify the universal consent approach.
+
+    test('should show consent banner regardless of visitor location', async ({ page }) => {
+      await navigateAndWait(page, '/en')
+      const banner = page.getByRole('dialog', { name: /cookie consent/i })
+      await expect(banner).toBeVisible()
     })
 
-    test('should show CCPA-compliant banner for California visitors', async ({ page: _page }) => {
-      // CCPA compliance
-      expect(true).toBe(true)
-    })
-
-    test('should detect visitor location', async ({ page: _page }) => {
-      // Geo-detection
-      expect(true).toBe(true)
-    })
-
-    test('should apply appropriate consent requirements', async ({ page: _page }) => {
-      // Region-specific rules
-      expect(true).toBe(true)
+    test('should support consent in Italian locale', async ({ page }) => {
+      await navigateAndWait(page, '/it')
+      const banner = page.getByRole('dialog')
+      await expect(banner).toBeVisible()
+      // Should have CMS-driven Italian content
+      const bannerText = await banner.textContent()
+      expect(bannerText).toBeTruthy()
+      expect(bannerText!.length).toBeGreaterThan(10)
     })
   })
 })

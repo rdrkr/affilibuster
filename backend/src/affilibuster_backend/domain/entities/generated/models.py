@@ -2316,6 +2316,10 @@ class CallToActionsNewsletterSignupCtaEntry(BaseModel):
     """
     A component field
     """
+    consent_label: ElementsLabelEntry | None = Field(default_factory=ElementsLabelEntry, alias="consentLabel")
+    """
+    A component field
+    """
 
 
 class MarkersEndHorizontalLayoutMarkerEntry(BaseModel):

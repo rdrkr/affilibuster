@@ -22,6 +22,11 @@ services:
         EOF
         RUN chmod +x /docker-entrypoint-initdb.d/init-db.sh
     restart: 'no'
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '5'
     env_file: # Load environment variables from .env file at build time
       - .env
     environment:
@@ -44,6 +49,11 @@ services:
   redis:
     image: redis:7-alpine
     restart: 'no'
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '5'
     env_file: # Load environment variables from .env file at build time
       - .env
     command: redis-server --port ${REDIS_PORT}
@@ -67,6 +77,11 @@ services:
         CMS_PROTOCOL: ${CMS_PROTOCOL}
         APP_KEYS: ${APP_KEYS}
     restart: 'no'
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '5'
     depends_on:
       postgres:
         condition: service_healthy
@@ -118,6 +133,11 @@ services:
         # Use custom entrypoint
         ENTRYPOINT ["/docker-entrypoint.sh"]
     restart: 'no'
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '5'
     depends_on:
       strapi:
         condition: service_healthy
@@ -142,6 +162,11 @@ services:
       args:
         BACKEND_PORT: ${BACKEND_PORT}
     restart: 'no'
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '5'
     depends_on:
       postgres:
         condition: service_healthy
@@ -176,6 +201,11 @@ services:
       args:
         THE_GREEN_BROTHER_PORT: ${THE_GREEN_BROTHER_PORT}
     restart: 'no'
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '5'
     depends_on:
       backend:
         condition: service_healthy
@@ -205,6 +235,11 @@ services:
       context: ./the-green-brother
       dockerfile: Dockerfile.test-runner
     restart: 'no'
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '5'
     depends_on:
       the-green-brother:
         condition: service_healthy

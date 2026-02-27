@@ -7,6 +7,7 @@ export interface CallToActionsNewsletterSignupCta extends Struct.ComponentSchema
     icon: 'play'
   }
   attributes: {
+    consentLabel: Schema.Attribute.Component<'elements.label', false>
     description: Schema.Attribute.String & Schema.Attribute.Required
     emailPlaceholder: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
     submitButton: Schema.Attribute.Component<'elements.button', false> & Schema.Attribute.Required
