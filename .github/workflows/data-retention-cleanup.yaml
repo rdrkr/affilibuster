@@ -32,6 +32,7 @@ jobs:
             set -e
             cd ~/affilibuster
             set -a; source .env.prod; set +a
+            make dcp PROD_ARGS="exec -T backend uv run task migrate"
             make dcp PROD_ARGS="exec -T backend uv run task cleanup"
 
       - name: Notify Telegram (failure)
