@@ -57,19 +57,14 @@ jest.mock('@/components/menus', () => ({
     isOpen,
     onOpenChange,
     children,
+    dropdownClassName,
   }: {
     triggerChildren: React.ReactNode
     isOpen: boolean
     onOpenChange: (open: boolean) => void
     children: React.ReactNode
+    dropdownClassName?: string
   }) {
-    // We expect SortMenu to control isOpen via props (controlled mode)
-    // In SortMenu implementation:
-    // isOpen={isOpen} onOpenChange={setIsOpen}
-
-    // However, DropdownMenu usually handles open/close internally if not controlled?
-    // SortMenu uses controlled isOpen.
-
     return (
       <div data-testid="mock-dropdown">
         <button
@@ -81,7 +76,11 @@ jest.mock('@/components/menus', () => ({
         >
           {triggerChildren}
         </button>
-        {isOpen && <div data-testid="dropdown-content">{children}</div>}
+        {isOpen && (
+          <div data-testid="dropdown-content" className={dropdownClassName}>
+            {children}
+          </div>
+        )}
       </div>
     )
   },
@@ -219,6 +218,17 @@ describe('SortMenu', () => {
     const selectedOption = options.find(opt => opt.getAttribute('aria-pressed') === 'true')
 
     expect(selectedOption).toHaveTextContent('Price: Low to High')
+  })
+
+  it('should apply min-w-max to dropdown so it fits longest item', () => {
+    render(
+      <SortMenu data={mockData} sortBy="bestSellers" onSortChange={mockOnSortChange} direction={DirectionEnum.LTR} />
+    )
+
+    fireEvent.click(screen.getByRole('button'))
+
+    const content = screen.getByTestId('dropdown-content')
+    expect(content.className).toContain('min-w-max')
   })
 
   it('should use end alignment for RTL direction', () => {

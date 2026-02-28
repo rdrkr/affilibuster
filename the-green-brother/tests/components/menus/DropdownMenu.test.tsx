@@ -115,15 +115,28 @@ describe('Dropdown', () => {
     expect(hoverBridge).toHaveStyle({ height: '0', marginTop: '-10px' })
   })
 
-  it('should use inline positioning when inlineOnMobile is true', () => {
+  it('should use inline positioning anchored left for LTR when inlineOnMobile is true', () => {
     render(
-      <Dropdown isVisible={true} inlineOnMobile={true}>
+      <Dropdown isVisible={true} inlineOnMobile={true} direction={DirectionEnum.LTR}>
         <div>Test Content</div>
       </Dropdown>
     )
     const container = screen.getByText('Test Content').closest('.absolute')
     expect(container).toHaveClass('absolute')
     expect(container).toHaveClass('top-full')
+    expect(container).toHaveClass('left-0')
+  })
+
+  it('should use inline positioning anchored right for RTL when inlineOnMobile is true', () => {
+    render(
+      <Dropdown isVisible={true} inlineOnMobile={true} direction={DirectionEnum.RTL}>
+        <div>Test Content</div>
+      </Dropdown>
+    )
+    const container = screen.getByText('Test Content').closest('.absolute')
+    expect(container).toHaveClass('absolute')
+    expect(container).toHaveClass('top-full')
+    expect(container).toHaveClass('left-0')
   })
 
   it('should apply custom width style', () => {

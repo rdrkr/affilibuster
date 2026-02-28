@@ -2,21 +2,152 @@
 
 /**
  * Unit tests for root layout component.
- * Root layout is a pass-through that delegates HTML shell to [lang]/layout.tsx.
+ * Root layout provides the HTML shell (html, head, body) with fonts and scripts.
  */
 
+// Mock next/font/google
+jest.mock('next/font/google', () => ({
+  Inter: () => ({ variable: 'inter-variable' }),
+  Heebo: () => ({ variable: 'heebo-variable' }),
+}))
+
 import RootLayout, { generateMetadata } from '@/app/layout'
+import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
+
+/** Props shape for the html element returned by RootLayout. */
+interface HtmlElementProps {
+  lang: string
+  dir: string
+  suppressHydrationWarning: boolean
+  children: React.ReactNode
+}
+
+/**
+ * Get typed props from the html ReactElement returned by RootLayout.
+ * @param element - The ReactElement returned by RootLayout
+ * @returns Typed HTML element props
+ */
+function getHtmlProps(element: ReactElement): HtmlElementProps {
+  return element.props as HtmlElementProps
+}
+
+/**
+ * Extract the body element from the HTML element returned by RootLayout.
+ * @param element - The ReactElement returned by RootLayout
+ * @returns The body ReactElement
+ */
+function getBodyElement(element: ReactElement): ReactElement {
+  const htmlChildren = Children.toArray((element.props as { children: ReactNode }).children)
+  const body = htmlChildren.find((child): child is ReactElement => isValidElement(child) && child.type === 'body')
+  if (!body) {
+    throw new Error('Expected <body> element inside <html>')
+  }
+  return body
+}
+
+/**
+ * Extract the head element from the HTML element returned by RootLayout.
+ * @param element - The ReactElement returned by RootLayout
+ * @returns The head ReactElement
+ */
+function getHeadElement(element: ReactElement): ReactElement {
+  const htmlChildren = Children.toArray((element.props as { children: ReactNode }).children)
+  const head = htmlChildren.find((child): child is ReactElement => isValidElement(child) && child.type === 'head')
+  if (!head) {
+    throw new Error('Expected <head> element inside <html>')
+  }
+  return head
+}
 
 describe('RootLayout', () => {
-  it('should be a valid React component', () => {
-    expect(typeof RootLayout).toBe('function')
+  it('should return an html element', () => {
+    const result = RootLayout({ children: <div>Test</div> })
+
+    expect(result.type).toBe('html')
   })
 
-  it('should pass through children directly', () => {
-    const child = <div>Test</div>
-    const result = RootLayout({ children: child })
+  it('should set default lang to en', () => {
+    const result = RootLayout({ children: <div>Test</div> })
 
-    expect(result).toBe(child)
+    expect(getHtmlProps(result).lang).toBe('en')
+  })
+
+  it('should set default dir to ltr', () => {
+    const result = RootLayout({ children: <div>Test</div> })
+
+    expect(getHtmlProps(result).dir).toBe('ltr')
+  })
+
+  it('should include suppressHydrationWarning', () => {
+    const result = RootLayout({ children: <div>Test</div> })
+
+    expect(getHtmlProps(result).suppressHydrationWarning).toBe(true)
+  })
+
+  it('should render a body element with font CSS variable classes', () => {
+    const result = RootLayout({ children: <div>Test</div> })
+
+    const body = getBodyElement(result)
+    const bodyClassName = (body.props as { className: string }).className
+    expect(bodyClassName).toContain('inter-variable')
+    expect(bodyClassName).toContain('heebo-variable')
+    expect(bodyClassName).toContain('font-sans')
+  })
+
+  it('should render children inside the body', () => {
+    const result = RootLayout({ children: <div data-testid="child">Test</div> })
+
+    const body = getBodyElement(result)
+    const bodyChildren = Children.toArray((body.props as { children: ReactNode }).children)
+    const childElement = bodyChildren.find(
+      (child): child is ReactElement =>
+        isValidElement(child) && (child.props as { 'data-testid'?: string })['data-testid'] === 'child'
+    )
+    expect(childElement).toBeDefined()
+  })
+
+  it('should include head element with scripts', () => {
+    const result = RootLayout({ children: <div>Test</div> })
+
+    const head = getHeadElement(result)
+    const headChildren = Children.toArray((head.props as { children: ReactNode }).children)
+
+    // Should have two script elements (locale + theme)
+    const scripts = headChildren.filter(
+      (child): child is ReactElement => isValidElement(child) && child.type === 'script'
+    )
+    expect(scripts).toHaveLength(2)
+  })
+
+  it('should include locale detection script', () => {
+    const result = RootLayout({ children: <div>Test</div> })
+
+    const head = getHeadElement(result)
+    const headChildren = Children.toArray((head.props as { children: ReactNode }).children)
+    const scripts = headChildren.filter(
+      (child): child is ReactElement => isValidElement(child) && child.type === 'script'
+    )
+
+    const localeScript = (scripts[0]!.props as { dangerouslySetInnerHTML: { __html: string } }).dangerouslySetInnerHTML
+      .__html
+    expect(localeScript).toContain('window.location.pathname')
+    expect(localeScript).toContain('document.documentElement.lang')
+    expect(localeScript).toContain('document.documentElement.dir')
+  })
+
+  it('should include theme detection script', () => {
+    const result = RootLayout({ children: <div>Test</div> })
+
+    const head = getHeadElement(result)
+    const headChildren = Children.toArray((head.props as { children: ReactNode }).children)
+    const scripts = headChildren.filter(
+      (child): child is ReactElement => isValidElement(child) && child.type === 'script'
+    )
+
+    const themeScript = (scripts[1]!.props as { dangerouslySetInnerHTML: { __html: string } }).dangerouslySetInnerHTML
+      .__html
+    expect(themeScript).toContain('theme-preference')
+    expect(themeScript).toContain('data-theme')
   })
 })
 

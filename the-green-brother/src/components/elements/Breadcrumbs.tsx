@@ -152,7 +152,7 @@ export function Breadcrumbs({
         return (
           <div key={crumb.href} className="flex items-center">
             {crumb.isLast ? (
-              <span className="truncate font-medium text-neutral-800 dark:text-white">
+              <span className="max-w-48 truncate font-medium text-neutral-800 sm:max-w-72 md:max-w-96 dark:text-white">
                 {isLastAndCustom ? (
                   typeof customLastCrumbLabel === 'string' ? (
                     <Text text={stripMarkdown(customLastCrumbLabel)} />

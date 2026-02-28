@@ -87,9 +87,10 @@ export function ThemeMenu({
       testId="theme-menu-container"
       isOpen={isOpen}
       onOpenChange={setIsOpen}
+      dropdownClassName="items-center! sm:items-start!"
     >
       {/* Theme items have their own direction, independent of the menu direction */}
-      <div dir="ltr">
+      <div className="flex w-full flex-col gap-1" dir="ltr">
         {themes.map((theme: ApiThemeThemeDocument) => {
           const themeMode = cmsTextToThemeMode(theme.themeId)
 

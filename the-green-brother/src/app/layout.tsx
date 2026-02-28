@@ -2,6 +2,10 @@
 
 import '@/styles/globals.css'
 import type { Metadata } from 'next'
+import { Heebo, Inter } from 'next/font/google'
+
+const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
+const heebo = Heebo({ subsets: ['hebrew', 'latin'], display: 'swap', variable: '--font-heebo' })
 
 /**
  * Generate base-level metadata for the application.
@@ -17,17 +21,66 @@ export function generateMetadata(): Metadata {
 }
 
 /**
- * Root layout pass-through. The HTML shell (html, body, theme, font)
- * is rendered by the [lang]/layout.tsx which has access to the locale
- * for setting the html lang and dir attributes.
+ * Inline script that sets the correct lang and dir attributes on the
+ * html element based on the URL pathname. Runs before React hydrates
+ * to avoid a flash of incorrect language/direction.
+ */
+const localeScript = `
+  (function() {
+    try {
+      var path = window.location.pathname;
+      var match = path.match(/^\\/([a-z]{2})(?:\\/|$)/);
+      if (match) {
+        var lang = match[1];
+        document.documentElement.lang = lang;
+        document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+      }
+    } catch (e) {}
+  })();
+`
+
+/**
+ * Inline script that prevents FOUC by setting the theme data attribute
+ * before React hydrates. Reads from localStorage or falls back to
+ * the system color scheme preference.
+ */
+const themeScript = `
+  (function() {
+    try {
+      var stored = localStorage.getItem('theme-preference');
+      var theme = stored === 'light' || stored === 'dark' ? stored : null;
+      if (!theme) {
+        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+`
+
+/**
+ * Root layout providing the HTML shell with default lang/dir attributes,
+ * font CSS variables, and inline scripts for locale and theme detection.
+ * The [lang]/layout.tsx provides locale-specific providers and content.
  * @param root0 - Root props object
  * @param root0.children - Child components to render
- * @returns Children without additional wrapping
+ * @returns Full HTML document shell wrapping children
  */
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
-}>) {
-  return children
+}>): React.ReactElement {
+  return (
+    <html lang="en" dir="ltr" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: localeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body
+        className={`${inter.variable} ${heebo.variable} font-sans transition-colors duration-300 selection:bg-primary selection:text-black`}
+      >
+        {children}
+      </body>
+    </html>
+  )
 }

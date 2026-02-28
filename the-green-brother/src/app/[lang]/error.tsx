@@ -2,6 +2,8 @@
 
 // Copyright (c) 2026 Affilibuster by Ronen Druker.
 
+import { Icon } from '@/components/elements'
+
 /**
  * Error boundary client component for the locale layout.
  *
@@ -31,7 +33,7 @@ interface ErrorPageProps {
 export default function ErrorPage({ error, reset }: ErrorPageProps): React.ReactElement {
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center px-4 text-center">
-      <div className="mb-4 text-6xl text-neutral-300 dark:text-neutral-600">&#9888;</div>
+      <Icon icon="warning" size="6xl" className="mb-4 text-neutral-300 dark:text-neutral-600" />
       <p className="text-sm text-neutral-500">{error.digest}</p>
       <button
         onClick={reset}

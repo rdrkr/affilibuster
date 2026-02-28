@@ -244,6 +244,22 @@ describe('Breadcrumbs', () => {
     const nav = container.querySelector('nav')
     expect(nav).toBeInTheDocument()
   })
+  it('should apply max-width truncation to last crumb', () => {
+    render(
+      <Breadcrumbs
+        lang={LanguageCode.EN}
+        pathname={defaultPath}
+        direction={DirectionEnum.LTR}
+        navigation={mockNavigation}
+      />
+    )
+    const text = screen.getByTestId('text-component')
+    const lastCrumbSpan = text.closest('span.truncate')
+    expect(lastCrumbSpan).toHaveClass('max-w-48')
+    expect(lastCrumbSpan).toHaveClass('sm:max-w-72')
+    expect(lastCrumbSpan).toHaveClass('md:max-w-96')
+  })
+
   it('should strip markdown formatting from breadcrumb labels', () => {
     const markdownNavigation = {
       ...mockNavigation,

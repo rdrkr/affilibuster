@@ -110,12 +110,12 @@ export function SortMenu({
       direction={direction}
       variant="ghost-1"
       size="sm"
-      dropdownClassName={`flex flex-col ${className}`}
+      dropdownClassName={`flex flex-col min-w-max ${className}`}
       isOpen={isOpen}
       onOpenChange={setIsOpen}
       align={isRTL ? 'end' : 'start'}
       inlineOnMobile
-      triggerGapClassName="-m-6 md:m-0"
+      triggerGapClassName="-mt-6 md:mt-0"
       testId="sort-menu-container"
       visible={visible}
     >

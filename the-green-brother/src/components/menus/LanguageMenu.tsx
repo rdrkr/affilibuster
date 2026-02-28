@@ -123,9 +123,10 @@ export function LanguageMenu({
       testId="language-menu-container"
       isOpen={isOpen}
       onOpenChange={setIsOpen}
+      dropdownClassName="items-center! sm:items-start!"
     >
       {/* Always LTR regardless of page direction */}
-      <div dir="ltr">
+      <div className="flex w-full flex-col gap-1" dir="ltr">
         {languages.map(lang => (
           <ButtonAction
             key={lang.name}

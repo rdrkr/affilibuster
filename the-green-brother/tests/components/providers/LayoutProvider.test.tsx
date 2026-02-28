@@ -61,6 +61,37 @@ describe('LayoutProvider', () => {
     expect(screen.getByTestId('navigation')).toHaveTextContent('no-nav')
   })
 
+  it('should sync document.documentElement.lang and dir on mount', () => {
+    render(
+      <LayoutProvider lang={LanguageCode.HE} direction={DirectionEnum.RTL} navigation={null}>
+        <div />
+      </LayoutProvider>
+    )
+
+    expect(document.documentElement.lang).toBe('he')
+    expect(document.documentElement.dir).toBe('rtl')
+  })
+
+  it('should update document.documentElement when direction changes', () => {
+    const { rerender } = render(
+      <LayoutProvider lang={LanguageCode.EN} direction={DirectionEnum.LTR} navigation={null}>
+        <div />
+      </LayoutProvider>
+    )
+
+    expect(document.documentElement.lang).toBe('en')
+    expect(document.documentElement.dir).toBe('ltr')
+
+    rerender(
+      <LayoutProvider lang={LanguageCode.HE} direction={DirectionEnum.RTL} navigation={null}>
+        <div />
+      </LayoutProvider>
+    )
+
+    expect(document.documentElement.lang).toBe('he')
+    expect(document.documentElement.dir).toBe('rtl')
+  })
+
   it('should throw error when useLayoutContext is used outside provider', () => {
     // Suppress console.error for expected error
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})

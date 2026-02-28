@@ -4,6 +4,17 @@
  * Unit tests for the error boundary client component.
  */
 
+// Mock Icon component
+jest.mock('@/components/elements', () => ({
+  Icon: function MockIcon({ icon, size, className }: { icon: string; size?: string; className?: string }) {
+    return (
+      <span data-testid="mock-icon" data-icon={icon} data-size={size} className={className}>
+        {icon}
+      </span>
+    )
+  },
+}))
+
 import ErrorPage from '@/app/[lang]/error'
 import { render, screen, fireEvent } from '@testing-library/react'
 
@@ -21,6 +32,17 @@ describe('ErrorPage', () => {
 
     const button = screen.getByRole('button')
     expect(button).toBeInTheDocument()
+  })
+
+  it('should render warning icon using Icon component', () => {
+    const error = new Error('Something went wrong')
+
+    render(<ErrorPage error={error} reset={mockReset} />)
+
+    const icon = screen.getByTestId('mock-icon')
+    expect(icon).toBeInTheDocument()
+    expect(icon).toHaveAttribute('data-icon', 'warning')
+    expect(icon).toHaveAttribute('data-size', '6xl')
   })
 
   it('should call reset when retry button is clicked', () => {

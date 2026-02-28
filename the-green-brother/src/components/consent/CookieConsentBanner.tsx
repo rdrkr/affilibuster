@@ -253,10 +253,10 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
         ${isClosing ? 'animate-[slideDownOut_0.3s_ease-in_forwards]' : 'animate-[slideUp_0.3s_ease-out_forwards]'}
       `}
     >
-      <div className="relative">
-        {/* Close button for edit mode — positioned at top corner */}
+      <div>
+        {/* Close button for edit mode — rendered above content to avoid overlap on mobile */}
         {isEditMode && (
-          <div className={`absolute top-0 ${isRTL ? 'left-0' : 'right-0'}`}>
+          <div className="mb-1 flex justify-end">
             <ButtonAction
               data={consentPage.exitButton}
               direction={direction}

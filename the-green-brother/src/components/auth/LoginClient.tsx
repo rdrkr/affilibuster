@@ -9,7 +9,6 @@
  * Renders the login form using CMS data for labels and text.
  */
 
-import NextImage from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -223,18 +222,14 @@ export default function LoginClient({ data, lang, direction }: LoginClientProps)
               direction={direction}
               variant="outline"
               className="w-full justify-center bg-neutral-50 dark:bg-background-dark"
-            >
-              <NextImage src="/icons/google.svg" width={20} height={20} alt="Google" className="mr-2" />
-            </ButtonLink>
+            />
 
             <ButtonLink
               data={appleButton}
               direction={direction}
               variant="outline"
               className="w-full justify-center bg-neutral-50 dark:bg-background-dark"
-            >
-              <NextImage src="/icons/apple.svg" width={20} height={20} alt="Apple" className="mr-2 invert" />
-            </ButtonLink>
+            />
           </div>
         </div>
 

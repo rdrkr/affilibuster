@@ -1,7 +1,12 @@
 // Copyright (c) 2026 Affilibuster by Ronen Druker.
 
+import { getError404 } from '@/lib/content'
+import { Icon, TextBlock } from '@/components/elements'
+import { DirectionEnum, LanguageCode } from '@/lib/generated/types.gen'
+import { getLanguages } from '@/lib/languages/api'
 import { buildNoIndexMetadata } from '@/lib/seo'
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import Link from 'next/link'
 
 /**
@@ -13,23 +18,76 @@ export const metadata: Metadata = buildNoIndexMetadata({
 })
 
 /**
+ * Detect the locale from the request URL pathname.
+ * Extracts a two-letter language code from the first path segment
+ * and validates it against supported LanguageCode values.
+ * @returns The detected LanguageCode, or EN as default
+ */
+async function detectLocale(): Promise<LanguageCode> {
+  try {
+    const headersList = await headers()
+    const url = headersList.get('x-url') ?? headersList.get('x-invoke-path') ?? ''
+    const match = /^\/([a-z]{2})(?:\/|$)/.exec(url)
+    if (match) {
+      const code = match[1] as LanguageCode
+      if (Object.values(LanguageCode).includes(code)) {
+        return code
+      }
+    }
+  } catch {
+    // Fallback to default
+  }
+  return LanguageCode.EN
+}
+
+/**
  * Root-level 404 Not Found page.
  *
  * Handles 404 errors that occur outside the [lang] segment, such as
  * when the locale layout itself fails or when a route doesn't match
- * any [lang] pattern. Provides a minimal fallback with a link to the
- * default locale homepage.
- *
- * Does not depend on CMS data since this page renders when the
- * backend/CMS may be unreachable.
- * @returns Minimal 404 page with a link to the homepage
+ * any [lang] pattern. Attempts to fetch CMS content for a rich error page.
+ * Falls back to a minimal page if CMS is unreachable.
+ * @returns 404 page with CMS content if available, or minimal fallback
  */
-export default function RootNotFound(): React.ReactElement {
+export default async function RootNotFound(): Promise<React.ReactElement> {
+  const locale = await detectLocale()
+  const [errorData, languages] = await Promise.all([getError404(locale), getLanguages()])
+
+  const currentLanguage = languages?.find(l => l.code === locale)
+  const direction = currentLanguage?.direction ?? DirectionEnum.LTR
+
+  // Extract icon from header to render as a big standalone icon on top
+  const headerIcon = errorData?.content.header?.header?.icon
+
+  // Build TextBlock data with icon stripped from header to avoid duplication
+  const textBlockData = errorData?.content
+    ? {
+        ...errorData.content,
+        __component: 'elements.text-block' as const,
+        ...(errorData.content.header?.header
+          ? (() => {
+              const { icon: _icon, ...headerWithoutIcon } = errorData.content.header.header
+              return {
+                header: {
+                  ...errorData.content.header,
+                  header: headerWithoutIcon,
+                },
+              }
+            })()
+          : {}),
+      }
+    : null
+
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center px-4 text-center">
-      <div className="text-6xl">&#128269;</div>
+      {headerIcon ? (
+        <Icon icon={headerIcon} size="6xl" className="mb-4 text-neutral-300 dark:text-neutral-600" />
+      ) : (
+        <Icon icon="search" size="6xl" className="mb-4 text-neutral-300 dark:text-neutral-600" />
+      )}
+      {textBlockData && <TextBlock data={textBlockData} direction={direction} headerLevel={2} />}
       <Link
-        href="/en"
+        href={`/${locale}`}
         className="mt-8 inline-block rounded-lg bg-primary-600 px-6 py-3 text-white transition-colors hover:bg-primary-700"
       >
         &larr;

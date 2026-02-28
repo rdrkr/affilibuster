@@ -4,9 +4,8 @@ import { LanguageCode } from '@/lib/generated/types.gen'
 import type { AbstractIntlMessages } from 'next-intl'
 import { getRequestConfig } from 'next-intl/server'
 
-export default getRequestConfig(() => {
-  // Provide a static locale for now, or implement logic to determine it
-  const locale = LanguageCode.EN.toString()
+export default getRequestConfig(async ({ requestLocale }) => {
+  const locale = (await requestLocale) ?? LanguageCode.EN.toString()
 
   return {
     locale,

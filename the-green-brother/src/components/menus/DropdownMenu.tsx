@@ -101,9 +101,13 @@ export function Dropdown({
     ...(width ? ({ '--dropdown-width': width } as React.CSSProperties) : {}),
   } as React.CSSProperties
 
-  // Mobile positioning: fixed for nav-style, absolute for inline
+  // Mobile positioning: fixed for nav-style, absolute for inline.
+  // For inline mode, anchor to the correct edge so the panel extends inward
+  // (rightward for LTR, leftward for RTL) without overflowing the viewport.
+  // Using a single anchor (not inset-x-0) lets the outer div shrink-wrap to
+  // the panel's content width, keeping it within the scroll-close detection zone.
   const mobilePositionClasses = inlineOnMobile
-    ? 'absolute inset-x-0 top-full'
+    ? `absolute top-full left-0`
     : 'fixed inset-x-4 top-[calc(var(--nav-top,5rem))]'
 
   return (

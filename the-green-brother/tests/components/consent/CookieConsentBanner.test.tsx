@@ -557,7 +557,7 @@ describe('CookieConsentBanner', () => {
       expect(mockGetConsentCategories).toHaveBeenCalledWith('en')
     })
 
-    it('should position close button based on RTL direction', async () => {
+    it('should position close button at the end for RTL direction', async () => {
       mockUseConsent.mockReturnValue({
         ...defaultUseConsentReturn,
         hasConsented: true,
@@ -571,10 +571,11 @@ describe('CookieConsentBanner', () => {
 
       const closeButton = screen.getByLabelText('Close cookie settings')
       const closeContainer = closeButton.parentElement
-      expect(closeContainer?.className).toContain('left-0')
+      // justify-end respects the dir attribute on the container for correct positioning
+      expect(closeContainer?.className).toContain('justify-end')
     })
 
-    it('should position close button to the end for LTR direction', async () => {
+    it('should position close button at the end for LTR direction', async () => {
       mockUseConsent.mockReturnValue({
         ...defaultUseConsentReturn,
         hasConsented: true,
@@ -588,7 +589,7 @@ describe('CookieConsentBanner', () => {
 
       const closeButton = screen.getByLabelText('Close cookie settings')
       const closeContainer = closeButton.parentElement
-      expect(closeContainer?.className).toContain('right-0')
+      expect(closeContainer?.className).toContain('justify-end')
     })
   })
 

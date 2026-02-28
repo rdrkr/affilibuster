@@ -31,7 +31,8 @@ jobs:
           script: |
             set -e
             cd ~/affilibuster
-            docker compose exec -T backend uv run task cleanup
+            set -a; source .env.prod; set +a
+            make dcp PROD_ARGS="exec -T backend uv run task cleanup"
 
       - name: Notify Telegram (failure)
         if: failure()

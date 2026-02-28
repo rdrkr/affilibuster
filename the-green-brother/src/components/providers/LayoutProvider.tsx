@@ -3,7 +3,7 @@
 'use client'
 
 import { ApiNavigationNavigationDocument, LanguageCode, DirectionEnum } from '@/lib/generated/types.gen'
-import { createContext, ReactNode, useContext } from 'react'
+import { createContext, ReactNode, useContext, useEffect } from 'react'
 
 interface LayoutContextType {
   /** Current language code */
@@ -44,5 +44,13 @@ interface LayoutProviderProps extends LayoutContextType {
  * @returns Layout provider wrapping children
  */
 export function LayoutProvider({ children, lang, direction, navigation }: LayoutProviderProps) {
+  // Sync html element attributes when language/direction changes via client-side navigation.
+  // The root layout's inline script only runs on initial page load, so client-side
+  // route changes (e.g., language switch) need this effect to keep the DOM in sync.
+  useEffect(() => {
+    document.documentElement.lang = lang
+    document.documentElement.dir = direction === DirectionEnum.RTL ? 'rtl' : 'ltr'
+  }, [lang, direction])
+
   return <LayoutContext.Provider value={{ lang, direction, navigation }}>{children}</LayoutContext.Provider>
 }
