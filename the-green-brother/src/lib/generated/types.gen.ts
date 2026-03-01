@@ -183,6 +183,40 @@ export type RedirectCheckResponse = {
     statusCode?: number | null;
 };
 
+/**
+ * Request body for subscribing to the newsletter
+ */
+export type NewsletterSubscribeRequest = {
+    /**
+     * RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
+     */
+    email: string;
+};
+
+/**
+ * Response after newsletter subscription attempt
+ */
+export type NewsletterSubscribeResponse = {
+    success: boolean;
+};
+
+/**
+ * Request body for unsubscribing from the newsletter
+ */
+export type NewsletterUnsubscribeRequest = {
+    /**
+     * RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
+     */
+    email: string;
+};
+
+/**
+ * Response after newsletter unsubscription attempt
+ */
+export type NewsletterUnsubscribeResponse = {
+    success: boolean;
+};
+
 export type Error = {
     error: string;
     message: string;
@@ -256,7 +290,8 @@ export enum ConsentAction {
 export enum ConsentType {
     COOKIE = 'cookie',
     TERMS = 'terms',
-    PRIVACY = 'privacy'
+    PRIVACY = 'privacy',
+    NEWSLETTER = 'newsletter'
 }
 
 /**
@@ -475,7 +510,7 @@ export type ApiAboutAboutDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -705,7 +740,7 @@ export type ApiAuthPageAuthPageDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -768,7 +803,7 @@ export type ApiBlogPostTagBlogPostTagDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -923,7 +958,7 @@ export type ApiContributorRoleContributorRoleDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -1026,7 +1061,7 @@ export type ApiContributorContributorDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -1113,7 +1148,7 @@ export type ApiBlogPostBlogPostDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -1219,7 +1254,7 @@ export type ApiBlogBlogDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -1298,7 +1333,7 @@ export type ApiConsentConsentDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -1361,7 +1396,7 @@ export type ApiConsentCategoryConsentCategoryDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -1460,7 +1495,7 @@ export type ApiContactUsContactUsDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -1519,7 +1554,7 @@ export type ApiCookiePolicyCookiePolicyDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -1603,7 +1638,7 @@ export type ApiCurrencyCurrencyDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -1662,7 +1697,7 @@ export type ApiError404Error404Document = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -1721,7 +1756,7 @@ export type ApiError410Error410Document = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -1796,7 +1831,7 @@ export type ApiFaqFaqDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -1883,7 +1918,7 @@ export type ApiFooterFooterDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -1992,7 +2027,7 @@ export type ApiHomepageHomepageDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -2074,7 +2109,7 @@ export type ApiProductCategoryProductCategoryDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -2179,7 +2214,7 @@ export type ApiThemeThemeDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -2308,7 +2343,7 @@ export type ApiNavigationNavigationDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -2367,7 +2402,7 @@ export type ApiPrivacyPrivacyDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -2445,7 +2480,7 @@ export type ApiProductCertificateProductCertificateDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -2508,7 +2543,7 @@ export type ApiProductTagProductTagDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -2626,7 +2661,7 @@ export type ApiProductProductDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -2781,7 +2816,7 @@ export type ApiProductCategoriesPageProductCategoriesPageDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -2886,6 +2921,10 @@ export type ApiProfileProfileDocument = {
     /**
      * A component field
      */
+    newsletterUnsubscribeHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
     seoMetadata: ElementsSeoMetadataEntry;
     /**
      * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
@@ -2912,7 +2951,7 @@ export type ApiProfileProfileDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -2971,7 +3010,7 @@ export type ApiTermTermDocument = {
          * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
          */
         publishedAt?: string | null;
-        [key: string]: unknown | number | string | string | null | undefined;
+        [key: string]: unknown;
     }>;
 };
 
@@ -3164,7 +3203,31 @@ export type CallToActionsNewsletterSignupCtaEntry = {
     /**
      * A component field
      */
-    consentLabel?: ElementsLabelEntry;
+    consentLabel: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    consentRequiredError: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    pendingConfirmationMessage: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    successMessage: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    errorMessage: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    emailRequiredError: ElementsLabelEntry;
+    /**
+     * A component field
+     */
+    emailInvalidError: ElementsLabelEntry;
 };
 
 /**
@@ -5174,6 +5237,10 @@ export type ApiProfileProfileDocumentWritable = {
     /**
      * A component field
      */
+    newsletterUnsubscribeHeader: ElementsHeaderEntry;
+    /**
+     * A component field
+     */
     seoMetadata: ElementsSeoMetadataEntry;
 };
 
@@ -5467,7 +5534,7 @@ export type AboutGetAboutResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -5714,7 +5781,7 @@ export type AuthPageGetAuthPageResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -6270,7 +6337,7 @@ export type BlogGetBlogResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -6448,7 +6515,7 @@ export type BlogPostTagGetBlogPostTagsResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         }>;
         /**
@@ -6600,7 +6667,7 @@ export type BlogPostTagGetBlogPostTagsByIdResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -6802,7 +6869,7 @@ export type BlogPostGetBlogPostsResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         }>;
         /**
@@ -6978,7 +7045,7 @@ export type BlogPostGetBlogPostsBySlugResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -7154,7 +7221,7 @@ export type BlogPostGetBlogPostsByIdResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -7309,7 +7376,7 @@ export type ConsentGetConsentResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -7487,7 +7554,7 @@ export type ConsentCategoryGetConsentCategoriesResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         }>;
         /**
@@ -7639,7 +7706,7 @@ export type ConsentCategoryGetConsentCategoriesByIdResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -7814,7 +7881,7 @@ export type ContactUsGetContactUsResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -7988,7 +8055,7 @@ export type ContributorRoleGetContributorRolesResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         }>;
         /**
@@ -8136,7 +8203,7 @@ export type ContributorRoleGetContributorRolesByIdResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -8354,7 +8421,7 @@ export type ContributorGetContributorsResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         }>;
         /**
@@ -8546,7 +8613,7 @@ export type ContributorGetContributorsBySlugResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -8738,7 +8805,7 @@ export type ContributorGetContributorsByIdResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -8873,7 +8940,7 @@ export type CookiePolicyGetCookiePolicyResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -9072,7 +9139,7 @@ export type CurrencyGetCurrenciesResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         }>;
         /**
@@ -9245,7 +9312,7 @@ export type CurrencyGetCurrenciesByIdResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -9380,7 +9447,7 @@ export type Error404GetError404Responses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -9515,7 +9582,7 @@ export type Error410GetError410Responses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -9666,7 +9733,7 @@ export type FaqGetFaqResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -10348,7 +10415,7 @@ export type FooterGetFooterResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -10558,7 +10625,7 @@ export type HomepageGetHomepageResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -10794,7 +10861,7 @@ export type NavigationGetNavigationResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -10807,6 +10874,64 @@ export type NavigationGetNavigationResponses = {
 };
 
 export type NavigationGetNavigationResponse = NavigationGetNavigationResponses[keyof NavigationGetNavigationResponses];
+
+export type SubscribeNewsletterData = {
+    body: NewsletterSubscribeRequest;
+    path?: never;
+    query?: never;
+    url: '/newsletter/subscribe';
+};
+
+export type SubscribeNewsletterErrors = {
+    /**
+     * Validation error (invalid email)
+     */
+    400: Error;
+    /**
+     * Newsletter provider error
+     */
+    502: Error;
+};
+
+export type SubscribeNewsletterError = SubscribeNewsletterErrors[keyof SubscribeNewsletterErrors];
+
+export type SubscribeNewsletterResponses = {
+    /**
+     * Subscription successful (or already subscribed)
+     */
+    200: NewsletterSubscribeResponse;
+};
+
+export type SubscribeNewsletterResponse = SubscribeNewsletterResponses[keyof SubscribeNewsletterResponses];
+
+export type UnsubscribeNewsletterData = {
+    body: NewsletterUnsubscribeRequest;
+    path?: never;
+    query?: never;
+    url: '/newsletter/unsubscribe';
+};
+
+export type UnsubscribeNewsletterErrors = {
+    /**
+     * Not authenticated
+     */
+    401: Error;
+    /**
+     * Newsletter provider error
+     */
+    502: Error;
+};
+
+export type UnsubscribeNewsletterError = UnsubscribeNewsletterErrors[keyof UnsubscribeNewsletterErrors];
+
+export type UnsubscribeNewsletterResponses = {
+    /**
+     * Unsubscription successful
+     */
+    200: NewsletterUnsubscribeResponse;
+};
+
+export type UnsubscribeNewsletterResponse = UnsubscribeNewsletterResponses[keyof UnsubscribeNewsletterResponses];
 
 export type PrivacyGetPrivacyData = {
     body?: never;
@@ -10929,7 +11054,7 @@ export type PrivacyGetPrivacyResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -11111,7 +11236,7 @@ export type ProductCategoryGetProductCategoriesResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         }>;
         /**
@@ -11270,7 +11395,7 @@ export type ProductCategoriesPageGetProductCategoriesPageResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -11426,7 +11551,7 @@ export type ProductCategoryGetProductCategoriesBySlugResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -11582,7 +11707,7 @@ export type ProductCategoryGetProductCategoriesByIdResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -11760,7 +11885,7 @@ export type ProductCertificateGetProductCertificatesResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         }>;
         /**
@@ -11912,7 +12037,7 @@ export type ProductCertificateGetProductCertificatesByIdResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -12090,7 +12215,7 @@ export type ProductTagGetProductTagsResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         }>;
         /**
@@ -12242,7 +12367,7 @@ export type ProductTagGetProductTagsByIdResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -12475,7 +12600,7 @@ export type ProductGetProductsResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         }>;
         /**
@@ -12682,7 +12807,7 @@ export type ProductGetProductsBySlugResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -12889,7 +13014,7 @@ export type ProductGetProductsByIdResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -13070,6 +13195,10 @@ export type ProfileGetProfileResponses = {
             /**
              * A component field
              */
+            newsletterUnsubscribeHeader: ElementsHeaderEntry;
+            /**
+             * A component field
+             */
             seoMetadata: ElementsSeoMetadataEntry;
             /**
              * Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
@@ -13096,7 +13225,7 @@ export type ProfileGetProfileResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -13261,7 +13390,7 @@ export type TermGetTermResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**
@@ -13439,7 +13568,7 @@ export type ThemeGetThemesResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         }>;
         /**
@@ -13591,7 +13720,7 @@ export type ThemeGetThemesByIdResponses = {
                  * Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
                  */
                 publishedAt?: string | null;
-                [key: string]: unknown | number | string | string | null | undefined;
+                [key: string]: unknown;
             }>;
         };
         /**

@@ -51,6 +51,7 @@ from affilibuster_backend.infrastructure.api.dependencies.auth_dependencies impo
 from affilibuster_backend.infrastructure.dependencies import (
     ConsentRepoDep,
     PreferencesRepoDep,
+    _get_newsletter_service,
 )
 
 router = APIRouter(prefix="/auth/profile", tags=["profile"])
@@ -191,7 +192,10 @@ async def delete_account(  # noqa: PLR0913 - All dependencies required for FastA
         HTTPException: 401 if not authenticated, 400 if password incorrect or user already deleted.
     """
     try:
-        use_case = DeleteAccountUseCase(user_repo, session_repo, consent_repo, preferences_repo, password_hasher)
+        newsletter_service = _get_newsletter_service()
+        use_case = DeleteAccountUseCase(
+            user_repo, session_repo, consent_repo, preferences_repo, password_hasher, newsletter_service
+        )
         await use_case.execute(current_user.id, body.password.get_secret_value())
     except ValueError as e:
         raise HTTPException(

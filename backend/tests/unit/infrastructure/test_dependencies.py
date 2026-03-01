@@ -22,6 +22,10 @@ from affilibuster_backend.domain.repositories.url_redirect_repository import IUR
 from affilibuster_backend.domain.use_cases.cms.get_cms_content_use_case import GetCMSContentUseCase
 from affilibuster_backend.domain.use_cases.cms.get_url_redirect_use_case import GetURLRedirectUseCase
 from affilibuster_backend.domain.use_cases.consent.record_consent_use_case import RecordConsentUseCase
+from affilibuster_backend.domain.use_cases.newsletter.subscribe_newsletter_use_case import SubscribeNewsletterUseCase
+from affilibuster_backend.domain.use_cases.newsletter.unsubscribe_newsletter_use_case import (
+    UnsubscribeNewsletterUseCase,
+)
 from affilibuster_backend.domain.use_cases.preferences.get_user_preferences_use_case import GetUserPreferencesUseCase
 from affilibuster_backend.domain.use_cases.preferences.update_user_preferences_use_case import (
     UpdateUserPreferencesUseCase,
@@ -36,6 +40,8 @@ from affilibuster_backend.infrastructure.dependencies import (
     get_password_reset_token_repo,
     get_preferences_repo,
     get_record_consent_use_case,
+    get_subscribe_newsletter_use_case,
+    get_unsubscribe_newsletter_use_case,
     get_update_user_preferences_use_case,
     get_url_redirect_repo,
     get_url_redirect_use_case,
@@ -227,3 +233,17 @@ class TestDependencyGetters:
 
         assert use_case is not None
         assert isinstance(use_case, RecordConsentUseCase)
+
+    def test_get_subscribe_newsletter_use_case_returns_instance(self):
+        """Test get_subscribe_newsletter_use_case returns use case."""
+        use_case = get_subscribe_newsletter_use_case()
+
+        assert use_case is not None
+        assert isinstance(use_case, SubscribeNewsletterUseCase)
+
+    def test_get_unsubscribe_newsletter_use_case_returns_instance(self):
+        """Test get_unsubscribe_newsletter_use_case returns use case."""
+        use_case = get_unsubscribe_newsletter_use_case()
+
+        assert use_case is not None
+        assert isinstance(use_case, UnsubscribeNewsletterUseCase)

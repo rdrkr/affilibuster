@@ -7,13 +7,20 @@ Allows authenticated users to permanently delete their account (soft delete).
 Requires password verification for security.
 """
 
+import logging
 from uuid import UUID
 
 from affilibuster_backend.domain.repositories.consent_repository import IConsentRepository
 from affilibuster_backend.domain.repositories.preferences_repository import IUserPreferencesRepository
 from affilibuster_backend.domain.repositories.session_repository import ISessionRepository
 from affilibuster_backend.domain.repositories.user_repository import IUserRepository
+from affilibuster_backend.domain.services.newsletter_service import (
+    INewsletterService,
+    NewsletterUnsubscribeError,
+)
 from affilibuster_backend.domain.services.password_hasher import PasswordHasher
+
+logger = logging.getLogger(__name__)
 
 
 class DeleteAccountUseCase:
@@ -21,16 +28,18 @@ class DeleteAccountUseCase:
     Use case for deleting a user account.
 
     Performs soft deletion of the user, invalidates all sessions,
-    anonymizes consent records (preserving audit trail), and deletes preferences.
+    anonymizes consent records (preserving audit trail), deletes preferences,
+    and removes the user from newsletter mailing lists (GDPR Art. 17).
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913 - All dependencies required for account deletion cleanup chain
         self,
         user_repo: IUserRepository,
         session_repo: ISessionRepository,
         consent_repo: IConsentRepository,
         preferences_repo: IUserPreferencesRepository,
         password_hasher: PasswordHasher,
+        newsletter_service: INewsletterService | None = None,
     ) -> None:
         """
         Initialize use case.
@@ -41,12 +50,14 @@ class DeleteAccountUseCase:
             consent_repo: Consent repository for anonymizing records.
             preferences_repo: Preferences repository for deleting user preferences.
             password_hasher: Password hashing service for verification.
+            newsletter_service: Optional newsletter service for removing from mailing lists.
         """
         self.user_repo = user_repo
         self.session_repo = session_repo
         self.consent_repo = consent_repo
         self.preferences_repo = preferences_repo
         self.password_hasher = password_hasher
+        self.newsletter_service = newsletter_service
 
     async def execute(self, user_id: UUID, password: str) -> None:
         """
@@ -83,3 +94,11 @@ class DeleteAccountUseCase:
 
         # Delete user preferences
         await self.preferences_repo.delete_by_user_id(str(user_id))
+
+        # Remove from newsletter mailing list (GDPR Art. 17 - Right to erasure)
+        # Best-effort: don't fail account deletion if Brevo call fails
+        if self.newsletter_service:
+            try:
+                await self.newsletter_service.unsubscribe(user.email.value)
+            except NewsletterUnsubscribeError:
+                logger.warning("Failed to remove user from newsletter on account deletion")

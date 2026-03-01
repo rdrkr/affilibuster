@@ -41,6 +41,8 @@ RATE_LIMIT_RULES: dict[str, str] = {
     "/auth/forgot-password": settings.rate_limit_pw_reset,
     "/consent": settings.rate_limit_consent,
     "/profile/export": settings.rate_limit_dsar_export,
+    "/newsletter/subscribe": settings.rate_limit_newsletter,
+    "/newsletter/unsubscribe": settings.rate_limit_newsletter,
 }
 
 # Pre-parse rate limit items for efficient lookup

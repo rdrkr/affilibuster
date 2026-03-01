@@ -56,6 +56,14 @@ def rate_limited_app():
     async def export_data():
         return {"status": "ok"}
 
+    @app.post("/newsletter/subscribe")
+    async def newsletter_subscribe():
+        return {"status": "ok"}
+
+    @app.post("/newsletter/unsubscribe")
+    async def newsletter_unsubscribe():
+        return {"status": "ok"}
+
     @app.get("/health")
     async def health():
         return {"status": "ok"}
@@ -87,6 +95,14 @@ class TestRateLimitRulesConfiguration:
     def test_rate_limit_rules_contains_dsar_export(self):
         """Test DSAR export endpoint has a rate limit rule."""
         assert "/profile/export" in RATE_LIMIT_RULES
+
+    def test_rate_limit_rules_contains_newsletter_subscribe(self):
+        """Test newsletter subscribe endpoint has a rate limit rule."""
+        assert "/newsletter/subscribe" in RATE_LIMIT_RULES
+
+    def test_rate_limit_rules_contains_newsletter_unsubscribe(self):
+        """Test newsletter unsubscribe endpoint has a rate limit rule."""
+        assert "/newsletter/unsubscribe" in RATE_LIMIT_RULES
 
     def test_parsed_rules_match_rate_limit_rules(self):
         """Test that parsed rules have same count as raw rules."""
@@ -187,6 +203,40 @@ class TestRateLimitMiddlewareConsentEndpoint:
             assert resp.status_code == 200
 
         response = client.post("/consent")
+        assert response.status_code == 429
+
+
+@pytest.mark.unit
+class TestRateLimitMiddlewareNewsletterSubscribeEndpoint:
+    """Test rate limiting on the newsletter subscribe endpoint."""
+
+    def test_newsletter_subscribe_rate_limit_exceeded_returns_429(self, rate_limited_app):
+        """Test that exceeding newsletter subscribe rate limit returns 429."""
+        client = TestClient(rate_limited_app)
+
+        # Newsletter limit is 5/minute
+        for _ in range(5):
+            resp = client.post("/newsletter/subscribe")
+            assert resp.status_code == 200
+
+        response = client.post("/newsletter/subscribe")
+        assert response.status_code == 429
+
+
+@pytest.mark.unit
+class TestRateLimitMiddlewareNewsletterUnsubscribeEndpoint:
+    """Test rate limiting on the newsletter unsubscribe endpoint."""
+
+    def test_newsletter_unsubscribe_rate_limit_exceeded_returns_429(self, rate_limited_app):
+        """Test that exceeding newsletter unsubscribe rate limit returns 429."""
+        client = TestClient(rate_limited_app)
+
+        # Newsletter limit is 5/minute
+        for _ in range(5):
+            resp = client.post("/newsletter/unsubscribe")
+            assert resp.status_code == 200
+
+        response = client.post("/newsletter/unsubscribe")
         assert response.status_code == 429
 
 

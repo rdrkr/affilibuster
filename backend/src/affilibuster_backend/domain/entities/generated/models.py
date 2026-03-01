@@ -221,6 +221,48 @@ class RedirectCheckResponse(BaseModel):
     """
 
 
+class NewsletterSubscribeRequest(BaseModel):
+    """Request body for subscribing to the newsletter."""
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    email: EmailStr = Field(..., examples=["user@example.com"])
+    """
+    RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
+    """
+
+
+class NewsletterSubscribeResponse(BaseModel):
+    """Response after newsletter subscription attempt."""
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    success: bool = Field(..., examples=[True])
+
+
+class NewsletterUnsubscribeRequest(BaseModel):
+    """Request body for unsubscribing from the newsletter."""
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    email: EmailStr = Field(..., examples=["user@example.com"])
+    """
+    RFC 5321 compliant email address. Validated for correct format including domain and TLD requirements.
+    """
+
+
+class NewsletterUnsubscribeResponse(BaseModel):
+    """Response after newsletter unsubscription attempt."""
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    success: bool = Field(..., examples=[True])
+
+
 class Error(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
@@ -310,6 +352,7 @@ class ConsentType(StrEnum):
     COOKIE = "cookie"
     TERMS = "terms"
     PRIVACY = "privacy"
+    NEWSLETTER = "newsletter"
 
 
 class RecordConsentRequest(BaseModel):
@@ -2063,6 +2106,10 @@ class ApiProfileProfileDocument(BaseModel):
     """
     A component field
     """
+    newsletter_unsubscribe_header: ElementsHeaderEntry = Field(..., alias="newsletterUnsubscribeHeader")
+    """
+    A component field
+    """
     seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
     A component field
@@ -2316,7 +2363,31 @@ class CallToActionsNewsletterSignupCtaEntry(BaseModel):
     """
     A component field
     """
-    consent_label: ElementsLabelEntry | None = Field(default_factory=ElementsLabelEntry, alias="consentLabel")
+    consent_label: ElementsLabelEntry = Field(..., alias="consentLabel")
+    """
+    A component field
+    """
+    consent_required_error: ElementsLabelEntry = Field(..., alias="consentRequiredError")
+    """
+    A component field
+    """
+    pending_confirmation_message: ElementsLabelEntry = Field(..., alias="pendingConfirmationMessage")
+    """
+    A component field
+    """
+    success_message: ElementsLabelEntry = Field(..., alias="successMessage")
+    """
+    A component field
+    """
+    error_message: ElementsLabelEntry = Field(..., alias="errorMessage")
+    """
+    A component field
+    """
+    email_required_error: ElementsLabelEntry = Field(..., alias="emailRequiredError")
+    """
+    A component field
+    """
+    email_invalid_error: ElementsLabelEntry = Field(..., alias="emailInvalidError")
     """
     A component field
     """
@@ -9190,6 +9261,10 @@ class Data29(BaseModel):
     A component field
     """
     export_data_header: ElementsHeaderEntry = Field(..., alias="exportDataHeader")
+    """
+    A component field
+    """
+    newsletter_unsubscribe_header: ElementsHeaderEntry = Field(..., alias="newsletterUnsubscribeHeader")
     """
     A component field
     """

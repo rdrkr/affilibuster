@@ -4,10 +4,18 @@
  * Unit tests for NewsletterSignupCTA component (Newsletter Signup CTA)
  */
 
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 
 import { NewsletterSignupCTA, type NewsletterSignupCTAProps } from '@/components/call-to-actions/NewsletterSignupCTA'
 import { DirectionEnum, IconPositionEnum } from '@/lib/generated/types.gen'
+
+// Mock the newsletter API module
+const mockSubscribeNewsletter = jest.fn()
+jest.mock('@/lib/newsletter', () => ({
+  subscribeNewsletter: (...args: unknown[]) => mockSubscribeNewsletter(...args),
+}))
+
+// react-markdown, remark-gfm, rehype-raw, and rehype-sanitize are mocked via moduleNameMapper in jest.config.ts
 
 describe('NewsletterSignupCTA', () => {
   const mockSectionData: NewsletterSignupCTAProps['data'] = {
@@ -31,17 +39,53 @@ describe('NewsletterSignupCTA', () => {
       url: '#',
       openInNewTab: false,
     },
-  }
-
-  const mockSectionDataWithConsent: NewsletterSignupCTAProps['data'] = {
-    ...mockSectionData,
     consentLabel: {
-      text: 'I agree to receive newsletters and accept the privacy policy.',
+      text: 'I agree to receive newsletters and accept the [Privacy Policy](/en/privacy).',
       ariaDescription: 'Newsletter consent checkbox',
       icon: '',
       iconPosition: IconPositionEnum.BEFORE_TEXT,
     },
+    consentRequiredError: {
+      text: 'You must accept the privacy policy to subscribe.',
+      ariaDescription: 'Consent required error',
+      icon: '',
+      iconPosition: IconPositionEnum.BEFORE_TEXT,
+    },
+    pendingConfirmationMessage: {
+      text: 'Check your email to confirm your subscription.',
+      ariaDescription: 'DOI pending confirmation',
+      icon: 'mark_email_read',
+      iconPosition: IconPositionEnum.BEFORE_TEXT,
+    },
+    successMessage: {
+      text: 'Thank you for subscribing!',
+      ariaDescription: 'Subscription success message',
+      icon: 'check_circle',
+      iconPosition: IconPositionEnum.BEFORE_TEXT,
+    },
+    errorMessage: {
+      text: 'Something went wrong. Please try again.',
+      ariaDescription: 'Subscription error message',
+      icon: 'error',
+      iconPosition: IconPositionEnum.BEFORE_TEXT,
+    },
+    emailRequiredError: {
+      text: 'Please enter your email address.',
+      ariaDescription: 'Email required error',
+      icon: '',
+      iconPosition: IconPositionEnum.BEFORE_TEXT,
+    },
+    emailInvalidError: {
+      text: 'Please enter a valid email address.',
+      ariaDescription: 'Email invalid error',
+      icon: '',
+      iconPosition: IconPositionEnum.BEFORE_TEXT,
+    },
   }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
 
   it('should render newsletter title', () => {
     render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
@@ -74,32 +118,18 @@ describe('NewsletterSignupCTA', () => {
     expect(screen.getByText('Sign Up')).toBeInTheDocument()
   })
 
-  it('should call onClick handler when submit button is clicked', () => {
+  it('should have proper email input attributes', () => {
     render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-    const submitButton = screen.getByRole('button', { name: /Submit newsletter signup/i })
-    // Verify it doesn't crash when clicked (covers the empty handler)
-    fireEvent.click(submitButton)
-  })
-
-  it('should prevent form submission default behavior', () => {
-    render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
-
-    const form = document.querySelector('form')
-    expect(form).toBeInTheDocument()
-
-    // Submit the form - the onSubmit handler calls e.preventDefault()
-    // This doesn't throw or navigate, indicating the handler works
-    fireEvent.submit(form!)
-
-    // Form is still present after submit (no page reload)
-    expect(form).toBeInTheDocument()
+    const emailInput = screen.getByPlaceholderText('Enter your email')
+    expect(emailInput).toHaveAttribute('id', 'newsletter-email')
+    expect(emailInput).toHaveAttribute('name', 'email')
+    expect(emailInput).toHaveAttribute('autocomplete', 'email')
   })
 
   it('should render centered layout', () => {
     const { container } = render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-    // The component renders a centered container
     const maxWidthContainer = container.querySelector('.max-w-2xl')
     expect(maxWidthContainer).toBeInTheDocument()
   })
@@ -129,115 +159,449 @@ describe('NewsletterSignupCTA', () => {
     expect(inputRow).toBeInTheDocument()
   })
 
-  it('should render submit button and handle click without errors', () => {
+  it('should call onClick handler when submit button is clicked', () => {
     render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-    // Find the submit button by its aria label and click it
-    const button = screen.getByRole('button', { name: /Submit newsletter signup/i })
-    expect(button).toBeInTheDocument()
-
-    // Click should not throw - the onClick is an intentionally empty handler
-    expect(() => {
-      fireEvent.click(button)
-    }).not.toThrow()
-  })
-
-  it('should have proper email input attributes', () => {
-    render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
-
+    // Enter email and check consent so button is enabled
     const emailInput = screen.getByPlaceholderText('Enter your email')
-    expect(emailInput).toHaveAttribute('id', 'newsletter-email')
-    expect(emailInput).toHaveAttribute('name', 'email')
-    expect(emailInput).toHaveAttribute('autocomplete', 'email')
+    fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+    const checkbox = screen.getByTestId('consent-checkbox')
+    fireEvent.click(checkbox)
+
+    const submitButton = screen.getByRole('button', { name: /Submit newsletter signup/i })
+    // Verify it doesn't crash when clicked (covers the empty handler)
+    fireEvent.click(submitButton)
   })
 
   describe('consent checkbox', () => {
-    it('should not render consent checkbox when consentLabel is not provided', () => {
+    it('should render consent checkbox unchecked by default', () => {
       render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
-    })
-
-    it('should render consent checkbox when consentLabel is provided', () => {
-      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
-
-      const checkbox = screen.getByRole('checkbox')
+      const checkbox = screen.getByTestId('consent-checkbox')
       expect(checkbox).toBeInTheDocument()
-      expect(checkbox).toHaveAttribute('aria-label', 'Newsletter consent checkbox')
       expect(checkbox).not.toBeChecked()
     })
 
-    it('should render consent label text from CMS', () => {
-      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+    it('should render consent label text as markdown', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-      expect(screen.getByText('I agree to receive newsletters and accept the privacy policy.')).toBeInTheDocument()
+      const consentText = screen.getByTestId('consent-text')
+      expect(consentText).toBeInTheDocument()
+      expect(consentText).toHaveTextContent(/Privacy Policy/)
     })
 
-    it('should disable submit button when consent is required but not checked', () => {
-      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+    it('should disable submit button when consent is not checked', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
 
       const submitButton = screen.getByRole('button', { name: /Submit newsletter signup/i })
       expect(submitButton).toBeDisabled()
     })
 
-    it('should enable submit button when consent is checked', () => {
-      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+    it('should enable submit button when email is filled and consent is checked', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-      const checkbox = screen.getByRole('checkbox')
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+
+      const checkbox = screen.getByTestId('consent-checkbox')
       fireEvent.click(checkbox)
 
       const submitButton = screen.getByRole('button', { name: /Submit newsletter signup/i })
       expect(submitButton).not.toBeDisabled()
     })
 
-    it('should not disable submit button when no consent is required', () => {
+    it('should show consentRequiredError when submitting without consent', async () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+
+      // Check consent to enable submit, then uncheck
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      expect(screen.getByTestId('consent-error')).toHaveTextContent('You must accept the privacy policy to subscribe.')
+      expect(mockSubscribeNewsletter).not.toHaveBeenCalled()
+    })
+
+    it('should clear consent error when checkbox is checked', async () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+
+      // Check consent to enable button, uncheck, then submit to trigger error
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox) // check
+      fireEvent.click(checkbox) // uncheck
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+      expect(screen.getByTestId('consent-error')).toBeInTheDocument()
+
+      // Check consent again - error should clear
+      fireEvent.click(checkbox)
+      expect(screen.queryByTestId('consent-error')).not.toBeInTheDocument()
+    })
+
+    it('should apply text-left for LTR consent text', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const consentText = screen.getByTestId('consent-text')
+      expect(consentText).toHaveClass('text-left')
+      expect(consentText).not.toHaveClass('text-right')
+    })
+
+    it('should apply text-right for RTL consent text', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.RTL} data={mockSectionData} />)
+
+      const consentText = screen.getByTestId('consent-text')
+      expect(consentText).toHaveClass('text-right')
+    })
+
+    it('should disable consent checkbox during submission', async () => {
+      let resolvePromise: (value: unknown) => void
+      mockSubscribeNewsletter.mockReturnValueOnce(
+        new Promise(resolve => {
+          resolvePromise = resolve
+        })
+      )
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      await waitFor(() => {
+        expect(checkbox).toBeDisabled()
+      })
+
+      resolvePromise!({ success: true })
+
+      await waitFor(() => {
+        expect(screen.getByTestId('newsletter-success')).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('email validation', () => {
+    it('should disable submit button when email is empty', () => {
       render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
       const submitButton = screen.getByRole('button', { name: /Submit newsletter signup/i })
-      expect(submitButton).not.toBeDisabled()
+      expect(submitButton).toBeDisabled()
     })
 
-    it('should toggle consent checkbox state', () => {
-      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+    it('should show CMS required error when submitting empty email', async () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-      const checkbox = screen.getByRole('checkbox')
-      expect(checkbox).not.toBeChecked()
-
+      // Type something then clear it, check consent
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'a' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
       fireEvent.click(checkbox)
-      expect(checkbox).toBeChecked()
+      fireEvent.change(emailInput, { target: { value: '' } })
 
+      // Force submit by submitting the form
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      expect(screen.getByTestId('email-error')).toHaveTextContent('Please enter your email address.')
+      expect(mockSubscribeNewsletter).not.toHaveBeenCalled()
+    })
+
+    it('should show CMS invalid error when submitting invalid email', async () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'not-an-email' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
       fireEvent.click(checkbox)
-      expect(checkbox).not.toBeChecked()
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      expect(screen.getByTestId('email-error')).toHaveTextContent('Please enter a valid email address.')
+      expect(mockSubscribeNewsletter).not.toHaveBeenCalled()
     })
 
-    it('should have proper consent checkbox attributes', () => {
-      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+    it('should clear email error when user types', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-      const checkbox = screen.getByRole('checkbox')
-      expect(checkbox).toHaveAttribute('id', 'newsletter-consent')
-      expect(checkbox).toHaveAttribute('name', 'consent')
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'bad' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      // Submit to trigger error
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+      expect(screen.getByTestId('email-error')).toBeInTheDocument()
+
+      // Type again to clear error
+      fireEvent.change(emailInput, { target: { value: 'bad2' } })
+      expect(screen.queryByTestId('email-error')).not.toBeInTheDocument()
     })
 
-    it('should associate label with checkbox via htmlFor', () => {
-      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+    it('should set aria-invalid on email input when there is an error', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-      const label = screen.getByText('I agree to receive newsletters and accept the privacy policy.').closest('label')
-      expect(label).toHaveAttribute('for', 'newsletter-consent')
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'bad' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      expect(emailInput).toHaveAttribute('aria-invalid', 'true')
     })
 
-    it('should apply RTL styling to consent label', () => {
-      render(<NewsletterSignupCTA direction={DirectionEnum.RTL} data={mockSectionDataWithConsent} />)
+    it('should apply error border styling when email is invalid', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-      const label = screen.getByText('I agree to receive newsletters and accept the privacy policy.').closest('label')
-      expect(label).toHaveClass('flex-row-reverse', 'text-right')
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'bad' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      expect(emailInput.className).toContain('border-error-500')
     })
 
-    it('should apply LTR styling to consent label', () => {
-      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionDataWithConsent} />)
+    it('should show error text aligned right in RTL mode', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.RTL} data={mockSectionData} />)
 
-      const label = screen.getByText('I agree to receive newsletters and accept the privacy policy.').closest('label')
-      expect(label).toHaveClass('text-left')
-      expect(label).not.toHaveClass('flex-row-reverse')
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'bad' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      const errorSpan = screen.getByTestId('email-error')
+      expect(errorSpan).toHaveClass('text-right')
+    })
+
+    it('should show error text aligned left in LTR mode', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'bad' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      const errorSpan = screen.getByTestId('email-error')
+      expect(errorSpan).toHaveClass('text-left')
+    })
+  })
+
+  describe('form submission', () => {
+    it('should call subscribeNewsletter on valid submission with consent', async () => {
+      mockSubscribeNewsletter.mockResolvedValueOnce({ success: true })
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      await waitFor(() => {
+        expect(mockSubscribeNewsletter).toHaveBeenCalledWith('user@example.com')
+      })
+    })
+
+    it('should trim email before submitting', async () => {
+      mockSubscribeNewsletter.mockResolvedValueOnce({ success: true })
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: '  user@example.com  ' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      await waitFor(() => {
+        expect(mockSubscribeNewsletter).toHaveBeenCalledWith('user@example.com')
+      })
+    })
+
+    it('should show DOI pending confirmation message after successful submission', async () => {
+      mockSubscribeNewsletter.mockResolvedValueOnce({ success: true })
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('newsletter-success')).toBeInTheDocument()
+      })
+
+      // Form should be hidden
+      expect(screen.queryByPlaceholderText('Enter your email')).not.toBeInTheDocument()
+    })
+
+    it('should show CMS pending confirmation message text in success state', async () => {
+      mockSubscribeNewsletter.mockResolvedValueOnce({ success: true })
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('newsletter-success')).toHaveTextContent(
+          'Check your email to confirm your subscription.'
+        )
+      })
+    })
+
+    it('should show success state with role="status" for accessibility', async () => {
+      mockSubscribeNewsletter.mockResolvedValueOnce({ success: true })
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      await waitFor(() => {
+        expect(screen.getByRole('status')).toBeInTheDocument()
+      })
+    })
+
+    it('should show CMS error message when API returns null', async () => {
+      mockSubscribeNewsletter.mockResolvedValueOnce(null)
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('submit-error')).toHaveTextContent('Something went wrong. Please try again.')
+      })
+    })
+
+    it('should show CMS error message when API returns success=false', async () => {
+      mockSubscribeNewsletter.mockResolvedValueOnce({ success: false })
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('submit-error')).toHaveTextContent('Something went wrong. Please try again.')
+      })
+    })
+
+    it('should disable input during submission', async () => {
+      // Make the promise hang to check loading state
+      let resolvePromise: (value: unknown) => void
+      mockSubscribeNewsletter.mockReturnValueOnce(
+        new Promise(resolve => {
+          resolvePromise = resolve
+        })
+      )
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      await waitFor(() => {
+        expect(emailInput).toBeDisabled()
+      })
+
+      // Resolve to clean up
+      resolvePromise!({ success: true })
+
+      await waitFor(() => {
+        expect(screen.getByTestId('newsletter-success')).toBeInTheDocument()
+      })
+    })
+
+    it('should clear submit error on new submission attempt', async () => {
+      // First attempt fails
+      mockSubscribeNewsletter.mockResolvedValueOnce(null)
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('submit-error')).toBeInTheDocument()
+      })
+
+      // Second attempt - error should be cleared when form submits
+      mockSubscribeNewsletter.mockResolvedValueOnce({ success: true })
+      fireEvent.submit(form!)
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('submit-error')).not.toBeInTheDocument()
+      })
     })
   })
 })

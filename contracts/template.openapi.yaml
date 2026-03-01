@@ -35,6 +35,8 @@ tags:
     description: Language detection and management
   - name: preferences
     description: User preferences management
+  - name: newsletter
+    description: Newsletter subscription management
   - name: system
     description: System health and utility endpoints
 
@@ -705,6 +707,78 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  # Newsletter API
+  /newsletter/subscribe:
+    post:
+      operationId: subscribeNewsletter
+      summary: Subscribe to newsletter
+      description: |
+        Subscribes an email address to the newsletter via the configured
+        email marketing provider (e.g., Brevo). Handles both new and
+        existing subscribers gracefully.
+      tags: [newsletter]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewsletterSubscribeRequest'
+      responses:
+        '200':
+          description: Subscription successful (or already subscribed)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsletterSubscribeResponse'
+        '400':
+          description: Validation error (invalid email)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '502':
+          description: Newsletter provider error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /newsletter/unsubscribe:
+    post:
+      operationId: unsubscribeNewsletter
+      summary: Unsubscribe from newsletter
+      description: |
+        Removes an email address from the newsletter mailing list via the
+        configured email marketing provider (e.g., Brevo). Requires authentication.
+      tags: [newsletter]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewsletterUnsubscribeRequest'
+      responses:
+        '200':
+          description: Unsubscription successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsletterUnsubscribeResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '502':
+          description: Newsletter provider error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   # Consent API
   /consent:
     post:
@@ -1079,6 +1153,51 @@ components:
       required:
         - found
 
+    # Newsletter Schemas
+    NewsletterSubscribeRequest:
+      type: object
+      description: Request body for subscribing to the newsletter
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email address to subscribe
+          example: 'user@example.com'
+      required:
+        - email
+
+    NewsletterSubscribeResponse:
+      type: object
+      description: Response after newsletter subscription attempt
+      properties:
+        success:
+          type: boolean
+          example: true
+      required:
+        - success
+
+    NewsletterUnsubscribeRequest:
+      type: object
+      description: Request body for unsubscribing from the newsletter
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email address to unsubscribe
+          example: 'user@example.com'
+      required:
+        - email
+
+    NewsletterUnsubscribeResponse:
+      type: object
+      description: Response after newsletter unsubscription attempt
+      properties:
+        success:
+          type: boolean
+          example: true
+      required:
+        - success
+
     Error:
       type: object
       properties:
@@ -1174,7 +1293,7 @@ components:
     ConsentType:
       type: string
       description: The type of consent being recorded
-      enum: [cookie, terms, privacy]
+      enum: [cookie, terms, privacy, newsletter]
       example: 'cookie'
 
     RecordConsentRequest:

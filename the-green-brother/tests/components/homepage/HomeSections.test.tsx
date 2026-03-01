@@ -186,6 +186,41 @@ describe('HomeSections', () => {
         url: '#',
         openInNewTab: false,
       },
+      consentLabel: {
+        text: 'I agree to the privacy policy.',
+        iconPosition: IconPositionEnum.BEFORE_TEXT,
+        ariaDescription: 'Consent',
+      },
+      consentRequiredError: {
+        text: 'Consent required.',
+        iconPosition: IconPositionEnum.BEFORE_TEXT,
+        ariaDescription: 'Consent required',
+      },
+      pendingConfirmationMessage: {
+        text: 'Check your email to confirm.',
+        iconPosition: IconPositionEnum.BEFORE_TEXT,
+        ariaDescription: 'Pending confirmation',
+      },
+      successMessage: {
+        text: 'Subscribed!',
+        iconPosition: IconPositionEnum.BEFORE_TEXT,
+        ariaDescription: 'Success',
+      },
+      errorMessage: {
+        text: 'Error occurred.',
+        iconPosition: IconPositionEnum.BEFORE_TEXT,
+        ariaDescription: 'Error',
+      },
+      emailRequiredError: {
+        text: 'Email required.',
+        iconPosition: IconPositionEnum.BEFORE_TEXT,
+        ariaDescription: 'Required',
+      },
+      emailInvalidError: {
+        text: 'Invalid email.',
+        iconPosition: IconPositionEnum.BEFORE_TEXT,
+        ariaDescription: 'Invalid',
+      },
     },
   ]
 

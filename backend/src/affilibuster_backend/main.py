@@ -36,6 +36,7 @@ from affilibuster_backend.infrastructure.api.routes import (
     auth,
     consent,
     languages,
+    newsletter,
     preferences,
     profile,
     redirects,
@@ -262,6 +263,7 @@ app.add_middleware(ErrorHandlingMiddleware)
 # Custom routers with special logic (NOT pure CMS proxies)
 app.include_router(auth.router)
 app.include_router(consent.router)
+app.include_router(newsletter.router)
 app.include_router(profile.router)
 app.include_router(languages.router)
 app.include_router(preferences.router)

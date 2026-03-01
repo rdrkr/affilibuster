@@ -16,6 +16,7 @@ import { useState } from 'react'
 import { exportUserData } from '@/lib/auth/api'
 import { openCookieSettings } from '@/lib/consent'
 import { type ApiProfileProfileDocument, DirectionEnum, type ElementsHeaderEntry } from '@/lib/generated/types.gen'
+import { unsubscribeNewsletter } from '@/lib/newsletter'
 
 import ButtonLink from '@/components/elements/ButtonLink'
 import Header from '@/components/elements/Header'
@@ -37,6 +38,8 @@ interface ProfileClientProps {
 export default function ProfileClient({ data, lang, direction }: ProfileClientProps) {
   const router = useRouter()
   const [isExporting, setIsExporting] = useState(false)
+  const [isUnsubscribing, setIsUnsubscribing] = useState(false)
+  const [unsubscribeStatus, setUnsubscribeStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   // Mock user data for now (should come from session/context)
   const user = {
@@ -53,6 +56,7 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
     currencyHeader,
     cookieSettingsHeader,
     exportDataHeader,
+    newsletterUnsubscribeHeader,
     deleteAccountHeader,
     logoutButton,
   } = data
@@ -80,6 +84,19 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
     }
 
     setIsExporting(false)
+  }
+
+  /**
+   * Handle newsletter unsubscribe button click.
+   * Calls the unsubscribe API with the user's email.
+   * Shows success or error feedback inline (GDPR Art. 12(1) transparency).
+   */
+  const handleUnsubscribe = async (): Promise<void> => {
+    setIsUnsubscribing(true)
+    setUnsubscribeStatus('idle')
+    const result = await unsubscribeNewsletter(user.email)
+    setIsUnsubscribing(false)
+    setUnsubscribeStatus(result?.success ? 'success' : 'error')
   }
 
   const handleLogout = () => {
@@ -260,6 +277,54 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
                   chevron_right
                 </span>
               </button>
+
+              {/* Newsletter Unsubscribe Button */}
+              <button
+                onClick={() => void handleUnsubscribe()}
+                disabled={isUnsubscribing}
+                className={`
+                    flex w-full items-center gap-3 rounded-xl p-3
+                    transition-colors hover:bg-warning-50
+                    disabled:cursor-not-allowed disabled:opacity-50
+                    dark:hover:bg-warning-900/10
+                  `}
+              >
+                <div
+                  className={`
+                    flex size-10 items-center justify-center rounded-lg
+                    bg-warning-100 text-warning-600
+                    dark:bg-warning-900/30 dark:text-warning-400
+                  `}
+                >
+                  <span className="material-symbols-outlined">unsubscribe</span>
+                </div>
+                <span className="font-medium text-warning-600 dark:text-warning-400">
+                  {getHeaderText(newsletterUnsubscribeHeader)}
+                </span>
+                <span
+                  className={`material-symbols-outlined text-warning-400 ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
+                >
+                  chevron_right
+                </span>
+              </button>
+              {unsubscribeStatus === 'success' && newsletterUnsubscribeHeader.subheader?.text && (
+                <div
+                  className={`px-3 py-1 text-xs text-success-600 dark:text-success-400 ${isRtl ? 'text-right' : 'text-left'}`}
+                  data-testid="unsubscribe-success"
+                  role="status"
+                >
+                  {newsletterUnsubscribeHeader.subheader.text}
+                </div>
+              )}
+              {unsubscribeStatus === 'error' && newsletterUnsubscribeHeader.subheader?.ariaDescription && (
+                <div
+                  className={`px-3 py-1 text-xs text-error-600 dark:text-error-400 ${isRtl ? 'text-right' : 'text-left'}`}
+                  data-testid="unsubscribe-error"
+                  role="alert"
+                >
+                  {newsletterUnsubscribeHeader.subheader.ariaDescription}
+                </div>
+              )}
 
               {/* Delete Account Link */}
               <Link

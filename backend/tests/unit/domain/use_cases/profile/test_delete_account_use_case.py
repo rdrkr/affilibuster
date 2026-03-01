@@ -4,7 +4,8 @@
 Unit tests for delete account use case.
 
 Tests cover account deletion logic including password verification,
-soft deletion, session invalidation, consent anonymization, and preference deletion.
+soft deletion, session invalidation, consent anonymization, preference deletion,
+and newsletter mailing list removal (GDPR Art. 17).
 """
 
 from datetime import UTC, datetime
@@ -18,6 +19,9 @@ from affilibuster_backend.domain.entities.user import (
     HashedPassword,
     UserEntity,
     UserStatus,
+)
+from affilibuster_backend.domain.services.newsletter_service import (
+    NewsletterUnsubscribeError,
 )
 from affilibuster_backend.domain.use_cases.profile.delete_account_use_case import (
     DeleteAccountUseCase,
@@ -64,6 +68,25 @@ class TestDeleteAccountUseCaseConstructor:
         assert use_case.consent_repo is consent_repo
         assert use_case.preferences_repo is preferences_repo
         assert use_case.password_hasher is password_hasher
+        assert use_case.newsletter_service is None
+
+    def test_constructor_initializes_with_newsletter_service(self) -> None:
+        """Test that constructor accepts optional newsletter service."""
+        # Arrange
+        user_repo = AsyncMock()
+        session_repo = AsyncMock()
+        consent_repo = AsyncMock()
+        preferences_repo = AsyncMock()
+        password_hasher = Mock()
+        newsletter_service = AsyncMock()
+
+        # Act
+        use_case = DeleteAccountUseCase(
+            user_repo, session_repo, consent_repo, preferences_repo, password_hasher, newsletter_service
+        )
+
+        # Assert
+        assert use_case.newsletter_service is newsletter_service
 
 
 @pytest.mark.asyncio
@@ -182,3 +205,95 @@ class TestDeleteAccountUseCase:
         # Verify no further cleanup was performed
         user_repo.update.assert_not_called()
         session_repo.delete_all_by_user_id.assert_not_called()
+
+    async def test_delete_account_unsubscribes_from_newsletter(self) -> None:
+        """Test that account deletion removes user from newsletter mailing list (GDPR Art. 17)."""
+        # Arrange
+        user_id = uuid4()
+        user = create_test_user(user_id=user_id)
+
+        user_repo = AsyncMock()
+        user_repo.get_by_id.return_value = user
+        user_repo.update.return_value = user
+
+        session_repo = AsyncMock()
+        consent_repo = AsyncMock()
+        consent_repo.anonymize_by_user_id.return_value = 1
+        preferences_repo = AsyncMock()
+        preferences_repo.delete_by_user_id.return_value = 1
+        password_hasher = Mock()
+        password_hasher.verify_password.return_value = True
+
+        newsletter_service = AsyncMock()
+
+        use_case = DeleteAccountUseCase(
+            user_repo, session_repo, consent_repo, preferences_repo, password_hasher, newsletter_service
+        )
+
+        # Act
+        await use_case.execute(user_id, "CorrectPassword123!")
+
+        # Assert - newsletter unsubscribe was called with user's email
+        newsletter_service.unsubscribe.assert_called_once_with("test@example.com")
+
+    async def test_delete_account_succeeds_when_newsletter_unsubscribe_fails(self) -> None:
+        """Test that account deletion succeeds even if newsletter unsubscribe fails (best-effort)."""
+        # Arrange
+        user_id = uuid4()
+        user = create_test_user(user_id=user_id)
+
+        user_repo = AsyncMock()
+        user_repo.get_by_id.return_value = user
+        user_repo.update.return_value = user
+
+        session_repo = AsyncMock()
+        consent_repo = AsyncMock()
+        consent_repo.anonymize_by_user_id.return_value = 1
+        preferences_repo = AsyncMock()
+        preferences_repo.delete_by_user_id.return_value = 1
+        password_hasher = Mock()
+        password_hasher.verify_password.return_value = True
+
+        newsletter_service = AsyncMock()
+        newsletter_service.unsubscribe.side_effect = NewsletterUnsubscribeError("Brevo error")
+
+        use_case = DeleteAccountUseCase(
+            user_repo, session_repo, consent_repo, preferences_repo, password_hasher, newsletter_service
+        )
+
+        # Act - should not raise
+        await use_case.execute(user_id, "CorrectPassword123!")
+
+        # Assert - all other cleanup still happened
+        user_repo.update.assert_called_once()
+        session_repo.delete_all_by_user_id.assert_called_once_with(user_id)
+        consent_repo.anonymize_by_user_id.assert_called_once_with(user_id)
+        preferences_repo.delete_by_user_id.assert_called_once_with(str(user_id))
+
+    async def test_delete_account_without_newsletter_service(self) -> None:
+        """Test that account deletion works when no newsletter service is provided."""
+        # Arrange
+        user_id = uuid4()
+        user = create_test_user(user_id=user_id)
+
+        user_repo = AsyncMock()
+        user_repo.get_by_id.return_value = user
+        user_repo.update.return_value = user
+
+        session_repo = AsyncMock()
+        consent_repo = AsyncMock()
+        consent_repo.anonymize_by_user_id.return_value = 1
+        preferences_repo = AsyncMock()
+        preferences_repo.delete_by_user_id.return_value = 1
+        password_hasher = Mock()
+        password_hasher.verify_password.return_value = True
+
+        # No newsletter service provided (None)
+        use_case = DeleteAccountUseCase(user_repo, session_repo, consent_repo, preferences_repo, password_hasher)
+
+        # Act - should not raise
+        await use_case.execute(user_id, "CorrectPassword123!")
+
+        # Assert - all other cleanup happened normally
+        user_repo.update.assert_called_once()
+        session_repo.delete_all_by_user_id.assert_called_once_with(user_id)

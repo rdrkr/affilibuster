@@ -88,7 +88,9 @@ jobs:
               -b "${{ secrets.UPTIME_KUMA_TELEGRAM_BOT_TOKEN }}" \
               -c "${{ secrets.UPTIME_KUMA_TELEGRAM_CHAT_ID }}" \
               -g "${{ vars.GA_ID }}" \
-              -t "${{ vars.GTM_ID }}"
+              -t "${{ vars.GTM_ID }}" \
+              -a "${{ secrets.BREVO_API_KEY }}" \
+              -l "${{ secrets.BREVO_LIST_ID }}"
 
             set -a
             source .env.prod

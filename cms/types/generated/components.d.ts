@@ -7,10 +7,16 @@ export interface CallToActionsNewsletterSignupCta extends Struct.ComponentSchema
     icon: 'play'
   }
   attributes: {
-    consentLabel: Schema.Attribute.Component<'elements.label', false>
+    consentLabel: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
+    consentRequiredError: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
     description: Schema.Attribute.String & Schema.Attribute.Required
+    emailInvalidError: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
     emailPlaceholder: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
+    emailRequiredError: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
+    errorMessage: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
+    pendingConfirmationMessage: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
     submitButton: Schema.Attribute.Component<'elements.button', false> & Schema.Attribute.Required
+    successMessage: Schema.Attribute.Component<'elements.label', false> & Schema.Attribute.Required
     title: Schema.Attribute.String & Schema.Attribute.Required
   }
 }

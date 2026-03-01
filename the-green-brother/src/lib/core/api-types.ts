@@ -132,7 +132,12 @@ import type {
 } from '@/lib/generated/types.gen'
 
 import type { RecordConsentData } from '@/lib/consent/types'
-import type { RecordConsentResponse } from '@/lib/generated/types.gen'
+import type { SubscribeNewsletterData, UnsubscribeNewsletterData } from '@/lib/newsletter/types'
+import type {
+  NewsletterSubscribeResponse,
+  NewsletterUnsubscribeResponse,
+  RecordConsentResponse,
+} from '@/lib/generated/types.gen'
 
 /**
  * Union type of all API request data types.
@@ -210,6 +215,9 @@ export type ApiRequest =
   | CheckRedirectData
   // Consent operations
   | RecordConsentData
+  // Newsletter operations
+  | SubscribeNewsletterData
+  | UnsubscribeNewsletterData
 
 /**
  * Union type of all API response types.
@@ -286,6 +294,9 @@ export type ApiResponse =
   | CheckRedirectResponses[200]
   // Consent operations
   | RecordConsentResponse
+  // Newsletter operations
+  | NewsletterSubscribeResponse
+  | NewsletterUnsubscribeResponse
 
 /**
  * Custom error class for API request failures.

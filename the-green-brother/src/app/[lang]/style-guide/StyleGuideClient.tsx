@@ -2150,6 +2150,41 @@ export default function StyleGuideClient(): React.ReactElement {
                       url: '#',
                       openInNewTab: false,
                     },
+                    consentLabel: {
+                      text: 'I agree to receive newsletters and accept the [Privacy Policy](/en/privacy).',
+                      iconPosition: IconPositionEnum.BEFORE_TEXT,
+                      ariaDescription: 'Newsletter consent checkbox',
+                    },
+                    consentRequiredError: {
+                      text: 'You must accept the privacy policy to subscribe.',
+                      iconPosition: IconPositionEnum.BEFORE_TEXT,
+                      ariaDescription: 'Consent required error',
+                    },
+                    pendingConfirmationMessage: {
+                      text: 'Check your email to confirm your subscription.',
+                      iconPosition: IconPositionEnum.BEFORE_TEXT,
+                      ariaDescription: 'DOI pending confirmation',
+                    },
+                    successMessage: {
+                      text: 'Thank you for subscribing!',
+                      iconPosition: IconPositionEnum.BEFORE_TEXT,
+                      ariaDescription: 'Success message',
+                    },
+                    errorMessage: {
+                      text: 'Something went wrong. Please try again.',
+                      iconPosition: IconPositionEnum.BEFORE_TEXT,
+                      ariaDescription: 'Error message',
+                    },
+                    emailRequiredError: {
+                      text: 'Email is required.',
+                      iconPosition: IconPositionEnum.BEFORE_TEXT,
+                      ariaDescription: 'Email required error',
+                    },
+                    emailInvalidError: {
+                      text: 'Please enter a valid email address.',
+                      iconPosition: IconPositionEnum.BEFORE_TEXT,
+                      ariaDescription: 'Email invalid error',
+                    },
                   }}
                 />
               </div>

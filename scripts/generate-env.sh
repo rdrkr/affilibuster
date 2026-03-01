@@ -27,6 +27,8 @@
 #     -c CHAT_ID    Uptime Kuma Telegram Chat ID
 #     -g GA_ID      Google Analytics ID
 #     -t GTM_ID     Google Tag Manager ID
+#     -a API_KEY    Brevo API Key
+#     -l LIST_ID    Brevo List ID
 #     -h            Show help
 
 # Show help message
@@ -51,6 +53,8 @@ OPTIONS:
   -c CHAT_ID     Uptime Kuma Telegram Chat ID
   -g GA_ID       Google Analytics ID
   -t GTM_ID      Google Tag Manager ID
+  -a API_KEY     Brevo API Key
+  -l LIST_ID     Brevo List ID
 
 EXAMPLES:
   # Generate .env for CI (automated)
@@ -86,10 +90,12 @@ UPTIME_KUMA_TELEGRAM_BOT_TOKEN=""
 UPTIME_KUMA_TELEGRAM_CHAT_ID=""
 GA_ID=""
 GTM_ID=""
+BREVO_API_KEY=""
+BREVO_LIST_ID=""
 
 # Parse flags
 OPTIND=1
-while getopts "n:k:s:u:p:b:c:g:t:h" opt; do
+while getopts "n:k:s:u:p:b:c:g:t:a:l:h" opt; do
   case ${opt} in
   n) CLOUDINARY_NAME="${OPTARG}" ;;
   k) CLOUDINARY_KEY="${OPTARG}" ;;
@@ -100,6 +106,8 @@ while getopts "n:k:s:u:p:b:c:g:t:h" opt; do
   c) UPTIME_KUMA_TELEGRAM_CHAT_ID="${OPTARG}" ;;
   g) GA_ID="${OPTARG}" ;;
   t) GTM_ID="${OPTARG}" ;;
+  a) BREVO_API_KEY="${OPTARG}" ;;
+  l) BREVO_LIST_ID="${OPTARG}" ;;
   h) show_help ;;
   *) show_help ;;
   esac
@@ -251,6 +259,11 @@ main() {
   echo "Optional Analytics"
   GA_ID=$(prompt_optional "GA4 ID:" "" "${GA_ID}")
   GTM_ID=$(prompt_optional "GTM ID:" "" "${GTM_ID}")
+
+  echo ""
+  echo "Brevo (Newsletter)"
+  BREVO_API_KEY=$(prompt_optional "API Key:" "" "${BREVO_API_KEY}")
+  BREVO_LIST_ID=$(prompt_optional "List ID:" "0" "${BREVO_LIST_ID}")
 
   echo ""
   echo "Uptime Kuma"
@@ -439,6 +452,12 @@ UPTIME_KUMA_USER=${UPTIME_KUMA_USER}
 UPTIME_KUMA_PASS=${UPTIME_KUMA_PASS}
 UPTIME_KUMA_TELEGRAM_BOT_TOKEN=${UPTIME_KUMA_TELEGRAM_BOT_TOKEN}
 UPTIME_KUMA_TELEGRAM_CHAT_ID=${UPTIME_KUMA_TELEGRAM_CHAT_ID}
+
+# ======================================
+# BREVO (Email Marketing / Newsletter)
+# ======================================
+BREVO_API_KEY=${BREVO_API_KEY}
+BREVO_LIST_ID=${BREVO_LIST_ID}
 EOF
 
   log_success "${OUTPUT_FILE} created successfully!"

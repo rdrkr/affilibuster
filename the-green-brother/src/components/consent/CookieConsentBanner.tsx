@@ -265,6 +265,7 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
               size="sm"
               onClick={handleClose}
               showText={false}
+              className="w-fit!"
             />
           </div>
         )}

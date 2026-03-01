@@ -12353,6 +12353,9 @@ paths:
                       exportDataHeader:
                         description: A component field
                         $ref: '#/components/schemas/ElementsHeaderEntry'
+                      newsletterUnsubscribeHeader:
+                        description: A component field
+                        $ref: '#/components/schemas/ElementsHeaderEntry'
                       seoMetadata:
                         description: A component field
                         $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -12416,6 +12419,7 @@ paths:
                       - passwordLabel
                       - cookieSettingsHeader
                       - exportDataHeader
+                      - newsletterUnsubscribeHeader
                       - seoMetadata
                     additionalProperties: false
                   meta:
@@ -16615,6 +16619,9 @@ components:
         exportDataHeader:
           description: A component field
           $ref: '#/components/schemas/ElementsHeaderEntry'
+        newsletterUnsubscribeHeader:
+          description: A component field
+          $ref: '#/components/schemas/ElementsHeaderEntry'
         seoMetadata:
           description: A component field
           $ref: '#/components/schemas/ElementsSeoMetadataEntry'
@@ -16678,6 +16685,7 @@ components:
         - passwordLabel
         - cookieSettingsHeader
         - exportDataHeader
+        - newsletterUnsubscribeHeader
         - seoMetadata
       additionalProperties: false
       id: ApiProfileProfileDocument
@@ -16956,12 +16964,37 @@ components:
         consentLabel:
           description: A component field
           $ref: '#/components/schemas/ElementsLabelEntry'
+        consentRequiredError:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        pendingConfirmationMessage:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        successMessage:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        errorMessage:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        emailRequiredError:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
+        emailInvalidError:
+          description: A component field
+          $ref: '#/components/schemas/ElementsLabelEntry'
       required:
         - id
         - title
         - description
         - emailPlaceholder
         - submitButton
+        - consentLabel
+        - consentRequiredError
+        - pendingConfirmationMessage
+        - successMessage
+        - errorMessage
+        - emailRequiredError
+        - emailInvalidError
       additionalProperties: false
     MarkersEndHorizontalLayoutMarkerEntry:
       type: object

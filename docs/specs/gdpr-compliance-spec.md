@@ -105,16 +105,40 @@ Created Alembic migration to NULL all existing raw IP and user-agent values.
 
 ### 7. Newsletter Consent Mechanism (GDPR Art. 7 - Consent)
 
-**Problem**: Newsletter signup CTA exists but lacks explicit consent checkbox.
+**Problem**: Newsletter signup CTA lacked explicit consent checkbox, no double opt-in, no consent audit trail, and no Brevo cleanup on account deletion.
 
-**Solution**: Full-stack implementation with:
-- CMS-driven consent label
-- Required consent checkbox
-- Double opt-in email verification
-- Unsubscribe endpoint
-- Database table for subscriptions
+**Solution**: Comprehensive GDPR-compliant newsletter implementation:
 
-**Files**: TBD (pending implementation)
+- **Consent Checkbox (Art. 7(1))**: Required checkbox with CMS-driven `consentLabel` (supports markdown privacy policy links). Submit button disabled until consent is given. `consentRequiredError` shown if user attempts submit without consent.
+- **Double Opt-In (Art. 7(1))**: Brevo DOI endpoint sends confirmation email before subscription activates. Frontend shows `pendingConfirmationMessage` instead of success message. Configurable via `BREVO_DOI_TEMPLATE_ID` and `BREVO_DOI_REDIRECT_URL` environment variables.
+- **Consent Audit Trail (Art. 7(1))**: `RecordConsentUseCase` called on subscribe (`action=accept_all`) and unsubscribe (`action=revoke`) with `consentType=newsletter`. IP addresses hashed via `IPAnonymizer` before storage.
+- **Rate Limiting (Art. 32)**: Newsletter subscribe/unsubscribe endpoints limited to 5 requests/minute per IP.
+- **Log Sanitization (Art. 5(1)(c))**: Brevo error responses no longer logged with `response.text` (may contain PII). Only status codes are logged.
+- **Right to Erasure (Art. 17)**: `DeleteAccountUseCase` now calls `newsletter_service.unsubscribe()` to remove the user from Brevo mailing lists on account deletion (best-effort, does not block deletion on failure).
+- **Unsubscribe Feedback (Art. 12(1))**: Profile unsubscribe button shows inline success/error feedback using CMS-driven messages.
+
+**CMS Schema Changes**:
+- `consentLabel` changed from optional to required
+- Added `consentRequiredError` (elements.label, required)
+- Added `pendingConfirmationMessage` (elements.label, required)
+
+**Contract Changes**:
+- `ConsentType` enum extended with `newsletter` value
+
+**Files Modified**:
+- `cms/src/components/call-to-actions/newsletter-signup-cta.json`
+- `contracts/template.openapi.yaml`
+- `backend/src/affilibuster_backend/config/settings.py`
+- `backend/src/affilibuster_backend/infrastructure/newsletter/brevo_newsletter_service.py`
+- `backend/src/affilibuster_backend/infrastructure/api/routes/newsletter.py`
+- `backend/src/affilibuster_backend/infrastructure/middleware/rate_limiter.py`
+- `backend/src/affilibuster_backend/infrastructure/dependencies.py`
+- `backend/src/affilibuster_backend/domain/use_cases/profile/delete_account_use_case.py`
+- `backend/src/affilibuster_backend/infrastructure/api/routes/profile.py`
+- `the-green-brother/src/components/call-to-actions/NewsletterSignupCTA.tsx`
+- `the-green-brother/src/components/profile/ProfileClient.tsx`
+- `the-green-brother/src/app/[lang]/style-guide/StyleGuideClient.tsx`
+- All corresponding test files updated with 100% coverage
 
 ### 8. E2E Cookie Consent Tests
 
@@ -143,10 +167,10 @@ withdrawal.
 | Art. 5(1)(e) | Storage limitation | Data retention cleanup + log rotation |
 | Art. 5(1)(f) | Integrity and confidentiality | HTTPS, secure cookies, rate limiting |
 | Art. 6 | Lawful basis | Consent for cookies, legitimate interest for logging |
-| Art. 7 | Conditions for consent | Granular consent banner, withdrawal mechanism |
+| Art. 7 | Conditions for consent | Granular consent banner, withdrawal mechanism, newsletter DOI + consent checkbox |
 | Art. 12-14 | Information obligations | Privacy policy, cookie policy |
 | Art. 15 | Right of access | DSAR export endpoint |
-| Art. 17 | Right to erasure | Profile deletion endpoint |
+| Art. 17 | Right to erasure | Profile deletion endpoint, Brevo newsletter cleanup on deletion |
 | Art. 20 | Right to data portability | JSON export format |
 | Art. 25 | Data protection by design | IP hashing at write time, minimal data collection |
 | Art. 32 | Security of processing | HTTPS, rate limiting, secure cookies |

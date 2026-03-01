@@ -2411,6 +2411,13 @@ export interface ApiProfileProfile extends Struct.SingleTypeSchema {
           localized: true
         }
       }>
+    newsletterUnsubscribeHeader: Schema.Attribute.Component<'elements.header', false> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true
+        }
+      }>
     pageHeader: Schema.Attribute.Component<'elements.header', false> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{

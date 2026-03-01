@@ -30,7 +30,43 @@
       "type": "component",
       "component": "elements.label",
       "repeatable": false,
-      "required": false
+      "required": true
+    },
+    "consentRequiredError": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "pendingConfirmationMessage": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "successMessage": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "errorMessage": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "emailRequiredError": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
+    },
+    "emailInvalidError": {
+      "type": "component",
+      "component": "elements.label",
+      "repeatable": false,
+      "required": true
     }
   },
   "config": {}

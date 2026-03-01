@@ -95,6 +95,12 @@ class Settings(BaseSettings):
     rate_limit_pw_reset: str = "3/minute"
     rate_limit_consent: str = "10/minute"
     rate_limit_dsar_export: str = "3/hour"
+    rate_limit_newsletter: str = "5/minute"
+
+    brevo_api_key: str = ""
+    brevo_list_id: int = 0
+    brevo_doi_template_id: int = 0
+    brevo_doi_redirect_url: str = ""
 
     # Email / SMTP
     smtp_host: str = "localhost"

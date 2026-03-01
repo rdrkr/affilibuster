@@ -106,7 +106,7 @@ describe('RootNotFound', () => {
     expect(link).toHaveAttribute('href', '/en')
   })
 
-  it('should render fallback search icon when CMS has no icon', async () => {
+  it('should not render an icon when CMS has no icon', async () => {
     const mockContent = {
       header: {
         alignment: 'center',
@@ -119,18 +119,18 @@ describe('RootNotFound', () => {
     const Component = await RootNotFound()
     render(Component)
 
-    // Should fall back to search icon
-    expect(mockIcon).toHaveBeenCalledWith(expect.objectContaining({ icon: 'search', size: '6xl' }), undefined)
+    // Should not render an icon
+    expect(mockIcon).not.toHaveBeenCalled()
   })
 
-  it('should render fallback search icon when error data is null', async () => {
+  it('should not render an icon when error data is null', async () => {
     mockGetError404.mockResolvedValue(null)
 
     const Component = await RootNotFound()
     render(Component)
 
-    // Should render fallback search icon
-    expect(mockIcon).toHaveBeenCalledWith(expect.objectContaining({ icon: 'search', size: '6xl' }), undefined)
+    // Should not render an icon
+    expect(mockIcon).not.toHaveBeenCalled()
     // No TextBlock when no CMS data
     expect(mockTextBlock).not.toHaveBeenCalled()
   })
@@ -235,7 +235,7 @@ describe('RootNotFound', () => {
     const Component = await RootNotFound()
     render(Component)
 
-    expect(mockIcon).toHaveBeenCalledWith(expect.objectContaining({ icon: 'search', size: '6xl' }), undefined)
+    expect(mockIcon).not.toHaveBeenCalled()
     expect(mockTextBlock).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({

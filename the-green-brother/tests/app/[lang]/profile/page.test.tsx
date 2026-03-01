@@ -47,6 +47,12 @@ jest.mock('@/lib/consent', () => ({
   openCookieSettings: (...args: unknown[]) => mockOpenCookieSettings(...args),
 }))
 
+// Mock newsletter lib
+const mockUnsubscribeNewsletter = jest.fn()
+jest.mock('@/lib/newsletter', () => ({
+  unsubscribeNewsletter: (...args: unknown[]) => mockUnsubscribeNewsletter(...args),
+}))
+
 import Profile, { generateMetadata } from '@/app/[lang]/profile/page'
 import { getProfile } from '@/lib/content/api'
 
@@ -62,6 +68,13 @@ const mockProfileData = {
   wishlistHeader: { header: { text: 'Wishlist' } },
   cookieSettingsHeader: { header: { text: 'Cookie Settings' } },
   exportDataHeader: { header: { text: 'Export My Data' } },
+  newsletterUnsubscribeHeader: {
+    header: { text: 'Unsubscribe' },
+    subheader: {
+      text: 'Successfully unsubscribed from newsletter.',
+      ariaDescription: 'Failed to unsubscribe. Please try again.',
+    },
+  },
   deleteAccountHeader: { header: { text: 'Delete Account' } },
   logoutButton: { label: { text: 'Log Out' } },
 }
@@ -143,6 +156,13 @@ describe('Profile', () => {
     expect(screen.getByRole('button', { name: /Cookie Settings/i })).toBeInTheDocument()
   })
 
+  it('should render newsletter unsubscribe button with CMS label', async () => {
+    const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
+
+    expect(screen.getByRole('button', { name: /Unsubscribe/i })).toBeInTheDocument()
+  })
+
   it('should call openCookieSettings when cookie settings button is clicked', async () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
@@ -199,6 +219,62 @@ describe('Profile', () => {
       expect(mockExportUserData).toHaveBeenCalled()
       // Button should return to normal state
       expect(screen.getByRole('button', { name: /Export My Data/i })).not.toBeDisabled()
+    })
+  })
+
+  it('should call unsubscribeNewsletter when unsubscribe button is clicked', async () => {
+    mockUnsubscribeNewsletter.mockResolvedValueOnce({ success: true })
+
+    const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
+
+    const unsubscribeButton = screen.getByRole('button', { name: /Unsubscribe/i })
+    fireEvent.click(unsubscribeButton)
+
+    await waitFor(() => {
+      expect(mockUnsubscribeNewsletter).toHaveBeenCalledWith('ronen@example.com')
+    })
+  })
+
+  it('should show success feedback after successful unsubscribe', async () => {
+    mockUnsubscribeNewsletter.mockResolvedValueOnce({ success: true })
+
+    const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
+
+    const unsubscribeButton = screen.getByRole('button', { name: /Unsubscribe/i })
+    fireEvent.click(unsubscribeButton)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('unsubscribe-success')).toHaveTextContent('Successfully unsubscribed from newsletter.')
+    })
+  })
+
+  it('should show error feedback after failed unsubscribe', async () => {
+    mockUnsubscribeNewsletter.mockResolvedValueOnce(null)
+
+    const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
+
+    const unsubscribeButton = screen.getByRole('button', { name: /Unsubscribe/i })
+    fireEvent.click(unsubscribeButton)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('unsubscribe-error')).toHaveTextContent('Failed to unsubscribe. Please try again.')
+    })
+  })
+
+  it('should show error feedback when unsubscribe returns success=false', async () => {
+    mockUnsubscribeNewsletter.mockResolvedValueOnce({ success: false })
+
+    const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
+
+    const unsubscribeButton = screen.getByRole('button', { name: /Unsubscribe/i })
+    fireEvent.click(unsubscribeButton)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('unsubscribe-error')).toBeInTheDocument()
     })
   })
 

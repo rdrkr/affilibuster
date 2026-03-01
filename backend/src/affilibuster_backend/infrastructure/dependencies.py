@@ -22,9 +22,14 @@ from affilibuster_backend.domain.repositories.password_reset_token_repository im
 )
 from affilibuster_backend.domain.repositories.preferences_repository import IUserPreferencesRepository
 from affilibuster_backend.domain.repositories.url_redirect_repository import IURLRedirectRepository
+from affilibuster_backend.domain.services.newsletter_service import INewsletterService
 from affilibuster_backend.domain.use_cases.cms.get_cms_content_use_case import GetCMSContentUseCase
 from affilibuster_backend.domain.use_cases.cms.get_url_redirect_use_case import GetURLRedirectUseCase
 from affilibuster_backend.domain.use_cases.consent.record_consent_use_case import RecordConsentUseCase
+from affilibuster_backend.domain.use_cases.newsletter.subscribe_newsletter_use_case import SubscribeNewsletterUseCase
+from affilibuster_backend.domain.use_cases.newsletter.unsubscribe_newsletter_use_case import (
+    UnsubscribeNewsletterUseCase,
+)
 from affilibuster_backend.domain.use_cases.preferences.get_user_preferences_use_case import GetUserPreferencesUseCase
 from affilibuster_backend.domain.use_cases.preferences.update_user_preferences_use_case import (
     UpdateUserPreferencesUseCase,
@@ -183,6 +188,37 @@ def get_record_consent_use_case(
     return RecordConsentUseCase(consent_repo)
 
 
+def _get_newsletter_service() -> INewsletterService:
+    """
+    Provide a configured BrevoNewsletterService instance.
+
+    Uses local imports to avoid circular dependencies at module load time.
+
+    Returns:
+        Configured newsletter service with DOI settings.
+
+    """
+    from affilibuster_backend.config import settings
+    from affilibuster_backend.infrastructure.newsletter.brevo_newsletter_service import BrevoNewsletterService
+
+    return BrevoNewsletterService(
+        api_key=settings.brevo_api_key,
+        list_id=settings.brevo_list_id,
+        doi_template_id=settings.brevo_doi_template_id,
+        doi_redirect_url=settings.brevo_doi_redirect_url,
+    )
+
+
+def get_subscribe_newsletter_use_case() -> SubscribeNewsletterUseCase:
+    """Provide SubscribeNewsletterUseCase instance."""
+    return SubscribeNewsletterUseCase(_get_newsletter_service())
+
+
+def get_unsubscribe_newsletter_use_case() -> UnsubscribeNewsletterUseCase:
+    """Provide UnsubscribeNewsletterUseCase instance."""
+    return UnsubscribeNewsletterUseCase(_get_newsletter_service())
+
+
 # Type aliases for use in route signatures
 CMSRepoDep = Annotated[ICMSRepository, Depends(get_cms_repo)]
 GetCMSContentUseCaseDep = Annotated[GetCMSContentUseCase, Depends(get_cms_content_use_case)]
@@ -194,3 +230,5 @@ URLRedirectRepoDep = Annotated[IURLRedirectRepository, Depends(get_url_redirect_
 GetURLRedirectUseCaseDep = Annotated[GetURLRedirectUseCase, Depends(get_url_redirect_use_case)]
 ConsentRepoDep = Annotated[IConsentRepository, Depends(get_consent_repo)]
 RecordConsentUseCaseDep = Annotated[RecordConsentUseCase, Depends(get_record_consent_use_case)]
+SubscribeNewsletterUseCaseDep = Annotated[SubscribeNewsletterUseCase, Depends(get_subscribe_newsletter_use_case)]
+UnsubscribeNewsletterUseCaseDep = Annotated[UnsubscribeNewsletterUseCase, Depends(get_unsubscribe_newsletter_use_case)]
