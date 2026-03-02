@@ -110,11 +110,12 @@ describe('NewsletterSignupCTA', () => {
     expect(emailInput).toHaveAttribute('aria-label', 'Email input field')
   })
 
-  it('should render submit button with correct text', () => {
+  it('should render submit button with correct text and type', () => {
     render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
     const submitButton = screen.getByRole('button', { name: /Submit newsletter signup/i })
     expect(submitButton).toBeInTheDocument()
+    expect(submitButton).toHaveAttribute('type', 'submit')
     expect(screen.getByText('Sign Up')).toBeInTheDocument()
   })
 

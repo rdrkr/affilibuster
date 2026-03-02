@@ -257,10 +257,22 @@ describe('ButtonAction', () => {
     expect(children[1]).toHaveAttribute('data-testid', 'custom')
   })
 
-  it('should have type="button"', () => {
+  it('should have type="button" by default', () => {
     render(<ButtonAction direction={DirectionEnum.LTR} data={mockButtonData} onClick={mockOnClick} />)
     const button = screen.getByRole('button')
     expect(button).toHaveAttribute('type', 'button')
+  })
+
+  it('should have type="submit" when type prop is submit', () => {
+    render(<ButtonAction direction={DirectionEnum.LTR} data={mockButtonData} onClick={mockOnClick} type="submit" />)
+    const button = screen.getByRole('button')
+    expect(button).toHaveAttribute('type', 'submit')
+  })
+
+  it('should have type="reset" when type prop is reset', () => {
+    render(<ButtonAction direction={DirectionEnum.LTR} data={mockButtonData} onClick={mockOnClick} type="reset" />)
+    const button = screen.getByRole('button')
+    expect(button).toHaveAttribute('type', 'reset')
   })
 
   describe('Accessibility Props', () => {

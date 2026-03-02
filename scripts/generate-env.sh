@@ -29,6 +29,8 @@
 #     -t GTM_ID     Google Tag Manager ID
 #     -a API_KEY    Brevo API Key
 #     -l LIST_ID    Brevo List ID
+#     -d TMPL_ID    Brevo DOI Template ID
+#     -r URL        Brevo DOI Redirect URL
 #     -h            Show help
 
 # Show help message
@@ -55,6 +57,8 @@ OPTIONS:
   -t GTM_ID      Google Tag Manager ID
   -a API_KEY     Brevo API Key
   -l LIST_ID     Brevo List ID
+  -d TMPL_ID     Brevo DOI Template ID
+  -r URL         Brevo DOI Redirect URL
 
 EXAMPLES:
   # Generate .env for CI (automated)
@@ -92,10 +96,12 @@ GA_ID=""
 GTM_ID=""
 BREVO_API_KEY=""
 BREVO_LIST_ID=""
+BREVO_DOI_TEMPLATE_ID=""
+BREVO_DOI_REDIRECT_URL=""
 
 # Parse flags
 OPTIND=1
-while getopts "n:k:s:u:p:b:c:g:t:a:l:h" opt; do
+while getopts "n:k:s:u:p:b:c:g:t:a:l:d:r:h" opt; do
   case ${opt} in
   n) CLOUDINARY_NAME="${OPTARG}" ;;
   k) CLOUDINARY_KEY="${OPTARG}" ;;
@@ -108,6 +114,8 @@ while getopts "n:k:s:u:p:b:c:g:t:a:l:h" opt; do
   t) GTM_ID="${OPTARG}" ;;
   a) BREVO_API_KEY="${OPTARG}" ;;
   l) BREVO_LIST_ID="${OPTARG}" ;;
+  d) BREVO_DOI_TEMPLATE_ID="${OPTARG}" ;;
+  r) BREVO_DOI_REDIRECT_URL="${OPTARG}" ;;
   h) show_help ;;
   *) show_help ;;
   esac
@@ -264,6 +272,8 @@ main() {
   echo "Brevo (Newsletter)"
   BREVO_API_KEY=$(prompt_optional "API Key:" "" "${BREVO_API_KEY}")
   BREVO_LIST_ID=$(prompt_optional "List ID:" "0" "${BREVO_LIST_ID}")
+  BREVO_DOI_TEMPLATE_ID=$(prompt_optional "DOI Template ID:" "0" "${BREVO_DOI_TEMPLATE_ID}")
+  BREVO_DOI_REDIRECT_URL=$(prompt_optional "DOI Redirect URL:" "" "${BREVO_DOI_REDIRECT_URL}")
 
   echo ""
   echo "Uptime Kuma"
@@ -458,6 +468,8 @@ UPTIME_KUMA_TELEGRAM_CHAT_ID=${UPTIME_KUMA_TELEGRAM_CHAT_ID}
 # ======================================
 BREVO_API_KEY=${BREVO_API_KEY}
 BREVO_LIST_ID=${BREVO_LIST_ID}
+BREVO_DOI_TEMPLATE_ID=${BREVO_DOI_TEMPLATE_ID}
+BREVO_DOI_REDIRECT_URL=${BREVO_DOI_REDIRECT_URL}
 EOF
 
   log_success "${OUTPUT_FILE} created successfully!"

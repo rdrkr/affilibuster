@@ -90,7 +90,9 @@ jobs:
               -g "${{ vars.GA_ID }}" \
               -t "${{ vars.GTM_ID }}" \
               -a "${{ secrets.BREVO_API_KEY }}" \
-              -l "${{ secrets.BREVO_LIST_ID }}"
+              -l "${{ secrets.BREVO_LIST_ID }}" \
+              -d "${{ secrets.BREVO_DOI_TEMPLATE_ID }}" \
+              -r "${{ secrets.BREVO_DOI_REDIRECT_URL }}"
 
             set -a
             source .env.prod

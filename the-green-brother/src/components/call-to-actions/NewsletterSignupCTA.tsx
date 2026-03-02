@@ -220,6 +220,7 @@ export function NewsletterSignupCTA({ data, direction }: NewsletterSignupCTAProp
                   showText={true}
                   variant="primary"
                   size="md"
+                  type="submit"
                   disabled={isSubmitting || !email.trim() || !consentChecked}
                   className={`
                     rounded-full bg-primary px-6 py-2.5 text-sm font-bold

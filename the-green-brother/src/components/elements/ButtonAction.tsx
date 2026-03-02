@@ -75,6 +75,8 @@ export interface ButtonActionProps {
   'aria-label'?: string
   /** Whether the element should be inert (non-interactive and hidden from AT) */
   inert?: boolean
+  /** HTML button type attribute (default: 'button') */
+  type?: 'button' | 'submit' | 'reset'
 }
 
 /**
@@ -102,6 +104,7 @@ export interface ButtonActionProps {
  * @param props.'aria-controls' - ID of the element this button controls
  * @param props.id - Unique ID for the button element
  * @param props.'data-testid' - Test ID for testing purposes
+ * @param props.type - HTML button type attribute (default: 'button')
  * @returns Button action component or null if no data or not visible
  */
 export const ButtonAction = forwardRef<HTMLButtonElement, ButtonActionProps>(
@@ -131,6 +134,7 @@ export const ButtonAction = forwardRef<HTMLButtonElement, ButtonActionProps>(
       'data-testid': dataTestId,
       'aria-label': propsAriaLabel,
       inert,
+      type = 'button',
     },
     ref
   ) => {
@@ -172,7 +176,7 @@ export const ButtonAction = forwardRef<HTMLButtonElement, ButtonActionProps>(
     return (
       <button
         ref={ref}
-        type="button"
+        type={type}
         className={`${baseClasses} ${visibilityClasses}`}
         onClick={onClick}
         disabled={disabled}
