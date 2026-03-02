@@ -239,9 +239,9 @@ export function Card({
   const imageMarginClass =
     isHorizontalLayout && sizeClasses.imageMarginHorizontal
       ? (size === 'xs' || size === 'sm') && imageShape === 'rectangle'
-        ? `${sizeClasses.imageMarginHorizontal ?? ''} ${layout === 'ltr' ? 'ms-3' : 'me-3'}`
+        ? `${sizeClasses.imageMarginHorizontal} ${layout === 'ltr' ? 'ms-3' : 'me-3'}`
         : size === 'md'
-          ? (sizeClasses.imageMarginHorizontal ?? '')
+          ? sizeClasses.imageMarginHorizontal
           : ''
       : ''
 

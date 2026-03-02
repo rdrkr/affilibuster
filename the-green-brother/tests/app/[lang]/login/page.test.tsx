@@ -24,10 +24,12 @@ jest.mock('next/link', () => ({
 
 // Mock next/navigation
 const mockPush = jest.fn()
+const mockNotFound = jest.fn()
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
+  notFound: (...args: unknown[]) => mockNotFound(...args),
 }))
 
 // Mock API
@@ -177,6 +179,18 @@ describe('Login', () => {
     render(ui)
 
     expect(screen.getByRole('button', { name: 'Log In' })).toBeInTheDocument() // Default
+  })
+
+  it('should call notFound when auth page is null', async () => {
+    ;(getAuthPage as jest.Mock).mockResolvedValueOnce(null)
+
+    try {
+      await Login({ params: Promise.resolve({ lang: 'en' }) })
+    } catch {
+      // notFound throws an error
+    }
+
+    expect(mockNotFound).toHaveBeenCalled()
   })
 })
 

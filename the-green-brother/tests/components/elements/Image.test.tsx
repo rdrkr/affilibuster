@@ -209,4 +209,26 @@ describe('Image', () => {
       expect(img).toHaveAttribute('src', '/images/logo.png')
     })
   })
+
+  describe('CMS_URL resolution fallback', () => {
+    const originalEnv = process.env
+
+    beforeEach(() => {
+      process.env = { ...originalEnv }
+    })
+
+    afterEach(() => {
+      process.env = originalEnv
+    })
+
+    it('should fallback to protocol://localhost:port when NEXT_PUBLIC_CMS_URL is not set', () => {
+      delete process.env.NEXT_PUBLIC_CMS_URL
+      process.env.NEXT_PUBLIC_CMS_PROTOCOL = 'http'
+      process.env.NEXT_PUBLIC_CMS_PORT = '1338'
+
+      render(<Image image={{ url: '/uploads/fallback_test.jpg' } as unknown as PluginUploadFileDocument} />)
+      const img = screen.getByTestId('mock-image')
+      expect(img).toHaveAttribute('src', 'http://localhost:1338/uploads/fallback_test.jpg')
+    })
+  })
 })

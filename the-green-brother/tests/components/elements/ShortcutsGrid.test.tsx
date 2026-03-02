@@ -100,11 +100,20 @@ describe('ShortcutsGrid', () => {
   })
 
   it('should render items as links when url provided', () => {
-    render(<ShortcutsGrid direction={DirectionEnum.LTR} items={mockItems} />)
+    const items = [...mockItems]
+    items[0]!.openInNewTab = true
+
+    render(<ShortcutsGrid direction={DirectionEnum.LTR} items={items} />)
 
     const homeLink = screen.getByRole('link', { name: 'Go Home' })
     expect(homeLink).toBeInTheDocument()
     expect(homeLink).toHaveAttribute('href', '/home')
+    expect(homeLink).toHaveAttribute('target', '_blank')
+    expect(homeLink).toHaveAttribute('rel', 'noopener noreferrer')
+
+    const settingsLink = screen.getByRole('link', { name: 'Open Settings' })
+    expect(settingsLink).not.toHaveAttribute('target')
+    expect(settingsLink).not.toHaveAttribute('rel')
   })
 
   it('should render items as static content when no url provided', () => {

@@ -168,6 +168,42 @@ describe('BlogPostPage', () => {
     )
   })
 
+  it('should render JSON-LD with fallback title to slug and handling no author last name', async () => {
+    const mockPost = {
+      documentId: 'post-1',
+      slug: 'fallback-slug',
+      content: { header: {} },
+      author: { firstName: 'Jane' }, // no lastName
+      wideImage: { url: 'https://example.com/featured.jpg' },
+      squareImage: { url: 'https://example.com/featured-square.jpg' },
+      publishedDate: '2026-01-15T10:00:00Z',
+      seoMetadata: { metaDescription: 'Testing fallback' }, // no metaTitle
+    }
+    mockGetBlogPostBySlug.mockResolvedValue(mockPost as Awaited<ReturnType<typeof getBlogPostBySlug>>)
+    const { getBlog } = require('@/lib/content') as { getBlog: jest.Mock }
+    getBlog.mockResolvedValue({ id: 1 } as any)
+
+    const Component = await BlogPostPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'fallback-slug' }) })
+    render(Component)
+
+    expect(mockJsonLdScript).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          '@type': 'Article',
+          headline: 'fallback-slug',
+          author: expect.objectContaining({ name: 'Jane' }),
+        }),
+      }),
+      undefined
+    )
+    expect(mockJsonLdScript).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ '@type': 'BreadcrumbList' }), // will test the name inside structure if possible but at least it hits line 94
+      }),
+      undefined
+    )
+  })
+
   it('should call notFound when post is null', async () => {
     mockGetBlogPostBySlug.mockResolvedValue(null)
 

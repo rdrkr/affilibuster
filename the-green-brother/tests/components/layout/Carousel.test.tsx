@@ -358,6 +358,45 @@ describe('Carousel', () => {
       ])
     })
 
+    it('should quietly ignore if targetChild is missing in HeroCarousel', async () => {
+      renderHeroCarousel({})
+      const dots = screen.getAllByRole('tab')
+      const track = screen.getByTestId('hero-carousel-track')
+      track.scrollTo = jest.fn()
+
+      // Define children array smaller than target index
+      Object.defineProperty(track, 'children', {
+        value: [{ offsetLeft: 0 }],
+      })
+
+      await act(async () => {
+        // Will try to scroll to index 1 which doesn't exist
+        fireEvent.click(dots[1]!)
+      })
+
+      expect(track.scrollTo).not.toHaveBeenCalled()
+    })
+
+    it('should ignore duplicate activeIndex update on scroll', async () => {
+      renderHeroCarousel({})
+      const track = screen.getByTestId('hero-carousel-track')
+      // Initially activeIndex is 0 automatically
+      Object.defineProperty(track, 'scrollLeft', { value: 0, writable: true })
+      Object.defineProperty(track, 'children', {
+        value: [{ offsetLeft: 0 }, { offsetLeft: 1000 }, { offsetLeft: 2000 }],
+      })
+
+      // Setting scrollLeft to 0 means bestMatch will be 0, which equals activeIndex (0), ignoring update
+      fireEvent.scroll(track)
+
+      act(() => {
+        jest.advanceTimersByTime(100)
+      })
+
+      const dots = screen.getAllByRole('tab')
+      expect(dots[0]).toHaveAttribute('aria-selected', 'true')
+    })
+
     it('should pause auto-rotation on mouse enter', () => {
       renderHeroCarousel({})
       const container = screen.getByRole('region')
@@ -670,6 +709,49 @@ describe('Carousel', () => {
 
       global.requestAnimationFrame = originalRAF
       jest.useRealTimers()
+    })
+
+    it('should calculate scrollLeft differently for RTL', () => {
+      HTMLElement.prototype.scrollTo = jest.fn()
+      const originalRAF = global.requestAnimationFrame
+
+      // Render initially with index 0
+      const { rerender } = render(
+        <Carousel direction={DirectionEnum.RTL} startScrollItemIndex={0}>
+          <div data-testid="item-0">Item 0</div>
+          <div data-testid="item-1">Item 1</div>
+          <div data-testid="item-2">Item 2</div>
+        </Carousel>
+      )
+
+      // Now mock RAF so the next update's callback happens synchronously in the test
+      global.requestAnimationFrame = jest.fn(cb => {
+        cb(0)
+        return 0
+      }) as unknown as typeof requestAnimationFrame
+
+      const carouselTrack = screen.getByTestId('carousel-track')
+      const parentScrollTo = jest.fn()
+      const parentMock = { scrollTo: parentScrollTo, scrollLeft: 0, clientWidth: 1000 }
+      Object.defineProperty(carouselTrack, 'parentElement', { value: parentMock, configurable: true })
+      Object.defineProperty(carouselTrack, 'children', {
+        value: [{ offsetLeft: 10 }, { offsetLeft: 310 }, { offsetLeft: 610 }], // 10px padding
+      })
+
+      // Rerender with new index to trigger effect!
+      rerender(
+        <Carousel direction={DirectionEnum.RTL} startScrollItemIndex={1}>
+          <div data-testid="item-0">Item 0</div>
+          <div data-testid="item-1">Item 1</div>
+          <div data-testid="item-2">Item 2</div>
+        </Carousel>
+      )
+
+      // In RTL, scrollLeft is targetChild.offsetLeft (310), NOT (310 - 10 = 300)
+      const instantCall = parentScrollTo.mock.calls.find(call => call[0]?.behavior === 'instant')
+      expect(instantCall?.[0]?.left).toBe(310)
+
+      global.requestAnimationFrame = originalRAF
     })
   })
 

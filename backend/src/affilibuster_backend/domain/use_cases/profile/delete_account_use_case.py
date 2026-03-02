@@ -7,6 +7,7 @@ Allows authenticated users to permanently delete their account (soft delete).
 Requires password verification for security.
 """
 
+import asyncio
 import logging
 from uuid import UUID
 
@@ -96,9 +97,18 @@ class DeleteAccountUseCase:
         await self.preferences_repo.delete_by_user_id(str(user_id))
 
         # Remove from newsletter mailing list (GDPR Art. 17 - Right to erasure)
-        # Best-effort: don't fail account deletion if Brevo call fails
+        # Best-effort with retry: don't fail account deletion if Brevo call fails
         if self.newsletter_service:
-            try:
-                await self.newsletter_service.unsubscribe(user.email.value)
-            except NewsletterUnsubscribeError:
-                logger.warning("Failed to remove user from newsletter on account deletion")
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    await self.newsletter_service.unsubscribe(user.email.value)
+                    break
+                except NewsletterUnsubscribeError:
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(2**attempt)  # 1s, 2s
+                    else:
+                        logger.warning(
+                            "Failed to remove user from newsletter after %s attempts",
+                            max_retries,
+                        )

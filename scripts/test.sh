@@ -125,6 +125,7 @@ run_the-green-brother_tests() {
       --coverageReporters=lcov \
       --coverageReporters=json \
       --coverageReporters=html \
+      --coverageReporters=text \
       --coverageReporters=text-summary" 2>&1 | tee /tmp/the-green-brother-test.log
     local jest_result="${PIPESTATUS[0]}"
 
@@ -183,6 +184,7 @@ run_the-green-brother_tests() {
       --coverageReporters=lcov \
       --coverageReporters=json \
       --coverageReporters=html \
+      --coverageReporters=text \
       --coverageReporters=text-summary" 2>&1 | tee /tmp/the-green-brother-test.log
     local jest_result="${PIPESTATUS[0]}"
 

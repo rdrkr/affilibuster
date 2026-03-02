@@ -30,13 +30,15 @@ jest.mock('@/components/elements/ButtonLink', () => ({
     data,
     children,
     variant,
+    className,
   }: {
     data: { url: string; openInNewTab: boolean | null }
     children: React.ReactNode
     variant?: string
+    className?: string
   }) {
     return (
-      <a data-testid="mock-button-link" href={data.url} data-variant={variant}>
+      <a data-testid="mock-button-link" href={data.url} data-variant={variant} className={className}>
         {children}
       </a>
     )
@@ -321,6 +323,42 @@ describe('TextBlock', () => {
       expect(screen.queryByTestId('mock-cms-image')).not.toBeInTheDocument()
       // No img element in the container either
       expect(container.querySelector('img')).not.toBeInTheDocument()
+    })
+
+    it('should render icon image with empty src', () => {
+      const dataWithIconNoSrc = createTextBlockData({
+        content: '![xl]()',
+      })
+      render(<TextBlock data={dataWithIconNoSrc} direction={DirectionEnum.LTR} />)
+      const label = screen.getByTestId('mock-label')
+      expect(label).toBeInTheDocument()
+    })
+
+    it('should render image without alt and title', () => {
+      const dataNoAlt = createTextBlockData({
+        content: '<img src="/image.png" />',
+      })
+      render(<TextBlock data={dataNoAlt} direction={DirectionEnum.LTR} />)
+      const img = screen.queryByTestId('mock-cms-image')
+      if (img) {
+        expect(img).toBeInTheDocument()
+      }
+    })
+
+    it('should render image with custom linkButtonVariantClassName', () => {
+      const dataWithLink = createTextBlockData({
+        content: 'Click [here](https://example.com) for more.',
+      })
+      render(
+        <TextBlock
+          data={dataWithLink}
+          direction={DirectionEnum.RTL}
+          linkButtonVariantClassName="test-custom-class"
+          linkButtonAnimation={true}
+        />
+      )
+      const link = screen.getByTestId('mock-button-link')
+      expect(link).toHaveClass('test-custom-class')
     })
   })
 

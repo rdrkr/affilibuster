@@ -2433,6 +2433,13 @@ class Status1(StrEnum):
     PUBLISHED = "published"
 
 
+class HasPublishedVersion(StrEnum):
+    """Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published."""
+
+    TRUE = "true"
+    FALSE = "false"
+
+
 class AboutGetParametersQuery(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
@@ -2452,6 +2459,10 @@ class AboutGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -2620,6 +2631,10 @@ class AuthPageGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -2935,6 +2950,10 @@ class BlogGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -3155,6 +3174,10 @@ class BlogPostTagsGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -3262,6 +3285,10 @@ class BlogPostTagsIdGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -3494,6 +3521,10 @@ class BlogPostsGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -3652,6 +3683,10 @@ class BlogPostsSlugSlugGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -3812,6 +3847,10 @@ class BlogPostsIdGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -3923,6 +3962,10 @@ class ConsentGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -4143,6 +4186,10 @@ class ConsentCategoriesGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -4251,6 +4298,10 @@ class ConsentCategoriesIdGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -4373,6 +4424,10 @@ class ContactUsGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -4613,6 +4668,10 @@ class ContributorRolesGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -4717,6 +4776,10 @@ class ContributorRolesIdGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -5000,6 +5063,10 @@ class ContributorsGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -5217,6 +5284,10 @@ class ContributorsSlugSlugGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -5436,6 +5507,10 @@ class ContributorsIdGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -5565,6 +5640,10 @@ class CookiePolicyGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -5835,6 +5914,10 @@ class CurrenciesGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -6026,6 +6109,10 @@ class CurrenciesIdGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -6138,6 +6225,10 @@ class Error404GetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -6214,6 +6305,10 @@ class Error410GetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -6320,6 +6415,10 @@ class FaqGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -6577,6 +6676,10 @@ class FeatureFlagsGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -6722,6 +6825,10 @@ class FeatureFlagsIdGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -7016,6 +7123,10 @@ class FooterGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -7134,6 +7245,10 @@ class HomepageGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -7281,6 +7396,10 @@ class NavigationGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -7312,6 +7431,10 @@ class PrivacyGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -7509,6 +7632,10 @@ class ProductCategoriesGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -7604,6 +7731,10 @@ class ProductCategoriesPageGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -7663,6 +7794,10 @@ class ProductCategoriesSlugSlugGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -7775,6 +7910,10 @@ class ProductCategoriesIdGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -7980,6 +8119,10 @@ class ProductCertificatesGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -8087,6 +8230,10 @@ class ProductCertificatesIdGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -8288,6 +8435,10 @@ class ProductTagsGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -8395,6 +8546,10 @@ class ProductTagsIdGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -8611,6 +8766,10 @@ class ProductsGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -8797,6 +8956,10 @@ class ProductsSlugSlugGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -8995,6 +9158,10 @@ class ProductsIdGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -9157,6 +9324,10 @@ class ProfileGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -9316,6 +9487,10 @@ class TermGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
@@ -9513,6 +9688,10 @@ class ThemesGetParametersQuery(BaseModel):
     """
     Fetch documents based on their status. Default to "published" if not specified.
     """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
@@ -9620,6 +9799,10 @@ class ThemesIdGetParametersQuery(BaseModel):
     status: Status1 | None = Field(None, examples=["published"])
     """
     Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")

@@ -258,6 +258,20 @@ describe('/api/preview route', () => {
       expect(NextResponse.redirect).toHaveBeenCalledWith(new URL('/en/blog/test-post', 'https://thegreenbrother.com'))
     })
 
+    it('should fallback to localhost:3000 when host header is missing', async () => {
+      const request = createRequest({
+        secret: VALID_SECRET,
+        slug: '/en/blog/test-post',
+      })
+      // Clear out host entirely to trigger fallback to localhost:3000
+      ;(request as unknown as { headers: Map<string, string> }).headers.delete('host')
+
+      await GET(request)
+
+      // Fallback proto 'https' and fallback host 'localhost:3000'
+      expect(NextResponse.redirect).toHaveBeenCalledWith(new URL('/en/blog/test-post', 'https://localhost:3000'))
+    })
+
     it('should not set SameSite cookie for published status', async () => {
       mockCookieMap.set('__prerender_bypass', { value: 'bypass-token-pub' })
       const request = createRequest({

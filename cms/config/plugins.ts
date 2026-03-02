@@ -38,8 +38,9 @@ export default ({ env }: { env: StrapiEnv }) => ({
     },
   },
   'strapi-plugin-nested-populator': {
+    enabled: true,
+    resolve: './src/plugins/strapi-plugin-nested-populator',
     config: {
-      enabled: true,
       defaultDepth: 8,
     },
   },

@@ -46,7 +46,7 @@ export function FeaturedProductsSection({ data, direction, enableUserProfile }: 
 
   return (
     <section className="flex flex-col" dir={isRTL ? 'rtl' : 'ltr'} aria-label={header.header?.ariaDescription ?? ''}>
-      <Header data={header} level={3} direction={direction} />
+      <Header data={header} level={2} direction={direction} />
       <ButtonLink
         data={viewAllButton}
         direction={direction}

@@ -181,6 +181,17 @@ describe('ContributorCard', () => {
     )
   })
 
+  it('should use justify-start for footer in horizontal layout', () => {
+    const memberWithSocials = {
+      ...mockMember,
+      twitter: 'tw',
+    }
+    render(<ContributorCard {...defaultProps} member={memberWithSocials as any} layout="ltr" />)
+
+    const flutter = screen.getByTestId('card-footer').firstChild
+    expect(flutter).toHaveClass('justify-start')
+  })
+
   it('should embed header content into content slot when size="xs"', () => {
     render(<ContributorCard {...defaultProps} size="xs" />)
 

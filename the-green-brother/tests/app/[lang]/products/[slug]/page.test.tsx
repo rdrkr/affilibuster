@@ -183,6 +183,50 @@ describe('ProductDetailPage', () => {
     )
   })
 
+  describe('Environment variable fallback for site URL', () => {
+    const originalEnv = process.env
+
+    beforeEach(() => {
+      jest.resetModules()
+      process.env = { ...originalEnv }
+    })
+
+    afterAll(() => {
+      process.env = originalEnv
+    })
+
+    it('should use fallback URL when NEXT_PUBLIC_SITE_URL is missing', async () => {
+      delete process.env.NEXT_PUBLIC_SITE_URL
+      mockGetProductBySlug.mockResolvedValue({
+        documentId: 'prod-1',
+        slug: 'prod-slug',
+        header: { header: { text: 'Eco Bottle' } },
+        category: { slug: 'eco', content: { text: 'Eco Products' } },
+        seller: { firstName: 'Jane' },
+        images: [{ url: 'https://example.com/img1.jpg' }],
+        prices: [{ amount: 19.99, currency: { code: 'EUR' } }],
+        seoMetadata: { metaDescription: 'A great product' },
+      } as unknown as Awaited<ReturnType<typeof getProductBySlug>>)
+      mockGetProductCategoriesPage.mockResolvedValue({ certificatesSectionHeader: {} } as any)
+      mockGetProducts.mockResolvedValue([])
+
+      const jsx = await ProductDetailPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'prod-slug' }) })
+      render(jsx)
+
+      expect(mockJsonLdScript).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            '@type': 'Product',
+            offers: expect.arrayContaining([
+              expect.objectContaining({ url: 'http://localhost:3000/en/products/prod-slug' }),
+            ]),
+          }),
+        }),
+        undefined
+      )
+    })
+  })
+
   it('should call notFound when product is null', async () => {
     mockGetProductBySlug.mockResolvedValue(null)
     mockGetProductCategoriesPage.mockResolvedValue({ certificatesSectionHeader: {} } as any)
@@ -232,6 +276,57 @@ describe('ProductDetailPage', () => {
         locale: LanguageCode.EN,
         status: SchemaEnum.DRAFT,
       })
+    )
+  })
+
+  it('should fallback to empty array when getProducts returns undefined', async () => {
+    mockGetProductBySlug.mockResolvedValue({
+      documentId: 'prod-1',
+      slug: 'prod-slug',
+      header: { header: { text: 'Product' } },
+      category: { slug: 'electronics', content: { text: 'Electronics' } },
+      seller: { firstName: 'John' },
+      images: [],
+      prices: [],
+      seoMetadata: {},
+    } as unknown as Awaited<ReturnType<typeof getProductBySlug>>)
+    mockGetProductCategoriesPage.mockResolvedValue(
+      {} as unknown as Awaited<ReturnType<typeof getProductCategoriesPage>>
+    )
+    mockGetProducts.mockResolvedValue(null as any)
+
+    const jsx = await ProductDetailPage({ params: Promise.resolve({ lang: LanguageCode.EN, slug: 'prod-slug' }) })
+    render(jsx)
+
+    expect(screen.getByTestId('product-detail-client')).toHaveAttribute('data-related-products-count', '0')
+  })
+
+  it('should fallback to slug when header text is missing', async () => {
+    mockGetProductBySlug.mockResolvedValue({
+      documentId: 'prod-1',
+      slug: 'prod-slug-fallback',
+      header: { header: { text: undefined } },
+      category: { slug: 'electronics', content: { text: 'Electronics' } },
+      seller: { firstName: 'John' },
+      images: [],
+      prices: [],
+      seoMetadata: {},
+    } as unknown as Awaited<ReturnType<typeof getProductBySlug>>)
+    mockGetProductCategoriesPage.mockResolvedValue(
+      {} as unknown as Awaited<ReturnType<typeof getProductCategoriesPage>>
+    )
+    mockGetProducts.mockResolvedValue([])
+
+    const jsx = await ProductDetailPage({
+      params: Promise.resolve({ lang: LanguageCode.EN, slug: 'prod-slug-fallback' }),
+    })
+    render(jsx)
+
+    expect(mockJsonLdScript).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ '@type': 'Product', name: 'prod-slug-fallback' }),
+      }),
+      undefined
     )
   })
 })

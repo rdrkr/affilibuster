@@ -34,10 +34,37 @@ describe('robots', () => {
     expect(disallow).toContain('/*/style-guide')
   })
 
-  it('should include sitemap URL using base URL from env or default', () => {
-    const result = robots()
-    const expectedBase = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://thegreenbrother.com'
-    expect(result.sitemap).toBe(`${expectedBase}/sitemap.xml`)
+  describe('environment variables', () => {
+    const originalEnv = process.env
+
+    beforeEach(() => {
+      jest.resetModules()
+      process.env = { ...originalEnv }
+    })
+
+    afterAll(() => {
+      process.env = originalEnv
+    })
+
+    it('should use custom NEXT_PUBLIC_SITE_URL', () => {
+      process.env.NEXT_PUBLIC_SITE_URL = 'https://custom-site.com'
+      let robotsModule!: typeof import('@/app/robots').default
+      jest.isolateModules(() => {
+        robotsModule = require('@/app/robots').default
+      })
+      const result = robotsModule()
+      expect(result.sitemap).toBe('https://custom-site.com/sitemap.xml')
+    })
+
+    it('should use fallback URL when NEXT_PUBLIC_SITE_URL is undefined', () => {
+      delete process.env.NEXT_PUBLIC_SITE_URL
+      let robotsModule!: typeof import('@/app/robots').default
+      jest.isolateModules(() => {
+        robotsModule = require('@/app/robots').default
+      })
+      const result = robotsModule()
+      expect(result.sitemap).toBe('https://thegreenbrother.com/sitemap.xml')
+    })
   })
 
   it('should include sitemap URL ending with /sitemap.xml', () => {

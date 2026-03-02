@@ -11,11 +11,16 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { exportUserData } from '@/lib/auth/api'
+import { exportUserData, getUserProfile } from '@/lib/auth/api'
 import { openCookieSettings } from '@/lib/consent'
-import { type ApiProfileProfileDocument, DirectionEnum, type ElementsHeaderEntry } from '@/lib/generated/types.gen'
+import {
+  type ApiProfileProfileDocument,
+  DirectionEnum,
+  type ElementsHeaderEntry,
+  type UserProfile,
+} from '@/lib/generated/types.gen'
 import { unsubscribeNewsletter } from '@/lib/newsletter'
 
 import ButtonLink from '@/components/elements/ButtonLink'
@@ -40,13 +45,25 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
   const [isExporting, setIsExporting] = useState(false)
   const [isUnsubscribing, setIsUnsubscribing] = useState(false)
   const [unsubscribeStatus, setUnsubscribeStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true)
 
-  // Mock user data for now (should come from session/context)
-  const user = {
-    name: 'Ronen Druker',
-    email: 'ronen@example.com',
-    avatar: null,
-  }
+  useEffect(() => {
+    /**
+     * Fetches the authenticated user's profile on mount.
+     * Redirects to login if profile cannot be loaded (unauthenticated).
+     */
+    async function loadProfile(): Promise<void> {
+      const profile = await getUserProfile()
+      if (!profile) {
+        router.push(`/${lang}/login`)
+        return
+      }
+      setUserProfile(profile)
+      setIsLoadingProfile(false)
+    }
+    void loadProfile()
+  }, [lang, router])
 
   const {
     pageHeader,
@@ -92,9 +109,10 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
    * Shows success or error feedback inline (GDPR Art. 12(1) transparency).
    */
   const handleUnsubscribe = async (): Promise<void> => {
+    if (!userProfile) return
     setIsUnsubscribing(true)
     setUnsubscribeStatus('idle')
-    const result = await unsubscribeNewsletter(user.email)
+    const result = await unsubscribeNewsletter(userProfile.email)
     setIsUnsubscribing(false)
     setUnsubscribeStatus(result?.success ? 'success' : 'error')
   }
@@ -105,6 +123,18 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
   }
 
   const isRtl = direction === DirectionEnum.RTL
+
+  if (isLoadingProfile) {
+    return (
+      <div className="flex min-h-[80vh] items-center justify-center py-12" data-testid="profile-loading">
+        <div className="size-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    )
+  }
+
+  if (!userProfile) {
+    return null
+  }
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center py-12">
@@ -134,11 +164,11 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
                   bg-primary text-2xl font-bold text-white shadow-lg shadow-primary/20
                 `}
               >
-                {user.name.charAt(0)}
+                {userProfile.display_name.charAt(0)}
               </div>
               <div>
-                <h2 className="text-xl font-bold text-neutral-800 dark:text-white">{user.name}</h2>
-                <p className="text-sm text-neutral-500 dark:text-text-secondary-dark">{user.email}</p>
+                <h2 className="text-xl font-bold text-neutral-800 dark:text-white">{userProfile.display_name}</h2>
+                <p className="text-sm text-neutral-500 dark:text-text-secondary-dark">{userProfile.email}</p>
               </div>
               {/* Edit Profile Button */}
               {editProfileButton.label && (
@@ -316,15 +346,20 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
                   {newsletterUnsubscribeHeader.subheader.text}
                 </div>
               )}
-              {unsubscribeStatus === 'error' && newsletterUnsubscribeHeader.subheader?.ariaDescription && (
-                <div
-                  className={`px-3 py-1 text-xs text-error-600 dark:text-error-400 ${isRtl ? 'text-right' : 'text-left'}`}
-                  data-testid="unsubscribe-error"
-                  role="alert"
-                >
-                  {newsletterUnsubscribeHeader.subheader.ariaDescription}
-                </div>
-              )}
+              {unsubscribeStatus === 'error' &&
+                (() => {
+                  // CMS reuses ariaDescription for inline error text in this context
+                  const unsubscribeErrorText = newsletterUnsubscribeHeader.subheader?.ariaDescription ?? ''
+                  return unsubscribeErrorText ? (
+                    <div
+                      className={`px-3 py-1 text-xs text-error-600 dark:text-error-400 ${isRtl ? 'text-right' : 'text-left'}`}
+                      data-testid="unsubscribe-error"
+                      role="alert"
+                    >
+                      {unsubscribeErrorText}
+                    </div>
+                  ) : null
+                })()}
 
               {/* Delete Account Link */}
               <Link

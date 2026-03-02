@@ -112,7 +112,7 @@ export function HomeSections(props: HomeSectionsProps) {
         return <NewsletterSignupCTA key={section.id} data={section} direction={direction} />
 
       case 'elements.text-block':
-        return <TextBlock key={section.id} data={section} direction={direction} />
+        return <TextBlock key={section.id} headerLevel={2} data={section} direction={direction} />
 
       default:
         // Unknown section type or marker - render nothing

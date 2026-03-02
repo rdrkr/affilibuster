@@ -16,10 +16,12 @@ jest.mock('next/link', () => ({
 
 // Mock next/navigation
 const mockPush = jest.fn()
+const mockNotFound = jest.fn()
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
+  notFound: (...args: unknown[]) => mockNotFound(...args),
 }))
 
 // Mock content API
@@ -188,6 +190,17 @@ describe('DeleteAccount', () => {
 
     expect(screen.getByText('Confirm Delete')).toBeInTheDocument() // Default
     expect(screen.getByText('Cancel')).toBeInTheDocument() // Default
+  })
+
+  it('should call notFound when profile data is missing', async () => {
+    ;(getProfile as jest.Mock).mockResolvedValueOnce(null)
+    try {
+      await DeleteAccount({ params: Promise.resolve({ lang: 'en' }) })
+    } catch {
+      // notFound throws an error
+    }
+
+    expect(mockNotFound).toHaveBeenCalled()
   })
 })
 

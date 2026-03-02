@@ -63,9 +63,10 @@ export function ContainerTabBar<T = unknown>({ tabs, activeKey, onTabChange, dir
    */
   const updateScrollArrows = useCallback(() => {
     const container = scrollContainerRef.current
-    if (!container) return
 
-    const { scrollLeft, scrollWidth, clientWidth } = container
+    const scrollLeft = container?.scrollLeft ?? 0
+    const scrollWidth = container?.scrollWidth ?? 0
+    const clientWidth = container?.clientWidth ?? 0
     const tolerance = 2
 
     if (isRTL) {
@@ -84,9 +85,8 @@ export function ContainerTabBar<T = unknown>({ tabs, activeKey, onTabChange, dir
    */
   const updatePillPosition = useCallback(() => {
     const activeButton = tabButtonRefs.current.get(activeKey)
-    const scrollContainer = scrollContainerRef.current
 
-    if (!activeButton || !scrollContainer) return
+    if (!activeButton) return
 
     // Use offsetLeft relative to scroll container for accuracy regardless of scroll position
     setPillPosition({
@@ -116,18 +116,19 @@ export function ContainerTabBar<T = unknown>({ tabs, activeKey, onTabChange, dir
   // Monitor scroll for arrow visibility
   useEffect(() => {
     const container = scrollContainerRef.current
-    if (!container) return
 
-    updateScrollArrows()
+    requestAnimationFrame(() => {
+      updateScrollArrows()
+    })
 
     const handleScroll = () => {
       updateScrollArrows()
       updatePillPosition()
     }
 
-    container.addEventListener('scroll', handleScroll, { passive: true })
+    container?.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
-      container.removeEventListener('scroll', handleScroll)
+      container?.removeEventListener('scroll', handleScroll)
     }
   }, [updateScrollArrows, updatePillPosition])
 
@@ -138,13 +139,12 @@ export function ContainerTabBar<T = unknown>({ tabs, activeKey, onTabChange, dir
   const handleScrollArrowClick = useCallback(
     (scrollDirection: 'start' | 'end') => {
       const container = scrollContainerRef.current
-      if (!container) return
 
-      const scrollAmount = container.clientWidth * 0.6
+      const scrollAmount = (container?.clientWidth ?? 0) * 0.6
       const direction = scrollDirection === 'end' ? 1 : -1
       const rtlMultiplier = isRTL ? -1 : 1
 
-      container.scrollBy({
+      container?.scrollBy({
         left: scrollAmount * direction * rtlMultiplier,
         behavior: 'smooth',
       })

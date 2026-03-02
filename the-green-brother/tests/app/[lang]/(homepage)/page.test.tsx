@@ -136,8 +136,80 @@ describe('HomePage', () => {
     )
   })
 
+  describe('Environment variable fallback for site URL', () => {
+    const originalEnv = process.env
+
+    beforeEach(() => {
+      jest.resetModules()
+      process.env = { ...originalEnv }
+    })
+
+    afterAll(() => {
+      process.env = originalEnv
+    })
+
+    it('should use custom NEXT_PUBLIC_SITE_URL and site name for JSON-LD', async () => {
+      process.env.NEXT_PUBLIC_SITE_URL = 'https://custom-home.com'
+
+      mockGetHomepage.mockResolvedValue({ sections: [] } as unknown as Awaited<ReturnType<typeof getHomepage>>)
+      mockGetTeamMembers.mockResolvedValue([])
+      mockGetBlog.mockResolvedValue({
+        readTimeMinutesLabel: { text: '' },
+        readArticleLabel: { text: '' },
+      } as unknown as Awaited<ReturnType<typeof getBlog>>)
+      mockGetNavigation.mockResolvedValue({
+        siteTitle: 'CustomSite',
+        brandButton: { label: { icon: 'logo.png' } },
+      } as any)
+
+      const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+      render(Component)
+
+      expect(mockJsonLdScript).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            '@type': 'Organization',
+            url: 'https://custom-home.com',
+            name: 'CustomSite',
+          }),
+        }),
+        undefined
+      )
+    })
+
+    it('should use fallback URL when NEXT_PUBLIC_SITE_URL is missing', async () => {
+      delete process.env.NEXT_PUBLIC_SITE_URL
+
+      mockGetHomepage.mockResolvedValue({ sections: [] } as unknown as Awaited<ReturnType<typeof getHomepage>>)
+      mockGetTeamMembers.mockResolvedValue([])
+      mockGetBlog.mockResolvedValue({
+        readTimeMinutesLabel: { text: '' },
+        readArticleLabel: { text: '' },
+      } as unknown as Awaited<ReturnType<typeof getBlog>>)
+      mockGetNavigation.mockResolvedValue({
+        siteTitle: 'TheGreenBrotherFallback',
+        brandButton: { label: { icon: 'logo.png' } },
+      } as any)
+
+      const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
+      render(Component)
+
+      expect(mockJsonLdScript).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            '@type': 'WebSite',
+            url: 'http://localhost:3000',
+            name: 'TheGreenBrotherFallback',
+          }),
+        }),
+        undefined
+      )
+    })
+  })
+
   it('should use fallback site name when navigation is null', async () => {
     mockGetNavigation.mockResolvedValue(null)
+
     const mockBlogPage = {
       readTimeMinutesLabel: { text: 'min' },
       readArticleLabel: { text: 'Read' },

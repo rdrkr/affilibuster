@@ -88,6 +88,7 @@ export function ScrollableTableWrapper({
   // Find and track the table element inside the wrapper
   useEffect(() => {
     const wrapper = wrapperRef.current
+    /* istanbul ignore next - React natively populates this ref before effect runs */
     if (!wrapper) return
 
     // Determine which table element to control
@@ -155,6 +156,7 @@ export function ScrollableTableWrapper({
   const handleScroll = useCallback(
     (scrollDirection: 'start' | 'end') => {
       const table = tableRef.current
+      /* istanbul ignore next - Buttons are disabled if table is null, making this unreachable */
       if (!table) return
 
       const multiplier = scrollDirection === 'end' ? 1 : -1

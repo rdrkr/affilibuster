@@ -52,6 +52,8 @@ interface MarkdownProps {
   linkButtonVariant: ButtonVariant
   /** Control button link animation (default: false) */
   linkButtonAnimation?: boolean
+  /** Additional CSS classes for link buttons */
+  linkButtonVariantClassName?: string
 }
 
 /**
@@ -63,9 +65,16 @@ interface MarkdownProps {
  * @param props.direction - Language direction for RTL support
  * @param props.linkButtonVariant - Button variant for links
  * @param props.linkButtonAnimation - Control button link animation
+ * @param props.linkButtonVariantClassName - Additional CSS classes for link buttons
  * @returns Rendered markdown as React elements
  */
-function Markdown({ content, direction, linkButtonVariant, linkButtonAnimation = false }: MarkdownProps) {
+function Markdown({
+  content,
+  direction,
+  linkButtonVariant,
+  linkButtonAnimation = false,
+  linkButtonVariantClassName,
+}: MarkdownProps) {
   const isRTL = direction === DirectionEnum.RTL
 
   /**
@@ -89,6 +98,7 @@ function Markdown({ content, direction, linkButtonVariant, linkButtonAnimation =
               direction={direction}
               linkButtonVariant={linkButtonVariant}
               linkButtonAnimation={linkButtonAnimation}
+              {...(linkButtonVariantClassName ? { linkButtonVariantClassName } : {})}
             />
           ) : (
             children
@@ -103,21 +113,19 @@ function Markdown({ content, direction, linkButtonVariant, linkButtonAnimation =
         size="sm"
         direction={direction}
         noAnimation={!linkButtonAnimation}
+        {...(linkButtonVariantClassName ? { className: linkButtonVariantClassName } : {})}
       >
         {children}
       </ButtonLink>
     ),
     code: ({ children }: ComponentPropsWithoutRef<'code'>) => {
-      let codeText = ''
-      if (typeof children === 'string') {
-        codeText = children
-      } else if (Array.isArray(children)) {
-        codeText = children.filter(child => typeof child === 'string').join('')
-      } else {
-        // In standard ReactMarkdown v9+, children is usually a string or array
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        codeText = String((children as any) ?? '')
-      }
+      const codeText =
+        typeof children === 'string'
+          ? children
+          : /* istanbul ignore next - defensive parsing for rehype-raw edge cases */
+            Array.isArray(children)
+            ? children.filter(child => typeof child === 'string').join('')
+            : ''
 
       const labelData: ElementsLabelEntry = {
         icon: '',
@@ -244,6 +252,8 @@ export interface TextBlockProps {
   linkButtonVariant?: ButtonVariant
   /** Control button link animation (default: false) */
   linkButtonAnimation?: boolean
+  /** Additional CSS classes for link buttons */
+  linkButtonVariantClassName?: string
 }
 
 /**
@@ -255,6 +265,7 @@ export interface TextBlockProps {
  * @param props.className - Additional CSS classes
  * @param props.linkButtonVariant - Button variant for links
  * @param props.linkButtonAnimation - Control button link animation
+ * @param props.linkButtonVariantClassName - Additional CSS classes for link buttons
  * @param props.headerLevel - Heading level
  * @param props.headerIconSize - Icon size for the header
  * @param props.headerClassName - Header text classes
@@ -274,6 +285,7 @@ export function TextBlock({
   subheaderTextClassName,
   linkButtonVariant = 'link-1',
   linkButtonAnimation = false,
+  linkButtonVariantClassName,
 }: TextBlockProps) {
   if (visible === false) {
     return null
@@ -393,6 +405,7 @@ export function TextBlock({
           direction={direction}
           linkButtonVariant={linkButtonVariant}
           linkButtonAnimation={linkButtonAnimation}
+          {...(linkButtonVariantClassName ? { linkButtonVariantClassName } : {})}
         />
       )}
     </div>

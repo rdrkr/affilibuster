@@ -24,6 +24,16 @@ jest.mock('next/link', () => ({
   },
 }))
 
+// Mock next/navigation
+const mockPush = jest.fn()
+const mockNotFound = jest.fn()
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+  notFound: (...args: unknown[]) => mockNotFound(...args),
+}))
+
 // Mock API
 jest.mock('@/lib/content/api', () => ({
   getProfile: jest.fn(),
@@ -123,6 +133,17 @@ describe('Wishlist', () => {
     const ui = await Wishlist({ params: Promise.resolve({ lang: 'he' }) })
     render(ui)
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
+  })
+
+  it('should call notFound when profile data is missing', async () => {
+    ;(getProfile as jest.Mock).mockResolvedValueOnce(null)
+    try {
+      await Wishlist({ params: Promise.resolve({ lang: 'en' }) })
+    } catch {
+      // notFound throws an error
+    }
+
+    expect(mockNotFound).toHaveBeenCalled()
   })
 })
 

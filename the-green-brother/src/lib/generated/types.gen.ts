@@ -3273,6 +3273,11 @@ export enum SchemaEnum {
     PUBLISHED = 'published'
 }
 
+export enum _1Enum {
+    TRUE = 'true',
+    FALSE = 'false'
+}
+
 export enum ItemsEnum2 {
     EMAIL_PLACEHOLDER = 'emailPlaceholder',
     PASSWORD_PLACEHOLDER = 'passwordPlaceholder',
@@ -5386,6 +5391,10 @@ export type AboutGetAboutData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -5570,6 +5579,10 @@ export type AuthPageGetAuthPageData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -6215,6 +6228,10 @@ export type BlogGetBlogData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -6413,6 +6430,10 @@ export type BlogPostTagGetBlogPostTagsData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -6564,6 +6585,10 @@ export type BlogPostTagGetBlogPostTagsByIdData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -6743,6 +6768,10 @@ export type BlogPostGetBlogPostsData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -6918,6 +6947,10 @@ export type BlogPostGetBlogPostsBySlugData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -7095,6 +7128,10 @@ export type BlogPostGetBlogPostsByIdData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -7257,6 +7294,10 @@ export type ConsentGetConsentData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -7452,6 +7493,10 @@ export type ConsentCategoryGetConsentCategoriesData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -7604,6 +7649,10 @@ export type ConsentCategoryGetConsentCategoriesByIdData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -7742,6 +7791,10 @@ export type ContactUsGetContactUsData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -7957,6 +8010,10 @@ export type ContributorRoleGetContributorRolesData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -8104,6 +8161,10 @@ export type ContributorRoleGetContributorRolesByIdData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -8278,6 +8339,10 @@ export type ContributorGetContributorsData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -8471,6 +8536,10 @@ export type ContributorGetContributorsBySlugData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -8663,6 +8732,10 @@ export type ContributorGetContributorsByIdData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -8842,6 +8915,10 @@ export type CookiePolicyGetCookiePolicyData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -9016,6 +9093,10 @@ export type CurrencyGetCurrenciesData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -9189,6 +9270,10 @@ export type CurrencyGetCurrenciesByIdData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -9349,6 +9434,10 @@ export type Error404GetError404Data = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -9484,6 +9573,10 @@ export type Error410GetError410Data = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -9618,6 +9711,10 @@ export type FaqGetFaqData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -9805,6 +9902,10 @@ export type FeatureFlagGetFeatureFlagsData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -9929,6 +10030,10 @@ export type FeatureFlagGetFeatureFlagsByIdData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -10289,6 +10394,10 @@ export type FooterGetFooterData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -10476,6 +10585,10 @@ export type HomepageGetHomepageData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -10719,6 +10832,10 @@ export type NavigationGetNavigationData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -10956,6 +11073,10 @@ export type PrivacyGetPrivacyData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -11130,6 +11251,10 @@ export type ProductCategoryGetProductCategoriesData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -11272,6 +11397,10 @@ export type ProductCategoriesPageGetProductCategoriesPageData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -11445,6 +11574,10 @@ export type ProductCategoryGetProductCategoriesBySlugData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -11600,6 +11733,10 @@ export type ProductCategoryGetProductCategoriesByIdData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -11783,6 +11920,10 @@ export type ProductCertificateGetProductCertificatesData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -11934,6 +12075,10 @@ export type ProductCertificateGetProductCertificatesByIdData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -12113,6 +12258,10 @@ export type ProductTagGetProductTagsData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -12264,6 +12413,10 @@ export type ProductTagGetProductTagsByIdData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -12442,6 +12595,10 @@ export type ProductGetProductsData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -12650,6 +12807,10 @@ export type ProductGetProductsBySlugData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -12857,6 +13018,10 @@ export type ProductGetProductsByIdData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -13050,6 +13215,10 @@ export type ProfileGetProfileData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
@@ -13292,6 +13461,10 @@ export type TermGetTermData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -13466,6 +13639,10 @@ export type ThemeGetThemesData = {
          */
         status?: SchemaEnum;
         /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
+        /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */
         customPopulate: string;
@@ -13617,6 +13794,10 @@ export type ThemeGetThemesByIdData = {
          * Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
          */
         status?: SchemaEnum;
+        /**
+         * Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+         */
+        hasPublishedVersion?: boolean | _1Enum;
         /**
          * Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
          */

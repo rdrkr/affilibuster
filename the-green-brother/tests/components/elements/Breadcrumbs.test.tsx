@@ -216,6 +216,19 @@ describe('Breadcrumbs', () => {
     expect(text).toHaveTextContent('About')
   })
 
+  it('should handle explicit "home" segment correctly', () => {
+    render(
+      <Breadcrumbs
+        navigation={mockNavigation}
+        pathname="/en/home"
+        lang={LanguageCode.EN}
+        direction={DirectionEnum.LTR}
+      />
+    )
+    const links = screen.getAllByTestId('crumb-link')
+    expect(links.length).toBeGreaterThan(0)
+  })
+
   it('should handle products path correctly', () => {
     render(
       <Breadcrumbs

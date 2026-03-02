@@ -147,7 +147,7 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
                 alignment: headerAlignment ?? AlignmentEnum.LANGUAGE_DIRECTION,
               } as ElementsHeaderEntry
             }
-            level={3}
+            level={2}
             direction={direction}
           />
           {learnMoreButtonUrl && learnMoreButtonText && (

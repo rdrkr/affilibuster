@@ -227,6 +227,15 @@ describe('Header', () => {
     })
   })
 
+  it('should use fallback classes for unknown level', () => {
+    render(<Header direction={DirectionEnum.LTR} data={mockHeaderData} level={7 as any} />)
+    const headerLabel = screen.getByTestId('mock-label-h7')
+    expect(headerLabel.className).toContain('text-2xl')
+
+    const subheaderLabel = screen.getByTestId('mock-label-p')
+    expect(subheaderLabel).toBeInTheDocument()
+  })
+
   it('should render promoted layout when promoteHeaderIcon is true and icon exists', () => {
     const dataWithPromotedIcon = {
       ...mockHeaderData,

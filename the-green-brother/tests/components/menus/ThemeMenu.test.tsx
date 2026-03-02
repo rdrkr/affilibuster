@@ -530,6 +530,42 @@ describe('ThemeMenu', () => {
     expect(mockOnThemeChange).toHaveBeenCalledWith('system')
   })
 
+  it('should trim whitespace from theme text and map correctly', () => {
+    const mockDataWithSpacedTheme = {
+      ...mockData,
+      themes: [
+        {
+          id: 5,
+          documentId: 'theme-5',
+          themeId: ' dark ', // Theme id with spaces
+          publishedAt: '2024-01-01',
+          content: {
+            text: 'Spaced Dark',
+            icon: 'dark_mode',
+            iconPosition: IconPositionEnum.BEFORE_TEXT,
+            ariaDescription: 'Spaced Dark theme',
+          },
+        },
+      ],
+    } as unknown as ThemeMenuProps['data']
+
+    render(
+      <ThemeMenu
+        data={mockDataWithSpacedTheme}
+        selectedTheme="dark"
+        onThemeChange={mockOnThemeChange}
+        direction={DirectionEnum.LTR}
+      />
+    )
+
+    // Open menu
+    fireEvent.click(screen.getByRole('button', { name: 'Select theme' }))
+
+    // The 'Spaced Dark' button should map to 'dark' mode and be highlighted
+    const darkButton = screen.getByRole('button', { name: 'Spaced Dark theme' })
+    expect(darkButton.className).toContain('bg-white/5')
+  })
+
   describe('visible prop', () => {
     it('should be visible by default', () => {
       render(

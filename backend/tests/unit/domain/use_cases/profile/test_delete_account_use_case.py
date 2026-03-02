@@ -9,7 +9,7 @@ and newsletter mailing list removal (GDPR Art. 17).
 """
 
 from datetime import UTC, datetime
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, Mock, patch
 from uuid import UUID, uuid4
 
 import pytest
@@ -236,8 +236,13 @@ class TestDeleteAccountUseCase:
         # Assert - newsletter unsubscribe was called with user's email
         newsletter_service.unsubscribe.assert_called_once_with("test@example.com")
 
-    async def test_delete_account_succeeds_when_newsletter_unsubscribe_fails(self) -> None:
-        """Test that account deletion succeeds even if newsletter unsubscribe fails (best-effort)."""
+    @patch(
+        "affilibuster_backend.domain.use_cases.profile.delete_account_use_case.asyncio.sleep", new_callable=AsyncMock
+    )
+    async def test_delete_account_succeeds_when_newsletter_unsubscribe_fails_after_retries(
+        self, mock_sleep: AsyncMock
+    ) -> None:
+        """Test that account deletion succeeds after all 3 retry attempts exhaust (best-effort)."""
         # Arrange
         user_id = uuid4()
         user = create_test_user(user_id=user_id)
@@ -264,11 +269,57 @@ class TestDeleteAccountUseCase:
         # Act - should not raise
         await use_case.execute(user_id, "CorrectPassword123!")
 
+        # Assert - all 3 attempts were made
+        assert newsletter_service.unsubscribe.call_count == 3
+        # Assert - exponential backoff sleeps (1s, 2s)
+        assert mock_sleep.call_count == 2
+        mock_sleep.assert_any_call(1)
+        mock_sleep.assert_any_call(2)
         # Assert - all other cleanup still happened
         user_repo.update.assert_called_once()
         session_repo.delete_all_by_user_id.assert_called_once_with(user_id)
         consent_repo.anonymize_by_user_id.assert_called_once_with(user_id)
         preferences_repo.delete_by_user_id.assert_called_once_with(str(user_id))
+
+    @patch(
+        "affilibuster_backend.domain.use_cases.profile.delete_account_use_case.asyncio.sleep", new_callable=AsyncMock
+    )
+    async def test_delete_account_newsletter_retry_succeeds_on_second_attempt(self, mock_sleep: AsyncMock) -> None:
+        """Test that newsletter unsubscribe retry succeeds on second attempt."""
+        # Arrange
+        user_id = uuid4()
+        user = create_test_user(user_id=user_id)
+
+        user_repo = AsyncMock()
+        user_repo.get_by_id.return_value = user
+        user_repo.update.return_value = user
+
+        session_repo = AsyncMock()
+        consent_repo = AsyncMock()
+        consent_repo.anonymize_by_user_id.return_value = 1
+        preferences_repo = AsyncMock()
+        preferences_repo.delete_by_user_id.return_value = 1
+        password_hasher = Mock()
+        password_hasher.verify_password.return_value = True
+
+        newsletter_service = AsyncMock()
+        # First call fails, second succeeds
+        newsletter_service.unsubscribe.side_effect = [
+            NewsletterUnsubscribeError("Brevo error"),
+            None,
+        ]
+
+        use_case = DeleteAccountUseCase(
+            user_repo, session_repo, consent_repo, preferences_repo, password_hasher, newsletter_service
+        )
+
+        # Act
+        await use_case.execute(user_id, "CorrectPassword123!")
+
+        # Assert - 2 attempts were made (succeeded on 2nd)
+        assert newsletter_service.unsubscribe.call_count == 2
+        # Assert - one backoff sleep (1s)
+        mock_sleep.assert_called_once_with(1)
 
     async def test_delete_account_without_newsletter_service(self) -> None:
         """Test that account deletion works when no newsletter service is provided."""

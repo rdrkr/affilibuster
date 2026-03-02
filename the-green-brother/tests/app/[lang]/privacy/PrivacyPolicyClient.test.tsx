@@ -97,4 +97,28 @@ describe('PrivacyPolicyClient', () => {
     const breadcrumbNav = screen.getByRole('navigation')
     expect(breadcrumbNav).toHaveTextContent('Privacy Policy')
   })
+
+  it('should use empty string for breadcrumb when header text is missing', () => {
+    const dataWithoutHeader = {
+      ...mockPrivacyData,
+      content: {
+        ...mockPrivacyData.content!,
+        header: {
+          ...mockPrivacyData.content!.header,
+          header: { ...mockPrivacyData.content!.header!.header, text: undefined },
+        },
+      },
+    } as any
+
+    renderWithLayout(<PrivacyPolicyClient data={dataWithoutHeader} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+
+    act(() => {
+      jest.runAllTimers()
+    })
+
+    const breadcrumbNav = screen.getByRole('navigation')
+    expect(breadcrumbNav).toBeInTheDocument()
+  })
 })

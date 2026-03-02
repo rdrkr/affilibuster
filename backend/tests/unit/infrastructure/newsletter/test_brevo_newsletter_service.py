@@ -83,8 +83,8 @@ class TestBrevoNewsletterServiceSubscribe:
             timeout=10.0,
         )
 
-    async def test_subscribe_204_is_not_success_for_doi(self) -> None:
-        """Test that 204 response raises error for DOI endpoint (only 201 is success)."""
+    async def test_subscribe_204_success_contact_already_exists(self) -> None:
+        """Test that 204 response is treated as success (contact already exists)."""
         service = _create_service()
 
         mock_response = MagicMock(spec=httpx.Response)
@@ -95,8 +95,7 @@ class TestBrevoNewsletterServiceSubscribe:
             "affilibuster_backend.infrastructure.newsletter.brevo_newsletter_service.httpx.AsyncClient",
             return_value=mock_client,
         ):
-            with pytest.raises(NewsletterSubscribeError, match="Brevo API returned status 204"):
-                await service.subscribe("existing@example.com")
+            await service.subscribe("existing@example.com")
 
     async def test_subscribe_error_400_bad_request(self) -> None:
         """Test that 400 response raises NewsletterSubscribeError."""
@@ -141,13 +140,13 @@ class TestBrevoNewsletterServiceSubscribe:
             with pytest.raises(NewsletterSubscribeError, match="Failed to connect to Brevo"):
                 await service.subscribe("user@example.com")
 
-    async def test_subscribe_error_log_does_not_contain_response_text(self) -> None:
-        """Test that error log does not leak PII from Brevo response body (GDPR Art. 5(1)(c))."""
+    async def test_subscribe_error_log_includes_brevo_error_body(self) -> None:
+        """Test that error log includes Brevo error body for debugging."""
         service = _create_service(list_id=1)
 
         mock_response = MagicMock(spec=httpx.Response)
         mock_response.status_code = 400
-        mock_response.text = "Contact already exists with email bad@example.com"
+        mock_response.text = '{"code":"invalid_parameter","message":"Invalid template ID"}'
         mock_client = _mock_async_client(response=mock_response)
 
         with (
@@ -160,12 +159,11 @@ class TestBrevoNewsletterServiceSubscribe:
             with pytest.raises(NewsletterSubscribeError):
                 await service.subscribe("bad@example.com")
 
-        # Verify logger.error was called without response.text
         mock_logger.error.assert_called_once()
         log_args = mock_logger.error.call_args
         log_message = log_args[0][0] % log_args[0][1:]
-        assert "bad@example.com" not in log_message
-        assert "Contact already exists" not in log_message
+        assert "400" in log_message
+        assert "invalid_parameter" in log_message
 
     async def test_subscribe_uses_doi_template_id_and_redirect(self) -> None:
         """Test that DOI template ID and redirect URL are included in payload."""

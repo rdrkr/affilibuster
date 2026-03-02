@@ -196,6 +196,9 @@ affilibuster/                        # Monorepo root
 │ │ │ ├── product-tag/               # Product tags
 │ │ │ └── [+11 more types]           # FAQ, Privacy, Terms, Error pages, etc.
 │ │ ├── components/                  # UI component schemas
+│ │ ├── plugins/                     # Custom Strapi plugins
+│ │ │ ├── strapi-plugin-nested-populator/  # Deep nested content population via REST API
+│ │ │ └── strapi-plugin-relation-filter/   # Admin panel relation dropdown filtering
 │ │ ├── index.ts                     # Strapi entry point
 │ │ └── utils/                       # Utility functions
 │ └── scripts/                       # Build and utility scripts
@@ -777,6 +780,25 @@ All user-facing content originates from Strapi CMS, ensuring consistency and sca
 2. Update `backend/scripts/seed.py` with new language seeding data
 3. Run `make seed` or let it happen automatically on startup
 4. **Zero backend code changes required**
+
+### Custom CMS Plugins
+
+Affilibuster includes two custom Strapi plugins managed in-house under `cms/src/plugins/`:
+
+#### strapi-plugin-nested-populator
+
+Automatically populates deeply nested content structures in Strapi REST API responses. When a query includes
+`customPopulate=nested`, the plugin intercepts the request via a Document Service middleware and recursively builds a
+full populate tree for all components, dynamic zones, relations, and media fields. Supports configurable maximum depth
+(`defaultDepth`), field ignore lists, and automatic circular reference prevention. Creator fields (`admin::user`) are
+skipped by default to reduce response size.
+
+#### strapi-plugin-relation-filter
+
+Filters relation dropdowns in the Strapi admin panel based on `pluginOptions` configuration defined in content type
+schemas. When editing content in the admin panel, relation fields normally show all available entries. This plugin
+overrides the `findAvailable` handler on the content-manager's relations controller to automatically apply filters
+defined in each attribute's `pluginOptions`, restricting which related entries appear in the dropdown.
 
 ---
 

@@ -93,4 +93,25 @@ describe('CookiePolicyClient', () => {
     const breadcrumbNav = screen.getByRole('navigation')
     expect(breadcrumbNav).toHaveTextContent('Cookie Policy')
   })
+
+  it('should use empty string for breadcrumb when header text is missing', () => {
+    const dataWithoutHeader = {
+      ...mockCookiePolicyData,
+      content: {
+        ...mockCookiePolicyData.content!,
+        header: undefined,
+      },
+    } as any
+
+    renderWithLayout(<CookiePolicyClient data={dataWithoutHeader} />, {
+      layoutContext: { direction: DirectionEnum.LTR },
+    })
+
+    act(() => {
+      jest.runAllTimers()
+    })
+
+    const breadcrumbNav = screen.getByRole('navigation')
+    expect(breadcrumbNav).toBeInTheDocument()
+  })
 })

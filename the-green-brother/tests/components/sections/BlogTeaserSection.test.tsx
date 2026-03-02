@@ -403,7 +403,7 @@ describe('BlogTeaserSection', () => {
   it('should render section with header text', () => {
     render(<BlogTeaserSection {...defaultProps} direction={DirectionEnum.LTR} data={mockSectionDataWithPosts} />)
 
-    expect(screen.getByRole('heading', { level: 3, name: 'From Our Blog' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'From Our Blog' })).toBeInTheDocument()
   })
 
   it('should render view all button with correct alignment for LTR', () => {
@@ -596,7 +596,7 @@ describe('BlogTeaserSection', () => {
     // Since role="region" requires label, it falls back to generic section.
     // We check attribute directly.
     // Query by class to find the section
-    const section = screen.getByRole('heading', { level: 3 }).closest('section')
+    const section = screen.getByRole('heading', { level: 2 }).closest('section')
     expect(section).toHaveAttribute('aria-label', '')
   })
 

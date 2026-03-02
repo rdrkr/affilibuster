@@ -183,7 +183,7 @@ describe('BrandFeaturesSection', () => {
   it('should render section with header text (as HTML)', () => {
     render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-    expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument()
   })
 
   it('should render subheader when provided', () => {
@@ -294,7 +294,7 @@ describe('BrandFeaturesSection', () => {
 
     render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithoutHeader} />)
 
-    expect(screen.queryByRole('heading', { level: 3 })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument()
   })
 
   it('should not render learn more button when URL is not provided', () => {

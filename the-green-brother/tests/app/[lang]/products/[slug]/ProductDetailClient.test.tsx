@@ -9,9 +9,9 @@ import { screen } from '@testing-library/react'
 import ProductDetailClient from '@/app/[lang]/products/[slug]/ProductDetailClient'
 import {
   AlignmentEnum,
-  LanguageCode,
   DirectionEnum,
   IconPositionEnum,
+  LanguageCode,
   type ApiProductProductDocument,
 } from '@/lib/generated/types.gen'
 import { renderWithLayout } from '../../../../utils/renderWithLayout'
@@ -253,6 +253,23 @@ describe('ProductDetailClient', () => {
     })
 
     expect(screen.getByText('by Green Seller')).toBeInTheDocument()
+  })
+
+  it('should render seller name without last name', () => {
+    const productWithoutLastName = {
+      ...mockProduct,
+      seller: {
+        documentId: 'seller-2',
+        firstName: 'Green',
+        slug: 'green',
+      },
+    } as unknown as ApiProductProductDocument
+
+    renderWithLayout(<ProductDetailClient {...defaultProps} product={productWithoutLastName} />, {
+      layoutContext: { lang: LanguageCode.EN },
+    })
+
+    expect(screen.getByText('by Green')).toBeInTheDocument()
   })
 
   it('should render affiliate link when affiliateButton has URL', () => {

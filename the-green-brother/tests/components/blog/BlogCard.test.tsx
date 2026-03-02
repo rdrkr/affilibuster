@@ -470,4 +470,12 @@ describe('BlogCard', () => {
     // Tag header should not render because firstTag is empty string
     expect(screen.queryByTestId('mock-card-header')).not.toBeInTheDocument()
   })
+
+  it('should have asLink default to false when omitted', () => {
+    const propsWithoutAsLink = { ...defaultProps }
+    delete propsWithoutAsLink.asLink
+    render(<BlogCard {...propsWithoutAsLink} />)
+    // When asLink is false, mock-card-overlay-link should not be present
+    expect(screen.queryByTestId('mock-card-overlay-link')).not.toBeInTheDocument()
+  })
 })

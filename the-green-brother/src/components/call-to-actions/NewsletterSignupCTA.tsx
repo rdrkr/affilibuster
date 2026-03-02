@@ -13,13 +13,10 @@
 
 'use client'
 
-import { useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import rehypeRaw from 'rehype-raw'
-import rehypeSanitize from 'rehype-sanitize'
-import remarkGfm from 'remark-gfm'
+import { useSearchParams } from 'next/navigation'
+import { Suspense, useState } from 'react'
 
-import { ButtonAction, Header } from '@/components/elements'
+import { ButtonAction, Header, TextBlock } from '@/components/elements'
 import {
   AlignmentEnum,
   DirectionEnum,
@@ -28,6 +25,9 @@ import {
   type ElementsHeaderEntry,
 } from '@/lib/generated/types.gen'
 import { subscribeNewsletter } from '@/lib/newsletter'
+
+/** Newsletter form state machine: form → pending (DOI email sent) → confirmed (DOI completed). */
+type NewsletterState = 'form' | 'pending' | 'confirmed'
 
 /**
  * Props for the NewsletterSignupCTA component
@@ -41,8 +41,8 @@ export interface NewsletterSignupCTAProps {
   direction: DirectionEnum
 }
 
-/** Simple email format validation regex. */
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+/** Email format validation regex requiring alphanumeric local part and 2+ char TLD. */
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
 /**
  * Newsletter signup CTA section.
@@ -55,6 +55,21 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
  * @returns Newsletter signup CTA component
  */
 export function NewsletterSignupCTA({ data, direction }: NewsletterSignupCTAProps) {
+  return (
+    <Suspense>
+      <NewsletterSignupCTAInner data={data} direction={direction} />
+    </Suspense>
+  )
+}
+
+/**
+ * Inner component that uses useSearchParams (requires Suspense boundary).
+ * @param props - Component props with CMS CTA data
+ * @param props.data - Newsletter signup CTA data from CMS
+ * @param props.direction - Language direction for RTL support
+ * @returns Newsletter signup CTA inner component
+ */
+function NewsletterSignupCTAInner({ data, direction }: NewsletterSignupCTAProps) {
   const {
     title,
     description,
@@ -63,18 +78,23 @@ export function NewsletterSignupCTA({ data, direction }: NewsletterSignupCTAProp
     consentLabel,
     consentRequiredError,
     pendingConfirmationMessage,
+    successMessage,
     errorMessage,
     emailRequiredError,
     emailInvalidError,
   } = data
   const isRTL = direction === DirectionEnum.RTL
+  const searchParams = useSearchParams()
 
+  /** Derive initial state from URL query param (DOI redirect sets ?newsletter=confirmed). */
+  const initialState: NewsletterState = searchParams.get('newsletter') === 'confirmed' ? 'confirmed' : 'form'
+
+  const [state, setState] = useState<NewsletterState>(initialState)
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [consentChecked, setConsentChecked] = useState(false)
   const [consentError, setConsentError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
   /**
@@ -121,7 +141,7 @@ export function NewsletterSignupCTA({ data, direction }: NewsletterSignupCTAProp
     setIsSubmitting(false)
 
     if (result?.success) {
-      setIsSuccess(true)
+      setState('pending')
     } else {
       setSubmitError(errorMessage.text)
     }
@@ -160,10 +180,18 @@ export function NewsletterSignupCTA({ data, direction }: NewsletterSignupCTAProp
             headerClassName="text-neutral-800 dark:text-white"
             subheaderClassName="text-sm text-neutral-600 dark:text-text-secondary-dark"
           />
-          {isSuccess ? (
+          {state === 'confirmed' ? (
             <div
               className="text-center text-sm text-primary-600 dark:text-primary-400"
-              data-testid="newsletter-success"
+              data-testid="newsletter-confirmed"
+              role="status"
+            >
+              {successMessage.text}
+            </div>
+          ) : state === 'pending' ? (
+            <div
+              className="text-center text-sm text-primary-600 dark:text-primary-400"
+              data-testid="newsletter-pending"
               role="status"
             >
               {pendingConfirmationMessage.text}
@@ -252,14 +280,21 @@ export function NewsletterSignupCTA({ data, direction }: NewsletterSignupCTAProp
                       setConsentError('')
                     }
                   }}
-                  className="mt-0.5 shrink-0 accent-primary"
+                  className="mt-2 shrink-0 accent-primary"
                   data-testid="consent-checkbox"
                   disabled={isSubmitting}
                 />
+
                 <span className="leading-relaxed">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeSanitize]}>
-                    {consentLabel.text}
-                  </ReactMarkdown>
+                  <TextBlock
+                    data={{
+                      __component: 'elements.text-block',
+                      content: consentLabel.text,
+                    }}
+                    direction={direction}
+                    className="text-sm"
+                    linkButtonVariantClassName="text-sm"
+                  />
                 </span>
               </label>
               {consentError && (

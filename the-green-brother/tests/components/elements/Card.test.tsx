@@ -78,7 +78,7 @@ describe('Card', () => {
     asLink: true,
   }
 
-  it('should render as a link by default (overlay)', () => {
+  it('should render as a link by default (overlay) when asLink is true', () => {
     const { container } = render(<Card {...defaultProps} />)
     // Check for overlay link existence
     // The main wrapper is a div now
@@ -88,6 +88,16 @@ describe('Card', () => {
     // Check for inner overlay link
     const link = screen.getByRole('link', { hidden: true }) // aria-hidden=true on overlay
     expect(link).toHaveAttribute('href', '/test-path')
+  })
+
+  it('should default to asLink=false when not provided', () => {
+    const props = { ...defaultProps }
+    delete (props as any).asLink
+    render(<Card {...props} />)
+
+    // Should NOT find the overlay link
+    const link = screen.queryByRole('link', { hidden: true })
+    expect(link).not.toBeInTheDocument()
   })
 
   it('should render as a div when asLink is false', () => {

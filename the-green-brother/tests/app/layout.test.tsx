@@ -152,14 +152,32 @@ describe('RootLayout', () => {
 })
 
 describe('generateMetadata', () => {
-  it('should return metadataBase and manifest', () => {
+  const originalEnv = process.env
+
+  beforeEach(() => {
+    jest.resetModules()
+    process.env = { ...originalEnv }
+  })
+
+  afterAll(() => {
+    process.env = originalEnv
+  })
+
+  it('should return metadataBase using process.env.NEXT_PUBLIC_SITE_URL', () => {
+    process.env.NEXT_PUBLIC_SITE_URL = 'https://custom-site.com'
     const metadata = generateMetadata()
 
     expect(metadata.metadataBase).toBeInstanceOf(URL)
-    expect(metadata.metadataBase?.toString()).toBe(
-      new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').toString()
-    )
+    expect(metadata.metadataBase?.toString()).toBe('https://custom-site.com/')
     expect(metadata.manifest).toBe('/manifest.webmanifest')
+  })
+
+  it('should return metadataBase fallback to http://localhost:3000', () => {
+    delete process.env.NEXT_PUBLIC_SITE_URL
+    const metadata = generateMetadata()
+
+    expect(metadata.metadataBase).toBeInstanceOf(URL)
+    expect(metadata.metadataBase?.toString()).toBe('http://localhost:3000/')
   })
 
   it('should not include title or description', () => {

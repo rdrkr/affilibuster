@@ -11,7 +11,7 @@
 'use client'
 
 import type { PluginUploadFileDocument } from '@/lib/generated/types.gen'
-import NextImage, { type ImageProps as NextImageProps } from 'next/image'
+import NextImage, { ImageProps as NextImageProps } from 'next/image'
 import { useState } from 'react'
 
 /** Default placeholder image for missing images */
@@ -31,15 +31,6 @@ export const DEFAULT_IMAGE: PluginUploadFileDocument = {
   publishedAt: new Date().toISOString(),
   alternativeText: 'Placeholder Image',
 }
-
-/** CMS port from environment */
-const CMS_PORT = process.env.NEXT_PUBLIC_CMS_PORT ?? '1337'
-
-/** CMS protocol from environment */
-const CMS_PROTOCOL = process.env.NEXT_PUBLIC_CMS_PROTOCOL ?? 'https'
-
-/** CMS base URL for image resolution */
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? `${CMS_PROTOCOL}://localhost:${CMS_PORT}`
 
 /**
  * Props for the Image component
@@ -73,8 +64,12 @@ function resolveImageUrl(source: PluginUploadFileDocument | undefined | null): s
     return url
   }
 
+  const cmsPort = process.env.NEXT_PUBLIC_CMS_PORT ?? '1337'
+  const cmsProtocol = process.env.NEXT_PUBLIC_CMS_PROTOCOL ?? 'https'
+  const cmsUrl = process.env.NEXT_PUBLIC_CMS_URL ?? `${cmsProtocol}://localhost:${cmsPort}`
+
   // CMS relative URLs - prepend CMS base URL
-  return `${CMS_URL}${url}`
+  return `${cmsUrl}${url}`
 }
 
 /**

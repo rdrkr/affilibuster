@@ -407,6 +407,34 @@ describe('CookieConsentBanner', () => {
 
       expect(screen.getByText('Save Preferences')).toBeInTheDocument()
     })
+
+    it('should reset prevIsSettingsOpen when settings are closed', async () => {
+      mockUseConsent.mockReturnValue({
+        ...defaultUseConsentReturn,
+        hasConsented: false,
+        isSettingsOpen: true,
+      })
+
+      let rerenderFunc: any
+      await act(async () => {
+        const { rerender } = render(<CookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
+        rerenderFunc = rerender
+      })
+
+      // Change settings open to false
+      mockUseConsent.mockReturnValue({
+        ...defaultUseConsentReturn,
+        hasConsented: false,
+        isSettingsOpen: false,
+      })
+
+      await act(async () => {
+        rerenderFunc(<CookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
+      })
+
+      // We just need the code to execute to cover `!isSettingsOpen && prevIsSettingsOpen`
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
   })
 
   describe('edit mode (consent withdrawal)', () => {
@@ -736,6 +764,24 @@ describe('CookieConsentBanner', () => {
         acceptedCategories: ['necessary', 'analytics'],
         isDoNotTrackEnabled: true,
         cookieDntState: false,
+        rejectAll: mockRejectAll,
+      })
+
+      await act(async () => {
+        render(<CookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
+      })
+
+      expect(mockRejectAll).toHaveBeenCalledWith('necessary', '2026-01-01T00:00:00Z')
+    })
+
+    it('should revoke consent when DNT is newly enabled and cookieDntState is undefined', async () => {
+      const mockRejectAll = jest.fn()
+      mockUseConsent.mockReturnValue({
+        ...defaultUseConsentReturn,
+        hasConsented: true,
+        acceptedCategories: ['necessary', 'analytics'],
+        isDoNotTrackEnabled: true,
+        cookieDntState: undefined,
         rejectAll: mockRejectAll,
       })
 

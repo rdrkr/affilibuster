@@ -24,10 +24,12 @@ jest.mock('next/link', () => ({
 
 // Mock next/navigation
 const mockPush = jest.fn()
+const mockNotFound = jest.fn()
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
+  notFound: (...args: unknown[]) => mockNotFound(...args),
 }))
 
 // Mock content API
@@ -37,8 +39,10 @@ jest.mock('@/lib/content/api', () => ({
 
 // Mock auth API
 const mockExportUserData = jest.fn()
+const mockGetUserProfile = jest.fn()
 jest.mock('@/lib/auth/api', () => ({
   exportUserData: (...args: unknown[]) => mockExportUserData(...args),
+  getUserProfile: (...args: unknown[]) => mockGetUserProfile(...args),
 }))
 
 // Mock consent lib
@@ -79,93 +83,150 @@ const mockProfileData = {
   logoutButton: { label: { text: 'Log Out' } },
 }
 
+/** Mock user profile returned by getUserProfile */
+const mockUserProfile = {
+  id: 'test-uuid',
+  email: 'alex@example.com',
+  display_name: 'Alex G.',
+  email_verified: true,
+}
+
 describe('Profile', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     ;(getProfile as jest.Mock).mockResolvedValue(mockProfileData)
+    mockGetUserProfile.mockResolvedValue(mockUserProfile)
   })
 
-  it('should render profile page', async () => {
+  it('should render profile page with user display name', async () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Alex Green')
+    await waitFor(() => {
+      expect(screen.getByText('Alex G.')).toBeInTheDocument()
+    })
   })
 
   it('should render account settings section', async () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
-    expect(screen.getByRole('heading', { level: 2, name: /Account Settings/i })).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { level: 2, name: /Account Settings/i })).toBeInTheDocument()
+    })
   })
 
   it('should render edit profile link', async () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
-    const editLinks = screen.getAllByRole('link', { name: /Edit Profile/i })
-    expect(editLinks.length).toBeGreaterThan(0)
-    expect(editLinks[0]).toHaveAttribute('href', '/en/profile/edit')
+    await waitFor(() => {
+      const editLinks = screen.getAllByRole('link', { name: /Edit Profile/i })
+      expect(editLinks.length).toBeGreaterThan(0)
+      expect(editLinks[0]).toHaveAttribute('href', '/en/profile/edit')
+    })
   })
 
   it('should render currency link', async () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
-    expect(screen.getByRole('link', { name: /Currency/i })).toHaveAttribute('href', '/en/profile/currency')
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: /Currency/i })).toHaveAttribute('href', '/en/profile/currency')
+    })
   })
 
   it('should render wishlist link', async () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
-    expect(screen.getByRole('link', { name: /Wishlist/i })).toHaveAttribute('href', '/en/profile/wishlist')
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: /Wishlist/i })).toHaveAttribute('href', '/en/profile/wishlist')
+    })
   })
 
   it('should render logout button', async () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
-    expect(screen.getByRole('button', { name: /Log Out/i })).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Log Out/i })).toBeInTheDocument()
+    })
   })
 
   it('should render delete account link', async () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
-    expect(screen.getByRole('link', { name: /Delete Account/i })).toHaveAttribute('href', '/en/profile/delete')
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: /Delete Account/i })).toHaveAttribute('href', '/en/profile/delete')
+    })
   })
 
-  it('should render user email', async () => {
+  it('should render user email from profile API', async () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
-    expect(screen.getByText('ronen@example.com')).toBeInTheDocument()
+
+    await waitFor(() => {
+      expect(screen.getByText('alex@example.com')).toBeInTheDocument()
+    })
+  })
+
+  it('should render loading spinner while profile loads', async () => {
+    // Make getUserProfile hang
+    mockGetUserProfile.mockReturnValue(new Promise(() => {}))
+
+    const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
+
+    expect(screen.getByTestId('profile-loading')).toBeInTheDocument()
+  })
+
+  it('should redirect to login when getUserProfile returns null', async () => {
+    mockGetUserProfile.mockResolvedValueOnce(null)
+
+    const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
+    render(ui)
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/en/login')
+    })
   })
 
   it('should render export data button with CMS label', async () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
-    expect(screen.getByRole('button', { name: /Export My Data/i })).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Export My Data/i })).toBeInTheDocument()
+    })
   })
 
   it('should render cookie settings button with CMS label', async () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
-    expect(screen.getByRole('button', { name: /Cookie Settings/i })).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Cookie Settings/i })).toBeInTheDocument()
+    })
   })
 
   it('should render newsletter unsubscribe button with CMS label', async () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
-    expect(screen.getByRole('button', { name: /Unsubscribe/i })).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Unsubscribe/i })).toBeInTheDocument()
+    })
   })
 
   it('should call openCookieSettings when cookie settings button is clicked', async () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Cookie Settings/i })).toBeInTheDocument()
+    })
 
     const cookieButton = screen.getByRole('button', { name: /Cookie Settings/i })
     fireEvent.click(cookieButton)
@@ -195,6 +256,10 @@ describe('Profile', () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Export My Data/i })).toBeInTheDocument()
+    })
+
     const exportButton = screen.getByRole('button', { name: /Export My Data/i })
     fireEvent.click(exportButton)
 
@@ -212,6 +277,10 @@ describe('Profile', () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Export My Data/i })).toBeInTheDocument()
+    })
+
     const exportButton = screen.getByRole('button', { name: /Export My Data/i })
     fireEvent.click(exportButton)
 
@@ -222,17 +291,22 @@ describe('Profile', () => {
     })
   })
 
-  it('should call unsubscribeNewsletter when unsubscribe button is clicked', async () => {
+  it('should call unsubscribeNewsletter with profile email when unsubscribe button is clicked', async () => {
     mockUnsubscribeNewsletter.mockResolvedValueOnce({ success: true })
 
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
+    // Wait for profile to load
+    await waitFor(() => {
+      expect(screen.getByText('alex@example.com')).toBeInTheDocument()
+    })
+
     const unsubscribeButton = screen.getByRole('button', { name: /Unsubscribe/i })
     fireEvent.click(unsubscribeButton)
 
     await waitFor(() => {
-      expect(mockUnsubscribeNewsletter).toHaveBeenCalledWith('ronen@example.com')
+      expect(mockUnsubscribeNewsletter).toHaveBeenCalledWith('alex@example.com')
     })
   })
 
@@ -241,6 +315,10 @@ describe('Profile', () => {
 
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Unsubscribe/i })).toBeInTheDocument()
+    })
 
     const unsubscribeButton = screen.getByRole('button', { name: /Unsubscribe/i })
     fireEvent.click(unsubscribeButton)
@@ -256,6 +334,10 @@ describe('Profile', () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Unsubscribe/i })).toBeInTheDocument()
+    })
+
     const unsubscribeButton = screen.getByRole('button', { name: /Unsubscribe/i })
     fireEvent.click(unsubscribeButton)
 
@@ -270,6 +352,10 @@ describe('Profile', () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Unsubscribe/i })).toBeInTheDocument()
+    })
+
     const unsubscribeButton = screen.getByRole('button', { name: /Unsubscribe/i })
     fireEvent.click(unsubscribeButton)
 
@@ -281,6 +367,10 @@ describe('Profile', () => {
   it('should redirect to login on logout', async () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Log Out/i })).toBeInTheDocument()
+    })
 
     const logoutButton = screen.getByRole('button', { name: /Log Out/i })
     fireEvent.click(logoutButton)
@@ -299,6 +389,10 @@ describe('Profile', () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Log Out/i })).toBeInTheDocument()
+    })
+
     // Verify Edit Profile link is not rendered
     const editLink = screen.queryByRole('link', { name: /Edit Profile/i })
     expect(editLink).not.toBeInTheDocument()
@@ -315,6 +409,10 @@ describe('Profile', () => {
 
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Log Out/i })).toBeInTheDocument()
+    })
 
     // Wishlist link should still be rendered (href check)
     // We search by href because text content might be empty or fallback
@@ -336,6 +434,10 @@ describe('Profile', () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'en' }) })
     render(ui)
 
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Log Out/i })).toBeInTheDocument()
+    })
+
     // Wishlist link should still be rendered (href check)
     const links = screen.getAllByRole('link')
     const wishlistLink = links.find(link => link.getAttribute('href') === '/en/profile/wishlist')
@@ -348,10 +450,22 @@ describe('Profile', () => {
     const ui = await Profile({ params: Promise.resolve({ lang: 'he' }) })
     render(ui)
 
-    // Verify basic rendering to ensure no crash in RTL
-    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
+    })
 
     // We can just verify it renders successfullly, coverage for isRtl branch will be hit
+  })
+
+  it('should call notFound when profile page is null', async () => {
+    ;(getProfile as jest.Mock).mockResolvedValueOnce(null)
+    try {
+      await Profile({ params: Promise.resolve({ lang: 'en' }) })
+    } catch {
+      // notFound throws an error
+    }
+
+    expect(mockNotFound).toHaveBeenCalled()
   })
 })
 

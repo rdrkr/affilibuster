@@ -86,12 +86,18 @@ class BrevoNewsletterService(INewsletterService):
                 )
 
             # 201 = DOI confirmation email sent
-            if response.status_code == HTTPStatus.CREATED:
+            # 204 = Contact already exists (re-subscription)
+            if response.status_code in {HTTPStatus.CREATED, HTTPStatus.NO_CONTENT}:
                 logger.info("Newsletter DOI confirmation sent for email")
                 return
 
-            # Any other status is an error
-            logger.error("Brevo API error: status=%s", response.status_code)
+            # Log error details for debugging (Brevo error body contains
+            # structured error codes, not PII)
+            logger.error(
+                "Brevo API error: status=%s body=%s",
+                response.status_code,
+                response.text,
+            )
             raise NewsletterSubscribeError(f"Brevo API returned status {response.status_code}")
 
         except httpx.RequestError as e:

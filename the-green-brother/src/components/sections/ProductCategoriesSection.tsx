@@ -52,5 +52,14 @@ export function ProductCategoriesSection({ data, categories, direction }: Produc
     label: category.content,
   }))
 
-  return <ShortcutsGrid header={header} items={items} direction={direction} noAnimation={false} buttonSize="lg" />
+  return (
+    <ShortcutsGrid
+      headerLevel={2}
+      header={header}
+      items={items}
+      direction={direction}
+      noAnimation={false}
+      buttonSize="lg"
+    />
+  )
 }

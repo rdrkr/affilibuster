@@ -105,17 +105,22 @@ describe('sitemap', () => {
 
   it('should include dynamic category entries from CMS', async () => {
     mockGetProducts.mockResolvedValueOnce([])
-    mockGetProductCategories.mockResolvedValueOnce([{ slug: 'kitchen', updatedAt: '2026-01-10T10:00:00Z' }] as Awaited<
-      ReturnType<typeof getProductCategories>
-    >)
+    mockGetProductCategories.mockResolvedValueOnce([
+      { slug: 'kitchen', updatedAt: '2026-01-10T10:00:00Z' },
+      { slug: 'bathroom', updatedAt: undefined },
+    ] as Awaited<ReturnType<typeof getProductCategories>>)
     mockGetBlogPosts.mockResolvedValueOnce({ data: [], meta: {} } as Awaited<ReturnType<typeof getBlogPosts>>)
 
     const result = await sitemap()
 
-    const categoryEntries = result.filter(entry => entry.url.includes('/products/category/kitchen'))
-    expect(categoryEntries.length).toBe(1)
-    expect(categoryEntries[0]?.priority).toBe(0.7)
-    expect(categoryEntries[0]?.changeFrequency).toBe('weekly')
+    const categoryEntries = result.filter(
+      entry => entry.url.includes('/products/category/kitchen') || entry.url.includes('/products/category/bathroom')
+    )
+    expect(categoryEntries.length).toBe(2)
+    for (const entry of categoryEntries) {
+      expect(entry.priority).toBe(0.7)
+      expect(entry.changeFrequency).toBe('weekly')
+    }
   })
 
   it('should include dynamic blog post entries from CMS', async () => {
@@ -153,30 +158,51 @@ describe('sitemap', () => {
     expect(result.length).toBe(8)
   })
 
-  it('should use base URL from env var or default in all URLs', async () => {
-    mockGetProducts.mockResolvedValueOnce([])
-    mockGetProductCategories.mockResolvedValueOnce([])
-    mockGetBlogPosts.mockResolvedValueOnce({ data: [], meta: {} } as Awaited<ReturnType<typeof getBlogPosts>>)
+  describe('environment variables', () => {
+    const originalEnv = process.env
 
-    const result = await sitemap()
+    beforeEach(() => {
+      jest.resetModules()
+      process.env = { ...originalEnv }
+    })
 
-    // All entries should start with a valid base URL
-    const expectedBase = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://thegreenbrother.com'
-    for (const entry of result) {
-      expect(entry.url).toContain(expectedBase)
-    }
-  })
+    afterAll(() => {
+      process.env = originalEnv
+    })
 
-  it('should include alternates with base URL in language URLs', async () => {
-    mockGetProducts.mockResolvedValueOnce([])
-    mockGetProductCategories.mockResolvedValueOnce([])
-    mockGetBlogPosts.mockResolvedValueOnce({ data: [], meta: {} } as Awaited<ReturnType<typeof getBlogPosts>>)
+    it('should use custom NEXT_PUBLIC_SITE_URL in all URLs', async () => {
+      process.env.NEXT_PUBLIC_SITE_URL = 'https://custom-site.com'
+      let sitemapModule!: typeof import('@/app/sitemap').default
+      jest.isolateModules(() => {
+        sitemapModule = require('@/app/sitemap').default
+      })
 
-    const result = await sitemap()
+      mockGetProducts.mockResolvedValueOnce([])
+      mockGetProductCategories.mockResolvedValueOnce([])
+      mockGetBlogPosts.mockResolvedValueOnce({ data: [], meta: {} } as Awaited<ReturnType<typeof getBlogPosts>>)
 
-    const expectedBase = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://thegreenbrother.com'
-    const languages = result[0]?.alternates?.languages as Record<string, string> | undefined
-    expect(languages?.[LanguageCode.EN]).toContain(expectedBase)
+      const result = await sitemapModule()
+      for (const entry of result) {
+        expect(entry.url).toContain('https://custom-site.com')
+      }
+    })
+
+    it('should use fallback URL when NEXT_PUBLIC_SITE_URL is undefined', async () => {
+      delete process.env.NEXT_PUBLIC_SITE_URL
+      let sitemapModule!: typeof import('@/app/sitemap').default
+      jest.isolateModules(() => {
+        sitemapModule = require('@/app/sitemap').default
+      })
+
+      mockGetProducts.mockResolvedValueOnce([])
+      mockGetProductCategories.mockResolvedValueOnce([])
+      mockGetBlogPosts.mockResolvedValueOnce({ data: [], meta: {} } as Awaited<ReturnType<typeof getBlogPosts>>)
+
+      const result = await sitemapModule()
+      for (const entry of result) {
+        expect(entry.url).toContain('https://thegreenbrother.com')
+      }
+    })
   })
 
   it('should not include auth or profile pages', async () => {

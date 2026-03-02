@@ -16,10 +16,15 @@ jest.mock('next/link', () => ({
 
 // Mock next/navigation
 const mockPush = jest.fn()
+const mockNotFound = jest.fn()
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
+  notFound: (): void => {
+    mockNotFound()
+    throw new Error('NEXT_NOT_FOUND')
+  },
 }))
 
 // Mock API
@@ -190,6 +195,7 @@ describe('Signup', () => {
       signupButton: { label: undefined },
       termsLinkText: undefined,
       privacyLinkText: undefined,
+      termsText: undefined,
     }
     ;(getAuthPage as jest.Mock).mockResolvedValueOnce(mockDataMissing)
 
@@ -199,6 +205,23 @@ describe('Signup', () => {
     expect(screen.getByRole('button', { name: 'Sign Up' })).toBeInTheDocument() // Default
     expect(screen.getByText('Terms')).toBeInTheDocument() // Default
     expect(screen.getByText('Privacy Policy')).toBeInTheDocument() // Default
+  })
+
+  it('should call notFound when auth page is null', async () => {
+    ;(getAuthPage as jest.Mock).mockResolvedValueOnce(null)
+
+    // We already mocked notFound above, but might need to ensure it is mocked appropriately.
+    // If not, we can use the same pattern as in other pages. We need to mock next/navigation's notFound.
+    // However, it seems we only mocked `useRouter` from next/navigation in this file. Let's make sure `notFound` is mocked.
+    const mockNotFound = jest.fn()
+    jest.mocked(require('next/navigation')).notFound = (): void => {
+      mockNotFound()
+      throw new Error('NEXT_NOT_FOUND')
+    }
+
+    await expect(Signup({ params: Promise.resolve({ lang: 'en' }) })).rejects.toThrow('NEXT_NOT_FOUND')
+
+    expect(mockNotFound).toHaveBeenCalled()
   })
 })
 

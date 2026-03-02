@@ -453,6 +453,28 @@ describe('apiRequest', () => {
     )
   })
 
+  it('should process request without a headers object gracefully', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({}),
+    } as Response)
+
+    const request = {
+      url: '/products',
+      // No headers property
+    } as unknown as Parameters<typeof apiRequest>[0]
+    await apiRequest(request)
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json',
+        }),
+      })
+    )
+  })
+
   it('should serialize request body as JSON', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
@@ -613,6 +635,18 @@ describe('apiRequest', () => {
     const request = createApiRequest('/missing', {})
 
     await expect(apiRequest(request)).rejects.toThrow('Resource not found')
+  })
+
+  it('should handle 500 server error and fallback to default message', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+    } as Response)
+
+    const request = createApiRequest('/error', {})
+
+    await expect(apiRequest(request)).rejects.toThrow('API request failed: Internal Server Error')
   })
 })
 

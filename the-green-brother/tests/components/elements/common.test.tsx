@@ -92,6 +92,13 @@ describe('common utilities', () => {
       expect(classes).toContain('-translate-x-4')
     })
   })
+  describe('getVisibilityClasses defaults', () => {
+    it('should use default values', () => {
+      const classes = getVisibilityClasses()
+      expect(classes).toContain('translate-x-0')
+    })
+  })
+
   describe('getButtonBaseClasses', () => {
     it('should return base classes', () => {
       const params: ButtonBaseClassesParams = {
@@ -109,6 +116,23 @@ describe('common utilities', () => {
       expect(classes).toContain('bg-primary')
       expect(classes).toContain('text-base')
       expect(classes).toContain('extra-class')
+      expect(classes).toContain('gap-2')
+    })
+
+    it('should adjust for showText=false', () => {
+      const params: ButtonBaseClassesParams = {
+        variant: 'primary',
+        size: 'md',
+        isActive: false,
+        noAnimation: false,
+        showText: false,
+        direction: DirectionEnum.LTR,
+        hasIcon: false,
+        className: 'extra-class',
+      }
+      const classes = getButtonBaseClasses(params)
+      expect(classes).toContain('gap-0')
+      expect(classes).toContain('!px-0')
     })
   })
 
@@ -133,6 +157,18 @@ describe('common utilities', () => {
       }
       const content = composeButtonContent(params)
       expect(content).toBe('Child Content')
+    })
+
+    it('should handle label with showText=false and default parameters', () => {
+      const params: ComposeButtonContentParams = {
+        label: { text: 'Test', icon: 'test', iconPosition: 'BEFORE_TEXT' as any, ariaDescription: '' },
+        children: null,
+        direction: DirectionEnum.RTL,
+        iconSize: 'md',
+        showText: false,
+      }
+      const content = composeButtonContent(params)
+      expect(content).toBeTruthy()
     })
   })
 })

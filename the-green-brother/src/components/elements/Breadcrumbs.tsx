@@ -61,7 +61,6 @@ export function Breadcrumbs({
     const segmentLower = segment.toLowerCase()
     switch (segmentLower) {
       case 'home':
-      case '':
         return navigation.homeButton
       case 'blog':
         return navigation.blogButton

@@ -15,6 +15,15 @@ jest.mock('@/lib/newsletter', () => ({
   subscribeNewsletter: (...args: unknown[]) => mockSubscribeNewsletter(...args),
 }))
 
+// Mock useSearchParams for DOI redirect detection
+let mockSearchParamsValue = new URLSearchParams()
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+  }),
+  useSearchParams: () => mockSearchParamsValue,
+}))
+
 // react-markdown, remark-gfm, rehype-raw, and rehype-sanitize are mocked via moduleNameMapper in jest.config.ts
 
 describe('NewsletterSignupCTA', () => {
@@ -85,6 +94,7 @@ describe('NewsletterSignupCTA', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockSearchParamsValue = new URLSearchParams()
   })
 
   it('should render newsletter title', () => {
@@ -267,6 +277,32 @@ describe('NewsletterSignupCTA', () => {
       expect(consentText).toHaveClass('text-right')
     })
 
+    it('should apply text-left for LTR consent error', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      const consentError = screen.getByTestId('consent-error')
+      expect(consentError).toHaveClass('text-left')
+    })
+
+    it('should apply text-right for RTL consent error', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.RTL} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      const consentError = screen.getByTestId('consent-error')
+      expect(consentError).toHaveClass('text-right')
+    })
+
     it('should disable consent checkbox during submission', async () => {
       let resolvePromise: (value: unknown) => void
       mockSubscribeNewsletter.mockReturnValueOnce(
@@ -292,7 +328,7 @@ describe('NewsletterSignupCTA', () => {
       resolvePromise!({ success: true })
 
       await waitFor(() => {
-        expect(screen.getByTestId('newsletter-success')).toBeInTheDocument()
+        expect(screen.getByTestId('newsletter-pending')).toBeInTheDocument()
       })
     })
   })
@@ -399,6 +435,39 @@ describe('NewsletterSignupCTA', () => {
       expect(errorSpan).toHaveClass('text-right')
     })
 
+    it('should reject email with single-char TLD like a@b.c', async () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'a@b.c' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      expect(screen.getByTestId('email-error')).toHaveTextContent('Please enter a valid email address.')
+      expect(mockSubscribeNewsletter).not.toHaveBeenCalled()
+    })
+
+    it('should accept email with valid two-char TLD like user@domain.co', async () => {
+      mockSubscribeNewsletter.mockResolvedValueOnce({ success: true })
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@domain.co' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      await waitFor(() => {
+        expect(mockSubscribeNewsletter).toHaveBeenCalledWith('user@domain.co')
+      })
+    })
+
     it('should show error text aligned left in LTR mode', () => {
       render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
@@ -466,7 +535,7 @@ describe('NewsletterSignupCTA', () => {
       fireEvent.submit(form!)
 
       await waitFor(() => {
-        expect(screen.getByTestId('newsletter-success')).toBeInTheDocument()
+        expect(screen.getByTestId('newsletter-pending')).toBeInTheDocument()
       })
 
       // Form should be hidden
@@ -487,7 +556,7 @@ describe('NewsletterSignupCTA', () => {
       fireEvent.submit(form!)
 
       await waitFor(() => {
-        expect(screen.getByTestId('newsletter-success')).toHaveTextContent(
+        expect(screen.getByTestId('newsletter-pending')).toHaveTextContent(
           'Check your email to confirm your subscription.'
         )
       })
@@ -574,7 +643,7 @@ describe('NewsletterSignupCTA', () => {
       resolvePromise!({ success: true })
 
       await waitFor(() => {
-        expect(screen.getByTestId('newsletter-success')).toBeInTheDocument()
+        expect(screen.getByTestId('newsletter-pending')).toBeInTheDocument()
       })
     })
 
@@ -603,6 +672,74 @@ describe('NewsletterSignupCTA', () => {
       await waitFor(() => {
         expect(screen.queryByTestId('submit-error')).not.toBeInTheDocument()
       })
+    })
+  })
+
+  describe('DOI state machine', () => {
+    it('should show form state by default (no query param)', () => {
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      expect(screen.getByPlaceholderText('Enter your email')).toBeInTheDocument()
+      expect(screen.queryByTestId('newsletter-pending')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('newsletter-confirmed')).not.toBeInTheDocument()
+    })
+
+    it('should show successMessage when ?newsletter=confirmed is present', () => {
+      mockSearchParamsValue = new URLSearchParams('newsletter=confirmed')
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      expect(screen.getByTestId('newsletter-confirmed')).toHaveTextContent('Thank you for subscribing!')
+      expect(screen.queryByPlaceholderText('Enter your email')).not.toBeInTheDocument()
+    })
+
+    it('should hide form when in confirmed state', () => {
+      mockSearchParamsValue = new URLSearchParams('newsletter=confirmed')
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      expect(screen.queryByPlaceholderText('Enter your email')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('consent-checkbox')).not.toBeInTheDocument()
+    })
+
+    it('should show pending state after successful form submission', async () => {
+      mockSubscribeNewsletter.mockResolvedValueOnce({ success: true })
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      const emailInput = screen.getByPlaceholderText('Enter your email')
+      fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
+      const checkbox = screen.getByTestId('consent-checkbox')
+      fireEvent.click(checkbox)
+
+      const form = document.querySelector('form')
+      fireEvent.submit(form!)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('newsletter-pending')).toHaveTextContent(
+          'Check your email to confirm your subscription.'
+        )
+      })
+
+      // Form should be hidden in pending state
+      expect(screen.queryByPlaceholderText('Enter your email')).not.toBeInTheDocument()
+    })
+
+    it('should show confirmed state with role="status" for accessibility', () => {
+      mockSearchParamsValue = new URLSearchParams('newsletter=confirmed')
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      expect(screen.getByTestId('newsletter-confirmed')).toHaveAttribute('role', 'status')
+    })
+
+    it('should not transition to confirmed state for unrelated query params', () => {
+      mockSearchParamsValue = new URLSearchParams('newsletter=other')
+
+      render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
+
+      expect(screen.getByPlaceholderText('Enter your email')).toBeInTheDocument()
+      expect(screen.queryByTestId('newsletter-confirmed')).not.toBeInTheDocument()
     })
   })
 })

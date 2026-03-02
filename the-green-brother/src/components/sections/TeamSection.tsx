@@ -76,7 +76,7 @@ export function TeamSection({ data, contributors, direction }: TeamSectionProps)
 
   return (
     <section aria-label={header.header?.ariaDescription ?? ''}>
-      <Header data={header} level={3} direction={direction} />
+      <Header data={header} level={2} direction={direction} />
 
       {/* Horizontal scroll carousel */}
       <Carousel direction={direction} className="mt-8">

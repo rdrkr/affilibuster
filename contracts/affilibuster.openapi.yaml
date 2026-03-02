@@ -186,6 +186,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -532,6 +545,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -1354,6 +1380,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -1694,6 +1733,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -1962,6 +2014,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -2294,6 +2359,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -2604,6 +2682,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -2913,6 +3004,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -3143,6 +3247,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -3483,6 +3600,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -3760,6 +3890,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -3986,6 +4129,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -4335,6 +4491,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -4605,6 +4774,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -4974,6 +5156,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -5332,6 +5527,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -5689,6 +5897,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -5926,6 +6147,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -6282,6 +6516,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -6628,6 +6875,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -6865,6 +7125,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -7062,6 +7335,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -7269,6 +7555,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -7606,6 +7905,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -7853,6 +8165,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -8445,6 +8770,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -8721,6 +9059,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -9098,6 +9449,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -9411,6 +9775,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -9725,6 +10102,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -9934,6 +10324,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -10219,6 +10622,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -10489,6 +10905,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -10811,6 +11240,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -11079,6 +11521,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -11397,6 +11852,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -11665,6 +12133,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -11987,6 +12468,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -12343,6 +12837,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -12698,6 +13205,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -12984,6 +13504,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -13285,6 +13818,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -13599,6 +14145,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
@@ -13867,6 +14426,19 @@ paths:
             example: published
           x-strapi-serialize: querystring
           description: Filter documents by publication status. Use "published" for published content or "draft" for draft content. Defaults to "published" when not specified.
+        - name: hasPublishedVersion
+          in: query
+          required: false
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            description: Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+            anyOf:
+              - type: boolean
+              - type: string
+                enum:
+                  - 'true'
+                  - 'false'
+          x-strapi-serialize: querystring
         - name: customPopulate
           in: query
           description: Populate fields using nested-populator syntax. Use "nested" for full depth or specify fields.
