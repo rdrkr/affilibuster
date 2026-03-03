@@ -81,19 +81,24 @@ async def subscribe_newsletter(
         ) from e
 
     # Record consent acceptance in audit trail (GDPR Art. 7(1))
-    raw_ip = request.client.host if request.client else None
-    ip_hash = _ip_anonymizer.hash_ip(raw_ip, settings.ip_hash_salt) if raw_ip else None
+    # Wrapped in try/except: consent recording must not fail the subscription
+    # response since the email was already sent by the provider.
+    try:
+        raw_ip = request.client.host if request.client else None
+        ip_hash = _ip_anonymizer.hash_ip(raw_ip, settings.ip_hash_salt) if raw_ip else None
 
-    await consent_use_case.execute(
-        consent_request=RecordConsentRequest(
-            consent_type=ConsentType.NEWSLETTER,
-            categories=ConsentCategories(necessary=True),
-            action=ConsentAction.ACCEPT_ALL,
-        ),
-        session_id=x_session_id,
-        ip_address=ip_hash,
-        user_agent=None,
-    )
+        await consent_use_case.execute(
+            consent_request=RecordConsentRequest(
+                consent_type=ConsentType.NEWSLETTER,
+                categories=ConsentCategories(necessary=True),
+                action=ConsentAction.ACCEPT_ALL,
+            ),
+            session_id=x_session_id,
+            ip_address=ip_hash,
+            user_agent=None,
+        )
+    except Exception:
+        logger.exception("Failed to record newsletter subscribe consent for %s", body.email)
 
     return result
 
@@ -132,18 +137,23 @@ async def unsubscribe_newsletter(
         ) from e
 
     # Record consent withdrawal in audit trail (GDPR Art. 7(3))
-    raw_ip = request.client.host if request.client else None
-    ip_hash = _ip_anonymizer.hash_ip(raw_ip, settings.ip_hash_salt) if raw_ip else None
+    # Wrapped in try/except: consent recording must not fail the unsubscription
+    # response since the provider action was already completed.
+    try:
+        raw_ip = request.client.host if request.client else None
+        ip_hash = _ip_anonymizer.hash_ip(raw_ip, settings.ip_hash_salt) if raw_ip else None
 
-    await consent_use_case.execute(
-        consent_request=RecordConsentRequest(
-            consent_type=ConsentType.NEWSLETTER,
-            categories=ConsentCategories(necessary=True),
-            action=ConsentAction.REVOKE,
-        ),
-        session_id=x_session_id,
-        ip_address=ip_hash,
-        user_agent=None,
-    )
+        await consent_use_case.execute(
+            consent_request=RecordConsentRequest(
+                consent_type=ConsentType.NEWSLETTER,
+                categories=ConsentCategories(necessary=True),
+                action=ConsentAction.REVOKE,
+            ),
+            session_id=x_session_id,
+            ip_address=ip_hash,
+            user_agent=None,
+        )
+    except Exception:
+        logger.exception("Failed to record newsletter unsubscribe consent for %s", body.email)
 
     return result

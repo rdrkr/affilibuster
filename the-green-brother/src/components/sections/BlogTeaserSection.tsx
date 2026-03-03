@@ -66,6 +66,7 @@ export function BlogTeaserSection({ data, direction, readTimeMinutesLabel, readA
             direction={direction}
             readTimeMinutesLabel={readTimeMinutesLabel}
             readArticleLabel={readArticleLabel}
+            asLink={true}
           />
         ))}
       </Carousel>

@@ -64,6 +64,7 @@ export function FeaturedProductsSection({ data, direction, enableUserProfile }: 
             direction={direction}
             enableUserProfile={enableUserProfile}
             noAnimation={false}
+            asLink={true}
             preload={index < 4}
           />
         ))}

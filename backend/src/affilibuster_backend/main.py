@@ -221,17 +221,6 @@ async def http_exception_handler(_request: Request, exc: HTTPException) -> JSONR
     )
 
 
-# CORS Configuration
-# Origins come from environment variable via settings
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
 # API Version middleware
 class APIVersionMiddleware(BaseHTTPMiddleware):
     """Middleware to add API version header to all responses."""
@@ -257,6 +246,17 @@ app.add_middleware(RequestLoggingMiddleware)
 
 # Add error handling middleware (T142)
 app.add_middleware(ErrorHandlingMiddleware)
+
+# CORS Configuration (MUST be outermost - added last so all responses,
+# including error handler and rate limiter responses, get CORS headers.
+# Without this, browser blocks error responses → "Failed to fetch" TypeError.)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins_list,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Register routers (most specific prefixes first, least specific last)
 

@@ -195,6 +195,55 @@ class TestSubscribeNewsletterEndpoint:
         call_kwargs = mock_consent.execute.call_args.kwargs
         assert call_kwargs["session_id"] == "sess-abc-123"
 
+    async def test_subscribe_succeeds_when_consent_recording_fails(self) -> None:
+        """Test that subscription succeeds even if consent recording fails.
+
+        The email has already been sent by the provider, so a consent recording
+        failure must not prevent the success response from reaching the client.
+        """
+        # Arrange
+        mock_use_case = AsyncMock(spec=SubscribeNewsletterUseCase)
+        mock_use_case.execute.return_value = NewsletterSubscribeResponse(success=True)
+        mock_consent = _create_mock_consent_use_case()
+        mock_consent.execute.side_effect = RuntimeError("Database connection lost")
+        body = NewsletterSubscribeRequest(email="user@example.com")
+
+        # Act
+        with patch("affilibuster_backend.infrastructure.api.routes.newsletter.settings"):
+            result = await subscribe_newsletter(
+                body=body,
+                use_case=mock_use_case,
+                consent_use_case=mock_consent,
+                request=_create_mock_request(),
+            )
+
+        # Assert - subscription still succeeds
+        assert result.success is True
+        mock_use_case.execute.assert_called_once_with(email="user@example.com")
+
+    async def test_subscribe_logs_consent_recording_failure(self) -> None:
+        """Test that consent recording failures are logged for debugging."""
+        # Arrange
+        mock_use_case = AsyncMock(spec=SubscribeNewsletterUseCase)
+        mock_use_case.execute.return_value = NewsletterSubscribeResponse(success=True)
+        mock_consent = _create_mock_consent_use_case()
+        mock_consent.execute.side_effect = RuntimeError("DB error")
+        body = NewsletterSubscribeRequest(email="user@example.com")
+
+        # Act
+        with patch("affilibuster_backend.infrastructure.api.routes.newsletter.settings"):
+            with patch("affilibuster_backend.infrastructure.api.routes.newsletter.logger") as mock_logger:
+                await subscribe_newsletter(
+                    body=body,
+                    use_case=mock_use_case,
+                    consent_use_case=mock_consent,
+                    request=_create_mock_request(),
+                )
+
+        # Assert - error was logged
+        mock_logger.exception.assert_called_once()
+        assert "user@example.com" in mock_logger.exception.call_args[0][1]
+
     async def test_subscribe_handles_no_client_ip(self) -> None:
         """Test that missing client IP is handled gracefully."""
         # Arrange
@@ -292,6 +341,55 @@ class TestUnsubscribeNewsletterEndpoint:
         assert call_kwargs["consent_request"].consent_type == ConsentType.NEWSLETTER
         assert call_kwargs["consent_request"].action == ConsentAction.REVOKE
         assert call_kwargs["user_agent"] is None
+
+    async def test_unsubscribe_succeeds_when_consent_recording_fails(self) -> None:
+        """Test that unsubscription succeeds even if consent recording fails.
+
+        The provider action was already completed, so a consent recording
+        failure must not prevent the success response from reaching the client.
+        """
+        # Arrange
+        mock_use_case = AsyncMock(spec=UnsubscribeNewsletterUseCase)
+        mock_use_case.execute.return_value = NewsletterUnsubscribeResponse(success=True)
+        mock_consent = _create_mock_consent_use_case()
+        mock_consent.execute.side_effect = RuntimeError("Database connection lost")
+        body = NewsletterUnsubscribeRequest(email="user@example.com")
+
+        # Act
+        with patch("affilibuster_backend.infrastructure.api.routes.newsletter.settings"):
+            result = await unsubscribe_newsletter(
+                body=body,
+                use_case=mock_use_case,
+                consent_use_case=mock_consent,
+                request=_create_mock_request(),
+            )
+
+        # Assert - unsubscription still succeeds
+        assert result.success is True
+        mock_use_case.execute.assert_called_once_with(email="user@example.com")
+
+    async def test_unsubscribe_logs_consent_recording_failure(self) -> None:
+        """Test that consent recording failures are logged for debugging."""
+        # Arrange
+        mock_use_case = AsyncMock(spec=UnsubscribeNewsletterUseCase)
+        mock_use_case.execute.return_value = NewsletterUnsubscribeResponse(success=True)
+        mock_consent = _create_mock_consent_use_case()
+        mock_consent.execute.side_effect = RuntimeError("DB error")
+        body = NewsletterUnsubscribeRequest(email="user@example.com")
+
+        # Act
+        with patch("affilibuster_backend.infrastructure.api.routes.newsletter.settings"):
+            with patch("affilibuster_backend.infrastructure.api.routes.newsletter.logger") as mock_logger:
+                await unsubscribe_newsletter(
+                    body=body,
+                    use_case=mock_use_case,
+                    consent_use_case=mock_consent,
+                    request=_create_mock_request(),
+                )
+
+        # Assert - error was logged
+        mock_logger.exception.assert_called_once()
+        assert "user@example.com" in mock_logger.exception.call_args[0][1]
 
     async def test_unsubscribe_does_not_record_consent_on_provider_error(self) -> None:
         """Test that consent withdrawal is not recorded when the provider fails."""
