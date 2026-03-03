@@ -4,7 +4,7 @@
  * Unit tests for BlogClient component
  */
 
-import { screen, waitFor } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 
 // Mock next/link
 jest.mock('next/link', () => ({
@@ -381,35 +381,13 @@ describe('BlogClient', () => {
     expect(fifthPosts.length).toBeGreaterThanOrEqual(2)
   })
 
-  it('should cleanup animation frame on unmount', () => {
-    const cancelAnimationFrameSpy = jest.spyOn(window, 'cancelAnimationFrame')
-
-    const { unmount } = renderWithLayout(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} />, {
-      layoutContext: { direction: DirectionEnum.LTR },
-    })
-
-    unmount()
-
-    expect(cancelAnimationFrameSpy).toHaveBeenCalled()
-    cancelAnimationFrameSpy.mockRestore()
-  })
-
-  it('should become visible after mount', async () => {
-    // Mock requestAnimationFrame to execute immediate
-    const requestAnimationFrameSpy = jest.spyOn(window, 'requestAnimationFrame').mockImplementation(cb => {
-      cb(0)
-      return 1
-    })
-
+  it('should render content visible immediately without JS-gated opacity', () => {
     const { container } = renderWithLayout(<BlogClient blogPageData={mockBlogPageData} posts={mockPosts} />, {
       layoutContext: { direction: DirectionEnum.LTR },
     })
 
-    // Should have opacity-100 class
-    await waitFor(() => {
-      expect(container.firstChild).toHaveClass('opacity-100')
-    })
-
-    requestAnimationFrameSpy.mockRestore()
+    const wrapper = container.firstChild as HTMLElement
+    expect(wrapper.className).not.toContain('opacity-0')
+    expect(wrapper.className).not.toContain('transition-opacity')
   })
 })

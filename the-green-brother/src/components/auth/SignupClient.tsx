@@ -232,8 +232,8 @@ export default function SignupClient({ data, lang, direction }: SignupClientProp
                 }}
                 className={`
                   size-5 rounded-sm border-neutral-200 bg-neutral-50
-                  text-primary-600 focus:ring-primary dark:border-white/10
-                  dark:bg-background-dark dark:text-primary
+                  text-accent focus:ring-primary dark:border-white/10
+                  dark:bg-background-dark
                 `}
                 required
               />
@@ -304,13 +304,7 @@ export default function SignupClient({ data, lang, direction }: SignupClientProp
 
         <p className="mt-8 text-center text-neutral-600 dark:text-text-secondary-dark">
           {haveAccountText}{' '}
-          <Link
-            href={`/${lang}/login`}
-            className={`
-            font-bold text-primary-600 hover:underline
-            dark:text-primary
-          `}
-          >
+          <Link href={`/${lang}/login`} className="font-bold text-accent hover:underline">
             {loginLinkText}
           </Link>
         </p>

@@ -103,10 +103,19 @@ export function LanguageMenu({
   ) : null
 
   // Remove icon from label and use customized icon instead.
+  // Also fix aria-label to include visible text (WCAG label-content-name-mismatch)
   const buttonData = { ...data.menuButton }
   if (buttonData.label) {
     const { icon: _icon, ...rest } = buttonData.label
-    buttonData.label = rest
+    const visibleText = rest.text
+    const cmsAriaDescription = rest.ariaDescription
+    buttonData.label = {
+      ...rest,
+      ariaDescription:
+        visibleText && cmsAriaDescription && !cmsAriaDescription.includes(visibleText)
+          ? `${visibleText} - ${cmsAriaDescription}`
+          : cmsAriaDescription,
+    }
   }
 
   // Determine children position based on icon position from CMS

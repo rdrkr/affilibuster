@@ -4,20 +4,12 @@
  * Unit tests for HomeClient component
  */
 
-import { act, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 
 import HomeClient from '@/app/[lang]/(homepage)/HomeClient'
 import { renderWithLayout } from '../../../utils/renderWithLayout'
 
 describe('HomeClient', () => {
-  beforeEach(() => {
-    jest.useFakeTimers()
-  })
-
-  afterEach(() => {
-    jest.useRealTimers()
-  })
-
   it('should render children', () => {
     renderWithLayout(
       <HomeClient>
@@ -29,40 +21,7 @@ describe('HomeClient', () => {
     expect(screen.getByText('Child Content')).toBeInTheDocument()
   })
 
-  it('should start with opacity-0 and transition to opacity-100', () => {
-    const { container } = renderWithLayout(
-      <HomeClient>
-        <div>Content</div>
-      </HomeClient>
-    )
-
-    // Initially should be opacity-0
-    const wrapper = container.firstChild as HTMLElement
-    expect(wrapper.className).toContain('opacity-0')
-
-    // After requestAnimationFrame, should be opacity-100
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(wrapper.className).toContain('opacity-100')
-  })
-
-  it('should cancel animation frame on unmount', () => {
-    const cancelAnimationFrameSpy = jest.spyOn(window, 'cancelAnimationFrame')
-
-    const { unmount } = renderWithLayout(
-      <HomeClient>
-        <div>Content</div>
-      </HomeClient>
-    )
-    unmount()
-
-    expect(cancelAnimationFrameSpy).toHaveBeenCalled()
-    cancelAnimationFrameSpy.mockRestore()
-  })
-
-  it('should render with transition classes', () => {
+  it('should render content visible immediately without JS-gated opacity', () => {
     const { container } = renderWithLayout(
       <HomeClient>
         <div>Content</div>
@@ -70,7 +29,7 @@ describe('HomeClient', () => {
     )
 
     const wrapper = container.firstChild as HTMLElement
-    expect(wrapper.className).toContain('transition-opacity')
-    expect(wrapper.className).toContain('duration-1000')
+    expect(wrapper.className).not.toContain('opacity-0')
+    expect(wrapper.className).not.toContain('transition-opacity')
   })
 })

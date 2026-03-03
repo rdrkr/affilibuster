@@ -81,7 +81,7 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
                 dark:shadow-none
               `}
             >
-              <Header data={feature} level={5} direction={direction} className="w-full" />
+              <Header data={feature} level={3} direction={direction} className="w-full" />
             </div>
           )
         })}
@@ -185,7 +185,7 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
 
             return (
               <div key={feature.id ?? index} className={`flex items-start gap-4`}>
-                <Header data={feature} level={5} direction={direction} />
+                <Header data={feature} level={3} direction={direction} />
               </div>
             )
           })}

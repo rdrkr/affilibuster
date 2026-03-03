@@ -3,7 +3,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { type HTMLAttributes, type ReactNode, useEffect, useState } from 'react'
+import { type HTMLAttributes, type ReactNode } from 'react'
 
 import { useLayoutContext } from '@/components/providers'
 import { DirectionEnum } from '../../lib/generated'
@@ -22,21 +22,21 @@ export interface PageClientProps extends HTMLAttributes<HTMLDivElement> {
   layout?: PageClientLayout
   /** Breadcrumbs configuration. If true or object provided, breadcrumbs are shown (requires lang/direction/navigation). */
   breadcrumbs?: boolean | Pick<BreadcrumbsProps, 'customLastCrumbLabel'>
-  /** content to render inside the animated wrapper */
+  /** content to render inside the page wrapper */
   children: ReactNode
   /** Additional classes for the children wrapper */
   childrenClassName?: string
 }
 
 /**
- * Generic page client wrapper that handles enter animations.
+ * Generic page client wrapper with layout, RTL, and breadcrumbs support.
  * @param props - Component props
  * @param props.layout - Layout variant
  * @param props.breadcrumbs - Breadcrumbs configuration. If provided, breadcrumbs are shown.
  * @param props.children - Content to render
  * @param props.className - Additional classes for the outer wrapper
  * @param props.childrenClassName - Additional classes for the children wrapper
- * @returns Animated wrapper div
+ * @returns Page wrapper div
  */
 export function PageClient({
   layout = 'wide',
@@ -48,17 +48,6 @@ export function PageClient({
 }: PageClientProps) {
   const { lang, direction, navigation } = useLayoutContext()
   const pathname = usePathname()
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    // Use requestAnimationFrame to avoid cascading renders
-    const frame = requestAnimationFrame(() => {
-      setIsVisible(true)
-    })
-    return () => {
-      cancelAnimationFrame(frame)
-    }
-  }, [])
 
   const isRTL = direction === DirectionEnum.RTL
   const showBreadcrumbs = !!breadcrumbs && !!navigation
@@ -68,8 +57,7 @@ export function PageClient({
     <div
       dir={isRTL ? 'rtl' : 'ltr'}
       className={`
-        mx-auto mt-8 mb-16 flex flex-col transition-opacity duration-1000
-        ${isVisible ? `opacity-100` : `opacity-0`}
+        mx-auto mt-8 mb-16 flex flex-col
         ${layout === 'wide' ? `max-w-7xl` : `max-w-4xl`}
         ${className}
         `}

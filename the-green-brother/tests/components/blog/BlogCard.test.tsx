@@ -275,7 +275,7 @@ describe('BlogCard', () => {
   it('should render post title', () => {
     render(<BlogCard {...defaultProps} />)
 
-    expect(screen.getByRole('heading', { level: 4, name: 'Test Post Title' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Test Post Title' })).toBeInTheDocument()
   })
 
   it('should render post excerpt', () => {

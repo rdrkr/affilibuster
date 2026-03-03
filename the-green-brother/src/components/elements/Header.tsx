@@ -103,8 +103,8 @@ export function Header({
   const DEFAULT_LEVEL_CLASSES: Record<number, string> = {
     1: 'text-5xl lg:text-7xl md:text-6xl leading-tight tracking-tight',
     2: 'text-4xl',
-    3: 'text-3xl',
-    4: 'text-xl',
+    3: 'text-xl',
+    4: 'text-lg',
     5: 'text-lg',
     6: 'text-base lg:text-sm md:text-lg',
   }
@@ -140,7 +140,7 @@ export function Header({
             iconSize={headerIconSize}
             promoteIcon
             className="shrink-0"
-            iconClassName="text-primary text-shadow-sm dark:text-shadow-none"
+            iconClassName="text-accent text-shadow-none dark:text-shadow-none"
             direction={direction}
           />
           <div className="flex flex-col">
@@ -189,7 +189,7 @@ export function Header({
           promoteIcon={isPromoted}
           className={`font-bold ${alignmentClass} ${defaultSizeClass} ${headerClassName}`}
           textClassName={headerTextClassName}
-          iconClassName="text-primary text-shadow-sm dark:text-shadow-none"
+          iconClassName="text-accent text-shadow-none dark:text-shadow-none"
           direction={direction}
         />
       )}

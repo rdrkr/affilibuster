@@ -174,26 +174,18 @@ function NewsletterSignupCTAInner({ data, direction }: NewsletterSignupCTAProps)
                 alignment: AlignmentEnum.CENTER,
               } as ElementsHeaderEntry
             }
-            level={4}
+            level={3}
             direction={direction}
             className="mb-6"
             headerClassName="text-neutral-800 dark:text-white"
             subheaderClassName="text-sm text-neutral-600 dark:text-text-secondary-dark"
           />
           {state === 'confirmed' ? (
-            <div
-              className="text-center text-sm text-primary-600 dark:text-primary-400"
-              data-testid="newsletter-confirmed"
-              role="status"
-            >
+            <div className="text-center text-sm text-accent" data-testid="newsletter-confirmed" role="status">
               {successMessage.text}
             </div>
           ) : state === 'pending' ? (
-            <div
-              className="text-center text-sm text-primary-600 dark:text-primary-400"
-              data-testid="newsletter-pending"
-              role="status"
-            >
+            <div className="text-center text-sm text-accent" data-testid="newsletter-pending" role="status">
               {pendingConfirmationMessage.text}
             </div>
           ) : (

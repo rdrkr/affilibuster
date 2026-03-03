@@ -264,8 +264,8 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
                 <div
                   className={`
                     flex size-10 items-center justify-center rounded-lg
-                    bg-primary-100 text-primary-600
-                    dark:bg-primary-900/30 dark:text-primary-400
+                    bg-primary-100 text-accent
+                    dark:bg-primary-900/30
                   `}
                 >
                   <span className="material-symbols-outlined">download</span>

@@ -88,7 +88,7 @@ export default function BlogPostClient({ post, direction, blogData, language }: 
               text={post.tags[0].tag.text}
               as="span"
               className={`
-                mb-4 block text-sm font-bold tracking-wider text-primary-600
+                mb-4 block text-sm font-bold tracking-wider text-accent-light
                 uppercase
               `}
             />

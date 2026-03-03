@@ -105,4 +105,38 @@ describe('PageClient', () => {
     expect(childWrapper).toHaveClass('flex-col')
     expect(childWrapper).toHaveClass('gap-16')
   })
+
+  it('should set dir="rtl" when direction is RTL', () => {
+    mockUseLayoutContext.mockReturnValue({
+      lang: 'he',
+      direction: 'rtl',
+      navigation: { menu: [] },
+    })
+
+    const { container } = render(
+      <PageClient>
+        <div>Child</div>
+      </PageClient>
+    )
+
+    expect(container.firstChild).toHaveAttribute('dir', 'rtl')
+  })
+
+  it('should pass breadcrumbs config object to Breadcrumbs component', () => {
+    const { Breadcrumbs } = jest.requireMock('@/components/elements/Breadcrumbs') as {
+      Breadcrumbs: jest.Mock
+    }
+
+    render(
+      <PageClient breadcrumbs={{ customLastCrumbLabel: 'Custom Label' }}>
+        <div>Child</div>
+      </PageClient>
+    )
+
+    expect(screen.getByTestId('breadcrumbs')).toBeInTheDocument()
+    expect(Breadcrumbs).toHaveBeenCalledWith(
+      expect.objectContaining({ customLastCrumbLabel: 'Custom Label' }),
+      undefined
+    )
+  })
 })

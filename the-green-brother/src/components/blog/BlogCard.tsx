@@ -33,7 +33,7 @@ export interface BlogCardProps {
   height?: CardSizeModifier
   /** Additional CSS classes for the card */
   className?: string
-  /** Heading level for semantic hierarchy (default: 4) */
+  /** Heading level for semantic hierarchy (default: 3) */
   headingLevel?: HeaderLevel
   /** Whether to disable hover animations */
   noAnimation?: boolean
@@ -60,7 +60,7 @@ export interface BlogCardProps {
  * @param props.width - Card width
  * @param props.height - Card height
  * @param props.className - Additional CSS classes
- * @param props.headingLevel - Heading level (default: 4)
+ * @param props.headingLevel - Heading level (default: 3)
  * @param props.noAnimation - Whether to disable hover animations
  * @param props.asLink - Whether the card acts as a link
  * @param props.showTag - Whether to show tag
@@ -78,7 +78,7 @@ export function BlogCard({
   width = 'fixed',
   height = 'fixed',
   className = '',
-  headingLevel = 4,
+  headingLevel = 3,
   noAnimation,
   asLink = false,
   showTag = true,
@@ -204,6 +204,7 @@ export function BlogCard({
       direction={direction}
       noAnimation={noAnimation ?? false}
       preload={preload}
+      linkAriaLabel={content.header?.header?.text}
       className={`
         group @container flex justify-between overflow-hidden
         ${className}

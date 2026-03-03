@@ -4,7 +4,7 @@
  * Unit tests for AboutClient component
  */
 
-import { act, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 
 // Mock AboutSections component
 jest.mock('@/components/about', () => ({
@@ -58,14 +58,6 @@ describe('AboutClient', () => {
     },
   }
 
-  beforeEach(() => {
-    jest.useFakeTimers()
-  })
-
-  afterEach(() => {
-    jest.useRealTimers()
-  })
-
   it('should return null when aboutData is null', () => {
     const { container } = renderWithLayout(<AboutClient aboutData={null} contributors={[]} />, {
       layoutContext: { direction: DirectionEnum.LTR },
@@ -101,43 +93,14 @@ describe('AboutClient', () => {
     expect(aboutSections).toHaveAttribute('data-contributor-count', '2')
   })
 
-  it('should start with opacity-0 and transition to opacity-100', () => {
-    const { container } = renderWithLayout(<AboutClient aboutData={mockAboutData} contributors={[]} />, {
-      layoutContext: { direction: DirectionEnum.LTR },
-    })
-
-    // Initially should be opacity-0
-    const wrapper = container.firstChild as HTMLElement
-    expect(wrapper.className).toContain('opacity-0')
-
-    // After requestAnimationFrame, should be opacity-100
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(wrapper.className).toContain('opacity-100')
-  })
-
-  it('should cancel animation frame on unmount', () => {
-    const cancelAnimationFrameSpy = jest.spyOn(window, 'cancelAnimationFrame')
-
-    const { unmount } = renderWithLayout(<AboutClient aboutData={mockAboutData} contributors={[]} />, {
-      layoutContext: { direction: DirectionEnum.LTR },
-    })
-    unmount()
-
-    expect(cancelAnimationFrameSpy).toHaveBeenCalled()
-    cancelAnimationFrameSpy.mockRestore()
-  })
-
-  it('should render with transition classes', () => {
+  it('should render content visible immediately without JS-gated opacity', () => {
     const { container } = renderWithLayout(<AboutClient aboutData={mockAboutData} contributors={[]} />, {
       layoutContext: { direction: DirectionEnum.LTR },
     })
 
     const wrapper = container.firstChild as HTMLElement
-    expect(wrapper.className).toContain('transition-opacity')
-    expect(wrapper.className).toContain('duration-1000')
+    expect(wrapper.className).not.toContain('opacity-0')
+    expect(wrapper.className).not.toContain('transition-opacity')
   })
 
   it('should have space-y classes for layout', () => {

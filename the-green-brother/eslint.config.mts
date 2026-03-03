@@ -104,6 +104,7 @@ export default defineConfig([
             'prose', // Typography plugin
             'prose-invert', // Typography plugin
             'skeleton', // Custom skeleton loading element
+            'accent', // Custom accent color
           ],
         },
       ],

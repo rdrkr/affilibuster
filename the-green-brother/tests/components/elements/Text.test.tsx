@@ -187,19 +187,19 @@ describe('resolveTextFormatHtml', () => {
 
   it('should convert **bold** to span with text-primary class', () => {
     expect(resolveTextFormatHtml('Hello **World**')).toBe(
-      'Hello <span class="text-primary text-shadow-sm dark:text-shadow-none">World</span>'
+      'Hello <span class="text-primary dark:text-primary text-shadow-sm dark:text-shadow-none">World</span>'
     )
   })
 
   it('should convert multiple bold sections', () => {
     expect(resolveTextFormatHtml('**A** and **B**')).toBe(
-      '<span class="text-primary text-shadow-sm dark:text-shadow-none">A</span> and <span class="text-primary text-shadow-sm dark:text-shadow-none">B</span>'
+      '<span class="text-primary dark:text-primary text-shadow-sm dark:text-shadow-none">A</span> and <span class="text-primary dark:text-primary text-shadow-sm dark:text-shadow-none">B</span>'
     )
   })
 
   it('should handle only bold text', () => {
     expect(resolveTextFormatHtml('**OnlyBold**')).toBe(
-      '<span class="text-primary text-shadow-sm dark:text-shadow-none">OnlyBold</span>'
+      '<span class="text-primary dark:text-primary text-shadow-sm dark:text-shadow-none">OnlyBold</span>'
     )
   })
 
@@ -209,7 +209,7 @@ describe('resolveTextFormatHtml', () => {
 
   it('should handle mixed bold and newlines', () => {
     expect(resolveTextFormatHtml('**Bold**\nText')).toBe(
-      '<span class="text-primary text-shadow-sm dark:text-shadow-none">Bold</span><br />Text'
+      '<span class="text-primary dark:text-primary text-shadow-sm dark:text-shadow-none">Bold</span><br />Text'
     )
   })
 })

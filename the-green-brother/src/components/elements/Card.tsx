@@ -75,6 +75,8 @@ export interface CardProps {
   preload?: boolean
   /** Whether to show the card background, border, and shadow (default: true) */
   showBackground?: boolean
+  /** Accessible label for the full-card overlay link (required when asLink is true) */
+  linkAriaLabel?: string | undefined
 }
 
 const sizeConfig: Record<
@@ -158,6 +160,7 @@ function getSizeClasses(size: CardSize, layout: CardLayout) {
  * @param props.noAnimation - Whether to disable hover animations
  * @param props.preload - Whether to preload image (for LCP optimization)
  * @param props.showBackground - Whether to show the card background/shadow (default: true)
+ * @param props.linkAriaLabel - Accessible label for overlay link (required when asLink is true)
  * @returns Card component or null if not visible
  */
 export function Card({
@@ -180,6 +183,7 @@ export function Card({
   noAnimation = false,
   preload = false,
   showBackground = true,
+  linkAriaLabel,
 }: CardProps) {
   if (visible === false) {
     return null
@@ -258,7 +262,9 @@ export function Card({
 
   return (
     <div className={cardClasses} style={cardStyle} data-href={href} dir={isRTL ? 'rtl' : 'ltr'}>
-      {asLink && <Link href={href} className="absolute inset-0 z-10 cursor-pointer" tabIndex={-1} />}
+      {asLink && (
+        <Link href={href} className="absolute inset-0 z-10 cursor-pointer" tabIndex={-1} aria-label={linkAriaLabel} />
+      )}
 
       {isHorizontalLayout ? (
         // Horizontal Layout

@@ -524,6 +524,14 @@ describe('Card', () => {
     expect(overlayLink).toHaveAttribute('tabindex', '-1')
   })
 
+  it('should apply aria-label to overlay link when linkAriaLabel is provided', () => {
+    render(<Card {...defaultProps} linkAriaLabel="Read more about test" />)
+
+    const links = screen.getAllByRole('link', { hidden: true })
+    const overlayLink = links.find(l => l.getAttribute('href') === '/test-path' && l.className.includes('absolute'))
+    expect(overlayLink).toHaveAttribute('aria-label', 'Read more about test')
+  })
+
   it('should not render absolute link overlay when asLink is false', () => {
     render(<Card {...defaultProps} asLink={false} />)
 

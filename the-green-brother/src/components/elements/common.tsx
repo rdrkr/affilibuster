@@ -83,15 +83,15 @@ export function getVariantClasses(
     `,
     secondary: `
       cursor-pointer
-      bg-black/5 text-primary-600 font-semibold text-shadow-none
-      dark:bg-white/5 dark:text-primary dark:text-shadow-none
+      bg-black/5 text-accent font-semibold text-shadow-none
+      dark:bg-white/5 dark:text-shadow-none
       hover:bg-primary hover:text-background-dark active:bg-primary-600
       disabled:bg-tertiary-500 disabled:text-tertiary-500 disabled:cursor-not-allowed
     `,
     outline: `
       cursor-pointer
-      border-2 border-primary-600 text-primary-600 font-bold text-shadow-none
-      dark:border-primary dark:text-primary dark:text-shadow-none
+      border-2 border-primary-600 text-accent font-bold text-shadow-none
+      dark:border-primary dark:text-shadow-none
       hover:bg-primary hover:text-background-dark active:bg-primary-600
       disabled:border-tertiary-500 disabled:text-tertiary-500 disabled:cursor-not-allowed
     `,
@@ -99,11 +99,7 @@ export function getVariantClasses(
       cursor-pointer
       font-medium bg-transparent whitespace-nowrap rounded-full
       transition-colors
-      ${
-        isActive
-          ? `text-primary-600 text-shadow-none dark:text-primary dark:text-shadow-none`
-          : `text-black dark:text-text-secondary-dark`
-      }
+      ${isActive ? `text-accent text-shadow-none dark:text-shadow-none` : `text-black dark:text-text-secondary-dark`}
       hover:bg-transparent hover:text-primary-600 hover:text-shadow-none dark:hover:text-shadow-none
       active:text-primary-600 dark:active:text-primary dark:hover:text-primary-hover
       disabled:text-tertiary-500 disabled:cursor-not-allowed
@@ -144,8 +140,8 @@ export function getVariantClasses(
     'link-1': `
       cursor-pointer
       font-medium font-semibold no-underline
-      text-primary-600 text-shadow-none hover:text-primary-600 active:text-primary
-      dark:text-primary dark:text-shadow-none dark:hover:text-primary-hover dark:active:text-primary-400
+      text-accent text-shadow-none hover:text-primary-600 active:text-primary
+      dark:text-shadow-none dark:hover:text-primary-hover dark:active:text-primary-400
       disabled:text-tertiary-500 disabled:cursor-not-allowed
       ${
         noAnimation

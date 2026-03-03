@@ -2,6 +2,7 @@
 
 import { ButtonLink, Icon, Text } from '@/components/elements'
 import { Card, type CardLayout, type CardSize, type CardSizeModifier } from '@/components/elements/Card'
+import type { HeaderLevel } from '@/components/elements/Header'
 import { DirectionEnum, type ApiProductProductDocument } from '@/lib/generated/types.gen'
 
 /**
@@ -30,6 +31,8 @@ export interface ProductCardProps {
   noAnimation?: boolean
   /** Whether to preload image (for LCP optimization) */
   preload?: boolean
+  /** Heading level for semantic hierarchy (default: 3) */
+  headingLevel?: HeaderLevel
 }
 
 /**
@@ -49,6 +52,7 @@ export interface ProductCardProps {
  * @param props.height - Card height
  * @param props.noAnimation - No card hover animation
  * @param props.preload - Whether to preload image (for LCP optimization)
+ * @param props.headingLevel - Heading level for semantic hierarchy (default: 3)
  * @returns ProductCard component
  */
 export function ProductCard({
@@ -63,6 +67,7 @@ export function ProductCard({
   height = 'fixed',
   noAnimation = true,
   preload = false,
+  headingLevel = 3,
 }: ProductCardProps) {
   // Data extraction
   const primaryImage = product.images[0]
@@ -97,7 +102,7 @@ export function ProductCard({
             as="span"
             className={`
               text-xs font-bold tracking-wider
-              text-primary-600 uppercase text-shadow-sm dark:text-primary dark:text-shadow-none
+              text-accent uppercase text-shadow-sm dark:text-shadow-none
             `}
           />
         )}
@@ -113,10 +118,11 @@ export function ProductCard({
       </div>
     )
 
+  const HeadingTag = `h${String(headingLevel)}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
   const contentHeader = product.header.header ? (
     <Text
       text={product.header.header.text}
-      as="h4"
+      as={HeadingTag}
       className={`
         line-clamp-2 text-lg font-bold text-neutral-800
         transition-colors
@@ -173,6 +179,7 @@ export function ProductCard({
       noAnimation={noAnimation}
       preload={preload}
       showBackground={showBackground}
+      linkAriaLabel={product.header.header?.text}
       imageOverlay={
         enableUserProfile && (
           <div className="absolute top-3 right-3 z-20">

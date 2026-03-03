@@ -140,7 +140,7 @@ describe('LanguageMenu', () => {
         showText={true}
       />
     )
-    const button = screen.getByRole('button', { name: 'Select language' })
+    const button = screen.getByRole('button', { name: 'Language - Select language' })
     expect(button).toBeInTheDocument()
   })
 
@@ -156,7 +156,7 @@ describe('LanguageMenu', () => {
       />
     )
     // Open menu first
-    fireEvent.click(screen.getByRole('button', { name: 'Select language' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Language - Select language' }))
     expect(screen.getByText(/🇺🇸.*English/)).toBeInTheDocument()
     expect(screen.getByText(/🇮🇹.*Italiano/)).toBeInTheDocument()
     expect(screen.getByText(/🇮🇱.*עברית/)).toBeInTheDocument()
@@ -174,7 +174,7 @@ describe('LanguageMenu', () => {
       />
     )
     // Open menu first
-    fireEvent.click(screen.getByRole('button', { name: 'Select language' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Language - Select language' }))
     expect(screen.getByText(/🇺🇸/)).toBeInTheDocument()
     expect(screen.getByText(/🇮🇹/)).toBeInTheDocument()
     expect(screen.getByText(/🇮🇱/)).toBeInTheDocument()
@@ -207,7 +207,7 @@ describe('LanguageMenu', () => {
       />
     )
     // Open menu first
-    fireEvent.click(screen.getByRole('button', { name: 'Select language' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Language - Select language' }))
     const italianButton = screen.getByText(/Italiano/).closest('button')
     fireEvent.click(italianButton!)
     expect(mockOnLanguageChange).toHaveBeenCalledWith(LanguageCode.IT)
@@ -225,7 +225,7 @@ describe('LanguageMenu', () => {
       />
     )
     // Open menu first
-    fireEvent.click(screen.getByRole('button', { name: 'Select language' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Language - Select language' }))
     const italianButton = screen.getByText(/Italiano/).closest('button')
     expect(italianButton?.className).toContain('bg-white/5')
   })
@@ -242,7 +242,7 @@ describe('LanguageMenu', () => {
       />
     )
     // Open menu first
-    fireEvent.click(screen.getByRole('button', { name: 'Select language' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Language - Select language' }))
     const italianButton = screen.getByText(/Italiano/).closest('button')
     expect(italianButton?.className).not.toContain('bg-white/5')
   })
@@ -279,7 +279,7 @@ describe('LanguageMenu', () => {
       />
     )
     // Open menu first to check content
-    fireEvent.click(screen.getByRole('button', { name: 'Select language' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Language - Select language' }))
     expect(screen.getByText(/English/)).toBeInTheDocument()
   })
 
@@ -295,7 +295,7 @@ describe('LanguageMenu', () => {
       />
     )
     // Open menu
-    fireEvent.click(screen.getByRole('button', { name: 'Select language' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Language - Select language' }))
     // Language items wrapper should always be LTR
     const ltrWrapper = container.querySelector('[dir="ltr"]')
     expect(ltrWrapper).toBeInTheDocument()
@@ -352,6 +352,34 @@ describe('LanguageMenu', () => {
     expect(screen.getByText('Language')).toBeInTheDocument()
   })
 
+  it('should not duplicate visible text in aria-label when ariaDescription already includes it', () => {
+    const mockDataWithIncludedText = {
+      ...mockData,
+      menuButton: {
+        ...mockData.menuButton,
+        label: {
+          text: 'Language',
+          icon: 'language',
+          iconPosition: IconPositionEnum.BEFORE_TEXT,
+          ariaDescription: 'Language selector',
+        },
+      },
+    } as unknown as LanguageMenuProps['data']
+    render(
+      <LanguageMenu
+        data={mockDataWithIncludedText}
+        languages={mockLanguages}
+        selectedLang={LanguageCode.EN}
+        onLanguageChange={mockOnLanguageChange}
+        direction={DirectionEnum.LTR}
+        showText={true}
+      />
+    )
+    // ariaDescription "Language selector" already includes "Language", so no prefix
+    const button = screen.getByRole('button', { name: 'Language selector' })
+    expect(button).toBeInTheDocument()
+  })
+
   it('should handle missing label in buttonData (line 106 else branch)', () => {
     const mockDataNoLabel = {
       ...mockData,
@@ -386,7 +414,7 @@ describe('LanguageMenu', () => {
         showText={true}
       />
     )
-    const button = screen.getByRole('button', { name: 'Select language' })
+    const button = screen.getByRole('button', { name: 'Language - Select language' })
     // Initial state: closed
     expect(button).toHaveAttribute('aria-expanded', 'false')
 
@@ -412,7 +440,7 @@ describe('LanguageMenu', () => {
         />
       </div>
     )
-    const button = screen.getByRole('button', { name: 'Select language' })
+    const button = screen.getByRole('button', { name: 'Language - Select language' })
 
     // Open menu
     fireEvent.click(button)
@@ -434,7 +462,7 @@ describe('LanguageMenu', () => {
         showText={true}
       />
     )
-    const button = screen.getByRole('button', { name: 'Select language' })
+    const button = screen.getByRole('button', { name: 'Language - Select language' })
 
     // Open menu
     fireEvent.click(button)
@@ -458,7 +486,7 @@ describe('LanguageMenu', () => {
       />
     )
     const container = screen.getByTestId('language-menu-container')
-    const button = screen.getByRole('button', { name: 'Select language' })
+    const button = screen.getByRole('button', { name: 'Language - Select language' })
 
     // Hover -> Open
     fireEvent.mouseEnter(container)
@@ -493,7 +521,7 @@ describe('LanguageMenu', () => {
       />
     )
     const container = screen.getByTestId('language-menu-container')
-    const button = screen.getByRole('button', { name: 'Select language' })
+    const button = screen.getByRole('button', { name: 'Language - Select language' })
 
     // Hover -> Open
     fireEvent.mouseEnter(container)
@@ -516,7 +544,7 @@ describe('LanguageMenu', () => {
         showText={true}
       />
     )
-    const button = screen.getByRole('button', { name: 'Select language' })
+    const button = screen.getByRole('button', { name: 'Language - Select language' })
 
     // Open
     fireEvent.click(button)
@@ -541,7 +569,7 @@ describe('LanguageMenu', () => {
         showText={true}
       />
     )
-    const button = screen.getByRole('button', { name: 'Select language' })
+    const button = screen.getByRole('button', { name: 'Language - Select language' })
 
     // Open menu
     fireEvent.click(button)
@@ -598,7 +626,7 @@ describe('LanguageMenu', () => {
           showText={true}
         />
       )
-      expect(screen.getByRole('button', { name: 'Select language' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Language - Select language' })).toBeInTheDocument()
     })
 
     it('should stay in document but be hidden when visible is false', () => {

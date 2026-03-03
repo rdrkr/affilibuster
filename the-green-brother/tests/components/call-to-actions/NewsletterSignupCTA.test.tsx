@@ -100,7 +100,7 @@ describe('NewsletterSignupCTA', () => {
   it('should render newsletter title', () => {
     render(<NewsletterSignupCTA direction={DirectionEnum.LTR} data={mockSectionData} />)
 
-    expect(screen.getByRole('heading', { level: 4, name: 'Join Our Community' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Join Our Community' })).toBeInTheDocument()
   })
 
   it('should render newsletter description', () => {

@@ -85,7 +85,7 @@ export function HeroSection({
   const renderContent = (isOverlay: boolean) => (
     <div
       className={`
-        animate-fade-in-up relative z-20 flex max-w-4xl flex-col px-4
+        relative z-20 flex max-w-4xl animate-fade-in-up flex-col px-4
         text-neutral-800 dark:text-white
         ${textAlignClass}
         ${isOverlay && !isCentered ? (isRTL ? 'mr-8' : 'ml-8') : ''}
@@ -120,9 +120,8 @@ export function HeroSection({
         image={image}
         className={`size-full object-cover ${isOverlay ? 'opacity-80' : 'rounded-xl'}`}
         fill
-        preload
-        loading="eager"
         fetchPriority="high"
+        loading="eager"
         sizes="100vw"
       />
     </div>

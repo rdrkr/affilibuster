@@ -48,7 +48,10 @@ export function resolveTextFormat(text: string): ReactNode {
       parts.push(
         createElement(
           'span',
-          { key: `bold-${String(keyIndex++)}`, className: 'text-primary text-shadow-sm dark:text-shadow-none' },
+          {
+            key: `bold-${String(keyIndex++)}`,
+            className: 'text-primary dark:text-primary text-shadow-sm dark:text-shadow-none',
+          },
           match[1]
         )
       )
@@ -112,7 +115,10 @@ export function resolveTextFormatHtml(text: string | undefined | null): string {
     return ''
   }
   return text
-    .replace(/\*\*([^*]+)\*\*/g, '<span class="text-primary text-shadow-sm dark:text-shadow-none">$1</span>')
+    .replace(
+      /\*\*([^*]+)\*\*/g,
+      '<span class="text-primary dark:text-primary text-shadow-sm dark:text-shadow-none">$1</span>'
+    )
     .replace(/(\\n|\n)/g, '<br />')
 }
 

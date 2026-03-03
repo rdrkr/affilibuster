@@ -236,13 +236,7 @@ export default function LoginClient({ data, lang, direction }: LoginClientProps)
         {/* Footer Link */}
         <p className="mt-8 text-center text-neutral-600 dark:text-text-secondary-dark">
           {noAccountText}{' '}
-          <Link
-            href={`/${lang}/signup`}
-            className={`
-            font-bold text-primary-600 hover:underline
-            dark:text-primary
-          `}
-          >
+          <Link href={`/${lang}/signup`} className="font-bold text-accent hover:underline">
             {signupLinkText}
           </Link>
         </p>

@@ -97,23 +97,32 @@
   /* ============================================
    * SKELETON / LOADING PLACEHOLDER COLORS
    * ============================================ */
-  --color-skeleton: var(--color-primary-50);
+  --color-skeleton-light: var(--color-secondary-50);
   --color-skeleton-dark: var(--color-secondary-900);
+  --color-skeleton: light-dark(var(--color-skeleton-light), var(--color-skeleton-dark));
 
   /* ============================================
    * INTERACTIVE STATE COLORS
    * ============================================ */
   --color-primary-hover: var(--color-primary-500);
+  --color-primary-hover-dark: var(--color-primary-500);
   --color-focus-ring: var(--color-primary-400);
-  --color-hover-accent: var(--color-primary-300);
+  --color-focus-ring-dark: var(--color-primary-400);
+  --color-accent-light: var(--color-primary-700);
+  --color-accent-dark: var(--color-primary);
+  --color-accent: light-dark(var(--color-accent-light), var(--color-accent-dark));
   --color-active-indicator: var(--color-primary-400);
+  --color-active-indicator-dark: var(--color-primary-400);
 
   /* ============================================
    * FORM COLORS
    * ============================================ */
   --color-form-input-border: var(--color-tertiary-300);
+  --color-form-input-border-dark: var(--color-tertiary-300);
   --color-form-input-focus: var(--color-primary-500);
+  --color-form-input-focus-dark: var(--color-primary-500);
   --color-form-input-focus-ring: var(--color-primary-400);
+  --color-form-input-focus-ring-dark: var(--color-primary-400);
 
   /* ============================================
    * SEMANTIC THEME COLORS
@@ -243,6 +252,7 @@
   --animate-scale-up: scaleUp 0.2s ease-out;
   --animate-scale-down: scaleDown 0.2s ease-out;
   --animate-spin: spin 1s linear infinite;
+  --animate-fade-in-up: fadeInUp 0.5s ease-out;
   --animate-collapse-text: collapseText 0.2s ease-out forwards;
   --animate-expand-text: expandText 0.2s ease-out forwards;
 }
@@ -269,6 +279,17 @@ html[lang='he'] {
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

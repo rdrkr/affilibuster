@@ -78,7 +78,7 @@ export default function BlogClient({ blogPageData, posts }: BlogClientProps) {
       {featuredBlogPosts?.length && featuredBlogPosts.length > 0 && (
         <>
           {/* Featured Posts Hero Carousel - Desktop */}
-          <Carousel variant="hero" direction={direction} className="animate-fade-in-up hidden md:flex md:flex-col">
+          <Carousel variant="hero" direction={direction} className="hidden animate-fade-in-up md:flex md:flex-col">
             {featuredBlogPosts.map((post, index) => (
               <BlogCard
                 key={post.documentId}
@@ -92,7 +92,7 @@ export default function BlogClient({ blogPageData, posts }: BlogClientProps) {
           </Carousel>
 
           {/* Featured Posts Hero Carousel - Mobile */}
-          <Carousel variant="hero" direction={direction} className="animate-fade-in-up flex flex-col md:hidden">
+          <Carousel variant="hero" direction={direction} className="flex animate-fade-in-up flex-col md:hidden">
             {featuredBlogPosts.map((post, index) => (
               <BlogCard
                 key={`mobile-${post.documentId}`}
