@@ -97,7 +97,7 @@ export function ProductCard({
             as="span"
             className={`
               text-xs font-bold tracking-wider
-              text-primary uppercase text-shadow-sm dark:text-shadow-none
+              text-primary-600 uppercase text-shadow-sm dark:text-primary dark:text-shadow-none
             `}
           />
         )}

@@ -1,10 +1,8 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
-import { CookieConsentBanner } from '@/components/consent'
 import DraftModeBanner from '@/components/elements/DraftModeBanner'
 import Footer from '@/components/footer'
 import Navigation from '@/components/navigation'
-import BackToTopButton from '@/components/navigation/BackToTopButton'
 import { LayoutProvider, ThemeProvider } from '@/components/providers'
 import { getNavigation } from '@/lib/content/api'
 import { productSearchFlag, userProfileFlag } from '@/lib/feature-flags'
@@ -14,8 +12,14 @@ import { LanguageCode } from '@/lib/types'
 import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
+import dynamic from 'next/dynamic'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
+
+/** Lazy-loaded: rendered after scroll, below the fold */
+const BackToTopButton = dynamic(() => import('@/components/navigation/BackToTopButton'))
+/** Lazy-loaded: consent banner shown on first visit, below the fold */
+const CookieConsentBanner = dynamic(() => import('@/components/consent/CookieConsentBanner'))
 
 interface Props {
   children: React.ReactNode

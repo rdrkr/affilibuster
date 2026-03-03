@@ -232,8 +232,8 @@ export default function SignupClient({ data, lang, direction }: SignupClientProp
                 }}
                 className={`
                   size-5 rounded-sm border-neutral-200 bg-neutral-50
-                  text-primary focus:ring-primary
-                  dark:border-white/10 dark:bg-background-dark
+                  text-primary-600 focus:ring-primary dark:border-white/10
+                  dark:bg-background-dark dark:text-primary
                 `}
                 required
               />
@@ -307,8 +307,8 @@ export default function SignupClient({ data, lang, direction }: SignupClientProp
           <Link
             href={`/${lang}/login`}
             className={`
-            font-bold text-primary
-            hover:underline
+            font-bold text-primary-600 hover:underline
+            dark:text-primary
           `}
           >
             {loginLinkText}

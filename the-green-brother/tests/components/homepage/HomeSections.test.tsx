@@ -51,7 +51,7 @@ jest.mock('@/components/call-to-actions/NewsletterSignupCTA', () => ({
   },
 }))
 
-jest.mock('@/components/elements', () => ({
+jest.mock('@/components/elements/TextBlock', () => ({
   TextBlock: function MockTextBlock({ data }: { data: { id: number } }) {
     return <div data-testid="text-block" data-id={data.id} />
   },

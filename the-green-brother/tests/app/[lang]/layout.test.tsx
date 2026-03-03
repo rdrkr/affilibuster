@@ -54,18 +54,41 @@ jest.mock('@/components/navigation/BackToTopButton', () => ({
   },
 }))
 
+// Mock CookieConsentBanner component
+jest.mock('@/components/consent/CookieConsentBanner', () => ({
+  __esModule: true,
+  default: function MockCookieConsentBanner() {
+    return <div data-testid="mock-cookie-consent-banner">Cookie Consent</div>
+  },
+}))
+
+// Mock next/dynamic to render the component synchronously in tests
+jest.mock('next/dynamic', () => {
+  return function mockDynamic(loader: () => Promise<{ default: React.ComponentType }>) {
+    let Component: React.ComponentType | null = null
+    void loader().then(mod => {
+      Component = mod.default
+    })
+
+    /**
+     * Mock dynamic component that renders synchronously after module resolution.
+     * @param props - Props to pass to the resolved component
+     * @returns The resolved component with props
+     */
+    function DynamicComponent(props: Record<string, unknown>) {
+      if (!Component) return null
+      return <Component {...props} />
+    }
+    DynamicComponent.displayName = 'MockDynamic'
+    return DynamicComponent
+  }
+})
+
 // Mock Footer component
 jest.mock('@/components/footer', () => ({
   __esModule: true,
   default: function MockFooter() {
     return <footer data-testid="mock-footer">Footer</footer>
-  },
-}))
-
-// Mock CookieConsentBanner component
-jest.mock('@/components/consent', () => ({
-  CookieConsentBanner: function MockCookieConsentBanner() {
-    return <div data-testid="mock-cookie-consent-banner">Cookie Consent</div>
   },
 }))
 

@@ -311,14 +311,34 @@ const parseInline = (text: string): React.ReactNode[] => {
     }
 
     // Images (![alt](src "title"))
-    const imageMatch = /^!\[(.+?)\]\((.*?)(?:\s+"(.+?)")?\)/.exec(remaining)
+    const imageMatch = /^!\[(.*?)\]\((.*?)(?:\s+"(.*?)")?\)/.exec(remaining)
     if (imageMatch) {
-      const alt = imageMatch[1] ?? ''
+      const altFromMatch = imageMatch[1] ?? ''
+      const alt = altFromMatch !== '' ? altFromMatch : undefined
       const src = imageMatch[2] ?? ''
       const title = imageMatch[3]
 
       nodes.push(<img key={key++} src={src} alt={alt} title={title} />)
       remaining = remaining.slice(imageMatch[0].length)
+      continue
+    }
+
+    // Raw HTML Images (<img src="..." alt="..." width="..." height="..." />)
+    const rawImgMatch = /^<img\s+(.*?)>/.exec(remaining)
+    if (rawImgMatch) {
+      const attrsStr = rawImgMatch[1] ?? ''
+      const getAttr = (name: string) => {
+        const regex = new RegExp(`${name}=['"](.*?)['"]`)
+        return regex.exec(attrsStr)?.[1]
+      }
+      const src = getAttr('src') ?? ''
+      const alt = getAttr('alt')
+      const title = getAttr('title')
+      const width = getAttr('width')
+      const height = getAttr('height')
+
+      nodes.push(<img key={key++} src={src} alt={alt} title={title} width={width} height={height} />)
+      remaining = remaining.slice(rawImgMatch[0].length)
       continue
     }
 
@@ -385,12 +405,8 @@ const ReactMarkdown = ({ children, components }: ReactMarkdownProps): React.Reac
       // Replace images
       if (element.type === 'img' && components.img) {
         const ImageComponent = components.img
-        const imgProps = element.props as { src?: string; alt?: string; title?: string }
-        return ImageComponent({
-          ...(imgProps.src !== undefined ? { src: imgProps.src } : {}),
-          ...(imgProps.alt !== undefined ? { alt: imgProps.alt } : {}),
-          ...(imgProps.title !== undefined ? { title: imgProps.title } : {}),
-        })
+        const imgProps = element.props as Record<string, unknown>
+        return ImageComponent(imgProps)
       }
 
       // Replace code

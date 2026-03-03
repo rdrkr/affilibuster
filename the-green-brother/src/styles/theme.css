@@ -418,16 +418,10 @@ html[lang='he'] {
   0% {
     transform: scale(1);
     opacity: 1;
-    visibility: visible;
-  }
-  99% {
-    transform: scale(0.8);
-    opacity: 0;
-    visibility: visible;
   }
   100% {
+    transform: scale(0.8);
     opacity: 0;
-    visibility: hidden;
   }
 }
 

@@ -165,6 +165,22 @@ describe('TextBlock', () => {
       )
       expect(container.firstChild).toHaveClass('custom-class')
     })
+
+    it('should apply special spacing for level 1 headers with and without subheaders', () => {
+      const dataWithSubheader = createTextBlockData({ withHeader: true })
+      render(<TextBlock data={dataWithSubheader} direction={DirectionEnum.LTR} headerLevel={1} />)
+      expect(screen.getByTestId('header-title')).toBeInTheDocument()
+
+      const dataWithoutSubheader = {
+        ...dataWithSubheader,
+        header: {
+          ...dataWithSubheader.header,
+          subheader: undefined,
+        },
+      } as any
+      render(<TextBlock data={dataWithoutSubheader} direction={DirectionEnum.LTR} headerLevel={1} />)
+      expect(screen.getAllByTestId('header-title').length).toBeGreaterThan(0)
+    })
   })
 
   describe('visibility', () => {
@@ -311,6 +327,15 @@ describe('TextBlock', () => {
       expect(label).toHaveTextContent('Award Icon')
       // CmsImage should NOT be rendered for icon images
       expect(screen.queryByTestId('mock-cms-image')).not.toBeInTheDocument()
+    })
+
+    it('should render icon images with RTL direction', () => {
+      const dataWithIconImage = createTextBlockData({
+        content: '![xl](award.svg "Award")',
+      })
+      render(<TextBlock data={dataWithIconImage} direction={DirectionEnum.RTL} />)
+      const label = screen.getByTestId('mock-label')
+      expect(label).toBeInTheDocument()
     })
 
     it('should not render image when src is empty', () => {

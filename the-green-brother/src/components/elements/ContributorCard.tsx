@@ -97,7 +97,7 @@ export function ContributorCard({
         }
       `}
       subheaderClassName="text-sm font-medium mt-0!"
-      subheaderTextClassName="text-primary text-shadow-sm dark:text-primary dark:text-shadow-none"
+      subheaderTextClassName="text-primary-600 text-shadow-sm dark:text-primary dark:text-shadow-none"
     />
   )
 

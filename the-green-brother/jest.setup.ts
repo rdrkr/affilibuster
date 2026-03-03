@@ -4,17 +4,23 @@
 import { LanguageCode } from '@/lib/generated/types.gen'
 import '@testing-library/jest-dom'
 
-// Mock remark (ESM-only package that Jest can't parse)
-jest.mock('remark', () => ({
-  remark: () => ({
-    use: () => ({
-      process: (content: string) =>
-        Promise.resolve({
-          toString: () => content, // Return content unchanged in tests
-        }),
-    }),
-  }),
-}))
+// Mock next/dynamic to eagerly load components (React.lazy doesn't resolve synchronously in Jest)
+jest.mock('next/dynamic', () => {
+  const react = jest.requireActual<typeof import('react')>('react')
+  return function dynamic(importFn: () => Promise<{ default: React.ComponentType }>) {
+    let Component: React.ComponentType | null = null
+    void importFn().then((mod: { default: React.ComponentType }) => {
+      Component = mod.default
+    })
+    // In Jest, the promise resolves synchronously when the module is already loaded/mocked
+    const DynamicWrapper = (props: Record<string, unknown>) => {
+      if (!Component) return null
+      return react.createElement(Component, props)
+    }
+    DynamicWrapper.displayName = 'DynamicMock'
+    return DynamicWrapper
+  }
+})
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({

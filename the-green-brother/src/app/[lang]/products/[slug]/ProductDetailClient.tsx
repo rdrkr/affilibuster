@@ -88,7 +88,7 @@ export default function ProductDetailClient({
               <Text
                 text={product.category.content.text}
                 as="p"
-                className="text-sm font-bold tracking-wider text-primary-500 uppercase"
+                className="text-sm font-bold tracking-wider text-primary-600 uppercase"
               />
               <Text
                 text={`${bySellerText} ${product.seller.firstName}${product.seller.lastName ? ` ${product.seller.lastName}` : ''}`}

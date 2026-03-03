@@ -40,7 +40,9 @@ const nextConfig: NextConfig = {
   // Performance optimizations
   compress: true, // Enable gzip compression (SWC minification & font optimization are enabled by default)
   images: {
-    unoptimized: true, // Images are pre-optimized by Strapi/Cloudinary; Next.js optimization blocks private IPs in Docker
+    unoptimized: false,
+    loader: 'default',
+
     remotePatterns: [
       {
         // Backend access
@@ -60,8 +62,6 @@ const nextConfig: NextConfig = {
         // Cloudinary access (for images coming directly from Cloudinary storage)
         protocol: 'https',
         hostname: 'res.cloudinary.com',
-        port: '443',
-        pathname: '/**',
       },
     ],
     formats: ['image/avif', 'image/webp'], // Use modern image formats
@@ -70,7 +70,7 @@ const nextConfig: NextConfig = {
   },
   // Enable experimental optimizations
   experimental: {
-    optimizePackageImports: ['react', 'react-dom'],
+    optimizePackageImports: ['react', 'react-dom', 'next-intl', 'react-markdown', 'rehype-sanitize'],
   },
   bundlePagesRouterDependencies: true,
   typedRoutes: false,

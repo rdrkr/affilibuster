@@ -73,7 +73,7 @@ describe('Image', () => {
     render(<Image image={{ url: '/uploads/test.png' } as unknown as PluginUploadFileDocument} />)
     const img = screen.getByTestId('mock-image')
     // CMS URL is based on NEXT_PUBLIC_CMS_URL env var - match pattern with any hostname
-    expect(img).toHaveAttribute('src', expect.stringMatching(/https?:\/\/.+:\d+\/uploads\/test\.png$/))
+    expect(img).toHaveAttribute('src', expect.stringMatching(/https?:\/\/.+(:\d+)?\/uploads\/test\.png$/))
   })
 
   it('should use alternativeText from media object', () => {

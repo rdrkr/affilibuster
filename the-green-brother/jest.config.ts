@@ -15,7 +15,6 @@ const customJestConfig: Config = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     'react-markdown': '<rootDir>/tests/mocks/react-markdown.tsx',
-    'remark-breaks': '<rootDir>/tests/mocks/remark-breaks.ts',
     'remark-gfm': '<rootDir>/tests/mocks/remark-gfm.ts',
     'rehype-raw': '<rootDir>/tests/mocks/rehype-raw.ts',
     'rehype-sanitize': '<rootDir>/tests/mocks/rehype-sanitize.ts',
@@ -37,7 +36,7 @@ const customJestConfig: Config = {
   ],
   coverageThreshold: {
     global: {
-      branches: 95,
+      branches: 96,
       functions: 99,
       lines: 99,
       statements: 98,

@@ -26,7 +26,7 @@ describe('common utilities', () => {
 
     it('should handle active state', () => {
       const classes = getVariantClasses('ghost-1', true, false, DirectionEnum.LTR, false, true)
-      expect(classes).toContain('text-primary text-shadow-sm dark:text-primary dark:text-shadow-none')
+      expect(classes).toContain('text-primary-600 text-shadow-none dark:text-primary dark:text-shadow-none')
     })
 
     it('should handle noAnimation for link-1 variant', () => {

@@ -77,7 +77,11 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body
-        className={`${inter.variable} ${heebo.variable} font-sans transition-colors duration-300 selection:bg-primary selection:text-black`}
+        className={`
+          ${inter.variable} ${heebo.variable} font-sans caret-primary-600 transition-colors
+          duration-300 selection:bg-primary-600 selection:text-black
+          dark:caret-primary dark:selection:bg-primary dark:selection:text-black
+        `}
       >
         {children}
       </body>

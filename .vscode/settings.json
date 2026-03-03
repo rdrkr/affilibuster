@@ -203,6 +203,7 @@
     "codegen",
     "Consolas",
     "contextlib",
+    "crossfade",
     "datamodel",
     "datefmt",
     "datetime",

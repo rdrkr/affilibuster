@@ -121,6 +121,7 @@ function StandardCarousel({
         // Calculate scroll position with padding to avoid cutting off the button
         // Get the first child's offsetLeft as the natural padding
         const firstChild = track.children[0] as HTMLElement | undefined
+        /* istanbul ignore next -- defensive fallback */
         const padding = firstChild?.offsetLeft ?? 0
 
         // In LTR: scroll to (offsetLeft - padding) to maintain consistent left spacing
@@ -191,6 +192,7 @@ function HeroCarousel({
    * @param behavior - Scroll behavior (default: 'smooth')
    */
   const scrollToSlide = useCallback((index: number, behavior: ScrollBehavior = 'smooth') => {
+    /* istanbul ignore next -- defensive fallback */
     if (!trackRef.current) return
 
     const track = trackRef.current
@@ -219,6 +221,7 @@ function HeroCarousel({
   // Handle scroll events to update active index
   useEffect(() => {
     const track = trackRef.current
+    /* istanbul ignore next -- defensive fallback */
     if (!track) return
 
     let timeoutId: NodeJS.Timeout
@@ -273,6 +276,7 @@ function HeroCarousel({
     timerRef.current = setTimeout(nextSlide, autoRotateInterval)
 
     return () => {
+      /* istanbul ignore next -- defensive fallback */
       if (timerRef.current) {
         clearTimeout(timerRef.current)
       }

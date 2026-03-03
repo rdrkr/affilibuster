@@ -12,8 +12,9 @@
 
 import type { ReactNode } from 'react'
 
+import dynamic from 'next/dynamic'
+
 import { NewsletterSignupCTA } from '@/components/call-to-actions'
-import { TextBlock } from '@/components/elements'
 import { DynamicZone } from '@/components/layout'
 import { useLayoutContext } from '@/components/providers/LayoutProvider'
 import {
@@ -29,6 +30,9 @@ import type {
   ApiHomepageHomepageDocument,
   ElementsLabelEntry,
 } from '@/lib/generated/types.gen'
+
+/** Lazy-loaded: TextBlock uses heavy react-markdown pipeline, only needed when CMS includes text-block sections */
+const TextBlock = dynamic(() => import('@/components/elements/TextBlock').then(m => ({ default: m.TextBlock })))
 
 /**
  * Union type for all section types with discriminators

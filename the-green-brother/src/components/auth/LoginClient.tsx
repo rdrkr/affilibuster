@@ -239,8 +239,8 @@ export default function LoginClient({ data, lang, direction }: LoginClientProps)
           <Link
             href={`/${lang}/signup`}
             className={`
-            font-bold text-primary
-            hover:underline
+            font-bold text-primary-600 hover:underline
+            dark:text-primary
           `}
           >
             {signupLinkText}

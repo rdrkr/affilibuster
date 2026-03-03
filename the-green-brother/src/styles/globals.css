@@ -1,8 +1,23 @@
 @import 'tailwindcss';
 @plugin "@tailwindcss/typography";
-@import '@material-symbols/font-400/outlined.css';
-@import '@material-symbols/font-700/outlined.css';
 @import './theme.css';
+
+/* Material Symbols Outlined - font-display: swap to avoid render blocking (330ms FCP saving) */
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('@material-symbols/font-400/material-symbols-outlined.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('@material-symbols/font-700/material-symbols-outlined.woff2') format('woff2');
+}
 
 /* Wire dark: variant to data-theme attribute for manual theme toggling */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
@@ -14,6 +29,21 @@
   }
 
   .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'liga';
     font-variation-settings:
       'FILL' 0,
       'wght' 400,

@@ -6,7 +6,7 @@
 
 import { act, fireEvent, screen } from '@testing-library/react'
 
-import ImageGallery from '@/components/elements/ImageGallery'
+import { ImageGallery } from '@/components/elements/ImageGallery'
 import { DirectionEnum, type PluginUploadFileDocument } from '@/lib/generated/types.gen'
 import { renderWithLayout } from '../../utils/renderWithLayout'
 
@@ -115,6 +115,47 @@ describe('ImageGallery', () => {
       )
 
       expect(container.firstChild).toHaveClass('custom-class')
+    })
+
+    it('should handl explicit undefined for all optional props to trigger defaults', () => {
+      renderWithLayout(
+        // @ts-expect-error -- testing explicit undefined for coverage
+        <ImageGallery
+          images={mockImages}
+          direction={DirectionEnum.LTR}
+          className={undefined}
+          preload={undefined}
+          sizes={undefined}
+          thumbnailCols={undefined}
+          placeholderIcon={undefined}
+          ariaLabel={undefined}
+          enableUserProfile={undefined}
+          onWishlistClick={undefined}
+          autoRotateInterval={undefined}
+        />
+      )
+      expect(screen.getByRole('region')).toBeInTheDocument()
+    })
+
+    it('should accept and use all optional props', () => {
+      const { container } = renderWithLayout(
+        <ImageGallery
+          images={mockImages}
+          direction={DirectionEnum.LTR}
+          className="mt-4"
+          preload={true}
+          sizes="(max-width: 500px) 100vw, 500px"
+          thumbnailCols={3}
+          placeholderIcon="custom-icon"
+          ariaLabel="Custom Gallery"
+          enableUserProfile={true}
+          onWishlistClick={jest.fn()}
+          autoRotateInterval={100}
+        />
+      )
+
+      expect(container.firstChild).toHaveClass('mt-4')
+      expect(screen.getByRole('region')).toHaveAttribute('aria-label', 'Custom Gallery')
     })
 
     it('should render current image with fade-in animation', () => {
