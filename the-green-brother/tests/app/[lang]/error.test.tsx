@@ -16,7 +16,7 @@ jest.mock('@/components/elements', () => ({
 }))
 
 import ErrorPage from '@/app/[lang]/error'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 
 describe('ErrorPage', () => {
   const mockReset = jest.fn()
@@ -70,7 +70,7 @@ describe('ErrorPage', () => {
     const { container } = render(<ErrorPage error={error} reset={mockReset} />)
 
     // The p element should exist but have no text content
-    const digestParagraph = container.querySelector('.text-neutral-500')
+    const digestParagraph = container.querySelector('p.text-muted-foreground')
     expect(digestParagraph).toBeInTheDocument()
     expect(digestParagraph?.textContent).toBe('')
   })

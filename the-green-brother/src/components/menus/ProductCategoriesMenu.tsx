@@ -129,7 +129,7 @@ export function ProductCategoriesMenu({
               text={category.content.text}
               as="span"
               className={`
-                font-bold text-white transition-colors
+                font-bold text-foreground-dark transition-colors
                 group-hover/item:text-primary
               `}
             />

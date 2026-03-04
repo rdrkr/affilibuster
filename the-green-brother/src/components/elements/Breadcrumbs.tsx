@@ -54,7 +54,7 @@ export function Breadcrumbs({
   const segments = pathname.split('/').filter(Boolean)
   const ignoredSegments = [lang, 'tag'].map(s => s.toLowerCase())
   const pathSegments = segments.filter(s => !ignoredSegments.includes(s.toLowerCase()))
-  const defaultClassName = 'text-sm font-light! text-neutral-500! transition-colors! dark:text-tertiary-400!'
+  const defaultClassName = 'text-sm font-light! text-muted-foreground! transition-colors!'
 
   // Map segment names to navigation buttons
   const getButtonForSegment = (segment: string): ElementsButtonEntry | null => {
@@ -151,7 +151,7 @@ export function Breadcrumbs({
         return (
           <div key={crumb.href} className="flex items-center">
             {crumb.isLast ? (
-              <span className="max-w-48 truncate font-medium text-neutral-800 sm:max-w-72 md:max-w-96 dark:text-white">
+              <span className="max-w-48 truncate font-medium text-foreground sm:max-w-72 md:max-w-96">
                 {isLastAndCustom ? (
                   typeof customLastCrumbLabel === 'string' ? (
                     <Text text={stripMarkdown(customLastCrumbLabel)} />
@@ -170,7 +170,7 @@ export function Breadcrumbs({
                   size="sm"
                   className={`
                     ${defaultClassName}
-                    hover:text-primary-500! hover:no-underline! active:text-primary-700!
+                    hover:text-primary-hover! hover:no-underline! active:text-primary-active!
                   `}
                   data={linkButtonData}
                   noAnimation

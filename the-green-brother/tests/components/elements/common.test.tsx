@@ -21,7 +21,7 @@ describe('common utilities', () => {
     it('should return classes for primary variant', () => {
       const classes = getVariantClasses('primary', false, false, DirectionEnum.LTR, false, true)
       expect(classes).toContain('bg-primary')
-      expect(classes).toContain('text-background-dark')
+      expect(classes).toContain('text-foreground')
     })
 
     it('should handle active state', () => {

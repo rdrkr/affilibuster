@@ -495,9 +495,9 @@ describe('Card', () => {
   it('should apply background classes by default (showBackground=true)', () => {
     const { container } = render(<Card {...defaultProps} />)
     const card = container.firstChild as HTMLElement
-    expect(card.className).toContain('bg-white')
+    expect(card.className).toContain('bg-card')
     expect(card.className).toContain('shadow-md')
-    expect(card.className).toContain('border-neutral-200')
+    expect(card.className).toContain('border-border')
   })
 
   it('should not apply background classes when showBackground is false', () => {

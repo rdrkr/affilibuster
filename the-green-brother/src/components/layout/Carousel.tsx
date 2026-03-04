@@ -325,7 +325,7 @@ function HeroCarousel({
           className={`
             absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 justify-center gap-2 p-2
             ${frostedGlassStyle}
-            dark:bg-neutral-800/30!
+
           `}
           role="tablist"
           aria-label="Carousel navigation"
@@ -340,8 +340,8 @@ function HeroCarousel({
               data-testid={`hero-dot-${String(index)}`}
               className={`size-1.5 cursor-pointer rounded-full transition-colors duration-200 md:size-3 ${
                 index === activeIndex
-                  ? 'bg-primary-600'
-                  : 'bg-neutral-300 hover:bg-neutral-400 active:bg-neutral-500 dark:bg-neutral-600 dark:hover:bg-neutral-500 dark:active:bg-neutral-400'
+                  ? 'bg-primary'
+                  : 'bg-muted-foreground/40 hover:bg-muted-foreground/60 active:bg-muted-foreground'
               }`}
               onClick={() => {
                 scrollToSlide(index)

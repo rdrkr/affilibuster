@@ -54,10 +54,10 @@ jest.mock('@/components/navigation/BackToTopButton', () => ({
   },
 }))
 
-// Mock CookieConsentBanner component
-jest.mock('@/components/consent/CookieConsentBanner', () => ({
+// Mock DeferredCookieConsentBanner component
+jest.mock('@/components/consent/DeferredCookieConsentBanner', () => ({
   __esModule: true,
-  default: function MockCookieConsentBanner() {
+  default: function MockDeferredCookieConsentBanner() {
     return <div data-testid="mock-cookie-consent-banner">Cookie Consent</div>
   },
 }))

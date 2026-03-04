@@ -177,15 +177,15 @@ describe('ImageGallery', () => {
       fireEvent.click(secondThumbnail)
 
       // The selected thumbnail should now have the active border class
-      expect(secondThumbnail).toHaveClass('border-primary-500')
+      expect(secondThumbnail).toHaveClass('border-ring')
     })
 
     it('should highlight first thumbnail by default', () => {
       renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} />)
 
       const thumbnailButtons = screen.getAllByRole('button')
-      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
-      expect(thumbnailButtons[1]!).not.toHaveClass('border-primary-500')
+      expect(thumbnailButtons[0]!).toHaveClass('border-ring')
+      expect(thumbnailButtons[1]!).not.toHaveClass('border-ring')
     })
 
     it('should show previous image fading out when thumbnail is clicked', () => {
@@ -409,8 +409,8 @@ describe('ImageGallery', () => {
 
       const thumbnailButtons = screen.getAllByRole('button')
       // First thumbnail should be selected initially
-      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
-      expect(thumbnailButtons[1]!).not.toHaveClass('border-primary-500')
+      expect(thumbnailButtons[0]!).toHaveClass('border-ring')
+      expect(thumbnailButtons[1]!).not.toHaveClass('border-ring')
 
       // Fast-forward 5 seconds
       act(() => {
@@ -418,34 +418,34 @@ describe('ImageGallery', () => {
       })
 
       // Second thumbnail should now be selected
-      expect(thumbnailButtons[0]!).not.toHaveClass('border-primary-500')
-      expect(thumbnailButtons[1]!).toHaveClass('border-primary-500')
+      expect(thumbnailButtons[0]!).not.toHaveClass('border-ring')
+      expect(thumbnailButtons[1]!).toHaveClass('border-ring')
     })
 
     it('should respect custom autoRotateInterval', () => {
       renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} autoRotateInterval={2000} />)
 
       const thumbnailButtons = screen.getAllByRole('button')
-      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
+      expect(thumbnailButtons[0]!).toHaveClass('border-ring')
 
       // 2 seconds should trigger rotation
       act(() => {
         jest.advanceTimersByTime(2000)
       })
-      expect(thumbnailButtons[1]!).toHaveClass('border-primary-500')
+      expect(thumbnailButtons[1]!).toHaveClass('border-ring')
     })
 
     it('should disable auto-rotation when autoRotateInterval is 0', () => {
       renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} autoRotateInterval={0} />)
 
       const thumbnailButtons = screen.getAllByRole('button')
-      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
+      expect(thumbnailButtons[0]!).toHaveClass('border-ring')
 
       // Even after 10 seconds, should not auto-rotate
       act(() => {
         jest.advanceTimersByTime(10000)
       })
-      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
+      expect(thumbnailButtons[0]!).toHaveClass('border-ring')
     })
 
     it('should pause auto-rotation on mouse enter', () => {
@@ -454,7 +454,7 @@ describe('ImageGallery', () => {
       )
 
       const thumbnailButtons = screen.getAllByRole('button')
-      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
+      expect(thumbnailButtons[0]!).toHaveClass('border-ring')
 
       // Mouse enter to pause
       const gallery = container.querySelector('[role="region"]')!
@@ -464,7 +464,7 @@ describe('ImageGallery', () => {
       act(() => {
         jest.advanceTimersByTime(1000)
       })
-      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
+      expect(thumbnailButtons[0]!).toHaveClass('border-ring')
     })
 
     it('should resume auto-rotation on mouse leave', () => {
@@ -483,7 +483,7 @@ describe('ImageGallery', () => {
       act(() => {
         jest.advanceTimersByTime(1000)
       })
-      expect(thumbnailButtons[1]!).toHaveClass('border-primary-500')
+      expect(thumbnailButtons[1]!).toHaveClass('border-ring')
     })
 
     it('should not auto-rotate when there is only one image', () => {
@@ -510,17 +510,17 @@ describe('ImageGallery', () => {
       act(() => {
         jest.advanceTimersByTime(1000)
       }) // -> 2nd
-      expect(thumbnailButtons[1]!).toHaveClass('border-primary-500')
+      expect(thumbnailButtons[1]!).toHaveClass('border-ring')
 
       act(() => {
         jest.advanceTimersByTime(1000)
       }) // -> 3rd
-      expect(thumbnailButtons[2]!).toHaveClass('border-primary-500')
+      expect(thumbnailButtons[2]!).toHaveClass('border-ring')
 
       act(() => {
         jest.advanceTimersByTime(1000)
       }) // -> 1st (wrap around)
-      expect(thumbnailButtons[0]!).toHaveClass('border-primary-500')
+      expect(thumbnailButtons[0]!).toHaveClass('border-ring')
     })
 
     it('should trigger crossfade animation during auto-rotation', () => {

@@ -93,7 +93,7 @@ export default function ProductDetailClient({
               <Text
                 text={`${bySellerText} ${product.seller.firstName}${product.seller.lastName ? ` ${product.seller.lastName}` : ''}`}
                 as="p"
-                className="text-sm text-neutral-600 dark:text-tertiary-400"
+                className="text-sm text-muted-foreground"
               />
             </div>
 
@@ -101,19 +101,16 @@ export default function ProductDetailClient({
               text={productTitle}
               as="h1"
               className={`
-                mb-4 text-3xl font-bold text-neutral-800 md:text-4xl
-                dark:text-white
+                mb-4 text-3xl font-bold text-foreground md:text-4xl
               `}
             />
 
             {product.prices[0] && (
-              <div className="mb-8 text-3xl font-bold text-neutral-800 dark:text-white">
+              <div className="mb-8 text-3xl font-bold text-foreground">
                 {product.prices[0].currency.symbol}
                 {product.prices[0].amount.toFixed(2)}
                 {product.prices[0].currency.code && product.prices[0].currency.code !== 'USD' && (
-                  <span className="ml-2 text-lg text-neutral-500 dark:text-tertiary-400">
-                    {product.prices[0].currency.code}
-                  </span>
+                  <span className="ml-2 text-lg text-muted-foreground">{product.prices[0].currency.code}</span>
                 )}
               </div>
             )}
@@ -122,7 +119,7 @@ export default function ProductDetailClient({
               <Text
                 text={product.header.subheader.text}
                 as="p"
-                className="prose mb-8 text-neutral-600 prose-neutral dark:text-tertiary-300 dark:prose-invert"
+                className="prose mb-8 text-muted-foreground dark:prose-invert"
               />
             )}
 
@@ -140,7 +137,7 @@ export default function ProductDetailClient({
               <Label
                 data={product.disclaimerLabel}
                 direction={direction}
-                className="text-center text-xs text-neutral-500"
+                className="text-center text-xs text-muted-foreground"
               />
             </div>
           </div>

@@ -417,7 +417,7 @@ describe('NewsletterSignupCTA', () => {
       const form = document.querySelector('form')
       fireEvent.submit(form!)
 
-      expect(emailInput.className).toContain('border-error-500')
+      expect(emailInput.className).toContain('border-error')
     })
 
     it('should show error text aligned right in RTL mode', () => {

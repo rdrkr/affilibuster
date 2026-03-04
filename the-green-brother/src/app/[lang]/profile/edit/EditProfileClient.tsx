@@ -17,22 +17,22 @@ const EditProfileClient = () => {
         <Link
           href="/profile"
           className={`
-          rounded-full bg-neutral-100 p-2 transition-colors
-          hover:bg-neutral-200 dark:bg-surface-dark dark:hover:bg-white/10
+          rounded-full bg-muted p-2 transition-colors
+          hover:bg-muted dark:bg-card dark:hover:bg-white/10
         `}
         >
-          <span className="material-symbols-outlined text-neutral-800 dark:text-white">arrow_back</span>
+          <span className="material-symbols-outlined text-foreground">arrow_back</span>
         </Link>
-        <h1 className="text-3xl font-bold text-neutral-800 dark:text-white">Edit Profile</h1>
+        <h1 className="text-3xl font-bold text-foreground">Edit Profile</h1>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 bg-white p-8 shadow-md dark:border-white/5 dark:bg-surface-dark dark:shadow-none">
+      <div className="rounded-xl border border-border bg-card p-8 shadow-md dark:shadow-none">
         <div className="mb-8 flex justify-center">
           <div className="group relative cursor-pointer">
             <div
               className={`
               relative size-24 overflow-hidden rounded-full border-2
-              border-neutral-200 dark:border-white/10
+              border-border dark:border-white/10
             `}
             >
               <NextImage
@@ -55,8 +55,7 @@ const EditProfileClient = () => {
             >
               <span
                 className={`
-                material-symbols-outlined text-2xl text-white drop-shadow-lg
-                dark:text-white
+                material-symbols-outlined text-2xl text-foreground-reversed drop-shadow-lg
               `}
               >
                 photo_camera
@@ -75,7 +74,7 @@ const EditProfileClient = () => {
             <div>
               <label
                 className={`
-                mb-2 block text-sm font-medium text-neutral-600 dark:text-text-secondary-dark
+                mb-2 block text-sm font-medium text-muted-foreground
               `}
               >
                 First Name
@@ -84,17 +83,17 @@ const EditProfileClient = () => {
                 type="text"
                 defaultValue="Alex"
                 className={`
-                  w-full rounded-xl border border-neutral-200 bg-neutral-50
-                  p-3 text-neutral-800 outline-none
+                  w-full rounded-xl border border-input bg-input
+                  p-3 text-foreground outline-none
                   focus:border-transparent focus:ring-2 focus:ring-primary
-                  dark:border-white/10 dark:bg-background-dark dark:text-white
+                  dark:border-white/10 dark:bg-background-dark dark:text-foreground
                 `}
               />
             </div>
             <div>
               <label
                 className={`
-                mb-2 block text-sm font-medium text-neutral-600 dark:text-text-secondary-dark
+                mb-2 block text-sm font-medium text-muted-foreground
               `}
               >
                 Last Name
@@ -103,10 +102,10 @@ const EditProfileClient = () => {
                 type="text"
                 defaultValue="Green"
                 className={`
-                  w-full rounded-xl border border-neutral-200 bg-neutral-50
-                  p-3 text-neutral-800 outline-none
+                  w-full rounded-xl border border-input bg-input
+                  p-3 text-foreground outline-none
                   focus:border-transparent focus:ring-2 focus:ring-primary
-                  dark:border-white/10 dark:bg-background-dark dark:text-white
+                  dark:border-white/10 dark:bg-background-dark dark:text-foreground
                 `}
               />
             </div>
@@ -114,7 +113,7 @@ const EditProfileClient = () => {
           <div>
             <label
               className={`
-              mb-2 block text-sm font-medium text-neutral-600 dark:text-text-secondary-dark
+              mb-2 block text-sm font-medium text-muted-foreground
             `}
             >
               Email
@@ -123,17 +122,17 @@ const EditProfileClient = () => {
               type="email"
               defaultValue="alex.green@example.com"
               className={`
-                w-full rounded-xl border border-neutral-200 bg-neutral-50 p-3
-                text-neutral-800 outline-none
+                w-full rounded-xl border border-input bg-input p-3
+                text-foreground outline-none
                 focus:border-transparent focus:ring-2 focus:ring-primary
-                dark:border-white/10 dark:bg-background-dark dark:text-white
+                dark:border-white/10 dark:bg-background-dark dark:text-foreground
               `}
             />
           </div>
           <div>
             <label
               className={`
-              mb-2 block text-sm font-medium text-neutral-600 dark:text-text-secondary-dark
+              mb-2 block text-sm font-medium text-muted-foreground
             `}
             >
               Bio
@@ -142,10 +141,10 @@ const EditProfileClient = () => {
               rows={4}
               defaultValue="Passionate about sustainable living and finding eco-friendly alternatives for everyday products."
               className={`
-                w-full resize-none rounded-xl border border-neutral-200
-                bg-neutral-50 p-3 text-neutral-800 outline-none
+                w-full resize-none rounded-xl border border-input
+                bg-input p-3 text-foreground outline-none
                 focus:border-transparent focus:ring-2 focus:ring-primary
-                dark:border-white/10 dark:bg-background-dark dark:text-white
+                dark:border-white/10 dark:bg-background-dark dark:text-foreground
               `}
             ></textarea>
           </div>
@@ -154,16 +153,16 @@ const EditProfileClient = () => {
             <Link
               href="/profile"
               className={`
-                rounded-full px-6 py-3 font-medium text-neutral-600
-                transition-colors hover:bg-neutral-100 hover:text-neutral-800
-                dark:text-text-secondary-dark dark:hover:bg-white/5 dark:hover:text-white
+                rounded-full px-6 py-3 font-medium text-muted-foreground
+                transition-colors hover:bg-muted hover:text-foreground
+                dark:hover:bg-white/5
               `}
             >
               Cancel
             </Link>
             <button
               className={`
-                rounded-full bg-primary px-8 py-3 font-bold text-background-dark
+                rounded-full bg-primary px-8 py-3 font-bold text-foreground
                 shadow-lg shadow-primary/20 transition-colors
                 hover:bg-primary-hover
               `}

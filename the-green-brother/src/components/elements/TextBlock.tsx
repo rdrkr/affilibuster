@@ -141,7 +141,7 @@ function Markdown({
           data={labelData}
           direction={direction}
           display="inline"
-          className="text-sm text-neutral-600 dark:text-text-secondary-dark"
+          className="text-sm text-muted-foreground"
           hideIcon
         />
       )
@@ -299,7 +299,7 @@ export function TextBlock({
   const isRTL = direction === DirectionEnum.RTL
 
   const headingsClassName = `
-    prose-headings:font-bold prose-headings:text-neutral-800 dark:prose-headings:text-neutral-50
+    prose-headings:font-bold prose-headings:text-foreground
     prose-headings:mb-4
     prose-h1:mt-0
     prose-h2:mt-8
@@ -312,35 +312,35 @@ export function TextBlock({
   const paragraphsClassName = `
     prose-p:mt-0 prose-p:not-last:mb-2 prose-p:last:mb-0
     prose-p:leading-7 prose-p:font-light
-    prose-p:text-tertiary-800 dark:prose-p:text-tertiary-300
+    prose-p:text-foreground
   `
 
   const blockquotesClassName = `
-    prose-blockquote:rounded-xl prose-blockquote:border prose-blockquote:border-neutral-200
-    prose-blockquote:bg-white prose-blockquote:p-4 prose-blockquote:text-neutral-500
-    prose-blockquote:shadow-sm dark:prose-blockquote:border-white/5
+    prose-blockquote:rounded-xl prose-blockquote:border prose-blockquote:border-border
+    prose-blockquote:bg-card prose-blockquote:p-4 prose-blockquote:text-muted-foreground
+    prose-blockquote:shadow-sm
     ${
       isRTL
-        ? 'prose-blockquote:border-r-8 prose-blockquote:border-r-primary-400 dark:prose-blockquote:border-r-primary-400'
-        : 'prose-blockquote:border-l-8 prose-blockquote:border-l-primary-400 dark:prose-blockquote:border-l-primary-400'
+        ? 'prose-blockquote:border-r-8 prose-blockquote:border-r-ring'
+        : 'prose-blockquote:border-l-8 prose-blockquote:border-l-ring'
     }
-    dark:prose-blockquote:bg-surface-dark dark:prose-blockquote:text-neutral-300 dark:prose-blockquote:shadow-none
+    dark:prose-blockquote:shadow-none
   `
 
   const codeClassName = `
-    prose-code:text-tertiary-600 dark:prose-code:text-tertiary-400
+    prose-code:text-muted-foreground
   `
 
   const strongClassName = `
-    prose-strong:text-neutral-800 dark:prose-strong:text-neutral-50
+    prose-strong:text-foreground
   `
 
   const emClassName = `
-    prose-em:text-neutral-500 dark:prose-em:text-neutral-300
+    prose-em:text-muted-foreground
   `
 
   const listsClassName = `
-    prose-li:text-neutral-600 dark:prose-li:text-neutral-200
+    prose-li:text-foreground
   `
 
   const imagesClassName = `
@@ -350,14 +350,13 @@ export function TextBlock({
   const tablesClassName = `
     prose-table:block prose-table:w-full prose-table:overflow-x-auto
     prose-table:my-6 prose-table:rounded-xl
-    prose-table:border prose-table:border-neutral-200
-    prose-table:bg-white prose-table:shadow-sm
-    dark:prose-table:border-white/5 dark:prose-table:bg-surface-dark dark:prose-table:shadow-none
+    prose-table:border prose-table:border-border
+    prose-table:bg-card prose-table:shadow-sm
+    dark:prose-table:shadow-none
     prose-th:bg-primary prose-th:px-6 prose-th:py-3 prose-th:text-start prose-th:font-semibold
-    prose-th:text-neutral-800 prose-th:whitespace-nowrap
-    dark:prose-th:bg-primary-dark dark:prose-th:text-background-dark
+    prose-th:text-foreground-light prose-th:whitespace-nowrap
     prose-td:px-6 prose-td:py-3
-    prose-td:text-neutral-500 dark:prose-td:text-neutral-300
+    prose-td:text-muted-foreground
   `
 
   const safeHeaderClassName = headerClassName ?? ''
@@ -372,7 +371,7 @@ export function TextBlock({
 
   const finalHeaderClassName = `${safeHeaderClassName} ${level1HeaderClass}`.trim()
   const finalSubheaderClassName =
-    `tracking-wide text-neutral-600! dark:text-text-secondary-dark! text-base font-medium! ${subheaderClassName || ''} ${level1SubheaderClass}`.trim()
+    `tracking-wide text-muted-foreground! text-base font-medium! ${subheaderClassName || ''} ${level1SubheaderClass}`.trim()
 
   return (
     <div

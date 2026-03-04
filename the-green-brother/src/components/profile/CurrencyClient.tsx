@@ -59,23 +59,19 @@ export default function CurrencyClient({ profileData, currencies, lang, directio
         <Link
           href={`/${lang}/profile`}
           className={`
-          rounded-full bg-neutral-100 p-2 transition-colors
-          hover:bg-neutral-200 dark:bg-surface-dark dark:hover:bg-white/10
+          rounded-full bg-muted p-2 transition-colors
+          hover:bg-muted dark:bg-card dark:hover:bg-white/10
         `}
         >
-          <span className={`material-symbols-outlined text-neutral-800 dark:text-white ${isRtl ? 'rotate-180' : ''}`}>
-            arrow_back
-          </span>
+          <span className={`material-symbols-outlined text-foreground ${isRtl ? 'rotate-180' : ''}`}>arrow_back</span>
         </Link>
-        <h1 className="text-3xl font-bold text-neutral-800 dark:text-white">
-          {currencyHeader.header?.text ?? 'Select Currency'}
-        </h1>
+        <h1 className="text-3xl font-bold text-foreground">{currencyHeader.header?.text ?? 'Select Currency'}</h1>
       </div>
 
       <div
         className={`
-        rounded-xl border border-neutral-200 bg-white p-4 shadow-md
-        md:p-8 dark:border-white/5 dark:bg-surface-dark dark:shadow-none
+        rounded-xl border border-border bg-card p-4 shadow-md
+        md:p-8 dark:shadow-none
       `}
       >
         <div className="space-y-4">
@@ -87,10 +83,10 @@ export default function CurrencyClient({ profileData, currencies, lang, directio
                 border p-4 transition-all
                 ${
                   selected === curr.code
-                    ? 'border-primary bg-primary-50 ring-1 ring-primary dark:bg-background-dark'
+                    ? 'border-primary bg-primary/10 ring-1 ring-primary dark:bg-primary/10'
                     : `
-                    border-neutral-200 bg-neutral-50
-                    hover:border-neutral-300
+                    border-border bg-muted
+                    hover:border-muted-foreground
                     dark:border-white/5 dark:bg-background-dark
                     dark:hover:border-white/20
                   `
@@ -106,14 +102,14 @@ export default function CurrencyClient({ profileData, currencies, lang, directio
                      but for now just text is safer to avoid broken images.
                   */}
                 <div>
-                  <p className="font-bold text-neutral-800 dark:text-white">{curr.code}</p>
-                  <p className="text-sm text-neutral-600 dark:text-text-secondary-dark">{curr.name}</p>
+                  <p className="font-bold text-foreground">{curr.code}</p>
+                  <p className="text-sm text-muted-foreground">{curr.name}</p>
                 </div>
               </div>
               <div
                 className={`
                   flex size-5 items-center justify-center rounded-full border-2
-                  ${selected === curr.code ? 'border-primary' : 'border-neutral-400 dark:border-text-secondary-dark'}
+                  ${selected === curr.code ? 'border-primary' : 'border-muted-foreground'}
                 `}
               >
                 {selected === curr.code && <div className="size-2.5 rounded-full bg-primary" />}
@@ -125,7 +121,7 @@ export default function CurrencyClient({ profileData, currencies, lang, directio
           onClick={handleSave}
           className={`
             mt-8 w-full rounded-xl bg-primary py-3.5 font-bold
-            text-background-dark shadow-lg shadow-primary/20 transition-colors
+             text-foreground shadow-lg shadow-primary/20 transition-colors
             hover:bg-primary-hover
           `}
         >

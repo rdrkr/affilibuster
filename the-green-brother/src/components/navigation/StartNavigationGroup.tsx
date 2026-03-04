@@ -147,8 +147,7 @@ export function StartNavigationGroup({
             slideDirection="end-to-start"
             iconPriority
             className={`
-              text-black! hover:text-black hover:no-underline! active:scale-95
-              dark:text-white! dark:hover:text-white
+              text-foreground! hover:text-foreground hover:no-underline! active:scale-95
               ${isBrandTextVisible ? 'me-3' : ''}
               [&]:inline-flex [&]:overflow-hidden [&]:whitespace-nowrap
               [&]:transition-all [&]:duration-300 [&]:ease-out

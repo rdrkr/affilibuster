@@ -86,7 +86,7 @@ export function HeroSection({
     <div
       className={`
         relative z-20 flex max-w-4xl animate-fade-in-up flex-col px-4
-        text-neutral-800 dark:text-white
+        text-foreground
         ${textAlignClass}
         ${isOverlay && !isCentered ? (isRTL ? 'mr-8' : 'ml-8') : ''}
       `}

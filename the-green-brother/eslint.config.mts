@@ -105,6 +105,10 @@ export default defineConfig([
             'prose-invert', // Typography plugin
             'skeleton', // Custom skeleton loading element
             'accent', // Custom accent color
+            'foreground', // Custom foreground color
+            'caret-caret', // Custom caret color
+            'selection:bg-selection', // Custom selection color
+            'selection:text-selection-foreground', // Custom selection foreground color
           ],
         },
       ],
@@ -163,6 +167,9 @@ export default defineConfig([
             'drop-shadow-icon-sm',
             'prose',
             'prose-invert',
+            'caret-caret',
+            'selection:bg-selection',
+            'selection:text-selection-foreground',
           ],
         },
       ],

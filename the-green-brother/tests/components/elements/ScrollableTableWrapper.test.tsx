@@ -441,12 +441,12 @@ describe('ScrollableTableWrapper', () => {
       const rightButton = screen.getByTestId('scroll-right-button')
 
       expect(leftButton).toHaveClass('backdrop-blur-sm')
-      expect(leftButton).toHaveClass('bg-white/50')
+      expect(leftButton).toHaveClass('bg-card/50')
       expect(leftButton).toHaveClass('border')
       expect(leftButton).toHaveClass('shadow-lg')
 
       expect(rightButton).toHaveClass('backdrop-blur-sm')
-      expect(rightButton).toHaveClass('bg-white/50')
+      expect(rightButton).toHaveClass('bg-card/50')
       expect(rightButton).toHaveClass('border')
       expect(rightButton).toHaveClass('shadow-lg')
     })

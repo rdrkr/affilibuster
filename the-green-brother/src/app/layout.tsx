@@ -78,9 +78,9 @@ export default function RootLayout({
       </head>
       <body
         className={`
-          ${inter.variable} ${heebo.variable} font-sans caret-primary-600 transition-colors
-          duration-300 selection:bg-primary-600 selection:text-black
-          dark:caret-primary dark:selection:bg-primary dark:selection:text-black
+          ${inter.variable} ${heebo.variable}
+          font-sans text-foreground caret-caret transition-colors
+          duration-300 selection:bg-selection selection:text-selection-foreground
         `}
       >
         {children}

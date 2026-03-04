@@ -33,11 +33,11 @@ interface ErrorPageProps {
 export default function ErrorPage({ error, reset }: ErrorPageProps): React.ReactElement {
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center px-4 text-center">
-      <Icon icon="warning" size="6xl" className="mb-4 text-neutral-300 dark:text-neutral-600" />
-      <p className="text-sm text-neutral-500">{error.digest}</p>
+      <Icon icon="warning" size="6xl" className="mb-4 text-muted-foreground" />
+      <p className="text-sm text-muted-foreground">{error.digest}</p>
       <button
         onClick={reset}
-        className="mt-8 inline-block rounded-lg bg-primary-600 px-6 py-3 text-white transition-colors hover:bg-primary-700"
+        className="mt-8 inline-block rounded-lg bg-primary px-6 py-3 text-foreground transition-colors hover:bg-primary-hover"
       >
         &#8635;
       </button>

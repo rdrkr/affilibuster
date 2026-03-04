@@ -90,11 +90,7 @@ export function ContributorCard({
       level={isXs ? 6 : 4}
       direction={direction}
       headerClassName={`
-        ${
-          isXs
-            ? 'mb-0! text-sm! font-medium text-neutral-500 dark:text-tertiary-400 whitespace-normal'
-            : 'text-lg text-neutral-800 dark:text-white'
-        }
+        ${isXs ? 'mb-0! text-sm! font-medium text-muted-foreground whitespace-normal' : 'text-lg text-foreground'}
       `}
       subheaderClassName="text-sm font-medium mt-0!"
       subheaderTextClassName="text-accent text-shadow-sm dark:text-shadow-none"
@@ -107,7 +103,7 @@ export function ContributorCard({
       as="p"
       className={`
         mt-2 line-clamp-3 text-sm
-        text-neutral-600 dark:text-text-secondary-dark
+        text-muted-foreground
         ${isHorizontalLayout ? 'text-start' : 'text-center'}
       `}
     />
@@ -210,8 +206,7 @@ export function ContributorCard({
       className={`
         ${profilePicturePlaceholderTextSizes[size]}
         absolute inset-0 flex items-center justify-center
-        bg-neutral-200 font-bold text-neutral-400
-        dark:bg-tertiary-700 dark:text-text-secondary-dark
+        bg-muted font-bold text-muted-foreground
       `}
     >
       {fullName

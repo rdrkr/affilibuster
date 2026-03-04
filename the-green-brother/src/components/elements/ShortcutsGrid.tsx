@@ -80,18 +80,18 @@ export function ShortcutsGrid({
     : `
       ${buttonSizeClasses[buttonSize]}
       transition-all duration-300
-      bg-white dark:bg-surface-dark
-      border border-neutral-200 dark:border-white/10
-      group-hover:scale-110 group-hover:border-primary
-      group-hover:bg-primary
-      group-active:scale-95 group-active:bg-primary-600 group-active:border-primary-600
+      bg-card
+      border border-border
+      group-hover:scale-110 group-hover:border-primary-hover
+      group-hover:bg-primary-hover
+      group-active:scale-95 group-active:bg-primary-active group-active:border-primary-active
     `
 
   const iconAnimation = noAnimation
     ? ''
     : `
       transition-colors
-      group-hover:text-background-dark
+      group-hover:text-foreground
       group-active:text-white
     `
 
@@ -99,8 +99,8 @@ export function ShortcutsGrid({
     ? 'mt-2 text-xs md:text-sm'
     : `
       mt-3 font-semibold
-      transition-colors group-hover:text-neutral-800 dark:group-hover:text-white
-      group-active:text-neutral-900 dark:group-active:text-white
+      transition-colors group-hover:text-foreground
+      group-active:text-foreground
     `
 
   const gapSizeClasses: Record<HeaderLevel, string> = {
@@ -164,7 +164,7 @@ export function ShortcutsGrid({
                   size={iconSize}
                   promoted={noAnimation}
                   className={`
-                    text-neutral-500 dark:text-text-secondary-dark
+                    text-muted-foreground
                     ${iconAnimation}
                   `}
                 />
@@ -173,7 +173,7 @@ export function ShortcutsGrid({
                 text={item.label.text}
                 as="span"
                 className={`
-                  w-full text-center text-neutral-600 dark:text-text-secondary-dark
+                  w-full text-center text-muted-foreground
                   ${textAnimation}
                   ${textClassName}
                 `}

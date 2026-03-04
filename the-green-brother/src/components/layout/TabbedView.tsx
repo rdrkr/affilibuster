@@ -123,8 +123,7 @@ export function TabbedView<T = unknown>({
   }
 
   /** Background classes matching Card component look and feel */
-  const bgClasses =
-    'rounded-xl border border-neutral-200 bg-white p-5 shadow-md dark:border-white/5 dark:bg-surface-dark dark:shadow-none'
+  const bgClasses = 'rounded-xl border border-border bg-card p-5 shadow-md dark:shadow-none'
 
   /** Whether the tab bar should have its own background */
   const hasTabBarBg = backgroundVariant === 'tabs' || backgroundVariant === 'separate'

@@ -400,22 +400,22 @@ describe('TabbedView', () => {
       const activeTab = screen.getByTestId('tab-tab1')
       // Container style uses plain HTML buttons, not ButtonAction
       expect(activeTab.tagName).toBe('BUTTON')
-      expect(activeTab).toHaveClass('text-neutral-900')
+      expect(activeTab).toHaveClass('text-foreground')
     })
 
     it('should apply inactive text color to non-selected tabs in container style', () => {
       render(<TabbedView {...defaultProps} backgroundVariant="tabs" />)
 
       const inactiveTab = screen.getByTestId('tab-tab2')
-      expect(inactiveTab).toHaveClass('text-neutral-700')
-      expect(inactiveTab).not.toHaveClass('text-neutral-900')
+      expect(inactiveTab).toHaveClass('text-muted-foreground')
+      expect(inactiveTab).not.toHaveClass('text-foreground')
     })
 
     it('should have Card-style background on container tab bar', () => {
       render(<TabbedView {...defaultProps} backgroundVariant="tabs" />)
 
       const container = screen.getByTestId('container-tab-bar')
-      expect(container).toHaveClass('rounded-xl', 'bg-white', 'shadow-md')
+      expect(container).toHaveClass('rounded-xl', 'bg-card', 'shadow-md')
     })
 
     it('should call onTabChange when container tab is clicked', () => {

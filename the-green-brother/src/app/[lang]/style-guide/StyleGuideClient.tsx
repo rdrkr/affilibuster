@@ -113,7 +113,7 @@ export default function StyleGuideClient(): React.ReactElement {
             <div className="grid gap-6 md:grid-cols-2">
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 text-xl font-bold text-primary">Primitives</h3>
-                <ul className="space-y-2 text-text-secondary-dark">
+                <ul className="space-y-2 text-muted-foreground">
                   <li>• Text - Text with markdown formatting</li>
                   <li>• Icon - Material Symbols & local icons</li>
                   <li>• Image - CMS media handler</li>
@@ -121,7 +121,7 @@ export default function StyleGuideClient(): React.ReactElement {
               </div>
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 text-xl font-bold text-primary">Elements</h3>
-                <ul className="space-y-2 text-text-secondary-dark">
+                <ul className="space-y-2 text-muted-foreground">
                   <li>
                     <a href="#blog-card" className="hover:text-primary-hover active:text-primary-700">
                       • BlogCard - Blog post preview
@@ -146,7 +146,7 @@ export default function StyleGuideClient(): React.ReactElement {
               </div>
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 text-xl font-bold text-primary">Interactive Components</h3>
-                <ul className="space-y-2 text-text-secondary-dark">
+                <ul className="space-y-2 text-muted-foreground">
                   <li>• LanguageMenu - Language switcher</li>
                   <li>• ThemeMenu - Dark/Light mode toggle</li>
                   <li>• BackToTopButton - Scroll to top</li>
@@ -154,7 +154,7 @@ export default function StyleGuideClient(): React.ReactElement {
               </div>
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 text-xl font-bold text-primary">Layout Components</h3>
-                <ul className="space-y-2 text-text-secondary-dark">
+                <ul className="space-y-2 text-muted-foreground">
                   <li>• Navigation - Header with menus (CMS-driven)</li>
                   <li>• Footer - Site footer (CMS-driven)</li>
                   <li>• Section Components - Hero, Products, Blog, etc.</li>
@@ -171,7 +171,7 @@ export default function StyleGuideClient(): React.ReactElement {
           <div className="relative z-10 space-y-12">
             <div>
               <h2 className="mb-4 text-4xl font-bold text-white">Primitive Components</h2>
-              <p className="text-lg text-text-secondary-dark">
+              <p className="text-lg text-muted-foreground">
                 1:1 mappings to Strapi fields. These are the building blocks for all other components.
               </p>
             </div>
@@ -179,7 +179,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* Text Component */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">Text</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Renders CMS text with markdown-style **bold** formatting. Bold text automatically gets primary color.
               </p>
               <div className="space-y-6">
@@ -199,11 +199,7 @@ export default function StyleGuideClient(): React.ReactElement {
                   <h4 className="mb-3 text-lg font-semibold text-white">As Different HTML Elements</h4>
                   <div className="space-y-4 rounded-xl border border-white/10 bg-surface-dark p-6">
                     <Text text="Heading: Eco **Friendly** Products" as="h2" className="text-3xl font-bold text-white" />
-                    <Text
-                      text="Paragraph: We sell **sustainable** products"
-                      as="p"
-                      className="text-text-secondary-dark"
-                    />
+                    <Text text="Paragraph: We sell **sustainable** products" as="p" className="text-muted-foreground" />
                     <Text text="Span: Visit our **store**" as="span" className="text-white" />
                   </div>
                 </div>
@@ -223,7 +219,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* Icon Component */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">Icon</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Renders Material Symbols icons or local image files. Automatically detects type based on file extension.
               </p>
               <div className="space-y-6">
@@ -233,27 +229,27 @@ export default function StyleGuideClient(): React.ReactElement {
                     <div className="flex flex-wrap gap-8">
                       <div className="flex flex-col items-center gap-2">
                         <Icon icon="Nest Eco Leaf" size="3xl" className="text-primary" />
-                        <span className="text-sm text-text-secondary-dark">nest_eco_leaf</span>
+                        <span className="text-sm text-muted-foreground">nest_eco_leaf</span>
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <Icon icon="recycling" size="3xl" className="text-primary" />
-                        <span className="text-sm text-text-secondary-dark">recycling</span>
+                        <span className="text-sm text-muted-foreground">recycling</span>
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <Icon icon="eco" size="3xl" className="text-primary" />
-                        <span className="text-sm text-text-secondary-dark">eco</span>
+                        <span className="text-sm text-muted-foreground">eco</span>
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <Icon icon="water_drop" size="3xl" className="text-primary" />
-                        <span className="text-sm text-text-secondary-dark">water_drop</span>
+                        <span className="text-sm text-muted-foreground">water_drop</span>
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <Icon icon="shopping_bag" size="3xl" className="text-primary" />
-                        <span className="text-sm text-text-secondary-dark">shopping_bag</span>
+                        <span className="text-sm text-muted-foreground">shopping_bag</span>
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <Icon icon="favorite" size="3xl" className="text-primary" />
-                        <span className="text-sm text-text-secondary-dark">favorite</span>
+                        <span className="text-sm text-muted-foreground">favorite</span>
                       </div>
                     </div>
                   </div>
@@ -263,35 +259,35 @@ export default function StyleGuideClient(): React.ReactElement {
                   <div className="flex flex-wrap items-end gap-8 rounded-xl border border-white/10 bg-surface-dark p-6">
                     <div className="flex flex-col items-center gap-2">
                       <Icon icon="eco" size="sm" className="text-primary" />
-                      <span className="text-xs text-text-secondary-dark">sm (16px)</span>
+                      <span className="text-xs text-muted-foreground">sm (16px)</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <Icon icon="eco" size="md" className="text-primary" />
-                      <span className="text-xs text-text-secondary-dark">md (20px)</span>
+                      <span className="text-xs text-muted-foreground">md (20px)</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <Icon icon="eco" size="lg" className="text-primary" />
-                      <span className="text-xs text-text-secondary-dark">lg (24px)</span>
+                      <span className="text-xs text-muted-foreground">lg (24px)</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <Icon icon="eco" size="xl" className="text-primary" />
-                      <span className="text-xs text-text-secondary-dark">xl (32px)</span>
+                      <span className="text-xs text-muted-foreground">xl (32px)</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <Icon icon="eco" size="2xl" className="text-primary" />
-                      <span className="text-xs text-text-secondary-dark">2xl (40px)</span>
+                      <span className="text-xs text-muted-foreground">2xl (40px)</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <Icon icon="eco" size="3xl" className="text-primary" />
-                      <span className="text-xs text-text-secondary-dark">3xl (48px)</span>
+                      <span className="text-xs text-muted-foreground">3xl (48px)</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <Icon icon="eco" size="4xl" className="text-primary" />
-                      <span className="text-xs text-text-secondary-dark">4xl (56px)</span>
+                      <span className="text-xs text-muted-foreground">4xl (56px)</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <Icon icon="eco" size="5xl" className="text-primary" />
-                      <span className="text-xs text-text-secondary-dark">5xl (64px)</span>
+                      <span className="text-xs text-muted-foreground">5xl (64px)</span>
                     </div>
                   </div>
                 </div>
@@ -300,19 +296,19 @@ export default function StyleGuideClient(): React.ReactElement {
                   <div className="flex flex-wrap gap-8 rounded-xl border border-white/10 bg-surface-dark p-6">
                     <div className="flex flex-col items-center gap-2">
                       <Icon icon="eco" size="3xl" className="text-primary" />
-                      <span className="text-sm text-text-secondary-dark">Primary</span>
+                      <span className="text-sm text-muted-foreground">Primary</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <Icon icon="eco" size="3xl" className="text-secondary" />
-                      <span className="text-sm text-text-secondary-dark">Secondary</span>
+                      <span className="text-sm text-muted-foreground">Secondary</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
                       <Icon icon="eco" size="3xl" className="text-white" />
-                      <span className="text-sm text-text-secondary-dark">White</span>
+                      <span className="text-sm text-muted-foreground">White</span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <Icon icon="eco" size="3xl" className="text-text-secondary-dark" />
-                      <span className="text-sm text-text-secondary-dark">Gray</span>
+                      <Icon icon="eco" size="3xl" className="text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Gray</span>
                     </div>
                   </div>
                 </div>
@@ -333,7 +329,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* Image Component */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">Image</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Wrapper around Next.js Image that resolves CMS media URLs and extracts alt text. Handles placeholder
                 fallback.
               </p>
@@ -384,7 +380,7 @@ export default function StyleGuideClient(): React.ReactElement {
           <div className="relative z-10 space-y-16">
             <div>
               <h2 className="mb-4 text-4xl font-bold text-white">Color Palette</h2>
-              <p className="text-lg text-text-secondary-dark">
+              <p className="text-lg text-muted-foreground">
                 Complete design tokens from <code className="rounded-sm bg-surface-dark px-2 py-1">theme.css</code>. All
                 colors use CSS custom properties for consistency.
               </p>
@@ -408,7 +404,7 @@ export default function StyleGuideClient(): React.ReactElement {
                 ].map(({ shade, bg, border }) => (
                   <div key={`primary-${String(shade)}`} className="text-center">
                     <div className={`mb-2 h-16 rounded-xl ${bg} ${border ? 'border border-white/10' : ''}`} />
-                    <p className="text-xs text-text-secondary-dark">{shade}</p>
+                    <p className="text-xs text-muted-foreground">{shade}</p>
                   </div>
                 ))}
               </div>
@@ -432,7 +428,7 @@ export default function StyleGuideClient(): React.ReactElement {
                 ].map(({ shade, bg, border }) => (
                   <div key={`secondary-${String(shade)}`} className="text-center">
                     <div className={`mb-2 h-16 rounded-xl ${bg} ${border ? 'border border-white/10' : ''}`} />
-                    <p className="text-xs text-text-secondary-dark">{shade}</p>
+                    <p className="text-xs text-muted-foreground">{shade}</p>
                   </div>
                 ))}
               </div>
@@ -456,7 +452,7 @@ export default function StyleGuideClient(): React.ReactElement {
                 ].map(({ shade, bg, border }) => (
                   <div key={`tertiary-${String(shade)}`} className="text-center">
                     <div className={`mb-2 h-16 rounded-xl ${bg} ${border ? 'border border-white/10' : ''}`} />
-                    <p className="text-xs text-text-secondary-dark">{shade}</p>
+                    <p className="text-xs text-muted-foreground">{shade}</p>
                   </div>
                 ))}
               </div>
@@ -479,7 +475,7 @@ export default function StyleGuideClient(): React.ReactElement {
                     ].map(({ shade, bg, border }) => (
                       <div key={`success-${String(shade)}`} className="text-center">
                         <div className={`mb-1 h-10 rounded-sm ${bg} ${border ? 'border border-white/10' : ''}`} />
-                        <p className="text-xs text-text-secondary-dark">{shade}</p>
+                        <p className="text-xs text-muted-foreground">{shade}</p>
                       </div>
                     ))}
                   </div>
@@ -497,7 +493,7 @@ export default function StyleGuideClient(): React.ReactElement {
                     ].map(({ shade, bg, border }) => (
                       <div key={`error-${String(shade)}`} className="text-center">
                         <div className={`mb-1 h-10 rounded-sm ${bg} ${border ? 'border border-white/10' : ''}`} />
-                        <p className="text-xs text-text-secondary-dark">{shade}</p>
+                        <p className="text-xs text-muted-foreground">{shade}</p>
                       </div>
                     ))}
                   </div>
@@ -515,7 +511,7 @@ export default function StyleGuideClient(): React.ReactElement {
                     ].map(({ shade, bg, border }) => (
                       <div key={`warning-${String(shade)}`} className="text-center">
                         <div className={`mb-1 h-10 rounded-sm ${bg} ${border ? 'border border-white/10' : ''}`} />
-                        <p className="text-xs text-text-secondary-dark">{shade}</p>
+                        <p className="text-xs text-muted-foreground">{shade}</p>
                       </div>
                     ))}
                   </div>
@@ -529,19 +525,19 @@ export default function StyleGuideClient(): React.ReactElement {
               <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
                 <div className="text-center">
                   <div className="mb-2 h-24 rounded-xl border border-white/10 bg-background-dark" />
-                  <p className="text-sm text-text-secondary-dark">bg-background-dark</p>
+                  <p className="text-sm text-muted-foreground">bg-background-dark</p>
                 </div>
                 <div className="text-center">
                   <div className="mb-2 h-24 rounded-xl border border-white/10 bg-surface-dark" />
-                  <p className="text-sm text-text-secondary-dark">bg-surface-dark</p>
+                  <p className="text-sm text-muted-foreground">bg-surface-dark</p>
                 </div>
                 <div className="text-center">
-                  <div className="mb-2 h-24 rounded-xl border border-white/10 bg-subtle-dark" />
-                  <p className="text-sm text-text-secondary-dark">bg-subtle-dark</p>
+                  <div className="mb-2 h-24 rounded-xl border border-white/10 bg-muted" />
+                  <p className="text-sm text-muted-foreground">bg-muted</p>
                 </div>
                 <div className="text-center">
                   <div className="mb-2 h-24 rounded-xl bg-primary shadow-lg shadow-primary/30" />
-                  <p className="text-sm text-text-secondary-dark">bg-primary</p>
+                  <p className="text-sm text-muted-foreground">bg-primary</p>
                 </div>
               </div>
             </div>
@@ -550,11 +546,8 @@ export default function StyleGuideClient(): React.ReactElement {
             <div>
               <h3 className="mb-6 text-2xl font-semibold text-white">Text Colors</h3>
               <div className="space-y-4 rounded-xl border border-white/10 bg-background-dark p-6">
-                <p className="text-text-main-dark">text-text-main-dark - Primary text color</p>
-                <p className="text-text-secondary-dark">text-text-secondary-dark - Secondary/muted text</p>
-                <p className="text-text-heading-dark">text-text-heading-dark - Heading text</p>
-                <p className="text-text-body-dark">text-text-body-dark - Body text</p>
-                <p className="text-text-muted-dark">text-text-muted-dark - Muted text</p>
+                <p className="text-foreground">text-foreground - Primary text color</p>
+                <p className="text-muted-foreground">text-muted-foreground - Secondary/muted text</p>
                 <p className="text-primary">text-primary - Brand accent text</p>
               </div>
             </div>
@@ -567,7 +560,7 @@ export default function StyleGuideClient(): React.ReactElement {
 
           <div className="relative z-10">
             <h2 className="mb-4 text-4xl font-bold text-white">Spacing Scale</h2>
-            <p className="mb-8 text-lg text-text-secondary-dark">
+            <p className="mb-8 text-lg text-muted-foreground">
               Consistent spacing tokens follow Tailwind&apos;s 0.25rem increment scale.
             </p>
 
@@ -587,7 +580,7 @@ export default function StyleGuideClient(): React.ReactElement {
                 <div key={spacing.name} className="flex items-center gap-4">
                   <div className={`${spacing.class} h-6 rounded-sm bg-primary`} />
                   <span className="w-32 font-mono text-sm text-white">{spacing.name}</span>
-                  <span className="text-sm text-text-secondary-dark">{spacing.size}</span>
+                  <span className="text-sm text-muted-foreground">{spacing.size}</span>
                 </div>
               ))}
             </div>
@@ -600,7 +593,7 @@ export default function StyleGuideClient(): React.ReactElement {
 
           <div className="relative z-10">
             <h2 className="mb-4 text-4xl font-bold text-white">Animations</h2>
-            <p className="mb-8 text-lg text-text-secondary-dark">
+            <p className="mb-8 text-lg text-muted-foreground">
               Built-in animation keyframes from <code className="rounded-sm bg-surface-dark px-2 py-1">theme.css</code>.
               Hover to preview.
             </p>
@@ -612,7 +605,7 @@ export default function StyleGuideClient(): React.ReactElement {
                 <div className="group flex h-20 items-center justify-center rounded-xl bg-surface-dark">
                   <div className="size-12 rounded-xl bg-primary opacity-50 transition-opacity duration-300 group-hover:opacity-100" />
                 </div>
-                <p className="mt-3 text-center font-mono text-xs text-text-secondary-dark">animate-fade-in</p>
+                <p className="mt-3 text-center font-mono text-xs text-muted-foreground">animate-fade-in</p>
               </div>
 
               {/* Scale animations */}
@@ -621,7 +614,7 @@ export default function StyleGuideClient(): React.ReactElement {
                 <div className="group flex h-20 items-center justify-center rounded-xl bg-surface-dark">
                   <div className="size-12 rounded-xl bg-primary transition-transform duration-300 group-hover:scale-110" />
                 </div>
-                <p className="mt-3 text-center font-mono text-xs text-text-secondary-dark">animate-scale-up</p>
+                <p className="mt-3 text-center font-mono text-xs text-muted-foreground">animate-scale-up</p>
               </div>
 
               {/* Spin animation */}
@@ -632,7 +625,7 @@ export default function StyleGuideClient(): React.ReactElement {
                     <Icon icon="refresh" size="3xl" className="text-primary group-hover:animate-spin" />
                   </div>
                 </div>
-                <p className="mt-3 text-center font-mono text-xs text-text-secondary-dark">animate-spin</p>
+                <p className="mt-3 text-center font-mono text-xs text-muted-foreground">animate-spin</p>
               </div>
 
               {/* Shimmer animation */}
@@ -641,7 +634,7 @@ export default function StyleGuideClient(): React.ReactElement {
                 <div className="group flex h-20 items-center justify-center rounded-xl bg-surface-dark">
                   <span className="text-shadow-shimmer text-2xl font-bold text-primary">Glowing Text</span>
                 </div>
-                <p className="mt-3 text-center font-mono text-xs text-text-secondary-dark">text-shadow-shimmer</p>
+                <p className="mt-3 text-center font-mono text-xs text-muted-foreground">text-shadow-shimmer</p>
               </div>
 
               {/* Slide animations */}
@@ -650,7 +643,7 @@ export default function StyleGuideClient(): React.ReactElement {
                 <div className="group flex h-20 items-center justify-center overflow-hidden rounded-xl bg-surface-dark">
                   <div className="size-12 translate-y-4 rounded-xl bg-primary transition-transform duration-300 group-hover:translate-y-0" />
                 </div>
-                <p className="mt-3 text-center font-mono text-xs text-text-secondary-dark">animate-slide-up</p>
+                <p className="mt-3 text-center font-mono text-xs text-muted-foreground">animate-slide-up</p>
               </div>
 
               {/* Slide Left */}
@@ -659,7 +652,7 @@ export default function StyleGuideClient(): React.ReactElement {
                 <div className="group flex h-20 items-center justify-center overflow-hidden rounded-xl bg-surface-dark">
                   <div className="size-12 translate-x-8 rounded-xl bg-primary transition-transform duration-300 group-hover:translate-x-0" />
                 </div>
-                <p className="mt-3 text-center font-mono text-xs text-text-secondary-dark">animate-slide-left</p>
+                <p className="mt-3 text-center font-mono text-xs text-muted-foreground">animate-slide-left</p>
               </div>
 
               {/* Combined */}
@@ -668,7 +661,7 @@ export default function StyleGuideClient(): React.ReactElement {
                 <div className="group flex h-20 items-center justify-center rounded-xl bg-surface-dark">
                   <div className="size-12 scale-90 rounded-xl bg-primary opacity-70 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100" />
                 </div>
-                <p className="mt-3 text-center font-mono text-xs text-text-secondary-dark">fade + scale</p>
+                <p className="mt-3 text-center font-mono text-xs text-muted-foreground">fade + scale</p>
               </div>
             </div>
           </div>
@@ -676,7 +669,7 @@ export default function StyleGuideClient(): React.ReactElement {
 
         {/* Typography Section */}
         <section className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16">
-          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 size-80 rounded-full bg-blue-500/5 blur-3xl" />
+          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 size-80 rounded-full bg-primary/5 blur-3xl" />
 
           <div className="relative z-10">
             <h2 className="mb-8 text-4xl font-bold text-white">Typography</h2>
@@ -688,15 +681,15 @@ export default function StyleGuideClient(): React.ReactElement {
                 <div className="space-y-6 rounded-xl border border-white/5 bg-background-dark p-8">
                   <div>
                     <h1 className="text-5xl/tight font-bold text-white md:text-6xl">Heading 1</h1>
-                    <code className="text-sm text-text-secondary-dark">text-5xl md:text-6xl font-bold</code>
+                    <code className="text-sm text-muted-foreground">text-5xl md:text-6xl font-bold</code>
                   </div>
                   <div>
                     <h2 className="text-4xl font-bold text-white md:text-5xl">Heading 2</h2>
-                    <code className="text-sm text-text-secondary-dark">text-4xl md:text-5xl font-bold</code>
+                    <code className="text-sm text-muted-foreground">text-4xl md:text-5xl font-bold</code>
                   </div>
                   <div>
                     <h3 className="text-3xl font-bold text-white md:text-4xl">Heading 3</h3>
-                    <code className="text-sm text-text-secondary-dark">text-3xl md:text-4xl font-bold</code>
+                    <code className="text-sm text-muted-foreground">text-3xl md:text-4xl font-bold</code>
                   </div>
                 </div>
               </div>
@@ -706,10 +699,8 @@ export default function StyleGuideClient(): React.ReactElement {
                 <h3 className="mb-6 text-2xl font-semibold text-white">Body Text</h3>
                 <div className="space-y-4 rounded-xl border border-white/5 bg-background-dark p-8">
                   <p className="text-lg text-white">Large body text - text-lg text-white</p>
-                  <p className="text-base text-text-secondary-dark">
-                    Regular body text - text-base text-text-secondary-dark
-                  </p>
-                  <p className="text-sm text-text-secondary-dark">Small body text - text-sm text-text-secondary-dark</p>
+                  <p className="text-base text-muted-foreground">Regular body text - text-base text-muted-foreground</p>
+                  <p className="text-sm text-muted-foreground">Small body text - text-sm text-muted-foreground</p>
                 </div>
               </div>
             </div>
@@ -723,7 +714,7 @@ export default function StyleGuideClient(): React.ReactElement {
           <div className="relative z-10 space-y-12">
             <div>
               <h2 className="mb-4 text-4xl font-bold text-white">Element Components</h2>
-              <p className="text-lg text-text-secondary-dark">
+              <p className="text-lg text-muted-foreground">
                 Composite components built from primitives. 1:1 mapping to Strapi components.
               </p>
             </div>
@@ -731,7 +722,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* Label Component */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">Label</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Composites Icon + Text. Used for headings, labels, and inline text elements with icons.
               </p>
               <div className="space-y-4">
@@ -783,7 +774,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* Header Component */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">Header</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Composite header with title Label, optional subtitle Label, and alignment. Used for section headers.
               </p>
               <div className="space-y-8">
@@ -841,7 +832,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* Button Component */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">Button</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 CMS-driven button/link with multiple variants and sizes. Composites Icon + Text.
               </p>
 
@@ -1105,7 +1096,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* TextBlock Component */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">TextBlock</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Rich text block with optional Header. Supports HTML formatting from CMS. Uses Header + HTML content.
               </p>
               <TextBlock
@@ -1153,7 +1144,7 @@ export default function StyleGuideClient(): React.ReactElement {
           <div className="relative z-10 space-y-12">
             <div>
               <h2 className="mb-4 text-4xl font-bold text-white">BlogCard Component</h2>
-              <p className="text-lg text-text-secondary-dark">
+              <p className="text-lg text-muted-foreground">
                 Specialized card for blog posts. Wraps the Card component with blog-specific features like tags, read
                 time, and author info.
               </p>
@@ -1162,7 +1153,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* BlogCard Variants */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">Layouts, Widths & Sizes</h3>
-              <p className="mb-6 text-text-secondary-dark">BlogCard supports all Card layouts, widths, and sizes.</p>
+              <p className="mb-6 text-muted-foreground">BlogCard supports all Card layouts, widths, and sizes.</p>
               <div className="space-y-12">
                 {(['ltr', 'rtl', 'ttb', 'btt'] as const).map(layout => (
                   <div key={layout} className="space-y-8">
@@ -1254,7 +1245,7 @@ export default function StyleGuideClient(): React.ReactElement {
           <div className="relative z-10 space-y-12">
             <div>
               <h2 className="mb-4 text-4xl font-bold text-white">ProductCard Component</h2>
-              <p className="text-lg text-text-secondary-dark">
+              <p className="text-lg text-muted-foreground">
                 Specialized card for products. Wraps the Card component with product-specific details like price,
                 wishlist button, and tags.
               </p>
@@ -1263,7 +1254,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* ProductCard Variants */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">Layouts, Widths & Sizes</h3>
-              <p className="mb-6 text-text-secondary-dark">ProductCard supports all Card layouts, widths, and sizes.</p>
+              <p className="mb-6 text-muted-foreground">ProductCard supports all Card layouts, widths, and sizes.</p>
               <div className="space-y-12">
                 {(['ltr', 'rtl', 'ttb', 'btt'] as const).map(layout => (
                   <div key={layout} className="space-y-8">
@@ -1357,7 +1348,7 @@ export default function StyleGuideClient(): React.ReactElement {
           <div className="relative z-10 space-y-12">
             <div>
               <h2 className="mb-4 text-4xl font-bold text-white">ContributorCard Component</h2>
-              <p className="text-lg text-text-secondary-dark">
+              <p className="text-lg text-muted-foreground">
                 Specialized card for team profiles. Handles contributor data from CMS.
               </p>
             </div>
@@ -1365,7 +1356,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* Common Usage Patterns */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">Common Usage Patterns</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Real-world examples of how ContributorCard is used throughout the site.
               </p>
 
@@ -1375,7 +1366,7 @@ export default function StyleGuideClient(): React.ReactElement {
                   <h4 className="border-b border-white/10 pb-2 text-xl font-bold tracking-wider text-white uppercase">
                     Team Section (Carousel)
                   </h4>
-                  <p className="text-sm text-text-secondary-dark">
+                  <p className="text-sm text-muted-foreground">
                     Used in TeamSection.tsx - Default vertical layout with fixed width for carousel display.
                   </p>
                   <div className="flex gap-6 overflow-x-auto pb-4">
@@ -1436,7 +1427,7 @@ export default function StyleGuideClient(): React.ReactElement {
                   <h4 className="border-b border-white/10 pb-2 text-xl font-bold tracking-wider text-white uppercase">
                     Blog Author Bio
                   </h4>
-                  <p className="text-sm text-text-secondary-dark">
+                  <p className="text-sm text-muted-foreground">
                     Used in BlogPostClient.tsx - Compact horizontal layout for author bios at the end of articles.
                   </p>
                   <div className="max-w-2xl">
@@ -1482,7 +1473,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* All Layouts & Sizes Reference */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">All Layouts & Sizes</h3>
-              <p className="mb-6 text-text-secondary-dark">Complete reference of all layout and size combinations.</p>
+              <p className="mb-6 text-muted-foreground">Complete reference of all layout and size combinations.</p>
               <div className="space-y-12">
                 {(['ltr', 'rtl', 'ttb', 'btt'] as const).map(layout => (
                   <div key={layout} className="space-y-8">
@@ -1528,7 +1519,7 @@ export default function StyleGuideClient(): React.ReactElement {
           <div className="relative z-10 space-y-12">
             <div>
               <h2 className="mb-4 text-4xl font-bold text-white">Interactive Components</h2>
-              <p className="text-lg text-text-secondary-dark">
+              <p className="text-lg text-muted-foreground">
                 Standalone interactive UI components with client-side functionality.
               </p>
             </div>
@@ -1536,7 +1527,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* LanguageMenu */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">LanguageMenu</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Language switcher dropdown. Detects current language from URL and navigates to selected language.
               </p>
               <div className="flex justify-center rounded-xl border border-white/10 bg-surface-dark p-8">
@@ -1581,7 +1572,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* ThemeMenu */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">ThemeMenu</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Theme toggle for dark/light mode. Currently dark mode only, but ready for light mode support.
               </p>
               <div className="flex justify-center rounded-xl border border-white/10 bg-surface-dark p-8">
@@ -1669,7 +1660,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* SearchMenu */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">SearchMenu</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Expandable search input with recent/trending search suggestions.
               </p>
               <div className="flex justify-center rounded-xl border border-white/10 bg-surface-dark p-8">
@@ -1736,7 +1727,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* ProductCategoriesMenu */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">ProductCategoriesMenu</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Dropdown menu displaying product category cards with images. Hover to see the dropdown.
               </p>
               <div className="flex justify-center rounded-xl border border-white/10 bg-surface-dark p-8">
@@ -1873,7 +1864,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* BackToTopButton */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">BackToTopButton</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Floating button that appears on scroll. Smoothly scrolls to top when clicked.
               </p>
               <div className="flex justify-center rounded-xl border border-white/10 bg-surface-dark p-8">
@@ -1898,7 +1889,7 @@ export default function StyleGuideClient(): React.ReactElement {
           <div className="relative z-10 space-y-12">
             <div>
               <h2 className="mb-4 text-4xl font-bold text-white">Section Components</h2>
-              <p className="text-lg text-text-secondary-dark">
+              <p className="text-lg text-muted-foreground">
                 Page-level sections that compose primitives and elements. These are used on homepage and content pages.
               </p>
             </div>
@@ -1906,7 +1897,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* HeroSection Demo */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">HeroSection</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Hero banner with background image, header, subheader, and optional CTA button. Supports two variants.
               </p>
 
@@ -2021,7 +2012,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* BrandFeaturesSection Demo */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">BrandFeaturesSection</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Grid of feature cards highlighting brand values/benefits. Uses Label composite for feature items.
               </p>
               <div className="rounded-xl border border-white/10 bg-surface-dark p-6">
@@ -2124,7 +2115,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* NewsletterSignupCTA Demo */}
             <div className="rounded-xl border border-white/5 bg-background-dark p-8">
               <h3 className="mb-6 text-2xl font-semibold text-white">NewsletterSignupCTA</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Newsletter signup form with title, description, email input, and submit button.
               </p>
               <div className="rounded-xl border border-white/10 bg-surface-dark">
@@ -2206,10 +2197,10 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* CMS-Only Components Note */}
             <div className="rounded-xl border border-primary/20 bg-primary/5 p-6">
               <h3 className="mb-4 text-xl font-bold text-white">CMS-Driven Sections</h3>
-              <p className="mb-4 text-text-secondary-dark">
+              <p className="mb-4 text-muted-foreground">
                 The following sections require product/blog data from CMS and are best viewed on actual pages:
               </p>
-              <ul className="list-inside list-disc space-y-2 text-text-secondary-dark">
+              <ul className="list-inside list-disc space-y-2 text-muted-foreground">
                 <li>
                   <strong className="text-white">FeaturedProductsSection:</strong> Product carousel (requires products
                   array)
@@ -2246,11 +2237,11 @@ export default function StyleGuideClient(): React.ReactElement {
             <div className="space-y-6">
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-3 text-xl font-bold text-white">Navigation</h3>
-                <p className="mb-4 text-text-secondary-dark">
+                <p className="mb-4 text-muted-foreground">
                   Site header with logo, navigation links, language/theme menus, and mobile menu. Requires CMS
                   navigation data.
                 </p>
-                <ul className="list-inside list-disc space-y-2 text-text-secondary-dark">
+                <ul className="list-inside list-disc space-y-2 text-muted-foreground">
                   <li>Responsive design with mobile hamburger menu</li>
                   <li>Integrates LanguageMenu and ThemeMenu</li>
                   <li>Active link highlighting</li>
@@ -2260,10 +2251,10 @@ export default function StyleGuideClient(): React.ReactElement {
 
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-3 text-xl font-bold text-white">Footer</h3>
-                <p className="mb-4 text-text-secondary-dark">
+                <p className="mb-4 text-muted-foreground">
                   Site footer with multiple columns, newsletter signup, and social links. Requires CMS footer data.
                 </p>
-                <ul className="list-inside list-disc space-y-2 text-text-secondary-dark">
+                <ul className="list-inside list-disc space-y-2 text-muted-foreground">
                   <li>Multi-column layout (brand, links, newsletter)</li>
                   <li>Newsletter subscription form</li>
                   <li>Social media links</li>
@@ -2294,7 +2285,7 @@ export default function StyleGuideClient(): React.ReactElement {
             {/* Rounded Corners */}
             <div>
               <h3 className="mb-6 text-2xl font-semibold text-white">Rounded Corners</h3>
-              <p className="mb-6 text-text-secondary-dark">
+              <p className="mb-6 text-muted-foreground">
                 Simplified to two values: <code className="rounded-xl bg-surface-dark px-2 py-1">rounded-xl</code> for
                 UI elements and <code className="rounded-full bg-surface-dark px-2 py-1">rounded-full</code> for
                 circles.
@@ -2309,7 +2300,7 @@ export default function StyleGuideClient(): React.ReactElement {
                       className={`${radius.name} h-24 w-full border border-white/10 bg-primary shadow-lg shadow-primary/20`}
                     />
                     <p className="mt-4 font-mono text-sm text-white">{radius.name}</p>
-                    <p className="text-xs text-text-secondary-dark">{radius.desc}</p>
+                    <p className="text-xs text-muted-foreground">{radius.desc}</p>
                   </div>
                 ))}
               </div>
@@ -2326,7 +2317,7 @@ export default function StyleGuideClient(): React.ReactElement {
                 ].map(shadow => (
                   <div key={shadow.name} className="rounded-xl border border-white/5 bg-surface-dark p-6 text-center">
                     <div className={`${shadow.name} h-24 rounded-xl bg-primary`} />
-                    <p className="mt-4 font-mono text-sm text-text-secondary-dark">{shadow.name}</p>
+                    <p className="mt-4 font-mono text-sm text-muted-foreground">{shadow.name}</p>
                   </div>
                 ))}
               </div>
@@ -2338,16 +2329,14 @@ export default function StyleGuideClient(): React.ReactElement {
         <section className="relative overflow-hidden rounded-xl border border-white/5 bg-surface-dark p-8 md:p-16">
           <div className="mb-8">
             <h2 className="mb-4 text-4xl font-bold text-white">Consent Components</h2>
-            <p className="text-text-secondary-dark">
-              GDPR consent components for cookie management and consent gating.
-            </p>
+            <p className="text-muted-foreground">GDPR consent components for cookie management and consent gating.</p>
           </div>
 
           <div className="space-y-8">
             {/* CookieConsentBanner note */}
             <div>
               <h3 className="mb-4 text-2xl font-semibold text-white">CookieConsentBanner</h3>
-              <p className="text-text-secondary-dark">
+              <p className="text-muted-foreground">
                 The CookieConsentBanner is a layout-level component mounted in the root layout. It requires CMS API
                 calls and full consent state. See{' '}
                 <code className="rounded-sm bg-surface-dark px-2 py-1">src/app/[lang]/layout.tsx</code> for its usage.
@@ -2367,11 +2356,11 @@ export default function StyleGuideClient(): React.ReactElement {
               {/* CMS-Driven */}
               <div className="rounded-xl border border-primary/20 bg-primary/5 p-6">
                 <h3 className="mb-4 text-2xl font-bold text-white">CMS-Driven Components</h3>
-                <p className="mb-4 text-text-secondary-dark">
+                <p className="mb-4 text-muted-foreground">
                   All TheGreenBrother components are CMS-driven, meaning their content comes from Strapi through the
                   backend API.
                 </p>
-                <ul className="list-inside list-disc space-y-2 text-text-secondary-dark">
+                <ul className="list-inside list-disc space-y-2 text-muted-foreground">
                   <li>Content can be updated without code changes</li>
                   <li>Multi-language support is built-in</li>
                   <li>Consistency across all pages</li>
@@ -2382,7 +2371,7 @@ export default function StyleGuideClient(): React.ReactElement {
               {/* Component Hierarchy */}
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 text-2xl font-bold text-white">Component Hierarchy</h3>
-                <ol className="list-inside list-decimal space-y-2 text-text-secondary-dark">
+                <ol className="list-inside list-decimal space-y-2 text-muted-foreground">
                   <li>
                     <strong className="text-white">Primitives:</strong> Text, Icon, Image - Direct 1:1 mapping to Strapi
                     fields
@@ -2404,10 +2393,10 @@ export default function StyleGuideClient(): React.ReactElement {
               {/* Theme-First Styling */}
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 text-2xl font-bold text-white">Theme-First Styling</h3>
-                <p className="mb-4 text-text-secondary-dark">
+                <p className="mb-4 text-muted-foreground">
                   TheGreenBrother follows the <strong className="text-white">Theme-First Styling</strong> principle:
                 </p>
-                <ul className="list-inside list-disc space-y-2 text-text-secondary-dark">
+                <ul className="list-inside list-disc space-y-2 text-muted-foreground">
                   <li>
                     <strong className="text-white">FORBIDDEN:</strong> Hardcoded color values (hex, rgb, hsl)
                   </li>

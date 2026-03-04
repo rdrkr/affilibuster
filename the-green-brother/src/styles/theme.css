@@ -20,7 +20,9 @@
   --color-primary-700: #0a7549;
   --color-primary-800: #085d3a;
   --color-primary-900: #064c30;
-  --color-primary: var(--color-primary-400);
+  --color-primary-light: var(--color-primary-400);
+  --color-primary-dark: var(--color-primary-400);
+  --color-primary: light-dark(var(--color-primary-light), var(--color-primary-dark));
 
   /* ============================================
    * SECONDARY COLOR PALETTE - Darker Green (Accents)
@@ -35,7 +37,9 @@
   --color-secondary-700: #2e5a3d;
   --color-secondary-800: #1f3d2a;
   --color-secondary-900: #182a1b; /* TheGreenBrother surface-dark */
-  --color-secondary: var(--color-secondary-500);
+  --color-secondary-light: var(--color-secondary-500);
+  --color-secondary-dark: var(--color-secondary-500);
+  --color-secondary: light-dark(var(--color-secondary-light), var(--color-secondary-dark));
 
   /* ============================================
    * TERTIARY COLOR PALETTE - Forest/Background Tones
@@ -50,7 +54,9 @@
   --color-tertiary-700: #3d5745; /* Subtle dark accents */
   --color-tertiary-800: #243020;
   --color-tertiary-900: #101d13; /* TheGreenBrother background-dark */
-  --color-tertiary: var(--color-tertiary-500);
+  --color-tertiary-light: var(--color-tertiary-500);
+  --color-tertiary-dark: var(--color-tertiary-500);
+  --color-tertiary: light-dark(var(--color-tertiary-light), var(--color-tertiary-dark));
 
   /* ============================================
    * SEMANTIC COLORS - Success
@@ -65,6 +71,9 @@
   --color-success-700: #0a7549;
   --color-success-800: #085d3a;
   --color-success-900: #064c30;
+  --color-success-light: var(--color-success-500);
+  --color-success-dark: var(--color-success-500);
+  --color-success: light-dark(var(--color-success-light), var(--color-success-dark));
 
   /* ============================================
    * SEMANTIC COLORS - Error/Danger
@@ -79,6 +88,9 @@
   --color-error-700: #b91c1c;
   --color-error-800: #991b1b;
   --color-error-900: #7f1d1d;
+  --color-error-light: var(--color-error-500);
+  --color-error-dark: var(--color-error-500);
+  --color-error: light-dark(var(--color-error-light), var(--color-error-dark));
 
   /* ============================================
    * SEMANTIC COLORS - Warning
@@ -93,50 +105,122 @@
   --color-warning-700: #a16207;
   --color-warning-800: #854d0e;
   --color-warning-900: #713f12;
+  --color-warning-light: var(--color-warning-500);
+  --color-warning-dark: var(--color-warning-500);
+  --color-warning: light-dark(var(--color-warning-light), var(--color-warning-dark));
 
   /* ============================================
-   * SKELETON / LOADING PLACEHOLDER COLORS
+   * BASE & LAYOUT COLORS
    * ============================================ */
+  --color-background-light: var(--color-tertiary-50);
+  --color-background-dark: var(--color-tertiary-900);
+  --color-background: light-dark(var(--color-background-light), var(--color-background-dark));
+
+  --color-foreground-light: var(--color-tertiary-900);
+  --color-foreground-dark: var(--color-tertiary-50);
+  --color-foreground: light-dark(var(--color-foreground-light), var(--color-foreground-dark));
+  --color-foreground-reversed: light-dark(var(--color-foreground-dark), var(--color-foreground-light));
+
+  --color-card-light: var(--color-tertiary-50);
+  --color-card-dark: var(--color-secondary-900);
+  --color-card: light-dark(var(--color-card-light), var(--color-card-dark));
+
+  --color-card-foreground-light: var(--color-tertiary-900);
+  --color-card-foreground-dark: var(--color-tertiary-900);
+  --color-card-foreground: light-dark(var(--color-card-foreground-light), var(--color-card-foreground-dark));
+
+  --color-popover-light: var(--color-tertiary-50);
+  --color-popover-dark: var(--color-secondary-900);
+  --color-popover: light-dark(var(--color-popover-light), var(--color-popover-dark));
+
+  --color-popover-foreground-light: var(--color-tertiary-900);
+  --color-popover-foreground-dark: var(--color-tertiary-900);
+  --color-popover-foreground: light-dark(var(--color-popover-foreground-light), var(--color-popover-foreground-dark));
+
+  --color-surface-light: var(--color-secondary-600);
+  --color-surface-dark: var(--color-primary);
+  --color-surface: light-dark(var(--color-surface-light), var(--color-surface-dark));
+
+  /* ============================================
+   * ACTION & BRAND COLORS
+   * ============================================ */
+  --color-muted-light: var(--color-tertiary-100);
+  --color-muted-dark: var(--color-tertiary-800);
+  --color-muted: light-dark(var(--color-muted-light), var(--color-muted-dark));
+
+  --color-muted-foreground-light: var(--color-neutral-600);
+  --color-muted-foreground-dark: var(--color-tertiary-300);
+  --color-muted-foreground: light-dark(var(--color-muted-foreground-light), var(--color-muted-foreground-dark));
+
+  --color-accent-light: var(--color-primary-700);
+  --color-accent-dark: var(--color-primary);
+  --color-accent: light-dark(var(--color-accent-light), var(--color-accent-dark));
+
+  --color-accent-foreground-light: var(--color-tertiary-50);
+  --color-accent-foreground-dark: var(--color-tertiary-900);
+  --color-accent-foreground: light-dark(var(--color-accent-foreground-light), var(--color-accent-foreground-dark));
+
+  --color-destructive-light: var(--color-error-500);
+  --color-destructive-dark: var(--color-error-500);
+  --color-destructive: light-dark(var(--color-destructive-light), var(--color-destructive-dark));
+
+  --color-destructive-foreground-light: var(--color-tertiary-50);
+  --color-destructive-foreground-dark: var(--color-tertiary-50);
+  --color-destructive-foreground: light-dark(
+    var(--color-destructive-foreground-light),
+    var(--color-destructive-foreground-dark)
+  );
+
+  /* Hover interactivity equivalents */
+  --color-primary-hover-light: var(--color-primary);
+  --color-primary-hover-dark: var(--color-primary);
+  --color-primary-hover: light-dark(var(--color-primary-hover-light), var(--color-primary-hover-dark));
+
+  --color-primary-active-light: var(--color-primary-700);
+  --color-primary-active-dark: var(--color-primary);
+  --color-primary-active: light-dark(var(--color-primary-active-light), var(--color-primary-active-dark));
+
+  --color-secondary-hover-light: var(--color-secondary-900);
+  --color-secondary-hover-dark: var(--color-secondary-700);
+  --color-secondary-hover: light-dark(var(--color-secondary-hover-light), var(--color-secondary-hover-dark));
+
+  --color-secondary-active-light: var(--color-secondary-700);
+  --color-secondary-active-dark: var(--color-secondary-400);
+  --color-secondary-active: light-dark(var(--color-secondary-active-light), var(--color-secondary-active-dark));
+
+  --color-selection-light: var(--color-primary-600);
+  --color-selection-dark: var(--color-primary);
+  --color-selection: light-dark(var(--color-selection-light), var(--color-selection-dark));
+
+  --color-selection-foreground-light: var(--color-tertiary-900);
+  --color-selection-foreground-dark: var(--color-tertiary-900);
+  --color-selection-foreground: light-dark(
+    var(--color-selection-foreground-light),
+    var(--color-selection-foreground-dark)
+  );
+
+  --color-caret-light: var(--color-accent-light);
+  --color-caret-dark: var(--color-accent-dark);
+  --color-caret: light-dark(var(--color-caret-light), var(--color-caret-dark));
+
   --color-skeleton-light: var(--color-secondary-50);
   --color-skeleton-dark: var(--color-secondary-900);
   --color-skeleton: light-dark(var(--color-skeleton-light), var(--color-skeleton-dark));
 
   /* ============================================
-   * INTERACTIVE STATE COLORS
+   * BORDERS, INPUTS & STYLING
    * ============================================ */
-  --color-primary-hover: var(--color-primary-500);
-  --color-primary-hover-dark: var(--color-primary-500);
-  --color-focus-ring: var(--color-primary-400);
-  --color-focus-ring-dark: var(--color-primary-400);
-  --color-accent-light: var(--color-primary-700);
-  --color-accent-dark: var(--color-primary);
-  --color-accent: light-dark(var(--color-accent-light), var(--color-accent-dark));
-  --color-active-indicator: var(--color-primary-400);
-  --color-active-indicator-dark: var(--color-primary-400);
+  --color-border-light: var(--color-tertiary-100);
+  --color-border-dark: var(--color-tertiary-700);
+  --color-border: light-dark(var(--color-border-light), var(--color-border-dark));
 
-  /* ============================================
-   * FORM COLORS
-   * ============================================ */
-  --color-form-input-border: var(--color-tertiary-300);
-  --color-form-input-border-dark: var(--color-tertiary-300);
-  --color-form-input-focus: var(--color-primary-500);
-  --color-form-input-focus-dark: var(--color-primary-500);
-  --color-form-input-focus-ring: var(--color-primary-400);
-  --color-form-input-focus-ring-dark: var(--color-primary-400);
+  --color-input-light: var(--color-neutral-200);
+  --color-input-dark: var(--color-tertiary-300);
+  --color-input: light-dark(var(--color-input-light), var(--color-input-dark));
 
-  /* ============================================
-   * SEMANTIC THEME COLORS
-   * These are static colors for dark mode styling
-   * Components use these via utility classes like bg-surface-dark
-   * ============================================ */
-  --color-background-dark: var(--color-tertiary-900);
-  --color-surface-dark: var(--color-secondary-900);
-  --color-subtle-dark: var(--color-tertiary-700);
-  --color-text-main-dark: #ffffff;
-  --color-text-secondary-dark: #a0b5a7;
-  --color-text-heading-dark: var(--color-tertiary-50);
-  --color-text-body-dark: var(--color-tertiary-100);
-  --color-text-muted-dark: var(--color-tertiary-300);
+  --color-ring-light: var(--color-primary-400);
+  --color-ring-dark: var(--color-primary-400);
+  --color-ring: light-dark(var(--color-ring-light), var(--color-ring-dark));
 
   /* ============================================
    * TYPOGRAPHY - Font Families

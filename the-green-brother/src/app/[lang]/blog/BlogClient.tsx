@@ -112,11 +112,7 @@ export default function BlogClient({ blogPageData, posts }: BlogClientProps) {
         /* Empty State using pagination.noItemsFound */
         <div className="py-16 text-center">
           {pagination.noItemsFound.header?.icon && (
-            <Icon
-              icon={pagination.noItemsFound.header.icon}
-              size="6xl"
-              className="mb-4 text-neutral-300 dark:text-neutral-600"
-            />
+            <Icon icon={pagination.noItemsFound.header.icon} size="6xl" className="mb-4 text-muted-foreground" />
           )}
           {pagination.noItemsFound.header && (
             <Header

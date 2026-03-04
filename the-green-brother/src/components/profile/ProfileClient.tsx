@@ -145,30 +145,29 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
           direction={direction}
           level={1}
           className="mb-8 text-center"
-          headerClassName="text-3xl font-bold text-neutral-800 dark:text-white"
-          subheaderClassName="text-neutral-600 dark:text-text-secondary-dark"
+          headerClassName="text-3xl font-bold text-foreground"
+          subheaderClassName="text-muted-foreground"
         />
 
         <div
           className={`
-          overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-xl
-          dark:border-white/5 dark:bg-surface-dark
+          overflow-hidden rounded-xl border border-border bg-card shadow-xl
         `}
         >
           {/* User Info Section */}
-          <div className="border-b border-neutral-100 bg-neutral-50 p-6 dark:border-white/5 dark:bg-white/5">
+          <div className="border-b border-border bg-muted p-6 dark:bg-white/5">
             <div className="flex items-center gap-4">
               <div
                 className={`
                   flex size-16 items-center justify-center rounded-full
-                  bg-primary text-2xl font-bold text-white shadow-lg shadow-primary/20
+                  bg-primary text-2xl font-bold text-foreground-reversed shadow-lg shadow-primary/20
                 `}
               >
                 {userProfile.display_name.charAt(0)}
               </div>
               <div>
-                <h2 className="text-xl font-bold text-neutral-800 dark:text-white">{userProfile.display_name}</h2>
-                <p className="text-sm text-neutral-500 dark:text-text-secondary-dark">{userProfile.email}</p>
+                <h2 className="text-xl font-bold text-foreground">{userProfile.display_name}</h2>
+                <p className="text-sm text-muted-foreground">{userProfile.email}</p>
               </div>
               {/* Edit Profile Button */}
               {editProfileButton.label && (
@@ -192,7 +191,7 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
               direction={direction}
               level={2}
               className="mb-4"
-              headerClassName="text-lg font-bold text-neutral-800 dark:text-white"
+              headerClassName="text-lg font-bold text-foreground"
             />
 
             <div className="space-y-2">
@@ -201,23 +200,21 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
                 href={`/${lang}/profile/wishlist`}
                 className={`
                     flex items-center gap-3 rounded-xl p-3
-                    transition-colors hover:bg-neutral-50 dark:hover:bg-white/5
+                    transition-colors hover:bg-muted dark:hover:bg-white/5
                   `}
               >
                 <div
                   className={`
                     flex size-10 items-center justify-center rounded-lg
-                    bg-secondary-100 text-secondary-600
-                    dark:bg-secondary-900/30 dark:text-secondary-400
+                    bg-primary/10 text-primary
+                    dark:bg-primary/10 dark:text-primary
                   `}
                 >
                   <span className="material-symbols-outlined">favorite</span>
                 </div>
-                <span className="font-medium text-neutral-700 dark:text-neutral-200">
-                  {getHeaderText(wishlistHeader)}
-                </span>
+                <span className="font-medium text-foreground">{getHeaderText(wishlistHeader)}</span>
                 <span
-                  className={`material-symbols-outlined text-neutral-400 ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
+                  className={`material-symbols-outlined text-muted-foreground ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
                 >
                   chevron_right
                 </span>
@@ -228,23 +225,21 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
                 href={`/${lang}/profile/currency`}
                 className={`
                     flex items-center gap-3 rounded-xl p-3
-                    transition-colors hover:bg-neutral-50 dark:hover:bg-white/5
+                    transition-colors hover:bg-muted dark:hover:bg-white/5
                   `}
               >
                 <div
                   className={`
                     flex size-10 items-center justify-center rounded-lg
-                    bg-success-100 text-success-600
-                    dark:bg-success-900/30 dark:text-success-400
+                    bg-success/10 text-success
+                    dark:bg-success/10 dark:text-success
                   `}
                 >
                   <span className="material-symbols-outlined">attach_money</span>
                 </div>
-                <span className="font-medium text-neutral-700 dark:text-neutral-200">
-                  {getHeaderText(currencyHeader)}
-                </span>
+                <span className="font-medium text-foreground">{getHeaderText(currencyHeader)}</span>
                 <span
-                  className={`material-symbols-outlined text-neutral-400 ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
+                  className={`material-symbols-outlined text-muted-foreground ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
                 >
                   chevron_right
                 </span>
@@ -256,7 +251,7 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
                 disabled={isExporting}
                 className={`
                     flex w-full items-center gap-3 rounded-xl p-3
-                    transition-colors hover:bg-neutral-50
+                    transition-colors hover:bg-muted
                     disabled:cursor-not-allowed disabled:opacity-50
                     dark:hover:bg-white/5
                   `}
@@ -264,17 +259,15 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
                 <div
                   className={`
                     flex size-10 items-center justify-center rounded-lg
-                    bg-primary-100 text-accent
-                    dark:bg-primary-900/30
+                    bg-primary/10 text-primary
+                    dark:bg-primary/10
                   `}
                 >
                   <span className="material-symbols-outlined">download</span>
                 </div>
-                <span className="font-medium text-neutral-700 dark:text-neutral-200">
-                  {getHeaderText(exportDataHeader)}
-                </span>
+                <span className="font-medium text-foreground">{getHeaderText(exportDataHeader)}</span>
                 <span
-                  className={`material-symbols-outlined text-neutral-400 ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
+                  className={`material-symbols-outlined text-muted-foreground ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
                 >
                   chevron_right
                 </span>
@@ -285,24 +278,21 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
                 onClick={openCookieSettings}
                 className={`
                     flex w-full items-center gap-3 rounded-xl p-3
-                    transition-colors hover:bg-neutral-50
+                    transition-colors hover:bg-muted
                     dark:hover:bg-white/5
                   `}
               >
                 <div
                   className={`
                     flex size-10 items-center justify-center rounded-lg
-                    bg-tertiary-100 text-tertiary-600
-                    dark:bg-tertiary-900/30 dark:text-tertiary-400
+                    bg-muted text-muted-foreground
                   `}
                 >
                   <span className="material-symbols-outlined">cookie</span>
                 </div>
-                <span className="font-medium text-neutral-700 dark:text-neutral-200">
-                  {getHeaderText(cookieSettingsHeader)}
-                </span>
+                <span className="font-medium text-foreground">{getHeaderText(cookieSettingsHeader)}</span>
                 <span
-                  className={`material-symbols-outlined text-neutral-400 ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
+                  className={`material-symbols-outlined text-muted-foreground ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
                 >
                   chevron_right
                 </span>
@@ -314,32 +304,27 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
                 disabled={isUnsubscribing}
                 className={`
                     flex w-full items-center gap-3 rounded-xl p-3
-                    transition-colors hover:bg-warning-50
+                    transition-colors hover:bg-warning/10
                     disabled:cursor-not-allowed disabled:opacity-50
-                    dark:hover:bg-warning-900/10
                   `}
               >
                 <div
                   className={`
                     flex size-10 items-center justify-center rounded-lg
-                    bg-warning-100 text-warning-600
-                    dark:bg-warning-900/30 dark:text-warning-400
+                    bg-warning/10 text-warning
+                    dark:bg-warning/10 dark:text-warning
                   `}
                 >
                   <span className="material-symbols-outlined">unsubscribe</span>
                 </div>
-                <span className="font-medium text-warning-600 dark:text-warning-400">
-                  {getHeaderText(newsletterUnsubscribeHeader)}
-                </span>
-                <span
-                  className={`material-symbols-outlined text-warning-400 ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
-                >
+                <span className="font-medium text-warning">{getHeaderText(newsletterUnsubscribeHeader)}</span>
+                <span className={`material-symbols-outlined text-warning ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}>
                   chevron_right
                 </span>
               </button>
               {unsubscribeStatus === 'success' && newsletterUnsubscribeHeader.subheader?.text && (
                 <div
-                  className={`px-3 py-1 text-xs text-success-600 dark:text-success-400 ${isRtl ? 'text-right' : 'text-left'}`}
+                  className={`px-3 py-1 text-xs text-success ${isRtl ? 'text-right' : 'text-left'}`}
                   data-testid="unsubscribe-success"
                   role="status"
                 >
@@ -352,7 +337,7 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
                   const unsubscribeErrorText = newsletterUnsubscribeHeader.subheader?.ariaDescription ?? ''
                   return unsubscribeErrorText ? (
                     <div
-                      className={`px-3 py-1 text-xs text-error-600 dark:text-error-400 ${isRtl ? 'text-right' : 'text-left'}`}
+                      className={`px-3 py-1 text-xs text-error ${isRtl ? 'text-right' : 'text-left'}`}
                       data-testid="unsubscribe-error"
                       role="alert"
                     >
@@ -366,37 +351,33 @@ export default function ProfileClient({ data, lang, direction }: ProfileClientPr
                 href={`/${lang}/profile/delete`}
                 className={`
                     flex items-center gap-3 rounded-xl p-3
-                    transition-colors hover:bg-error-50 dark:hover:bg-error-900/10
+                    transition-colors hover:bg-error/10
                   `}
               >
                 <div
                   className={`
                     flex size-10 items-center justify-center rounded-lg
-                    bg-error-100 text-error-600
-                    dark:bg-error-900/30 dark:text-error-400
+                    bg-error/10 text-error
+                    dark:bg-error/10 dark:text-error
                   `}
                 >
                   <span className="material-symbols-outlined">delete</span>
                 </div>
-                <span className="font-medium text-error-600 dark:text-error-400">
-                  {getHeaderText(deleteAccountHeader)}
-                </span>
-                <span
-                  className={`material-symbols-outlined text-error-400 ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}
-                >
+                <span className="font-medium text-error">{getHeaderText(deleteAccountHeader)}</span>
+                <span className={`material-symbols-outlined text-error ${isRtl ? 'mr-auto rotate-180' : 'ml-auto'}`}>
                   chevron_right
                 </span>
               </Link>
             </div>
 
-            <div className="mt-8 border-t border-neutral-100 pt-6 dark:border-white/5">
+            <div className="mt-8 border-t border-border pt-6">
               <button
                 onClick={handleLogout}
                 className={`
                     flex w-full items-center justify-center gap-2 rounded-xl
-                    bg-neutral-100 py-3 font-medium text-neutral-600
-                    transition-colors hover:bg-neutral-200
-                    dark:bg-white/5 dark:text-neutral-300 dark:hover:bg-white/10
+                    bg-muted py-3 font-medium text-muted-foreground
+                    transition-colors hover:bg-muted
+                    dark:bg-white/5 dark:hover:bg-white/10
                   `}
               >
                 <span className="material-symbols-outlined">logout</span>

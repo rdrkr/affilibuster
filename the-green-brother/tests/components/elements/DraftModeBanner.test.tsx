@@ -7,8 +7,8 @@
  * text, link, and styling classes.
  */
 
-import { render, screen } from '@testing-library/react'
 import DraftModeBanner from '@/components/elements/DraftModeBanner'
+import { render, screen } from '@testing-library/react'
 
 jest.mock('next/link', () => ({
   __esModule: true,
@@ -48,8 +48,8 @@ describe('DraftModeBanner', () => {
     const { container } = render(<DraftModeBanner />)
 
     const banner = container.firstChild as HTMLElement
-    expect(banner).toHaveClass('bg-warning-600')
-    expect(banner).toHaveClass('text-neutral-900')
+    expect(banner).toHaveClass('bg-warning')
+    expect(banner).toHaveClass('text-foreground')
     expect(banner).toHaveClass('px-4')
     expect(banner).toHaveClass('py-2')
     expect(banner).toHaveClass('text-center')

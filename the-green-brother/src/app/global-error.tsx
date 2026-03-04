@@ -50,8 +50,12 @@ export function GlobalErrorContent({ error, reset }: GlobalErrorProps): React.Re
         fontFamily: 'system-ui, sans-serif',
       }}
     >
-      <div style={{ fontSize: '4rem', marginBottom: '1rem', color: '#d1d5db' }}>&#9888;</div>
-      {error.digest && <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>{error.digest}</p>}
+      <div style={{ fontSize: '4rem', marginBottom: '1rem', color: 'var(--color-muted-foreground, #a5b4ab)' }}>
+        &#9888;
+      </div>
+      {error.digest && (
+        <p style={{ fontSize: '0.875rem', color: 'var(--color-muted-foreground, #879b8f)' }}>{error.digest}</p>
+      )}
       <button
         onClick={reset}
         style={{
@@ -60,8 +64,8 @@ export function GlobalErrorContent({ error, reset }: GlobalErrorProps): React.Re
           fontSize: '1.5rem',
           borderRadius: '0.5rem',
           border: 'none',
-          backgroundColor: '#559540',
-          color: 'white',
+          backgroundColor: 'var(--color-primary, #14f195)',
+          color: 'var(--color-primary-foreground, #ffffff)',
           cursor: 'pointer',
         }}
       >

@@ -50,8 +50,8 @@ export function isIconSize(value: unknown): value is IconSize {
  * Frosted glass style for backgrounds
  */
 export const frostedGlassStyle = `
-  border rounded-full! border-neutral-200 bg-white/50 shadow-lg backdrop-blur-sm
-  dark:border-white/10 dark:bg-surface-dark/70
+  border rounded-full! border-border bg-card/50 shadow-lg backdrop-blur-sm
+  dark:border-white/10 dark:bg-card/70
 `
 
 /**
@@ -77,32 +77,32 @@ export function getVariantClasses(
     primary: `
       cursor-pointer transform
       ${isRTL ? 'ms-0.5 me-1.5' : 'ms-1.5 me-0.5'}
-      bg-primary text-background-dark font-bold
-      hover:bg-primary-hover active:bg-primary-700
-      disabled:bg-tertiary-500 disabled:cursor-not-allowed
+      bg-primary text-foreground-light font-bold
+      hover:bg-primary-hover active:bg-primary-active
+      disabled:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed
     `,
     secondary: `
       cursor-pointer
       bg-black/5 text-accent font-semibold text-shadow-none
       dark:bg-white/5 dark:text-shadow-none
-      hover:bg-primary hover:text-background-dark active:bg-primary-600
-      disabled:bg-tertiary-500 disabled:text-tertiary-500 disabled:cursor-not-allowed
+      hover:bg-primary-hover hover:text-foreground active:bg-primary-active
+      disabled:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed
     `,
     outline: `
       cursor-pointer
-      border-2 border-primary-600 text-accent font-bold text-shadow-none
+      border-2 border-accent text-accent font-bold text-shadow-none
       dark:border-primary dark:text-shadow-none
-      hover:bg-primary hover:text-background-dark active:bg-primary-600
-      disabled:border-tertiary-500 disabled:text-tertiary-500 disabled:cursor-not-allowed
+      hover:bg-primary-hover hover:text-foreground active:bg-primary-active
+      disabled:border-muted-foreground disabled:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed
     `,
     'ghost-1': `
       cursor-pointer
-      font-medium bg-transparent whitespace-nowrap rounded-full
+      font-semibold bg-transparent whitespace-nowrap rounded-full
       transition-colors
-      ${isActive ? `text-accent text-shadow-none dark:text-shadow-none` : `text-black dark:text-text-secondary-dark`}
-      hover:bg-transparent hover:text-primary-600 hover:text-shadow-none dark:hover:text-shadow-none
-      active:text-primary-600 dark:active:text-primary dark:hover:text-primary-hover
-      disabled:text-tertiary-500 disabled:cursor-not-allowed
+      ${isActive ? `text-accent text-shadow-none dark:text-shadow-none` : `text-foreground dark:text-muted-foreground`}
+      hover:bg-transparent hover:text-primary-hover hover:text-shadow-none dark:hover:text-shadow-none
+      active:text-primary-active dark:active:text-primary
+      disabled:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed
       ${
         noAnimation
           ? ''
@@ -120,11 +120,11 @@ export function getVariantClasses(
       cursor-pointer
       flex w-full items-center justify-center ${hasIcon && showText ? (isRTL ? 'sm:justify-end' : 'sm:justify-start') : ''}
       font-medium whitespace-nowrap rounded-full
-      transition-colors text-neutral-700 dark:text-white
-      ${isActive ? `bg-neutral-100 dark:bg-white/5` : `bg-transparent`}
-      hover:bg-neutral-100 dark:hover:bg-white/10
-      active:bg-neutral-200 dark:active:bg-white/20
-      disabled:text-tertiary-500 disabled:cursor-not-allowed
+      transition-colors text-foreground
+      ${isActive ? `bg-muted dark:bg-white/5` : `bg-transparent`}
+      hover:bg-muted dark:hover:bg-white/10
+      active:bg-muted dark:active:bg-white/20
+      disabled:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed
     `,
     'ghost-3': `
       cursor-pointer
@@ -132,17 +132,17 @@ export function getVariantClasses(
       transition-colors
       ${
         isActive
-          ? `bg-primary text-background-dark hover:bg-primary-hover active:bg-primary-700`
-          : `bg-neutral-100 text-neutral-700 dark:bg-white/5 dark:text-white hover:bg-neutral-200 dark:hover:bg-white/10 active:bg-neutral-300 dark:active:bg-white/20`
+          ? `bg-primary text-foreground hover:bg-primary-hover active:bg-primary-active`
+          : `bg-muted text-foreground dark:bg-white/5 hover:bg-muted dark:hover:bg-white/10 active:bg-muted dark:active:bg-white/20`
       }
-      disabled:text-tertiary-500 disabled:cursor-not-allowed
+      disabled:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed
     `,
     'link-1': `
       cursor-pointer
       font-medium font-semibold no-underline
-      text-accent text-shadow-none hover:text-primary-600 active:text-primary
-      dark:text-shadow-none dark:hover:text-primary-hover dark:active:text-primary-400
-      disabled:text-tertiary-500 disabled:cursor-not-allowed
+      text-accent text-shadow-none hover:text-primary-hover active:text-primary
+      dark:text-shadow-none dark:active:text-primary-active
+      disabled:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed
       ${
         noAnimation
           ? 'hover:underline'
@@ -152,9 +152,8 @@ export function getVariantClasses(
     'link-2': `
       cursor-pointer
       font-medium no-underline
-      text-neutral-600 hover:text-neutral-800 active:text-neutral-900
-      dark:text-text-secondary-dark dark:hover:text-text-main-dark dark:active:text-white
-      disabled:text-tertiary-500 disabled:cursor-not-allowed
+      text-muted-foreground hover:text-foreground active:text-foreground
+      disabled:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed
       ${
         noAnimation
           ? ''
@@ -165,9 +164,9 @@ export function getVariantClasses(
       cursor-pointer
       transition-opacity duration-300 ease-in-out
       hover:bg-white/70 active:bg-white/90
-      dark:hover:bg-neutral-800/50 dark:active:bg-neutral-800/70
+      dark:hover:bg-foreground/50 dark:active:bg-foreground/70
       ${frostedGlassStyle}
-      dark:bg-neutral-800/30!
+      dark:bg-foreground/30!
     `,
   }
   return variants[variant]

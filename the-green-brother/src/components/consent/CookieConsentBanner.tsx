@@ -249,7 +249,7 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
         fixed inset-x-4 bottom-8 z-50 mx-auto max-h-[82dvh] max-w-6xl overflow-y-auto p-4
         md:inset-x-6 md:max-h-[86dvh] md:p-6
         ${frostedGlassStyle}
-        rounded-xl! bg-white/80! dark:bg-surface-dark/80!
+        rounded-xl! bg-card/80!
         ${isClosing ? 'animate-[slideDownOut_0.3s_ease-in_forwards]' : 'animate-[slideUp_0.3s_ease-out_forwards]'}
       `}
     >
@@ -286,8 +286,8 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
             headerLevel={5}
             direction={direction}
             className={`
-              -mt-2 mb-4 rounded-xl border border-neutral-200 p-4
-              shadow-lg dark:border-white/5
+              -mt-2 mb-4 rounded-xl border border-border p-4
+              shadow-lg
               dark:shadow-none prose-headings:mb-0!
             `}
             data-testid="dnt-notice"
@@ -337,7 +337,7 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
           <div className="overflow-hidden">
             <div
               className={`
-                rounded-xl border border-neutral-200
+                rounded-xl border border-border
                 p-4 shadow-lg md:p-6
                 dark:border-white/5 dark:shadow-none
               `}
@@ -355,7 +355,7 @@ const CookieConsentBanner = ({ lang, direction }: CookieConsentBannerProps): Rea
                         }}
                         className={`
                           size-4 cursor-pointer rounded-full
-                          border-tertiary-500 accent-primary
+                          border-border accent-primary
                           disabled:cursor-not-allowed disabled:opacity-60
                         `}
                       />

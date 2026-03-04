@@ -593,14 +593,6 @@ describe('BlogPostClient', () => {
 
     const heroFooter = screen.getByTestId('hero-footer')
     const container = heroFooter.firstElementChild
-    expect(container).toHaveClass(
-      'flex',
-      'items-center',
-      'gap-4',
-      'text-sm',
-      'font-medium',
-      'text-neutral-500',
-      'dark:text-tertiary-400'
-    )
+    expect(container).toHaveClass('flex', 'items-center', 'gap-4', 'text-sm', 'font-medium', 'text-muted-foreground')
   })
 })

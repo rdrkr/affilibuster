@@ -110,8 +110,8 @@ export function BlogCard({
     showTag && firstTag ? (
       <span
         className={`
-          me-auto mb-2 w-fit rounded-sm bg-primary-900 px-2
-          py-1 text-xs font-bold tracking-wider text-white uppercase
+          me-auto mb-2 w-fit rounded-sm bg-accent px-2 py-1
+          text-xs font-bold tracking-wider text-foreground-reversed uppercase
         `}
       >
         {firstTag}
@@ -133,9 +133,9 @@ export function BlogCard({
         className="flex min-h-0 min-w-0 flex-1 flex-col"
         headerClassName={`
           leading-snug shrink-0
-          text-neutral-800 transition-colors group-hover:text-primary group-hover:text-shadow-sm
-          active:text-primary-700
-          dark:text-white dark:group-hover:text-shadow-none dark:active:text-primary-400
+          text-foreground transition-colors group-hover:text-primary-hover group-hover:text-shadow-none
+          active:text-primary-active
+          dark:group-hover:text-shadow-none
         `}
         headerTextClassName="line-clamp-2 min-w-0"
         subheaderClassName="flex-1 min-h-0 overflow-hidden flex flex-col"
@@ -158,7 +158,7 @@ export function BlogCard({
         text={authorAndReadTime}
         as="span"
         className={`
-          flex items-center text-xs text-neutral-500 dark:text-tertiary-400
+          flex items-center text-xs text-muted-foreground
         `}
       />
 
@@ -172,11 +172,10 @@ export function BlogCard({
         className={
           asLink
             ? `
-            text-neutral-800! transition-colors!
-            group-hover:text-primary! group-hover:text-shadow-sm!
-            group-active:text-primary-700!
-            dark:text-white! dark:group-hover:text-shadow-none!
-            dark:group-active:text-primary-400!
+            text-foreground! transition-colors!
+            group-hover:text-primary-hover! group-hover:text-shadow-none!
+            group-active:text-primary-active!
+            dark:group-hover:text-shadow-none!
             `
             : 'pointer-events-auto'
         }

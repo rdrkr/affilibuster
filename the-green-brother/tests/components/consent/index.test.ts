@@ -16,4 +16,9 @@ describe('components/consent barrel exports', () => {
     expect(consent.CookieSettingsAction).toBeDefined()
     expect(typeof consent.CookieSettingsAction).toBe('function')
   })
+
+  it('should export DeferredCookieConsentBanner component', () => {
+    expect(consent.DeferredCookieConsentBanner).toBeDefined()
+    expect(typeof consent.DeferredCookieConsentBanner).toBe('function')
+  })
 })

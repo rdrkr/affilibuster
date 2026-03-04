@@ -360,7 +360,7 @@ describe('BrandFeaturesSection', () => {
     const { container } = render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithoutHeader} />)
 
     // Each feature should be in its own container with bg-white (light mode) and dark:bg-surface-dark
-    const featureContainers = container.querySelectorAll('.bg-white.rounded-xl')
+    const featureContainers = container.querySelectorAll('.bg-card.rounded-xl')
     expect(featureContainers.length).toBe(4)
   })
 
@@ -405,7 +405,7 @@ describe('BrandFeaturesSection', () => {
     )
 
     // Should only render 1 valid feature container
-    const featureContainers = container.querySelectorAll('.bg-white.rounded-xl')
+    const featureContainers = container.querySelectorAll('.bg-card.rounded-xl')
     expect(featureContainers.length).toBe(1)
   })
 
@@ -452,7 +452,7 @@ describe('BrandFeaturesSection', () => {
 
     // Each feature should be in its own container with bg-white (light mode)
     // We check that they have justify-start class
-    const featureContainers = container.querySelectorAll('.bg-white.rounded-xl')
+    const featureContainers = container.querySelectorAll('.bg-card.rounded-xl')
     expect(featureContainers.length).toBeGreaterThan(0)
     featureContainers.forEach(feature => {
       expect(feature).toHaveClass('justify-start')
@@ -488,7 +488,7 @@ describe('BrandFeaturesSection', () => {
     const { container } = render(<BrandFeaturesSection direction={DirectionEnum.LTR} data={dataWithoutFeatureIds} />)
 
     // Should render without errors, using index as key
-    const featureContainers = container.querySelectorAll('.bg-white.rounded-xl')
+    const featureContainers = container.querySelectorAll('.bg-card.rounded-xl')
     expect(featureContainers.length).toBe(4)
   })
 
@@ -541,7 +541,7 @@ describe('BrandFeaturesSection', () => {
 
     // Each feature should be in its own container with bg-white (light mode)
     // We check that they have justify-end class
-    const featureContainers = container.querySelectorAll('.bg-white.rounded-xl')
+    const featureContainers = container.querySelectorAll('.bg-card.rounded-xl')
     expect(featureContainers.length).toBeGreaterThan(0)
     featureContainers.forEach(feature => {
       expect(feature).toHaveClass('justify-start')

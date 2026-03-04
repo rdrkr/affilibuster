@@ -233,8 +233,8 @@ describe('Carousel', () => {
       const activeDot = screen.getByTestId('hero-dot-0')
       const inactiveDot = screen.getByTestId('hero-dot-1')
 
-      expect(activeDot).toHaveClass('bg-primary-600')
-      expect(inactiveDot).toHaveClass('bg-neutral-300')
+      expect(activeDot).toHaveClass('bg-primary')
+      expect(inactiveDot).toHaveClass('bg-muted-foreground/40')
     })
 
     it('should have proper dot accessibility attributes', () => {

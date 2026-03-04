@@ -173,9 +173,9 @@ export function ContainerTabBar<T = unknown>({ tabs, activeKey, onTabChange, dir
       data-testid="container-tab-bar"
       className={`
         relative mx-auto flex w-fit max-w-full items-center
-        justify-center overflow-hidden rounded-xl border border-neutral-200
-        bg-white px-0.5 shadow-md dark:border-white/5
-        dark:bg-surface-dark dark:shadow-none
+        justify-center overflow-hidden rounded-xl border border-border
+        bg-card px-0.5 shadow-md
+        dark:shadow-none
       `}
     >
       {/* Scroll start arrow – always rendered, visibility via opacity */}
@@ -249,11 +249,7 @@ export function ContainerTabBar<T = unknown>({ tabs, activeKey, onTabChange, dir
               className={`
                 relative z-10 cursor-pointer px-5 py-2.5 text-sm font-medium whitespace-nowrap
                 transition-colors duration-300
-                ${
-                  isActive
-                    ? 'text-neutral-900 dark:text-white'
-                    : 'text-neutral-700 hover:text-neutral-900 active:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:active:text-white'
-                }
+                ${isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground active:text-foreground'}
               `}
             >
               {tab.label}

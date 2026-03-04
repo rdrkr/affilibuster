@@ -42,7 +42,6 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: false,
     loader: 'default',
-
     remotePatterns: [
       {
         // Backend access
@@ -122,6 +121,15 @@ const nextConfig: NextConfig = {
       { source: '/:lang/sitemap.xml', destination: '/sitemap.xml' },
     ]
   },
+}
+
+// see issue @ https://github.com/vercel/next.js/discussions/64330#discussioncomment-15839009
+if (nextConfig.turbopack) {
+  nextConfig.turbopack.resolveAlias = {
+    ...nextConfig.turbopack.resolveAlias,
+    '../build/polyfills/polyfill-module': 'false',
+    'next/dist/build/polyfills/polyfill-module': 'false',
+  }
 }
 
 export default withBundleAnalyzer(withNextIntl(nextConfig))

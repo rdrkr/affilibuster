@@ -11,7 +11,7 @@
 
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useRef, useState } from 'react'
 
 import type { DisplayMode } from '@/components/navigation'
 
@@ -288,7 +288,9 @@ export function useNavigationResize(): UseNavigationResizeReturn {
   )
 
   // Set up ResizeObserver to monitor navigation container width
-  useEffect(() => {
+  // Uses useLayoutEffect to calculate initial visibility before paint,
+  // preventing the navigation from flashing with opacity-0 then fading in.
+  useLayoutEffect(() => {
     const nav = navRef.current
     if (!nav) {
       return

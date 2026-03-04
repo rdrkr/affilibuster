@@ -153,9 +153,9 @@ function NewsletterSignupCTAInner({ data, direction }: NewsletterSignupCTAProps)
         <div
           className={`
           rounded-xl border
-          border-neutral-200 bg-neutral-50 p-8
+          border-border bg-muted p-8
           shadow-md
-          dark:border-white/5 dark:bg-surface-dark dark:shadow-none
+          dark:bg-card dark:shadow-none
         `}
         >
           <Header
@@ -177,8 +177,8 @@ function NewsletterSignupCTAInner({ data, direction }: NewsletterSignupCTAProps)
             level={3}
             direction={direction}
             className="mb-6"
-            headerClassName="text-neutral-800 dark:text-white"
-            subheaderClassName="text-sm text-neutral-600 dark:text-text-secondary-dark"
+            headerClassName="text-foreground"
+            subheaderClassName="text-sm text-muted-foreground"
           />
           {state === 'confirmed' ? (
             <div className="text-center text-sm text-accent" data-testid="newsletter-confirmed" role="status">
@@ -213,20 +213,19 @@ function NewsletterSignupCTAInner({ data, direction }: NewsletterSignupCTAProps)
                       }
                     }}
                     className={`
-                      grow rounded-full border bg-white px-4 py-2.5
-                      text-sm text-neutral-800 placeholder-neutral-400
+                      grow rounded-full border bg-card px-4 py-2.5
+                      text-sm text-foreground placeholder-muted-foreground
                       focus:border-primary/50 focus:ring-1 focus:ring-primary/50
                       focus:outline-none
-                      dark:bg-black/20 dark:text-white
-                      dark:placeholder-text-secondary-dark/50
-                      ${emailError ? 'border-error-500' : 'border-neutral-200 dark:border-white/10'}
+                      dark:bg-black/20
+                      ${emailError ? 'border-error' : 'border-border'}
                     `}
                     dir={isRTL ? 'rtl' : 'ltr'}
                     disabled={isSubmitting}
                   />
                   {emailError && (
                     <span
-                      className={`mt-1 text-xs text-error-500 ${isRTL ? 'text-right' : 'text-left'}`}
+                      className={`mt-1 text-xs text-error ${isRTL ? 'text-right' : 'text-left'}`}
                       data-testid="email-error"
                       role="alert"
                     >
@@ -244,8 +243,8 @@ function NewsletterSignupCTAInner({ data, direction }: NewsletterSignupCTAProps)
                   disabled={isSubmitting || !email.trim() || !consentChecked}
                   className={`
                     rounded-full bg-primary px-6 py-2.5 text-sm font-bold
-                    whitespace-nowrap text-background-dark shadow-lg
-                    hover:bg-primary-hover active:bg-primary-800
+                    whitespace-nowrap text-foreground shadow-lg
+                    hover:bg-primary-hover active:bg-primary-active
                   `}
                   onClick={() => {
                     // Submit is handled by form onSubmit, but onClick is required by ButtonAction
@@ -253,14 +252,12 @@ function NewsletterSignupCTAInner({ data, direction }: NewsletterSignupCTAProps)
                 />
               </div>
               {submitError && (
-                <span className="text-center text-xs text-error-500" data-testid="submit-error" role="alert">
+                <span className="text-center text-xs text-error" data-testid="submit-error" role="alert">
                   {submitError}
                 </span>
               )}
               <label
-                className={`flex items-start gap-2 text-xs text-neutral-600 dark:text-text-secondary-dark ${
-                  isRTL ? 'text-right' : 'text-left'
-                }`}
+                className={`flex items-start gap-2 text-xs text-muted-foreground ${isRTL ? 'text-right' : 'text-left'}`}
                 data-testid="consent-text"
               >
                 <input
@@ -291,7 +288,7 @@ function NewsletterSignupCTAInner({ data, direction }: NewsletterSignupCTAProps)
               </label>
               {consentError && (
                 <span
-                  className={`text-xs text-error-500 ${isRTL ? 'text-right' : 'text-left'}`}
+                  className={`text-xs text-error ${isRTL ? 'text-right' : 'text-left'}`}
                   data-testid="consent-error"
                   role="alert"
                 >

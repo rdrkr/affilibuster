@@ -88,14 +88,14 @@ export default function BlogPostClient({ post, direction, blogData, language }: 
               text={post.tags[0].tag.text}
               as="span"
               className={`
-                mb-4 block text-sm font-bold tracking-wider text-accent-light
+                mb-4 block text-sm font-bold tracking-wider text-accent
                 uppercase
               `}
             />
           ) : null
         }
         footer={
-          <div className="flex items-center gap-4 text-sm font-medium text-neutral-500 dark:text-tertiary-400">
+          <div className="flex items-center gap-4 text-sm font-medium text-muted-foreground">
             <ContributorCard
               member={post.author}
               direction={direction}
@@ -141,7 +141,7 @@ export default function BlogPostClient({ post, direction, blogData, language }: 
 
       {/* Author Bio (if available) */}
       {post.author.bio && (
-        <div className="flex flex-col gap-4 border-t border-neutral-200 pt-8 dark:border-tertiary-700">
+        <div className="flex flex-col gap-4 border-t border-border pt-8">
           <Header data={blogData.aboutAuthorHeader} direction={direction} level={3} />
           <ContributorCard
             member={post.author}

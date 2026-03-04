@@ -73,7 +73,7 @@ describe('ContainerTabBar', () => {
     it('should have Card-style background on container', () => {
       render(<ContainerTabBar {...defaultProps} />)
       const container = screen.getByTestId('container-tab-bar')
-      expect(container).toHaveClass('rounded-xl', 'bg-white', 'shadow-md')
+      expect(container).toHaveClass('rounded-xl', 'bg-card', 'shadow-md')
     })
 
     it('should render sliding pill with frosted glass style', () => {
@@ -99,14 +99,14 @@ describe('ContainerTabBar', () => {
     it('should apply active text color to selected tab', () => {
       render(<ContainerTabBar {...defaultProps} activeKey="tab1" />)
       const activeTab = screen.getByTestId('tab-tab1')
-      expect(activeTab).toHaveClass('text-neutral-900')
+      expect(activeTab).toHaveClass('text-foreground')
     })
 
     it('should apply inactive text color to non-selected tabs', () => {
       render(<ContainerTabBar {...defaultProps} activeKey="tab1" />)
       const inactiveTab = screen.getByTestId('tab-tab2')
-      expect(inactiveTab).toHaveClass('text-neutral-700')
-      expect(inactiveTab).not.toHaveClass('text-neutral-900')
+      expect(inactiveTab).toHaveClass('text-muted-foreground')
+      expect(inactiveTab).not.toHaveClass('text-foreground')
     })
 
     it('should set aria-selected on tabs', () => {

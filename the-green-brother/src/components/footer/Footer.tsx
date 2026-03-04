@@ -74,8 +74,8 @@ export default async function Footer({ lang, direction }: FooterProps) {
 
       case 'call-to-actions.newsletter-signup-cta':
         return (
-          <div key={column.id} className="text-neutral-600 dark:text-text-secondary-dark">
-            <Text text={column.title} as="h5" className="mb-4 font-bold text-neutral-800 dark:text-text-main-dark" />
+          <div key={column.id} className="text-muted-foreground">
+            <Text text={column.title} as="h5" className="mb-4 font-bold text-foreground" />
             <Text text={column.description} as="p" className="mb-4" />
           </div>
         )
@@ -88,7 +88,7 @@ export default async function Footer({ lang, direction }: FooterProps) {
   return (
     <footer className="mx-auto flex max-w-7xl flex-col gap-4 px-4 pb-8 sm:px-6 lg:px-8">
       {/* Content wrapper with top separator */}
-      <div className="border-y border-neutral-200 dark:border-subtle-dark">
+      <div className="border-y border-border">
         <DynamicZone
           sections={columns}
           renderSection={column => {
@@ -104,14 +104,10 @@ export default async function Footer({ lang, direction }: FooterProps) {
       <div
         className={`
             flex flex-col items-center justify-between
-            md:flex-row dark:border-subtle-dark
+            md:flex-row
           `}
       >
-        <Label
-          data={copyrightsLabel}
-          className="text-xs text-neutral-600 dark:text-text-secondary-dark"
-          direction={direction}
-        />
+        <Label data={copyrightsLabel} className="text-xs text-muted-foreground" direction={direction} />
 
         <div
           className={`

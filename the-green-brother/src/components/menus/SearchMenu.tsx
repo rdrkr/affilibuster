@@ -255,9 +255,9 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
           dir={isRTL ? 'rtl' : 'ltr'}
           className={`
             flex min-h-11.5 w-full items-center gap-1 overflow-hidden rounded-full
-            border border-neutral-200 bg-white/60 px-4 ring-1 ring-primary/50
+            border border-border bg-card/60 px-4 ring-1 ring-primary/50
             transition-all duration-300
-            dark:border-white/20 dark:bg-surface-dark/60
+            dark:border-white/20
           `}
         >
           <span className="material-symbols-outlined shrink-0 text-xl text-primary">
@@ -270,8 +270,8 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
             type="text"
             className={`
               size-full border-none bg-transparent p-0 ${isRTL ? 'text-right' : 'text-left'} text-base
-              leading-none text-neutral-800 placeholder-neutral-400 outline-none
-              focus:ring-0 dark:text-white dark:placeholder-text-secondary-dark
+              leading-none text-foreground placeholder-muted-foreground outline-none
+              focus:ring-0
             `}
             placeholder={data.textBoxPlaceholderLabel.text}
             value={searchQuery}
@@ -301,7 +301,7 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
             }}
             className={`
               flex shrink-0
-              transition-transform hover:text-white active:scale-95
+              transition-transform hover:text-foreground-reversed active:scale-95
             `}
             aria-label="Close search"
           >
@@ -319,8 +319,8 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
                 text={data.recentSearchesLabel.text}
                 as="h4"
                 className={`
-                mb-3 text-xs font-bold tracking-wider text-neutral-500
-                uppercase dark:text-text-secondary-dark
+                mb-3 text-xs font-bold tracking-wider text-muted-foreground
+                uppercase
               `}
               />
               <Carousel direction={direction} gap="sm">
@@ -348,7 +348,7 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
               <h4
                 className={`
                   mb-3 flex items-center gap-1 text-xs font-bold
-                  tracking-wider text-neutral-500 uppercase dark:text-text-secondary-dark
+                  tracking-wider text-muted-foreground uppercase
                 `}
               >
                 <span
@@ -375,15 +375,15 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
                     >
                       <span
                         className={`
-                        material-symbols-outlined text-neutral-500
-                        group-hover:text-primary group-hover:text-shadow-sm
-                        group-active:text-primary-700
-                        dark:text-text-secondary-dark dark:group-hover:text-shadow-none
+                        material-symbols-outlined text-muted-foreground
+                        group-hover:text-primary-hover group-hover:text-shadow-none
+                        group-active:text-primary-active
+                        dark:group-hover:text-shadow-none
                       `}
                       >
                         arrow_outward
                       </span>
-                      <span className="text-base font-normal text-neutral-700 dark:text-white">{term}</span>
+                      <span className="text-base font-normal text-foreground">{term}</span>
                     </ButtonAction>
                   </li>
                 ))}
@@ -395,7 +395,7 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
             <h4
               className={`
               px-4 py-2 text-xs font-bold tracking-wider
-              text-neutral-500 uppercase dark:text-text-secondary-dark
+              text-muted-foreground uppercase
             `}
             >
               Products
@@ -407,7 +407,7 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
                     href="/products"
                     className={`
                       flex items-center gap-4 px-4 py-3 transition-colors
-                      hover:bg-neutral-100 active:bg-neutral-200
+                      hover:bg-muted active:bg-muted
                       dark:hover:bg-white/5 dark:active:bg-white/10
                     `}
                   >
@@ -419,8 +419,8 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
                       className="rounded-md object-cover"
                     />
                     <div>
-                      <p className="text-sm font-medium text-neutral-800 dark:text-white">{result.name}</p>
-                      <p className="text-xs text-neutral-500 dark:text-text-secondary-dark">{result.category}</p>
+                      <p className="text-sm font-medium text-foreground">{result.name}</p>
+                      <p className="text-xs text-muted-foreground">{result.category}</p>
                     </div>
                   </Link>
                 </li>

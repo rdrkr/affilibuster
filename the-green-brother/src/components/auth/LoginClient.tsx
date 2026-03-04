@@ -83,15 +83,14 @@ export default function LoginClient({ data, lang, direction }: LoginClientProps)
             direction={direction}
             level={1}
             className="mb-2"
-            headerClassName="text-3xl font-bold text-neutral-800 dark:text-white"
-            subheaderClassName="text-neutral-600 dark:text-text-secondary-dark"
+            headerClassName="text-3xl font-bold text-foreground"
+            subheaderClassName="text-muted-foreground"
           />
         </div>
 
         <div
           className={`
-          rounded-xl border border-neutral-200 bg-white p-8 shadow-2xl
-          dark:border-white/5 dark:bg-surface-dark
+          rounded-xl border border-border bg-card p-8 shadow-2xl
         `}
         >
           <form onSubmit={handleLogin} className="space-y-6">
@@ -100,12 +99,12 @@ export default function LoginClient({ data, lang, direction }: LoginClientProps)
               <Label
                 data={emailLabel}
                 direction={direction}
-                className="mb-2 text-sm font-medium text-neutral-600 dark:text-text-secondary-dark"
+                className="mb-2 text-sm font-medium text-muted-foreground"
               />
               <div className="relative">
                 <span
                   className={`
-                    material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-neutral-400 dark:text-text-secondary-dark
+                    material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-muted-foreground
                     ${isRtl ? 'right-4' : 'left-4'}
                   `}
                 >
@@ -118,10 +117,10 @@ export default function LoginClient({ data, lang, direction }: LoginClientProps)
                     setEmail(e.target.value)
                   }}
                   className={`
-                    w-full rounded-xl border border-neutral-200 bg-neutral-50
-                    py-3 text-neutral-800 outline-none
+                    w-full rounded-xl border border-input bg-input
+                    py-3 text-foreground outline-none
                     focus:border-transparent focus:ring-2 focus:ring-primary
-                    dark:border-white/10 dark:bg-background-dark dark:text-white
+                    dark:border-white/10 dark:bg-background-dark dark:text-foreground
                     ${isRtl ? 'pr-12 pl-4' : 'pr-4 pl-12'}
                   `}
                   placeholder={emailPlaceholder}
@@ -136,7 +135,7 @@ export default function LoginClient({ data, lang, direction }: LoginClientProps)
                 <Label
                   data={passwordLabel}
                   direction={direction}
-                  className="text-sm font-medium text-neutral-600 dark:text-text-secondary-dark"
+                  className="text-sm font-medium text-muted-foreground"
                 />
 
                 {/* Forgot Password Link */}
@@ -151,7 +150,7 @@ export default function LoginClient({ data, lang, direction }: LoginClientProps)
               <div className="relative">
                 <span
                   className={`
-                    material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-neutral-400 dark:text-text-secondary-dark
+                    material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-muted-foreground
                     ${isRtl ? 'right-4' : 'left-4'}
                   `}
                 >
@@ -164,10 +163,10 @@ export default function LoginClient({ data, lang, direction }: LoginClientProps)
                     setPassword(e.target.value)
                   }}
                   className={`
-                    w-full rounded-xl border border-neutral-200 bg-neutral-50
-                    py-3 text-neutral-800 outline-none
+                    w-full rounded-xl border border-input bg-input
+                    py-3 text-foreground outline-none
                     focus:border-transparent focus:ring-2 focus:ring-primary
-                    dark:border-white/10 dark:bg-background-dark dark:text-white
+                    dark:border-white/10 dark:bg-background-dark dark:text-foreground
                     ${isRtl ? 'px-12' : 'px-12'}
                   `}
                   placeholder={passwordPlaceholder}
@@ -180,8 +179,7 @@ export default function LoginClient({ data, lang, direction }: LoginClientProps)
                   }}
                   className={`
                     absolute top-1/2 -translate-y-1/2
-                    text-neutral-400 hover:text-neutral-700
-                    dark:text-text-secondary-dark dark:hover:text-white
+                    text-muted-foreground hover:text-foreground
                     ${isRtl ? 'left-4' : 'right-4'}
                   `}
                 >
@@ -198,7 +196,7 @@ export default function LoginClient({ data, lang, direction }: LoginClientProps)
               disabled={isLoading}
               className={`
                 w-full rounded-xl bg-primary py-3.5 font-bold
-                text-background-dark shadow-lg shadow-primary/20
+                text-foreground shadow-lg shadow-primary/20
                 transition-colors
                 hover:bg-primary-hover
                 disabled:cursor-not-allowed disabled:opacity-70
@@ -210,9 +208,9 @@ export default function LoginClient({ data, lang, direction }: LoginClientProps)
 
           {/* Divider */}
           <div className="my-8 flex items-center gap-4">
-            <div className="h-px grow bg-neutral-200 dark:bg-white/10"></div>
-            <span className="text-sm text-neutral-600 dark:text-text-secondary-dark">{orDividerText}</span>
-            <div className="h-px grow bg-neutral-200 dark:bg-white/10"></div>
+            <div className="h-px grow bg-border"></div>
+            <span className="text-sm text-muted-foreground">{orDividerText}</span>
+            <div className="h-px grow bg-border"></div>
           </div>
 
           {/* Social Buttons */}
@@ -221,20 +219,20 @@ export default function LoginClient({ data, lang, direction }: LoginClientProps)
               data={googleButton}
               direction={direction}
               variant="outline"
-              className="w-full justify-center bg-neutral-50 dark:bg-background-dark"
+              className="w-full justify-center bg-input dark:bg-background-dark"
             />
 
             <ButtonLink
               data={appleButton}
               direction={direction}
               variant="outline"
-              className="w-full justify-center bg-neutral-50 dark:bg-background-dark"
+              className="w-full justify-center bg-input dark:bg-background-dark"
             />
           </div>
         </div>
 
         {/* Footer Link */}
-        <p className="mt-8 text-center text-neutral-600 dark:text-text-secondary-dark">
+        <p className="mt-8 text-center text-muted-foreground">
           {noAccountText}{' '}
           <Link href={`/${lang}/signup`} className="font-bold text-accent hover:underline">
             {signupLinkText}

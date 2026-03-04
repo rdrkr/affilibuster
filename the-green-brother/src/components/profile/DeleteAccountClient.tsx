@@ -70,17 +70,17 @@ export default function DeleteAccountClient({ data, lang, direction }: DeleteAcc
     <div className="mx-auto max-w-lg py-8 text-center">
       <div
         className={`
-        rounded-xl border border-neutral-200 bg-white p-8 shadow-md
-        md:p-12 dark:border-white/5 dark:bg-surface-dark dark:shadow-none
+        rounded-xl border border-border bg-card p-8 shadow-md
+        md:p-12 dark:shadow-none
       `}
       >
         <div
           className={`
           mx-auto mb-6 flex size-20 items-center justify-center rounded-full
-          bg-red-500/10
+          bg-error/10
         `}
         >
-          <span className="material-symbols-outlined text-4xl text-red-500">warning</span>
+          <span className="material-symbols-outlined text-4xl text-error">warning</span>
         </div>
 
         <Header
@@ -88,14 +88,14 @@ export default function DeleteAccountClient({ data, lang, direction }: DeleteAcc
           direction={direction}
           level={1}
           className="mb-4"
-          headerClassName="text-3xl font-bold text-neutral-800 dark:text-white"
+          headerClassName="text-3xl font-bold text-foreground"
         />
 
         <form onSubmit={e => void handleDelete(e)} className="space-y-6 text-left">
           <div>
             <label
               className={`
-              mb-2 block text-sm font-medium text-neutral-600 dark:text-text-secondary-dark
+              mb-2 block text-sm font-medium text-muted-foreground
             `}
             >
               Enter your password to confirm
@@ -104,7 +104,7 @@ export default function DeleteAccountClient({ data, lang, direction }: DeleteAcc
               <span
                 className={`
                   material-symbols-outlined absolute top-1/2
-                  -translate-y-1/2 text-neutral-400 dark:text-text-secondary-dark
+                   -translate-y-1/2 text-muted-foreground
                   ${isRtl ? 'right-4' : 'left-4'}
                 `}
               >
@@ -117,10 +117,10 @@ export default function DeleteAccountClient({ data, lang, direction }: DeleteAcc
                   setPassword(e.target.value)
                 }}
                 className={`
-                  w-full rounded-xl border border-neutral-200 bg-neutral-50
-                  py-3 text-neutral-800 outline-none
-                  focus:border-transparent focus:ring-2 focus:ring-red-500
-                  dark:border-white/10 dark:bg-background-dark dark:text-white
+                  w-full rounded-xl border border-border bg-muted
+                  py-3 text-foreground outline-none
+                  focus:border-transparent focus:ring-2 focus:ring-error
+                  dark:border-white/10 dark:bg-background-dark dark:text-foreground
                   ${isRtl ? 'pr-12 pl-4' : 'pr-4 pl-12'}
                 `}
                 placeholder="Password"
@@ -130,7 +130,7 @@ export default function DeleteAccountClient({ data, lang, direction }: DeleteAcc
           </div>
 
           {error && (
-            <p className="text-sm text-red-500" role="alert">
+            <p className="text-sm text-error" role="alert">
               {error}
             </p>
           )}
@@ -140,9 +140,9 @@ export default function DeleteAccountClient({ data, lang, direction }: DeleteAcc
               type="submit"
               disabled={isLoading}
               className={`
-                w-full rounded-xl bg-red-500 py-3.5 font-bold text-white
-                shadow-lg shadow-red-500/20 transition-colors
-                hover:bg-red-600
+                w-full rounded-xl bg-error py-3.5 font-bold text-foreground-reversed
+                shadow-lg shadow-error/20 transition-colors
+                hover:bg-error/90
                 disabled:cursor-not-allowed disabled:opacity-70
               `}
             >
@@ -151,9 +151,9 @@ export default function DeleteAccountClient({ data, lang, direction }: DeleteAcc
             <Link
               href={`/${lang}/profile`}
               className={`
-                w-full rounded-xl border border-neutral-200 bg-transparent py-3.5
-                text-center font-bold text-neutral-600 transition-colors
-                hover:bg-neutral-100 dark:border-white/10 dark:text-white
+                w-full rounded-xl border border-border bg-transparent py-3.5
+                text-center font-bold text-muted-foreground transition-colors
+                hover:bg-muted dark:border-white/10 dark:text-foreground
                 dark:hover:bg-white/5
               `}
             >

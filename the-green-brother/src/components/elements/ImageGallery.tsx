@@ -179,8 +179,7 @@ export function ImageGallery({
       <div
         className={`
           relative aspect-square overflow-hidden rounded-xl border
-          border-neutral-200 bg-white
-          dark:border-tertiary-700 dark:bg-tertiary-800
+          border-border bg-card
         `}
       >
         {selectedImage ? (
@@ -211,7 +210,7 @@ export function ImageGallery({
           </>
         ) : (
           <div className="flex size-full items-center justify-center">
-            <Icon icon={placeholderIcon} size="6xl" className="text-tertiary-600" />
+            <Icon icon={placeholderIcon} size="6xl" className="text-muted-foreground" />
           </div>
         )}
 
@@ -223,10 +222,10 @@ export function ImageGallery({
               onClick={handleWishlistClick}
               className={`
                 flex size-10 items-center justify-center rounded-full
-                bg-white/50 text-neutral-800 backdrop-blur-md
-                transition-colors hover:bg-primary hover:text-black
-                active:bg-primary-600
-                dark:bg-background-dark/50 dark:text-white
+                bg-card/50 text-foreground backdrop-blur-md
+                transition-colors hover:bg-primary-hover hover:text-foreground
+                active:bg-primary-active
+                dark:bg-background/50
               `}
               aria-label="Add to favorites"
             >
@@ -248,10 +247,9 @@ export function ImageGallery({
               }}
               className={`
                 aspect-square overflow-hidden rounded-xl border-2
-                ${index === selectedImageIndex ? 'border-primary-500' : 'border-transparent'}
-                relative bg-white transition-all duration-300 hover:border-primary-500/50
-                active:border-primary-600
-                dark:bg-tertiary-800
+                ${index === selectedImageIndex ? 'border-ring' : 'border-transparent'}
+                relative bg-card transition-all duration-300 hover:border-primary-hover/50
+                active:border-primary-active
               `}
               aria-label={img.alternativeText ?? `View image ${String(index + 1)}`}
               aria-pressed={index === selectedImageIndex}

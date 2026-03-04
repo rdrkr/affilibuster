@@ -196,7 +196,7 @@ export default function ProductsClient({ pageData, products, categories, enableU
                 onClick={handleClearSearch}
                 data-testid="clear-search-button"
               >
-                <Text text={searchTerm} className="text-neutral-600 dark:text-neutral-300" />
+                <Text text={searchTerm} className="text-muted-foreground" />
                 <Icon icon="close" size="sm" />
               </ButtonAction>
             )}

@@ -75,9 +75,8 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
               className={`
                 flex items-center justify-start
                 rounded-xl border
-                border-neutral-200 bg-white
+                border-border bg-card
                 p-6 shadow-sm
-                dark:border-white/5 dark:bg-surface-dark
                 dark:shadow-none
               `}
             >
@@ -92,9 +91,9 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
   return (
     <section
       className={`
-        relative overflow-hidden rounded-xl border border-neutral-200
-        bg-white p-8 shadow-md
-        md:p-16 dark:border-white/5 dark:bg-surface-dark
+        relative overflow-hidden rounded-xl border border-border
+        bg-card p-8 shadow-md
+        md:p-16
         dark:shadow-none
       `}
       aria-label={headerAriaDescription ?? ''}
@@ -103,14 +102,14 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
       {/* Decorative background elements */}
       <div
         className={`
-        absolute top-0 right-0 -mt-20 -mr-20 size-80 rounded-full bg-primary/5
-        blur-3xl
+        absolute right-0 bottom-0 -mr-20 -mb-20 size-80 rounded-full
+        bg-surface/20 blur-3xl
       `}
       />
       <div
         className={`
-        absolute bottom-0 left-0 -mb-20 -ml-20 size-80 rounded-full
-        bg-blue-500/5 blur-3xl
+        absolute top-0 left-0 -mt-20 -ml-20 h-80 w-120 rounded-full
+        bg-surface/40 blur-3xl
       `}
       />
 

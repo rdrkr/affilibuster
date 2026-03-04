@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Affilibuster by Ronen Druker.
 
-import { getError404 } from '@/lib/content'
 import { Icon, TextBlock } from '@/components/elements'
+import { getError404 } from '@/lib/content'
 import { DirectionEnum, LanguageCode } from '@/lib/generated/types.gen'
 import { getLanguages } from '@/lib/languages/api'
 import { buildNoIndexMetadata } from '@/lib/seo'
@@ -58,11 +58,11 @@ export default async function NotFoundPage(): Promise<React.ReactElement> {
 
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center px-4 text-center">
-      {headerIcon && <Icon icon={headerIcon} size="6xl" className="mb-4 text-neutral-300 dark:text-neutral-600" />}
+      {headerIcon && <Icon icon={headerIcon} size="6xl" className="mb-4 text-muted-foreground" />}
       {textBlockData && <TextBlock data={textBlockData} direction={direction} headerLevel={2} />}
       <Link
         href={`/${locale}`}
-        className="mt-8 inline-block rounded-lg bg-primary-600 px-6 py-3 text-white transition-colors hover:bg-primary-700"
+        className="mt-8 inline-block rounded-lg bg-primary px-6 py-3 text-foreground transition-colors hover:bg-primary-hover"
       >
         &larr;
       </Link>

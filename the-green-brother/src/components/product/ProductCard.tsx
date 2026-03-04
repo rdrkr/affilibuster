@@ -108,8 +108,8 @@ export function ProductCard({
         )}
         <span
           className={`
-            rounded-md bg-neutral-100 px-2 py-1 text-sm font-bold
-            text-neutral-800 dark:bg-white/10 dark:text-white
+            rounded-md bg-muted px-2 py-1 text-sm font-bold
+            text-foreground dark:bg-white/10
             ${!tagText ? 'ms-auto' : ''}
           `}
         >
@@ -124,10 +124,10 @@ export function ProductCard({
       text={product.header.header.text}
       as={HeadingTag}
       className={`
-        line-clamp-2 text-lg font-bold text-neutral-800
+        line-clamp-2 text-lg font-bold text-foreground
         transition-colors
-        group-hover:text-primary group-hover:text-shadow-sm
-        dark:text-white dark:group-hover:text-shadow-none
+        group-hover:text-primary-hover group-hover:text-shadow-none
+        dark:group-hover:text-shadow-none
       `}
     />
   ) : null
@@ -141,7 +141,7 @@ export function ProductCard({
       <div className="flex flex-col gap-1">
         {contentHeader}
         {isSmVertical && priceDisplay && (
-          <Text text={priceDisplay} as="span" className="font-bold text-neutral-500 dark:text-neutral-400" />
+          <Text text={priceDisplay} as="span" className="font-bold text-muted-foreground" />
         )}
       </div>
     ) : (
@@ -187,10 +187,10 @@ export function ProductCard({
               type="button"
               className={`
                 z-20 flex size-10 items-center justify-center
-                rounded-full bg-white/50 text-neutral-800
-                backdrop-blur-md transition-colors hover:bg-primary
-                hover:text-black active:bg-primary-600 active:text-black
-                dark:bg-background-dark/50 dark:text-white dark:active:bg-primary-600
+                rounded-full bg-card/50 text-foreground
+                backdrop-blur-md transition-colors hover:bg-primary-hover
+                hover:text-foreground active:bg-primary-active active:text-foreground
+                dark:bg-background-dark/50
               `}
               aria-label={product.header.header?.ariaDescription ?? 'Add to favorites'}
               onClick={e => {

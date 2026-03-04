@@ -200,14 +200,14 @@ export function Card({
     ? ''
     : `
     m-1 transition-all duration-300
-    hover:-translate-y-1 hover:transform hover:border-primary/30
-    dark:hover:border-primary/30
+    hover:-translate-y-1 hover:transform hover:border-primary-hover/30
+    dark:hover:border-primary-hover/30
     active:scale-[0.98] active:translate-y-0
     `
 
   const cardClasses = `
     group relative isolate flex shrink-0 snap-start overflow-hidden flex-col min-h-0 min-w-0
-    ${showBackground ? 'rounded-xl border border-neutral-200 bg-white shadow-md dark:border-white/5 dark:bg-surface-dark dark:shadow-none' : ''}
+    ${showBackground ? 'rounded-xl border border-border bg-card shadow-md dark:shadow-none' : ''}
     ${animationClasses}
     ${width === 'full' ? 'w-full' : width === 'fit' ? 'w-fit' : ''}
     ${height === 'full' ? 'h-full' : height === 'fit' ? 'h-fit' : ''}
@@ -250,7 +250,7 @@ export function Card({
       : ''
 
   const imageContainerClasses = `
-    relative overflow-hidden bg-neutral-100 dark:bg-tertiary-800
+    relative overflow-hidden bg-muted
     ${imageClassNames}
     ${imageMarginClass}
   `

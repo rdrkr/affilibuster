@@ -35,7 +35,7 @@
 
   body {
     /* Tailwind v4 best practice: use dark: variants instead of CSS variables */
-    @apply bg-white text-tertiary-800 dark:bg-tertiary-900 dark:text-white;
+    @apply bg-background text-foreground;
   }
 
   .material-symbols-outlined {

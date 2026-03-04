@@ -18,8 +18,8 @@ import { notFound } from 'next/navigation'
 
 /** Lazy-loaded: rendered after scroll, below the fold */
 const BackToTopButton = dynamic(() => import('@/components/navigation/BackToTopButton'))
-/** Lazy-loaded: consent banner shown on first visit, below the fold */
-const CookieConsentBanner = dynamic(() => import('@/components/consent/CookieConsentBanner'))
+/** Deferred: consent banner loads only after first user interaction or idle callback */
+const DeferredCookieConsentBanner = dynamic(() => import('@/components/consent/DeferredCookieConsentBanner'))
 
 interface Props {
   children: React.ReactNode
@@ -115,7 +115,7 @@ async function LocaleLayout({ children, params }: Props) {
             </div>
 
             <BackToTopButton />
-            <CookieConsentBanner lang={lang} direction={direction} />
+            <DeferredCookieConsentBanner lang={lang} direction={direction} />
           </div>
         </LayoutProvider>
       </NextIntlClientProvider>

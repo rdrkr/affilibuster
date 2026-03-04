@@ -85,7 +85,7 @@ export function QuantitySelector({
     <div
       className={`
         flex items-center justify-between gap-2 rounded-xl
-        bg-neutral-100 px-3 py-2
+        bg-muted px-3 py-2
         dark:bg-white/5
         ${className}
       `}
@@ -99,7 +99,7 @@ export function QuantitySelector({
         disabled={isDecrementDisabled}
         iconSize="sm"
       />
-      <span className="font-bold text-neutral-800 dark:text-white">{quantity}</span>
+      <span className="font-bold text-foreground">{quantity}</span>
       <ButtonAction
         data={incrementButtonData}
         direction={direction}

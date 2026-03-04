@@ -14,23 +14,32 @@ import type { ReactNode } from 'react'
 
 import dynamic from 'next/dynamic'
 
-import { NewsletterSignupCTA } from '@/components/call-to-actions'
 import { DynamicZone } from '@/components/layout'
 import { useLayoutContext } from '@/components/providers/LayoutProvider'
-import {
-  BlogTeaserSection,
-  BrandFeaturesSection,
-  FeaturedProductsSection,
-  HeroSection,
-  ProductCategoriesSection,
-  TeamSection,
-} from '@/components/sections'
+import { HeroSection } from '@/components/sections'
 import type {
   ApiContributorContributorDocument,
   ApiHomepageHomepageDocument,
   ElementsLabelEntry,
 } from '@/lib/generated/types.gen'
 
+/** Lazy-loaded below-fold sections: each loads its own chunk only when the CMS includes that section type */
+const FeaturedProductsSection = dynamic(() =>
+  import('@/components/sections/FeaturedProductsSection').then(m => ({ default: m.FeaturedProductsSection }))
+)
+const ProductCategoriesSection = dynamic(() =>
+  import('@/components/sections/ProductCategoriesSection').then(m => ({ default: m.ProductCategoriesSection }))
+)
+const BrandFeaturesSection = dynamic(() =>
+  import('@/components/sections/BrandFeaturesSection').then(m => ({ default: m.BrandFeaturesSection }))
+)
+const BlogTeaserSection = dynamic(() =>
+  import('@/components/sections/BlogTeaserSection').then(m => ({ default: m.BlogTeaserSection }))
+)
+const TeamSection = dynamic(() => import('@/components/sections/TeamSection').then(m => ({ default: m.TeamSection })))
+const NewsletterSignupCTA = dynamic(() =>
+  import('@/components/call-to-actions/NewsletterSignupCTA').then(m => ({ default: m.NewsletterSignupCTA }))
+)
 /** Lazy-loaded: TextBlock uses heavy react-markdown pipeline, only needed when CMS includes text-block sections */
 const TextBlock = dynamic(() => import('@/components/elements/TextBlock').then(m => ({ default: m.TextBlock })))
 

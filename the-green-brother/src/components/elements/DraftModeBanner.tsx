@@ -19,9 +19,9 @@ import Link from 'next/link'
  */
 export default function DraftModeBanner(): React.ReactElement {
   return (
-    <div className="bg-warning-600 px-4 py-2 text-center text-sm font-medium text-neutral-900">
+    <div className="bg-warning px-4 py-2 text-center text-sm font-medium text-foreground">
       Draft mode is enabled.{' '}
-      <Link href="/api/preview/disable" className="font-bold underline hover:text-neutral-700">
+      <Link href="/api/preview/disable" className="font-bold underline hover:text-foreground">
         Exit preview
       </Link>
     </div>

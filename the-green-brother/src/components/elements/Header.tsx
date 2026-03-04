@@ -112,7 +112,7 @@ export function Header({
 
   // Map defaults for subheader based on level
   const DEFAULT_SUBHEADER_CLASSES: Record<number, string> = {
-    1: 'mt-8 text-lg sm:text-xl md:text-xl text-neutral-600 dark:text-white',
+    1: 'mt-8 text-lg sm:text-xl md:text-xl text-muted-foreground',
     2: '',
     3: '',
     4: '',
@@ -166,7 +166,7 @@ export function Header({
                 className={`
                   mt-1
                   ${direction === DirectionEnum.RTL ? 'text-right' : 'text-left'}
-                  ${defaultSubheaderClass || 'text-neutral-600 dark:text-text-secondary-dark'}
+                  ${defaultSubheaderClass || 'text-muted-foreground'}
                   ${subheaderClassName}
                 `}
                 textClassName={subheaderTextClassName}
@@ -198,7 +198,7 @@ export function Header({
           data={subheader}
           as="p"
           iconSize={subheaderIconSize}
-          className={`mt-2 ${alignmentClass} ${defaultSubheaderClass || 'text-neutral-600 dark:text-text-secondary-dark'} ${subheaderClassName}`}
+          className={`mt-2 ${alignmentClass} ${defaultSubheaderClass || 'text-muted-foreground'} ${subheaderClassName}`}
           textClassName={subheaderTextClassName}
           direction={direction}
         />
