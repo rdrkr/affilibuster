@@ -225,9 +225,10 @@ export function Icon({
         height={sizeValue}
         priority={priority}
         className={`
-          drop-shadow-icon-sm dark:drop-shadow-none
+          drop-shadow-icon-sm shrink-0 dark:drop-shadow-none
           ${promoted ? '' : className}
         `}
+        style={{ width: `${String(sizeValue)}px`, height: `${String(sizeValue)}px` }}
         aria-hidden={!ariaLabel}
       />
     )
@@ -247,10 +248,18 @@ export function Icon({
   const materialIcon = (
     <span
       className={`
-        material-symbols-outlined-bold
+        material-symbols-outlined material-symbols-outlined-bold shrink-0
         ${promoted ? 'text-primary text-shadow-sm dark:text-shadow-none' : className}
       `}
-      style={{ fontSize: `${String(sizeValue)}px` }}
+      style={{
+        fontSize: `${String(sizeValue)}px`,
+        width: `${String(sizeValue)}px`,
+        height: `${String(sizeValue)}px`,
+        overflow: 'hidden',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
       aria-label={ariaLabel}
       aria-hidden={!ariaLabel}
     >

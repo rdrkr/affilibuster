@@ -5,7 +5,7 @@
  * Verifies deferred loading via user interaction events and fallback timeout.
  */
 
-import { render, screen, act } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 
 // Mock CookieConsentBanner — the actual banner loaded after activation
 jest.mock('@/components/consent/CookieConsentBanner', () => ({
@@ -41,6 +41,21 @@ jest.mock('next/dynamic', () => {
   }
 })
 
+jest.mock('@/lib/consent', () => ({
+  useConsent: jest.fn(() => ({
+    hasConsented: false,
+    acceptedCategories: [],
+    isSettingsOpen: false,
+    isDoNotTrackEnabled: false,
+    cookieDntState: undefined,
+    acceptAll: jest.fn(),
+    rejectAll: jest.fn(),
+    saveCustom: jest.fn(),
+    openSettings: jest.fn(),
+    closeSettings: jest.fn(),
+  })),
+}))
+
 import DeferredCookieConsentBanner from '@/components/consent/DeferredCookieConsentBanner'
 import { DirectionEnum } from '@/lib/generated/types.gen'
 
@@ -52,12 +67,28 @@ describe('DeferredCookieConsentBanner', () => {
     jest.useFakeTimers()
     addEventListenerSpy = jest.spyOn(window, 'addEventListener')
     removeEventListenerSpy = jest.spyOn(window, 'removeEventListener')
+
+    // Reset the useConsent mock to its default state before each test
+    const { useConsent } = require('@/lib/consent')
+    ;(useConsent as jest.Mock).mockReturnValue({
+      hasConsented: false,
+      acceptedCategories: [],
+      isSettingsOpen: false,
+      isDoNotTrackEnabled: false,
+      cookieDntState: undefined,
+      acceptAll: jest.fn(),
+      rejectAll: jest.fn(),
+      saveCustom: jest.fn(),
+      openSettings: jest.fn(),
+      closeSettings: jest.fn(),
+    })
   })
 
   afterEach(() => {
     jest.useRealTimers()
     addEventListenerSpy.mockRestore()
     removeEventListenerSpy.mockRestore()
+    jest.restoreAllMocks()
   })
 
   it('should not render banner before user interaction', () => {
@@ -146,19 +177,19 @@ describe('DeferredCookieConsentBanner', () => {
     render(<DeferredCookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
 
     act(() => {
-      jest.advanceTimersByTime(4999)
+      jest.advanceTimersByTime(7999)
     })
 
     expect(screen.queryByTestId('mock-cookie-consent-banner')).not.toBeInTheDocument()
   })
 
-  it('should activate via fallback timeout after 5 seconds', () => {
+  it('should activate via fallback timeout after 8 seconds', () => {
     render(<DeferredCookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
 
     expect(screen.queryByTestId('mock-cookie-consent-banner')).not.toBeInTheDocument()
 
     act(() => {
-      jest.advanceTimersByTime(5000)
+      jest.advanceTimersByTime(8000)
     })
 
     expect(screen.getByTestId('mock-cookie-consent-banner')).toBeInTheDocument()
@@ -170,6 +201,174 @@ describe('DeferredCookieConsentBanner', () => {
     const { unmount } = render(<DeferredCookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
 
     unmount()
+
+    const expectedEvents = ['scroll', 'click', 'keydown', 'touchstart']
+    for (const event of expectedEvents) {
+      const call = removeEventListenerSpy.mock.calls.find((c: [string, EventListener]) => c[0] === event)
+      expect(call).toBeDefined()
+    }
+
+    expect(clearTimeoutSpy).toHaveBeenCalled()
+    clearTimeoutSpy.mockRestore()
+  })
+
+  it('should not set up activation timeouts or listeners if shouldShow is false', () => {
+    // Mock useConsent to return hasConsented = true, which makes shouldShow = false
+    const { useConsent } = require('@/lib/consent')
+    ;(useConsent as jest.Mock).mockReturnValue({
+      hasConsented: true,
+      acceptedCategories: ['required'],
+      isSettingsOpen: false,
+      isDoNotTrackEnabled: false,
+      cookieDntState: false,
+      acceptAll: jest.fn(),
+      rejectAll: jest.fn(),
+      saveCustom: jest.fn(),
+      openSettings: jest.fn(),
+      closeSettings: jest.fn(),
+    })
+
+    const setTimeoutSpy = jest.spyOn(global, 'setTimeout')
+
+    render(<DeferredCookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
+
+    expect(addEventListenerSpy).not.toHaveBeenCalled()
+    expect(setTimeoutSpy).not.toHaveBeenCalled()
+    expect(screen.queryByTestId('mock-cookie-consent-banner')).not.toBeInTheDocument()
+
+    setTimeoutSpy.mockRestore()
+  })
+
+  it('should show banner if hasConsented is true but isSettingsOpen is true', () => {
+    const { useConsent } = require('@/lib/consent')
+    ;(useConsent as jest.Mock).mockReturnValue({
+      hasConsented: true,
+      acceptedCategories: ['required'],
+      isSettingsOpen: true, // This should make shouldShow = true
+      isDoNotTrackEnabled: false,
+      cookieDntState: false,
+      acceptAll: jest.fn(),
+      rejectAll: jest.fn(),
+      saveCustom: jest.fn(),
+      openSettings: jest.fn(),
+      closeSettings: jest.fn(),
+    })
+
+    render(<DeferredCookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
+
+    act(() => {
+      window.dispatchEvent(new Event('click'))
+    })
+
+    expect(screen.getByTestId('mock-cookie-consent-banner')).toBeInTheDocument()
+  })
+
+  it('should show banner if dnt was turned on after consent', () => {
+    const { useConsent } = require('@/lib/consent')
+    ;(useConsent as jest.Mock).mockReturnValue({
+      hasConsented: true,
+      acceptedCategories: ['required', 'analytics'], // Has categories
+      isSettingsOpen: false,
+      isDoNotTrackEnabled: true, // DNT is now ON
+      cookieDntState: false, // DNT was OFF when consented
+      acceptAll: jest.fn(),
+      rejectAll: jest.fn(),
+      saveCustom: jest.fn(),
+      openSettings: jest.fn(),
+      closeSettings: jest.fn(),
+    })
+
+    render(<DeferredCookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
+
+    act(() => {
+      window.dispatchEvent(new Event('click'))
+    })
+
+    expect(screen.getByTestId('mock-cookie-consent-banner')).toBeInTheDocument()
+  })
+
+  it('should not show banner if dnt is enabled but was also enabled during consent', () => {
+    const { useConsent } = require('@/lib/consent')
+    ;(useConsent as jest.Mock).mockReturnValue({
+      hasConsented: true,
+      acceptedCategories: ['required', 'analytics'],
+      isSettingsOpen: false,
+      isDoNotTrackEnabled: true,
+      cookieDntState: true, // DNT matches current state
+      acceptAll: jest.fn(),
+      rejectAll: jest.fn(),
+      saveCustom: jest.fn(),
+      openSettings: jest.fn(),
+      closeSettings: jest.fn(),
+    })
+
+    render(<DeferredCookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
+
+    act(() => {
+      window.dispatchEvent(new Event('click'))
+    })
+
+    expect(screen.queryByTestId('mock-cookie-consent-banner')).not.toBeInTheDocument()
+  })
+
+  it('should not render anything if isActivated is false but shouldShow is true', () => {
+    const { useConsent } = require('@/lib/consent')
+    ;(useConsent as jest.Mock).mockReturnValue({
+      hasConsented: false, // makes shouldShow = true
+      acceptedCategories: [],
+      isSettingsOpen: false,
+      isDoNotTrackEnabled: false,
+      cookieDntState: undefined,
+      acceptAll: jest.fn(),
+      rejectAll: jest.fn(),
+      saveCustom: jest.fn(),
+      openSettings: jest.fn(),
+      closeSettings: jest.fn(),
+    })
+
+    render(<DeferredCookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
+
+    // Component is rendered synchronously in tests, but we haven't triggered any events
+    // that set isActivated to true yet, so it should return null via line 92 (!isActivated)
+    expect(screen.queryByTestId('mock-cookie-consent-banner')).not.toBeInTheDocument()
+  })
+
+  it('should clean up event listeners and timeout when shouldShow becomes false', () => {
+    const { useConsent } = require('@/lib/consent')
+
+    // First render: shouldShow = true
+    ;(useConsent as jest.Mock).mockReturnValue({
+      hasConsented: false,
+      acceptedCategories: [],
+      isSettingsOpen: false,
+      isDoNotTrackEnabled: false,
+      cookieDntState: undefined,
+      acceptAll: jest.fn(),
+      rejectAll: jest.fn(),
+      saveCustom: jest.fn(),
+      openSettings: jest.fn(),
+      closeSettings: jest.fn(),
+    })
+
+    const { rerender } = render(<DeferredCookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
+
+    const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout')
+
+    // Second render: shouldShow = false
+    ;(useConsent as jest.Mock).mockReturnValue({
+      hasConsented: true, // makes shouldShow = false
+      acceptedCategories: ['required'],
+      isSettingsOpen: false,
+      isDoNotTrackEnabled: false,
+      cookieDntState: undefined,
+      acceptAll: jest.fn(),
+      rejectAll: jest.fn(),
+      saveCustom: jest.fn(),
+      openSettings: jest.fn(),
+      closeSettings: jest.fn(),
+    })
+
+    rerender(<DeferredCookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
 
     const expectedEvents = ['scroll', 'click', 'keydown', 'touchstart']
     for (const event of expectedEvents) {

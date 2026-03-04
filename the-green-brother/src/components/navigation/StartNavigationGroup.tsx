@@ -51,6 +51,8 @@ export interface StartNavigationGroupProps {
   isSearchExpanded?: boolean
   /** Callback to report if all group items have icons */
   onHasIconsChange?: (hasIcons: boolean) => void
+  /** Whether hydration and initial width calculation is complete */
+  isReady?: boolean
 }
 
 /**
@@ -78,6 +80,7 @@ function checkIsActive(pathname: string, path: string): boolean {
  * @param props.navWidth - Current navigation width
  * @param props.isSearchExpanded - Whether search is currently expanded
  * @param props.onHasIconsChange - Callback to report icon availability
+ * @param props.isReady - Whether hydration and initial width calculation is complete
  * @returns Start navigation group component
  */
 export function StartNavigationGroup({
@@ -87,6 +90,7 @@ export function StartNavigationGroup({
   navWidth,
   isSearchExpanded = false,
   onHasIconsChange,
+  isReady = true,
 }: StartNavigationGroupProps) {
   const pathname = usePathname()
 
@@ -130,13 +134,27 @@ export function StartNavigationGroup({
     []
   )
 
+  // Provide fallback data for brand if missing to ensure immediate LCP
+  const brandData = {
+    ...data.brandButton,
+    url: data.brandButton.url || '/',
+    label: {
+      ...data.brandButton.label,
+      text: data.brandButton.label?.text ?? 'TheGreenBrother',
+      icon: data.brandButton.label?.icon ?? {
+        url: '/icons/brand.svg',
+        alternativeText: 'TheGreenBrother Logo',
+      },
+    },
+  } as typeof data.brandButton
+
   return (
     <NavigationGroup displayMode={displayMode} position="start">
       {({ showText }) => (
         <>
           {/* Brand */}
           <ButtonLink
-            data={data.brandButton}
+            data={brandData}
             direction={direction}
             variant="link-1"
             iconSize="3xl"
@@ -166,7 +184,7 @@ export function StartNavigationGroup({
             iconSize="md"
             size="sm"
             showText={showText}
-            visible={isVisible(displayMode)}
+            visible={isReady && isVisible(displayMode)}
             isActive={isActive('/')}
             slideDirection="end-to-start"
           />
@@ -176,7 +194,7 @@ export function StartNavigationGroup({
             data={data.productsMenu}
             direction={direction}
             showText={showText}
-            visible={isVisible(displayMode)}
+            visible={isReady && isVisible(displayMode)}
             isActive={isActive('/products')}
             disabled={displayMode === 'minimal'}
           />
@@ -189,7 +207,7 @@ export function StartNavigationGroup({
             iconSize="md"
             size="sm"
             showText={showText}
-            visible={isVisible(displayMode)}
+            visible={isReady && isVisible(displayMode)}
             slideDirection="end-to-start"
             isActive={isActive('/blog')}
           />
@@ -202,7 +220,7 @@ export function StartNavigationGroup({
             iconSize="md"
             size="sm"
             showText={showText}
-            visible={isVisible(displayMode)}
+            visible={isReady && isVisible(displayMode)}
             slideDirection="end-to-start"
             isActive={isActive('/about')}
           />

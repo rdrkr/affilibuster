@@ -19,11 +19,12 @@
 
 // Primitive Components
 export { Icon, type IconProps, type ResolvedIcon } from './Icon'
-export { DEFAULT_IMAGE, Image, type ImageProps } from './Image'
-export { resolveTextFormatHtml, Text, type TextProps } from './Text'
+export { Image, type ImageProps } from './Image'
+export { DEFAULT_IMAGE, getAltText, resolveImageUrl } from './imageUtils'
+export { Text, resolveTextFormatHtml, type TextProps } from './Text'
 
 // Composite Components
-export { TabbedView, type BackgroundVariant, type Tab, type TabbedViewProps, type TabLayout } from '@/components/layout'
+export { TabbedView, type BackgroundVariant, type Tab, type TabLayout, type TabbedViewProps } from '@/components/layout'
 export { Breadcrumbs, type BreadcrumbsProps } from './Breadcrumbs'
 export { ButtonAction, type ButtonActionProps } from './ButtonAction'
 export { ButtonLink, type ButtonLinkProps } from './ButtonLink'

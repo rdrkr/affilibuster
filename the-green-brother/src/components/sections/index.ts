@@ -10,5 +10,6 @@ export { BlogTeaserSection, type BlogTeaserSectionProps } from './BlogTeaserSect
 export { BrandFeaturesSection, type BrandFeaturesSectionProps } from './BrandFeaturesSection'
 export { FeaturedProductsSection, type FeaturedProductsSectionProps } from './FeaturedProductsSection'
 export { HeroSection, type HeroSectionProps } from './HeroSection'
+export { ServerHeroSection, type ServerHeroSectionProps } from './ServerHeroSection'
 export { ProductCategoriesSection, type ProductCategoriesSectionProps } from './ProductCategoriesSection'
 export { TeamSection, type TeamSectionProps } from './TeamSection'

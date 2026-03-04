@@ -14,7 +14,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState, type SyntheticEvent } from 'react'
 
 import type { ApiNavigationNavigationDocument } from '@/lib/generated/types.gen'
-import { LanguageCode, DirectionEnum, type Language } from '@/lib/generated/types.gen'
+import { DirectionEnum, LanguageCode, type Language } from '@/lib/generated/types.gen'
 import { THRESHOLDS } from '@/lib/navigation'
 import { ThemeMode } from '@/lib/themes'
 
@@ -77,6 +77,8 @@ export interface EndNavigationGroupProps {
   enableProductSearch?: boolean
   /** Feature flag: Enable user profile (login/signup) */
   enableUserProfile: boolean
+  /** Whether hydration and initial width calculation is complete */
+  isReady?: boolean
 }
 
 // Block 3: Component Body (start)
@@ -95,6 +97,7 @@ export interface EndNavigationGroupProps {
  * @param props.onHasIconsChange - Callback to report icon availability
  * @param props.enableProductSearch - Feature flag: Enable product search
  * @param props.enableUserProfile - Feature flag: Enable user profile (login/signup)
+ * @param props.isReady - Whether hydration and initial width calculation is complete
  * @returns End navigation group component
  */
 export function EndNavigationGroup({
@@ -110,6 +113,7 @@ export function EndNavigationGroup({
   onHasIconsChange,
   enableProductSearch = false,
   enableUserProfile,
+  isReady = true,
 }: EndNavigationGroupProps) {
   const pathname = usePathname()
   const router = useRouter()
@@ -293,7 +297,7 @@ export function EndNavigationGroup({
       {({ showText }) => (
         <>
           {/* Search */}
-          {enableProductSearch && (
+          {enableProductSearch && isReady && (
             <SearchMenu
               data={data.searchMenu}
               onExpandChange={handleSearchExpandChange}
@@ -310,7 +314,7 @@ export function EndNavigationGroup({
             onThemeChange={setTheme}
             direction={direction}
             showText={showText}
-            visible={groupVisible}
+            visible={isReady && groupVisible}
           />
 
           {/* Language Selector */}
@@ -321,7 +325,7 @@ export function EndNavigationGroup({
             onLanguageChange={handleLanguageChange}
             direction={direction}
             showText={showText}
-            visible={groupVisible}
+            visible={isReady && groupVisible}
           />
 
           {/* Login Button */}
@@ -333,7 +337,7 @@ export function EndNavigationGroup({
               iconSize="lg"
               size="sm"
               showText={effectiveShowLoginButtonText}
-              visible={groupVisible}
+              visible={isReady && groupVisible}
               slideDirection="start-to-end"
             />
           )}
@@ -344,7 +348,7 @@ export function EndNavigationGroup({
             isOpen={isMenuOpen}
             onToggle={handleMenuToggle}
             navLinks={mobileNavLinks}
-            visible={effectiveShowMobileMenu && groupVisible}
+            visible={isReady && effectiveShowMobileMenu && groupVisible}
             direction={direction}
           />
         </>

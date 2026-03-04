@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
   // Performance optimizations
   compress: true, // Enable gzip compression (SWC minification & font optimization are enabled by default)
   images: {
-    unoptimized: false,
+    unoptimized: process.env.NEXT_PUBLIC_CMS_URL === process.env.CMS_URL_DEV,
     loader: 'default',
     remotePatterns: [
       {
@@ -63,7 +63,7 @@ const nextConfig: NextConfig = {
         hostname: 'res.cloudinary.com',
       },
     ],
-    formats: ['image/avif', 'image/webp'], // Use modern image formats
+    formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
@@ -73,6 +73,17 @@ const nextConfig: NextConfig = {
   },
   bundlePagesRouterDependencies: true,
   typedRoutes: false,
+  // see issue @ https://github.com/vercel/next.js/discussions/64330#discussioncomment-15140753
+  transpilePackages: ['next'],
+  turbopack: {
+    resolveAlias: {
+      '../build/polyfills/polyfill-module': './src/lib/others/modern-polyfill.js',
+      'next/dist/build/polyfills/polyfill-module': './src/lib/others/modern-polyfill.js',
+      'next/dev/build/polyfills/polyfill-module': './src/lib/others/modern-polyfill.js',
+      '.next/dist/build/polyfills/polyfill-module': './src/lib/others/modern-polyfill.js',
+      '.next/dev/build/polyfills/polyfill-module': './src/lib/others/modern-polyfill.js',
+    },
+  },
   // URL redirects for old/changed product slugs
   redirects() {
     return [
@@ -121,15 +132,6 @@ const nextConfig: NextConfig = {
       { source: '/:lang/sitemap.xml', destination: '/sitemap.xml' },
     ]
   },
-}
-
-// see issue @ https://github.com/vercel/next.js/discussions/64330#discussioncomment-15839009
-if (nextConfig.turbopack) {
-  nextConfig.turbopack.resolveAlias = {
-    ...nextConfig.turbopack.resolveAlias,
-    '../build/polyfills/polyfill-module': 'false',
-    'next/dist/build/polyfills/polyfill-module': 'false',
-  }
 }
 
 export default withBundleAnalyzer(withNextIntl(nextConfig))

@@ -11,6 +11,7 @@
 
 'use client'
 
+import { useConsent } from '@/lib/consent'
 import type { DirectionEnum } from '@/lib/generated/types.gen'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
@@ -22,7 +23,7 @@ const CookieConsentBanner = dynamic(() => import('./CookieConsentBanner'))
 const ACTIVATION_EVENTS = ['scroll', 'click', 'keydown', 'touchstart'] as const
 
 /** Fallback delay in milliseconds before activating without user interaction. */
-const FALLBACK_DELAY_MS = 5000
+const FALLBACK_DELAY_MS = 8000
 
 /** Props for the DeferredCookieConsentBanner component. */
 interface DeferredCookieConsentBannerProps {
@@ -49,8 +50,17 @@ const DeferredCookieConsentBanner = ({
   direction,
 }: DeferredCookieConsentBannerProps): React.ReactElement | null => {
   const [isActivated, setIsActivated] = useState(false)
+  const { hasConsented, isSettingsOpen, isDoNotTrackEnabled, cookieDntState, acceptedCategories } = useConsent()
+
+  const dntJustEnabled = isDoNotTrackEnabled && (cookieDntState === false || cookieDntState === undefined)
+
+  /** Whether the banner should even consider appearing */
+  const shouldShow = !hasConsented || isSettingsOpen || (dntJustEnabled && acceptedCategories.length > 0)
 
   useEffect(() => {
+    // If we definitely shouldn't show the banner, don't set up activation timeouts
+    if (!shouldShow) return
+
     /** Activates the banner by setting state to true. */
     const activate = (): void => {
       setIsActivated(true)
@@ -73,7 +83,11 @@ const DeferredCookieConsentBanner = ({
       }
       clearTimeout(timeoutId)
     }
-  }, [])
+  }, [shouldShow])
+
+  // If the user already consented and hasn't explicitly opened the settings,
+  // skip rendering both the wrapper and the dynamic chunk
+  if (!shouldShow) return null
 
   if (!isActivated) return null
 

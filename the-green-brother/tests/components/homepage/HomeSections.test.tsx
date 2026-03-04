@@ -253,6 +253,32 @@ describe('HomeSections', () => {
     expect(heroSection).toHaveAttribute('data-id', '1')
   })
 
+  it('should render heroSlot when provided instead of HeroSection', () => {
+    const sections: ApiHomepageHomepageDocument['sections'] = mockSections[0] ? [mockSections[0]] : []
+    render(
+      <HomeSections
+        sections={sections}
+        teamMembers={[]}
+        {...defaultProps}
+        heroSlot={<div data-testid="server-hero">Server Hero</div>}
+      />
+    )
+
+    expect(screen.getByTestId('server-hero')).toBeInTheDocument()
+    expect(screen.getByText('Server Hero')).toBeInTheDocument()
+    expect(screen.queryByTestId('hero-section')).not.toBeInTheDocument()
+  })
+
+  it('should fall back to HeroSection when heroSlot is not provided', () => {
+    const sections: ApiHomepageHomepageDocument['sections'] = mockSections[0] ? [mockSections[0]] : []
+    render(<HomeSections sections={sections} teamMembers={[]} {...defaultProps} heroSlot={undefined} />)
+
+    const heroSection = screen.getByTestId('hero-section')
+    expect(heroSection).toBeInTheDocument()
+    expect(heroSection).toHaveAttribute('data-id', '1')
+    expect(screen.queryByTestId('server-hero')).not.toBeInTheDocument()
+  })
+
   it('should render featured products section', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[1] ? [mockSections[1]] : []
     render(<HomeSections sections={sections} teamMembers={[]} {...defaultProps} />)

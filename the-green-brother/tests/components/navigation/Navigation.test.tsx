@@ -192,7 +192,7 @@ jest.mock('@/components/providers', () => ({
 }))
 
 import { Navigation } from '@/components/navigation/Navigation'
-import { ApiNavigationNavigationDocument, LanguageCode, DirectionEnum, Language } from '@/lib/generated/types.gen'
+import { ApiNavigationNavigationDocument, DirectionEnum, Language, LanguageCode } from '@/lib/generated/types.gen'
 
 describe('Navigation', () => {
   beforeEach(() => {
@@ -791,12 +791,11 @@ describe('Navigation', () => {
         />
       )
 
-      // The content div should have opacity-0 class when not ready
-      const contentDiv = container.querySelector('.opacity-0')
-      expect(contentDiv).toBeInTheDocument()
+      // The Navigation container should render immediately to support LCP
+      expect(container.firstChild).toBeInTheDocument()
 
-      // Navigation groups should NOT be rendered when not ready
-      expect(screen.queryByTestId('navigation-group-start')).not.toBeInTheDocument()
+      // The child NavigationGroups should also be rendered, but their children might be hidden based on isReady
+      expect(screen.getByTestId('navigation-group-start')).toBeInTheDocument()
     })
   })
 })

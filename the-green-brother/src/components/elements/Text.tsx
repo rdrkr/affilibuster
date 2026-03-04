@@ -4,7 +4,7 @@
  * CMS Text Component
  *
  * Renders CMS text content with markdown-style formatting.
- * Converts **bold** text to primary-colored spans.
+ * Converts **bold** text to accent-colored spans.
  */
 
 import type { ReactNode } from 'react'
@@ -50,7 +50,7 @@ export function resolveTextFormat(text: string): ReactNode {
           'span',
           {
             key: `bold-${String(keyIndex++)}`,
-            className: 'text-primary dark:text-primary text-shadow-sm dark:text-shadow-none',
+            className: 'text-accent-dark text-shadow-sm dark:text-shadow-none',
           },
           match[1]
         )
@@ -88,7 +88,7 @@ export function resolveTextFormat(text: string): ReactNode {
  * @param props.as - HTML element to wrap the text
  * @param props.className - Additional CSS classes
  * @param props.visible - Controls visibility (false = hidden from layout)
- * @returns Formatted text with **bold** converted to primary-colored spans
+ * @returns Formatted text with **bold** converted to accent-colored spans
  * @example
  * ```tsx
  * <Text text="Hello **World**" />
@@ -115,10 +115,7 @@ export function resolveTextFormatHtml(text: string | undefined | null): string {
     return ''
   }
   return text
-    .replace(
-      /\*\*([^*]+)\*\*/g,
-      '<span class="text-primary dark:text-primary text-shadow-sm dark:text-shadow-none">$1</span>'
-    )
+    .replace(/\*\*([^*]+)\*\*/g, '<span class="text-accent-dark text-shadow-sm dark:text-shadow-none">$1</span>')
     .replace(/(\\n|\n)/g, '<br />')
 }
 

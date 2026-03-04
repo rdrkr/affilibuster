@@ -43,7 +43,7 @@ const BackToTopButton = () => {
       aria-label="Scroll to top"
       className={`
         fixed inset-e-6 bottom-6 z-40 flex size-12 transform items-center
-        justify-center rounded-full bg-primary text-foreground shadow-lg
+        justify-center rounded-full bg-primary text-foreground-light shadow-lg
         transition-all duration-500
         hover:bg-primary-hover active:bg-primary-active
         ${

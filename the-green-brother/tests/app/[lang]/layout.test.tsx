@@ -340,6 +340,24 @@ describe('LocaleLayout', () => {
     expect(screen.queryByTestId('mock-draft-mode-banner')).not.toBeInTheDocument()
   })
 
+  it('should render preconnect link for CMS origin', async () => {
+    const Component = await LocaleLayout({
+      children: <div>Content</div>,
+      params: Promise.resolve({ lang: LanguageCode.EN }),
+    })
+
+    render(Component)
+
+    // React 19 hoists <link> elements into the document <head>
+    const preconnectLink = document.querySelector('link[rel="preconnect"]')
+    expect(preconnectLink).toBeInTheDocument()
+
+    const expectedUrl =
+      process.env.NEXT_PUBLIC_CMS_URL ??
+      `${process.env.NEXT_PUBLIC_CMS_PROTOCOL ?? 'https'}://localhost:${process.env.NEXT_PUBLIC_CMS_PORT ?? '1337'}`
+    expect(preconnectLink).toHaveAttribute('href', expectedUrl)
+  })
+
   it('should render DraftModeBanner when draft mode is enabled', async () => {
     mockDraftMode.mockResolvedValue({ isEnabled: true })
 

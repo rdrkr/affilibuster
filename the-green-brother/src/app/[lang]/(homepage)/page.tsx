@@ -2,9 +2,11 @@
 
 import { HomeSections } from '@/components/homepage'
 import { JsonLdScript } from '@/components/seo'
+import { ServerHeroSection } from '@/components/sections'
 import { getBlog, getHomepage, getNavigation, getTeamMembers } from '@/lib/content'
 import { userProfileFlag } from '@/lib/feature-flags'
-import { LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
+import { DirectionEnum, LanguageCode, SchemaEnum } from '@/lib/generated/types.gen'
+import { getLanguages } from '@/lib/languages/api'
 import { buildOrganizationJsonLd, buildPageMetadata, buildWebSiteJsonLd } from '@/lib/seo'
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
@@ -46,12 +48,13 @@ async function HomePage({ params }: { params: Promise<{ lang: LanguageCode }> })
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 
   // Fetch all homepage data in parallel
-  const [homepageData, teamMembers, enableUserProfile, blogPageResponse, navigation] = await Promise.all([
+  const [homepageData, teamMembers, enableUserProfile, blogPageResponse, navigation, languages] = await Promise.all([
     getHomepage(lang, { ...draftParams }),
     getTeamMembers(lang),
     userProfileFlag(),
     getBlog(lang, { ...draftParams }),
     getNavigation(lang),
+    getLanguages(),
   ])
 
   if (!homepageData || !blogPageResponse) {
@@ -60,6 +63,14 @@ async function HomePage({ params }: { params: Promise<{ lang: LanguageCode }> })
 
   const siteName = navigation?.siteTitle ?? 'TheGreenBrother'
   const logoUrl = navigation?.brandButton.label?.icon
+
+  // Derive direction for server-rendered hero (same logic as layout.tsx)
+  const currentLanguage = languages?.find(l => l.code === lang)
+  const direction = currentLanguage?.direction ?? DirectionEnum.LTR
+
+  // Find the hero section from CMS data for server-side rendering
+  const heroSection = homepageData.sections.find(s => s.__component === 'sections.hero')
+  const heroSlot = heroSection ? <ServerHeroSection data={heroSection} direction={direction} /> : undefined
 
   // Pass data to client component
   return (
@@ -73,6 +84,7 @@ async function HomePage({ params }: { params: Promise<{ lang: LanguageCode }> })
           enableUserProfile={enableUserProfile}
           readTimeMinutesLabel={blogPageResponse.readTimeMinutesLabel}
           readArticleLabel={blogPageResponse.readArticleLabel}
+          heroSlot={heroSlot}
         />
       </HomeClient>
     </>

@@ -7,6 +7,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 
 import { Image } from '@/components/elements/Image'
+import { getAltText, resolveImageUrl } from '@/components/elements/imageUtils'
 import type { PluginUploadFileDocument } from '@/lib/generated/types.gen'
 
 // Mock next/image to capture onError callback
@@ -18,7 +19,8 @@ jest.mock('next/image', () => ({
     className,
     fill,
     sizes,
-    preload,
+    fetchPriority,
+    loading,
     onError,
   }: {
     src: string
@@ -26,7 +28,8 @@ jest.mock('next/image', () => ({
     className?: string
     fill?: boolean
     sizes?: string
-    preload?: boolean
+    fetchPriority?: string
+    loading?: string
     onError?: () => void
   }) {
     return (
@@ -37,7 +40,8 @@ jest.mock('next/image', () => ({
         data-testid="mock-image"
         data-fill={fill ? 'true' : undefined}
         data-sizes={sizes}
-        data-preload={preload ? 'true' : undefined}
+        data-fetchpriority={fetchPriority}
+        data-loading={loading}
         onError={onError}
       />
     )
@@ -114,10 +118,25 @@ describe('Image', () => {
     expect(img).toHaveAttribute('data-sizes', '(max-width: 768px) 100vw, 50vw')
   })
 
-  it('should pass through preload prop', () => {
+  it('should set fetchPriority="high" and loading="eager" when preload is true', () => {
     render(<Image image={{ url: '/test.png' } as unknown as PluginUploadFileDocument} preload fill />)
     const img = screen.getByTestId('mock-image')
-    expect(img).toHaveAttribute('data-preload', 'true')
+    expect(img).toHaveAttribute('data-fetchpriority', 'high')
+    expect(img).toHaveAttribute('data-loading', 'eager')
+  })
+
+  it('should not set fetchPriority or loading when preload is false', () => {
+    render(<Image image={{ url: '/test.png' } as unknown as PluginUploadFileDocument} preload={false} fill />)
+    const img = screen.getByTestId('mock-image')
+    expect(img).not.toHaveAttribute('data-fetchpriority')
+    expect(img).not.toHaveAttribute('data-loading')
+  })
+
+  it('should not set fetchPriority or loading when preload is not provided', () => {
+    render(<Image image={{ url: '/test.png' } as unknown as PluginUploadFileDocument} fill />)
+    const img = screen.getByTestId('mock-image')
+    expect(img).not.toHaveAttribute('data-fetchpriority')
+    expect(img).not.toHaveAttribute('data-loading')
   })
 
   it('should handle http URLs correctly', () => {
@@ -230,5 +249,66 @@ describe('Image', () => {
       const img = screen.getByTestId('mock-image')
       expect(img).toHaveAttribute('src', 'http://localhost:1338/uploads/fallback_test.jpg')
     })
+  })
+})
+
+describe('resolveImageUrl', () => {
+  it('should return placeholder for null', () => {
+    expect(resolveImageUrl(null)).toBe('/images/placeholder.svg')
+  })
+
+  it('should return placeholder for undefined', () => {
+    expect(resolveImageUrl(undefined)).toBe('/images/placeholder.svg')
+  })
+
+  it('should return placeholder for media with empty URL', () => {
+    expect(resolveImageUrl({ url: '' } as unknown as PluginUploadFileDocument)).toBe('/images/placeholder.svg')
+  })
+
+  it('should return placeholder for media with undefined URL', () => {
+    expect(resolveImageUrl({ url: undefined } as unknown as PluginUploadFileDocument)).toBe('/images/placeholder.svg')
+  })
+
+  it('should prepend CMS URL to relative CMS paths', () => {
+    const result = resolveImageUrl({ url: '/uploads/test.png' } as unknown as PluginUploadFileDocument)
+    expect(result).toMatch(/https?:\/\/.+(:\d+)?\/uploads\/test\.png$/)
+  })
+
+  it('should return absolute URLs as-is', () => {
+    expect(resolveImageUrl({ url: 'https://example.com/photo.jpg' } as unknown as PluginUploadFileDocument)).toBe(
+      'https://example.com/photo.jpg'
+    )
+  })
+
+  it('should return http absolute URLs as-is', () => {
+    expect(resolveImageUrl({ url: 'http://example.com/photo.jpg' } as unknown as PluginUploadFileDocument)).toBe(
+      'http://example.com/photo.jpg'
+    )
+  })
+
+  it('should return /images/ paths as-is', () => {
+    expect(resolveImageUrl({ url: '/images/logo.png' } as unknown as PluginUploadFileDocument)).toBe('/images/logo.png')
+  })
+
+  it('should return /icons/ paths as-is', () => {
+    expect(resolveImageUrl({ url: '/icons/star.svg' } as unknown as PluginUploadFileDocument)).toBe('/icons/star.svg')
+  })
+})
+
+describe('getAltText', () => {
+  it('should return empty string for null', () => {
+    expect(getAltText(null)).toBe('')
+  })
+
+  it('should return empty string for undefined', () => {
+    expect(getAltText(undefined)).toBe('')
+  })
+
+  it('should return alternativeText when present', () => {
+    expect(getAltText({ alternativeText: 'A nice photo' } as unknown as PluginUploadFileDocument)).toBe('A nice photo')
+  })
+
+  it('should return empty string when alternativeText is not set', () => {
+    expect(getAltText({ url: '/test.png' } as unknown as PluginUploadFileDocument)).toBe('')
   })
 })

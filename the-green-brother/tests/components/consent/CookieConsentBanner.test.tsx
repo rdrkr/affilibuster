@@ -21,7 +21,7 @@ jest.mock('@/lib/consent', () => ({
 }))
 
 // Mock TextBlock component
-jest.mock('@/components/elements', () => ({
+jest.mock('@/components/elements/TextBlock', () => ({
   TextBlock: function MockTextBlock({
     data,
     'data-testid': dataTestId,
@@ -31,6 +31,9 @@ jest.mock('@/components/elements', () => ({
   }) {
     return <div data-testid={dataTestId ?? 'mock-textblock'}>{data.content}</div>
   },
+}))
+
+jest.mock('@/components/elements', () => ({
   ButtonAction: function MockButtonAction({
     data,
     onClick,

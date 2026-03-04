@@ -62,6 +62,8 @@ export interface HomeSectionsProps {
   readTimeMinutesLabel: ElementsLabelEntry
   /** Read article label */
   readArticleLabel: ElementsLabelEntry
+  /** Server-rendered hero section slot for LCP optimization */
+  heroSlot?: ReactNode
 }
 
 /**
@@ -71,7 +73,7 @@ export interface HomeSectionsProps {
  * @returns Rendered homepage sections with layout support
  */
 export function HomeSections(props: HomeSectionsProps) {
-  const { sections, teamMembers, enableUserProfile, readTimeMinutesLabel, readArticleLabel } = props
+  const { sections, teamMembers, enableUserProfile, readTimeMinutesLabel, readArticleLabel, heroSlot } = props
   const { direction } = useLayoutContext()
 
   /**
@@ -82,7 +84,7 @@ export function HomeSections(props: HomeSectionsProps) {
   const renderSection = (section: HomepageSection): ReactNode => {
     switch (section.__component) {
       case 'sections.hero':
-        return <HeroSection key={section.id} data={section} direction={direction} />
+        return heroSlot ?? <HeroSection key={section.id} data={section} direction={direction} />
 
       case 'sections.featured-products':
         return (

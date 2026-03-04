@@ -137,7 +137,7 @@
   --color-popover-foreground-dark: var(--color-tertiary-900);
   --color-popover-foreground: light-dark(var(--color-popover-foreground-light), var(--color-popover-foreground-dark));
 
-  --color-surface-light: var(--color-secondary-600);
+  --color-surface-light: var(--color-secondary-700);
   --color-surface-dark: var(--color-primary);
   --color-surface: light-dark(var(--color-surface-light), var(--color-surface-dark));
 
@@ -151,6 +151,10 @@
   --color-muted-foreground-light: var(--color-neutral-600);
   --color-muted-foreground-dark: var(--color-tertiary-300);
   --color-muted-foreground: light-dark(var(--color-muted-foreground-light), var(--color-muted-foreground-dark));
+  --color-muted-foreground-reversed: light-dark(
+    var(--color-muted-foreground-dark),
+    var(--color-muted-foreground-light)
+  );
 
   --color-accent-light: var(--color-primary-700);
   --color-accent-dark: var(--color-primary);
@@ -159,6 +163,10 @@
   --color-accent-foreground-light: var(--color-tertiary-50);
   --color-accent-foreground-dark: var(--color-tertiary-900);
   --color-accent-foreground: light-dark(var(--color-accent-foreground-light), var(--color-accent-foreground-dark));
+  --color-accent-foreground-reversed: light-dark(
+    var(--color-accent-foreground-dark),
+    var(--color-accent-foreground-light)
+  );
 
   --color-destructive-light: var(--color-error-500);
   --color-destructive-dark: var(--color-error-500);

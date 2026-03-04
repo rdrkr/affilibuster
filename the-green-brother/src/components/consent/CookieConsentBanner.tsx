@@ -16,7 +16,7 @@
  * with previously saved category preferences pre-filled.
  */
 
-import { ButtonAction, TextBlock } from '@/components/elements'
+import { ButtonAction } from '@/components/elements'
 import { frostedGlassStyle } from '@/components/elements/common'
 import { getConsentCategories, getConsentPage, useConsent } from '@/lib/consent'
 import type {
@@ -25,7 +25,10 @@ import type {
   ElementsTextBlockEntry,
 } from '@/lib/generated/types.gen'
 import { DirectionEnum } from '@/lib/generated/types.gen'
+import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useState } from 'react'
+
+const TextBlock = dynamic(() => import('@/components/elements/TextBlock').then(mod => ({ default: mod.TextBlock })))
 
 /** Props for the CookieConsentBanner component. */
 interface CookieConsentBannerProps {

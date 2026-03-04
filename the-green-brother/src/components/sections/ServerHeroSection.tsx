@@ -1,84 +1,69 @@
 // Copyright (c) 2025 Affilibuster by Ronen Druker.
 
 /**
- * Hero Section Component
+ * Server Hero Section Component
  *
- * Renders the hero banner section with background image, header, subheader, and CTA button.
- * All content comes from CMS - no hardcoded strings.
- * Uses Header and ButtonLink composites for content.
+ * Pure server component that renders the hero section with the image in the initial HTML.
+ * This enables the browser to start fetching the hero image during HTML parsing,
+ * significantly improving LCP on mobile by eliminating the JS hydration delay.
  *
- * Supports three layout variants:
+ * Uses Next.js Image with `priority={true}` to add `<link rel="preload" as="image">`
+ * to the document head, ensuring the LCP image loads as early as possible.
+ *
+ * Supports the same three layout variants as the client HeroSection:
  * - TEXT_OVER_BACKGROUND: Header centered over image (image as background)
  * - TEXT_ABOVE_BACKGROUND: Header above image (stacked vertically)
  * - TEXT_BELOW_BACKGROUND: Header below image (stacked vertically)
  */
 
-import { ButtonLink, Header, Image } from '@/components/elements'
+import { ButtonLink, Header, getAltText, resolveImageUrl } from '@/components/elements'
 import { AlignmentEnum, DirectionEnum, VariantEnum, type SectionsHeroEntry } from '@/lib/generated/types.gen'
+import NextImage from 'next/image'
 
 /**
- * Props for the HeroSection component
+ * Props for the ServerHeroSection component
  */
-/**
- * Props for the HeroSection component
- */
-export interface HeroSectionProps {
+export interface ServerHeroSectionProps {
   /** Hero section data from CMS */
   data: SectionsHeroEntry & {
     __component: 'sections.hero'
   }
   /** Language direction for RTL support */
   direction: DirectionEnum
-  /** Layout variant override */
-  variant?: VariantEnum
-  /** Header slot - renders above the content (e.g., tags) */
-  header?: React.ReactNode
-  /** Content slot - main content area (e.g., title, subtitle) */
-  content?: React.ReactNode
-  /** Footer slot - bottom section (e.g., author, date) */
-  footer?: React.ReactNode
 }
 
 /**
- * Hero section with background image and call-to-action.
+ * Server-rendered hero section that produces an `<img>` tag in the initial HTML.
+ *
+ * Unlike the client `HeroSection`, this component does not use `'use client'`,
+ * `useState`, or any client-side hooks. It renders a static hero with priority
+ * image loading for optimal LCP performance.
  * @param props - Component props with CMS hero data
  * @param props.data - Hero section data from CMS
  * @param props.direction - Language direction for RTL support
- * @param props.variant - Layout variant override
- * @param props.header - Header slot content
- * @param props.content - Main content slot
- * @param props.footer - Footer slot content
- * @returns Hero section component
+ * @returns Server-rendered hero section with priority image
  */
-export function HeroSection({
-  data,
-  direction,
-  variant: variantProp,
-  header: headerSlot,
-  content: contentSlot,
-  footer: footerSlot,
-}: HeroSectionProps) {
-  // Use props or fall back to data
+export function ServerHeroSection({ data, direction }: ServerHeroSectionProps) {
   const { image } = data
-  const variant = variantProp ?? data.variant
+  const variant = data.variant
   const alignment = data.header.alignment
 
   // --- Shared Logic ---
 
-  // Determine if content should be right-aligned (RTL) or left-aligned (LTR)
-  // or centered if explicitly set in CMS
   const isRTL = direction === DirectionEnum.RTL
   const isCentered = alignment === AlignmentEnum.CENTER
 
-  // Calculate justify class for the container
   const justifyClass = isCentered ? 'justify-center' : isRTL ? 'justify-end' : 'justify-start'
 
-  // Calculate text alignment and flex item alignment for content
   const textAlignClass = isCentered
     ? 'text-center items-center'
     : isRTL
       ? 'text-right items-end'
       : 'text-left items-start'
+
+  // --- Resolve image URL and alt text ---
+  const imageSrc = resolveImageUrl(image)
+  const imageAlt = getAltText(image)
 
   // --- Render Helpers ---
 
@@ -91,14 +76,9 @@ export function HeroSection({
         ${isOverlay && !isCentered ? (isRTL ? 'mr-8' : 'ml-8') : ''}
       `}
     >
-      {/* Manual Slots */}
-      {headerSlot}
-      {contentSlot}
-      {!contentSlot && <Header data={data.header} level={1} direction={direction} />}
+      <Header data={data.header} level={1} direction={direction} />
 
-      {footerSlot && <div className="mt-6 flex flex-wrap items-center gap-4 text-sm">{footerSlot}</div>}
-
-      {!footerSlot && data.exploreButton && (
+      {data.exploreButton && (
         <ButtonLink
           data={data.exploreButton}
           direction={direction}
@@ -116,8 +96,9 @@ export function HeroSection({
 
   const renderImage = (isOverlay: boolean) => (
     <div className={isOverlay ? 'absolute inset-0 z-0' : 'relative h-[40vh] max-h-100 min-h-62.5 w-full'}>
-      <Image
-        image={image}
+      <NextImage
+        src={imageSrc}
+        alt={imageAlt}
         className={`size-full object-cover ${isOverlay ? 'opacity-80' : 'rounded-xl'}`}
         fill
         fetchPriority="high"
@@ -129,7 +110,6 @@ export function HeroSection({
 
   // --- Layout Variants ---
 
-  // TEXT_OVER_BACKGROUND: Header centered over image (image as background)
   if (variant === VariantEnum.TEXT_OVER_BACKGROUND) {
     return (
       <section
@@ -140,7 +120,6 @@ export function HeroSection({
         aria-label={data.header.header?.ariaDescription ?? ''}
       >
         {renderImage(true)}
-        {/* Dark overlay gradient for readability */}
         <div
           className={`
             absolute inset-0 z-10 bg-linear-to-t from-white/90
@@ -153,7 +132,6 @@ export function HeroSection({
     )
   }
 
-  // TEXT_ABOVE_BACKGROUND: Header above image (stacked vertically)
   if (variant === VariantEnum.TEXT_ABOVE_BACKGROUND) {
     return (
       <section
@@ -166,7 +144,7 @@ export function HeroSection({
     )
   }
 
-  // TEXT_BELOW_BACKGROUND: Header below image (stacked vertically) - default case
+  // TEXT_BELOW_BACKGROUND - default
   return (
     <section
       className={`flex flex-col gap-8 ${isCentered ? 'items-center' : isRTL ? 'items-end' : 'items-start'}`}
@@ -178,4 +156,4 @@ export function HeroSection({
   )
 }
 
-export default HeroSection
+export default ServerHeroSection

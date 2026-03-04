@@ -16,7 +16,7 @@
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useState } from 'react'
 
-import { ButtonAction, Header, TextBlock } from '@/components/elements'
+import { ButtonAction, Header } from '@/components/elements'
 import {
   AlignmentEnum,
   DirectionEnum,
@@ -25,6 +25,9 @@ import {
   type ElementsHeaderEntry,
 } from '@/lib/generated/types.gen'
 import { subscribeNewsletter } from '@/lib/newsletter'
+import dynamic from 'next/dynamic'
+
+const TextBlock = dynamic(() => import('@/components/elements/TextBlock').then(mod => ({ default: mod.TextBlock })))
 
 /** Newsletter form state machine: form → pending (DOI email sent) → confirmed (DOI completed). */
 type NewsletterState = 'form' | 'pending' | 'confirmed'

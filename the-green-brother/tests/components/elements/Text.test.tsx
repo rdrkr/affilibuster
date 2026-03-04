@@ -65,16 +65,16 @@ describe('Text', () => {
     expect(element).toHaveClass('custom-class')
   })
 
-  it('should convert **bold** to primary-colored span', () => {
+  it('should convert **bold** to accent-colored span', () => {
     const { container } = render(<Text text="Hello **World**" />)
-    const boldSpan = container.querySelector('.text-primary')
+    const boldSpan = container.querySelector('.text-accent-dark')
     expect(boldSpan).toBeInTheDocument()
     expect(boldSpan).toHaveTextContent('World')
   })
 
   it('should handle multiple bold sections', () => {
     const { container } = render(<Text text="**First** and **Second**" />)
-    const boldSpans = container.querySelectorAll('.text-primary')
+    const boldSpans = container.querySelectorAll('.text-accent-dark')
     expect(boldSpans).toHaveLength(2)
     expect(boldSpans[0]).toHaveTextContent('First')
     expect(boldSpans[1]).toHaveTextContent('Second')
@@ -88,7 +88,7 @@ describe('Text', () => {
 
   it('should handle only bold text', () => {
     const { container } = render(<Text text="**OnlyBold**" />)
-    const boldSpan = container.querySelector('.text-primary')
+    const boldSpan = container.querySelector('.text-accent-dark')
     expect(boldSpan).toHaveTextContent('OnlyBold')
   })
 
@@ -123,7 +123,7 @@ describe('Text', () => {
   it('should handle mixed bold and newlines', () => {
     const { container } = render(<Text text={'**Bold**\nText'} />)
     // Check for bold span
-    expect(container.querySelector('.text-primary')).toHaveTextContent('Bold')
+    expect(container.querySelector('.text-accent-dark')).toHaveTextContent('Bold')
     // Check for break
     expect(container.querySelector('br')).toBeInTheDocument()
     // Check for plain text
@@ -185,21 +185,21 @@ describe('resolveTextFormatHtml', () => {
     expect(resolveTextFormatHtml('Hello World')).toBe('Hello World')
   })
 
-  it('should convert **bold** to span with text-primary class', () => {
+  it('should convert **bold** to span with text-accent-dark class', () => {
     expect(resolveTextFormatHtml('Hello **World**')).toBe(
-      'Hello <span class="text-primary dark:text-primary text-shadow-sm dark:text-shadow-none">World</span>'
+      'Hello <span class="text-accent-dark text-shadow-sm dark:text-shadow-none">World</span>'
     )
   })
 
   it('should convert multiple bold sections', () => {
     expect(resolveTextFormatHtml('**A** and **B**')).toBe(
-      '<span class="text-primary dark:text-primary text-shadow-sm dark:text-shadow-none">A</span> and <span class="text-primary dark:text-primary text-shadow-sm dark:text-shadow-none">B</span>'
+      '<span class="text-accent-dark text-shadow-sm dark:text-shadow-none">A</span> and <span class="text-accent-dark text-shadow-sm dark:text-shadow-none">B</span>'
     )
   })
 
   it('should handle only bold text', () => {
     expect(resolveTextFormatHtml('**OnlyBold**')).toBe(
-      '<span class="text-primary dark:text-primary text-shadow-sm dark:text-shadow-none">OnlyBold</span>'
+      '<span class="text-accent-dark text-shadow-sm dark:text-shadow-none">OnlyBold</span>'
     )
   })
 
@@ -209,7 +209,7 @@ describe('resolveTextFormatHtml', () => {
 
   it('should handle mixed bold and newlines', () => {
     expect(resolveTextFormatHtml('**Bold**\nText')).toBe(
-      '<span class="text-primary dark:text-primary text-shadow-sm dark:text-shadow-none">Bold</span><br />Text'
+      '<span class="text-accent-dark text-shadow-sm dark:text-shadow-none">Bold</span><br />Text'
     )
   })
 })

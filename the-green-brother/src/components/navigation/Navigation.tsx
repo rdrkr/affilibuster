@@ -13,8 +13,7 @@
 import { useCallback } from 'react'
 
 import { frostedGlassStyle } from '@/components/elements/common'
-import type { ApiNavigationNavigationDocument } from '@/lib/generated/types.gen'
-import type { DirectionEnum, Language } from '@/lib/generated/types.gen'
+import type { ApiNavigationNavigationDocument, DirectionEnum, Language } from '@/lib/generated/types.gen'
 import { useNavigationResize } from '@/lib/navigation'
 
 import { useThemeContext } from '@/components/providers'
@@ -82,41 +81,34 @@ export function Navigation({
         {/* Background layer with blur effect */}
         <div className={`absolute inset-0 ${frostedGlassStyle}`} aria-hidden="true" />
 
-        <div
-          className={`
-            relative z-20 grid h-12 grid-cols-1 items-center transition-opacity duration-200
-            ${isReady ? 'opacity-100' : 'opacity-0'}
-          `}
-        >
-          {isReady && (
-            <>
-              {/* Start Group - Brand and Nav Links - Aligned Start */}
-              <StartNavigationGroup
-                data={data}
-                displayMode={visibility.startGroupMode}
-                direction={direction}
-                navWidth={visibility.navWidth}
-                isSearchExpanded={isSearchExpanded}
-                onHasIconsChange={setStartHasIcons}
-              />
+        <div className="relative z-20 grid h-12 grid-cols-1 items-center">
+          {/* Start Group - Brand and Nav Links - Aligned Start */}
+          <StartNavigationGroup
+            data={data}
+            displayMode={visibility.startGroupMode}
+            direction={direction}
+            navWidth={visibility.navWidth}
+            isSearchExpanded={isSearchExpanded}
+            onHasIconsChange={setStartHasIcons}
+            isReady={isReady}
+          />
 
-              {/* End Group - Search, Theme, Language, Login - Aligned End */}
-              <EndNavigationGroup
-                data={data}
-                displayMode={visibility.endGroupMode}
-                startGroupMode={visibility.startGroupMode}
-                direction={direction}
-                navWidth={visibility.navWidth}
-                apiLanguages={languages}
-                theme={theme}
-                setTheme={setTheme}
-                onSearchExpandChange={handleSearchExpandChange}
-                onHasIconsChange={setEndHasIcons}
-                enableProductSearch={enableProductSearch}
-                enableUserProfile={enableUserProfile}
-              />
-            </>
-          )}
+          {/* End Group - Search, Theme, Language, Login - Aligned End */}
+          <EndNavigationGroup
+            data={data}
+            displayMode={visibility.endGroupMode}
+            startGroupMode={visibility.startGroupMode}
+            direction={direction}
+            navWidth={visibility.navWidth}
+            apiLanguages={languages}
+            theme={theme}
+            setTheme={setTheme}
+            onSearchExpandChange={handleSearchExpandChange}
+            onHasIconsChange={setEndHasIcons}
+            enableProductSearch={enableProductSearch}
+            enableUserProfile={enableUserProfile}
+            isReady={isReady}
+          />
         </div>
       </nav>
     </div>

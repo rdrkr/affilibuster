@@ -102,14 +102,14 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
       {/* Decorative background elements */}
       <div
         className={`
-        absolute right-0 bottom-0 -mr-20 -mb-20 size-80 rounded-full
-        bg-surface/20 blur-3xl
+        absolute inset-e-0 bottom-0 -me-20 -mb-20 size-80 rounded-full
+        bg-surface/25 blur-3xl
       `}
       />
       <div
         className={`
-        absolute top-0 left-0 -mt-20 -ml-20 h-80 w-120 rounded-full
-        bg-surface/40 blur-3xl
+        absolute inset-s-0 top-0 -ms-20 -mt-20 h-78 w-118 rounded-full
+        bg-surface-light blur-3xl
       `}
       />
 
@@ -148,6 +148,8 @@ export function BrandFeaturesSection({ data, direction }: BrandFeaturesSectionPr
             }
             level={2}
             direction={direction}
+            headerClassName={`text-foreground-dark`}
+            subheaderClassName={`text-foreground-dark!`}
           />
           {learnMoreButtonUrl && learnMoreButtonText && (
             <div className={`mt-8 ${alignmentClass}`}>

@@ -92,34 +92,41 @@ async function LocaleLayout({ children, params }: Props) {
   const currentLanguage = languages?.find(l => l.code === lang)
   const direction = currentLanguage?.direction ?? DirectionEnum.LTR
 
+  const cmsUrl =
+    process.env.NEXT_PUBLIC_CMS_URL ??
+    `${process.env.NEXT_PUBLIC_CMS_PROTOCOL ?? 'https'}://localhost:${process.env.NEXT_PUBLIC_CMS_PORT ?? '1337'}`
+
   return (
-    <ThemeProvider>
-      <NextIntlClientProvider messages={messages}>
-        <LayoutProvider lang={lang} direction={direction} navigation={navigationData ?? null}>
-          <div className="flex min-h-screen flex-col">
-            {isDraft && <DraftModeBanner />}
-            <div className="mx-auto w-full max-w-7xl">
-              {navigationData && (
-                <Navigation
-                  data={navigationData}
-                  languages={languages ?? []}
-                  direction={direction}
-                  enableProductSearch={enableProductSearch}
-                  enableUserProfile={enableUserProfile}
-                />
-              )}
+    <>
+      <link rel="preconnect" href={cmsUrl} />
+      <ThemeProvider>
+        <NextIntlClientProvider messages={messages}>
+          <LayoutProvider lang={lang} direction={direction} navigation={navigationData ?? null}>
+            <div className="flex min-h-screen flex-col">
+              {isDraft && <DraftModeBanner />}
+              <div className="mx-auto w-full max-w-7xl">
+                {navigationData && (
+                  <Navigation
+                    data={navigationData}
+                    languages={languages ?? []}
+                    direction={direction}
+                    enableProductSearch={enableProductSearch}
+                    enableUserProfile={enableUserProfile}
+                  />
+                )}
 
-              <main className="grow px-4 sm:px-6 lg:px-8">{children}</main>
+                <main className="grow px-4 sm:px-6 lg:px-8">{children}</main>
 
-              <Footer lang={lang} direction={direction} />
+                <Footer lang={lang} direction={direction} />
+              </div>
+
+              <BackToTopButton />
+              <DeferredCookieConsentBanner lang={lang} direction={direction} />
             </div>
-
-            <BackToTopButton />
-            <DeferredCookieConsentBanner lang={lang} direction={direction} />
-          </div>
-        </LayoutProvider>
-      </NextIntlClientProvider>
-    </ThemeProvider>
+          </LayoutProvider>
+        </NextIntlClientProvider>
+      </ThemeProvider>
+    </>
   )
 }
 
