@@ -205,6 +205,7 @@ export function useNavigationResize(): UseNavigationResizeReturn {
   // (avoids recreating observer on state changes)
   const isSearchExpandedRef = useRef(isSearchExpanded)
   const prevWidthRef = useRef<number>(0)
+  const latestWidthRef = useRef<number>(0)
 
   // Track when we're transitioning due to search expand/collapse
   // This prevents ResizeObserver from auto-closing search due to internal layout shifts
@@ -228,7 +229,7 @@ export function useNavigationResize(): UseNavigationResizeReturn {
       rafIdRef.current = requestAnimationFrame(() => {
         const nav = navRef.current
         if (nav) {
-          const navWidth = nav.getBoundingClientRect().width
+          const navWidth = latestWidthRef.current || nav.getBoundingClientRect().width
           const windowWidth = typeof window !== 'undefined' ? window.innerWidth : navWidth
 
           // Pass current modes as previous state for hysteresis
@@ -279,9 +280,7 @@ export function useNavigationResize(): UseNavigationResizeReturn {
       transitionTimeoutRef.current = setTimeout(() => {
         isTransitioningRef.current = false
         // Update prevWidthRef to current width so future external resizes are detected correctly
-        if (navRef.current) {
-          prevWidthRef.current = navRef.current.getBoundingClientRect().width
-        }
+        prevWidthRef.current = latestWidthRef.current
       }, 800)
     },
     [updateVisibilityDebounced]
@@ -300,6 +299,7 @@ export function useNavigationResize(): UseNavigationResizeReturn {
     const initialNavWidth = nav.getBoundingClientRect().width
     const initialWindowWidth = typeof window !== 'undefined' ? window.innerWidth : initialNavWidth
     prevWidthRef.current = initialNavWidth
+    latestWidthRef.current = initialNavWidth
     // Initial calculation doesn't have "prev" state, so defaults are used (no hysteresis yet)
     setVisibility(calculateVisibility(initialNavWidth, initialWindowWidth, false, startHasIcons, endHasIcons))
     setIsReady(true)
@@ -318,6 +318,7 @@ export function useNavigationResize(): UseNavigationResizeReturn {
       }
 
       const navWidth = entry.contentRect.width
+      latestWidthRef.current = navWidth
 
       // If width changed significantly and search is expanded, close search
       // This handles external window resizes only (transitions are skipped above)

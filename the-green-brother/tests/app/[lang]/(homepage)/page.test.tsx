@@ -40,8 +40,12 @@ jest.mock('@/lib/feature-flags', () => ({
 // Mock the HomeClient component
 jest.mock('@/app/[lang]/(homepage)/HomeClient', () => ({
   __esModule: true,
-  default: function MockHomeClient({ children }: { children: React.ReactNode }) {
-    return <div data-testid="home-client">{children}</div>
+  default: function MockHomeClient({ children, className }: { children: React.ReactNode; className?: string }) {
+    return (
+      <div data-testid="home-client" className={className}>
+        {children}
+      </div>
+    )
   },
 }))
 
@@ -61,7 +65,6 @@ jest.mock('@/components/seo', () => ({
 
 import HomePage, { generateMetadata } from '@/app/[lang]/(homepage)/page'
 import { HomeSections } from '@/components/homepage'
-import { ServerHeroSection } from '@/components/sections'
 import { JsonLdScript } from '@/components/seo'
 import { getBlog, getHomepage, getNavigation, getTeamMembers } from '@/lib/content'
 import { userProfileFlag } from '@/lib/feature-flags'
@@ -77,7 +80,6 @@ const mockUserProfileFlag = userProfileFlag as jest.MockedFunction<typeof userPr
 const mockGetLanguages = getLanguages as jest.MockedFunction<typeof getLanguages>
 const mockHomeSections = HomeSections as unknown as jest.Mock
 const mockJsonLdScript = JsonLdScript as unknown as jest.Mock
-const mockServerHeroSection = ServerHeroSection as unknown as jest.Mock
 
 describe('HomePage', () => {
   const mockNavigationData = {
@@ -134,7 +136,7 @@ describe('HomePage', () => {
         enableUserProfile: false,
         readTimeMinutesLabel: mockBlogPage.readTimeMinutesLabel,
         readArticleLabel: mockBlogPage.readArticleLabel,
-        heroSlot: undefined,
+        skipHero: false,
       }),
       undefined
     )
@@ -280,7 +282,7 @@ describe('HomePage', () => {
       expect.objectContaining({
         sections: [],
         teamMembers: [],
-        heroSlot: undefined,
+        skipHero: false,
       }),
       undefined
     )
@@ -351,7 +353,7 @@ describe('HomePage', () => {
     expect(mockHomeSections).toHaveBeenCalledWith(
       expect.objectContaining({
         teamMembers: mockTeamMembers,
-        heroSlot: undefined,
+        skipHero: false,
       }),
       undefined
     )
@@ -377,7 +379,7 @@ describe('HomePage', () => {
     expect(mockGetBlog).toHaveBeenCalledWith(LanguageCode.EN, { status: SchemaEnum.DRAFT })
   })
 
-  it('should provide heroSlot when sections contain a hero entry', async () => {
+  it('should render hero outside client boundary and pass skipHero when sections contain hero', async () => {
     const heroEntry = {
       __component: 'sections.hero' as const,
       id: 1,
@@ -397,20 +399,18 @@ describe('HomePage', () => {
     const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
-    // heroSlot is a React element passed as a prop; HomeSections is mocked so it won't render it.
-    // Verify the element type and props via the HomeSections call args.
-    const heroSlotArg = mockHomeSections.mock.calls[0][0].heroSlot
-    expect(heroSlotArg).toBeDefined()
-    expect(heroSlotArg.type).toBe(mockServerHeroSection)
-    expect(heroSlotArg.props).toEqual(
-      expect.objectContaining({
-        data: heroEntry,
-        direction: DirectionEnum.LTR,
-      })
-    )
+    // Hero is rendered outside HomeClient directly in the DOM
+    expect(screen.getByTestId('server-hero-section')).toBeInTheDocument()
+
+    // HomeSections receives skipHero=true (hero rendered outside)
+    expect(mockHomeSections).toHaveBeenCalledWith(expect.objectContaining({ skipHero: true }), undefined)
+
+    // HomeClient should receive mt-16! className for proper spacing
+    const homeClient = screen.getByTestId('home-client')
+    expect(homeClient.className).toContain('mt-16!')
   })
 
-  it('should not provide heroSlot when sections have no hero entry', async () => {
+  it('should not render hero outside client boundary when no hero entry exists', async () => {
     const nonHeroEntry = {
       __component: 'sections.team' as const,
       id: 1,
@@ -428,8 +428,12 @@ describe('HomePage', () => {
     const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
-    const heroSlotArg = mockHomeSections.mock.calls[0][0].heroSlot
-    expect(heroSlotArg).toBeUndefined()
+    expect(screen.queryByTestId('server-hero-section')).not.toBeInTheDocument()
+    expect(mockHomeSections).toHaveBeenCalledWith(expect.objectContaining({ skipHero: false }), undefined)
+
+    // HomeClient should not have spacing override
+    const homeClient = screen.getByTestId('home-client')
+    expect(homeClient.className).not.toContain('mt-16!')
   })
 
   it('should derive RTL direction from getLanguages for hero slot', async () => {
@@ -466,14 +470,9 @@ describe('HomePage', () => {
     const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.HE }) })
     render(Component)
 
-    const heroSlotArg = mockHomeSections.mock.calls[0][0].heroSlot
-    expect(heroSlotArg).toBeDefined()
-    expect(heroSlotArg.props).toEqual(
-      expect.objectContaining({
-        data: heroEntry,
-        direction: DirectionEnum.RTL,
-      })
-    )
+    // Server hero rendered outside client boundary with RTL direction
+    const heroSection = screen.getByTestId('server-hero-section')
+    expect(heroSection).toHaveAttribute('data-direction', DirectionEnum.RTL)
   })
 
   it('should fallback to LTR direction when getLanguages returns null', async () => {
@@ -498,14 +497,9 @@ describe('HomePage', () => {
     const Component = await HomePage({ params: Promise.resolve({ lang: LanguageCode.EN }) })
     render(Component)
 
-    const heroSlotArg = mockHomeSections.mock.calls[0][0].heroSlot
-    expect(heroSlotArg).toBeDefined()
-    expect(heroSlotArg.props).toEqual(
-      expect.objectContaining({
-        data: heroEntry,
-        direction: DirectionEnum.LTR,
-      })
-    )
+    // Server hero rendered with LTR fallback
+    const heroSection = screen.getByTestId('server-hero-section')
+    expect(heroSection).toHaveAttribute('data-direction', DirectionEnum.LTR)
   })
 })
 

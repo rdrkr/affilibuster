@@ -32,4 +32,15 @@ describe('HomeClient', () => {
     expect(wrapper.className).not.toContain('opacity-0')
     expect(wrapper.className).not.toContain('transition-opacity')
   })
+
+  it('should pass className to PageClient', () => {
+    const { container } = renderWithLayout(
+      <HomeClient className="mt-16!">
+        <div>Content</div>
+      </HomeClient>
+    )
+
+    const wrapper = container.firstChild as HTMLElement
+    expect(wrapper.className).toContain('mt-16!')
+  })
 })

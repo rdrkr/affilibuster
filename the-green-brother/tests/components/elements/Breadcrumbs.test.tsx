@@ -299,4 +299,26 @@ describe('Breadcrumbs', () => {
     expect(text).toHaveTextContent('Blog')
     expect(text.textContent).not.toContain('**')
   })
+
+  it('should fallback to segment name if CMS button label is missing', () => {
+    const navWithoutLabel = {
+      ...mockNavigation,
+      blogButton: {
+        ...mockNavigation.blogButton,
+        label: undefined,
+      },
+    } as unknown as ApiNavigationNavigationDocument
+
+    render(
+      <Breadcrumbs
+        navigation={navWithoutLabel}
+        pathname="/en/blog"
+        lang={LanguageCode.EN}
+        direction={DirectionEnum.LTR}
+      />
+    )
+
+    const text = screen.getByTestId('text-component')
+    expect(text).toHaveTextContent('Blog')
+  })
 })

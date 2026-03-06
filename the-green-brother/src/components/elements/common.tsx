@@ -108,11 +108,11 @@ export function getVariantClasses(
           ? ''
           : `
           [&]:inline-flex [&]:overflow-hidden [&]:whitespace-nowrap
-          [&]:transition-all [&]:duration-300 [&]:ease-out
+          [&]:transition-nav-layout [&]:duration-300 [&]:ease-out
           [&>span]:inline-flex [&>span]:overflow-hidden [&>span]:whitespace-nowrap
-          [&>span]:transition-all [&>span]:duration-300 [&>span]:ease-out
+          [&>span]:transition-nav-layout [&>span]:duration-300 [&>span]:ease-out
           [&>span>span]:inline-flex [&>span>span]:overflow-hidden [&>span>span]:whitespace-nowrap
-          [&>span>span]:transition-all [&>span>span]:duration-300 [&>span>span]:ease-out
+          [&>span>span]:transition-nav-layout [&>span>span]:duration-300 [&>span>span]:ease-out
           `
       }
     `,
@@ -146,7 +146,7 @@ export function getVariantClasses(
       ${
         noAnimation
           ? 'hover:underline'
-          : 'transition-all duration-300 hover:scale-105 hover:text-shadow-shimmer disabled:hover:scale-100 active:scale-95'
+          : 'transition-[color,transform,text-shadow,scale] duration-300 hover:scale-105 hover:text-shadow-shimmer disabled:hover:scale-100 active:scale-95'
       }
     `,
     'link-2': `
@@ -157,7 +157,7 @@ export function getVariantClasses(
       ${
         noAnimation
           ? ''
-          : 'transition-all duration-300 hover:scale-105 hover:text-shadow-shimmer disabled:hover:scale-100 active:scale-95'
+          : 'transition-[color,transform,text-shadow,scale] duration-300 hover:scale-105 hover:text-shadow-shimmer disabled:hover:scale-100 active:scale-95'
       }
     `,
     'scroll-arrow': `
@@ -268,7 +268,7 @@ export function getButtonBaseClasses(params: ButtonBaseClassesParams): string {
   const { variant, size, isActive, noAnimation, showText, direction, hasIcon, className } = params
 
   return `
-    inline-flex items-center justify-center transition-all duration-300 w-fit
+    inline-flex items-center justify-center transition-colors duration-300 w-fit
     ${!showText ? 'gap-0' : 'gap-2'}
     ${getVariantClasses(variant, isActive, noAnimation, direction, hasIcon, showText)}
     ${getSizeText(size)}

@@ -76,7 +76,7 @@ export default function WishlistClient({ data, lang, direction }: WishlistClient
             key={item.id}
             className={`
               group flex flex-col items-center gap-6 rounded-xl border
-              border-border bg-card p-4 transition-all
+              border-border bg-card p-4 transition-[border-color]
               hover:border-primary-hover/30
               sm:flex-row sm:p-6
             `}

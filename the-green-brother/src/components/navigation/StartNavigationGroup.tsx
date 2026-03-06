@@ -168,11 +168,11 @@ export function StartNavigationGroup({
               text-foreground! hover:text-foreground hover:no-underline! active:scale-95
               ${isBrandTextVisible ? 'me-3' : ''}
               [&]:inline-flex [&]:overflow-hidden [&]:whitespace-nowrap
-              [&]:transition-all [&]:duration-300 [&]:ease-out
+              [&]:transition-nav-layout [&]:duration-300 [&]:ease-out
               [&>span]:inline-flex [&>span]:overflow-hidden [&>span]:whitespace-nowrap
-              [&>span]:transition-all [&>span]:duration-300 [&>span]:ease-out
+              [&>span]:transition-nav-layout [&>span]:duration-300 [&>span]:ease-out
               [&>span>span]:inline-flex [&>span>span]:overflow-hidden [&>span>span]:whitespace-nowrap
-              [&>span>span]:transition-all [&>span>span]:duration-300 [&>span>span]:ease-out
+              [&>span>span]:transition-nav-layout [&>span>span]:duration-300 [&>span>span]:ease-out
             `}
           />
 

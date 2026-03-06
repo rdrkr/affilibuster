@@ -273,4 +273,17 @@ describe('ProductCategoriesSection', () => {
 
     expect(container).toBeEmptyDOMElement()
   })
+
+  it('should handle category without a numeric id', () => {
+    const categoryWithoutId = {
+      ...mockCategories[0],
+      id: undefined,
+    } as unknown as ApiProductCategoryProductCategoryDocument
+    render(
+      <ProductCategoriesSection direction={DirectionEnum.LTR} data={mockSectionData} categories={[categoryWithoutId]} />
+    )
+
+    const items = screen.getAllByTestId('grid-item')
+    expect(items).toHaveLength(1)
+  })
 })

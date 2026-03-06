@@ -199,7 +199,7 @@ export function Card({
   const animationClasses = noAnimation
     ? ''
     : `
-    m-1 transition-all duration-300
+    m-1 transition-[transform,border-color] duration-300
     hover:-translate-y-1 hover:transform hover:border-primary-hover/30
     dark:hover:border-primary-hover/30
     active:scale-[0.98] active:translate-y-0

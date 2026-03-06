@@ -69,7 +69,15 @@ const nextConfig: NextConfig = {
   },
   // Enable experimental optimizations
   experimental: {
-    optimizePackageImports: ['react', 'react-dom', 'next-intl', 'react-markdown', 'rehype-sanitize'],
+    optimizePackageImports: [
+      'react',
+      'react-dom',
+      'next-intl',
+      'react-markdown',
+      'rehype-sanitize',
+      'remark-gfm',
+      'rehype-raw',
+    ],
   },
   bundlePagesRouterDependencies: true,
   typedRoutes: false,
@@ -110,7 +118,7 @@ const nextConfig: NextConfig = {
       },
     ]
   },
-  // Cache-Control headers for static assets (immutable, long-lived cache)
+  // Cache-Control headers for static assets and security headers
   headers() {
     return [
       {
@@ -119,6 +127,32 @@ const nextConfig: NextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline'",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' data: blob: https://res.cloudinary.com",
+              "connect-src 'self' https://*.thegreenbrother.com",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+              'trusted-types default',
+              "require-trusted-types-for 'script'",
+            ].join('; '),
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
           },
         ],
       },

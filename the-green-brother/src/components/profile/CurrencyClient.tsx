@@ -80,7 +80,7 @@ export default function CurrencyClient({ profileData, currencies, lang, directio
               key={curr.code} // Assuming code is unique
               className={`
                 flex cursor-pointer items-center justify-between rounded-xl
-                border p-4 transition-all
+                border p-4 transition-[border-color,background-color,box-shadow]
                 ${
                   selected === curr.code
                     ? 'border-primary bg-primary/10 ring-1 ring-primary dark:bg-primary/10'

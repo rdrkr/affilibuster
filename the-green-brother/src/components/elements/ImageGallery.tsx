@@ -248,7 +248,7 @@ export function ImageGallery({
               className={`
                 aspect-square overflow-hidden rounded-xl border-2
                 ${index === selectedImageIndex ? 'border-ring' : 'border-transparent'}
-                relative bg-card transition-all duration-300 hover:border-primary-hover/50
+                relative bg-card transition-[border-color] duration-300 hover:border-primary-hover/50
                 active:border-primary-active
               `}
               aria-label={img.alternativeText ?? `View image ${String(index + 1)}`}

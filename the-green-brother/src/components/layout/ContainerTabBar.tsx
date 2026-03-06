@@ -218,7 +218,7 @@ export function ContainerTabBar<T = unknown>({ tabs, activeKey, onTabChange, dir
         <div
           className={`
             absolute inset-y-0 my-auto h-[calc(100%-4px)]
-            transition-all duration-300 ease-in-out
+            transition-[transform,width] duration-300 ease-in-out
             ${frostedGlassStyle}
             dark:bg-white/10!
           `}

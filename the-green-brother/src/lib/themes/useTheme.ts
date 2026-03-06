@@ -40,10 +40,6 @@ function getResolvedTheme(mode: ThemeMode): 'light' | 'dark' {
  * @returns The stored theme mode or default
  */
 function getStoredTheme(): ThemeMode {
-  if (typeof window === 'undefined') {
-    return DEFAULT_THEME
-  }
-
   const stored = localStorage.getItem(THEME_STORAGE_KEY)
   if (stored === 'light' || stored === 'dark' || stored === 'system') {
     return stored
@@ -56,10 +52,6 @@ function getStoredTheme(): ThemeMode {
  * @param mode - The theme mode to apply
  */
 function applyTheme(mode: ThemeMode): void {
-  if (typeof document === 'undefined') {
-    return
-  }
-
   const root = document.documentElement
 
   // Resolve to actual theme (dark/light) for CSS dark: variant to work

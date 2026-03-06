@@ -812,6 +812,24 @@ describe('CookieConsentBanner', () => {
 
       expect(mockRejectAll).not.toHaveBeenCalled()
     })
+
+    it('should not revoke consent when DNT is already enabled (cookieDntState is true)', async () => {
+      const mockRejectAll = jest.fn()
+      mockUseConsent.mockReturnValue({
+        ...defaultUseConsentReturn,
+        hasConsented: true,
+        acceptedCategories: ['necessary', 'analytics'],
+        isDoNotTrackEnabled: true,
+        cookieDntState: true,
+        rejectAll: mockRejectAll,
+      })
+
+      await act(async () => {
+        render(<CookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
+      })
+
+      expect(mockRejectAll).not.toHaveBeenCalled()
+    })
   })
 
   describe('edge cases', () => {

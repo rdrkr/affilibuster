@@ -659,7 +659,7 @@ export default function StyleGuideClient(): React.ReactElement {
               <div className="rounded-xl border border-white/10 bg-background-dark p-6">
                 <h3 className="mb-4 font-semibold text-white">Combined</h3>
                 <div className="group flex h-20 items-center justify-center rounded-xl bg-surface-dark">
-                  <div className="size-12 scale-90 rounded-xl bg-primary opacity-70 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100" />
+                  <div className="size-12 scale-90 rounded-xl bg-primary opacity-70 transition-[transform,opacity] duration-300 group-hover:scale-100 group-hover:opacity-100" />
                 </div>
                 <p className="mt-3 text-center font-mono text-xs text-muted-foreground">fade + scale</p>
               </div>

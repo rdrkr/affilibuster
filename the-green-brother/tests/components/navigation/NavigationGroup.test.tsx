@@ -222,7 +222,7 @@ describe('NavigationGroup', () => {
       )
 
       const group = screen.getByTestId('navigation-group-start')
-      expect(group.className).toContain('transition-all')
+      expect(group.className).toContain('transition-colors')
       expect(group.className).toContain('duration-500')
     })
   })

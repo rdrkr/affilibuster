@@ -64,6 +64,8 @@ export interface HomeSectionsProps {
   readArticleLabel: ElementsLabelEntry
   /** Server-rendered hero section slot for LCP optimization */
   heroSlot?: ReactNode
+  /** When true, skip rendering the hero section (used when hero is rendered outside client boundary) */
+  skipHero?: boolean
 }
 
 /**
@@ -73,7 +75,7 @@ export interface HomeSectionsProps {
  * @returns Rendered homepage sections with layout support
  */
 export function HomeSections(props: HomeSectionsProps) {
-  const { sections, teamMembers, enableUserProfile, readTimeMinutesLabel, readArticleLabel, heroSlot } = props
+  const { sections, teamMembers, enableUserProfile, readTimeMinutesLabel, readArticleLabel, heroSlot, skipHero } = props
   const { direction } = useLayoutContext()
 
   /**
@@ -84,6 +86,7 @@ export function HomeSections(props: HomeSectionsProps) {
   const renderSection = (section: HomepageSection): ReactNode => {
     switch (section.__component) {
       case 'sections.hero':
+        if (skipHero) return null
         return heroSlot ?? <HeroSection key={section.id} data={section} direction={direction} />
 
       case 'sections.featured-products':

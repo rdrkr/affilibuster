@@ -370,4 +370,24 @@ describe('LocaleLayout', () => {
 
     expect(screen.getByTestId('mock-draft-mode-banner')).toBeInTheDocument()
   })
+
+  it('should fallback to default variables for CMS URL', async () => {
+    const originalEnv = process.env
+    process.env = { ...originalEnv }
+    delete process.env.NEXT_PUBLIC_CMS_URL
+    delete process.env.NEXT_PUBLIC_CMS_PROTOCOL
+    delete process.env.NEXT_PUBLIC_CMS_PORT
+
+    const Component = await LocaleLayout({
+      children: <div>Content</div>,
+      params: Promise.resolve({ lang: LanguageCode.EN }),
+    })
+
+    render(Component)
+
+    const preconnectLink = document.querySelector('link[rel="preconnect"][href="https://localhost:1337"]')
+    expect(preconnectLink).toBeInTheDocument()
+
+    process.env = originalEnv
+  })
 })

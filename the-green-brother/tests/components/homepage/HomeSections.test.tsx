@@ -279,6 +279,21 @@ describe('HomeSections', () => {
     expect(screen.queryByTestId('server-hero')).not.toBeInTheDocument()
   })
 
+  it('should skip hero section when skipHero is true', () => {
+    const sections: ApiHomepageHomepageDocument['sections'] = mockSections[0] ? [mockSections[0]] : []
+    render(<HomeSections sections={sections} teamMembers={[]} {...defaultProps} skipHero />)
+
+    expect(screen.queryByTestId('hero-section')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('server-hero')).not.toBeInTheDocument()
+  })
+
+  it('should render hero when skipHero is false', () => {
+    const sections: ApiHomepageHomepageDocument['sections'] = mockSections[0] ? [mockSections[0]] : []
+    render(<HomeSections sections={sections} teamMembers={[]} {...defaultProps} skipHero={false} />)
+
+    expect(screen.getByTestId('hero-section')).toBeInTheDocument()
+  })
+
   it('should render featured products section', () => {
     const sections: ApiHomepageHomepageDocument['sections'] = mockSections[1] ? [mockSections[1]] : []
     render(<HomeSections sections={sections} teamMembers={[]} {...defaultProps} />)

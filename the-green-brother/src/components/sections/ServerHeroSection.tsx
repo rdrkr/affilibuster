@@ -102,7 +102,7 @@ export function ServerHeroSection({ data, direction }: ServerHeroSectionProps) {
         className={`size-full object-cover ${isOverlay ? 'opacity-80' : 'rounded-xl'}`}
         fill
         fetchPriority="high"
-        loading="eager"
+        priority
         sizes="100vw"
       />
     </div>

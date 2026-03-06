@@ -19,8 +19,14 @@ import { useEffect, useState } from 'react'
 /** Dynamically imported CookieConsentBanner — only loaded after activation. */
 const CookieConsentBanner = dynamic(() => import('./CookieConsentBanner'))
 
-/** User interaction events that trigger banner activation. */
-const ACTIVATION_EVENTS = ['scroll', 'click', 'keydown', 'touchstart'] as const
+/**
+ * User interaction events that trigger banner activation.
+ * Note: 'scroll' is intentionally excluded to avoid triggering a dynamic import
+ * during scroll, which can cause layout shifts (CLS) by blocking the main thread
+ * while the banner JS chunk loads. The banner still activates on explicit user
+ * interactions (click, keydown, touchstart) or via the fallback timeout.
+ */
+const ACTIVATION_EVENTS = ['click', 'keydown', 'touchstart'] as const
 
 /** Fallback delay in milliseconds before activating without user interaction. */
 const FALLBACK_DELAY_MS = 8000

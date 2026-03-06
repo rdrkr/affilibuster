@@ -91,8 +91,8 @@ export function LanguageMenu({
       {/* Badge positioned at bottom-right of icon */}
       <span
         className={`
-          pointer-events-none absolute right-0.5 bottom-0.5 flex min-w-[14px]
-          items-center justify-center rounded-sm bg-primary p-0.5 text-[9px] leading-none
+          pointer-events-none absolute right-0.5 bottom-0 flex min-w-[14px]
+          items-center justify-center rounded-sm bg-primary text-[9px] leading-none
           font-bold text-foreground-light transition-colors group-hover:bg-muted-foreground
           group-hover:text-foreground-reversed group-active:bg-foreground
         `}

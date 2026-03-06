@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react'
 import { ServerHeroSection, type ServerHeroSectionProps } from '@/components/sections/ServerHeroSection'
 import { AlignmentEnum, DirectionEnum, IconPositionEnum, VariantEnum } from '@/lib/generated/types.gen'
 
-// Mock next/image — captures fetchPriority and loading props
+// Mock next/image — captures priority, fetchPriority, and loading props
 jest.mock('next/image', () => ({
   __esModule: true,
   default: function MockImage(props: {
@@ -17,6 +17,7 @@ jest.mock('next/image', () => ({
     alt: string
     className?: string
     fill?: boolean
+    priority?: boolean
     fetchPriority?: string
     loading?: string
     sizes?: string
@@ -27,6 +28,7 @@ jest.mock('next/image', () => ({
         alt={props.alt}
         className={props.className}
         data-fill={props.fill}
+        data-priority={props.priority ? 'true' : undefined}
         data-fetch-priority={props.fetchPriority}
         data-loading={props.loading}
         data-sizes={props.sizes}
@@ -150,12 +152,11 @@ describe('ServerHeroSection', () => {
     expect(image).toHaveAttribute('src', 'https://localhost:1337/uploads/hero-plant.webp')
   })
 
-  it('should render image with fetchPriority="high" and loading="eager"', () => {
+  it('should render image with priority prop for LCP preload', () => {
     render(<ServerHeroSection direction={DirectionEnum.LTR} data={mockBaseData} />)
 
     const image = screen.getByRole('img')
-    expect(image).toHaveAttribute('data-fetch-priority', 'high')
-    expect(image).toHaveAttribute('data-loading', 'eager')
+    expect(image).toHaveAttribute('data-priority', 'true')
   })
 
   it('should render image with sizes="100vw"', () => {

@@ -97,14 +97,14 @@ describe('DeferredCookieConsentBanner', () => {
     expect(screen.queryByTestId('mock-cookie-consent-banner')).not.toBeInTheDocument()
   })
 
-  it('should render banner after scroll event', () => {
+  it('should not activate on scroll event (excluded to prevent CLS)', () => {
     render(<DeferredCookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
 
     act(() => {
       window.dispatchEvent(new Event('scroll'))
     })
 
-    expect(screen.getByTestId('mock-cookie-consent-banner')).toBeInTheDocument()
+    expect(screen.queryByTestId('mock-cookie-consent-banner')).not.toBeInTheDocument()
   })
 
   it('should render banner after click event', () => {
@@ -162,7 +162,7 @@ describe('DeferredCookieConsentBanner', () => {
   it('should register all activation events with passive and once options', () => {
     render(<DeferredCookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
 
-    const expectedEvents = ['scroll', 'click', 'keydown', 'touchstart']
+    const expectedEvents = ['click', 'keydown', 'touchstart']
 
     for (const event of expectedEvents) {
       const call = addEventListenerSpy.mock.calls.find(
@@ -171,6 +171,12 @@ describe('DeferredCookieConsentBanner', () => {
       expect(call).toBeDefined()
       expect(call[2]).toEqual({ passive: true, once: true })
     }
+
+    // Verify scroll is NOT registered (excluded to prevent CLS)
+    const scrollCall = addEventListenerSpy.mock.calls.find(
+      (c: [string, EventListener, AddEventListenerOptions]) => c[0] === 'scroll'
+    )
+    expect(scrollCall).toBeUndefined()
   })
 
   it('should not activate before fallback delay elapses', () => {
@@ -202,7 +208,7 @@ describe('DeferredCookieConsentBanner', () => {
 
     unmount()
 
-    const expectedEvents = ['scroll', 'click', 'keydown', 'touchstart']
+    const expectedEvents = ['click', 'keydown', 'touchstart']
     for (const event of expectedEvents) {
       const call = removeEventListenerSpy.mock.calls.find((c: [string, EventListener]) => c[0] === event)
       expect(call).toBeDefined()
@@ -370,7 +376,7 @@ describe('DeferredCookieConsentBanner', () => {
 
     rerender(<DeferredCookieConsentBanner lang="en" direction={DirectionEnum.LTR} />)
 
-    const expectedEvents = ['scroll', 'click', 'keydown', 'touchstart']
+    const expectedEvents = ['click', 'keydown', 'touchstart']
     for (const event of expectedEvents) {
       const call = removeEventListenerSpy.mock.calls.find((c: [string, EventListener]) => c[0] === event)
       expect(call).toBeDefined()

@@ -21,6 +21,27 @@ export function generateMetadata(): Metadata {
 }
 
 /**
+ * Inline script that creates a default Trusted Types policy.
+ * Required when CSP includes `require-trusted-types-for 'script'` to
+ * prevent React's `dangerouslySetInnerHTML` from being blocked.
+ * The default policy is a pass-through that satisfies the Trusted Types
+ * requirement while maintaining compatibility with React internals.
+ */
+const trustedTypesScript = `
+  (function() {
+    try {
+      if (typeof window !== 'undefined' && window.trustedTypes && window.trustedTypes.createPolicy) {
+        window.trustedTypes.createPolicy('default', {
+          createHTML: function(s) { return s; },
+          createScript: function(s) { return s; },
+          createScriptURL: function(s) { return s; }
+        });
+      }
+    } catch (e) {}
+  })();
+`
+
+/**
  * Inline script that sets the correct lang and dir attributes on the
  * html element based on the URL pathname. Runs before React hydrates
  * to avoid a flash of incorrect language/direction.
@@ -73,6 +94,7 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: trustedTypesScript }} />
         <script dangerouslySetInnerHTML={{ __html: localeScript }} />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

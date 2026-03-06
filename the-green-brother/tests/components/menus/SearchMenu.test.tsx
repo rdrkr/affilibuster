@@ -403,9 +403,9 @@ describe('SearchMenu', () => {
     // First mouse enter
     fireEvent.mouseEnter(searchContainer)
 
-    // Advance partially through the expansion
+    // Advance to after dropdown is shown but before lock expires (100ms + 300ms + <100ms)
     act(() => {
-      jest.advanceTimersByTime(200)
+      jest.advanceTimersByTime(450)
     })
 
     // Mouse leave and re-enter quickly - should clear pending timeout

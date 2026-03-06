@@ -179,4 +179,16 @@ describe('FeaturedProductsSection', () => {
     )
     expect(container.firstChild).toBeNull()
   })
+
+  it('should render correctly in RTL direction', () => {
+    const { container } = render(
+      <FeaturedProductsSection
+        direction={DirectionEnum.RTL}
+        data={mockSectionDataWithProducts}
+        enableUserProfile={false}
+      />
+    )
+    const section = container.querySelector('section')
+    expect(section).toHaveAttribute('dir', 'rtl')
+  })
 })

@@ -73,7 +73,7 @@ export function NavigationGroup({ displayMode, position, children, className = '
     <div
       className={`
         relative z-10 col-start-1 row-start-1 flex shrink-0 items-center
-        text-sm font-semibold text-muted-foreground transition-all
+        text-sm font-semibold text-muted-foreground transition-colors
         duration-500
         ${position === 'end' ? 'justify-self-end' : 'justify-self-start'}
         ${className}

@@ -135,4 +135,16 @@ describe('ProductCertificatesSection', () => {
     const items = screen.getAllByTestId('grid-item')
     expect(items[0]).not.toHaveAttribute('data-icon')
   })
+
+  it('should handle certificate without a numeric id', () => {
+    const certWithoutId = {
+      ...mockCertificates[0],
+      id: undefined,
+    } as unknown as ApiProductCertificateProductCertificateDocument
+    render(
+      <ProductCertificatesSection direction={DirectionEnum.LTR} certificates={[certWithoutId]} header={mockHeader} />
+    )
+    const items = screen.getAllByTestId('grid-item')
+    expect(items).toHaveLength(1)
+  })
 })

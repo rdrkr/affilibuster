@@ -112,11 +112,27 @@ describe('RootLayout', () => {
     const head = getHeadElement(result)
     const headChildren = Children.toArray((head.props as { children: ReactNode }).children)
 
-    // Should have two script elements (locale + theme)
+    // Should have three script elements (trusted types + locale + theme)
     const scripts = headChildren.filter(
       (child): child is ReactElement => isValidElement(child) && child.type === 'script'
     )
-    expect(scripts).toHaveLength(2)
+    expect(scripts).toHaveLength(3)
+  })
+
+  it('should include trusted types policy script', () => {
+    const result = RootLayout({ children: <div>Test</div> })
+
+    const head = getHeadElement(result)
+    const headChildren = Children.toArray((head.props as { children: ReactNode }).children)
+    const scripts = headChildren.filter(
+      (child): child is ReactElement => isValidElement(child) && child.type === 'script'
+    )
+
+    const trustedTypesScript = (scripts[0]!.props as { dangerouslySetInnerHTML: { __html: string } })
+      .dangerouslySetInnerHTML.__html
+    expect(trustedTypesScript).toContain('trustedTypes')
+    expect(trustedTypesScript).toContain('createPolicy')
+    expect(trustedTypesScript).toContain('default')
   })
 
   it('should include locale detection script', () => {
@@ -128,7 +144,7 @@ describe('RootLayout', () => {
       (child): child is ReactElement => isValidElement(child) && child.type === 'script'
     )
 
-    const localeScript = (scripts[0]!.props as { dangerouslySetInnerHTML: { __html: string } }).dangerouslySetInnerHTML
+    const localeScript = (scripts[1]!.props as { dangerouslySetInnerHTML: { __html: string } }).dangerouslySetInnerHTML
       .__html
     expect(localeScript).toContain('window.location.pathname')
     expect(localeScript).toContain('document.documentElement.lang')
@@ -144,7 +160,7 @@ describe('RootLayout', () => {
       (child): child is ReactElement => isValidElement(child) && child.type === 'script'
     )
 
-    const themeScript = (scripts[1]!.props as { dangerouslySetInnerHTML: { __html: string } }).dangerouslySetInnerHTML
+    const themeScript = (scripts[2]!.props as { dangerouslySetInnerHTML: { __html: string } }).dangerouslySetInnerHTML
       .__html
     expect(themeScript).toContain('theme-preference')
     expect(themeScript).toContain('data-theme')

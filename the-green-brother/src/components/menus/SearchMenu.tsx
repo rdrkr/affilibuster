@@ -216,7 +216,7 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
     <div
       ref={searchRef}
       className={`
-        group relative flex items-center transition-all duration-300 ease-out
+        group relative flex items-center transition-[width] duration-300 ease-out
         ${isSearchOpen ? 'sm:w-76! md:w-86!' : ''}
       `}
       style={{
@@ -256,7 +256,7 @@ export function SearchMenu({ data, onExpandChange, showText, direction, navWidth
           className={`
             flex min-h-11.5 w-full items-center gap-1 overflow-hidden rounded-full
             border border-border bg-card/60 px-4 ring-1 ring-primary/50
-            transition-all duration-300
+            transition-[border-color,box-shadow] duration-300
             dark:border-white/20
           `}
         >

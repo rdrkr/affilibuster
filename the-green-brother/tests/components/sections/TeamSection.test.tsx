@@ -502,4 +502,24 @@ describe('TeamSection', () => {
     expect(screen.queryByText('CEO & Author')).not.toBeInTheDocument()
     expect(screen.queryByText('Author')).not.toBeInTheDocument()
   })
+
+  it('should render section with empty aria-label when ariaDescription is undefined', () => {
+    const dataWithoutAria = {
+      ...mockBaseData,
+      header: {
+        ...mockBaseData.header,
+        header: {
+          ...mockBaseData.header.header,
+          ariaDescription: undefined,
+        },
+      },
+    } as unknown as TeamSectionProps['data']
+
+    const { container } = render(
+      <TeamSection direction={DirectionEnum.LTR} data={dataWithoutAria} contributors={contributors} />
+    )
+    const section = container.querySelector('section')
+    expect(section).toBeInTheDocument()
+    expect(section).toHaveAttribute('aria-label', '')
+  })
 })

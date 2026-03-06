@@ -79,7 +79,7 @@ export function ShortcutsGrid({
     ? ''
     : `
       ${buttonSizeClasses[buttonSize]}
-      transition-all duration-300
+      transition-[transform,border-color,background-color] duration-300
       bg-card
       border border-border
       group-hover:scale-110 group-hover:border-primary-hover

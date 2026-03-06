@@ -230,11 +230,11 @@ describe('ImageGallery', () => {
       expect(screen.queryByTestId('gallery-prev-image')).not.toBeInTheDocument()
     })
 
-    it('should apply transition-all duration-300 to thumbnails for animated border', () => {
+    it('should apply transition-[border-color] duration-300 to thumbnails for animated border', () => {
       renderWithLayout(<ImageGallery images={mockImages} direction={DirectionEnum.LTR} />)
 
       const thumbnailButtons = screen.getAllByRole('button')
-      expect(thumbnailButtons[0]!).toHaveClass('transition-all')
+      expect(thumbnailButtons[0]!).toHaveClass('transition-[border-color]')
       expect(thumbnailButtons[0]!).toHaveClass('duration-300')
     })
   })

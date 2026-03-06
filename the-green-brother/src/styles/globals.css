@@ -24,6 +24,14 @@
 /* Wire dark: variant to data-theme attribute for manual theme toggling */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+@utility transition-nav-layout {
+  transition-property:
+    opacity, transform, width, min-width, max-width, padding, margin, color, background-color, border-color,
+    text-shadow, box-shadow, scale;
+  transition-timing-function: var(--tw-ease, cubic-bezier(0.4, 0, 0.2, 1));
+  transition-duration: var(--tw-duration, 300ms);
+}
+
 @layer base {
   :root {
     color-scheme: light;

@@ -19,14 +19,17 @@ import { PageClient } from '@/components/layout'
 export interface HomeClientProps {
   /** content to render inside the animated wrapper */
   children: ReactNode
+  /** Additional CSS classes passed to PageClient (e.g. to adjust spacing when hero is extracted) */
+  className?: string
 }
 
 /**
  * Homepage client wrapper that handles enter animations.
  * @param props - Component props
  * @param props.children - Content to render (HomeSections from server)
+ * @param props.className - Additional CSS classes for PageClient (e.g. spacing override)
  * @returns Animated wrapper div
  */
-export default function HomeClient({ children }: HomeClientProps) {
-  return <PageClient>{children}</PageClient>
+export default function HomeClient({ children, className }: HomeClientProps) {
+  return <PageClient className={className}>{children}</PageClient>
 }

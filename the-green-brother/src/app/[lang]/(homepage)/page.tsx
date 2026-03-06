@@ -72,19 +72,22 @@ async function HomePage({ params }: { params: Promise<{ lang: LanguageCode }> })
   const heroSection = homepageData.sections.find(s => s.__component === 'sections.hero')
   const heroSlot = heroSection ? <ServerHeroSection data={heroSection} direction={direction} /> : undefined
 
-  // Pass data to client component
+  // Render hero outside client boundary for optimal LCP:
+  // Server-rendered hero appears in initial HTML without waiting for JS hydration.
+  // When hero is present, increase HomeClient top margin to maintain gap-16 spacing.
   return (
     <>
       <JsonLdScript data={buildOrganizationJsonLd(siteName, siteUrl, logoUrl)} />
       <JsonLdScript data={buildWebSiteJsonLd(siteName, siteUrl)} />
-      <HomeClient>
+      {heroSlot && <div className="mt-8">{heroSlot}</div>}
+      <HomeClient className={heroSlot ? 'mt-16!' : ''}>
         <HomeSections
           sections={homepageData.sections}
           teamMembers={teamMembers}
           enableUserProfile={enableUserProfile}
           readTimeMinutesLabel={blogPageResponse.readTimeMinutesLabel}
           readArticleLabel={blogPageResponse.readArticleLabel}
-          heroSlot={heroSlot}
+          skipHero={!!heroSlot}
         />
       </HomeClient>
     </>

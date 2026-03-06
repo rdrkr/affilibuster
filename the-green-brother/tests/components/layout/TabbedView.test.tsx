@@ -385,7 +385,7 @@ describe('TabbedView', () => {
 
       const pill = screen.getByTestId('tab-pill-indicator')
       expect(pill).toBeInTheDocument()
-      expect(pill).toHaveClass('transition-all', 'duration-300', 'backdrop-blur-sm')
+      expect(pill).toHaveClass('transition-[transform,width]', 'duration-300', 'backdrop-blur-sm')
     })
 
     it('should render tab scroll container', () => {
