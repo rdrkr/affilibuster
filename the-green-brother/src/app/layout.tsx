@@ -4,8 +4,8 @@ import '@/styles/globals.css'
 import type { Metadata } from 'next'
 import { Heebo, Inter } from 'next/font/google'
 
-const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
-const heebo = Heebo({ subsets: ['hebrew', 'latin'], display: 'swap', variable: '--font-heebo' })
+const inter = Inter({ subsets: ['latin'], display: 'optional', variable: '--font-inter' })
+const heebo = Heebo({ subsets: ['hebrew', 'latin'], display: 'optional', variable: '--font-heebo' })
 
 /**
  * Generate base-level metadata for the application.

@@ -77,7 +77,7 @@ export function Navigation({
         lg:px-8
       `}
     >
-      <nav ref={navRef} className={`relative min-h-16 p-2`} aria-label="Main navigation">
+      <nav ref={navRef} className={`relative h-16 p-2`} aria-label="Main navigation">
         {/* Background layer with blur effect */}
         <div className={`absolute inset-0 ${frostedGlassStyle}`} aria-hidden="true" />
 

@@ -115,7 +115,7 @@ async function LocaleLayout({ children, params }: Props) {
                   />
                 )}
 
-                <main className="grow px-4 sm:px-6 lg:px-8">{children}</main>
+                <main className="grow border-t border-t-transparent px-4 sm:px-6 lg:px-8">{children}</main>
 
                 <Footer lang={lang} direction={direction} />
               </div>

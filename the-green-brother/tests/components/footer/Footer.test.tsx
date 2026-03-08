@@ -33,6 +33,18 @@ jest.mock('@/components/elements', () => ({
       </div>
     )
   },
+  DynamicTextBlock: function MockDynamicTextBlock({
+    data,
+  }: {
+    data: { header?: { header?: { text?: string } }; content?: string }
+  }) {
+    return (
+      <div data-testid="text-block">
+        {data.header?.header?.text && <h5>{data.header.header.text}</h5>}
+        {data.content && <div>{data.content}</div>}
+      </div>
+    )
+  },
 }))
 
 // Mock CookieSettingsAction

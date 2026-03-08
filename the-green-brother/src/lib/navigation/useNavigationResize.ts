@@ -199,7 +199,7 @@ export function useNavigationResize(): UseNavigationResizeReturn {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false)
   const [startHasIcons, setStartHasIcons] = useState(true)
   const [endHasIcons, setEndHasIcons] = useState(true)
-  const [isReady, setIsReady] = useState(false)
+  const [isReady, setIsReady] = useState(true)
 
   // Use ref to track search expanded state for ResizeObserver
   // (avoids recreating observer on state changes)

@@ -11,7 +11,7 @@
 import type { ReactNode } from 'react'
 
 import { CookieSettingsAction } from '@/components/consent'
-import { ButtonLink, Label, Text, TextBlock } from '@/components/elements'
+import { ButtonLink, DynamicTextBlock, Label, Text } from '@/components/elements'
 import { DynamicZone } from '@/components/layout/DynamicZone'
 import { getFooter } from '@/lib/content/api'
 import type { ApiFooterFooterDocument, DirectionEnum } from '@/lib/generated/types.gen'
@@ -61,7 +61,7 @@ export default async function Footer({ lang, direction }: FooterProps) {
     switch (column.__component) {
       case 'elements.text-block': {
         return (
-          <TextBlock
+          <DynamicTextBlock
             key={column.id ?? index}
             data={column}
             direction={direction}
