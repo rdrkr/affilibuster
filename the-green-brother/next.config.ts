@@ -131,23 +131,23 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: '/:path*',
+        source: '/(.*)',
         headers: [
           {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
+              "object-src 'none'",
               "script-src 'self' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://res.cloudinary.com",
               "connect-src 'self' https://*.thegreenbrother.com",
-              "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
               "frame-ancestors 'none'",
-              'trusted-types default',
               "require-trusted-types-for 'script'",
+              'trusted-types default',
             ].join('; '),
           },
           {

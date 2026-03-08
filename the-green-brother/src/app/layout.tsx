@@ -9,14 +9,18 @@ const heebo = Heebo({ subsets: ['hebrew', 'latin'], display: 'swap', variable: '
 
 /**
  * Generate base-level metadata for the application.
- * Only includes metadataBase and manifest; per-page metadata is handled
- * by the [lang] layout and individual page generateMetadata functions.
- * @returns Metadata object with metadataBase and manifest
+ * Includes metadataBase, manifest, and a base description from environment.
+ * The description is set here (synchronous) so it appears in the initial
+ * HTML {@link https://developer.chrome.com/docs/lighthouse/seo/meta-description/ | <head>}
+ * before async child generateMetadata functions stream their overrides.
+ * Per-page metadata is handled by the [lang] layout and individual pages.
+ * @returns Metadata object with metadataBase, manifest, and base description
  */
 export function generateMetadata(): Metadata {
   return {
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
     manifest: '/manifest.webmanifest',
+    ...(process.env.NEXT_PUBLIC_SITE_DESCRIPTION ? { description: process.env.NEXT_PUBLIC_SITE_DESCRIPTION } : {}),
   }
 }
 

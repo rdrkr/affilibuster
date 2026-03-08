@@ -200,6 +200,5 @@ describe('generateMetadata', () => {
     const metadata = generateMetadata()
 
     expect(metadata.title).toBeUndefined()
-    expect(metadata.description).toBeUndefined()
   })
 })

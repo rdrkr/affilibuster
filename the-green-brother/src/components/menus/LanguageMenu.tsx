@@ -87,12 +87,14 @@ export function LanguageMenu({
   // Icon with badge overlay component
   const iconWithBadge = label?.icon ? (
     <span className="relative">
-      <Icon icon={label.icon} size="md" className={`mr-1.5`} />
-      {/* Badge positioned at bottom-right of icon */}
+      <Icon icon={label.icon} size="md" className={`m-1.5`} />
+      {/* Badge positioned at bottom-right of icon — aria-hidden because the
+          language is already conveyed by the button's accessible name */}
       <span
+        aria-hidden="true"
         className={`
-          pointer-events-none absolute right-0.5 bottom-0 flex min-w-[14px]
-          items-center justify-center rounded-sm bg-primary text-[9px] leading-none
+          pointer-events-none absolute right-0.5 bottom-1 flex min-w-[14px] items-center
+          justify-center rounded-sm bg-primary p-0.5 text-[8px] leading-none
           font-bold text-foreground-light transition-colors group-hover:bg-muted-foreground
           group-hover:text-foreground-reversed group-active:bg-foreground
         `}
