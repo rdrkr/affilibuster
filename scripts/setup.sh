@@ -219,9 +219,21 @@ cd backend
 uv sync --quiet
 cd ..
 
+# Install shared frontend package dependencies
+echo "  🧰 Installing frontend package dependencies..."
+cd frontend
+npm install --silent
+cd ..
+
 # Install the-green-brother dependencies
 echo "  🧰 Installing the-green-brother dependencies..."
 cd the-green-brother
+npm install --silent
+cd ..
+
+# Install gentle-hawk dependencies
+echo "  🧰 Installing gentle-hawk dependencies..."
+cd gentle-hawk
 npm install --silent
 cd ..
 

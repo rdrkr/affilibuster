@@ -4526,6 +4526,560 @@ class ContactUsGetResponse(BaseModel):
     """
 
 
+class Attributes(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["media"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    multiple: bool
+    required: bool | None = None
+    allowed_types: list[str] | None = Field(None, alias="allowedTypes")
+
+
+class Attributes1(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["relation"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    relation: str
+    target: str
+    target_attribute: str | None = Field(..., alias="targetAttribute")
+    auto_populate: bool | None = Field(None, alias="autoPopulate")
+    mapped_by: str | None = Field(None, alias="mappedBy")
+    inversed_by: str | None = Field(None, alias="inversedBy")
+
+
+class Attributes2(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["component"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    component: str
+    repeatable: bool
+    required: bool | None = None
+    min: float | None = None
+    max: float | None = None
+
+
+class Attributes3(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["dynamiczone"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    components: list[str]
+    required: bool | None = None
+    min: float | None = None
+    max: float | None = None
+
+
+class Attributes4(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["uid"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    target_field: str | None = Field(None, alias="targetField")
+
+
+class Attributes5(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: str
+    required: bool | None = None
+    unique: bool | None = None
+    default: Any | None = None
+    min: float | str | None = None
+    max: float | str | None = None
+    min_length: float | None = Field(None, alias="minLength")
+    max_length: float | None = Field(None, alias="maxLength")
+    enum: list[str] | None = None
+    regex: str | None = None
+    private: bool | None = None
+    configurable: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+
+
+class Schema(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    display_name: str = Field(..., alias="displayName")
+    description: str
+    icon: str | None = None
+    connection: str | None = None
+    collection_name: str | None = Field(None, alias="collectionName")
+    attributes: dict[str, Attributes | Attributes1 | Attributes2 | Attributes3 | Attributes4 | Attributes5]
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+
+
+class Datum3(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    uid: str
+    category: str
+    api_id: str = Field(..., alias="apiId")
+    schema_: Schema = Field(..., alias="schema")
+
+
+class ContentTypeBuilderComponentsGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: list[Datum3]
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
+class Attributes6(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["media"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    multiple: bool
+    required: bool | None = None
+    allowed_types: list[str] | None = Field(None, alias="allowedTypes")
+
+
+class Attributes7(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["relation"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    relation: str
+    target: str
+    target_attribute: str | None = Field(..., alias="targetAttribute")
+    auto_populate: bool | None = Field(None, alias="autoPopulate")
+    mapped_by: str | None = Field(None, alias="mappedBy")
+    inversed_by: str | None = Field(None, alias="inversedBy")
+
+
+class Attributes8(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["component"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    component: str
+    repeatable: bool
+    required: bool | None = None
+    min: float | None = None
+    max: float | None = None
+
+
+class Attributes9(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["dynamiczone"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    components: list[str]
+    required: bool | None = None
+    min: float | None = None
+    max: float | None = None
+
+
+class Attributes10(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["uid"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    target_field: str | None = Field(None, alias="targetField")
+
+
+class Attributes11(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: str
+    required: bool | None = None
+    unique: bool | None = None
+    default: Any | None = None
+    min: float | str | None = None
+    max: float | str | None = None
+    min_length: float | None = Field(None, alias="minLength")
+    max_length: float | None = Field(None, alias="maxLength")
+    enum: list[str] | None = None
+    regex: str | None = None
+    private: bool | None = None
+    configurable: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+
+
+class Schema1(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    display_name: str = Field(..., alias="displayName")
+    description: str
+    icon: str | None = None
+    connection: str | None = None
+    collection_name: str | None = Field(None, alias="collectionName")
+    attributes: dict[str, Attributes6 | Attributes7 | Attributes8 | Attributes9 | Attributes10 | Attributes11]
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+
+
+class Data9(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    uid: str
+    category: str
+    api_id: str = Field(..., alias="apiId")
+    schema_: Schema1 = Field(..., alias="schema")
+
+
+class ContentTypeBuilderComponentsUidGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data9
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
+class Kind(StrEnum):
+    COLLECTION_TYPE = "collectionType"
+    SINGLE_TYPE = "singleType"
+
+
+class ContentTypeBuilderContentTypesGetParametersQuery(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    kind: Kind
+
+
+class Attributes12(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["media"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    multiple: bool
+    required: bool | None = None
+    allowed_types: list[str] | None = Field(None, alias="allowedTypes")
+
+
+class Attributes13(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["relation"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    relation: str
+    target: str
+    target_attribute: str | None = Field(..., alias="targetAttribute")
+    auto_populate: bool | None = Field(None, alias="autoPopulate")
+    mapped_by: str | None = Field(None, alias="mappedBy")
+    inversed_by: str | None = Field(None, alias="inversedBy")
+
+
+class Attributes14(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["component"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    component: str
+    repeatable: bool
+    required: bool | None = None
+    min: float | None = None
+    max: float | None = None
+
+
+class Attributes15(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["dynamiczone"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    components: list[str]
+    required: bool | None = None
+    min: float | None = None
+    max: float | None = None
+
+
+class Attributes16(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["uid"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    target_field: str | None = Field(None, alias="targetField")
+
+
+class Attributes17(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: str
+    required: bool | None = None
+    unique: bool | None = None
+    default: Any | None = None
+    min: float | str | None = None
+    max: float | str | None = None
+    min_length: float | None = Field(None, alias="minLength")
+    max_length: float | None = Field(None, alias="maxLength")
+    enum: list[str] | None = None
+    regex: str | None = None
+    private: bool | None = None
+    configurable: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+
+
+class Schema2(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    display_name: str = Field(..., alias="displayName")
+    singular_name: str = Field(..., alias="singularName")
+    plural_name: str = Field(..., alias="pluralName")
+    description: str
+    draft_and_publish: bool = Field(..., alias="draftAndPublish")
+    kind: Kind
+    collection_name: str | None = Field(None, alias="collectionName")
+    attributes: dict[str, Attributes12 | Attributes13 | Attributes14 | Attributes15 | Attributes16 | Attributes17]
+    visible: bool
+    restrict_relations_to: list[str] | None = Field(..., alias="restrictRelationsTo")
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    options: dict[str, Any] | None = None
+    review_workflows: bool | None = Field(None, alias="reviewWorkflows")
+    populate_creator_fields: bool | None = Field(None, alias="populateCreatorFields")
+    comment: str | None = None
+    version: str | None = None
+
+
+class Datum4(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    uid: str
+    plugin: str | None = None
+    api_id: str = Field(..., alias="apiID")
+    schema_: Schema2 = Field(..., alias="schema")
+
+
+class ContentTypeBuilderContentTypesGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: list[Datum4]
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
+class Attributes18(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["media"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    multiple: bool
+    required: bool | None = None
+    allowed_types: list[str] | None = Field(None, alias="allowedTypes")
+
+
+class Attributes19(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["relation"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    relation: str
+    target: str
+    target_attribute: str | None = Field(..., alias="targetAttribute")
+    auto_populate: bool | None = Field(None, alias="autoPopulate")
+    mapped_by: str | None = Field(None, alias="mappedBy")
+    inversed_by: str | None = Field(None, alias="inversedBy")
+
+
+class Attributes20(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["component"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    component: str
+    repeatable: bool
+    required: bool | None = None
+    min: float | None = None
+    max: float | None = None
+
+
+class Attributes21(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["dynamiczone"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    components: list[str]
+    required: bool | None = None
+    min: float | None = None
+    max: float | None = None
+
+
+class Attributes22(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: Literal["uid"]
+    configurable: Literal[False] = False
+    private: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    target_field: str | None = Field(None, alias="targetField")
+
+
+class Attributes23(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    type: str
+    required: bool | None = None
+    unique: bool | None = None
+    default: Any | None = None
+    min: float | str | None = None
+    max: float | str | None = None
+    min_length: float | None = Field(None, alias="minLength")
+    max_length: float | None = Field(None, alias="maxLength")
+    enum: list[str] | None = None
+    regex: str | None = None
+    private: bool | None = None
+    configurable: bool | None = None
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+
+
+class Schema3(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    display_name: str = Field(..., alias="displayName")
+    singular_name: str = Field(..., alias="singularName")
+    plural_name: str = Field(..., alias="pluralName")
+    description: str
+    draft_and_publish: bool = Field(..., alias="draftAndPublish")
+    kind: Kind
+    collection_name: str | None = Field(None, alias="collectionName")
+    attributes: dict[str, Attributes18 | Attributes19 | Attributes20 | Attributes21 | Attributes22 | Attributes23]
+    visible: bool
+    restrict_relations_to: list[str] | None = Field(..., alias="restrictRelationsTo")
+    plugin_options: dict[str, Any] | None = Field(None, alias="pluginOptions")
+    options: dict[str, Any] | None = None
+    review_workflows: bool | None = Field(None, alias="reviewWorkflows")
+    populate_creator_fields: bool | None = Field(None, alias="populateCreatorFields")
+    comment: str | None = None
+    version: str | None = None
+
+
+class Data10(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    uid: str
+    plugin: str | None = None
+    api_id: str = Field(..., alias="apiID")
+    schema_: Schema3 = Field(..., alias="schema")
+
+
+class ContentTypeBuilderContentTypesUidGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data10
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
 class Field12(StrEnum):
     ROLE_ID = "roleId"
     NAME = "name"
@@ -4677,7 +5231,7 @@ class ContributorRolesGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Datum3(BaseModel):
+class Datum5(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -4722,7 +5276,7 @@ class ContributorRolesGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: list[Datum3]
+    data: list[Datum5]
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -4786,7 +5340,7 @@ class ContributorRolesIdGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data9(BaseModel):
+class Data11(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -4831,7 +5385,7 @@ class ContributorRolesIdGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data9
+    data: Data11
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -5072,7 +5626,7 @@ class ContributorsGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Datum4(BaseModel):
+class Datum6(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -5163,7 +5717,7 @@ class ContributorsGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: list[Datum4]
+    data: list[Datum6]
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -5294,7 +5848,7 @@ class ContributorsSlugSlugGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data10(BaseModel):
+class Data12(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -5385,7 +5939,7 @@ class ContributorsSlugSlugGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data10
+    data: Data12
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -5516,7 +6070,7 @@ class ContributorsIdGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data11(BaseModel):
+class Data13(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -5607,7 +6161,7 @@ class ContributorsIdGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data11
+    data: Data13
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -5650,7 +6204,7 @@ class CookiePolicyGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data12(BaseModel):
+class Data14(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -5695,7 +6249,7 @@ class CookiePolicyGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data12
+    data: Data14
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -5923,7 +6477,7 @@ class CurrenciesGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Datum5(BaseModel):
+class Datum7(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -5996,7 +6550,7 @@ class CurrenciesGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: list[Datum5]
+    data: list[Datum7]
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -6118,7 +6672,7 @@ class CurrenciesIdGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data13(BaseModel):
+class Data15(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -6191,7 +6745,7 @@ class CurrenciesIdGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data13
+    data: Data15
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -6234,7 +6788,7 @@ class Error404GetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data14(BaseModel):
+class Data16(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -6279,7 +6833,7 @@ class Error404GetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data14
+    data: Data16
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -6315,7 +6869,7 @@ class Error410GetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data15(BaseModel):
+class Data17(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -6360,7 +6914,7 @@ class Error410GetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data15
+    data: Data17
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -6425,7 +6979,7 @@ class FaqGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data16(BaseModel):
+class Data18(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -6486,7 +7040,7 @@ class FaqGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data16
+    data: Data18
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -6685,7 +7239,7 @@ class FeatureFlagsGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Datum6(BaseModel):
+class Datum8(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -6734,7 +7288,7 @@ class FeatureFlagsGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: list[Datum6]
+    data: list[Datum8]
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -6835,7 +7389,7 @@ class FeatureFlagsIdGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data17(BaseModel):
+class Data19(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -6884,215 +7438,10 @@ class FeatureFlagsIdGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data17
+    data: Data19
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
-    """
-
-
-class Pagination121(BaseModel):
-    """Page-based pagination."""
-
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    page: int = Field(..., gt=0, le=9007199254740991)
-    """
-    Page number (1-based)
-    """
-    page_size: int = Field(..., alias="pageSize", gt=0, le=9007199254740991)
-    """
-    Number of entries per page
-    """
-
-
-class Pagination122(BaseModel):
-    """Offset-based pagination."""
-
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    start: int = Field(..., ge=0, le=9007199254740991)
-    """
-    Number of entries to skip
-    """
-    limit: int = Field(..., gt=0, le=9007199254740991)
-    """
-    Maximum number of entries to return
-    """
-
-
-class Pagination123(BaseModel):
-    """Pagination parameters."""
-
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-    with_count: bool | None = Field(None, alias="withCount")
-    """
-    Include total count in response
-    """
-
-
-class Pagination124(Pagination121, Pagination123):
-    """Pagination parameters."""
-
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-
-
-class Pagination125(Pagination122, Pagination123):
-    """Pagination parameters."""
-
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-
-
-class Pagination12(RootModel[Pagination124 | Pagination125]):
-    """Pagination parameters."""
-
-    root: Pagination124 | Pagination125
-    """
-    Pagination parameters
-    """
-
-
-class FilesGetParametersQuery(BaseModel):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-    fields: str | list[str] | None = None
-    """
-    Select specific fields to return in the response
-    """
-    sort: str | list[str] | dict[str, Sort46] | list[dict[str, Sort46]] | None = None
-    """
-    Sort the results by specified fields
-    """
-    pagination: Pagination12 | None = Field(default_factory=Pagination12)
-    """
-    Pagination parameters
-    """
-    filters: dict[str, Any] | None = None
-    """
-    Apply filters to the query
-    """
-    custom_populate: str | None = Field("nested", alias="customPopulate")
-    custom_depth: int | None = Field(None, alias="customDepth")
-    custom_ignored: list[str] | None = Field(None, alias="customIgnored")
-
-
-class FilesGetResponseItem(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    id: int = Field(..., gt=0, le=9007199254740991)
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    name: str
-    alternative_text: str | None = Field(None, alias="alternativeText")
-    caption: str | None = None
-    width: int | None = Field(None, ge=-9007199254740991, le=9007199254740991)
-    height: int | None = Field(None, ge=-9007199254740991, le=9007199254740991)
-    formats: dict[str, Any] | None = None
-    hash: str
-    ext: str | None = None
-    mime: str
-    size: float
-    url: str
-    preview_url: str | None = Field(None, alias="previewUrl")
-    folder: float | None = None
-    folder_path: str | None = Field(None, alias="folderPath")
-    provider: str
-    provider_metadata: dict[str, Any] | None = None
-    created_at: str = Field(..., alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str = Field(..., alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    created_by: float | None = Field(None, alias="createdBy")
-    updated_by: float | None = Field(None, alias="updatedBy")
-    published_at: AwareDatetime | None = Field(None, alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    is_url_signed: bool | None = Field(None, alias="isUrlSigned")
-    """
-    Whether the file URL is signed (for private files)
-    """
-
-
-class FilesGetResponse(RootModel[list[FilesGetResponseItem]]):
-    root: list[FilesGetResponseItem]
-
-
-class FilesIdGetParametersQuery(BaseModel):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-    fields: str | list[str] | None = None
-    """
-    Select specific fields to return in the response
-    """
-    custom_populate: str | None = Field("nested", alias="customPopulate")
-    custom_depth: int | None = Field(None, alias="customDepth")
-    custom_ignored: list[str] | None = Field(None, alias="customIgnored")
-
-
-class FilesIdGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    id: int = Field(..., gt=0, le=9007199254740991)
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    name: str
-    alternative_text: str | None = Field(None, alias="alternativeText")
-    caption: str | None = None
-    width: int | None = Field(None, ge=-9007199254740991, le=9007199254740991)
-    height: int | None = Field(None, ge=-9007199254740991, le=9007199254740991)
-    formats: dict[str, Any] | None = None
-    hash: str
-    ext: str | None = None
-    mime: str
-    size: float
-    url: str
-    preview_url: str | None = Field(None, alias="previewUrl")
-    folder: float | None = None
-    folder_path: str | None = Field(None, alias="folderPath")
-    provider: str
-    provider_metadata: dict[str, Any] | None = None
-    created_at: str = Field(..., alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str = Field(..., alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    created_by: float | None = Field(None, alias="createdBy")
-    updated_by: float | None = Field(None, alias="updatedBy")
-    published_at: AwareDatetime | None = Field(None, alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    is_url_signed: bool | None = Field(None, alias="isUrlSigned")
-    """
-    Whether the file URL is signed (for private files)
     """
 
 
@@ -7166,7 +7515,7 @@ class Columns5(RootModel[Columns1 | Columns7 | Columns8 | Columns9]):
     root: Columns1 | Columns7 | Columns8 | Columns9 = Field(..., discriminator="field__component")
 
 
-class Data18(BaseModel):
+class Data20(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -7219,7 +7568,7 @@ class FooterGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data18
+    data: Data20
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -7345,6 +7694,37 @@ class Sections43(CallToActionsNewsletterSignupCtaEntry):
     """
 
 
+class I18nLocalesGetResponseItem(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    id: int = Field(..., gt=0, le=9007199254740991)
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    name: str
+    code: str = Field(..., max_length=2, min_length=2)
+    created_at: str = Field(..., alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str = Field(..., alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: str | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    is_default: bool = Field(..., alias="isDefault")
+
+
+class I18nLocalesGetResponse(RootModel[list[I18nLocalesGetResponseItem]]):
+    root: list[I18nLocalesGetResponseItem]
+
+
 class LanguagesGetResponse(RootModel[list[Language]]):
     root: list[Language]
 
@@ -7441,7 +7821,7 @@ class PrivacyGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data21(BaseModel):
+class Data23(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -7486,7 +7866,7 @@ class PrivacyGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data21
+    data: Data23
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -7495,6 +7875,493 @@ class PrivacyGetResponse(BaseModel):
 
 class Field29(StrEnum):
     SLUG = "slug"
+    CREATED_AT = "createdAt"
+    UPDATED_AT = "updatedAt"
+    PUBLISHED_AT = "publishedAt"
+    LOCALE = "locale"
+
+
+class Pagination121(BaseModel):
+    """Page-based pagination."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    page: int = Field(..., gt=0, le=9007199254740991)
+    """
+    Page number (1-based)
+    """
+    page_size: int = Field(..., alias="pageSize", gt=0, le=9007199254740991)
+    """
+    Number of entries per page
+    """
+
+
+class Pagination122(BaseModel):
+    """Offset-based pagination."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    start: int = Field(..., ge=0, le=9007199254740991)
+    """
+    Number of entries to skip
+    """
+    limit: int = Field(..., gt=0, le=9007199254740991)
+    """
+    Maximum number of entries to return
+    """
+
+
+class Pagination123(BaseModel):
+    """Pagination parameters."""
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    with_count: bool | None = Field(None, alias="withCount")
+    """
+    Include total count in response
+    """
+
+
+class Pagination124(Pagination121, Pagination123):
+    """Pagination parameters."""
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+
+
+class Pagination125(Pagination122, Pagination123):
+    """Pagination parameters."""
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+
+
+class Pagination12(RootModel[Pagination124 | Pagination125]):
+    """Pagination parameters."""
+
+    root: Pagination124 | Pagination125
+    """
+    Pagination parameters
+    """
+
+
+class Sort48(StrEnum):
+    """Sort the result."""
+
+    SLUG = "slug"
+    CREATED_AT = "createdAt"
+    UPDATED_AT = "updatedAt"
+    PUBLISHED_AT = "publishedAt"
+    LOCALE = "locale"
+
+
+class SortEnum16(StrEnum):
+    SLUG = "slug"
+    CREATED_AT = "createdAt"
+    UPDATED_AT = "updatedAt"
+    PUBLISHED_AT = "publishedAt"
+    LOCALE = "locale"
+
+
+class Sort49(StrEnum):
+    ASC = "asc"
+    DESC = "desc"
+
+
+class ProductCategoriesGetParametersQuery(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    fields: list[Field29] | None = Field(None, examples=[["slug", "createdAt", "updatedAt"]])
+    """
+    The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+    """
+    filters: dict[Literal["createdAt", "locale", "localizations", "publishedAt", "slug", "updatedAt"], Any] | None = (
+        None
+    )
+    """
+    Filters to apply to the query
+    """
+    field_q: str | None = Field(None, alias="_q", examples=["search terms"])
+    pagination: Pagination12 | None = Field(default_factory=Pagination12)
+    """
+    Pagination parameters
+    """
+    sort: (
+        Sort48
+        | list[SortEnum16]
+        | dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort49]
+        | list[dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort49]]
+        | None
+    ) = Field(None, examples=["slug"])
+    """
+    Sort the result
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    Select a locale
+    """
+    status: Status1 | None = Field(None, examples=["published"])
+    """
+    Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
+    custom_populate: str | None = Field("nested", alias="customPopulate")
+    custom_depth: int | None = Field(None, alias="customDepth")
+    custom_ignored: list[str] | None = Field(None, alias="customIgnored")
+
+
+class Datum9(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsLabelEntry
+    """
+    A component field
+    """
+    image: PluginUploadFileDocument
+    """
+    A media field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ProductCategoriesGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: list[Datum9]
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
+class Field30(StrEnum):
+    BY_SELLER_TEXT = "bySellerText"
+    CREATED_AT = "createdAt"
+    UPDATED_AT = "updatedAt"
+    PUBLISHED_AT = "publishedAt"
+    LOCALE = "locale"
+
+
+class ProductCategoriesPageGetParametersQuery(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    fields: list[Field30] | None = Field(None, examples=[["bySellerText", "createdAt", "updatedAt"]])
+    """
+    The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+    """
+    filters: (
+        dict[Literal["bySellerText", "createdAt", "locale", "localizations", "publishedAt", "updatedAt"], Any] | None
+    ) = None
+    """
+    Filters to apply to the query
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    Select a locale
+    """
+    status: Status1 | None = Field(None, examples=["published"])
+    """
+    Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
+    custom_populate: str | None = Field("nested", alias="customPopulate")
+    custom_depth: int | None = Field(None, alias="customDepth")
+    custom_ignored: list[str] | None = Field(None, alias="customIgnored")
+
+
+class Field31(StrEnum):
+    SLUG = "slug"
+    CREATED_AT = "createdAt"
+    UPDATED_AT = "updatedAt"
+    PUBLISHED_AT = "publishedAt"
+    LOCALE = "locale"
+
+
+class Sort51(StrEnum):
+    """Sort the result."""
+
+    SLUG = "slug"
+    CREATED_AT = "createdAt"
+    UPDATED_AT = "updatedAt"
+    PUBLISHED_AT = "publishedAt"
+    LOCALE = "locale"
+
+
+class Sort52(StrEnum):
+    ASC = "asc"
+    DESC = "desc"
+
+
+class ProductCategoriesSlugSlugGetParametersQuery(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    fields: list[Field31] | None = Field(None, examples=[["slug", "createdAt", "updatedAt"]])
+    """
+    The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+    """
+    filters: dict[Literal["createdAt", "locale", "localizations", "publishedAt", "slug", "updatedAt"], Any] | None = (
+        None
+    )
+    """
+    Filters to apply to the query
+    """
+    sort: (
+        Sort51
+        | list[SortEnum16]
+        | dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort52]
+        | list[dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort52]]
+        | None
+    ) = Field(None, examples=["slug"])
+    """
+    Sort the result
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    Select a locale
+    """
+    status: Status1 | None = Field(None, examples=["published"])
+    """
+    Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
+    custom_populate: str | None = Field("nested", alias="customPopulate")
+    custom_depth: int | None = Field(None, alias="customDepth")
+    custom_ignored: list[str] | None = Field(None, alias="customIgnored")
+
+
+class Data25(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsLabelEntry
+    """
+    A component field
+    """
+    image: PluginUploadFileDocument
+    """
+    A media field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ProductCategoriesSlugSlugGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data25
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
+class Sort54(StrEnum):
+    """Sort the result."""
+
+    SLUG = "slug"
+    CREATED_AT = "createdAt"
+    UPDATED_AT = "updatedAt"
+    PUBLISHED_AT = "publishedAt"
+    LOCALE = "locale"
+
+
+class Sort55(StrEnum):
+    ASC = "asc"
+    DESC = "desc"
+
+
+class ProductCategoriesIdGetParametersQuery(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    fields: list[Field31] | None = Field(None, examples=[["slug", "createdAt", "updatedAt"]])
+    """
+    The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+    """
+    filters: dict[Literal["createdAt", "locale", "localizations", "publishedAt", "slug", "updatedAt"], Any] | None = (
+        None
+    )
+    """
+    Filters to apply to the query
+    """
+    sort: (
+        Sort54
+        | list[SortEnum16]
+        | dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort55]
+        | list[dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort55]]
+        | None
+    ) = Field(None, examples=["slug"])
+    """
+    Sort the result
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    Select a locale
+    """
+    status: Status1 | None = Field(None, examples=["published"])
+    """
+    Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
+    custom_populate: str | None = Field("nested", alias="customPopulate")
+    custom_depth: int | None = Field(None, alias="customDepth")
+    custom_ignored: list[str] | None = Field(None, alias="customIgnored")
+
+
+class Data26(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    slug: str
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsLabelEntry
+    """
+    A component field
+    """
+    image: PluginUploadFileDocument
+    """
+    A media field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ProductCategoriesIdGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data26
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
+class Field33(StrEnum):
+    CERTIFICATE_ID = "certificateId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -7572,40 +8439,40 @@ class Pagination13(RootModel[Pagination134 | Pagination135]):
     """
 
 
-class Sort50(StrEnum):
+class Sort57(StrEnum):
     """Sort the result."""
 
-    SLUG = "slug"
+    CERTIFICATE_ID = "certificateId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
     LOCALE = "locale"
 
 
-class SortEnum16(StrEnum):
-    SLUG = "slug"
+class SortEnum19(StrEnum):
+    CERTIFICATE_ID = "certificateId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
     LOCALE = "locale"
 
 
-class Sort51(StrEnum):
+class Sort58(StrEnum):
     ASC = "asc"
     DESC = "desc"
 
 
-class ProductCategoriesGetParametersQuery(BaseModel):
+class ProductCertificatesGetParametersQuery(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
     )
-    fields: list[Field29] | None = Field(None, examples=[["slug", "createdAt", "updatedAt"]])
+    fields: list[Field33] | None = Field(None, examples=[["certificateId", "createdAt", "updatedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
-    filters: dict[Literal["createdAt", "locale", "localizations", "publishedAt", "slug", "updatedAt"], Any] | None = (
-        None
-    )
+    filters: (
+        dict[Literal["certificateId", "createdAt", "locale", "localizations", "publishedAt", "updatedAt"], Any] | None
+    ) = None
     """
     Filters to apply to the query
     """
@@ -7615,12 +8482,12 @@ class ProductCategoriesGetParametersQuery(BaseModel):
     Pagination parameters
     """
     sort: (
-        Sort50
-        | list[SortEnum16]
-        | dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort51]
-        | list[dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort51]]
+        Sort57
+        | list[SortEnum19]
+        | dict[Literal["certificateId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort58]
+        | list[dict[Literal["certificateId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort58]]
         | None
-    ) = Field(None, examples=["slug"])
+    ) = Field(None, examples=["certificateId"])
     """
     Sort the result
     """
@@ -7641,7 +8508,7 @@ class ProductCategoriesGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Datum7(BaseModel):
+class Datum10(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -7651,7 +8518,7 @@ class Datum7(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
-    slug: str
+    certificate_id: str = Field(..., alias="certificateId")
     """
     A UID field
     """
@@ -7671,13 +8538,9 @@ class Datum7(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    content: ElementsLabelEntry
+    certificate: ElementsLabelEntry
     """
     A component field
-    """
-    image: PluginUploadFileDocument
-    """
-    A media field
     """
     seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
@@ -7689,101 +8552,54 @@ class Datum7(BaseModel):
     """
 
 
-class ProductCategoriesGetResponse(BaseModel):
+class ProductCertificatesGetResponse(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
     )
-    data: list[Datum7]
+    data: list[Datum10]
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
     """
 
 
-class Field30(StrEnum):
-    BY_SELLER_TEXT = "bySellerText"
+class Sort60(StrEnum):
+    """Sort the result."""
+
+    CERTIFICATE_ID = "certificateId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
     LOCALE = "locale"
 
 
-class ProductCategoriesPageGetParametersQuery(BaseModel):
+class Sort61(StrEnum):
+    ASC = "asc"
+    DESC = "desc"
+
+
+class ProductCertificatesIdGetParametersQuery(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
     )
-    fields: list[Field30] | None = Field(None, examples=[["bySellerText", "createdAt", "updatedAt"]])
+    fields: list[Field33] | None = Field(None, examples=[["certificateId", "createdAt", "updatedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
     filters: (
-        dict[Literal["bySellerText", "createdAt", "locale", "localizations", "publishedAt", "updatedAt"], Any] | None
+        dict[Literal["certificateId", "createdAt", "locale", "localizations", "publishedAt", "updatedAt"], Any] | None
     ) = None
     """
     Filters to apply to the query
     """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    Select a locale
-    """
-    status: Status1 | None = Field(None, examples=["published"])
-    """
-    Fetch documents based on their status. Default to "published" if not specified.
-    """
-    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
-    """
-    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
-    """
-    custom_populate: str | None = Field("nested", alias="customPopulate")
-    custom_depth: int | None = Field(None, alias="customDepth")
-    custom_ignored: list[str] | None = Field(None, alias="customIgnored")
-
-
-class Field31(StrEnum):
-    SLUG = "slug"
-    CREATED_AT = "createdAt"
-    UPDATED_AT = "updatedAt"
-    PUBLISHED_AT = "publishedAt"
-    LOCALE = "locale"
-
-
-class Sort53(StrEnum):
-    """Sort the result."""
-
-    SLUG = "slug"
-    CREATED_AT = "createdAt"
-    UPDATED_AT = "updatedAt"
-    PUBLISHED_AT = "publishedAt"
-    LOCALE = "locale"
-
-
-class Sort54(StrEnum):
-    ASC = "asc"
-    DESC = "desc"
-
-
-class ProductCategoriesSlugSlugGetParametersQuery(BaseModel):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-    fields: list[Field31] | None = Field(None, examples=[["slug", "createdAt", "updatedAt"]])
-    """
-    The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
-    """
-    filters: dict[Literal["createdAt", "locale", "localizations", "publishedAt", "slug", "updatedAt"], Any] | None = (
-        None
-    )
-    """
-    Filters to apply to the query
-    """
     sort: (
-        Sort53
-        | list[SortEnum16]
-        | dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort54]
-        | list[dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort54]]
+        Sort60
+        | list[SortEnum19]
+        | dict[Literal["certificateId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort61]
+        | list[dict[Literal["certificateId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort61]]
         | None
-    ) = Field(None, examples=["slug"])
+    ) = Field(None, examples=["certificateId"])
     """
     Sort the result
     """
@@ -7804,7 +8620,7 @@ class ProductCategoriesSlugSlugGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data23(BaseModel):
+class Data27(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -7814,7 +8630,7 @@ class Data23(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
-    slug: str
+    certificate_id: str = Field(..., alias="certificateId")
     """
     A UID field
     """
@@ -7834,13 +8650,9 @@ class Data23(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    content: ElementsLabelEntry
+    certificate: ElementsLabelEntry
     """
     A component field
-    """
-    image: PluginUploadFileDocument
-    """
-    A media field
     """
     seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
     """
@@ -7852,136 +8664,20 @@ class Data23(BaseModel):
     """
 
 
-class ProductCategoriesSlugSlugGetResponse(BaseModel):
+class ProductCertificatesIdGetResponse(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data23
+    data: Data27
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
     """
 
 
-class Sort56(StrEnum):
-    """Sort the result."""
-
-    SLUG = "slug"
-    CREATED_AT = "createdAt"
-    UPDATED_AT = "updatedAt"
-    PUBLISHED_AT = "publishedAt"
-    LOCALE = "locale"
-
-
-class Sort57(StrEnum):
-    ASC = "asc"
-    DESC = "desc"
-
-
-class ProductCategoriesIdGetParametersQuery(BaseModel):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-    fields: list[Field31] | None = Field(None, examples=[["slug", "createdAt", "updatedAt"]])
-    """
-    The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
-    """
-    filters: dict[Literal["createdAt", "locale", "localizations", "publishedAt", "slug", "updatedAt"], Any] | None = (
-        None
-    )
-    """
-    Filters to apply to the query
-    """
-    sort: (
-        Sort56
-        | list[SortEnum16]
-        | dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort57]
-        | list[dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort57]]
-        | None
-    ) = Field(None, examples=["slug"])
-    """
-    Sort the result
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    Select a locale
-    """
-    status: Status1 | None = Field(None, examples=["published"])
-    """
-    Fetch documents based on their status. Default to "published" if not specified.
-    """
-    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
-    """
-    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
-    """
-    custom_populate: str | None = Field("nested", alias="customPopulate")
-    custom_depth: int | None = Field(None, alias="customDepth")
-    custom_ignored: list[str] | None = Field(None, alias="customIgnored")
-
-
-class Data24(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    slug: str
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsLabelEntry
-    """
-    A component field
-    """
-    image: PluginUploadFileDocument
-    """
-    A media field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ProductCategoriesIdGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data24
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Field33(StrEnum):
-    CERTIFICATE_ID = "certificateId"
+class Field35(StrEnum):
+    TAG_ID = "tagId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -8059,40 +8755,40 @@ class Pagination14(RootModel[Pagination144 | Pagination145]):
     """
 
 
-class Sort59(StrEnum):
+class Sort63(StrEnum):
     """Sort the result."""
 
-    CERTIFICATE_ID = "certificateId"
+    TAG_ID = "tagId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
     LOCALE = "locale"
 
 
-class SortEnum19(StrEnum):
-    CERTIFICATE_ID = "certificateId"
+class SortEnum21(StrEnum):
+    TAG_ID = "tagId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
     LOCALE = "locale"
 
 
-class Sort60(StrEnum):
+class Sort64(StrEnum):
     ASC = "asc"
     DESC = "desc"
 
 
-class ProductCertificatesGetParametersQuery(BaseModel):
+class ProductTagsGetParametersQuery(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
     )
-    fields: list[Field33] | None = Field(None, examples=[["certificateId", "createdAt", "updatedAt"]])
+    fields: list[Field35] | None = Field(None, examples=[["tagId", "createdAt", "updatedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
-    filters: (
-        dict[Literal["certificateId", "createdAt", "locale", "localizations", "publishedAt", "updatedAt"], Any] | None
-    ) = None
+    filters: dict[Literal["createdAt", "locale", "localizations", "publishedAt", "tagId", "updatedAt"], Any] | None = (
+        None
+    )
     """
     Filters to apply to the query
     """
@@ -8102,12 +8798,12 @@ class ProductCertificatesGetParametersQuery(BaseModel):
     Pagination parameters
     """
     sort: (
-        Sort59
-        | list[SortEnum19]
-        | dict[Literal["certificateId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort60]
-        | list[dict[Literal["certificateId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort60]]
+        Sort63
+        | list[SortEnum21]
+        | dict[Literal["tagId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort64]
+        | list[dict[Literal["tagId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort64]]
         | None
-    ) = Field(None, examples=["certificateId"])
+    ) = Field(None, examples=["tagId"])
     """
     Sort the result
     """
@@ -8128,7 +8824,7 @@ class ProductCertificatesGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Datum8(BaseModel):
+class Datum11(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -8138,7 +8834,7 @@ class Datum8(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
-    certificate_id: str = Field(..., alias="certificateId")
+    tag_id: str = Field(..., alias="tagId")
     """
     A UID field
     """
@@ -8158,7 +8854,7 @@ class Datum8(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    certificate: ElementsLabelEntry
+    tag: ElementsLabelEntry
     """
     A component field
     """
@@ -8172,54 +8868,54 @@ class Datum8(BaseModel):
     """
 
 
-class ProductCertificatesGetResponse(BaseModel):
+class ProductTagsGetResponse(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
     )
-    data: list[Datum8]
+    data: list[Datum11]
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
     """
 
 
-class Sort62(StrEnum):
+class Sort66(StrEnum):
     """Sort the result."""
 
-    CERTIFICATE_ID = "certificateId"
+    TAG_ID = "tagId"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
     LOCALE = "locale"
 
 
-class Sort63(StrEnum):
+class Sort67(StrEnum):
     ASC = "asc"
     DESC = "desc"
 
 
-class ProductCertificatesIdGetParametersQuery(BaseModel):
+class ProductTagsIdGetParametersQuery(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
     )
-    fields: list[Field33] | None = Field(None, examples=[["certificateId", "createdAt", "updatedAt"]])
+    fields: list[Field35] | None = Field(None, examples=[["tagId", "createdAt", "updatedAt"]])
     """
     The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
     """
-    filters: (
-        dict[Literal["certificateId", "createdAt", "locale", "localizations", "publishedAt", "updatedAt"], Any] | None
-    ) = None
+    filters: dict[Literal["createdAt", "locale", "localizations", "publishedAt", "tagId", "updatedAt"], Any] | None = (
+        None
+    )
     """
     Filters to apply to the query
     """
     sort: (
-        Sort62
-        | list[SortEnum19]
-        | dict[Literal["certificateId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort63]
-        | list[dict[Literal["certificateId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort63]]
+        Sort66
+        | list[SortEnum21]
+        | dict[Literal["tagId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort67]
+        | list[dict[Literal["tagId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort67]]
         | None
-    ) = Field(None, examples=["certificateId"])
+    ) = Field(None, examples=["tagId"])
     """
     Sort the result
     """
@@ -8240,7 +8936,7 @@ class ProductCertificatesIdGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data25(BaseModel):
+class Data28(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -8250,7 +8946,7 @@ class Data25(BaseModel):
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
     id: str | float
-    certificate_id: str = Field(..., alias="certificateId")
+    tag_id: str = Field(..., alias="tagId")
     """
     A UID field
     """
@@ -8270,7 +8966,7 @@ class Data25(BaseModel):
     """
     The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
     """
-    certificate: ElementsLabelEntry
+    tag: ElementsLabelEntry
     """
     A component field
     """
@@ -8284,20 +8980,20 @@ class Data25(BaseModel):
     """
 
 
-class ProductCertificatesIdGetResponse(BaseModel):
+class ProductTagsIdGetResponse(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data25
+    data: Data28
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
     """
 
 
-class Field35(StrEnum):
-    TAG_ID = "tagId"
+class Field37(StrEnum):
+    SLUG = "slug"
     CREATED_AT = "createdAt"
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
@@ -8375,323 +9071,7 @@ class Pagination15(RootModel[Pagination154 | Pagination155]):
     """
 
 
-class Sort65(StrEnum):
-    """Sort the result."""
-
-    TAG_ID = "tagId"
-    CREATED_AT = "createdAt"
-    UPDATED_AT = "updatedAt"
-    PUBLISHED_AT = "publishedAt"
-    LOCALE = "locale"
-
-
-class SortEnum21(StrEnum):
-    TAG_ID = "tagId"
-    CREATED_AT = "createdAt"
-    UPDATED_AT = "updatedAt"
-    PUBLISHED_AT = "publishedAt"
-    LOCALE = "locale"
-
-
-class Sort66(StrEnum):
-    ASC = "asc"
-    DESC = "desc"
-
-
-class ProductTagsGetParametersQuery(BaseModel):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-    fields: list[Field35] | None = Field(None, examples=[["tagId", "createdAt", "updatedAt"]])
-    """
-    The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
-    """
-    filters: dict[Literal["createdAt", "locale", "localizations", "publishedAt", "tagId", "updatedAt"], Any] | None = (
-        None
-    )
-    """
-    Filters to apply to the query
-    """
-    field_q: str | None = Field(None, alias="_q", examples=["search terms"])
-    pagination: Pagination15 | None = Field(default_factory=Pagination15)
-    """
-    Pagination parameters
-    """
-    sort: (
-        Sort65
-        | list[SortEnum21]
-        | dict[Literal["tagId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort66]
-        | list[dict[Literal["tagId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort66]]
-        | None
-    ) = Field(None, examples=["tagId"])
-    """
-    Sort the result
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    Select a locale
-    """
-    status: Status1 | None = Field(None, examples=["published"])
-    """
-    Fetch documents based on their status. Default to "published" if not specified.
-    """
-    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
-    """
-    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
-    """
-    custom_populate: str | None = Field("nested", alias="customPopulate")
-    custom_depth: int | None = Field(None, alias="customDepth")
-    custom_ignored: list[str] | None = Field(None, alias="customIgnored")
-
-
-class Datum9(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    tag_id: str = Field(..., alias="tagId")
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    tag: ElementsLabelEntry
-    """
-    A component field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ProductTagsGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: list[Datum9]
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Sort68(StrEnum):
-    """Sort the result."""
-
-    TAG_ID = "tagId"
-    CREATED_AT = "createdAt"
-    UPDATED_AT = "updatedAt"
-    PUBLISHED_AT = "publishedAt"
-    LOCALE = "locale"
-
-
 class Sort69(StrEnum):
-    ASC = "asc"
-    DESC = "desc"
-
-
-class ProductTagsIdGetParametersQuery(BaseModel):
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-    fields: list[Field35] | None = Field(None, examples=[["tagId", "createdAt", "updatedAt"]])
-    """
-    The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
-    """
-    filters: dict[Literal["createdAt", "locale", "localizations", "publishedAt", "tagId", "updatedAt"], Any] | None = (
-        None
-    )
-    """
-    Filters to apply to the query
-    """
-    sort: (
-        Sort68
-        | list[SortEnum21]
-        | dict[Literal["tagId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort69]
-        | list[dict[Literal["tagId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort69]]
-        | None
-    ) = Field(None, examples=["tagId"])
-    """
-    Sort the result
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    Select a locale
-    """
-    status: Status1 | None = Field(None, examples=["published"])
-    """
-    Fetch documents based on their status. Default to "published" if not specified.
-    """
-    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
-    """
-    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
-    """
-    custom_populate: str | None = Field("nested", alias="customPopulate")
-    custom_depth: int | None = Field(None, alias="customDepth")
-    custom_ignored: list[str] | None = Field(None, alias="customIgnored")
-
-
-class Data26(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
-    """
-    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
-    """
-    id: str | float
-    tag_id: str = Field(..., alias="tagId")
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was first created in the CMS.
-    """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
-    """
-    Timestamp when this entry was last modified.
-    """
-    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    tag: ElementsLabelEntry
-    """
-    A component field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ProductTagsIdGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data26
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
-
-
-class Field37(StrEnum):
-    SLUG = "slug"
-    CREATED_AT = "createdAt"
-    UPDATED_AT = "updatedAt"
-    PUBLISHED_AT = "publishedAt"
-    LOCALE = "locale"
-
-
-class Pagination161(BaseModel):
-    """Page-based pagination."""
-
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    page: int = Field(..., gt=0, le=9007199254740991)
-    """
-    Page number (1-based)
-    """
-    page_size: int = Field(..., alias="pageSize", gt=0, le=9007199254740991)
-    """
-    Number of entries per page
-    """
-
-
-class Pagination162(BaseModel):
-    """Offset-based pagination."""
-
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    start: int = Field(..., ge=0, le=9007199254740991)
-    """
-    Number of entries to skip
-    """
-    limit: int = Field(..., gt=0, le=9007199254740991)
-    """
-    Maximum number of entries to return
-    """
-
-
-class Pagination163(BaseModel):
-    """Pagination parameters."""
-
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-    with_count: bool | None = Field(None, alias="withCount")
-    """
-    Include total count in response
-    """
-
-
-class Pagination164(Pagination161, Pagination163):
-    """Pagination parameters."""
-
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-
-
-class Pagination165(Pagination162, Pagination163):
-    """Pagination parameters."""
-
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-
-
-class Pagination16(RootModel[Pagination164 | Pagination165]):
-    """Pagination parameters."""
-
-    root: Pagination164 | Pagination165
-    """
-    Pagination parameters
-    """
-
-
-class Sort71(StrEnum):
     """Sort the result."""
 
     SLUG = "slug"
@@ -8709,7 +9089,7 @@ class SortEnum23(StrEnum):
     LOCALE = "locale"
 
 
-class Sort72(StrEnum):
+class Sort70(StrEnum):
     ASC = "asc"
     DESC = "desc"
 
@@ -8744,15 +9124,15 @@ class ProductsGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     field_q: str | None = Field(None, alias="_q", examples=["search terms"])
-    pagination: Pagination16 | None = Field(default_factory=Pagination16)
+    pagination: Pagination15 | None = Field(default_factory=Pagination15)
     """
     Pagination parameters
     """
     sort: (
-        Sort71
+        Sort69
         | list[SortEnum23]
-        | dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort72]
-        | list[dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort72]]
+        | dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort70]
+        | list[dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort70]]
         | None
     ) = Field(None, examples=["slug"])
     """
@@ -8799,7 +9179,7 @@ class Description4(RootModel[Description1 | Description6 | Description7]):
     root: Description1 | Description6 | Description7 = Field(..., discriminator="field__component")
 
 
-class Datum10(BaseModel):
+class Datum12(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -8888,14 +9268,14 @@ class ProductsGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: list[Datum10]
+    data: list[Datum12]
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
     """
 
 
-class Sort74(StrEnum):
+class Sort72(StrEnum):
     """Sort the result."""
 
     SLUG = "slug"
@@ -8905,7 +9285,7 @@ class Sort74(StrEnum):
     LOCALE = "locale"
 
 
-class Sort75(StrEnum):
+class Sort73(StrEnum):
     ASC = "asc"
     DESC = "desc"
 
@@ -8940,10 +9320,10 @@ class ProductsSlugSlugGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     sort: (
-        Sort74
+        Sort72
         | list[SortEnum23]
-        | dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort75]
-        | list[dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort75]]
+        | dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort73]
+        | list[dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort73]]
         | None
     ) = Field(None, examples=["slug"])
     """
@@ -9000,7 +9380,7 @@ class Description8(RootModel[Description9 | Description10 | Description11]):
     root: Description9 | Description10 | Description11 = Field(..., discriminator="field__component")
 
 
-class Data27(BaseModel):
+class Data29(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -9089,14 +9469,14 @@ class ProductsSlugSlugGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data27
+    data: Data29
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
     """
 
 
-class Sort77(StrEnum):
+class Sort75(StrEnum):
     """Sort the result."""
 
     SLUG = "slug"
@@ -9106,7 +9486,7 @@ class Sort77(StrEnum):
     LOCALE = "locale"
 
 
-class Sort78(StrEnum):
+class Sort76(StrEnum):
     ASC = "asc"
     DESC = "desc"
 
@@ -9141,10 +9521,10 @@ class ProductsIdGetParametersQuery(BaseModel):
     Filters to apply to the query
     """
     sort: (
-        Sort77
+        Sort75
         | list[SortEnum23]
-        | dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort78]
-        | list[dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort78]]
+        | dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort76]
+        | list[dict[Literal["slug", "createdAt", "updatedAt", "publishedAt", "locale"], Sort76]]
         | None
     ) = Field(None, examples=["slug"])
     """
@@ -9201,7 +9581,7 @@ class Description12(RootModel[Description13 | Description14 | Description15]):
     root: Description13 | Description14 | Description15 = Field(..., discriminator="field__component")
 
 
-class Data28(BaseModel):
+class Data30(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -9290,7 +9670,7 @@ class ProductsIdGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data28
+    data: Data30
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -9333,7 +9713,7 @@ class ProfileGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data29(BaseModel):
+class Data31(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -9454,7 +9834,7 @@ class ProfileGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data29
+    data: Data31
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -9497,7 +9877,7 @@ class TermGetParametersQuery(BaseModel):
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data30(BaseModel):
+class Data32(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -9542,7 +9922,7 @@ class TermGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data30
+    data: Data32
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
@@ -9555,6 +9935,314 @@ class Field42(StrEnum):
     UPDATED_AT = "updatedAt"
     PUBLISHED_AT = "publishedAt"
     LOCALE = "locale"
+
+
+class Pagination161(BaseModel):
+    """Page-based pagination."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    page: int = Field(..., gt=0, le=9007199254740991)
+    """
+    Page number (1-based)
+    """
+    page_size: int = Field(..., alias="pageSize", gt=0, le=9007199254740991)
+    """
+    Number of entries per page
+    """
+
+
+class Pagination162(BaseModel):
+    """Offset-based pagination."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    start: int = Field(..., ge=0, le=9007199254740991)
+    """
+    Number of entries to skip
+    """
+    limit: int = Field(..., gt=0, le=9007199254740991)
+    """
+    Maximum number of entries to return
+    """
+
+
+class Pagination163(BaseModel):
+    """Pagination parameters."""
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    with_count: bool | None = Field(None, alias="withCount")
+    """
+    Include total count in response
+    """
+
+
+class Pagination164(Pagination161, Pagination163):
+    """Pagination parameters."""
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+
+
+class Pagination165(Pagination162, Pagination163):
+    """Pagination parameters."""
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+
+
+class Pagination16(RootModel[Pagination164 | Pagination165]):
+    """Pagination parameters."""
+
+    root: Pagination164 | Pagination165
+    """
+    Pagination parameters
+    """
+
+
+class Sort78(StrEnum):
+    """Sort the result."""
+
+    THEME_ID = "themeId"
+    CREATED_AT = "createdAt"
+    UPDATED_AT = "updatedAt"
+    PUBLISHED_AT = "publishedAt"
+    LOCALE = "locale"
+
+
+class SortEnum26(StrEnum):
+    THEME_ID = "themeId"
+    CREATED_AT = "createdAt"
+    UPDATED_AT = "updatedAt"
+    PUBLISHED_AT = "publishedAt"
+    LOCALE = "locale"
+
+
+class Sort79(StrEnum):
+    ASC = "asc"
+    DESC = "desc"
+
+
+class ThemesGetParametersQuery(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    fields: list[Field42] | None = Field(None, examples=[["themeId", "createdAt", "updatedAt"]])
+    """
+    The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+    """
+    filters: (
+        dict[Literal["createdAt", "locale", "localizations", "publishedAt", "themeId", "updatedAt"], Any] | None
+    ) = None
+    """
+    Filters to apply to the query
+    """
+    field_q: str | None = Field(None, alias="_q", examples=["search terms"])
+    pagination: Pagination16 | None = Field(default_factory=Pagination16)
+    """
+    Pagination parameters
+    """
+    sort: (
+        Sort78
+        | list[SortEnum26]
+        | dict[Literal["themeId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort79]
+        | list[dict[Literal["themeId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort79]]
+        | None
+    ) = Field(None, examples=["themeId"])
+    """
+    Sort the result
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    Select a locale
+    """
+    status: Status1 | None = Field(None, examples=["published"])
+    """
+    Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
+    custom_populate: str | None = Field("nested", alias="customPopulate")
+    custom_depth: int | None = Field(None, alias="customDepth")
+    custom_ignored: list[str] | None = Field(None, alias="customIgnored")
+
+
+class Datum13(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    theme_id: str = Field(..., alias="themeId")
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsLabelEntry
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ThemesGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: list[Datum13]
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
+
+
+class Sort81(StrEnum):
+    """Sort the result."""
+
+    THEME_ID = "themeId"
+    CREATED_AT = "createdAt"
+    UPDATED_AT = "updatedAt"
+    PUBLISHED_AT = "publishedAt"
+    LOCALE = "locale"
+
+
+class Sort82(StrEnum):
+    ASC = "asc"
+    DESC = "desc"
+
+
+class ThemesIdGetParametersQuery(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+    fields: list[Field42] | None = Field(None, examples=[["themeId", "createdAt", "updatedAt"]])
+    """
+    The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+    """
+    filters: (
+        dict[Literal["createdAt", "locale", "localizations", "publishedAt", "themeId", "updatedAt"], Any] | None
+    ) = None
+    """
+    Filters to apply to the query
+    """
+    sort: (
+        Sort81
+        | list[SortEnum26]
+        | dict[Literal["themeId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort82]
+        | list[dict[Literal["themeId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort82]]
+        | None
+    ) = Field(None, examples=["themeId"])
+    """
+    Sort the result
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    Select a locale
+    """
+    status: Status1 | None = Field(None, examples=["published"])
+    """
+    Fetch documents based on their status. Default to "published" if not specified.
+    """
+    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
+    """
+    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    """
+    custom_populate: str | None = Field("nested", alias="customPopulate")
+    custom_depth: int | None = Field(None, alias="customDepth")
+    custom_ignored: list[str] | None = Field(None, alias="customIgnored")
+
+
+class Data33(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
+    """
+    The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
+    """
+    id: str | float
+    theme_id: str = Field(..., alias="themeId")
+    """
+    A UID field
+    """
+    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was first created in the CMS.
+    """
+    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    """
+    Timestamp when this entry was last modified.
+    """
+    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
+    """
+    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
+    """
+    locale: str | None = Field(None, examples=["en"])
+    """
+    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
+    """
+    content: ElementsLabelEntry
+    """
+    A component field
+    """
+    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
+    """
+    A component field
+    """
+    localizations: list[Localization] | None = None
+    """
+    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
+    """
+
+
+class ThemesIdGetResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    data: Data33
+    meta: dict[str, Any] | None = None
+    """
+    Metadata object containing pagination and other response metadata
+    """
 
 
 class Pagination171(BaseModel):
@@ -9628,241 +10316,122 @@ class Pagination17(RootModel[Pagination174 | Pagination175]):
     """
 
 
-class Sort80(StrEnum):
-    """Sort the result."""
-
-    THEME_ID = "themeId"
-    CREATED_AT = "createdAt"
-    UPDATED_AT = "updatedAt"
-    PUBLISHED_AT = "publishedAt"
-    LOCALE = "locale"
-
-
-class SortEnum26(StrEnum):
-    THEME_ID = "themeId"
-    CREATED_AT = "createdAt"
-    UPDATED_AT = "updatedAt"
-    PUBLISHED_AT = "publishedAt"
-    LOCALE = "locale"
-
-
-class Sort81(StrEnum):
-    ASC = "asc"
-    DESC = "desc"
-
-
-class ThemesGetParametersQuery(BaseModel):
+class UploadFilesGetParametersQuery(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
     )
-    fields: list[Field42] | None = Field(None, examples=[["themeId", "createdAt", "updatedAt"]])
+    fields: str | list[str] | None = None
     """
-    The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
+    Select specific fields to return in the response
     """
-    filters: (
-        dict[Literal["createdAt", "locale", "localizations", "publishedAt", "themeId", "updatedAt"], Any] | None
-    ) = None
+    sort: str | list[str] | dict[str, Sort82] | list[dict[str, Sort82]] | None = None
     """
-    Filters to apply to the query
+    Sort the results by specified fields
     """
-    field_q: str | None = Field(None, alias="_q", examples=["search terms"])
     pagination: Pagination17 | None = Field(default_factory=Pagination17)
     """
     Pagination parameters
     """
-    sort: (
-        Sort80
-        | list[SortEnum26]
-        | dict[Literal["themeId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort81]
-        | list[dict[Literal["themeId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort81]]
-        | None
-    ) = Field(None, examples=["themeId"])
+    filters: dict[str, Any] | None = None
     """
-    Sort the result
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    Select a locale
-    """
-    status: Status1 | None = Field(None, examples=["published"])
-    """
-    Fetch documents based on their status. Default to "published" if not specified.
-    """
-    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
-    """
-    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    Apply filters to the query
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Datum11(BaseModel):
+class UploadFilesGetResponseItem(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
     )
+    id: int = Field(..., gt=0, le=9007199254740991)
     document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: str | float
-    theme_id: str = Field(..., alias="themeId")
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    name: str
+    alternative_text: str | None = Field(None, alias="alternativeText")
+    caption: str | None = None
+    width: int | None = Field(None, ge=-9007199254740991, le=9007199254740991)
+    height: int | None = Field(None, ge=-9007199254740991, le=9007199254740991)
+    formats: dict[str, Any] | None = None
+    hash: str
+    ext: str | None = None
+    mime: str
+    size: float
+    url: str
+    preview_url: str | None = Field(None, alias="previewUrl")
+    folder: float | None = None
+    folder_path: str = Field(..., alias="folderPath")
+    provider: str
+    provider_metadata: dict[str, Any] | None = None
+    created_at: str = Field(..., alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
     """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    updated_at: str = Field(..., alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
     """
     Timestamp when this entry was last modified.
     """
-    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsLabelEntry
-    """
-    A component field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
+    created_by: float | None = Field(None, alias="createdBy")
+    updated_by: float | None = Field(None, alias="updatedBy")
 
 
-class ThemesGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: list[Datum11]
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
+class UploadFilesGetResponse(RootModel[list[UploadFilesGetResponseItem]]):
+    root: list[UploadFilesGetResponseItem]
 
 
-class Sort83(StrEnum):
-    """Sort the result."""
-
-    THEME_ID = "themeId"
-    CREATED_AT = "createdAt"
-    UPDATED_AT = "updatedAt"
-    PUBLISHED_AT = "publishedAt"
-    LOCALE = "locale"
-
-
-class Sort84(StrEnum):
-    ASC = "asc"
-    DESC = "desc"
-
-
-class ThemesIdGetParametersQuery(BaseModel):
+class UploadFilesIdGetParametersQuery(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
     )
-    fields: list[Field42] | None = Field(None, examples=[["themeId", "createdAt", "updatedAt"]])
+    fields: str | list[str] | None = None
     """
-    The fields to return, this doesn't include populatable fields like relations, components, files, or dynamic zones
-    """
-    filters: (
-        dict[Literal["createdAt", "locale", "localizations", "publishedAt", "themeId", "updatedAt"], Any] | None
-    ) = None
-    """
-    Filters to apply to the query
-    """
-    sort: (
-        Sort83
-        | list[SortEnum26]
-        | dict[Literal["themeId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort84]
-        | list[dict[Literal["themeId", "createdAt", "updatedAt", "publishedAt", "locale"], Sort84]]
-        | None
-    ) = Field(None, examples=["themeId"])
-    """
-    Sort the result
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    Select a locale
-    """
-    status: Status1 | None = Field(None, examples=["published"])
-    """
-    Fetch documents based on their status. Default to "published" if not specified.
-    """
-    has_published_version: bool | HasPublishedVersion | None = Field(None, alias="hasPublishedVersion")
-    """
-    Filter documents by whether they have a published version. Use with status=draft to find documents that have never been published
+    Select specific fields to return in the response
     """
     custom_populate: str | None = Field("nested", alias="customPopulate")
     custom_depth: int | None = Field(None, alias="customDepth")
     custom_ignored: list[str] | None = Field(None, alias="customIgnored")
 
 
-class Data31(BaseModel):
+class UploadFilesIdGetResponse(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
     )
+    id: int = Field(..., gt=0, le=9007199254740991)
     document_id: str = Field(..., alias="documentId", examples=["550e8400-e29b-41d4-a716-446655440000"])
     """
     The unique document identifier as a UUID (v1-v8 or nil UUID). This ID persists across draft/published versions and localizations of the same document.
     """
-    id: str | float
-    theme_id: str = Field(..., alias="themeId")
-    """
-    A UID field
-    """
-    created_at: str | None = Field(None, alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
+    name: str
+    alternative_text: str | None = Field(None, alias="alternativeText")
+    caption: str | None = None
+    width: int | None = Field(None, ge=-9007199254740991, le=9007199254740991)
+    height: int | None = Field(None, ge=-9007199254740991, le=9007199254740991)
+    formats: dict[str, Any] | None = None
+    hash: str
+    ext: str | None = None
+    mime: str
+    size: float
+    url: str
+    preview_url: str | None = Field(None, alias="previewUrl")
+    folder: float | None = None
+    folder_path: str = Field(..., alias="folderPath")
+    provider: str
+    provider_metadata: dict[str, Any] | None = None
+    created_at: str = Field(..., alias="createdAt", examples=["2025-10-30T17:41:47.696Z"])
     """
     Timestamp when this entry was first created in the CMS.
     """
-    updated_at: str | None = Field(None, alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
+    updated_at: str = Field(..., alias="updatedAt", examples=["2025-10-30T18:23:15.432Z"])
     """
     Timestamp when this entry was last modified.
     """
-    published_at: AwareDatetime | None = Field(..., alias="publishedAt", examples=["2025-10-30T17:41:47.696Z"])
-    """
-    Timestamp when this entry was published. Null for draft entries. Part of Strapi Draft & Publish feature.
-    """
-    locale: str | None = Field(None, examples=["en"])
-    """
-    The locale code for this content version (e.g., "en", "es", "fr"). Part of Strapi Internationalization (i18n) feature.
-    """
-    content: ElementsLabelEntry
-    """
-    A component field
-    """
-    seo_metadata: ElementsSeoMetadataEntry = Field(..., alias="seoMetadata")
-    """
-    A component field
-    """
-    localizations: list[Localization] | None = None
-    """
-    Array of references to other locale versions of this document. Part of Strapi i18n feature for managing multilingual content.
-    """
-
-
-class ThemesIdGetResponse(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-    )
-    data: Data31
-    meta: dict[str, Any] | None = None
-    """
-    Metadata object containing pagination and other response metadata
-    """
+    created_by: float | None = Field(None, alias="createdBy")
+    updated_by: float | None = Field(None, alias="updatedBy")
 
 
 class UserDataExport(BaseModel):
@@ -10603,7 +11172,7 @@ class Sections33(
     ) = Field(..., discriminator="field__component")
 
 
-class Data19(BaseModel):
+class Data21(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -10648,14 +11217,14 @@ class HomepageGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data19
+    data: Data21
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
     """
 
 
-class Data20(BaseModel):
+class Data22(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -10744,14 +11313,14 @@ class NavigationGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data20
+    data: Data22
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata
     """
 
 
-class Data22(BaseModel):
+class Data24(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -10820,7 +11389,7 @@ class ProductCategoriesPageGetResponse(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    data: Data22
+    data: Data24
     meta: dict[str, Any] | None = None
     """
     Metadata object containing pagination and other response metadata

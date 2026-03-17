@@ -1,0 +1,64 @@
+{
+  "name": "@affilibuster/frontend",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./generated/*": "./src/lib/generated/*",
+    "./components/*": "./src/components/*",
+    "./lib/*": "./src/lib/*",
+    "./styles/*": "./src/styles/*",
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "openapi:generate": "openapi-ts",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint --concurrency=auto --max-warnings 0 . && npm run type-check",
+    "lint:fix": "eslint --concurrency=auto --fix --max-warnings 0 . && npm run type-check",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "test": "jest --coverage --coverageReporters=lcov --coverageReporters=html --passWithNoTests"
+  },
+  "peerDependencies": {
+    "next": "^16.1.7",
+    "next-intl": "^4.8.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "dependencies": {
+    "@material-symbols/font-400": "^0.42.3",
+    "@material-symbols/font-700": "^0.42.3",
+    "@tailwindcss/typography": "^0.5.19",
+    "react-markdown": "^10.1.0",
+    "rehype-raw": "^7.0.0",
+    "rehype-sanitize": "^6.0.0",
+    "remark-gfm": "^4.0.1",
+    "tailwindcss": "^4.2.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.3",
+    "@hey-api/openapi-ts": "^0.94.3",
+    "@swc/core": "^1.15.18",
+    "@swc/jest": "^0.2.39",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/jest": "^30.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-better-tailwindcss": "^4.3.2",
+    "eslint-plugin-jsdoc": "^62.8.0",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "next": "^16.2.0",
+    "next-intl": "^4.8.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.57.1"
+  }
+}

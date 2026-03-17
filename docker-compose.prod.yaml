@@ -187,6 +187,8 @@ services:
     build:
       context: ./the-green-brother
       dockerfile: Dockerfile.prod
+      additional_contexts:
+        frontend: ./frontend
       args:
         THE_GREEN_BROTHER_PORT: ${THE_GREEN_BROTHER_PORT}
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}

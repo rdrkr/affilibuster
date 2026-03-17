@@ -31,6 +31,10 @@ const nextConfig: NextConfig = {
   // Standalone output for production Docker deployment (self-contained server.js with minimal node_modules)
   // Only affects `next build` output, not `next dev`
   output: 'standalone',
+  // Monorepo root for standalone output file tracing — ensures Next.js traces
+  // dependencies from sibling packages (e.g. @affilibuster/frontend) into the
+  // standalone bundle. Points to the parent directory of the project.
+  outputFileTracingRoot: new URL('..', import.meta.url).pathname,
   reactStrictMode: true,
   allowedDevOrigins: ['localhost', '127.0.0.1', 'host.docker.internal', 'rdrkr-mbp-m1.local'],
   // Treat TypeScript errors strictly
@@ -82,7 +86,7 @@ const nextConfig: NextConfig = {
   bundlePagesRouterDependencies: true,
   typedRoutes: false,
   // see issue @ https://github.com/vercel/next.js/discussions/64330#discussioncomment-15140753
-  transpilePackages: ['next'],
+  transpilePackages: ['next', '@affilibuster/frontend'],
   turbopack: {
     resolveAlias: {
       '../build/polyfills/polyfill-module': './src/lib/others/modern-polyfill.js',

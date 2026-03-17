@@ -1,0 +1,118 @@
+// Copyright (c) 2025 Affilibuster by Ronen Druker.
+
+/**
+ * Navigation Component
+ *
+ * Main navigation bar consuming all content from CMS.
+ * Composes StartNavigationGroup and EndNavigationGroup with proper separation of concerns.
+ * Uses useNavigationResize for responsive collapse behavior.
+ */
+
+'use client'
+
+import { useCallback } from 'react'
+
+import { frostedGlassStyle } from '@/components/elements/common'
+import type { ApiNavigationNavigationDocument, DirectionEnum, Language } from '@/lib/generated/types.gen'
+import { useNavigationResize } from '@/lib/navigation'
+
+import { useThemeContext } from '@/components/providers'
+import { EndNavigationGroup } from '@/components/navigation/EndNavigationGroup'
+import { StartNavigationGroup } from '@/components/navigation/StartNavigationGroup'
+
+/**
+ * Props for the Navigation component
+ */
+export interface NavigationProps {
+  /** Navigation data from CMS */
+  data: ApiNavigationNavigationDocument
+  /** Languages from API */
+  languages?: Language[]
+  /** Text direction for RTL support */
+  direction: DirectionEnum
+  /** Feature flag: Enable product search */
+  enableProductSearch?: boolean
+  /** Feature flag: Enable user profile (login/signup) */
+  enableUserProfile: boolean
+}
+
+/**
+ * Main navigation bar component
+ * @param props - Component props with CMS navigation data
+ * @param props.data - Navigation data from CMS
+ * @param props.languages - Languages from API
+ * @param props.direction - Text direction for RTL support
+ * @param props.enableProductSearch - Feature flag: Enable product search
+ * @param props.enableUserProfile - Feature flag: Enable user profile (login/signup)
+ * @returns Navigation component
+ */
+export function Navigation({
+  data,
+  languages,
+  direction,
+  enableProductSearch = false,
+  enableUserProfile,
+}: NavigationProps) {
+  const { theme, setTheme } = useThemeContext()
+
+  // Get responsive visibility state
+  const { navRef, visibility, isSearchExpanded, setSearchExpanded, setStartHasIcons, setEndHasIcons, isReady } =
+    useNavigationResize()
+
+  /**
+   * Handle search expansion state change
+   */
+  const handleSearchExpandChange = useCallback(
+    (expanded: boolean): void => {
+      setSearchExpanded(expanded)
+    },
+    [setSearchExpanded]
+  )
+
+  return (
+    <div
+      className={`
+        sticky top-4 z-50 p-4
+        sm:px-6
+        lg:px-8
+      `}
+    >
+      <nav ref={navRef} className={`relative h-16 p-2`} aria-label="Main navigation">
+        {/* Background layer with blur effect */}
+        <div className={`absolute inset-0 ${frostedGlassStyle}`} aria-hidden="true" />
+
+        <div className="relative z-20 grid h-12 grid-cols-1 items-center">
+          {/* Start Group - Brand and Nav Links - Aligned Start */}
+          <StartNavigationGroup
+            data={data}
+            displayMode={visibility.startGroupMode}
+            direction={direction}
+            navWidth={visibility.navWidth}
+            isSearchExpanded={isSearchExpanded}
+            onHasIconsChange={setStartHasIcons}
+            isReady={isReady}
+          />
+
+          {/* End Group - Search, Theme, Language, Login - Aligned End */}
+          <EndNavigationGroup
+            data={data}
+            displayMode={visibility.endGroupMode}
+            startGroupMode={visibility.startGroupMode}
+            direction={direction}
+            navWidth={visibility.navWidth}
+            apiLanguages={languages}
+            theme={theme}
+            setTheme={setTheme}
+            onSearchExpandChange={handleSearchExpandChange}
+            onHasIconsChange={setEndHasIcons}
+            enableProductSearch={enableProductSearch}
+            enableUserProfile={enableUserProfile}
+            isReady={isReady}
+          />
+        </div>
+      </nav>
+    </div>
+  )
+}
+
+export default Navigation

@@ -1,0 +1,54 @@
+// Copyright (c) 2026 Affilibuster by Ronen Druker.
+
+/**
+ * Consent Types Module
+ *
+ * Re-exports generated types used by the consent feature for convenience.
+ */
+
+export type {
+  ConsentAction,
+  ConsentCategories,
+  ConsentCategoryGetConsentCategoriesResponses,
+  ConsentGetConsentResponses,
+  ConsentType,
+  RecordConsentRequest,
+  RecordConsentResponse,
+} from '@/lib/generated/types.gen'
+
+import type { RecordConsentRequest } from '@/lib/generated/types.gen'
+
+/**
+ * API request data type for the POST /consent endpoint.
+ *
+ * Manually defined because the code generator does not produce a Data type
+ * for this endpoint. Follows the same pattern as other generated Data types
+ * (e.g., DetectLanguageData, LoginUserData).
+ */
+export interface RecordConsentData {
+  /** The consent record request body. */
+  body: RecordConsentRequest
+  path?: never
+  query?: never
+  url: '/consent'
+}
+
+/** Cookie name used to store consent preferences. */
+export const CONSENT_COOKIE_NAME = 'cc_consent'
+
+/** Cookie expiry in days (1 year). */
+export const CONSENT_COOKIE_EXPIRY_DAYS = 365
+
+/**
+ * Shape of the consent cookie value stored in the browser.
+ */
+export interface ConsentCookieValue {
+  /** Accepted category UIDs (e.g., ['necessary', 'analytics']). */
+  categories: string[]
+  /** Timestamp of when consent was given (ISO 8601). */
+  timestamp: string
+  /** Consent version from CMS. */
+  version: string
+  /** Whether Do Not Track was enabled at the time of providing consent. */
+  dntStateAtConsent?: boolean
+}

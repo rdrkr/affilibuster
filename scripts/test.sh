@@ -121,13 +121,14 @@ run_the-green-brother_tests() {
   case "${test_type}" in
   unit)
     echo "🧪 Running the-green-brother unit tests (Jest)..."
-    docker compose exec -T the-green-brother sh -c "cd /app && npm test -- --coverage \
+    cd the-green-brother && npm test -- --coverage \
       --coverageReporters=lcov \
       --coverageReporters=json \
       --coverageReporters=html \
       --coverageReporters=text \
-      --coverageReporters=text-summary" 2>&1 | tee /tmp/the-green-brother-test.log
+      --coverageReporters=text-summary 2>&1 | tee /tmp/the-green-brother-test.log
     local jest_result="${PIPESTATUS[0]}"
+    cd ..
 
     # Check Jest result
     if [[ "${jest_result}" -ne 0 ]]; then
@@ -180,13 +181,14 @@ run_the-green-brother_tests() {
 
   all)
     echo "🧪 Running the-green-brother unit tests (Jest)..."
-    docker compose exec -T the-green-brother sh -c "cd /app && npm test -- --coverage \
+    cd the-green-brother && npm test -- --coverage \
       --coverageReporters=lcov \
       --coverageReporters=json \
       --coverageReporters=html \
       --coverageReporters=text \
-      --coverageReporters=text-summary" 2>&1 | tee /tmp/the-green-brother-test.log
+      --coverageReporters=text-summary 2>&1 | tee /tmp/the-green-brother-test.log
     local jest_result="${PIPESTATUS[0]}"
+    cd ..
 
     # Check Jest result before proceeding
     if [[ "${jest_result}" -ne 0 ]]; then
@@ -472,6 +474,18 @@ backend)
   echo "✅ Backend tests passed!"
   ;;
 
+frontend-unit)
+  echo "🧪 Running frontend package unit tests (Jest)..."
+  cd frontend && npm test -- --coverage \
+    --coverageReporters=lcov \
+    --coverageReporters=json \
+    --coverageReporters=html \
+    --coverageReporters=text \
+    --coverageReporters=text-summary || exit 1
+  cd ..
+  echo "✅ Frontend package unit tests passed!"
+  ;;
+
 the-green-brother-unit)
   run_the-green-brother_tests unit || exit 1
   echo "✅ TheGreenBrother unit tests passed!"
@@ -553,7 +567,7 @@ summary)
   ;;
 
 *)
-  echo "Usage: $0 {backend-unit|backend-integration|backend|the-green-brother-unit|the-green-brother-integration|the-green-brother|the-green-brother-unit|the-green-brother-integration|the-green-brother|performance|all-unit|all-integration|default|parallel|merge|merge-only}"
+  echo "Usage: $0 {backend-unit|backend-integration|backend|frontend-unit|the-green-brother-unit|the-green-brother-integration|the-green-brother|performance|all-unit|all-integration|default|parallel|merge|merge-only}"
   exit 1
   ;;
 esac

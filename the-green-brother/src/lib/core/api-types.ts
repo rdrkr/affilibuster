@@ -123,10 +123,10 @@ import type {
     ThemeGetThemesResponses,
     UpdateUserPreferencesData,
     UpdateUserProfileData,
-    UploadGetFilesByIdData,
-    UploadGetFilesByIdResponses,
-    UploadGetFilesData,
-    UploadGetFilesResponses,
+    UploadGetUploadFilesByIdData,
+    UploadGetUploadFilesByIdResponses,
+    UploadGetUploadFilesData,
+    UploadGetUploadFilesResponses,
     VerifyEmailData,
     VerifyEmailResponses
 } from '@/lib/generated/types.gen'
@@ -187,8 +187,8 @@ export type ApiRequest =
   | FeatureFlagGetFeatureFlagsData
   | FeatureFlagGetFeatureFlagsByIdData
   // Upload operations
-  | UploadGetFilesData
-  | UploadGetFilesByIdData
+  | UploadGetUploadFilesData
+  | UploadGetUploadFilesByIdData
   // Language operations
   | DetectLanguageData
   | GetLanguagesData
@@ -267,8 +267,8 @@ export type ApiResponse =
   | FeatureFlagGetFeatureFlagsResponses[200]
   | FeatureFlagGetFeatureFlagsByIdResponses[200]
   // Upload operations
-  | UploadGetFilesResponses[200]
-  | UploadGetFilesByIdResponses[200]
+  | UploadGetUploadFilesResponses[200]
+  | UploadGetUploadFilesByIdResponses[200]
   // Language operations
   | DetectLanguageResponses[200]
   | GetLanguagesResponses[200]
@@ -298,35 +298,5 @@ export type ApiResponse =
   | NewsletterSubscribeResponse
   | NewsletterUnsubscribeResponse
 
-/**
- * Custom error class for API request failures.
- *
- * Thrown by apiRequest when:
- * - Network request fails
- * - Response status is not ok (!response.ok)
- * - Response parsing fails
- */
-export class ApiError extends Error {
-  /**
-   * HTTP status code (if available)
-   */
-  public readonly status: number | undefined
-
-  /**
-   * Original error response (if available)
-   */
-  public readonly response: Response | undefined
-
-  /**
-   * Creates a new API error
-   * @param message - Error message
-   * @param status - HTTP status code
-   * @param response - Original fetch Response object
-   */
-  constructor(message: string, status?: number, response?: Response) {
-    super(message)
-    this.name = 'ApiError'
-    this.status = status
-    this.response = response
-  }
-}
+// Re-export ApiError from the shared frontend package
+export { ApiError } from '@affilibuster/frontend/lib/core/api-types'

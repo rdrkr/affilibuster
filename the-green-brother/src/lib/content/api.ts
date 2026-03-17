@@ -66,10 +66,10 @@ import type {
   ProfileGetProfileResponses,
   TermGetTermData,
   TermGetTermResponses,
-  UploadGetFilesByIdData,
-  UploadGetFilesByIdResponses,
-  UploadGetFilesData,
-  UploadGetFilesResponses,
+  UploadGetUploadFilesByIdData,
+  UploadGetUploadFilesByIdResponses,
+  UploadGetUploadFilesData,
+  UploadGetUploadFilesResponses,
 } from '@/lib/generated/types.gen'
 
 /**
@@ -713,16 +713,16 @@ export async function getContributorBySlug(
  * @returns The files data or null if the request fails
  */
 export async function getFiles(
-  query?: Omit<NonNullable<UploadGetFilesData['query']>, 'customPopulate'>
-): Promise<UploadGetFilesResponses[200] | null> {
+  query?: Omit<NonNullable<UploadGetUploadFilesData['query']>, 'customPopulate'>
+): Promise<UploadGetUploadFilesResponses[200] | null> {
   try {
-    const request = createApiRequest<UploadGetFilesData>('/files', {
+    const request = createApiRequest<UploadGetUploadFilesData>('/files', {
       query: {
         ...query,
         customPopulate: 'nested',
       },
     })
-    return await apiRequest<UploadGetFilesResponses[200]>(request)
+    return await apiRequest<UploadGetUploadFilesResponses[200]>(request)
   } catch (error) {
     console.error('Failed to fetch files:', error)
     return null
@@ -734,13 +734,16 @@ export async function getFiles(
  * @param id - File document ID (numeric)
  * @returns The file data or null if the request fails
  */
-export async function getFileById(id: number): Promise<UploadGetFilesByIdResponses[200] | null> {
+export async function getFileById(id: number): Promise<UploadGetUploadFilesByIdResponses[200] | null> {
   try {
-    const request: UploadGetFilesByIdData = createApiRequest<UploadGetFilesByIdData>(`/files/${String(id)}`, {
-      path: { id },
-      query: { customPopulate: 'nested' },
-    })
-    return await apiRequest<UploadGetFilesByIdResponses[200]>(request)
+    const request: UploadGetUploadFilesByIdData = createApiRequest<UploadGetUploadFilesByIdData>(
+      `/files/${String(id)}`,
+      {
+        path: { id },
+        query: { customPopulate: 'nested' },
+      }
+    )
+    return await apiRequest<UploadGetUploadFilesByIdResponses[200]>(request)
   } catch (error) {
     console.error(`Failed to fetch file ${String(id)}:`, error)
     return null

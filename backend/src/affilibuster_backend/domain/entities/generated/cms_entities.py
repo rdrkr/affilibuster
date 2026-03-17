@@ -51,6 +51,11 @@ from affilibuster_backend.domain.entities.generated.models import (
     ConsentGetResponse,
     ContactUsGetParametersQuery,
     ContactUsGetResponse,
+    ContentTypeBuilderComponentsGetResponse,
+    ContentTypeBuilderComponentsUidGetResponse,
+    ContentTypeBuilderContentTypesGetParametersQuery,
+    ContentTypeBuilderContentTypesGetResponse,
+    ContentTypeBuilderContentTypesUidGetResponse,
     ContributorRolesGetParametersQuery,
     ContributorRolesGetResponse,
     ContributorRolesIdGetParametersQuery,
@@ -77,14 +82,11 @@ from affilibuster_backend.domain.entities.generated.models import (
     FeatureFlagsGetResponse,
     FeatureFlagsIdGetParametersQuery,
     FeatureFlagsIdGetResponse,
-    FilesGetParametersQuery,
-    FilesGetResponse,
-    FilesIdGetParametersQuery,
-    FilesIdGetResponse,
     FooterGetParametersQuery,
     FooterGetResponse,
     HomepageGetParametersQuery,
     HomepageGetResponse,
+    I18nLocalesGetResponse,
     LanguagesDetectPostRequest,
     LanguagesGetResponse,
     NavigationGetParametersQuery,
@@ -122,6 +124,10 @@ from affilibuster_backend.domain.entities.generated.models import (
     ThemesGetResponse,
     ThemesIdGetParametersQuery,
     ThemesIdGetResponse,
+    UploadFilesGetParametersQuery,
+    UploadFilesGetResponse,
+    UploadFilesIdGetParametersQuery,
+    UploadFilesIdGetResponse,
 )
 
 
@@ -171,6 +177,7 @@ CMSRequest = (
     | ConsentCategoriesIdGetParametersQuery
     | ConsentGetParametersQuery
     | ContactUsGetParametersQuery
+    | ContentTypeBuilderContentTypesGetParametersQuery
     | ContributorRolesGetParametersQuery
     | ContributorRolesIdGetParametersQuery
     | ContributorsGetParametersQuery
@@ -184,8 +191,6 @@ CMSRequest = (
     | FaqGetParametersQuery
     | FeatureFlagsGetParametersQuery
     | FeatureFlagsIdGetParametersQuery
-    | FilesGetParametersQuery
-    | FilesIdGetParametersQuery
     | FooterGetParametersQuery
     | HomepageGetParametersQuery
     | LanguagesDetectPostRequest
@@ -207,6 +212,8 @@ CMSRequest = (
     | TermGetParametersQuery
     | ThemesGetParametersQuery
     | ThemesIdGetParametersQuery
+    | UploadFilesGetParametersQuery
+    | UploadFilesIdGetParametersQuery
 )
 
 # Union of all response types
@@ -223,6 +230,10 @@ CMSResponse = (
     | ConsentCategoriesIdGetResponse
     | ConsentGetResponse
     | ContactUsGetResponse
+    | ContentTypeBuilderComponentsGetResponse
+    | ContentTypeBuilderComponentsUidGetResponse
+    | ContentTypeBuilderContentTypesGetResponse
+    | ContentTypeBuilderContentTypesUidGetResponse
     | ContributorRolesGetResponse
     | ContributorRolesIdGetResponse
     | ContributorsGetResponse
@@ -236,10 +247,9 @@ CMSResponse = (
     | FaqGetResponse
     | FeatureFlagsGetResponse
     | FeatureFlagsIdGetResponse
-    | FilesGetResponse
-    | FilesIdGetResponse
     | FooterGetResponse
     | HomepageGetResponse
+    | I18nLocalesGetResponse
     | LanguagesGetResponse
     | NavigationGetResponse
     | PrivacyGetResponse
@@ -258,6 +268,8 @@ CMSResponse = (
     | TermGetResponse
     | ThemesGetResponse
     | ThemesIdGetResponse
+    | UploadFilesGetResponse
+    | UploadFilesIdGetResponse
     | LocalesResponse  # Internal Strapi i18n endpoint (added programmatically)
 )
 

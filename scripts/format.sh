@@ -26,11 +26,15 @@ format_typescript() {
     echo "  ✨ Checking TypeScript/JavaScript formatting..."
     cd the-green-brother && npm run format
     cd ..
+    cd gentle-hawk && npm run format
+    cd ..
     cd cms && npm run format
     cd ..
   else
     echo "  ✨ Formatting TypeScript/JavaScript..."
     cd the-green-brother && npm run format:fix
+    cd ..
+    cd gentle-hawk && npm run format:fix
     cd ..
     cd cms && npm run format:fix
     cd ..

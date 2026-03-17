@@ -9,8 +9,10 @@ a multi-language, SEO-optimized platform that can serve as a foundation for mult
 
 ### Key Characteristics
 
-- **Architecture**: BFF (Backend for TheGreenBrother) pattern - `TheGreenBrother (Next.js) → Backend API (FastAPI) → Strapi CMS`
-  - **THE_GREEN_BROTHER NEVER TALKS TO STRAPI DIRECTLY** - All content flows through the backend API
+- **Architecture**: BFF pattern with shared frontend framework - `Frontend Apps (Next.js) → Backend API (FastAPI) → Strapi CMS`
+  - **Shared Framework**: `@affilibuster/frontend` package provides reusable components, styles, and utilities
+  - **Frontend Apps**: `the-green-brother` (green brand), `gentle-hawk` (blue/amber brand) — both import from shared package
+  - **FRONTEND APPS NEVER TALK TO STRAPI DIRECTLY** - All content flows through the backend API
 - **Languages**: English (default), Italian, Hebrew (RTL support)
 - **Performance**: Lighthouse scores >90, <3s load times on 3G
 - **Testing**: 100% test coverage (backend AND frontend - non-negotiable)
@@ -325,23 +327,31 @@ See `the-green-brother/tests/README.md` for complete guidelines and migration in
 
 ### 18. Frontend Reference Architecture (Mandatory for All Frontend Apps)
 
-- **MANDATORY**: Use the `frontend` package as the canonical reference for all frontend applications
-- **Applies to**: `the-green-brother` and any future frontend applications in the monorepo
-- **Scope**: Architecture patterns, coding paradigms, idioms, file organization, and component structure
-- **Identical Structure**: `frontend` and `the-green-brother` share identical structure, patterns, and conventions
-- **When creating new frontends**: Copy `frontend` package structure and patterns as the starting point
-- **When making changes to `the-green-brother`**: Ensure patterns, file organization, and idioms align with those in `frontend`
+- **MANDATORY**: Use the `frontend` package (`@affilibuster/frontend`) as the shared framework for all frontend applications
+- **Applies to**: `the-green-brother`, `gentle-hawk`, and any future frontend applications in the monorepo
+- **Shared Package**: `frontend/` contains all reusable components, styles, hooks, providers, and utilities
+- **Brand Differentiation**: Each frontend app provides only `src/styles/theme.css` (brand palette) and app-specific pages/API types
+- **Component Re-exports**: Frontend apps re-export shared components via barrel files (e.g., `export * from '@affilibuster/frontend/components/elements'`)
+- **When creating new frontends**: Copy `gentle-hawk/` structure as the starting template — it demonstrates the minimal surface area needed
+- **When making changes to shared components**: Edit them in `frontend/`, not in individual frontend apps
 - **Reference First**: Before implementing new patterns in any frontend, check if `frontend` already has an established approach
 - **Rationale**:
+  - Single source of truth for UI components — change once, apply everywhere
+  - Brand theming via CSS custom properties only — same components, different look
   - Maintains consistency across frontend applications
-  - Enables code reuse and knowledge transfer between projects
-  - Simplifies onboarding for developers familiar with any one frontend
-  - Provides a stable reference implementation for architectural decisions
+  - Enables rapid creation of new branded frontends with minimal code
 
 ## Project Structure
 
 ```
 affilibuster/
+├── frontend/                   # Shared frontend framework (@affilibuster/frontend)
+│   ├── src/
+│   │   ├── components/        # Shared React components (elements, layout, sections, etc.)
+│   │   ├── lib/               # Shared utilities (core API client, generated types, themes, consent)
+│   │   ├── hooks/             # Shared hooks (useScrollToClose)
+│   │   └── styles/            # Shared styles (globals.css, base-theme.css)
+│   └── tests/                 # Shared component tests
 ├── backend/                    # FastAPI backend
 │   ├── src/
 │   │   ├── domain/            # Business logic (no framework deps)
@@ -357,14 +367,20 @@ affilibuster/
 │   │   └── config/            # Settings & configuration
 │   ├── tests/                 # Comprehensive test suite
 │   └── alembic/               # Database migrations
-├── the-green-brother/                  # Next.js frontend (TheGreenBrother)
+├── the-green-brother/          # Next.js frontend (TheGreenBrother — green brand)
 │   ├── src/
 │   │   ├── app/[lang]/        # Language-specific routes
-│   │   ├── components/        # React components
-│   │   ├── lib/               # Utilities, API clients, hooks
-│   │   ├── types/             # TypeScript definitions
-│   │   └── i18n/              # Internationalization
+│   │   ├── components/        # Brand-specific + re-exports from @affilibuster/frontend
+│   │   ├── lib/               # Brand-specific API types, content fetching
+│   │   └── styles/            # Brand theme (green palette)
 │   └── tests/                 # Component & E2E tests
+├── gentle-hawk/                # Next.js frontend (GentleHawk — blue/amber brand)
+│   ├── src/
+│   │   ├── app/[lang]/        # Language-specific routes
+│   │   ├── components/        # Brand-specific + re-exports from @affilibuster/frontend
+│   │   ├── lib/               # Brand-specific API types, content fetching
+│   │   └── styles/            # Brand theme (blue/amber palette)
+│   └── tests/                 # Component tests
 ├── cms/                       # Strapi CMS
 │   ├── src/api/              # Custom controllers & services
 │   └── scripts/              # Seeding scripts
@@ -497,6 +513,32 @@ npm test
 npm run test:e2e
 ```
 
+### GentleHawk Development
+
+```bash
+cd gentle-hawk
+
+# Install dependencies
+npm install
+
+# Dev server (port 3001)
+npm run dev
+
+# Type checking
+npm run type-check
+
+# Linting
+npm run lint
+npm run lint:fix
+
+# Format
+npm run format
+npm run format:fix
+
+# Tests
+npm test
+```
+
 ### Testing
 
 ```bash
@@ -508,6 +550,9 @@ make test-backend
 
 # TheGreenBrother tests only
 make test-the-green-brother
+
+# GentleHawk tests only
+make test-gentle-hawk
 
 # With coverage
 make test              # Includes coverage by default
@@ -836,6 +881,7 @@ redocly lint contracts/template.openapi.yaml
 
 - **Backend API Docs**: <https://localhost:8000/docs>
 - **TheGreenBrother**: <https://localhost:3000>
+- **GentleHawk**: <https://localhost:3001>
 - **Style Guide**: <https://localhost:3000/en/style-guide> (design system & reusable components)
 - **CMS Admin**: <https://localhost:1337/admin>
 - **Constitution**: `.specify/memory/constitution.md`

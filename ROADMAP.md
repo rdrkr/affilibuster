@@ -345,7 +345,6 @@ Prices are stored in single currency only.
 
 - PRD Section 2 (Login Area)
 - Spec: [004-user-authentication](./specs/004-user-authentication/)
-- Implementation summary: [IMPLEMENTATION_COMPLETE.md](./specs/004-user-authentication/IMPLEMENTATION_COMPLETE.md)
 
 ---
 
@@ -768,8 +767,6 @@ protocol.
 **Current State**: Strong GDPR foundations (~90% compliant). Comprehensive cookie consent system, consent audit trail,
 right to erasure, DSAR export, privacy/terms/cookie-policy pages, data retention, secure sessions, and zero third-party
 tracking all implemented. Remaining items are newsletter consent and E2E test coverage.
-
-**Specification**: [gdpr-compliance-spec](./specs/gdpr-compliance-spec.md)
 
 **Completed** ✅:
 

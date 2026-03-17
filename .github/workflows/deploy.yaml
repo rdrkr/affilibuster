@@ -5,13 +5,13 @@ run-name: Deploy to Production
 
 on:
   workflow_run:
-    workflows: ['Preflight']
+    workflows: ["Preflight"]
     types: [completed]
-    branches: ['main']
+    branches: ["main"]
   workflow_dispatch:
     inputs:
       strapi_import:
-        description: '⚠️ Import Strapi CMS data (WARNING: This DELETES all existing CMS data and replaces it)'
+        description: "⚠️ Import Strapi CMS data (WARNING: This DELETES all existing CMS data and replaces it)"
         required: false
         type: boolean
         default: false
@@ -197,7 +197,7 @@ jobs:
       # ========================================
       - name: Checkout for changelog
         if: success()
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: ${{ github.event.workflow_run.head_branch || github.ref_name }}

@@ -16,6 +16,10 @@ exclude: |
     cms/types/|
     coverage/|
     dist/|
+    frontend/coverage/|
+    frontend/src/lib/generated/|
+    gentle-hawk/coverage/|
+    tgentle-hawk/src/lib/generated/|
     the-green-brother/coverage/|
     the-green-brother/src/lib/generated/|
     htmlcov/|
@@ -29,7 +33,7 @@ exclude: |
 repos:
   # Security scanning
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.30.0
+    rev: v8.30.1
     hooks:
       - id: gitleaks
 
@@ -44,7 +48,7 @@ repos:
           - --license-filepath
           - .copyright-header.txt
           - --comment-style
-          - '|#|'
+          - "|#|"
           - --allow-past-years
           - --detect-license-in-X-top-lines=3
         exclude: |
@@ -64,7 +68,7 @@ repos:
           - --license-filepath
           - .copyright-header.txt
           - --comment-style
-          - '|//|'
+          - "|//|"
           - --allow-past-years
           - --detect-license-in-X-top-lines=3
 

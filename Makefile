@@ -5,7 +5,7 @@
 NPROCS := $(shell sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4)
 MAKEFLAGS += --output-sync=target
 
-.PHONY: help all all-fast dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-backend-unit test-backend-integration test-the-green-brother test-the-green-brother-unit test-performance test-all-unit test-all-integration test-parallel test-fast test-all audit clean clean-coverage coverage-merge coverage-view playwright-report ci-test install install-backend install-cms setup upgrade upgrade-cms upgrade-backend upgrade-pre-commit ps pre-commit export import export-docker import-docker generate-env-dev generate-env-prod backup-prod build-remote start-remote stop-remote logs-remote dev-remote
+.PHONY: help all all-fast dev build start stop restart logs lint lint-check lint-python lint-python-check lint-typescript lint-typescript-check lint-shell lint-shell-check format format-check format-python format-python-check format-typescript format-typescript-check format-shell format-shell-check format-makefile format-makefile-check test test-backend test-backend-unit test-backend-integration test-frontend-unit test-the-green-brother test-the-green-brother-unit test-gentle-hawk test-gentle-hawk-unit test-performance test-all-unit test-all-integration test-parallel test-fast test-all audit clean clean-coverage coverage-merge coverage-view playwright-report ci-test install install-backend install-frontend install-the-green-brother install-gentle-hawk install-cms setup upgrade upgrade-cms upgrade-backend upgrade-the-green-brother upgrade-gentle-hawk upgrade-frontend upgrade-pre-commit ps pre-commit export import export-docker import-docker generate-env-dev generate-env-prod backup-prod build-remote start-remote stop-remote logs-remote dev-remote
 
 # Default target
 .DEFAULT_GOAL := help
@@ -193,6 +193,28 @@ test-the-green-brother-integration: ## Run the-green-brother integration tests o
 test-the-green-brother: ## Run all the-green-brother tests (unit + integration)
 	@bash scripts/test.sh the-green-brother
 
+test-frontend-unit: ## Run shared frontend package unit tests (Jest)
+	@echo "🧪 Running frontend package unit tests..."
+	@cd frontend && npm test -- --coverage \
+		--coverageReporters=lcov \
+		--coverageReporters=json \
+		--coverageReporters=html \
+		--coverageReporters=text \
+		--coverageReporters=text-summary
+	@echo "✅ Frontend package unit tests passed"
+
+test-gentle-hawk-unit: ## Run gentle-hawk unit tests only (Jest)
+	@echo "🧪 Running gentle-hawk unit tests..."
+	@cd gentle-hawk && npm test -- --coverage \
+		--coverageReporters=lcov \
+		--coverageReporters=json \
+		--coverageReporters=html \
+		--coverageReporters=text \
+		--coverageReporters=text-summary
+	@echo "✅ GentleHawk unit tests passed"
+
+test-gentle-hawk: test-gentle-hawk-unit ## Run all gentle-hawk tests
+
 test-performance: ## Run performance tests only
 	@bash scripts/test.sh performance $(BROWSER)
 
@@ -208,10 +230,12 @@ test: ## Run all tests with coverage (shows all errors)
 test-parallel: ## Run all tests in parallel (FAST)
 	@bash scripts/test.sh parallel
 
-test-fast: ## Run fast tests only (backend + the-green-brother unit)
-	@echo "🧪 Running fast tests (backend + the-green-brother unit)..."
+test-fast: ## Run fast tests only (backend + frontend + the-green-brother + gentle-hawk unit)
+	@echo "🧪 Running fast tests (backend + frontend + the-green-brother + gentle-hawk unit)..."
 	@$(MAKE) test-backend
+	@$(MAKE) test-frontend-unit
 	@$(MAKE) test-the-green-brother-unit
+	@$(MAKE) test-gentle-hawk-unit
 	@echo "✅ Fast tests complete"
 
 test-all: ## Run all tests + merge coverage
@@ -248,15 +272,23 @@ install-backend: ## Install backend dependencies
 	@echo "📦 Installing backend dependencies..."
 	@cd backend && uv sync
 
+install-frontend: ## Install shared frontend package dependencies
+	@echo "📦 Installing frontend package dependencies..."
+	@cd frontend && npm install
+
 install-the-green-brother: ## Install the-green-brother dependencies
 	@echo "📦 Installing the-green-brother dependencies..."
 	@cd the-green-brother && npm install
+
+install-gentle-hawk: ## Install gentle-hawk dependencies
+	@echo "📦 Installing gentle-hawk dependencies..."
+	@cd gentle-hawk && npm install
 
 install-cms: ## Install CMS dependencies
 	@echo "📦 Installing CMS dependencies..."
 	@cd cms && npm install
 
-install: install-backend install-the-green-brother install-cms ## Install all dependencies
+install: install-backend install-frontend install-the-green-brother install-gentle-hawk install-cms ## Install all dependencies
 	@echo "✅ All dependencies installed"
 
 setup: ## Complete development environment setup (installs all tools and dependencies)
@@ -265,8 +297,14 @@ setup: ## Complete development environment setup (installs all tools and depende
 upgrade-cms: ## Update CMS dependencies only
 	@cd cms && npm update --save
 
+upgrade-frontend: ## Update shared frontend package dependencies only
+	@cd frontend && npm update --save
+
 upgrade-the-green-brother: ## Update the-green-brother dependencies only
 	@cd the-green-brother && npm update --save
+
+upgrade-gentle-hawk: ## Update gentle-hawk dependencies only
+	@cd gentle-hawk && npm update --save
 
 upgrade-backend: ## Update backend dependencies only
 	@cd backend && uv sync --upgrade
@@ -274,7 +312,7 @@ upgrade-backend: ## Update backend dependencies only
 upgrade-pre-commit: ## Update pre-commit hooks only
 	@pre-commit autoupdate
 
-upgrade: upgrade-backend upgrade-the-green-brother upgrade-cms upgrade-pre-commit ## Update all dependencies to latest
+upgrade: upgrade-backend upgrade-frontend upgrade-the-green-brother upgrade-gentle-hawk upgrade-cms upgrade-pre-commit ## Update all dependencies to latest
 	@echo "✅ All dependencies updated"
 
 clean: ## Clean up containers, volumes, and all build artifacts (zero state)

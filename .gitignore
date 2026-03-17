@@ -357,7 +357,13 @@ docs/_build/
 openapi-ts-error-*.log
 
 .fake
-frontend/
+frontend/node_modules/
+frontend/coverage/
 /cms/core
 /the-green-brother/core
 /.claude/worktrees
+
+# Prevent Docker's copy strategy from polluting git (frontend is copied into app dirs at build time)
+/the-green-brother/frontend/
+/gentle-hawk/frontend/
+.gstack/

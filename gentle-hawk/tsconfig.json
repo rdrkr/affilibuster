@@ -1,0 +1,28 @@
+{
+  "extends": "@affilibuster/frontend/tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/types/*": ["./src/types/*"],
+      "@affilibuster/frontend": ["../frontend/src/index.ts"],
+      "@affilibuster/frontend/generated/*": ["../frontend/src/lib/generated/*"],
+      "@affilibuster/frontend/*": ["../frontend/src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "*.ts",
+    "*.tsx",
+    "*.mjs",
+    "*.mts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mjs",
+    "**/*.mts",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": ["node_modules", "package-lock.json"]
+}

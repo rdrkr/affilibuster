@@ -3,7 +3,7 @@
 <!-- markdownlint-disable-next-line MD041 MD033 -->
 <div align="center">
   <!-- markdownlint-disable-next-line MD033 -->
-  <img src="the-green-brother/public/icons/brand.svg" alt="Affilibuster Brand Icon" width="120" height="120" />
+  <img src="the-green-brother/public/images/brand.png" alt="Affilibuster Brand Icon" width="120" height="120" />
 </div>
 
 <!-- markdownlint-disable-next-line MD033 -->
@@ -260,8 +260,6 @@ affilibuster/                        # Monorepo root
 ---
 
 ## 🎯 Design Principles
-
-The project follows these core principles documented in [`.specify/memory/constitution.md`](.specify/memory/constitution.md):
 
 - **Clean Architecture**: Business logic isolated from framework dependencies
 - **SOLID Principles**: Single responsibility, open/closed, Liskov substitution, interface segregation, dependency
@@ -850,8 +848,8 @@ maintainers of the following projects:
 
 ### Backend Dependencies (Python)
 
-- **[Uvicorn](https://www.uvicorn.org/)** ([BSD-3-Clause](https://github.com/encode/uvicorn/blob/master/LICENSE.md)) -
-  ASGI server
+- **[uvicorn](https://www.uvicorn.org/)** ([bsd-3-clause](https://github.com/encode/uvicorn/blob/master/license.md)) -
+  asgi server
 - **[SQLAlchemy](https://www.sqlalchemy.org/)** ([MIT](https://github.com/sqlalchemy/sqlalchemy/blob/main/LICENSE)) -
   Python SQL toolkit and ORM
 - **[Alembic](https://alembic.sqlalchemy.org/)** ([MIT](https://github.com/sqlalchemy/alembic/blob/main/LICENSE)) -

@@ -36,6 +36,11 @@ lint_typescript() {
     npm run lint || LINT_FAILED=$?
     cd ..
 
+    echo "  📋 Checking TypeScript (GentleHawk ESLint)..."
+    cd gentle-hawk
+    npm run lint || LINT_FAILED=$?
+    cd ..
+
     echo "  📋 Checking TypeScript (CMS ESLint)..."
     cd cms
     npm run lint || LINT_FAILED=$?
@@ -43,6 +48,11 @@ lint_typescript() {
   else
     echo "  🔧 Fixing TypeScript (TheGreenBrother ESLint)..."
     cd the-green-brother
+    npm run lint:fix || LINT_FAILED=$?
+    cd ..
+
+    echo "  🔧 Fixing TypeScript (GentleHawk ESLint)..."
+    cd gentle-hawk
     npm run lint:fix || LINT_FAILED=$?
     cd ..
 

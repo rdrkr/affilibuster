@@ -37,6 +37,11 @@ yarn-error.log*
 .env.*
 !.env.example
 
+# Test files (not needed in production)
+jest.setup.ts
+jest.config.ts
+tests/
+
 # Build
 dist/
 build/

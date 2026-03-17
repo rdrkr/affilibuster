@@ -219,6 +219,9 @@ services:
       - '${THE_GREEN_BROTHER_PORT}:${THE_GREEN_BROTHER_PORT}'
     volumes:
       - ./the-green-brother:/app
+      - ./frontend:/frontend
+      - ./scripts:/scripts:ro
+      - tgb_node_modules:/app/node_modules
       - ./contracts:/contracts
       - ./data:/data
       - ./certs:/certs:ro
@@ -226,6 +229,44 @@ services:
     healthcheck:
       test:
         ['CMD', 'curl', '-fk', '${THE_GREEN_BROTHER_PROTOCOL}://${THE_GREEN_BROTHER_HOST}:${THE_GREEN_BROTHER_PORT}']
+      interval: 5s
+      timeout: 10s
+      retries: 50
+
+  gentle-hawk:
+    build:
+      context: ./gentle-hawk
+      dockerfile: Dockerfile
+      args:
+        GENTLE_HAWK_PORT: ${GENTLE_HAWK_PORT:-3001}
+    restart: 'no'
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '5'
+    depends_on:
+      backend:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      PORT: ${GENTLE_HAWK_PORT:-3001}
+      NEXT_SERVER_SIDE_API_URL: '${BACKEND_PROTOCOL}://${INTERNAL_BACKEND_HOST}:${BACKEND_PORT}/v1'
+    ports:
+      - '${GENTLE_HAWK_PORT:-3001}:${GENTLE_HAWK_PORT:-3001}'
+    volumes:
+      - ./gentle-hawk:/app
+      - ./frontend:/frontend
+      - ./scripts:/scripts:ro
+      - gh_node_modules:/app/node_modules
+      - ./contracts:/contracts
+      - ./data:/data
+      - ./certs:/certs:ro
+      - .env:/app/.env
+    healthcheck:
+      test:
+        ['CMD', 'curl', '-fk', '${GENTLE_HAWK_PROTOCOL:-https}://${GENTLE_HAWK_HOST:-0.0.0.0}:${GENTLE_HAWK_PORT:-3001}']
       interval: 5s
       timeout: 10s
       retries: 50
@@ -274,3 +315,5 @@ volumes:
   backend_venv:
   nginx_cache:
   nginx_run:
+  tgb_node_modules:
+  gh_node_modules:

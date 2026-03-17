@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { LanguageCode } from '@/lib/generated/types.gen'
+import { LanguageCode } from '@/lib/middleware-types'
 import createMiddleware from 'next-intl/middleware'
 
 const intlMiddleware = createMiddleware({

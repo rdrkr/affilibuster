@@ -1,0 +1,13 @@
+/* Copyright (c) 2026 Affilibuster by Ronen Druker. */
+
+/* Shared frontend framework: Tailwind, fonts, dark mode, base layer */
+@import '@affilibuster/frontend/styles/globals.css';
+
+/* Shared design tokens: semantic colors, typography, spacing, shadows, animations */
+@import '@affilibuster/frontend/styles/base-theme.css';
+
+/* GentleHawk brand-specific colors: primary (blue), secondary (amber), tertiary (slate) palettes */
+@import './theme.css';
+
+/* Tailwind content scanning: include shared frontend components */
+@source "../../frontend/src/**/*.tsx";

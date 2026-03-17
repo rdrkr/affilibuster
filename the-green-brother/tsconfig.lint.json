@@ -1,40 +1,15 @@
 {
+  "extends": "@affilibuster/frontend/tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2024",
-    "module": "esnext",
-    "lib": ["dom", "dom.iterable", "ES2024"],
-    "allowJs": false,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "react-jsx",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "paths": {
       "@/*": ["./src/*"],
       "@/components/*": ["./src/components/*"],
       "@/lib/*": ["./src/lib/*"],
-      "@/types/*": ["./src/types/*"]
-    },
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "noPropertyAccessFromIndexSignature": false
+      "@/types/*": ["./src/types/*"],
+      "@affilibuster/frontend": ["../frontend/src/index.ts"],
+      "@affilibuster/frontend/generated/*": ["../frontend/src/lib/generated/*"],
+      "@affilibuster/frontend/*": ["../frontend/src/*"]
+    }
   },
   "include": [
     "*.ts",
@@ -58,6 +33,7 @@
     "dist",
     "build",
     ".turbo",
-    "package-lock.json"
+    "package-lock.json",
+    "eslint.config.mts"
   ]
 }

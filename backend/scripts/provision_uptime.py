@@ -1,4 +1,4 @@
-#!/usr/bin/env python3  # noqa: EXE001
+#!/usr/bin/env python3
 # Copyright (c) 2026 Affilibuster by Ronen Druker.
 
 """

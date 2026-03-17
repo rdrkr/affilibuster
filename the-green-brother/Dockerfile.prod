@@ -18,7 +18,9 @@ RUN npm ci
 # ============================================
 FROM node:22-slim AS builder
 
-WORKDIR /app
+# Mirror monorepo layout so tsconfig relative paths resolve correctly:
+# tsconfig paths use "../frontend/" which must resolve to a sibling directory
+WORKDIR /repo/the-green-brother
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
@@ -26,6 +28,12 @@ COPY --from=deps /app/package.json ./package.json
 
 # Copy application source (includes committed generated types)
 COPY . .
+
+# Copy shared frontend package as sibling (mirrors local monorepo layout)
+COPY --from=frontend . /repo/frontend/
+RUN if [ -d "node_modules/@affilibuster/frontend" ]; then rm -rf node_modules/@affilibuster/frontend; fi && \
+    ln -sfn /repo/frontend node_modules/@affilibuster/frontend && \
+    ln -sfn /repo/frontend /repo/the-green-brother/frontend
 
 # Build-time env vars needed for Next.js static optimization
 # NEXT_PUBLIC_* are baked into the client bundle at build time
@@ -71,9 +79,10 @@ RUN apt-get update && apt-get install -y \
   && rm -rf /var/lib/apt/lists/*
 
 # Copy Next.js standalone output and static files
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
+# outputFileTracingRoot nests output under the project name, so copy from the nested path
+COPY --from=builder /repo/the-green-brother/.next/standalone/the-green-brother ./
+COPY --from=builder /repo/the-green-brother/.next/static ./.next/static
+COPY --from=builder /repo/the-green-brother/public ./public
 
 # Non-root user for security
 RUN groupadd -g 1001 nextjs && \
