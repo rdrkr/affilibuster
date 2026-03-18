@@ -882,3 +882,22 @@ kill -9 <PID>         # Kill process
 - SEO-friendly slugs
 - Meta tags, OG tags
 - Image optimization (lazy loading, WebP)
+
+## gstack
+
+- Use the `/browse` skill from gstack for all web browsing. Never use `mcp__claude-in-chrome__*` tools.
+- Available gstack skills:
+  - `/plan-ceo-review` — CEO-perspective plan review
+  - `/plan-eng-review` — Engineering plan review
+  - `/plan-design-review` — Design plan review
+  - `/design-consultation` — Design system consultation
+  - `/review` — Code review
+  - `/ship` — Ship code
+  - `/browse` — Fast headless browser for QA testing and browsing
+  - `/qa` — QA testing
+  - `/qa-only` — QA testing only (no fixes)
+  - `/qa-design-review` — QA with design review
+  - `/setup-browser-cookies` — Set up browser cookies for authenticated browsing
+  - `/retro` — Retrospective
+  - `/document-release` — Post-ship documentation update
+- If gstack skills aren't working, run `cd .claude/skills/gstack && ./setup` to build the binary and register skills.
