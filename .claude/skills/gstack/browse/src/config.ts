@@ -1,5 +1,3 @@
-// Copyright (c) 2026 Affilibuster by Ronen Druker.
-
 /**
  * Shared config for browse CLI + server.
  *

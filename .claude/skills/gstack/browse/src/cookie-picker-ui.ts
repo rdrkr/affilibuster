@@ -1,5 +1,3 @@
-// Copyright (c) 2026 Affilibuster by Ronen Druker.
-
 /**
  * Cookie picker UI — self-contained HTML page
  *

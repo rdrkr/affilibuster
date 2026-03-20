@@ -3,6 +3,7 @@ node_modules/
 browse/dist/
 .gstack/
 .claude/skills/
+.context/
 /tmp/
 *.log
 bun.lock
@@ -11,18 +12,3 @@ bun.lock
 .env.local
 .env.*
 !.env.example
-
-# gstack dev files not needed when vendored
-test/
-browse/test/
-scripts/
-docs/
-.github/
-ARCHITECTURE.md
-CONTRIBUTING.md
-README.md
-CHANGELOG.md
-TODOS.md
-LICENSE
-BROWSER.md
-.env.example

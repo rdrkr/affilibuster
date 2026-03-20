@@ -1,5 +1,3 @@
-// Copyright (c) 2026 Affilibuster by Ronen Druker.
-
 /**
  * Snapshot command — accessibility tree with ref-based element selection
  *

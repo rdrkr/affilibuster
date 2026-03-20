@@ -1,5 +1,3 @@
-// Copyright (c) 2026 Affilibuster by Ronen Druker.
-
 /**
  * Shared buffers and types — extracted to break circular dependency
  * between server.ts and browser-manager.ts

@@ -1,5 +1,3 @@
-// Copyright (c) 2026 Affilibuster by Ronen Druker.
-
 /**
  * gstack CLI — thin wrapper that talks to the persistent server
  *

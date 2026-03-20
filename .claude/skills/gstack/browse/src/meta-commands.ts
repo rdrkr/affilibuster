@@ -1,5 +1,3 @@
-// Copyright (c) 2026 Affilibuster by Ronen Druker.
-
 /**
  * Meta commands — tabs, server control, screenshots, chain, diff, snapshot
  */
@@ -8,6 +6,7 @@ import type { BrowserManager } from './browser-manager';
 import { handleSnapshot } from './snapshot';
 import { getCleanText } from './read-commands';
 import { READ_COMMANDS, WRITE_COMMANDS, META_COMMANDS } from './commands';
+import { validateNavigationUrl } from './url-validation';
 import * as Diff from 'diff';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -15,7 +14,7 @@ import * as path from 'path';
 // Security: Path validation to prevent path traversal attacks
 const SAFE_DIRECTORIES = ['/tmp', process.cwd()];
 
-function validateOutputPath(filePath: string): void {
+export function validateOutputPath(filePath: string): void {
   const resolved = path.resolve(filePath);
   const isSafe = SAFE_DIRECTORIES.some(dir => resolved === dir || resolved.startsWith(dir + '/'));
   if (!isSafe) {
@@ -223,9 +222,11 @@ export async function handleMetaCommand(
       if (!url1 || !url2) throw new Error('Usage: browse diff <url1> <url2>');
 
       const page = bm.getPage();
+      validateNavigationUrl(url1);
       await page.goto(url1, { waitUntil: 'domcontentloaded', timeout: 15000 });
       const text1 = await getCleanText(page);
 
+      validateNavigationUrl(url2);
       await page.goto(url2, { waitUntil: 'domcontentloaded', timeout: 15000 });
       const text2 = await getCleanText(page);
 
@@ -246,6 +247,19 @@ export async function handleMetaCommand(
     // ─── Snapshot ─────────────────────────────────────
     case 'snapshot': {
       return await handleSnapshot(args, bm);
+    }
+
+    // ─── Handoff ────────────────────────────────────
+    case 'handoff': {
+      const message = args.join(' ') || 'User takeover requested';
+      return await bm.handoff(message);
+    }
+
+    case 'resume': {
+      bm.resume();
+      // Re-snapshot to capture current page state after human interaction
+      const snapshot = await handleSnapshot(['-i'], bm);
+      return `RESUMED\n${snapshot}`;
     }
 
     default:

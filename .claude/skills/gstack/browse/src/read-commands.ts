@@ -1,5 +1,3 @@
-// Copyright (c) 2026 Affilibuster by Ronen Druker.
-
 /**
  * Read commands — extract data from pages without side effects
  *
@@ -40,7 +38,7 @@ function wrapForEvaluate(code: string): string {
 // Security: Path validation to prevent path traversal attacks
 const SAFE_DIRECTORIES = ['/tmp', process.cwd()];
 
-function validateReadPath(filePath: string): void {
+export function validateReadPath(filePath: string): void {
   if (path.isAbsolute(filePath)) {
     const resolved = path.resolve(filePath);
     const isSafe = SAFE_DIRECTORIES.some(dir => resolved === dir || resolved.startsWith(dir + '/'));

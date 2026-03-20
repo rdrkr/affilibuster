@@ -1,5 +1,3 @@
-// Copyright (c) 2026 Affilibuster by Ronen Druker.
-
 /**
  * Chromium browser cookie import — read and decrypt cookies from real browsers
  *
