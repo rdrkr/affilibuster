@@ -53,7 +53,8 @@ format_shell() {
       ! -path "*/dist/*" \
       ! -path "*/.strapi/*" \
       ! -path "*/venv/*" \
-      ! -path "*/.venv/*" 2>/dev/null)
+      ! -path "*/.venv/*" \
+      ! -path "*/.claude/skills/*" 2>/dev/null)
 
     if [[ "${CHECK_ONLY}" = "check" ]]; then
       echo "  ✨ Checking shell script formatting..."

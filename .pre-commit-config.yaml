@@ -53,6 +53,7 @@ repos:
           - --detect-license-in-X-top-lines=3
         exclude: |
           (?x)^(
+            .claude/skills|
             contracts/affilibuster.openapi.yaml|
             contracts/strapi.openapi.yaml
           )
@@ -71,6 +72,10 @@ repos:
           - "|//|"
           - --allow-past-years
           - --detect-license-in-X-top-lines=3
+        exclude: |
+          (?x)^(
+            .claude/skills
+          )
 
   # General file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks

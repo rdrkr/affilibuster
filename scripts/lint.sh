@@ -80,7 +80,8 @@ lint_shell() {
       ! -path "*/dist/*" \
       ! -path "*/.strapi/*" \
       ! -path "*/venv/*" \
-      ! -path "*/.venv/*" 2>/dev/null)
+      ! -path "*/.venv/*" \
+      ! -path "*/.claude/skills/*" 2>/dev/null)
     if [[ -n "${shell_files}" ]]; then
       echo "${shell_files}" | xargs shellcheck || LINT_FAILED=$?
     fi
