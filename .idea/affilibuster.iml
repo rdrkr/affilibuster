@@ -49,10 +49,23 @@
       <excludeFolder url="file://$MODULE_DIR$/backend/src/affilibuster_backend/domain/entities/generated" />
       <excludeFolder url="file://$MODULE_DIR$/test-results" />
       <excludeFolder url="file://$MODULE_DIR$/frontend/public" />
+      <excludeFolder url="file://$MODULE_DIR$/.gstack" />
+      <excludeFolder url="file://$MODULE_DIR$/cms/src/plugins/strapi-plugin-nested-populator/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/cms/src/plugins/strapi-plugin-nested-populator/node_modules" />
+      <excludeFolder url="file://$MODULE_DIR$/cms/src/plugins/strapi-plugin-relation-filter/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/cms/src/plugins/strapi-plugin-relation-filter/node_modules" />
+      <excludeFolder url="file://$MODULE_DIR$/gentle-hawk/.next" />
+      <excludeFolder url="file://$MODULE_DIR$/gentle-hawk/.swc" />
+      <excludeFolder url="file://$MODULE_DIR$/gentle-hawk/coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/gentle-hawk/frontend" />
+      <excludeFolder url="file://$MODULE_DIR$/gentle-hawk/node_modules" />
+      <excludeFolder url="file://$MODULE_DIR$/the-green-brother/.next" />
+      <excludeFolder url="file://$MODULE_DIR$/the-green-brother/coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/the-green-brother/frontend" />
+      <excludeFolder url="file://$MODULE_DIR$/the-green-brother/node_modules" />
     </content>
     <orderEntry type="jdk" jdkName="uv (backend)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="uv (backend) interpreter library" level="application" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="renderExternalDocumentation" value="true" />

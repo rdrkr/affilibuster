@@ -68,8 +68,15 @@ jobs:
           TELEGRAM_TOKEN="$(echo -n "$TELEGRAM_TOKEN" | tr -d '[:space:]')"
           TELEGRAM_CHAT_ID="$(echo -n "$TELEGRAM_CHAT_ID" | tr -d '[:space:]')"
 
+          # Differentiate notification based on whether data was actually pushed
+          if [[ "${GIT_STATUS}" == "No changes" ]]; then
+            HEADER='ℹ️ <b>Affilibuster Backup — No Changes</b>'
+          else
+            HEADER='✅ <b>Affilibuster Backup Complete</b>'
+          fi
+
           printf -v MESSAGE '%s\n%s\n\n%s\n%s\n%s\n%s\n\n%s\n%s\n%s\n%s' \
-            '✅ <b>Affilibuster Backup Complete</b>' \
+            "${HEADER}" \
             "🕐 $(date -u +'%Y-%m-%d %H:%M:%S UTC')" \
             "📦 <b>Strapi CMS:</b> ${STRAPI_SIZE}" \
             "🗄 <b>PostgreSQL:</b> ${PG_SIZE}" \
