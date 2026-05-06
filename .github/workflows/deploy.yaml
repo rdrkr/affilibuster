@@ -4,14 +4,15 @@ name: Deploy
 run-name: Deploy to Production
 
 on:
-  workflow_run:
-    workflows: ["Preflight"]
-    types: [completed]
-    branches: ["main"]
+  #  workflow_run:
+  #    workflows: ["Preflight"]
+  #    types: [completed]
+  #    branches: ["main"]
   workflow_dispatch:
     inputs:
       strapi_import:
-        description: "⚠️ Import Strapi CMS data (WARNING: This DELETES all existing CMS data and replaces it)"
+        description: "⚠️ Import Strapi CMS data (WARNING: This DELETES all existing CMS
+          data and replaces it)"
         required: false
         type: boolean
         default: false
@@ -30,7 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # Only deploy if CI passed (or manual trigger)
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Create GitHub deployment
@@ -291,7 +293,8 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.UPTIME_KUMA_TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.UPTIME_KUMA_TELEGRAM_CHAT_ID }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
+            github.run_id }}
           DEPLOY_BRANCH: ${{ github.event.workflow_run.head_branch || github.ref_name }}
           CHANGELOG: ${{ steps.changelog.outputs.changelog }}
         run: |
@@ -318,7 +321,8 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.UPTIME_KUMA_TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.UPTIME_KUMA_TELEGRAM_CHAT_ID }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
+            github.run_id }}
           DEPLOY_BRANCH: ${{ github.event.workflow_run.head_branch || github.ref_name }}
         run: |
           # Trim whitespace/newlines from secrets to prevent curl URL malformat

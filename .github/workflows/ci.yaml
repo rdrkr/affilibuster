@@ -3,8 +3,8 @@
 name: Preflight
 
 on:
-  push:
-    branches: ["main"]
+  #  push:
+  #    branches: ["main"]
   workflow_dispatch:
 
 concurrency:
@@ -208,7 +208,8 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.UPTIME_KUMA_TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.UPTIME_KUMA_TELEGRAM_CHAT_ID }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
+            github.run_id }}
         run: |
           # Trim whitespace/newlines from secrets to prevent curl URL malformat
           TELEGRAM_TOKEN="$(echo -n "$TELEGRAM_TOKEN" | tr -d '[:space:]')"
@@ -231,7 +232,8 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.UPTIME_KUMA_TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.UPTIME_KUMA_TELEGRAM_CHAT_ID }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
+            github.run_id }}
         run: |
           # Trim whitespace/newlines from secrets to prevent curl URL malformat
           TELEGRAM_TOKEN="$(echo -n "$TELEGRAM_TOKEN" | tr -d '[:space:]')"

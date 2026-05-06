@@ -4,8 +4,8 @@ name: Data Retention Cleanup
 run-name: GDPR Data Retention Cleanup
 
 on:
-  schedule:
-    - cron: '0 3 * * *'
+  #  schedule:
+  #    - cron: '0 3 * * *'
   workflow_dispatch:
 
 concurrency:
@@ -40,7 +40,8 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.UPTIME_KUMA_TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.UPTIME_KUMA_TELEGRAM_CHAT_ID }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
+            github.run_id }}
         run: |
           TELEGRAM_TOKEN="$(echo -n "$TELEGRAM_TOKEN" | tr -d '[:space:]')"
           TELEGRAM_CHAT_ID="$(echo -n "$TELEGRAM_CHAT_ID" | tr -d '[:space:]')"
